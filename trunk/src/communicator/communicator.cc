@@ -1,12 +1,10 @@
-#include "../protocol/message.pb.h"
-#include "communicator.hh"
 #include <iostream>
+#include "communicator.hh"
+#include "../protocol/message.pb.h"
 
 using namespace std;
 
 Communicator::Communicator() {
-	// Verify version
-//	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	cout << "Communicator Initialised" << endl;
 }
 

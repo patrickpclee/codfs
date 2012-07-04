@@ -19,5 +19,6 @@ void OsdCommunicator::display(){
 
 void OsdCommunicator::listDirectoryRequest(uint32_t osdId, string directoryPath) {
 	printf ("=== List Directory ===\n");
-	printf ("OSD %d: %s", osdId, directoryPath.c_str());
+	printf ("OSD %d: %s\n", osdId, directoryPath.c_str());
+	printf ("======================\n");
 }
