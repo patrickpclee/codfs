@@ -1,8 +1,7 @@
 #include "mongodb.hh"
 
-MongoDB::MongoDB (char* host){
-	_host = (char*) malloc (strlen(host)+1);
-	strncpy(_host,host,strlen(host));
+MongoDB::MongoDB (string host){
+	_host = host;
 }
 
 uint32_t MongoDB::connect(){
