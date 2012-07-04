@@ -27,7 +27,7 @@ private:
 	// Send Primary Node List
 	uint32_t sendPrimaryNodeList (uint32_t clientId, uint32_t fileId, uint32_t primaryNodeList[]);
 
-	// Send Secondary Node Lsit
+	// Send Secondary Node List
 	uint32_t sendSecondaryNodeList (uint32_t osdId, uint64_t objectId, uint32_t SecondaryNodeList[]);
 
 	void updateOsdHealth (uint32_t osdId, uint32_t health);
