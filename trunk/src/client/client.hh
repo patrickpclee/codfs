@@ -1,12 +1,13 @@
 #ifndef __CLIENT_HH__
 #define __CLIENT_HH__
+#include <stdint.h>
 class Client {
-Public:
+public:
 	uint32_t uploadFileRequest (char[] srcPath, char[] dstPath);
 	FileMetaData[] listFolderRequest (char[] path);
 	downloadFileRequest (char[] srcPath, char[] dstPath);
 	downloadFileRequest (uint32_t fileId, char[] dstPath);
-Private:
+private:
 	reportPrimaryFailure (OsdInfo down_osd_info, uint64_t timestamp);
 
 	void contactPrimaryUpload(DataObject[] obj_list, uint32_t fileId);

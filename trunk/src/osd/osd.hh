@@ -1,13 +1,14 @@
 #ifndef __OSD_HH__
 #define __OSD_HH__
+#include <stdint.h>
 class Osd {
-Public:
+public:
 	uint32_t requestSegment(Cache _cache, uint32_t objectId);
 	uint32_t transSegment(	Cache _cache, 
 			uint32_t objectId, 
 			SegmentMetaData[] segment_metadata_list );
 
-Private:
+private:
 	uint32_t cacheObjectInfo (ObjectMetaData obj_info);
 	uint32_t cacheSecondaryList (uint32_t[] secondary_node_list);
 

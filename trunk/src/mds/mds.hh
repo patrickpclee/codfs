@@ -1,7 +1,8 @@
 #ifndef __MDS_HH__
 #define __MDS_HH__
+#include <stdint.h>
 class Mds {
-Public:
+public:
 	uint32_t uploadFileHandler (char[] dstPath);
 	uint32_t downloadFileHandler (char[] dstPath);
 	uint32_t downloadFileHandler (uint32_t fileId);
@@ -16,7 +17,7 @@ Public:
 	uint32_t osdObjectListHandler (uint32_t osdId);
 
 	uint32_t nodeListUpdateHandler (uint64_t objectId, uint32_t[] osdIdList);
-Private:
+private:
 	// Ask Monitor for Primary Node List
 	uint32_t[] requestPrimaryNodeList (uint32_t nObjects);
 
