@@ -1,8 +1,10 @@
 #ifndef __MDS_HH__
 #define __MDS_HH__
 
+#include "metadatamodule.hh"
+#include "namespacemodule.hh"
+
 #include <stdint.h>
-#include "metadata.hh"
 
 class Mds {
 public:
@@ -33,8 +35,8 @@ private:
 	void updateOsdHealth (uint32_t osdId, uint32_t health);
 
 //	MdsInfo _info;
-//	Communicator _communicator;
-//	MetaDataModule _metaDataModule;
-//	NameSpaceModule _nameSpaceModule;
+//	Communicator _communicator;	
+	MetaDataModule _metaDataModule;
+	NameSpaceModule _nameSpaceModule;
 };
 #endif
