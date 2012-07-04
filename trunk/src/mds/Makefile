@@ -1,18 +1,12 @@
 CC=			g++
 CFLAGS=		-g -Wall
 LDFLAGS=
-SRC=		cache_filemetadata.cc cache_objectmetadata.cc filemetadata.cc \
-			mds.cc metadata.cc namespace.cc objectmetadata.cc 
-OBJS=		$(SRC:.cc=.o)
+OBJ=		cache_filemetadata.o cache_objectmetadata.o filemetadata.o \
+mds_communicator.o mds.o metadata.o namespace.o objectmetadata.o
 EXE=		mds
 
-all: $(SRC) $(EXE)
-	
-$(EXE): $(OBJS) 
-	$(CC) -c $(LDFLAGS) $(OBJS) -o $@
-
-.cpp.o:
-	$(CC) -c $(CFLAGS) $< -o $@
+all: ${OBJ}
+	${CC} ${OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
 	
 clean:
-	rm -f *.o
+	rm -f ${OBJ} ${EXE}

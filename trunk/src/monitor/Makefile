@@ -1,17 +1,11 @@
 CC=			g++
 CFLAGS=		-g -Wall
 LDFLAGS=
-SRC=		monitor.cc
-OBJS=		$(SRC:.cc=.o)
-EXE=		mds
+OBJ=		monitor.o
+EXE=		monitor
 
-all: $(SRC) $(EXE)
-	
-$(EXE): $(OBJS) 
-	$(CC) -c $(LDFLAGS) $(OBJS) -o $@
-
-.cpp.o:
-	$(CC) -c $(CFLAGS) $< -o $@
+all: ${OBJ}
+	${CC} ${OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
 	
 clean:
-	rm -f *.o
+	rm -f ${OBJ} ${EXE}

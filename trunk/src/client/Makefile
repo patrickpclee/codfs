@@ -1,17 +1,11 @@
 CC=			g++
 CFLAGS=		-g -Wall
 LDFLAGS=
-SRC=		client.cc
-OBJS=		$(SRC:.cc=.o)
+OBJ=		client_communicator.o client.o	
 EXE=		client
 
-all: $(SRC) $(EXE)
-	
-$(EXE): $(OBJS) 
-	$(CC) -c $(LDFLAGS) $(OBJS) -o $@
-
-.cpp.o:
-	$(CC) -c $(CFLAGS) $< -o $@
+all: ${OBJ}
+	${CC} ${OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
 	
 clean:
-	rm -f *.o
+	rm -f ${OBJ} ${EXE}
