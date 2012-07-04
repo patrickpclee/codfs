@@ -9,6 +9,7 @@ class Osd {
 public:
 	Osd();
 	~Osd();
+	OsdCommunicator* getOsdCommunicator ();
 //	uint32_t requestSegment(Cache _cache, uint32_t objectId);
 //	uint32_t transSegment(Cache _cache, uint32_t objectId,
 //			SegmentMetaData segment_metadata_list[]);

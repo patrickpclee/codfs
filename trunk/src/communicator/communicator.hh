@@ -5,6 +5,7 @@
 
 class Communicator {
 public:
+	Communicator();
 	void waitForMessage();
 	virtual void display() = 0; // abstract class
 	virtual ~Communicator();
