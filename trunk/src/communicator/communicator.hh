@@ -6,8 +6,7 @@
 class Communicator {
 public:
 	void waitForMessage();
-	virtual void display = 0; // abstract class
+	virtual void display() = 0; // abstract class
 private:
-	Connection conns[];
 };
 #endif

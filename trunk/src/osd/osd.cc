@@ -2,7 +2,6 @@
 #include "osd.hh"
 
 int main (void) {
-	printf ("OSD");
+	printf ("OSD\n");
 	return 0;
 }
-

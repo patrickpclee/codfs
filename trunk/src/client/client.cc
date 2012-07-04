@@ -2,7 +2,7 @@
 #include "client.hh"
 
 int main (void) {
-	printf ("CLIENT");
+	printf ("CLIENT\n");
 	return 0;
 }
 

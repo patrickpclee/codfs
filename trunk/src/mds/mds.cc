@@ -2,7 +2,7 @@
 #include "mds.hh"
 
 int main (void) {
-	printf ("MDS");
+	printf ("MDS\n");
 	return 0;
 }
 
