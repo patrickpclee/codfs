@@ -8,10 +8,10 @@ using namespace mongo;
 
 class MongoDB {
 public:
-	MongoDB (char* host);
+	MongoDB (string host);
 	uint32_t connect();
 private:
-	char* _host;
+	string _host;
 	DBClientConnection _connection;
 };
 

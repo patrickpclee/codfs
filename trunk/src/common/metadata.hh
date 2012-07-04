@@ -2,9 +2,11 @@
 #define __METADATA_HH__
 
 #include <stdint.h>
+#include <string>
+using namespace std;
 
 struct FileMetaData {
-	char* _path;
+	string _path;
 	uint32_t _id;
 	unsigned char* _checksum;
 	uint64_t* _objectList[];

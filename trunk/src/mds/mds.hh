@@ -5,14 +5,15 @@
 #include "namespacemodule.hh"
 
 #include <stdint.h>
+#include <string.h>
 
 class Mds {
 public:
-	uint32_t uploadFileHandler (char dstPath[]);
-	uint32_t downloadFileHandler (char dstPath[]);
+	uint32_t uploadFileHandler (string dstPath);
+	uint32_t downloadFileHandler (string dstPath);
 	uint32_t downloadFileHandler (uint32_t fileId);
 
-	uint32_t listFolderHandler (char path[]);
+	uint32_t listFolderHandler (string path);
 
 	uint32_t secondaryNodeListHandler (uint64_t objectId);
 

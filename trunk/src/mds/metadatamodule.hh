@@ -18,7 +18,7 @@ public:
 	// Select Acting Primary in case of Primary Failure
 	uint32_t selectActingPrimary (uint64_t objectId);
 
-	uint32_t createFileMetaData (uint32_t fileId, char path[]);
+	uint32_t createFileMetaData (uint32_t fileId, string path);
 	uint32_t saveFileMetaData (FileMetaData	fileMetaData);
 	uint32_t deleteFileMetaData (uint32_t fileId);
 	uint32_t saveObjectList (uint32_t fileId, uint64_t objectIdList[]);
