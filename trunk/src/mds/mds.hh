@@ -1,9 +1,9 @@
 #ifndef __MDS_HH__
 #define __MDS_HH__
 
+#include <stdint.h>
 #include "metadata.hh"
 
-#include <stdint.h>
 class Mds {
 public:
 	uint32_t uploadFileHandler (char dstPath[]);
