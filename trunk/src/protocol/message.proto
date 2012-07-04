@@ -1,0 +1,24 @@
+package ncvfs;
+
+//
+// OSD -> MDS
+//
+
+message ListDirectoryRequest {
+	optional int32 osdId = 1;
+	optional string directoryPath = 2;
+}
+
+//
+// MDS -> OSD
+//
+
+message FileList {
+	repeated FileInfo fileInfo = 1;
+} 
+
+message FileInfo {
+	optional int32 fileId = 1;
+	optional int32 filesize = 2;
+	optional string filename = 3;
+}

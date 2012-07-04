@@ -1,7 +1,7 @@
 CC=			g++
 CFLAGS=		-g -Wall
 LDFLAGS=
-OBJ=		monitor.o
+OBJ=		monitor.o recoverymodule.o statmodule.o selectionmodule.o
 EXE=		monitor
 
 all: ${OBJ}
