@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "osd.hh"
 
 int main (void) {

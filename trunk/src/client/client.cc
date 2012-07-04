@@ -1,3 +1,4 @@
+#include <cstdio>
 #include "client.hh"
 
 int main (void) {

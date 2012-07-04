@@ -36,5 +36,5 @@ private:
 //	Communicator _communicator;
 //	MetaDataModule _metaDataModule;
 //	NameSpaceModule _nameSpaceModule;
-};
+}
 #endif
