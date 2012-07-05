@@ -18,6 +18,8 @@ int main(void) {
 	Osd* osd = new Osd();
 	OsdCommunicator* communicator = osd->getOsdCommunicator();
 
+	communicator->connectToMds();
+
 	// test list directory
 	communicator->listDirectoryRequest(1, "/");
 

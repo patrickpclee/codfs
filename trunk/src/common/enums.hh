@@ -5,5 +5,6 @@ enum ComponentType {CLIENT, OSD, MDS, MONITOR};
 
 enum DatabaseType {MONGODB, MYSQL};
 
+enum MsgType {LIST_DIRECTORY_REQUEST};
 
 #endif

@@ -13,6 +13,7 @@ public:
 	~OsdCommunicator();
 	void display();
 	void listDirectoryRequest(uint32_t osdId, string directoryPath);
+	void connectToMds ();
 private:
 };
 
