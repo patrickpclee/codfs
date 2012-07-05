@@ -21,7 +21,7 @@ public:
 	// for send
 	void preparePayload (char* buf, uint32_t offset, uint32_t length);
 	void prepareMsgHeader(uint32_t protocolMsgType, uint32_t protocolMsgSize);
-	virtual void prepareProtocolMsg();
+//	virtual void prepareProtocolMsg();
 
 	// for receive
 //	virtual void handler();

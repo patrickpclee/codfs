@@ -25,5 +25,7 @@ int main(void) {
 
 	delete osd;
 
+	cout << "OSD Destroyed" << endl;
+
 	return 0;
 }

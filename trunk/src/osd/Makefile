@@ -2,7 +2,7 @@ CC=			g++
 CFLAGS=		-g -Wall
 LDFLAGS=	`pkg-config --cflags --libs protobuf`
 COMM_OBJ=	../communicator/communicator.o ../communicator/connection.o
-PROTO_OBJ=	../protocol/listdirectoryrequest.o ../protocol/message.o
+PROTO_OBJ=	../protocol/listdirectoryrequest.o ../protocol/message.o ../protocol/message.pb.o
 OBJ=		osd_communicator.o osd.o
 EXE=		osd
 
