@@ -3,7 +3,8 @@
 
 enum ComponentType {CLIENT, OSD, MDS, MONITOR};
 
-enum DatabaseType {MONGODB, MYSQL};
+enum FailureReason {UNREACHABLE, DISKFAILURE, OBJECTLOST};
 
+enum StorageType {MONGODB, MYSQL};
 
 #endif
