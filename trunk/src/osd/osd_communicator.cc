@@ -4,10 +4,10 @@
 #include "osd_communicator.hh"
 #include "../protocol/listdirectoryrequest.hh"
 
-
 using namespace std;
 
 OsdCommunicator::OsdCommunicator() {
+	cout << "OSD Communicator Created" << endl;
 
 }
 
@@ -27,6 +27,10 @@ void OsdCommunicator::listDirectoryRequest(uint32_t osdId,
 	ListDirectoryRequestMessage* message = new ListDirectoryRequestMessage(
 			osdId, directoryPath);
 	message->prepareProtocolMsg();
+
+	// debug
+	message->printHeader();
+	message->printProtocol();
 
 }
 

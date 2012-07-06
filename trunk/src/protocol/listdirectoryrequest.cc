@@ -11,7 +11,6 @@ ListDirectoryRequestMessage::ListDirectoryRequestMessage(uint32_t osdId,
 
 void ListDirectoryRequestMessage::prepareProtocolMsg() {
 	string serializedString;
-	const MsgType msgType = LIST_DIRECTORY_REQUEST;
 
 	ncvfs::ListDirectoryRequest listDirectoryRequest;
 	listDirectoryRequest.set_directorypath(_directoryPath);
@@ -22,9 +21,12 @@ void ListDirectoryRequestMessage::prepareProtocolMsg() {
 		return;
 	}
 
-	const uint32_t msgSize = serializedString.length();
+	setProtocolSize(serializedString.length());
+	setProtocolType(LIST_DIRECTORY_REQUEST);
 
-	prepareMsgHeader(msgType, msgSize);
+}
 
-	cout << "Message Prepared. Type = " << msgType << " Size = " << msgSize << endl;
+void ListDirectoryRequestMessage::printProtocol() {
+	cout << "[LIST_DIRECTORY_REQUEST] osdID = " << _osdId << " Path = "
+			<< _directoryPath << endl;
 }

@@ -2,6 +2,7 @@
 #include "osd.hh"
 
 Osd::Osd() {
+	cout << "OSD Created" << endl;
 	_osdCommunicator = new OsdCommunicator();
 }
 
