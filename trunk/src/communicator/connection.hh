@@ -8,23 +8,27 @@
 
 using namespace std;
 
+/**
+ * Handle connections to components
+ */
+
 class Connection {
 public:
 	Connection ();
 	Connection (string ip, uint16_t port, ComponentType connectionType);
 	void doConnect (string ip, uint16_t port, ComponentType connectionType);
-	uint32_t getSockfd();
-//	void disconnect ();
-//	void waitForConnection ();
-//	bool checkTimeout(u32int_t timeoutPeriod);
+	void disconnect ();
 
 //	uint32_t send (Message msg);
 //	Message recv ();
+
+	// getters
+	uint32_t getSockfd();
+
 private:
 	uint32_t _sockfd;
 	string _ip;
 	uint16_t _port;
-	uint32_t _timestamp;
 	ComponentType _connectionType;
 };
 
