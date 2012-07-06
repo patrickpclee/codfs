@@ -1,9 +1,10 @@
 CC=			g++
 CFLAGS=		-g -Wall
-LDFLAGS=
-SRC=		communicator.cc
+LDFLAGS=	#`pkg-config --cflags --libs protobuf`
+SRC=		communicator.cc connection.cc
 
 all: ${SRC}
+#	pkg-config --cflags protobuf
 	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS}
 	
 clean:
