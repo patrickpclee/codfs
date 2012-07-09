@@ -6,6 +6,7 @@ MongoDB::MongoDB (string host){
 
 uint32_t MongoDB::connect(){
 	_connection.connect(_host);
+	return 0;
 }
 
 void MongoDB::read(string table, uint64_t id, vector<uint64_t>data){

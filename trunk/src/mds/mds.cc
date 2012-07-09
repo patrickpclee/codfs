@@ -27,12 +27,12 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 
 }
 
-void Mds::uploadObjectAckHandler (uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList)
+void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList)
 {
 	_metaDataModule->saveNodeList(objectId, osdIdList);
 	_metaDataModule->setPrimary(objectId, osdIdList[0]);
 
-	return;
+	return ;
 }
 
 void Mds::downloadFileHandler (uint32_t clientId, string dstPath)
@@ -66,6 +66,16 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 
 	_mdsCommunicator->sendObjectandPrimaryList(clientId, objectList, primaryList);
 	
+	return ;
+}
+
+void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
+{
+	vector<uint32_t>nodeList;
+
+	nodeList = _metaDataModule->readNodeList(objectId);
+	_mdsCommunicator->sendNodeList(osdId, objectId, nodeList);
+
 	return ;
 }
 

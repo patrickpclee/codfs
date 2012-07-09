@@ -26,6 +26,7 @@ public:
 	void openFile (uint32_t clientId, uint32_t filieId);
 	uint32_t createFile (string path);
 	uint32_t saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
+	vector<uint64_t> readObjectList (uint32_t fileId);
 
 //	uint32_t saveFileMetaData (FileMetaData	fileMetaData);
 //	uint32_t deleteFileMetaData (uint32_t fileId);
@@ -39,7 +40,8 @@ public:
 	uint32_t getPrimary (uint64_t objectId);
 
 	void saveNodeList (uint64_t objectId, vector<uint32_t> osdIdList);
-	vector<uint64_t> readObjectList (uint32_t fileId);
+	vector<uint32_t> readNodeList (uint64_t objectId);
+
 
 private:
 	FileMetaDataModule _fileMetaDataModule;
