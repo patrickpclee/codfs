@@ -1,11 +1,11 @@
 #include "filemetadatacache.hh"
 
 uint32_t FileMetaDataCache::readFileMetaData (uint32_t fileId){
-	throw CacheMiss;
+	throw new CacheMissException();
 }
 
 uint32_t FileMetaDataCache::writeFileMetaData (uint32_t fileId, FileMetaData fileMetaData){
-	throw CacheMiss;
+	throw new CacheMissException();
 }
 
 uint32_t FileMetaDataCache::createFileMetaData (uint32_t fileId){
