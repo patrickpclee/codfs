@@ -20,7 +20,7 @@ class OsdCommunicator: public Communicator {
 public:
 	OsdCommunicator();
 	~OsdCommunicator();
-	void listDirectoryRequest(uint32_t osdId, string directoryPath);
+//	void listDirectoryRequest(uint32_t osdId, string directoryPath);
 	void connectToMds ();
 private:
 };

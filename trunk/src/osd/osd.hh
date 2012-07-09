@@ -7,26 +7,55 @@
 #include <stdint.h>
 #include "../cache/cache.hh"
 #include "../common/metadata.hh"
+#include "../protocol/message.hh"
 #include "osd_communicator.hh"
+#include "objectdata.hh"
+#include "segmentdata.hh"
 
 /**
  * Central class of OSD
  * All functions of OSD are invoked here
+ * Objects and Segments can be divided into trunks for transportation
  */
 
 class Osd {
 public:
+
 	Osd();
 	~Osd();
-	OsdCommunicator* getOsdCommunicator ();
-//	uint32_t requestSegment(Cache _cache, uint32_t objectId);
-//	uint32_t transSegment(Cache _cache, uint32_t objectId,
-//			SegmentMetaData segment_metadata_list[]);
+	OsdCommunicator* getOsdCommunicator();
+
+	list<uint32_t> secOsdListHandler(uint64_t objectId);
+
+	ObjectData getObjectHandler(uint64_t objectId);
+	SegmentData getSegmentHandler(uint64_t objectId, uint32_t segmentId);
+
+	uint32_t objectTrunkHandler(uint64_t objectId, uint32_t offset,
+			uint32_t length, char* buf);
+	uint32_t segmentTrunkHandler(uint64_t objectId, uint32_t segmentId,
+			uint32_t offset, uint32_t length, char* buf);
+
+	uint32_t recoveryHandler (uint64_t objectId);
 
 private:
-//	uint32_t cacheObjectInfo(ObjectMetaData obj_info);
-//	uint32_t cacheSecondaryList(uint32_t secondary_node_list[]);
-//	uint32_t* secondaryOsdListRequest(uint32_t objectId);
+
+	list<SegmentData> encodeObjectToSegment(ObjectData objectData);
+	ObjectData decodeSegmentToObject(uint64_t objectId,
+			list<SegmentData> segmentData);
+
+	uint32_t sendAckToMds(uint64_t objectId, uint32_t segmentId);
+	uint32_t sendAckToClient(uint32_t fileId);
+
+	uint32_t getSegmentRequest(uint64_t objectId, uint32_t segmentId);
+	uint32_t getSecOsdListRequest(uint64_t objectId);
+	SegmentData getSegmentFromStroage(uint64_t objectId, uint32_t segmentId);
+
+	uint32_t sendSegmentToOsd(SegmentData segmentData);
+	uint32_t sendObjectToClient (ObjectData objectData);
+	uint32_t saveSegmentToStorage(SegmentData segmentData);
+
+	uint32_t degradedRead (uint64_t objectId);
+	uint32_t reportOsdFailure (uint32_t osdId);
 
 	Cache* _cache;
 	OsdCommunicator* _osdCommunicator;
