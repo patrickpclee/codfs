@@ -10,7 +10,7 @@ class CacheMissException : public exception {
 	{
 		return "Cache Miss";
 	}
-} CacheMiss;
+};
 
 class Cache {
 	public:
