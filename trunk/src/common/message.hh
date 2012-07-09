@@ -11,7 +11,7 @@ struct MsgHeader {
 
 class Message {
 public:
-	MessageHandler* messageHandler;
+//	MessageHandler* messageHandler;
 
 	// for send
 	virtual void prepareProtocolMsg();
