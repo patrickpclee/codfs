@@ -1,3 +1,7 @@
+/**
+ * osd_communicator.hh
+ */
+
 #ifndef __OSD_COMMUNICATOR_HH__
 #define __OSD_COMMUNICATOR_HH__
 
@@ -7,12 +11,17 @@
 
 using namespace std;
 
+/**
+ * Extends Communicator class
+ * Handles all OSD communications
+ */
+
 class OsdCommunicator: public Communicator {
 public:
 	OsdCommunicator();
 	~OsdCommunicator();
-	void display();
 	void listDirectoryRequest(uint32_t osdId, string directoryPath);
+	void connectToMds ();
 private:
 };
 

@@ -1,9 +1,18 @@
+/**
+ * osd.hh
+ */
+
 #ifndef __OSD_HH__
 #define __OSD_HH__
 #include <stdint.h>
 #include "../cache/cache.hh"
 #include "../common/metadata.hh"
 #include "osd_communicator.hh"
+
+/**
+ * Central class of OSD
+ * All functions of OSD are invoked here
+ */
 
 class Osd {
 public:
