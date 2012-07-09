@@ -13,11 +13,11 @@ class Mds {
 public:
 	Mds();
 	~Mds();
-	uint32_t uploadFileHandler (string dstPath,uint32_t clientId, uint32_t numOfObjs);
+	uint32_t uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs);
 	void uploadObjectAckHandler (uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList);
 
-	uint32_t downloadFileHandler (string dstPath);
-	uint32_t downloadFileHandler (uint32_t fileId);
+	void downloadFileHandler (uint32_t clientId, string dstPath);
+	void downloadFileHandler (uint32_t clientId, uint32_t fileId);
 
 	uint32_t listFolderHandler (string path);
 
@@ -40,6 +40,7 @@ private:
 	// Send Secondary Node List
 	uint32_t sendSecondaryNodeList (uint32_t osdId, uint64_t objectId, uint32_t SecondaryNodeList[]);
 
+	void downloadFileProcess (uint32_t clientId, uint32_t fileId, string path);
 	void updateOsdHealth (uint32_t osdId, uint32_t health);
 
 //	MdsInfo _info;
