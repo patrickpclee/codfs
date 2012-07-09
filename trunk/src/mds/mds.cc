@@ -13,8 +13,8 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 	vector<uint32_t> primaryList(numOfObjs);
 	uint32_t fileId = 0;
 
-	fileId = _nameSpaceModule->createFile(dstPath,clientId);
-	_metaDataModule->createFile(fileId,dstPath);
+	_nameSpaceModule->createFile(clientId, dstPath);
+	fileId = _metaDataModule->createFile(dstPath);
 
 	objectList = newObjectList(numOfObjs);
 	_metaDataModule->saveObjectList(fileId,objectList);
@@ -38,13 +38,13 @@ void Mds::uploadObjectAckHandler (uint32_t fileId, uint64_t objectId, vector<uin
 void Mds::downloadFileHandler (uint32_t clientId, string dstPath)
 {
 	uint32_t fileId = _metaDataModule->lookupFileId(dstPath);
-	return downloadFileProcess(clientId,fileId,dstPath);
+	return downloadFileProcess(clientId, fileId, dstPath);
 }
 
 void Mds::downloadFileHandler (uint32_t clientId, uint32_t fileId)
 {
 	string path = _metaDataModule->lookupFilePath(fileId);
-	return downloadFileProcess(clientId,fileId,path);
+	return downloadFileProcess(clientId, fileId, path);
 }
 
 void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
@@ -52,7 +52,8 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 	vector<uint64_t> objectList;
 	vector<uint32_t> primaryList;
 
-	_nameSpaceModule->openFile(path,clientId);
+	_nameSpaceModule->openFile(clientId, path);
+	_metaDataModule->openFile(clientId, fileId);
 	objectList = _metaDataModule->readObjectList(fileId);
 	
 	vector<uint64_t>::iterator it;

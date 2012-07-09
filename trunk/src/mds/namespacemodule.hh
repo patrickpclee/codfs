@@ -8,9 +8,9 @@
 
 class NameSpaceModule {
 public:
-	uint32_t createFile (string path, uint32_t clientId);
+	uint32_t createFile (uint32_t clientId, string path);
 //	uint32_t deleteFile (string path, uint32_t clientId);
-	uint32_t openFile (string path, uint32_t clientId);
+	uint32_t openFile (uint32_t clientId, string path);
 //	FileMetaData* listFolder (string path);
 private:
 	uint32_t newFileId (string path);

@@ -23,8 +23,9 @@ public:
 	// Select Acting Primary in case of Primary Failure
 //	uint32_t selectActingPrimary (uint64_t objectId);
 
-	uint32_t createFile (uint32_t fileId, string path);
-	uint32_t saveObjectList(uint32_t fileId, vector<uint64_t> objectList);
+	void openFile (uint32_t clientId, uint32_t filieId);
+	uint32_t createFile (string path);
+	uint32_t saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
 
 //	uint32_t saveFileMetaData (FileMetaData	fileMetaData);
 //	uint32_t deleteFileMetaData (uint32_t fileId);
