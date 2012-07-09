@@ -23,7 +23,7 @@ public:
 
 	uint32_t listFolderHandler (string path);
 
-	uint32_t primaryFailureHandler (uint32_t osdId);
+	void primaryFailureHandler (uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason=UNREACHABLE);
 	uint32_t secondaryFailureHandler (uint32_t osdId);
 
 	uint32_t osdObjectListHandler (uint32_t osdId);
@@ -35,13 +35,12 @@ private:
 	vector<uint32_t> askPrimaryList (uint32_t numOfObjs);
 
 	// Send Primary Node List
-	uint32_t sendPrimaryNodeList (uint32_t clientId, uint32_t fileId, uint32_t primaryNodeList[]);
+	//uint32_t sendPrimaryNodeList (uint32_t clientId, uint32_t fileId, uint32_t primaryNodeList[]);
 
 	// Send Secondary Node List
-	uint32_t sendSecondaryNodeList (uint32_t osdId, uint64_t objectId, uint32_t SecondaryNodeList[]);
+	//uint32_t sendSecondaryNodeList (uint32_t osdId, uint64_t objectId, uint32_t SecondaryNodeList[]);
 
 	void downloadFileProcess (uint32_t clientId, uint32_t fileId, string path);
-	void updateOsdHealth (uint32_t osdId, uint32_t health);
 
 //	MdsInfo _info;
 //	Communicator _communicator;	

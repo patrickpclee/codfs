@@ -13,6 +13,8 @@ public:
 
 	void sendObjectandPrimaryList(uint32_t clientId, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 	void sendNodeList(uint32_t osdId, uint64_t objectId, vector<uint32_t>nodeList);
+	void reportFailure(uint32_t osdId, FailureReason reason);
+	void sendPrimary(uint32_t clientId, uint64_t objectId, uint32_t osdId);
 private:
 };
 #endif
