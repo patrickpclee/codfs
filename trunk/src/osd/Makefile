@@ -3,7 +3,7 @@ CFLAGS=		-g -Wall
 LDFLAGS=	`pkg-config --cflags --libs protobuf`
 COMM_OBJ=	../communicator/communicator.o ../communicator/connection.o
 PROTO_OBJ=	../protocol/listdirectoryrequest.o ../protocol/message.o ../protocol/message.pb.o
-OBJ=		osd_communicator.o osd.o
+OBJ=		osd_communicator.o osd.o segmentlocationcache.o
 EXE=		osd
 
 all: ${OBJ} ${COMM_OBJ} ${PROTO_OBJ}

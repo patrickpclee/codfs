@@ -27,11 +27,7 @@ OsdCommunicator::~OsdCommunicator() {
 	cout << "OSD Communicator Destroyed" << endl;
 }
 
-/**
- * Request MDS for listing files in a directory
- * @param osdId My OSD ID
- * @param directoryPath Directory to list
- */
+/*
 
 void OsdCommunicator::listDirectoryRequest(uint32_t osdId,
 		string directoryPath) {
@@ -54,6 +50,8 @@ void OsdCommunicator::listDirectoryRequest(uint32_t osdId,
 
 	// TODO: send message
 }
+
+ */
 
 /**
  * Establish connection to MDS

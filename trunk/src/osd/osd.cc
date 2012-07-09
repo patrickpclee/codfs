@@ -47,7 +47,7 @@ int main(void) {
 	communicator->connectToMds();
 
 	// TEST: list directory from MDS
-	communicator->listDirectoryRequest(1, "/");
+//	communicator->listDirectoryRequest(1, "/");
 
 
 	// cleanup
