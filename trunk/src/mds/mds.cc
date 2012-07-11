@@ -79,9 +79,15 @@ void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
 	return ;
 }
 
+void Mds::primaryFailureHandler(uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason)
+{
+	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(objectId ,osdId);
+	_mdsCommunicator->reportFailure(osdId,reason);
+	_mdsCommunicator->sendPrimary(clientId,objectId,actingPrimary);
+}
+
 int main (void)
 {
 	printf ("MDS\n");
 	return 0;
 }
-

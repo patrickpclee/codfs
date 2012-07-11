@@ -20,8 +20,7 @@ public:
 	string lookupFilePath (uint32_t fileId);
 	uint32_t lookupFileId (string path);
 
-	// Select Acting Primary in case of Primary Failure
-//	uint32_t selectActingPrimary (uint64_t objectId);
+	uint32_t selectActingPrimary (uint64_t objectId, uint32_t exclude);
 
 	void openFile (uint32_t clientId, uint32_t filieId);
 	uint32_t createFile (string path);
