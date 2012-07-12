@@ -44,6 +44,7 @@ private:
 
 //	MdsInfo _info;
 //	Communicator _communicator;	
+
 	MdsCommunicator* _mdsCommunicator;
 	MetaDataModule* _metaDataModule;
 	NameSpaceModule* _nameSpaceModule;
