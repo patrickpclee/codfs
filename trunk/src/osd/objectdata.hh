@@ -5,11 +5,15 @@
 
 using namespace std;
 
-struct ObjectData {
+struct ObjectInfo {
 	uint64_t objectId;
+	uint32_t objectSize;
+	string objectPath;
+};
+
+struct ObjectData {
+	struct ObjectInfo info;
 	uint32_t offsetInFile;
-	uint32_t length;
-	string ObjectPath;
 	char* buf;
 };
 

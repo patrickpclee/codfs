@@ -5,12 +5,13 @@
 #ifndef __OSD_HH__
 #define __OSD_HH__
 #include <stdint.h>
-#include "../cache/cache.hh"
+#include <vector>
 #include "../common/metadata.hh"
 #include "../protocol/message.hh"
 #include "osd_communicator.hh"
 #include "objectdata.hh"
 #include "segmentdata.hh"
+#include "segmentlocationcache.hh"
 
 /**
  * Central class of OSD
@@ -24,16 +25,17 @@ public:
 	Osd();
 	~Osd();
 	OsdCommunicator* getOsdCommunicator();
+	SegmentLocationCache* getCache();
 
-	list<uint32_t> secOsdListHandler(uint64_t objectId);
+	list<uint32_t> secOsdListHandler(uint64_t objectId, list<uint32_t> osdList);
 
 	ObjectData getObjectHandler(uint64_t objectId);
 	SegmentData getSegmentHandler(uint64_t objectId, uint32_t segmentId);
 
 	uint32_t objectTrunkHandler(uint64_t objectId, uint32_t offset,
-			uint32_t length, char* buf);
+			uint32_t length, vector<unsigned char> buf);
 	uint32_t segmentTrunkHandler(uint64_t objectId, uint32_t segmentId,
-			uint32_t offset, uint32_t length, char* buf);
+			uint32_t offset, uint32_t length, vector<unsigned char> buf);
 
 	uint32_t recoveryHandler (uint64_t objectId);
 
@@ -57,7 +59,7 @@ private:
 	uint32_t degradedRead (uint64_t objectId);
 	uint32_t reportOsdFailure (uint32_t osdId);
 
-	Cache* _cache;
+	SegmentLocationCache* _cache;
 	OsdCommunicator* _osdCommunicator;
 
 //	Coding _cunit; // encode & decode done here

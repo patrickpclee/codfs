@@ -11,7 +11,7 @@ struct SegmentData {
 	uint32_t offsetInObject;
 	uint32_t length;
 	string segmentPath;
-	char* buf;
+	vector <unsigned char>* buf;
 };
 
 #endif

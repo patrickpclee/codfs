@@ -5,59 +5,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "message.hh"
 
 using namespace std;
 
-/**
- * Set the message type
- * @param protocolType Message type
- */
-
-void Message::setProtocolType(MsgType protocolType) {
-	_msgHeader.protocolMsgType = protocolType;
-}
-
-/**
- * Set the size of the protocol part
- * @param protocolSize Size of protocol part
- */
-
-void Message::setProtocolSize(uint32_t protocolSize) {
-	_msgHeader.protocolMsgSize = protocolSize;
-}
-
-/**
- * Set the size of payload (binary data)
- * @param payloadSize Payload size
- */
-
-void Message::setPayloadSize(uint32_t payloadSize) {
-	_msgHeader.payloadSize = payloadSize;
-}
-
-/**
- * Set the embedded protocol message (serialized string)
- * @param protocolMsg Protocol message (serialized string)
- */
-
-void Message::setProtocolMsg(string protocolMsg) {
-	_protocolMsg = protocolMsg;
-}
-
-/**
- * Set destination socket descriptor
- * @param sockfd Destination socket descriptor
- */
-
-void Message::setSockfd(uint32_t sockfd) {
-	_sockfd = sockfd;
-}
-
-/**
- * Constructor
- */
+// Global Memory Pool
+extern MemoryPool* memoryPool;
 
 Message::Message() {
 	_protocolMsg = "";
@@ -68,17 +24,35 @@ Message::Message() {
 	_payload = NULL;
 }
 
-/**
- * Destructor
- */
-
 Message::~Message() {
-	// TODO: Deallocate Payload Buffer
+	if (_payload != NULL) {
+		memoryPool->poolFree(_payload);
+	}
 }
 
-/**
- * DEBUG: Print MsgHeader content
- */
+void Message::setProtocolType(MsgType protocolType) {
+	_msgHeader.protocolMsgType = protocolType;
+}
+
+void Message::setProtocolSize(uint32_t protocolSize) {
+	_msgHeader.protocolMsgSize = protocolSize;
+}
+
+void Message::setPayloadSize(uint32_t payloadSize) {
+	_msgHeader.payloadSize = payloadSize;
+}
+
+void Message::setProtocolMsg(string protocolMsg) {
+	_protocolMsg = protocolMsg;
+}
+
+void Message::setSockfd(uint32_t sockfd) {
+	_sockfd = sockfd;
+}
+
+void Message::setRequestId(uint32_t requestId) {
+	_requestId = requestId;
+}
 
 void Message::printHeader() {
 	cout << "[MsgHeader] Type = " << _msgHeader.protocolMsgType << " Size = "
@@ -86,15 +60,32 @@ void Message::printHeader() {
 			<< _msgHeader.payloadSize << endl;
 }
 
-/**
- * Copy data from file to memory buffer
- * Make _payload point to the memory buffer
- * @param filepath File to send
- * @param offset Offset of file segment
- * @param length Size of file segment
- */
+uint32_t Message::preparePayload(string filepath, uint32_t offset,
+		uint32_t length) {
 
-void Message::preparePayload(string filepath, uint32_t offset, uint32_t length) {
-	// TODO: Prepare Payload
+	ifstream file;
+	file.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
 
+	try {
+
+		// open file
+		file.open(filepath.c_str(), ios::in | ios::binary);
+
+		// seek file
+		file.seekg(offset, ios_base::beg);
+
+		// allocate memory:
+		_payload = memoryPool->poolMalloc(length);
+
+		// read data as a block:
+		file.read(_payload, length);
+
+	} catch (ifstream::failure e) {
+		cerr << "Exception reading file" << endl;
+	}
+
+	// close file
+	file.close();
+
+	return 0;
 }
