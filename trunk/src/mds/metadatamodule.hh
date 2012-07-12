@@ -7,6 +7,7 @@ using namespace std;
 
 #include "filemetadatamodule.hh"
 #include "objectmetadatamodule.hh"
+#include "osdmetadatamodule.hh"
 
 #include "../common/metadata.hh"
 
@@ -43,8 +44,10 @@ public:
 
 
 private:
-	FileMetaDataModule _fileMetaDataModule;
-	ObjectMetaDataModule _objectMetaDataModule;
+
+	FileMetaDataModule* _fileMetaDataModule;
+	ObjectMetaDataModule* _objectMetaDataModule;
+	OsdMetaDataModule* _osdMetaDataModule;
 };
 
 #endif

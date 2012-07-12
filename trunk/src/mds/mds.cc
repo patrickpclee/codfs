@@ -84,6 +84,8 @@ void Mds::primaryFailureHandler(uint32_t clientId, uint32_t osdId, uint64_t obje
 	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(objectId ,osdId);
 	_mdsCommunicator->reportFailure(osdId,reason);
 	_mdsCommunicator->sendPrimary(clientId,objectId,actingPrimary);
+
+	return ;
 }
 
 int main (void)

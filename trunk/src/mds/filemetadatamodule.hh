@@ -2,9 +2,11 @@
 #define __FILE_METADATA_MODULE_HH__
 
 #include <stdint.h>
+
+#include "../cache/filemetadatacache.hh"
+
 #include "../common/metadata.hh"
 
-#include "filemetadatacache.hh"
 
 class FileMetaDataModule {
 public:

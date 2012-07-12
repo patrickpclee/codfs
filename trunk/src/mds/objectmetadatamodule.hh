@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "../common/metadata.hh"
 
-#include "objectmetadatacache.hh"
+#include "../cache/objectmetadatacache.hh"
 
 class ObjectMetaDataModule {
 public:
