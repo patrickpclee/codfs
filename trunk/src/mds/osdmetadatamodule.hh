@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
-#include "osdmetadatacache.hh"
-
 #include "../common/metadata.hh"
+
+#include "../cache/osdmetadatacache.hh"
 
 class OsdMetaDataModule {
 	public:

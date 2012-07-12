@@ -44,9 +44,9 @@ public:
 
 
 private:
+
 	FileMetaDataModule* _fileMetaDataModule;
 	ObjectMetaDataModule* _objectMetaDataModule;
-
 	OsdMetaDataModule* _osdMetaDataModule;
 };
 

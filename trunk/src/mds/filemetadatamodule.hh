@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "filemetadatacache.hh"
+#include "../cache/filemetadatacache.hh"
 
 #include "../common/metadata.hh"
 
