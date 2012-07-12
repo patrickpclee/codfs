@@ -15,11 +15,13 @@ using namespace std;
  * struct for message Header
  */
 
+#pragma pack(1)
 struct MsgHeader {
 	uint32_t protocolMsgType;
 	uint32_t protocolMsgSize;
 	uint32_t payloadSize;
 };
+#pragma pack(0)
 
 /**
  * Abstract class for all kinds of Message
@@ -81,47 +83,21 @@ public:
 	// setters
 	//
 
-	/**
-	 * Set a unique (for this machine) request ID
-	 * @param requestId Unique request ID
-	 */
-
 	void setRequestId (uint32_t requestId);
-
-	/**
-	 * Set destination socket descriptor
-	 * @param sockfd Destination socket descriptor
-	 */
-
 	void setSockfd (uint32_t sockfd);
-
-	/**
-	 * Set the message type
-	 * @param protocolType Message type
-	 */
-
 	void setProtocolType (MsgType protocolType);
-
-	/**
-	 * Set the size of the protocol buffer string
-	 * @param protocolSize Size of protocol buffer string
-	 */
-
 	void setProtocolSize (uint32_t protocolSize);
-
-	/**
-	 * Set the size of payload (binary data)
-	 * @param payloadSize Payload size
-	 */
-
 	void setPayloadSize (uint32_t payloadSize);
-
-	/**
-	 * Set the embedded protocol message (serialized string)
-	 * @param protocolMsg Protocol message (serialized string)
-	 */
-
 	void setProtocolMsg(string protocolMsg);
+
+	//
+	// getter
+	//
+
+	struct MsgHeader getMsgHeader ();
+	string getProtocolMsg();
+	char* getPayload();
+
 
 	/**
 	 * DEBUG: Print the MsgHeader

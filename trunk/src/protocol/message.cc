@@ -89,3 +89,15 @@ uint32_t Message::preparePayload(string filepath, uint32_t offset,
 
 	return 0;
 }
+
+struct MsgHeader Message::getMsgHeader() {
+	return _msgHeader;
+}
+
+string Message::getProtocolMsg() {
+	return _protocolMsg;
+}
+
+char* Message::getPayload() {
+	return _payload;
+}
