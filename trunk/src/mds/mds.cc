@@ -5,6 +5,7 @@ Mds::Mds()
 {
 	_metaDataModule = new MetaDataModule();
 	_nameSpaceModule = new NameSpaceModule();
+	_mdsCommunicator = new MdsCommunicator();
 }
 
 uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs)
@@ -21,7 +22,7 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 	
 	primaryList = askPrimaryList(numOfObjs);
 
-	_mdsCommunicator->sendObjectandPrimaryList (clientId, objectList, primaryList);
+	_mdsCommunicator->sendObjectandPrimaryList (clientId, fileId, objectList, primaryList);
 
 	return fileId;
 
@@ -64,7 +65,7 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 		primaryList.push_back(primaryId);	
 	}
 
-	_mdsCommunicator->sendObjectandPrimaryList(clientId, objectList, primaryList);
+	_mdsCommunicator->sendObjectandPrimaryList(clientId, fileId, objectList, primaryList);
 	
 	return ;
 }
