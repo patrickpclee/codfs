@@ -9,10 +9,6 @@
  * GLOBAL VARIABLES
  */
 
-/**
- * MDS Constructor
- * Initialise MDS Communicator and MetaData Modules
- */
 Mds::Mds()
 {
 	_metaDataModule = new MetaDataModule();
@@ -28,12 +24,6 @@ Mds::Mds()
  * 3. Generate Object IDs \n
  * 4. Ask Monitor for Primary list \n
  * 5. Send the Object and Primary List to client
- *
- * @param	clientId	ID of the client which the request originated
- * @param	dstPath		Target Path for the file uploaded
- * @param	numOfObjs	number of objects to be uploaded
- *
- * @return	File ID		File ID
  */
 uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs)
 {
@@ -56,15 +46,10 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 }
 
 /**
- *	@brief	Handle Upload Object Acknowledgement from Primary
+ * @brief	Handle Upload Object Acknowledgement from Primary
  *
- *	1. Save the Node List of the object \n
- *	2. Set the Primary for the object
- *	
- *	@param	osdId		ID of the OSD which the Acknowledgement originated
- *	@param	fileId		ID of the File which the object associated with
- *	@param	objectId	ID of the object uploaded
- *	@param	osdIdList	List of the OSD
+ * 1. Save the Node List of the object \n
+ * 2. Set the Primary for the object
  */
 void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList)
 {
@@ -76,9 +61,6 @@ void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t o
 
 /**
  * @brief	Handle Download File Request from Client (Request with Path)
- *
- * @param	clientId	ID of the client which the request originated
- * @param	dstPath		Target Path for the file uploaded
  */
 void Mds::downloadFileHandler (uint32_t clientId, string dstPath)
 {
@@ -86,6 +68,9 @@ void Mds::downloadFileHandler (uint32_t clientId, string dstPath)
 	return downloadFileProcess(clientId, fileId, dstPath);
 }
 
+/**
+ * @brief	Handle Download File Request from Client (Request with File ID)
+ */
 void Mds::downloadFileHandler (uint32_t clientId, uint32_t fileId)
 {
 	string path = _metaDataModule->lookupFilePath(fileId);
