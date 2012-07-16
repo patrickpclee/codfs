@@ -74,6 +74,12 @@ void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t o
 	return ;
 }
 
+/**
+ * @brief	Handle Download File Request from Client (Request with Path)
+ *
+ * @param	clientId	ID of the client which the request originated
+ * @param	dstPath		Target Path for the file uploaded
+ */
 void Mds::downloadFileHandler (uint32_t clientId, string dstPath)
 {
 	uint32_t fileId = _metaDataModule->lookupFileId(dstPath);
