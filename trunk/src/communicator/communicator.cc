@@ -10,11 +10,6 @@
 
 using namespace std;
 
-/**
- * Communicator Constructor
- * Verify Protocol Buffer version
- */
-
 Communicator::Communicator() {
 
 	cout << "Checking Protocol Buffer Version...";
@@ -24,60 +19,63 @@ Communicator::Communicator() {
 	cout << "Communicator Initialised" << endl;
 }
 
-/**
- * Communicator Destructor
- */
-
 Communicator::~Communicator() {
 	cout << "Communicator Destroyed" << endl;
 }
-
-/**
- * Establish a connection to a component. Save the connection to list
- * @param ip Destination ip
- * @param port Destination port
- * @param Destination type: MDS/CLIENT/MONITOR/OSD
- */
 
 void Communicator::addConnection(string ip, uint16_t port,
 		ComponentType connectionType) {
 
 	// Construct a Connection object and connect to component
-	Connection conn (ip, port, connectionType);
+	Connection conn;
+	const uint32_t sockfd = conn.doConnect(ip, port, connectionType);
 
 	// Save the connection into corresponding list
 	switch (connectionType) {
-		case MDS:
-			_mdsConnectionList.push_back(conn);
-			break;
-		case OSD:
-			_osdConnectionList.push_back(conn);
-			break;
-		case MONITOR:
-			_monitorConnectionList.push_back(conn);
-			break;
-		case CLIENT:
-			_clientConnectionList.push_back(conn);
-			break;
+	case MDS:
+		_mdsConnectionMap[sockfd] = conn;
+		break;
+	case OSD:
+		_osdConnectionMap[sockfd] = conn;
+		break;
+	case MONITOR:
+		_monitorConnectionMap[sockfd] = conn;
+		break;
+	case CLIENT:
+		_clientConnectionMap[sockfd] = conn;
+		break;
 	}
 
 	cout << "Connection Added" << endl;
 }
 
-/**
- * Get the socket descriptor of MDS
- * @return socket descriptor of MDS
- */
+void Communicator::removeConnection(uint32_t sockfd) {
 
-uint32_t Communicator::getMdsSockfd() {
-	return _mdsConnectionList.front().getSockfd();
+	if (_mdsConnectionMap.count(sockfd)) {
+		_mdsConnectionMap[sockfd].disconnect();
+		_mdsConnectionMap.erase(sockfd);
+	} else if (_osdConnectionMap.count(sockfd)) {
+		_osdConnectionMap[sockfd].disconnect();
+		_osdConnectionMap.erase(sockfd);
+	} else if (_clientConnectionMap.count(sockfd)) {
+		_clientConnectionMap[sockfd].disconnect();
+		_clientConnectionMap.erase(sockfd);
+	} else if (_monitorConnectionMap.count(sockfd)) {
+		_monitorConnectionMap[sockfd].disconnect();
+		_monitorConnectionMap.erase(sockfd);
+	} else {
+		cerr << "Cannot remove connection. Socket Descriptor not found."
+				<< endl;
+	}
+
 }
 
-/**
- * Get socket descriptor of Monitor
- * @return socket descriptor of Monitor
- */
+uint32_t Communicator::getMdsSockfd() {
+	// TODO: assume return first MDS
+	return _mdsConnectionMap.begin()->second.getSockfd();
+}
 
 uint32_t Communicator::getMonitorSockfd() {
-	return _monitorConnectionList.front().getSockfd();
+	// TODO: assume return first Monitor
+	return _monitorConnectionMap.begin()->second.getSockfd();
 }
