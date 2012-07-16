@@ -55,6 +55,9 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 
 }
 
+/**
+ *	@brief	Handle Upload Object Acknowledgement from Client
+ */
 void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList)
 {
 	_metaDataModule->saveNodeList(objectId, osdIdList);
