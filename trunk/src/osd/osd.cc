@@ -6,72 +6,45 @@
 #include <vector>
 #include "osd.hh"
 
-/*
- * GLOBAL VARIABLES
- */
-
-/**
- * OSD Constructor
- * Initialise a communicator
- */
-
 Osd::Osd() {
 	cout << "OSD Created" << endl;
 	_osdCommunicator = new OsdCommunicator();
 }
 
-/**
- * OSD Destructor
- */
 Osd::~Osd() {
 	delete _osdCommunicator;
 }
-
-/**
- * Get the OSD Communicator
- * @return Pointer to OSD Communicator
- */
 
 OsdCommunicator* Osd::getOsdCommunicator() {
 	return _osdCommunicator;
 }
 
-/**
- * Get the Cache
- * @return Point to Cache
- */
-
-SegmentLocationCache* Osd::getCache() {
+SegmentLocationCache* Osd::getSegmentLocationCache() {
 	return _segmentLocationCache;
 }
 
-list<uint32_t> Osd::secOsdListHandler(uint64_t objectId, list<uint32_t> osdList) {
+uint32_t Osd::secOsdListHandler(uint64_t objectId, list<uint32_t> osdList) {
 	// TODO: Save to cache
-
+	return 0;
 }
 
-ObjectData Osd::getObjectHandler(uint64_t objectId) {
+uint32_t ObjectData Osd::getObjectHandler(uint64_t objectId) {
 	list <uint32_t> osdIdList;
+
 	try {
-		osdIdList = getCache()->readSegmentLocation (objectId);
+		osdIdList = getSegmentLocationCache()->readSegmentLocation (objectId);
 	} catch (CacheMissException &e) {
 		// Cache Miss
 		getSecOsdListRequest(objectId);
-		// TODO: how to continue logic after async-request?
+		// TODO: sleep thread
+		// ........
+
 	}
+
 }
 
-/**
- * Handle request for segment from other OSDs
- * @param objectId Object ID which the segment belongs to
- * @param segmentId Segment ID
- * @return SegmentData structure
- */
-
-SegmentData Osd::getSegmentHandler(uint64_t objectId, uint32_t segmentId) {
+struct SegmentData Osd::getSegmentHandler(uint64_t objectId, uint32_t segmentId) {
 	//string filepath = getSegmentPath (objectId, segmentId);
-
-
 
 }
 
@@ -95,14 +68,6 @@ list<SegmentData> Osd::encodeObjectToSegment(ObjectData objectData) {
 
 ObjectData Osd::decodeSegmentToObject(uint64_t objectId,
 		list<SegmentData> segmentData) {
-
-}
-
-uint32_t Osd::sendAckToMds(uint64_t objectId, uint32_t segmentId) {
-
-}
-
-uint32_t Osd::sendAckToClient(uint32_t fileId) {
 
 }
 
