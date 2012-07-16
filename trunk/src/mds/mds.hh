@@ -14,7 +14,7 @@ public:
 	Mds();
 	~Mds();
 	uint32_t uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs);
-	void uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList);
+	void uploadObjectAckHandler (uint32_t osdId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList);
 
 	void downloadFileHandler (uint32_t clientId, string dstPath);
 	void downloadFileHandler (uint32_t clientId, uint32_t fileId);

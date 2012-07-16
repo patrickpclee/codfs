@@ -56,7 +56,12 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 }
 
 /**
- *	@brief	Handle Upload Object Acknowledgement from Client
+ *	@brief	Handle Upload Object Acknowledgement from Primary
+ *	
+ *	@param	osdId		ID of the OSD which the Acknowledgement originated
+ *	@param	fileId		ID of the File which the object associated with
+ *	@param	objectId	ID of the object uploaded
+ *	@param	osdIdList	List of the OSD
  */
 void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList)
 {
