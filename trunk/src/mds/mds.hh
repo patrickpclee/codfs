@@ -15,12 +15,48 @@
 
 class Mds {
 public:
+	/**
+	 * @brief	MDS Constructor
+	 */
 	Mds();
+
 	~Mds();
+
+	/**
+	 * @brief	Handle File Upload Request From Client
+	 *
+	 * @param	clientId	ID of the client
+	 * @param	dstPath		Target Path for the file uploaded
+	 * @param	numOfObjs	number of objects to be uploaded
+	 *
+	 * @return	File ID		File ID
+	 */
 	uint32_t uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs);
+
+	/**
+	 * @brief	Handle Upload Object Acknowledgement from Primary
+	 *
+	 * @param	osdId		ID of the OSD which the Acknowledgement originated
+	 * @param	fileId		ID of the File which the object associated with
+	 * @param	objectId	ID of the object uploaded
+	 * @param	osdIdList	List of the OSD
+	 */
 	void uploadObjectAckHandler (uint32_t osdId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList);
 
+	/**
+	 * @brief	Handle Download File Request from Client (Request with Path)
+	 *
+	 * @param	clientId	ID of the client which the request originated
+	 * @param	dstPath		Target Path for the file uploaded
+	 */
 	void downloadFileHandler (uint32_t clientId, string dstPath);
+
+	/**
+	 * @brief	Handle Download File Request from Client (Request with File ID)
+	 *
+	 * @param	clientId	ID of the client which the request originated
+	 * @param	fileId		ID for the file uploaded
+	 */
 	void downloadFileHandler (uint32_t clientId, uint32_t fileId);
 
 	void secondaryNodeListHandler (uint32_t clientId, uint64_t objectId);
