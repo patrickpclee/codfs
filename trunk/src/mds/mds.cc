@@ -1,6 +1,18 @@
+/**
+ * mds.cc
+ */
+
 #include <cstdio>
 #include "mds.hh"
 
+/*
+ * GLOBAL VARIABLES
+ */
+
+/**
+ * MDS Constructor
+ * Initialise MDS Communicator and MetaData Modules
+ */
 Mds::Mds()
 {
 	_metaDataModule = new MetaDataModule();
@@ -8,6 +20,21 @@ Mds::Mds()
 	_mdsCommunicator = new MdsCommunicator();
 }
 
+/**
+ * @brief	Handle File Upload Request From Client
+ *
+ * 1. Create File in the Name Space (Directory Tree)
+ * 2. Create File Meta Data (Generate File ID)
+ * 3. Generate Object IDs
+ * 4. Ask Monitor for Primary list
+ * 5. Send the Object and Primary List to client
+ *
+ * @param	clientId	ID of the client which the request originated
+ * @param	dstPath		Target Path for the file uploaded
+ * @param	numOfObjs	number of objects to be uploaded
+ *
+ * @return	File ID		File ID
+ */
 uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs)
 {
 	vector<uint64_t> objectList(numOfObjs);
