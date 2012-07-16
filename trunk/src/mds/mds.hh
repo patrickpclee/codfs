@@ -16,8 +16,7 @@
 class Mds {
 public:
 	/**
-	 * MDS Constructor
-	 * Initialise MDS Communicator and MetaData Modules
+	 * @brief	MDS Constructor
 	 */
 	Mds();
 
@@ -42,7 +41,6 @@ public:
 	 * @param	objectId	ID of the object uploaded
 	 * @param	osdIdList	List of the OSD
 	 */
-void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList)
 	void uploadObjectAckHandler (uint32_t osdId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList);
 
 	/**

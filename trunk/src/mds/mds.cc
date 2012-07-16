@@ -5,10 +5,9 @@
 #include <cstdio>
 #include "mds.hh"
 
-/*
- * GLOBAL VARIABLES
+/**
+ * Initialise MDS Communicator and MetaData Modules
  */
-
 Mds::Mds()
 {
 	_metaDataModule = new MetaDataModule();
@@ -42,7 +41,6 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 	_mdsCommunicator->sendObjectandPrimaryList (clientId, fileId, objectList, primaryList);
 
 	return fileId;
-
 }
 
 /**
