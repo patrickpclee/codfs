@@ -10,9 +10,6 @@
  * GLOBAL VARIABLES
  */
 
-// Memory Pool for OSD
-MemoryPool* memoryPool = new MemoryPool();
-
 /**
  * OSD Constructor
  * Initialise a communicator
@@ -45,7 +42,7 @@ OsdCommunicator* Osd::getOsdCommunicator() {
  */
 
 SegmentLocationCache* Osd::getCache() {
-	return _cache;
+	return _segmentLocationCache;
 }
 
 list<uint32_t> Osd::secOsdListHandler(uint64_t objectId, list<uint32_t> osdList) {

@@ -12,9 +12,6 @@
 
 using namespace std;
 
-// Global Memory Pool
-extern MemoryPool* memoryPool;
-
 Message::Message() {
 	_protocolMsg = "";
 	_sockfd = 0;
@@ -26,7 +23,7 @@ Message::Message() {
 
 Message::~Message() {
 	if (_payload != NULL) {
-		memoryPool->poolFree(_payload);
+		MemoryPool::getInstance().poolFree(_payload);
 	}
 }
 
@@ -75,12 +72,12 @@ uint32_t Message::preparePayload(string filepath, uint32_t offset,
 		file.seekg(offset, ios_base::beg);
 
 		// allocate memory:
-		_payload = memoryPool->poolMalloc(length);
+		_payload = MemoryPool::getInstance().poolMalloc(length);
 
 		// read data as a block:
 		file.read(_payload, length);
 
-	} catch (ifstream::failure e) {
+	} catch (ifstream::failure &e) {
 		cerr << "Exception reading file" << endl;
 	}
 

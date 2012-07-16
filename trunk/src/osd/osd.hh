@@ -12,6 +12,7 @@
 #include "objectdata.hh"
 #include "segmentdata.hh"
 #include "segmentlocationcache.hh"
+#include "storagemodule.hh"
 
 /**
  * Central class of OSD
@@ -59,12 +60,12 @@ private:
 	uint32_t degradedRead (uint64_t objectId);
 	uint32_t reportOsdFailure (uint32_t osdId);
 
-	SegmentLocationCache* _cache;
+	SegmentLocationCache* _segmentLocationCache;
 	OsdCommunicator* _osdCommunicator;
+	StorageModule* _storageModule;
 
 //	Coding _cunit; // encode & decode done here
 //	OsdInfo _info;
-//	StorageModule _storageModule;
 
 };
 #endif

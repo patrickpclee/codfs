@@ -3,6 +3,7 @@
 
 #include <string>
 #include "../common/enums.hh"
+#include "../protocol/message.hh"
 
 #include <stdint.h>
 

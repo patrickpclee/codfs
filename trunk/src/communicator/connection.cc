@@ -9,11 +9,9 @@
 #include "connection.hh"
 #include "../common/enums.hh"
 #include "../protocol/message.hh"
+#include "../common/memorypool.hh"
 
 using namespace std;
-
-// Global Memory Pool
-extern MemoryPool* memoryPool;
 
 Connection::Connection() {
 
@@ -133,7 +131,9 @@ char* Connection::recvMessage() {
 
 	const uint32_t bufferSize = headerLength + msgHeader.protocolMsgSize
 			+ msgHeader.payloadSize;
-	buf = memoryPool->poolMalloc(bufferSize);
+	buf = MemoryPool::getInstance().poolMalloc(bufferSize);
+
+	// TODO: free buf
 
 	// copy header to buffer
 	memcpy(buf, &msgHeader, headerLength);
@@ -179,7 +179,7 @@ uint32_t Connection::getSockfd() {
 // PRIVATE METHODS
 //
 
-uint32_t sendn(uint32_t sd, const void* buf, uint32_t buf_len) {
+uint32_t sendn(uint32_t sd, const char* buf, uint32_t buf_len) {
 	uint32_t n_left = buf_len; // actual data bytes sent
 	uint32_t n;
 	while (n_left > 0) {
@@ -193,7 +193,7 @@ uint32_t sendn(uint32_t sd, const void* buf, uint32_t buf_len) {
 	return buf_len;
 }
 
-uint32_t recvn(uint32_t sd, void* buf, uint32_t buf_len) {
+uint32_t recvn(uint32_t sd, char* buf, uint32_t buf_len) {
 	uint32_t n_left = buf_len;
 	uint32_t n = 0;
 	while (n_left > 0) {
