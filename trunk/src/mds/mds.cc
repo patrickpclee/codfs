@@ -23,10 +23,10 @@ Mds::Mds()
 /**
  * @brief	Handle File Upload Request From Client
  *
- * 1. Create File in the Name Space (Directory Tree)
- * 2. Create File Meta Data (Generate File ID)
- * 3. Generate Object IDs
- * 4. Ask Monitor for Primary list
+ * 1. Create File in the Name Space (Directory Tree) \n
+ * 2. Create File Meta Data (Generate File ID) \n
+ * 3. Generate Object IDs \n
+ * 4. Ask Monitor for Primary list \n
  * 5. Send the Object and Primary List to client
  *
  * @param	clientId	ID of the client which the request originated
@@ -57,6 +57,9 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 
 /**
  *	@brief	Handle Upload Object Acknowledgement from Primary
+ *
+ *	1. Save the Node List of the object \n
+ *	2. Set the Primary for the object
  *	
  *	@param	osdId		ID of the OSD which the Acknowledgement originated
  *	@param	fileId		ID of the File which the object associated with
