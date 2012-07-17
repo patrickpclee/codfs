@@ -78,10 +78,6 @@ void Mds::downloadFileHandler (uint32_t clientId, uint32_t fileId)
 /**
  * @brief	Process the Download Request
  *
- * @param	clientId	ID of the client
- * @param	fileId		ID of the File
- * @param	path		Path of the File
- *
  * 1. Open File in the Name Space \n
  * 2. Open File Metadata \n
  * 3. Read Object List from the Metadata Module \n
@@ -112,9 +108,6 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 
 /**
  * @brief	Handle the Secondary Node List Request from OSDs
- *
- * @param	osdId	ID of the OSD Requesting
- * @param	objectID	ID of the Object
  */
 void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
 {
@@ -128,11 +121,6 @@ void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
 
 /**
  * @brief	Handle Primary Node Failure Report from Client
- *
- * @param	clientId	ID of the Client Reporting
- * @param	osdId		ID of the Failed OSD
- * @param	objectId	ID of the Failed Object
- * @param	reason		Reason of the Failure (Default to Node Failure)
  *
  * 1. Select Acting Primary \n
  * 2. Report Node Failure to Monitor \n
