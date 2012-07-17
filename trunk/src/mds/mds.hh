@@ -78,9 +78,23 @@ public:
 	 * @param	reason		Reason of the Failure (Default to Node Failure)
 	 */
 	void primaryFailureHandler (uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason=UNREACHABLE);
-	uint32_t secondaryFailureHandler (uint32_t osdId);
 
-	uint32_t osdObjectListHandler (uint32_t osdId);
+	/**
+	 * @brief	Handle Secondary Node Failure Report from OSD
+	 *
+	 * @param	osdId		ID of the Failed OSD
+	 * @param	objectId	ID of the Failed Object
+	 * @param	reason		Reason of the Failure (Default to Node Failure)
+	 */
+	void secondaryFailureHandler(uint32_t osdId, uint64_t objectId, FailureReason reason=UNREACHABLE);
+
+	/**
+	 * @brief	Handle OSD Recovery Initialized by Monitor
+	 *
+	 * @param	monitorId	ID of the Monitor
+	 * @param	osdId		ID of the failed OSD
+	 */
+	void recoveryHandler(uint32_t monitorId, uint32_t osdId);
 
 	uint32_t nodeListUpdateHandler (uint64_t objectId, uint32_t osdIdList[]);
 private:
