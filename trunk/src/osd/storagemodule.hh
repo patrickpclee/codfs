@@ -7,6 +7,10 @@ using namespace std;
 
 class StorageModule {
 public:
+
+
+
+	bool isObjectExist (uint64_t objectId);
 	uint32_t writeObject (uint64_t objectId, vector<unsigned char> buf);
 	uint32_t readObject (uint64_t objectId, vector <unsigned char> buf);
 	uint32_t readSegment (uint64_t objectId, uint32_t segmentId, vector<unsigned char> buf);

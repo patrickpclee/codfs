@@ -35,25 +35,26 @@ public:
 	~Osd();
 
 	/**
-	 * Action when a secondary OSD list is received
-	 * @param objectId Object ID
-	 * @param osdList Secondary OSD List
+	 * Action when an OSD list is received
+	 * @param objectId 	Object ID
+	 * @param osdList 	Secondary OSD List
 	 * @return Length of list if success, -1 if failure
 	 */
 
-	uint32_t secOsdListHandler(uint64_t objectId, list<uint32_t> osdList);
+	uint32_t osdListHandler(uint64_t objectId, list<uint32_t> osdList);
 
 	/**
 	 * Action when a getObjectRequest is received
-	 * @param objectId ID of the object to send
+	 * @param objectId 	ID of the object to send
+	 * @param sockfd	Socket Descriptor of the destination
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t getObjectHandler(uint64_t objectId);
+	uint32_t getObjectHandler(uint64_t objectId, uint32_t sockfd);
 
 	/**
 	 * Action when a getSegmentRequest is received
-	 * @param objectId ID of Object that the segment is belonged to
+	 * @param objectId 	ID of Object that the segment is belonged to
 	 * @param segmentId ID of the segment to send
 	 * @return 0 if success, -1 if failure
 	 */
@@ -152,7 +153,8 @@ private:
 	 * @return a SegmentData structure
 	 */
 
-	struct SegmentData getSegmentFromStroage(uint64_t objectId, uint32_t segmentId);
+	struct SegmentData getSegmentFromStroage(uint64_t objectId,
+			uint32_t segmentId);
 
 	/**
 	 * Send a segment to another OSD
@@ -170,7 +172,8 @@ private:
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendObjectToClient(struct ObjectData objectData, uint32_t clientId);
+	uint32_t sendObjectToClient(struct ObjectData objectData,
+			uint32_t clientId);
 
 	/**
 	 * Save a segment to storage

@@ -15,24 +15,34 @@ Osd::~Osd() {
 	delete _osdCommunicator;
 }
 
-OsdCommunicator* Osd::getOsdCommunicator() {
-	return _osdCommunicator;
-}
+/**
+ * Save the received OSD list into the SegmentLocationCache
+ * 1. If existing list is found, delete it
+ * 2. Insert the new list into the cache
+ */
 
-SegmentLocationCache* Osd::getSegmentLocationCache() {
-	return _segmentLocationCache;
-}
+uint32_t Osd::osdListHandler(uint64_t objectId, list<uint32_t> osdList) {
 
-uint32_t Osd::secOsdListHandler(uint64_t objectId, list<uint32_t> osdList) {
-	// TODO: Save to cache
+	_segmentLocationCache->deleteSegmentLocation(objectId);
+	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
+
 	return 0;
 }
 
-uint32_t ObjectData Osd::getObjectHandler(uint64_t objectId) {
-	list <uint32_t> osdIdList;
+/**
+ * Send the object to the target
+ */
+
+uint32_t Osd::getObjectHandler(uint64_t objectId, uint32_t sockfd) {
+	list<uint32_t> osdIdList;
+
+	// check if I have the object
+	if (_storageModule) {
+
+	}
 
 	try {
-		osdIdList = getSegmentLocationCache()->readSegmentLocation (objectId);
+		osdIdList = getSegmentLocationCache()->readSegmentLocation(objectId);
 	} catch (CacheMissException &e) {
 		// Cache Miss
 		getSecOsdListRequest(objectId);
@@ -41,66 +51,16 @@ uint32_t ObjectData Osd::getObjectHandler(uint64_t objectId) {
 
 	}
 
-}
-
-struct SegmentData Osd::getSegmentHandler(uint64_t objectId, uint32_t segmentId) {
-	//string filepath = getSegmentPath (objectId, segmentId);
+	return 0;
 
 }
 
-uint32_t Osd::objectTrunkHandler(uint64_t objectId, uint32_t offset, uint32_t length,
-		vector<unsigned char> buf) {
-
+OsdCommunicator* Osd::getOsdCommunicator() {
+	return _osdCommunicator;
 }
 
-uint32_t Osd::segmentTrunkHandler(uint64_t objectId, uint32_t segmentId,
-		uint32_t offset, uint32_t length, vector<unsigned char> buf) {
-
-}
-
-uint32_t Osd::recoveryHandler(uint64_t objectId) {
-
-}
-
-list<SegmentData> Osd::encodeObjectToSegment(ObjectData objectData) {
-
-}
-
-ObjectData Osd::decodeSegmentToObject(uint64_t objectId,
-		list<SegmentData> segmentData) {
-
-}
-
-uint32_t Osd::getSegmentRequest(uint64_t objectId, uint32_t segmentId) {
-
-}
-
-uint32_t Osd::getSecOsdListRequest(uint64_t objectId) {
-
-}
-
-SegmentData Osd::getSegmentFromStroage(uint64_t objectId, uint32_t segmentId) {
-
-}
-
-uint32_t Osd::sendSegmentToOsd(SegmentData segmentData) {
-
-}
-
-uint32_t Osd::sendObjectToClient(ObjectData objectData) {
-
-}
-
-uint32_t Osd::saveSegmentToStorage(SegmentData segmentData) {
-
-}
-
-uint32_t Osd::degradedRead(uint64_t objectId) {
-
-}
-
-uint32_t Osd::reportOsdFailure(uint32_t osdId) {
-
+SegmentLocationCache* Osd::getSegmentLocationCache() {
+	return _segmentLocationCache;
 }
 
 /**

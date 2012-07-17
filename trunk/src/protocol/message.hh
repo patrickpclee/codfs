@@ -17,6 +17,7 @@ using namespace std;
 
 #pragma pack(1)
 struct MsgHeader {
+	uint32_t _requestId;
 	uint32_t protocolMsgType;
 	uint32_t protocolMsgSize;
 	uint32_t payloadSize;
@@ -112,7 +113,6 @@ public:
 	virtual void printProtocol() = 0;
 
 private:
-	uint32_t _requestId;
 	uint32_t _sockfd;		// destination
 	struct MsgHeader _msgHeader;
 	string _protocolMsg;
