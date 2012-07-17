@@ -111,7 +111,7 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
  */
 void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
 {
-	vector<uint32_t>nodeList;
+	vector<uint32_t> nodeList;
 
 	nodeList = _metaDataModule->readNodeList(objectId);
 	_mdsCommunicator->sendNodeList(osdId, objectId, nodeList);
@@ -124,13 +124,56 @@ void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
  *
  * 1. Select Acting Primary \n
  * 2. Report Node Failure to Monitor \n
- * 3. Reply with Acting Primary ID \n
+ * 4. Reply with Acting Primary ID \n
  */
 void Mds::primaryFailureHandler(uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason)
 {
 	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(objectId ,osdId);
 	_mdsCommunicator->reportFailure(osdId,reason);
 	_mdsCommunicator->sendPrimary(clientId,objectId,actingPrimary);
+
+	return ;
+}
+
+/**
+ * @brief	Handle Secondary Node Failure Report from OSD
+ */
+void Mds::secondaryFailureHandler(uint32_t osdId, uint64_t objectId, FailureReason reason)
+{
+	_mdsCommunicator->reportFailure(osdId,reason);
+
+	return ;
+}
+
+
+/**
+ * @brief	Handle OSD Recovery Initialized by Monitor
+ *
+ * 1. Read Object List of the Failed OSD
+ * 2. For each Object, Read Current Primary and Node List
+ * 3. Reply with Object List, Primary List, and Node List of the Objects
+ */
+void Mds::recoveryHandler(uint32_t monitorId, uint32_t osdId)
+{
+	vector<uint64_t> objectList;
+	vector<uint32_t> primaryList;
+	vector< vector<uint32_t> > objectNodeList;
+
+	_metaDataModule->readOsdObjectList(osdId);
+
+	vector<uint64_t>::iterator it;
+	uint32_t primaryId;
+
+	for (it = objectList.begin(); it < objectList.end(); ++it){
+		primaryId = _metaDataModule->getPrimary(*it);
+		primaryList.push_back(primaryId);
+
+		vector<uint32_t> nodeList;
+		nodeList = _metaDataModule->readNodeList(*it);
+		objectNodeList.push_back(nodeList);
+	}
+	
+	_mdsCommunicator->sendRecoveryInfo(monitorId, osdId, objectList, primaryList, objectNodeList);
 
 	return ;
 }
