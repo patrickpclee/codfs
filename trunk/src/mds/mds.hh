@@ -46,23 +46,37 @@ public:
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)
 	 *
-	 * @param	clientId	ID of the client which the request originated
-	 * @param	dstPath		Target Path for the file uploaded
+	 * @param	clientId	ID of the client Requesting
+	 * @param	dstPath		Path of the file
 	 */
 	void downloadFileHandler (uint32_t clientId, string dstPath);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with File ID)
 	 *
-	 * @param	clientId	ID of the client which the request originated
-	 * @param	fileId		ID for the file uploaded
+	 * @param	clientId	ID of the client Requesting
+	 * @param	fileId		ID of the file
 	 */
 	void downloadFileHandler (uint32_t clientId, uint32_t fileId);
 
+	/**
+	 * @brief	Handle the Secondary Node List Request from OSDs
+	 *
+	 * @param	osdId	ID of the OSD Requesting
+	 * @param	objectID	ID of the Object
+	 */
 	void secondaryNodeListHandler (uint32_t clientId, uint64_t objectId);
 
 	uint32_t listFolderHandler (string path);
 
+	/**
+	 * @brief	Handle Primary Node Failure Report from Client
+	 *
+	 * @param	clientId	ID of the Client Reporting
+	 * @param	osdId		ID of the Failed OSD
+	 * @param	objectId	ID of the Failed Object
+	 * @param	reason		Reason of the Failure (Default to Node Failure)
+	 */
 	void primaryFailureHandler (uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason=UNREACHABLE);
 	uint32_t secondaryFailureHandler (uint32_t osdId);
 
@@ -74,16 +88,14 @@ private:
 	// Ask Monitor for Primary Node List
 	vector<uint32_t> askPrimaryList (uint32_t numOfObjs);
 
-	// Send Primary Node List
-	//uint32_t sendPrimaryNodeList (uint32_t clientId, uint32_t fileId, uint32_t primaryNodeList[]);
-
-	// Send Secondary Node List
-	//uint32_t sendSecondaryNodeList (uint32_t osdId, uint64_t objectId, uint32_t SecondaryNodeList[]);
-
+	/**
+	 * @brief	Process the Download Request
+	 *
+	 * @param	clientId	ID of the client
+	 * @param	fileId		ID of the File
+	 * @param	path		Path of the File
+	 */
 	void downloadFileProcess (uint32_t clientId, uint32_t fileId, string path);
-
-//	MdsInfo _info;
-//	Communicator _communicator;	
 
 	MdsCommunicator* _mdsCommunicator;
 	MetaDataModule* _metaDataModule;

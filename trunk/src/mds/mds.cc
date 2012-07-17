@@ -22,7 +22,7 @@ Mds::Mds()
  * 2. Create File Meta Data (Generate File ID) \n
  * 3. Generate Object IDs \n
  * 4. Ask Monitor for Primary list \n
- * 5. Send the Object and Primary List to client
+ * 5. Reply with Object and Primary List
  */
 uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs)
 {
@@ -75,6 +75,19 @@ void Mds::downloadFileHandler (uint32_t clientId, uint32_t fileId)
 	return downloadFileProcess(clientId, fileId, path);
 }
 
+/**
+ * @brief	Process the Download Request
+ *
+ * @param	clientId	ID of the client
+ * @param	fileId		ID of the File
+ * @param	path		Path of the File
+ *
+ * 1. Open File in the Name Space \n
+ * 2. Open File Metadata \n
+ * 3. Read Object List from the Metadata Module \n
+ * 4. Read Primary Node ID for each Object \n
+ * 5. Reply with Object and Primary List
+ */
 void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 {
 	vector<uint64_t> objectList;
@@ -97,6 +110,12 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 	return ;
 }
 
+/**
+ * @brief	Handle the Secondary Node List Request from OSDs
+ *
+ * @param	osdId	ID of the OSD Requesting
+ * @param	objectID	ID of the Object
+ */
 void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
 {
 	vector<uint32_t>nodeList;
@@ -107,6 +126,18 @@ void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
 	return ;
 }
 
+/**
+ * @brief	Handle Primary Node Failure Report from Client
+ *
+ * @param	clientId	ID of the Client Reporting
+ * @param	osdId		ID of the Failed OSD
+ * @param	objectId	ID of the Failed Object
+ * @param	reason		Reason of the Failure (Default to Node Failure)
+ *
+ * 1. Select Acting Primary \n
+ * 2. Report Node Failure to Monitor \n
+ * 3. Reply with Acting Primary ID \n
+ */
 void Mds::primaryFailureHandler(uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason)
 {
 	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(objectId ,osdId);
