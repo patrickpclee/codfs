@@ -24,7 +24,7 @@ Mds::Mds()
  * 4. Ask Monitor for Primary list \n
  * 5. Reply with Object and Primary List
  */
-uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t numOfObjs)
+uint32_t Mds::uploadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath, uint32_t numOfObjs)
 {
 	vector<uint64_t> objectList(numOfObjs);
 	vector<uint32_t> primaryList(numOfObjs);
@@ -33,12 +33,12 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
 	_nameSpaceModule->createFile(clientId, dstPath);
 	fileId = _metaDataModule->createFile(dstPath);
 
-	objectList = newObjectList(numOfObjs);
+	objectList = _metaDataModule->newObjectList(numOfObjs);
 	_metaDataModule->saveObjectList(fileId,objectList);
 	
-	primaryList = askPrimaryList(numOfObjs);
+	primaryList = _mdsCommunicator->askPrimaryList(numOfObjs);
 
-	_mdsCommunicator->sendObjectandPrimaryList (clientId, fileId, objectList, primaryList);
+	_mdsCommunicator->replyObjectandPrimaryList (requestId, connectionId, clientId, fileId, objectList, primaryList);
 
 	return fileId;
 }
@@ -49,10 +49,10 @@ uint32_t Mds::uploadFileHandler (uint32_t clientId, string dstPath, uint32_t num
  * 1. Save the Node List of the object \n
  * 2. Set the Primary for the object
  */
-void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t objectId, vector<uint32_t> osdIdList)
+void Mds::uploadObjectAckProcessor (uint32_t requestId, uint32_t connectionId, uint32_t osdId, uint32_t fileId, uint64_t objectId, vector<uint32_t> objectNodeList)
 {
-	_metaDataModule->saveNodeList(objectId, osdIdList);
-	_metaDataModule->setPrimary(objectId, osdIdList[0]);
+	_metaDataModule->saveNodeList(objectId, objectNodeList);
+	_metaDataModule->setPrimary(objectId, objectNodeList[0]);
 
 	return ;
 }
@@ -60,19 +60,19 @@ void Mds::uploadObjectAckHandler (uint32_t clientId, uint32_t fileId, uint64_t o
 /**
  * @brief	Handle Download File Request from Client (Request with Path)
  */
-void Mds::downloadFileHandler (uint32_t clientId, string dstPath)
+void Mds::downloadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath)
 {
 	uint32_t fileId = _metaDataModule->lookupFileId(dstPath);
-	return downloadFileProcess(clientId, fileId, dstPath);
+	return downloadFileProcess(requestId, connectionId, clientId, fileId, dstPath);
 }
 
 /**
  * @brief	Handle Download File Request from Client (Request with File ID)
  */
-void Mds::downloadFileHandler (uint32_t clientId, uint32_t fileId)
+void Mds::downloadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId)
 {
 	string path = _metaDataModule->lookupFilePath(fileId);
-	return downloadFileProcess(clientId, fileId, path);
+	return downloadFileProcess(requestId, connectionId, clientId, fileId, path);
 }
 
 /**
@@ -84,7 +84,7 @@ void Mds::downloadFileHandler (uint32_t clientId, uint32_t fileId)
  * 4. Read Primary Node ID for each Object \n
  * 5. Reply with Object and Primary List
  */
-void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
+void Mds::downloadFileProcess (uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, string path)
 {
 	vector<uint64_t> objectList;
 	vector<uint32_t> primaryList;
@@ -101,7 +101,7 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 		primaryList.push_back(primaryId);	
 	}
 
-	_mdsCommunicator->sendObjectandPrimaryList(clientId, fileId, objectList, primaryList);
+	_mdsCommunicator->replyObjectandPrimaryList(requestId, connectionId, clientId, fileId, objectList, primaryList);
 	
 	return ;
 }
@@ -109,12 +109,12 @@ void Mds::downloadFileProcess (uint32_t clientId, uint32_t fileId, string path)
 /**
  * @brief	Handle the Secondary Node List Request from OSDs
  */
-void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
+void Mds::secondaryNodeListProcessor (uint32_t requestId, uint32_t connectionId, uint32_t osdId, uint64_t objectId)
 {
 	vector<uint32_t> nodeList;
 
 	nodeList = _metaDataModule->readNodeList(objectId);
-	_mdsCommunicator->sendNodeList(osdId, objectId, nodeList);
+	_mdsCommunicator->replyNodeList(requestId, connectionId, osdId, objectId, nodeList);
 
 	return ;
 }
@@ -126,11 +126,11 @@ void Mds::secondaryNodeListHandler (uint32_t osdId, uint64_t objectId)
  * 2. Report Node Failure to Monitor \n
  * 4. Reply with Acting Primary ID \n
  */
-void Mds::primaryFailureHandler(uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason)
+void Mds::primaryFailureProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t osdId, uint64_t objectId, FailureReason reason)
 {
 	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(objectId ,osdId);
 	_mdsCommunicator->reportFailure(osdId,reason);
-	_mdsCommunicator->sendPrimary(clientId,objectId,actingPrimary);
+	_mdsCommunicator->replyPrimary(requestId, connectionId, clientId,objectId,actingPrimary);
 
 	return ;
 }
@@ -138,13 +138,12 @@ void Mds::primaryFailureHandler(uint32_t clientId, uint32_t osdId, uint64_t obje
 /**
  * @brief	Handle Secondary Node Failure Report from OSD
  */
-void Mds::secondaryFailureHandler(uint32_t osdId, uint64_t objectId, FailureReason reason)
+void Mds::secondaryFailureProcessor (uint32_t requestId, uint32_t connectionId, uint32_t osdId, uint64_t objectId, FailureReason reason)
 {
 	_mdsCommunicator->reportFailure(osdId,reason);
 
 	return ;
 }
-
 
 /**
  * @brief	Handle OSD Recovery Initialized by Monitor
@@ -153,7 +152,7 @@ void Mds::secondaryFailureHandler(uint32_t osdId, uint64_t objectId, FailureReas
  * 2. For each Object, Read Current Primary and Node List
  * 3. Reply with Object List, Primary List, and Node List of the Objects
  */
-void Mds::recoveryHandler(uint32_t monitorId, uint32_t osdId)
+void Mds::recoveryProcessor (uint32_t requestId, uint32_t connectionId, uint32_t monitorId, uint32_t osdId)
 {
 	vector<uint64_t> objectList;
 	vector<uint32_t> primaryList;
@@ -173,8 +172,18 @@ void Mds::recoveryHandler(uint32_t monitorId, uint32_t osdId)
 		objectNodeList.push_back(nodeList);
 	}
 	
-	_mdsCommunicator->sendRecoveryInfo(monitorId, osdId, objectList, primaryList, objectNodeList);
+	_mdsCommunicator->replyRecoveryInfo(requestId, connectionId, monitorId, osdId, objectList, primaryList, objectNodeList);
 
+	return ;
+}
+
+/**
+ * @brief	Handle Object Node List Update from OSD
+ */
+void Mds::nodeListUpdateProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t> objectNodeList)
+{
+	_metaDataModule->saveNodeList(objectId,objectNodeList);
+	_metaDataModule->setPrimary(objectId,objectNodeList[0]);
 	return ;
 }
 
