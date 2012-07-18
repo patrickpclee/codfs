@@ -80,7 +80,7 @@ void ConfigLayer::init(const char* configPath){
 		fprintf(stderr,"Inited with %s\n",configPath);
 	}
 	configHandle_ = new TiXmlHandle(doc_);
-	configElement_ = configHandle_->FirstChild("NcfsConfig").Element();
+	configElement_ = configHandle_->FirstChild(XML_ROOT_NODE).Element();
 	if(configElement_ == NULL){
 		fprintf(stderr,"Failed to load2 %s\n",configPath);
 		return;

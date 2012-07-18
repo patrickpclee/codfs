@@ -3,6 +3,7 @@
 #include "tinyxml.hh"
 
 #define DEFAULT_CONFIG_PATH	"config.xml"
+#define XML_ROOT_NODE "NcvfsConfig"
 
 class ConfigLayer{
 	public:
