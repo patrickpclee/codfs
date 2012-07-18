@@ -21,7 +21,8 @@ Osd::~Osd() {
  * 2. Insert the new list into the cache
  */
 
-uint32_t Osd::osdListHandler(uint64_t objectId, list<uint32_t> osdList) {
+uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
+		list<uint32_t> osdList) {
 
 	_segmentLocationCache->deleteSegmentLocation(objectId);
 	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
@@ -33,7 +34,7 @@ uint32_t Osd::osdListHandler(uint64_t objectId, list<uint32_t> osdList) {
  * Send the object to the target
  */
 
-uint32_t Osd::getObjectHandler(uint64_t objectId, uint32_t sockfd) {
+uint32_t Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 	list<uint32_t> osdIdList;
 
 	// check if I have the object
@@ -44,10 +45,6 @@ uint32_t Osd::getObjectHandler(uint64_t objectId, uint32_t sockfd) {
 	try {
 		osdIdList = getSegmentLocationCache()->readSegmentLocation(objectId);
 	} catch (CacheMissException &e) {
-		// Cache Miss
-		getSecOsdListRequest(objectId);
-		// TODO: sleep thread
-		// ........
 
 	}
 
