@@ -20,7 +20,7 @@ using namespace std;
  * Reply to List Folder
  */
 
-class ListDirectoryReplyMessage : public Message {
+class ListDirectoryReplyMsg : public Message {
 public:
 	/**
 	 * @brief	Constructor - Save Parameters in Private Variables
@@ -30,7 +30,7 @@ public:
 	 * @param	path	Path to the Folder
 	 * @param	folderData	Folder Data
 	 */
-	ListDirectoryReplyMessage(uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData);
+	ListDirectoryReplyMsg(uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData);
 
 	/**
 	 * @brief	Copy values in private variables to protocol message

@@ -9,7 +9,7 @@
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
 
-ListDirectoryReplyMessage::ListDirectoryReplyMessage(uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
+ListDirectoryReplyMsg::ListDirectoryReplyMsg(uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
 {
 	_requestId = requestId;
 	_path = path;
@@ -21,22 +21,22 @@ ListDirectoryReplyMessage::ListDirectoryReplyMessage(uint32_t requestId, uint32_
  * @brief	Copy values in private variables to protocol message
  * Serialize protocol message and copy to private variable
  */
-void ListDirectoryReplyMessage::prepareProtocolMsg() {
+void ListDirectoryReplyMsg::prepareProtocolMsg() {
 	string serializedString;
 
-	ncvfs::ListDirectoryReply listDirectoryReply;
+	ncvfs::ListDirectoryReplyPro listDirectoryReplyPro;
 
 	vector<FileMetaData>::iterator it;
 
 	for (it = _folderData.begin(); it < _folderData.end(); ++it)
 	{
-		ncvfs::FileInfo* fileInfo = listDirectoryReply.add_fileinfo();
+		ncvfs::FileInfo* fileInfo = listDirectoryReplyPro.add_fileinfo();
 		fileInfo->set_fileid((*it)._id);
 		fileInfo->set_filesize((*it)._size);
 		fileInfo->set_filename((*it)._path);
 	}
 
-	if (!listDirectoryReply.SerializeToString(&serializedString)) {
+	if (!listDirectoryReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
 		return ;
 	}
