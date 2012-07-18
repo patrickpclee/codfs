@@ -32,20 +32,20 @@ void  protobuf_AddDesc_message_2eproto();
 void protobuf_AssignDesc_message_2eproto();
 void protobuf_ShutdownFile_message_2eproto();
 
-class ListDirectoryRequest;
-class ListDirectoryReply;
-class FileInfo;
+class ListDirectoryRequestPro;
+class ListDirectoryReplyPro;
+class FileInfoPro;
 
 // ===================================================================
 
-class ListDirectoryRequest : public ::google::protobuf::Message {
+class ListDirectoryRequestPro : public ::google::protobuf::Message {
  public:
-  ListDirectoryRequest();
-  virtual ~ListDirectoryRequest();
+  ListDirectoryRequestPro();
+  virtual ~ListDirectoryRequestPro();
   
-  ListDirectoryRequest(const ListDirectoryRequest& from);
+  ListDirectoryRequestPro(const ListDirectoryRequestPro& from);
   
-  inline ListDirectoryRequest& operator=(const ListDirectoryRequest& from) {
+  inline ListDirectoryRequestPro& operator=(const ListDirectoryRequestPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -59,17 +59,17 @@ class ListDirectoryRequest : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const ListDirectoryRequest& default_instance();
+  static const ListDirectoryRequestPro& default_instance();
   
-  void Swap(ListDirectoryRequest* other);
+  void Swap(ListDirectoryRequestPro* other);
   
   // implements Message ----------------------------------------------
   
-  ListDirectoryRequest* New() const;
+  ListDirectoryRequestPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ListDirectoryRequest& from);
-  void MergeFrom(const ListDirectoryRequest& from);
+  void CopyFrom(const ListDirectoryRequestPro& from);
+  void MergeFrom(const ListDirectoryRequestPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -110,7 +110,7 @@ class ListDirectoryRequest : public ::google::protobuf::Message {
   inline ::std::string* mutable_directorypath();
   inline ::std::string* release_directorypath();
   
-  // @@protoc_insertion_point(class_scope:ncvfs.ListDirectoryRequest)
+  // @@protoc_insertion_point(class_scope:ncvfs.ListDirectoryRequestPro)
  private:
   inline void set_has_osdid();
   inline void clear_has_osdid();
@@ -130,18 +130,18 @@ class ListDirectoryRequest : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static ListDirectoryRequest* default_instance_;
+  static ListDirectoryRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class ListDirectoryReply : public ::google::protobuf::Message {
+class ListDirectoryReplyPro : public ::google::protobuf::Message {
  public:
-  ListDirectoryReply();
-  virtual ~ListDirectoryReply();
+  ListDirectoryReplyPro();
+  virtual ~ListDirectoryReplyPro();
   
-  ListDirectoryReply(const ListDirectoryReply& from);
+  ListDirectoryReplyPro(const ListDirectoryReplyPro& from);
   
-  inline ListDirectoryReply& operator=(const ListDirectoryReply& from) {
+  inline ListDirectoryReplyPro& operator=(const ListDirectoryReplyPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -155,17 +155,17 @@ class ListDirectoryReply : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const ListDirectoryReply& default_instance();
+  static const ListDirectoryReplyPro& default_instance();
   
-  void Swap(ListDirectoryReply* other);
+  void Swap(ListDirectoryReplyPro* other);
   
   // implements Message ----------------------------------------------
   
-  ListDirectoryReply* New() const;
+  ListDirectoryReplyPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ListDirectoryReply& from);
-  void MergeFrom(const ListDirectoryReply& from);
+  void CopyFrom(const ListDirectoryReplyPro& from);
+  void MergeFrom(const ListDirectoryReplyPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -188,24 +188,24 @@ class ListDirectoryReply : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated .ncvfs.FileInfo fileInfo = 1;
-  inline int fileinfo_size() const;
-  inline void clear_fileinfo();
-  static const int kFileInfoFieldNumber = 1;
-  inline const ::ncvfs::FileInfo& fileinfo(int index) const;
-  inline ::ncvfs::FileInfo* mutable_fileinfo(int index);
-  inline ::ncvfs::FileInfo* add_fileinfo();
-  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo >&
-      fileinfo() const;
-  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo >*
-      mutable_fileinfo();
+  // repeated .ncvfs.FileInfoPro fileInfoPro = 1;
+  inline int fileinfopro_size() const;
+  inline void clear_fileinfopro();
+  static const int kFileInfoProFieldNumber = 1;
+  inline const ::ncvfs::FileInfoPro& fileinfopro(int index) const;
+  inline ::ncvfs::FileInfoPro* mutable_fileinfopro(int index);
+  inline ::ncvfs::FileInfoPro* add_fileinfopro();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfoPro >&
+      fileinfopro() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfoPro >*
+      mutable_fileinfopro();
   
-  // @@protoc_insertion_point(class_scope:ncvfs.ListDirectoryReply)
+  // @@protoc_insertion_point(class_scope:ncvfs.ListDirectoryReplyPro)
  private:
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo > fileinfo_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfoPro > fileinfopro_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -215,18 +215,18 @@ class ListDirectoryReply : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static ListDirectoryReply* default_instance_;
+  static ListDirectoryReplyPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class FileInfo : public ::google::protobuf::Message {
+class FileInfoPro : public ::google::protobuf::Message {
  public:
-  FileInfo();
-  virtual ~FileInfo();
+  FileInfoPro();
+  virtual ~FileInfoPro();
   
-  FileInfo(const FileInfo& from);
+  FileInfoPro(const FileInfoPro& from);
   
-  inline FileInfo& operator=(const FileInfo& from) {
+  inline FileInfoPro& operator=(const FileInfoPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -240,17 +240,17 @@ class FileInfo : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const FileInfo& default_instance();
+  static const FileInfoPro& default_instance();
   
-  void Swap(FileInfo* other);
+  void Swap(FileInfoPro* other);
   
   // implements Message ----------------------------------------------
   
-  FileInfo* New() const;
+  FileInfoPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const FileInfo& from);
-  void MergeFrom(const FileInfo& from);
+  void CopyFrom(const FileInfoPro& from);
+  void MergeFrom(const FileInfoPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -280,17 +280,17 @@ class FileInfo : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 fileid() const;
   inline void set_fileid(::google::protobuf::uint32 value);
   
-  // optional fixed64 filesize = 2;
+  // optional fixed64 fileSize = 2;
   inline bool has_filesize() const;
   inline void clear_filesize();
-  static const int kFilesizeFieldNumber = 2;
+  static const int kFileSizeFieldNumber = 2;
   inline ::google::protobuf::uint64 filesize() const;
   inline void set_filesize(::google::protobuf::uint64 value);
   
-  // optional string filename = 3;
+  // optional string fileName = 3;
   inline bool has_filename() const;
   inline void clear_filename();
-  static const int kFilenameFieldNumber = 3;
+  static const int kFileNameFieldNumber = 3;
   inline const ::std::string& filename() const;
   inline void set_filename(const ::std::string& value);
   inline void set_filename(const char* value);
@@ -298,7 +298,7 @@ class FileInfo : public ::google::protobuf::Message {
   inline ::std::string* mutable_filename();
   inline ::std::string* release_filename();
   
-  // @@protoc_insertion_point(class_scope:ncvfs.FileInfo)
+  // @@protoc_insertion_point(class_scope:ncvfs.FileInfoPro)
  private:
   inline void set_has_fileid();
   inline void clear_has_fileid();
@@ -321,85 +321,85 @@ class FileInfo : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static FileInfo* default_instance_;
+  static FileInfoPro* default_instance_;
 };
 // ===================================================================
 
 
 // ===================================================================
 
-// ListDirectoryRequest
+// ListDirectoryRequestPro
 
 // optional int32 osdId = 1;
-inline bool ListDirectoryRequest::has_osdid() const {
+inline bool ListDirectoryRequestPro::has_osdid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void ListDirectoryRequest::set_has_osdid() {
+inline void ListDirectoryRequestPro::set_has_osdid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void ListDirectoryRequest::clear_has_osdid() {
+inline void ListDirectoryRequestPro::clear_has_osdid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void ListDirectoryRequest::clear_osdid() {
+inline void ListDirectoryRequestPro::clear_osdid() {
   osdid_ = 0;
   clear_has_osdid();
 }
-inline ::google::protobuf::int32 ListDirectoryRequest::osdid() const {
+inline ::google::protobuf::int32 ListDirectoryRequestPro::osdid() const {
   return osdid_;
 }
-inline void ListDirectoryRequest::set_osdid(::google::protobuf::int32 value) {
+inline void ListDirectoryRequestPro::set_osdid(::google::protobuf::int32 value) {
   set_has_osdid();
   osdid_ = value;
 }
 
 // optional string directoryPath = 2;
-inline bool ListDirectoryRequest::has_directorypath() const {
+inline bool ListDirectoryRequestPro::has_directorypath() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void ListDirectoryRequest::set_has_directorypath() {
+inline void ListDirectoryRequestPro::set_has_directorypath() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void ListDirectoryRequest::clear_has_directorypath() {
+inline void ListDirectoryRequestPro::clear_has_directorypath() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void ListDirectoryRequest::clear_directorypath() {
+inline void ListDirectoryRequestPro::clear_directorypath() {
   if (directorypath_ != &::google::protobuf::internal::kEmptyString) {
     directorypath_->clear();
   }
   clear_has_directorypath();
 }
-inline const ::std::string& ListDirectoryRequest::directorypath() const {
+inline const ::std::string& ListDirectoryRequestPro::directorypath() const {
   return *directorypath_;
 }
-inline void ListDirectoryRequest::set_directorypath(const ::std::string& value) {
+inline void ListDirectoryRequestPro::set_directorypath(const ::std::string& value) {
   set_has_directorypath();
   if (directorypath_ == &::google::protobuf::internal::kEmptyString) {
     directorypath_ = new ::std::string;
   }
   directorypath_->assign(value);
 }
-inline void ListDirectoryRequest::set_directorypath(const char* value) {
+inline void ListDirectoryRequestPro::set_directorypath(const char* value) {
   set_has_directorypath();
   if (directorypath_ == &::google::protobuf::internal::kEmptyString) {
     directorypath_ = new ::std::string;
   }
   directorypath_->assign(value);
 }
-inline void ListDirectoryRequest::set_directorypath(const char* value, size_t size) {
+inline void ListDirectoryRequestPro::set_directorypath(const char* value, size_t size) {
   set_has_directorypath();
   if (directorypath_ == &::google::protobuf::internal::kEmptyString) {
     directorypath_ = new ::std::string;
   }
   directorypath_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* ListDirectoryRequest::mutable_directorypath() {
+inline ::std::string* ListDirectoryRequestPro::mutable_directorypath() {
   set_has_directorypath();
   if (directorypath_ == &::google::protobuf::internal::kEmptyString) {
     directorypath_ = new ::std::string;
   }
   return directorypath_;
 }
-inline ::std::string* ListDirectoryRequest::release_directorypath() {
+inline ::std::string* ListDirectoryRequestPro::release_directorypath() {
   clear_has_directorypath();
   if (directorypath_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -412,129 +412,129 @@ inline ::std::string* ListDirectoryRequest::release_directorypath() {
 
 // -------------------------------------------------------------------
 
-// ListDirectoryReply
+// ListDirectoryReplyPro
 
-// repeated .ncvfs.FileInfo fileInfo = 1;
-inline int ListDirectoryReply::fileinfo_size() const {
-  return fileinfo_.size();
+// repeated .ncvfs.FileInfoPro fileInfoPro = 1;
+inline int ListDirectoryReplyPro::fileinfopro_size() const {
+  return fileinfopro_.size();
 }
-inline void ListDirectoryReply::clear_fileinfo() {
-  fileinfo_.Clear();
+inline void ListDirectoryReplyPro::clear_fileinfopro() {
+  fileinfopro_.Clear();
 }
-inline const ::ncvfs::FileInfo& ListDirectoryReply::fileinfo(int index) const {
-  return fileinfo_.Get(index);
+inline const ::ncvfs::FileInfoPro& ListDirectoryReplyPro::fileinfopro(int index) const {
+  return fileinfopro_.Get(index);
 }
-inline ::ncvfs::FileInfo* ListDirectoryReply::mutable_fileinfo(int index) {
-  return fileinfo_.Mutable(index);
+inline ::ncvfs::FileInfoPro* ListDirectoryReplyPro::mutable_fileinfopro(int index) {
+  return fileinfopro_.Mutable(index);
 }
-inline ::ncvfs::FileInfo* ListDirectoryReply::add_fileinfo() {
-  return fileinfo_.Add();
+inline ::ncvfs::FileInfoPro* ListDirectoryReplyPro::add_fileinfopro() {
+  return fileinfopro_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo >&
-ListDirectoryReply::fileinfo() const {
-  return fileinfo_;
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfoPro >&
+ListDirectoryReplyPro::fileinfopro() const {
+  return fileinfopro_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo >*
-ListDirectoryReply::mutable_fileinfo() {
-  return &fileinfo_;
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfoPro >*
+ListDirectoryReplyPro::mutable_fileinfopro() {
+  return &fileinfopro_;
 }
 
 // -------------------------------------------------------------------
 
-// FileInfo
+// FileInfoPro
 
 // optional fixed32 fileId = 1;
-inline bool FileInfo::has_fileid() const {
+inline bool FileInfoPro::has_fileid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void FileInfo::set_has_fileid() {
+inline void FileInfoPro::set_has_fileid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void FileInfo::clear_has_fileid() {
+inline void FileInfoPro::clear_has_fileid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void FileInfo::clear_fileid() {
+inline void FileInfoPro::clear_fileid() {
   fileid_ = 0u;
   clear_has_fileid();
 }
-inline ::google::protobuf::uint32 FileInfo::fileid() const {
+inline ::google::protobuf::uint32 FileInfoPro::fileid() const {
   return fileid_;
 }
-inline void FileInfo::set_fileid(::google::protobuf::uint32 value) {
+inline void FileInfoPro::set_fileid(::google::protobuf::uint32 value) {
   set_has_fileid();
   fileid_ = value;
 }
 
-// optional fixed64 filesize = 2;
-inline bool FileInfo::has_filesize() const {
+// optional fixed64 fileSize = 2;
+inline bool FileInfoPro::has_filesize() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void FileInfo::set_has_filesize() {
+inline void FileInfoPro::set_has_filesize() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void FileInfo::clear_has_filesize() {
+inline void FileInfoPro::clear_has_filesize() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void FileInfo::clear_filesize() {
+inline void FileInfoPro::clear_filesize() {
   filesize_ = GOOGLE_ULONGLONG(0);
   clear_has_filesize();
 }
-inline ::google::protobuf::uint64 FileInfo::filesize() const {
+inline ::google::protobuf::uint64 FileInfoPro::filesize() const {
   return filesize_;
 }
-inline void FileInfo::set_filesize(::google::protobuf::uint64 value) {
+inline void FileInfoPro::set_filesize(::google::protobuf::uint64 value) {
   set_has_filesize();
   filesize_ = value;
 }
 
-// optional string filename = 3;
-inline bool FileInfo::has_filename() const {
+// optional string fileName = 3;
+inline bool FileInfoPro::has_filename() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void FileInfo::set_has_filename() {
+inline void FileInfoPro::set_has_filename() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void FileInfo::clear_has_filename() {
+inline void FileInfoPro::clear_has_filename() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void FileInfo::clear_filename() {
+inline void FileInfoPro::clear_filename() {
   if (filename_ != &::google::protobuf::internal::kEmptyString) {
     filename_->clear();
   }
   clear_has_filename();
 }
-inline const ::std::string& FileInfo::filename() const {
+inline const ::std::string& FileInfoPro::filename() const {
   return *filename_;
 }
-inline void FileInfo::set_filename(const ::std::string& value) {
+inline void FileInfoPro::set_filename(const ::std::string& value) {
   set_has_filename();
   if (filename_ == &::google::protobuf::internal::kEmptyString) {
     filename_ = new ::std::string;
   }
   filename_->assign(value);
 }
-inline void FileInfo::set_filename(const char* value) {
+inline void FileInfoPro::set_filename(const char* value) {
   set_has_filename();
   if (filename_ == &::google::protobuf::internal::kEmptyString) {
     filename_ = new ::std::string;
   }
   filename_->assign(value);
 }
-inline void FileInfo::set_filename(const char* value, size_t size) {
+inline void FileInfoPro::set_filename(const char* value, size_t size) {
   set_has_filename();
   if (filename_ == &::google::protobuf::internal::kEmptyString) {
     filename_ = new ::std::string;
   }
   filename_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* FileInfo::mutable_filename() {
+inline ::std::string* FileInfoPro::mutable_filename() {
   set_has_filename();
   if (filename_ == &::google::protobuf::internal::kEmptyString) {
     filename_ = new ::std::string;
   }
   return filename_;
 }
-inline ::std::string* FileInfo::release_filename() {
+inline ::std::string* FileInfoPro::release_filename() {
   clear_has_filename();
   if (filename_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;

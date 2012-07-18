@@ -21,6 +21,10 @@ public:
 	ListDirectoryRequestMsg(uint32_t osdId, string directoryPath, uint32_t mdsSockfd);
 	void prepareProtocolMsg();
 	void printProtocol();
+
+	void parse (char* buf);
+
+	void handle ();
 private:
 	uint32_t _osdId;
 	string _directoryPath;

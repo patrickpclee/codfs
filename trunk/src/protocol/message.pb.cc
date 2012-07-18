@@ -17,15 +17,15 @@ namespace ncvfs {
 
 namespace {
 
-const ::google::protobuf::Descriptor* ListDirectoryRequest_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* ListDirectoryRequestPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  ListDirectoryRequest_reflection_ = NULL;
-const ::google::protobuf::Descriptor* ListDirectoryReply_descriptor_ = NULL;
+  ListDirectoryRequestPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* ListDirectoryReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  ListDirectoryReply_reflection_ = NULL;
-const ::google::protobuf::Descriptor* FileInfo_descriptor_ = NULL;
+  ListDirectoryReplyPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* FileInfoPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  FileInfo_reflection_ = NULL;
+  FileInfoPro_reflection_ = NULL;
 
 }  // namespace
 
@@ -36,54 +36,54 @@ void protobuf_AssignDesc_message_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "message.proto");
   GOOGLE_CHECK(file != NULL);
-  ListDirectoryRequest_descriptor_ = file->message_type(0);
-  static const int ListDirectoryRequest_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequest, osdid_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequest, directorypath_),
+  ListDirectoryRequestPro_descriptor_ = file->message_type(0);
+  static const int ListDirectoryRequestPro_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequestPro, osdid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequestPro, directorypath_),
   };
-  ListDirectoryRequest_reflection_ =
+  ListDirectoryRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      ListDirectoryRequest_descriptor_,
-      ListDirectoryRequest::default_instance_,
-      ListDirectoryRequest_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequest, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequest, _unknown_fields_),
+      ListDirectoryRequestPro_descriptor_,
+      ListDirectoryRequestPro::default_instance_,
+      ListDirectoryRequestPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequestPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequestPro, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(ListDirectoryRequest));
-  ListDirectoryReply_descriptor_ = file->message_type(1);
-  static const int ListDirectoryReply_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryReply, fileinfo_),
+      sizeof(ListDirectoryRequestPro));
+  ListDirectoryReplyPro_descriptor_ = file->message_type(1);
+  static const int ListDirectoryReplyPro_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryReplyPro, fileinfopro_),
   };
-  ListDirectoryReply_reflection_ =
+  ListDirectoryReplyPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      ListDirectoryReply_descriptor_,
-      ListDirectoryReply::default_instance_,
-      ListDirectoryReply_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryReply, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryReply, _unknown_fields_),
+      ListDirectoryReplyPro_descriptor_,
+      ListDirectoryReplyPro::default_instance_,
+      ListDirectoryReplyPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryReplyPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryReplyPro, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(ListDirectoryReply));
-  FileInfo_descriptor_ = file->message_type(2);
-  static const int FileInfo_offsets_[3] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfo, fileid_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfo, filesize_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfo, filename_),
+      sizeof(ListDirectoryReplyPro));
+  FileInfoPro_descriptor_ = file->message_type(2);
+  static const int FileInfoPro_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfoPro, fileid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfoPro, filesize_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfoPro, filename_),
   };
-  FileInfo_reflection_ =
+  FileInfoPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      FileInfo_descriptor_,
-      FileInfo::default_instance_,
-      FileInfo_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfo, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfo, _unknown_fields_),
+      FileInfoPro_descriptor_,
+      FileInfoPro::default_instance_,
+      FileInfoPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfoPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(FileInfoPro, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(FileInfo));
+      sizeof(FileInfoPro));
 }
 
 namespace {
@@ -97,22 +97,22 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    ListDirectoryRequest_descriptor_, &ListDirectoryRequest::default_instance());
+    ListDirectoryRequestPro_descriptor_, &ListDirectoryRequestPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    ListDirectoryReply_descriptor_, &ListDirectoryReply::default_instance());
+    ListDirectoryReplyPro_descriptor_, &ListDirectoryReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    FileInfo_descriptor_, &FileInfo::default_instance());
+    FileInfoPro_descriptor_, &FileInfoPro::default_instance());
 }
 
 }  // namespace
 
 void protobuf_ShutdownFile_message_2eproto() {
-  delete ListDirectoryRequest::default_instance_;
-  delete ListDirectoryRequest_reflection_;
-  delete ListDirectoryReply::default_instance_;
-  delete ListDirectoryReply_reflection_;
-  delete FileInfo::default_instance_;
-  delete FileInfo_reflection_;
+  delete ListDirectoryRequestPro::default_instance_;
+  delete ListDirectoryRequestPro_reflection_;
+  delete ListDirectoryReplyPro::default_instance_;
+  delete ListDirectoryReplyPro_reflection_;
+  delete FileInfoPro::default_instance_;
+  delete FileInfoPro_reflection_;
 }
 
 void protobuf_AddDesc_message_2eproto() {
@@ -122,20 +122,20 @@ void protobuf_AddDesc_message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rmessage.proto\022\005ncvfs\"<\n\024ListDirectoryR"
-    "equest\022\r\n\005osdId\030\001 \001(\005\022\025\n\rdirectoryPath\030\002"
-    " \001(\t\"7\n\022ListDirectoryReply\022!\n\010fileInfo\030\001"
-    " \003(\0132\017.ncvfs.FileInfo\">\n\010FileInfo\022\016\n\006fil"
-    "eId\030\001 \001(\007\022\020\n\010filesize\030\002 \001(\006\022\020\n\010filename\030"
-    "\003 \001(\t", 205);
+    "\n\rmessage.proto\022\005ncvfs\"\?\n\027ListDirectoryR"
+    "equestPro\022\r\n\005osdId\030\001 \001(\005\022\025\n\rdirectoryPat"
+    "h\030\002 \001(\t\"@\n\025ListDirectoryReplyPro\022\'\n\013file"
+    "InfoPro\030\001 \003(\0132\022.ncvfs.FileInfoPro\"A\n\013Fil"
+    "eInfoPro\022\016\n\006fileId\030\001 \001(\007\022\020\n\010fileSize\030\002 \001"
+    "(\006\022\020\n\010fileName\030\003 \001(\t", 220);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
-  ListDirectoryRequest::default_instance_ = new ListDirectoryRequest();
-  ListDirectoryReply::default_instance_ = new ListDirectoryReply();
-  FileInfo::default_instance_ = new FileInfo();
-  ListDirectoryRequest::default_instance_->InitAsDefaultInstance();
-  ListDirectoryReply::default_instance_->InitAsDefaultInstance();
-  FileInfo::default_instance_->InitAsDefaultInstance();
+  ListDirectoryRequestPro::default_instance_ = new ListDirectoryRequestPro();
+  ListDirectoryReplyPro::default_instance_ = new ListDirectoryReplyPro();
+  FileInfoPro::default_instance_ = new FileInfoPro();
+  ListDirectoryRequestPro::default_instance_->InitAsDefaultInstance();
+  ListDirectoryReplyPro::default_instance_->InitAsDefaultInstance();
+  FileInfoPro::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
 }
 
@@ -150,36 +150,36 @@ struct StaticDescriptorInitializer_message_2eproto {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int ListDirectoryRequest::kOsdIdFieldNumber;
-const int ListDirectoryRequest::kDirectoryPathFieldNumber;
+const int ListDirectoryRequestPro::kOsdIdFieldNumber;
+const int ListDirectoryRequestPro::kDirectoryPathFieldNumber;
 #endif  // !_MSC_VER
 
-ListDirectoryRequest::ListDirectoryRequest()
+ListDirectoryRequestPro::ListDirectoryRequestPro()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void ListDirectoryRequest::InitAsDefaultInstance() {
+void ListDirectoryRequestPro::InitAsDefaultInstance() {
 }
 
-ListDirectoryRequest::ListDirectoryRequest(const ListDirectoryRequest& from)
+ListDirectoryRequestPro::ListDirectoryRequestPro(const ListDirectoryRequestPro& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void ListDirectoryRequest::SharedCtor() {
+void ListDirectoryRequestPro::SharedCtor() {
   _cached_size_ = 0;
   osdid_ = 0;
   directorypath_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-ListDirectoryRequest::~ListDirectoryRequest() {
+ListDirectoryRequestPro::~ListDirectoryRequestPro() {
   SharedDtor();
 }
 
-void ListDirectoryRequest::SharedDtor() {
+void ListDirectoryRequestPro::SharedDtor() {
   if (directorypath_ != &::google::protobuf::internal::kEmptyString) {
     delete directorypath_;
   }
@@ -187,27 +187,27 @@ void ListDirectoryRequest::SharedDtor() {
   }
 }
 
-void ListDirectoryRequest::SetCachedSize(int size) const {
+void ListDirectoryRequestPro::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* ListDirectoryRequest::descriptor() {
+const ::google::protobuf::Descriptor* ListDirectoryRequestPro::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return ListDirectoryRequest_descriptor_;
+  return ListDirectoryRequestPro_descriptor_;
 }
 
-const ListDirectoryRequest& ListDirectoryRequest::default_instance() {
+const ListDirectoryRequestPro& ListDirectoryRequestPro::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
 }
 
-ListDirectoryRequest* ListDirectoryRequest::default_instance_ = NULL;
+ListDirectoryRequestPro* ListDirectoryRequestPro::default_instance_ = NULL;
 
-ListDirectoryRequest* ListDirectoryRequest::New() const {
-  return new ListDirectoryRequest;
+ListDirectoryRequestPro* ListDirectoryRequestPro::New() const {
+  return new ListDirectoryRequestPro;
 }
 
-void ListDirectoryRequest::Clear() {
+void ListDirectoryRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     osdid_ = 0;
     if (has_directorypath()) {
@@ -220,7 +220,7 @@ void ListDirectoryRequest::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool ListDirectoryRequest::MergePartialFromCodedStream(
+bool ListDirectoryRequestPro::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -274,7 +274,7 @@ bool ListDirectoryRequest::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void ListDirectoryRequest::SerializeWithCachedSizes(
+void ListDirectoryRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional int32 osdId = 1;
   if (has_osdid()) {
@@ -296,7 +296,7 @@ void ListDirectoryRequest::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* ListDirectoryRequest::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ListDirectoryRequestPro::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional int32 osdId = 1;
   if (has_osdid()) {
@@ -320,7 +320,7 @@ void ListDirectoryRequest::SerializeWithCachedSizes(
   return target;
 }
 
-int ListDirectoryRequest::ByteSize() const {
+int ListDirectoryRequestPro::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -350,10 +350,10 @@ int ListDirectoryRequest::ByteSize() const {
   return total_size;
 }
 
-void ListDirectoryRequest::MergeFrom(const ::google::protobuf::Message& from) {
+void ListDirectoryRequestPro::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const ListDirectoryRequest* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const ListDirectoryRequest*>(
+  const ListDirectoryRequestPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ListDirectoryRequestPro*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -362,7 +362,7 @@ void ListDirectoryRequest::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void ListDirectoryRequest::MergeFrom(const ListDirectoryRequest& from) {
+void ListDirectoryRequestPro::MergeFrom(const ListDirectoryRequestPro& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_osdid()) {
@@ -375,24 +375,24 @@ void ListDirectoryRequest::MergeFrom(const ListDirectoryRequest& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void ListDirectoryRequest::CopyFrom(const ::google::protobuf::Message& from) {
+void ListDirectoryRequestPro::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void ListDirectoryRequest::CopyFrom(const ListDirectoryRequest& from) {
+void ListDirectoryRequestPro::CopyFrom(const ListDirectoryRequestPro& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool ListDirectoryRequest::IsInitialized() const {
+bool ListDirectoryRequestPro::IsInitialized() const {
   
   return true;
 }
 
-void ListDirectoryRequest::Swap(ListDirectoryRequest* other) {
+void ListDirectoryRequestPro::Swap(ListDirectoryRequestPro* other) {
   if (other != this) {
     std::swap(osdid_, other->osdid_);
     std::swap(directorypath_, other->directorypath_);
@@ -402,11 +402,11 @@ void ListDirectoryRequest::Swap(ListDirectoryRequest* other) {
   }
 }
 
-::google::protobuf::Metadata ListDirectoryRequest::GetMetadata() const {
+::google::protobuf::Metadata ListDirectoryRequestPro::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = ListDirectoryRequest_descriptor_;
-  metadata.reflection = ListDirectoryRequest_reflection_;
+  metadata.descriptor = ListDirectoryRequestPro_descriptor_;
+  metadata.reflection = ListDirectoryRequestPro_reflection_;
   return metadata;
 }
 
@@ -414,80 +414,80 @@ void ListDirectoryRequest::Swap(ListDirectoryRequest* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int ListDirectoryReply::kFileInfoFieldNumber;
+const int ListDirectoryReplyPro::kFileInfoProFieldNumber;
 #endif  // !_MSC_VER
 
-ListDirectoryReply::ListDirectoryReply()
+ListDirectoryReplyPro::ListDirectoryReplyPro()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void ListDirectoryReply::InitAsDefaultInstance() {
+void ListDirectoryReplyPro::InitAsDefaultInstance() {
 }
 
-ListDirectoryReply::ListDirectoryReply(const ListDirectoryReply& from)
+ListDirectoryReplyPro::ListDirectoryReplyPro(const ListDirectoryReplyPro& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void ListDirectoryReply::SharedCtor() {
+void ListDirectoryReplyPro::SharedCtor() {
   _cached_size_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-ListDirectoryReply::~ListDirectoryReply() {
+ListDirectoryReplyPro::~ListDirectoryReplyPro() {
   SharedDtor();
 }
 
-void ListDirectoryReply::SharedDtor() {
+void ListDirectoryReplyPro::SharedDtor() {
   if (this != default_instance_) {
   }
 }
 
-void ListDirectoryReply::SetCachedSize(int size) const {
+void ListDirectoryReplyPro::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* ListDirectoryReply::descriptor() {
+const ::google::protobuf::Descriptor* ListDirectoryReplyPro::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return ListDirectoryReply_descriptor_;
+  return ListDirectoryReplyPro_descriptor_;
 }
 
-const ListDirectoryReply& ListDirectoryReply::default_instance() {
+const ListDirectoryReplyPro& ListDirectoryReplyPro::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
 }
 
-ListDirectoryReply* ListDirectoryReply::default_instance_ = NULL;
+ListDirectoryReplyPro* ListDirectoryReplyPro::default_instance_ = NULL;
 
-ListDirectoryReply* ListDirectoryReply::New() const {
-  return new ListDirectoryReply;
+ListDirectoryReplyPro* ListDirectoryReplyPro::New() const {
+  return new ListDirectoryReplyPro;
 }
 
-void ListDirectoryReply::Clear() {
-  fileinfo_.Clear();
+void ListDirectoryReplyPro::Clear() {
+  fileinfopro_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
-bool ListDirectoryReply::MergePartialFromCodedStream(
+bool ListDirectoryReplyPro::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // repeated .ncvfs.FileInfo fileInfo = 1;
+      // repeated .ncvfs.FileInfoPro fileInfoPro = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_fileInfo:
+         parse_fileInfoPro:
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-                input, add_fileinfo()));
+                input, add_fileinfopro()));
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(10)) goto parse_fileInfo;
+        if (input->ExpectTag(10)) goto parse_fileInfoPro;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -508,12 +508,12 @@ bool ListDirectoryReply::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void ListDirectoryReply::SerializeWithCachedSizes(
+void ListDirectoryReplyPro::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // repeated .ncvfs.FileInfo fileInfo = 1;
-  for (int i = 0; i < this->fileinfo_size(); i++) {
+  // repeated .ncvfs.FileInfoPro fileInfoPro = 1;
+  for (int i = 0; i < this->fileinfopro_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, this->fileinfo(i), output);
+      1, this->fileinfopro(i), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -522,13 +522,13 @@ void ListDirectoryReply::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* ListDirectoryReply::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ListDirectoryReplyPro::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // repeated .ncvfs.FileInfo fileInfo = 1;
-  for (int i = 0; i < this->fileinfo_size(); i++) {
+  // repeated .ncvfs.FileInfoPro fileInfoPro = 1;
+  for (int i = 0; i < this->fileinfopro_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
-        1, this->fileinfo(i), target);
+        1, this->fileinfopro(i), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -538,15 +538,15 @@ void ListDirectoryReply::SerializeWithCachedSizes(
   return target;
 }
 
-int ListDirectoryReply::ByteSize() const {
+int ListDirectoryReplyPro::ByteSize() const {
   int total_size = 0;
   
-  // repeated .ncvfs.FileInfo fileInfo = 1;
-  total_size += 1 * this->fileinfo_size();
-  for (int i = 0; i < this->fileinfo_size(); i++) {
+  // repeated .ncvfs.FileInfoPro fileInfoPro = 1;
+  total_size += 1 * this->fileinfopro_size();
+  for (int i = 0; i < this->fileinfopro_size(); i++) {
     total_size +=
       ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->fileinfo(i));
+        this->fileinfopro(i));
   }
   
   if (!unknown_fields().empty()) {
@@ -560,10 +560,10 @@ int ListDirectoryReply::ByteSize() const {
   return total_size;
 }
 
-void ListDirectoryReply::MergeFrom(const ::google::protobuf::Message& from) {
+void ListDirectoryReplyPro::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const ListDirectoryReply* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const ListDirectoryReply*>(
+  const ListDirectoryReplyPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ListDirectoryReplyPro*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -572,43 +572,43 @@ void ListDirectoryReply::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void ListDirectoryReply::MergeFrom(const ListDirectoryReply& from) {
+void ListDirectoryReplyPro::MergeFrom(const ListDirectoryReplyPro& from) {
   GOOGLE_CHECK_NE(&from, this);
-  fileinfo_.MergeFrom(from.fileinfo_);
+  fileinfopro_.MergeFrom(from.fileinfopro_);
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void ListDirectoryReply::CopyFrom(const ::google::protobuf::Message& from) {
+void ListDirectoryReplyPro::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void ListDirectoryReply::CopyFrom(const ListDirectoryReply& from) {
+void ListDirectoryReplyPro::CopyFrom(const ListDirectoryReplyPro& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool ListDirectoryReply::IsInitialized() const {
+bool ListDirectoryReplyPro::IsInitialized() const {
   
   return true;
 }
 
-void ListDirectoryReply::Swap(ListDirectoryReply* other) {
+void ListDirectoryReplyPro::Swap(ListDirectoryReplyPro* other) {
   if (other != this) {
-    fileinfo_.Swap(&other->fileinfo_);
+    fileinfopro_.Swap(&other->fileinfopro_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
   }
 }
 
-::google::protobuf::Metadata ListDirectoryReply::GetMetadata() const {
+::google::protobuf::Metadata ListDirectoryReplyPro::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = ListDirectoryReply_descriptor_;
-  metadata.reflection = ListDirectoryReply_reflection_;
+  metadata.descriptor = ListDirectoryReplyPro_descriptor_;
+  metadata.reflection = ListDirectoryReplyPro_reflection_;
   return metadata;
 }
 
@@ -616,26 +616,26 @@ void ListDirectoryReply::Swap(ListDirectoryReply* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int FileInfo::kFileIdFieldNumber;
-const int FileInfo::kFilesizeFieldNumber;
-const int FileInfo::kFilenameFieldNumber;
+const int FileInfoPro::kFileIdFieldNumber;
+const int FileInfoPro::kFileSizeFieldNumber;
+const int FileInfoPro::kFileNameFieldNumber;
 #endif  // !_MSC_VER
 
-FileInfo::FileInfo()
+FileInfoPro::FileInfoPro()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void FileInfo::InitAsDefaultInstance() {
+void FileInfoPro::InitAsDefaultInstance() {
 }
 
-FileInfo::FileInfo(const FileInfo& from)
+FileInfoPro::FileInfoPro(const FileInfoPro& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void FileInfo::SharedCtor() {
+void FileInfoPro::SharedCtor() {
   _cached_size_ = 0;
   fileid_ = 0u;
   filesize_ = GOOGLE_ULONGLONG(0);
@@ -643,11 +643,11 @@ void FileInfo::SharedCtor() {
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-FileInfo::~FileInfo() {
+FileInfoPro::~FileInfoPro() {
   SharedDtor();
 }
 
-void FileInfo::SharedDtor() {
+void FileInfoPro::SharedDtor() {
   if (filename_ != &::google::protobuf::internal::kEmptyString) {
     delete filename_;
   }
@@ -655,27 +655,27 @@ void FileInfo::SharedDtor() {
   }
 }
 
-void FileInfo::SetCachedSize(int size) const {
+void FileInfoPro::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* FileInfo::descriptor() {
+const ::google::protobuf::Descriptor* FileInfoPro::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return FileInfo_descriptor_;
+  return FileInfoPro_descriptor_;
 }
 
-const FileInfo& FileInfo::default_instance() {
+const FileInfoPro& FileInfoPro::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
 }
 
-FileInfo* FileInfo::default_instance_ = NULL;
+FileInfoPro* FileInfoPro::default_instance_ = NULL;
 
-FileInfo* FileInfo::New() const {
-  return new FileInfo;
+FileInfoPro* FileInfoPro::New() const {
+  return new FileInfoPro;
 }
 
-void FileInfo::Clear() {
+void FileInfoPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     fileid_ = 0u;
     filesize_ = GOOGLE_ULONGLONG(0);
@@ -689,7 +689,7 @@ void FileInfo::Clear() {
   mutable_unknown_fields()->Clear();
 }
 
-bool FileInfo::MergePartialFromCodedStream(
+bool FileInfoPro::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -706,15 +706,15 @@ bool FileInfo::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(17)) goto parse_filesize;
+        if (input->ExpectTag(17)) goto parse_fileSize;
         break;
       }
       
-      // optional fixed64 filesize = 2;
+      // optional fixed64 fileSize = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
-         parse_filesize:
+         parse_fileSize:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
                  input, &filesize_)));
@@ -722,15 +722,15 @@ bool FileInfo::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(26)) goto parse_filename;
+        if (input->ExpectTag(26)) goto parse_fileName;
         break;
       }
       
-      // optional string filename = 3;
+      // optional string fileName = 3;
       case 3: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_filename:
+         parse_fileName:
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_filename()));
           ::google::protobuf::internal::WireFormat::VerifyUTF8String(
@@ -759,19 +759,19 @@ bool FileInfo::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void FileInfo::SerializeWithCachedSizes(
+void FileInfoPro::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional fixed32 fileId = 1;
   if (has_fileid()) {
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->fileid(), output);
   }
   
-  // optional fixed64 filesize = 2;
+  // optional fixed64 fileSize = 2;
   if (has_filesize()) {
     ::google::protobuf::internal::WireFormatLite::WriteFixed64(2, this->filesize(), output);
   }
   
-  // optional string filename = 3;
+  // optional string fileName = 3;
   if (has_filename()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->filename().data(), this->filename().length(),
@@ -786,19 +786,19 @@ void FileInfo::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* FileInfo::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* FileInfoPro::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional fixed32 fileId = 1;
   if (has_fileid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->fileid(), target);
   }
   
-  // optional fixed64 filesize = 2;
+  // optional fixed64 fileSize = 2;
   if (has_filesize()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(2, this->filesize(), target);
   }
   
-  // optional string filename = 3;
+  // optional string fileName = 3;
   if (has_filename()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8String(
       this->filename().data(), this->filename().length(),
@@ -815,7 +815,7 @@ void FileInfo::SerializeWithCachedSizes(
   return target;
 }
 
-int FileInfo::ByteSize() const {
+int FileInfoPro::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -824,12 +824,12 @@ int FileInfo::ByteSize() const {
       total_size += 1 + 4;
     }
     
-    // optional fixed64 filesize = 2;
+    // optional fixed64 fileSize = 2;
     if (has_filesize()) {
       total_size += 1 + 8;
     }
     
-    // optional string filename = 3;
+    // optional string fileName = 3;
     if (has_filename()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -848,10 +848,10 @@ int FileInfo::ByteSize() const {
   return total_size;
 }
 
-void FileInfo::MergeFrom(const ::google::protobuf::Message& from) {
+void FileInfoPro::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const FileInfo* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const FileInfo*>(
+  const FileInfoPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const FileInfoPro*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -860,7 +860,7 @@ void FileInfo::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void FileInfo::MergeFrom(const FileInfo& from) {
+void FileInfoPro::MergeFrom(const FileInfoPro& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_fileid()) {
@@ -876,24 +876,24 @@ void FileInfo::MergeFrom(const FileInfo& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void FileInfo::CopyFrom(const ::google::protobuf::Message& from) {
+void FileInfoPro::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void FileInfo::CopyFrom(const FileInfo& from) {
+void FileInfoPro::CopyFrom(const FileInfoPro& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool FileInfo::IsInitialized() const {
+bool FileInfoPro::IsInitialized() const {
   
   return true;
 }
 
-void FileInfo::Swap(FileInfo* other) {
+void FileInfoPro::Swap(FileInfoPro* other) {
   if (other != this) {
     std::swap(fileid_, other->fileid_);
     std::swap(filesize_, other->filesize_);
@@ -904,11 +904,11 @@ void FileInfo::Swap(FileInfo* other) {
   }
 }
 
-::google::protobuf::Metadata FileInfo::GetMetadata() const {
+::google::protobuf::Metadata FileInfoPro::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = FileInfo_descriptor_;
-  metadata.reflection = FileInfo_reflection_;
+  metadata.descriptor = FileInfoPro_descriptor_;
+  metadata.reflection = FileInfoPro_reflection_;
   return metadata;
 }
 

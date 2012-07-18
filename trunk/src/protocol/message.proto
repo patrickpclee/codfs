@@ -14,7 +14,7 @@ message ListDirectoryRequestPro {
 //
 
 message ListDirectoryReplyPro {
-	repeated FileInfo fileInfo = 1;
+	repeated FileInfoPro fileInfoPro = 1;
 } 
 
 message FileInfoPro {

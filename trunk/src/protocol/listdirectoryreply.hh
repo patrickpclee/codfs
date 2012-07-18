@@ -30,15 +30,19 @@ public:
 	 * @param	path	Path to the Folder
 	 * @param	folderData	Folder Data
 	 */
-	ListDirectoryReplyMsg(uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData);
+	ListDirectoryReplyMsg (uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData);
 
 	/**
 	 * @brief	Copy values in private variables to protocol message
 	 * Serialize protocol message and copy to private variable
 	 */
-	void prepareProtocolMsg();
+	void prepareProtocolMsg ();
 
-	void printProtocol();
+	void printProtocol ();
+
+	void parse (char* buf);
+
+	void handle ();
 private:
 	string _path;
 	vector<FileMetaData> _folderData;

@@ -30,10 +30,10 @@ void ListDirectoryReplyMsg::prepareProtocolMsg() {
 
 	for (it = _folderData.begin(); it < _folderData.end(); ++it)
 	{
-		ncvfs::FileInfo* fileInfo = listDirectoryReplyPro.add_fileinfo();
-		fileInfo->set_fileid((*it)._id);
-		fileInfo->set_filesize((*it)._size);
-		fileInfo->set_filename((*it)._path);
+		ncvfs::FileInfoPro* fileInfoPro = listDirectoryReplyPro.add_fileinfopro();
+		fileInfoPro->set_fileid((*it)._id);
+		fileInfoPro->set_filesize((*it)._size);
+		fileInfoPro->set_filename((*it)._path);
 	}
 
 	if (!listDirectoryReplyPro.SerializeToString(&serializedString)) {

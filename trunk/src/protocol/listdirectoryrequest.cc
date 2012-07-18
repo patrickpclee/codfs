@@ -14,7 +14,7 @@
  * @param mdsSockfd Socket descriptor of MDS
  */
 
-ListDirectoryRequestMessage::ListDirectoryRequestMessage(uint32_t osdId,
+ListDirectoryRequestMsg::ListDirectoryRequestMsg(uint32_t osdId,
 		string directoryPath, uint32_t mdsSockfd) {
 	_osdId = osdId;
 	_directoryPath = directoryPath;
@@ -26,14 +26,14 @@ ListDirectoryRequestMessage::ListDirectoryRequestMessage(uint32_t osdId,
  * Serialize protocol message and copy to private variable
  */
 
-void ListDirectoryRequestMessage::prepareProtocolMsg() {
+void ListDirectoryRequestMsg::prepareProtocolMsg() {
 	string serializedString;
 
-	ncvfs::ListDirectoryRequest listDirectoryRequest;
-	listDirectoryRequest.set_directorypath(_directoryPath);
-	listDirectoryRequest.set_osdid(_osdId);
+	ncvfs::ListDirectoryRequestPro listDirectoryRequestPro;
+	listDirectoryRequestPro.set_directorypath(_directoryPath);
+	listDirectoryRequestPro.set_osdid(_osdId);
 
-	if (!listDirectoryRequest.SerializeToString(&serializedString)) {
+	if (!listDirectoryRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
 		return;
 	}
@@ -48,7 +48,7 @@ void ListDirectoryRequestMessage::prepareProtocolMsg() {
  * DEBUG: override method: print protocol message
  */
 
-void ListDirectoryRequestMessage::printProtocol() {
+void ListDirectoryRequestMsg::printProtocol() {
 	cout << "[LIST_DIRECTORY_REQUEST] osdID = " << _osdId << " Path = "
 			<< _directoryPath << endl;
 }
