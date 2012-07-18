@@ -17,7 +17,7 @@ using namespace std;
 
 #pragma pack(1)
 struct MsgHeader {
-	uint32_t _requestId;
+	uint32_t requestId;
 	uint32_t protocolMsgType;
 	uint32_t protocolMsgSize;
 	uint32_t payloadSize;
@@ -95,6 +95,7 @@ public:
 	// getter
 	//
 
+	uint32_t getSockfd();
 	struct MsgHeader getMsgHeader ();
 	string getProtocolMsg();
 	char* getPayload();

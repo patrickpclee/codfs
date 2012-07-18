@@ -32,37 +32,43 @@ public:
 	/**
 	 * Destructor
 	 */
+
 	~Osd();
 
 	/**
 	 * Action when an OSD list is received
+	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	Object ID
 	 * @param osdList 	Secondary OSD List
 	 * @return Length of list if success, -1 if failure
 	 */
 
-	uint32_t osdListHandler(uint64_t objectId, list<uint32_t> osdList);
+	uint32_t osdListProcessor(uint32_t sockfd, uint64_t objectId,
+			list<uint32_t> osdList);
 
 	/**
 	 * Action when a getObjectRequest is received
+	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of the object to send
-	 * @param sockfd	Socket Descriptor of the destination
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t getObjectHandler(uint64_t objectId, uint32_t sockfd);
+	uint32_t getObjectProcessor(uint32_t sockfd, uint64_t objectId);
 
 	/**
 	 * Action when a getSegmentRequest is received
+	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of Object that the segment is belonged to
 	 * @param segmentId ID of the segment to send
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t getSegmentHandler(uint64_t objectId, uint32_t segmentId);
+	uint32_t getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
+			uint32_t segmentId);
 
 	/**
 	 * Action when an object trunk is received
+	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param offset Offset of the trunk in the object
 	 * @param length Length of trunk
@@ -70,11 +76,12 @@ public:
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
-	uint32_t objectTrunkHandler(uint64_t objectId, uint32_t offset,
-			uint32_t length, char* buf);
+	uint32_t objectTrunkProcessor(uint32_t sockfd, uint64_t objectId,
+			uint32_t offset, uint32_t length, char* buf);
 
 	/**
 	 * Action when a segment trunk is received
+	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
 	 * @param offset Offset of the trunk in the segment
@@ -83,15 +90,17 @@ public:
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
-	uint32_t segmentTrunkHandler(uint64_t objectId, uint32_t segmentId,
-			uint32_t offset, uint32_t length, vector<unsigned char> buf);
+	uint32_t segmentTrunkProcessor(uint32_t sockfd, uint64_t objectId,
+			uint32_t segmentId, uint32_t offset, uint32_t length,
+			vector<unsigned char> buf);
 
 	/**
 	 * Action when a recovery request is received
+	 * @param sockfd Socket descriptor of message source
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t recoveryHandler();
+	uint32_t recoveryProcessor(uint32_t sockfd);
 
 	// getters
 
@@ -130,23 +139,6 @@ private:
 			list<struct SegmentData> segmentData);
 
 	/**
-	 * Send a request to get a segment to other OSD
-	 * @param objectId ID of the object that the segment is belonged to
-	 * @param segmentId
-	 * @return 0 if success, -1 if failure
-	 */
-
-	uint32_t getSegmentRequest(uint64_t objectId, uint32_t segmentId);
-
-	/**
-	 * Send a request to get the secondary OSD list of an object from MDS/Monitor
-	 * @param objectId Object ID for query
-	 * @return 0 if success, -1 if failure
-	 */
-
-	uint32_t getSecOsdListRequest(uint64_t objectId);
-
-	/**
 	 * Retrieve a segment from the storage module
 	 * @param objectId ID of the object that the segment is belonged to
 	 * @param segmentId ID of the segment to retrieve
@@ -155,25 +147,6 @@ private:
 
 	struct SegmentData getSegmentFromStroage(uint64_t objectId,
 			uint32_t segmentId);
-
-	/**
-	 * Send a segment to another OSD
-	 * @param segmentData a SegmentData structure
-	 * @param osdId ID of the destination OSD
-	 * @return 0 if success, -1 if failure
-	 */
-
-	uint32_t sendSegmentToOsd(struct SegmentData segmentData, uint32_t osdId);
-
-	/**
-	 * Send an object to a client
-	 * @param objectData an objectData structure
-	 * @param clientId ID of the destination client
-	 * @return 0 if success, -1 if failure
-	 */
-
-	uint32_t sendObjectToClient(struct ObjectData objectData,
-			uint32_t clientId);
 
 	/**
 	 * Save a segment to storage
@@ -190,14 +163,6 @@ private:
 	 */
 
 	struct ObjectData degradedRead(uint64_t objectId);
-
-	/**
-	 * Send a failure report to MDS / Monitor
-	 * @param osdId ID of the OSD that failed
-	 * @return 0 if success, -1 if failure
-	 */
-
-	uint32_t reportOsdFailure(uint32_t osdId);
 
 	/**
 	 * Stores the list of OSDs that store a certain segment

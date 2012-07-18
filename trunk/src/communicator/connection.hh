@@ -62,12 +62,9 @@ public:
 
 	char* recvMessage ();
 
-	/**
-	 * Get back socket descriptor
-	 * @return socket descriptor of this connection
-	 */
-
 	uint32_t getSockfd();
+	ComponentType getConnectionType();
+
 
 private:
 	uint32_t sendn (int sd, const void* buf, int buf_len);

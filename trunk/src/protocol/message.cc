@@ -48,7 +48,7 @@ void Message::setSockfd(uint32_t sockfd) {
 }
 
 void Message::setRequestId(uint32_t requestId) {
-	_requestId = requestId;
+	_msgHeader.requestId = requestId;
 }
 
 void Message::printHeader() {
@@ -97,4 +97,8 @@ string Message::getProtocolMsg() {
 
 char* Message::getPayload() {
 	return _payload;
+}
+
+uint32_t Message::getSockfd() {
+	return _sockfd;
 }

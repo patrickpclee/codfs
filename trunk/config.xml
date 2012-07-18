@@ -1,3 +1,7 @@
 <?xml version="1.0"?>
 <NcvfsConfig>
+	<Communication>
+	 	<!-- polling interval in terms of ms -->
+		<SendPollingInterval>100</SendPollingInterval>
+	</Communication>
 </NcvfsConfig>

@@ -175,6 +175,10 @@ uint32_t Connection::getSockfd() {
 	return _sockfd;
 }
 
+ComponentType Connection::getConnectionType() {
+	return _connectionType;
+}
+
 //
 // PRIVATE METHODS
 //
