@@ -8,6 +8,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include "../protocol/messagefactory.hh"
 #include "../protocol/message.hh"
 #include "connection.hh"
 #include "../common/enums.hh"
@@ -48,13 +49,14 @@ public:
 	void sendMessage();
 
 	/**
+	 * Abstract function
 	 * Aanalyze the MsgHeader and create the corresponding Message class
 	 * Execute message.handle() in a separate thread
 	 * @param buf Pointer to the buffer holding the Message
 	 * @param sockfd Socket Descriptor of incoming connection
 	 */
 
-	void dispatch(char* buf, uint32_t sockfd);
+	virtual void dispatch(char* buf, uint32_t sockfd) = 0;
 
 	/**
 	 * Establish a connection to a component. Save the connection to list
@@ -86,7 +88,14 @@ public:
 
 	uint32_t getMonitorSockfd();
 
+	/**
+	 *
+	 */
+
+	void setMessageFactory (MessageFactory* messageFactory);
+
 private:
+	MessageFactory* _messageFactory;
 	map<uint32_t, Connection> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
 };

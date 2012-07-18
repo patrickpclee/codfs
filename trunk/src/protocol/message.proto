@@ -4,7 +4,7 @@ package ncvfs;
 // OSD -> MDS
 //
 
-message ListDirectoryRequest {
+message ListDirectoryRequestPro {
 	optional int32 osdId = 1;
 	optional string directoryPath = 2;
 }
@@ -13,11 +13,11 @@ message ListDirectoryRequest {
 // MDS -> OSD
 //
 
-message FileList {
+message FileListPro {
 	repeated FileInfo fileInfo = 1;
 } 
 
-message FileInfo {
+message FileInfoPro {
 	optional int32 fileId = 1;
 	optional int32 filesize = 2;
 	optional string filename = 3;
