@@ -9,19 +9,31 @@
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
 
-ListDirectoryReplyMsg::ListDirectoryReplyMsg(uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
+ListDirectoryReplyMsg::ListDirectoryReplyMsg ()
 {
+
+}
+
+ListDirectoryReplyMsg::ListDirectoryReplyMsg (uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
+{
+	setVariables(requestId, sockfd, path, folderData);
+}
+
+void ListDirectoryReplyMsg::setVariables (uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
+{
+	_sockfd = sockfd;
 	_requestId = requestId;
 	_path = path;
 	_folderData = folderData;
-	_sockfd = sockfd;
+
+	return ;
 }
 
 /**
  * @brief	Copy values in private variables to protocol message
  * Serialize protocol message and copy to private variable
  */
-void ListDirectoryReplyMsg::prepareProtocolMsg() {
+void ListDirectoryReplyMsg::prepareProtocolMsg () {
 	string serializedString;
 
 	ncvfs::ListDirectoryReplyPro listDirectoryReplyPro;
