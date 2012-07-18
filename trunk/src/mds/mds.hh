@@ -68,7 +68,7 @@ public:
 	void downloadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId);
 
 	/**
-	 * @brief	Handle the Secondary Node List Request from Osds
+	 * @brief	Handle the Secondary Node List Request from Osd
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID

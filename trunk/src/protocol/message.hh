@@ -71,7 +71,7 @@ public:
 	 * Parse Message (binary) and store information into class variables
 	 */
 
-	virtual void parse() = 0;
+	virtual void parse(char* buf) = 0;
 
 	/**
 	 * After parsing, carry out action to handle the message
@@ -113,8 +113,9 @@ public:
 
 	virtual void printProtocol() = 0;
 
-private:
+protected:
 	uint32_t _sockfd;		// destination
+	uint32_t _requestId;
 	struct MsgHeader _msgHeader;
 	string _protocolMsg;
 	char* _payload;

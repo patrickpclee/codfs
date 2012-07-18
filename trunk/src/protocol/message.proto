@@ -13,12 +13,12 @@ message ListDirectoryRequestPro {
 // MDS -> OSD
 //
 
-message FileListPro {
+message ListDirectoryReplyPro {
 	repeated FileInfo fileInfo = 1;
 } 
 
 message FileInfoPro {
-	optional int32 fileId = 1;
-	optional int32 filesize = 2;
-	optional string filename = 3;
+	optional fixed32 fileId = 1;
+	optional fixed64 fileSize = 2;
+	optional string fileName = 3;
 }

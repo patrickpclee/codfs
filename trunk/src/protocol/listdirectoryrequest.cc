@@ -18,7 +18,7 @@ ListDirectoryRequestMessage::ListDirectoryRequestMessage(uint32_t osdId,
 		string directoryPath, uint32_t mdsSockfd) {
 	_osdId = osdId;
 	_directoryPath = directoryPath;
-	setSockfd(mdsSockfd);
+	_sockfd = mdsSockfd;
 }
 
 /**

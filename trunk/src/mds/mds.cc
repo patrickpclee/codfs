@@ -31,7 +31,7 @@ uint32_t Mds::uploadFileProcessor (uint32_t requestId, uint32_t connectionId, ui
 	uint32_t fileId = 0;
 
 	_nameSpaceModule->createFile(clientId, dstPath);
-	fileId = _metaDataModule->createFile(dstPath);
+	fileId = _metaDataModule->createFile(clientId, dstPath);
 
 	objectList = _metaDataModule->newObjectList(numOfObjs);
 	_metaDataModule->saveObjectList(fileId,objectList);
@@ -101,13 +101,15 @@ void Mds::downloadFileProcess (uint32_t requestId, uint32_t connectionId, uint32
 		primaryList.push_back(primaryId);	
 	}
 
-	_mdsCommunicator->replyObjectandPrimaryList(requestId, connectionId, fileId, objectList, primaryList);
+	unsigned char* checksum = _metaDataModule->readChecksum(fileId);
+
+	_mdsCommunicator->replyObjectandPrimaryList(requestId, connectionId, fileId, objectList, primaryList,checksum);
 	
 	return ;
 }
 
 /**
- * @brief	Handle the Secondary Node List Request from Osds
+ * @brief	Handle the Secondary Node List Request from Osd
  */
 void Mds::secondaryNodeListProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId)
 {
@@ -131,6 +133,8 @@ void Mds::listFolderProcessor (uint32_t requestId, uint32_t connectionId, uint32
 
 	folderData = _nameSpaceModule->listFolder(clientId, path);
 	_mdsCommunicator->replyFolderData(requestId, connectionId, path, folderData);
+
+	return ;
 }
 
 /**
