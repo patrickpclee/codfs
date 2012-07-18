@@ -88,14 +88,7 @@ public:
 
 	uint32_t getMonitorSockfd();
 
-	/**
-	 *
-	 */
-
-	void setMessageFactory (MessageFactory* messageFactory);
-
 private:
-	MessageFactory* _messageFactory;
 	map<uint32_t, Connection> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
 };

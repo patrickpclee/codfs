@@ -18,6 +18,7 @@ using namespace std;
 
 class ListDirectoryRequestMsg : public Message {
 public:
+	ListDirectoryRequestMsg();
 	ListDirectoryRequestMsg(uint32_t osdId, string directoryPath, uint32_t mdsSockfd);
 	void prepareProtocolMsg();
 	void printProtocol();
