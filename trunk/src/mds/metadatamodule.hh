@@ -13,11 +13,6 @@ using namespace std;
 
 class MetaDataModule {
 public:
-	//Lookup Object ID List from File ID
-//	uint64_t* getFileObjectList (uint32_t fileId);
-	// Lookup Object ID List from OSD ID
-//	uint64_t* getOsdObjectList (uint32_t osdId);o
-
 	string lookupFilePath (uint32_t fileId);
 	uint32_t lookupFileId (string path);
 
@@ -29,22 +24,22 @@ public:
 	vector<uint64_t> readObjectList (uint32_t fileId);
 	vector<uint64_t> readOsdObjectList (uint32_t osdId);
 
-//	uint32_t saveFileMetaData (FileMetaData	fileMetaData);
-//	uint32_t deleteFileMetaData (uint32_t fileId);
-//	uint32_t saveObjectList (uint32_t fileId, uint64_t objectIdList[]);
-
-	uint64_t newObjectId ();
-//	uint32_t saveObjectMetaData (ObjectMetaData	objectMetaData);
-//	uint32_t deleteObjectMetaData (uint64_t objectId);
+	/**
+	 * @brief	Generate List of Object ID
+	 *
+	 * @param	numOfObjs	Number of Objects
+	 */
+	vector<uint64_t> newObjectList (uint32_t numOfObjs);
 
 	void setPrimary (uint64_t objectId, uint32_t primaryOsdId);
 	uint32_t getPrimary (uint64_t objectId);
 
-	void saveNodeList (uint64_t objectId, vector<uint32_t> osdIdList);
+	void saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList);
 	vector<uint32_t> readNodeList (uint64_t objectId);
 
 
 private:
+	uint64_t newObjectId ();
 
 	FileMetaDataModule* _fileMetaDataModule;
 	ObjectMetaDataModule* _objectMetaDataModule;
