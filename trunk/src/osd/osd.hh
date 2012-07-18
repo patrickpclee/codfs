@@ -20,6 +20,29 @@
  * Objects and Segments can be divided into trunks for transportation
  */
 
+/**
+ * Message Functions
+ *
+ * UPLOAD
+ * 1. putObjectProcessor
+ * 2. objectTrunkProcessor 	-> getOsdListRequest (MONITOR)
+ * 									-> osdListProcessor
+ * 							-> sendSegmentToOsd
+ * 3. (other OSD) putSegmentProcessor
+ * 4. (other OSD) segmentTrunkProcessor
+ * 5. sendSegmentAck (PRIMARY OSD, CLIENT, MDS)
+ *
+ * DOWNLOAD
+ * 1. getObjectProcessor 	-> getOsdListRequest (MDS)
+ * 									-> osdListProcessor
+ * 2. getSegmentRequest
+ * 			-> (other OSD) getSegmentProcessor
+ * 			-> (other OSD) sendSegmentToOsd
+ * 			-> putSegmentProcessor
+ * 			-> segmentTrunkProcessor
+ * 	3. sendObjectToClient
+ */
+
 class Osd {
 public:
 
@@ -67,17 +90,45 @@ public:
 			uint32_t segmentId);
 
 	/**
+	 * Action when a put object request is received
+	 * A number of trunks are expected to receive afterwards
+	 * @param sockfd Socket descriptor of message source
+	 * @param objectId Object ID
+	 * @param length Object size, equals the total length of all the trunks
+	 * @param trunkCount Total number of trunks that will be sent
+	 * @return 0 if success, -1 if failure
+	 */
+
+	uint32_t putObjectProcessor(uint32_t sockfd, uint64_t objectId,
+			uint32_t length, uint32_t trunkCount);
+
+	/**
 	 * Action when an object trunk is received
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param offset Offset of the trunk in the object
 	 * @param length Length of trunk
+	 * @param trunkId ID of the trunk in this object
 	 * @param buf Pointer to buffer
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
 	uint32_t objectTrunkProcessor(uint32_t sockfd, uint64_t objectId,
-			uint32_t offset, uint32_t length, char* buf);
+			uint32_t offset, uint32_t length, uint32_t trunkId, char* buf);
+
+	/**
+	 * Action when a put object request is received
+	 * A number of trunks are expected to receive afterwards
+	 * @param sockfd Socket descriptor of message source
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 * @param length Segment size, equals the total length of all the trunks
+	 * @param trunkCount Total number of trunks that will be sent
+	 * @return 0 if success, -1 if failure
+	 */
+
+	uint32_t putSegmentProcessor(uint32_t sockfd, uint64_t objectId,
+			uint32_t segmentId, uint32_t length, uint32_t trunkCount);
 
 	/**
 	 * Action when a segment trunk is received
@@ -91,8 +142,7 @@ public:
 	 */
 
 	uint32_t segmentTrunkProcessor(uint32_t sockfd, uint64_t objectId,
-			uint32_t segmentId, uint32_t offset, uint32_t length,
-			vector<unsigned char> buf);
+			uint32_t segmentId, uint32_t offset, uint32_t length, char* buf);
 
 	/**
 	 * Action when a recovery request is received
@@ -118,32 +168,6 @@ public:
 	SegmentLocationCache* getSegmentLocationCache();
 
 private:
-
-	/**
-	 * Encode an object to a list of segments
-	 * @param objectData
-	 * @return A list of SegmentData structure
-	 */
-
-	list<struct SegmentData> encodeObjectToSegment(
-			struct ObjectData objectData);
-
-	/**
-	 * Decode a list of segments into an object
-	 * @param objectId Destination object ID
-	 * @param segmentData a list of SegmentData structure
-	 * @return an ObjectData structure
-	 */
-
-	struct ObjectData decodeSegmentToObject(uint64_t objectId,
-			list<struct SegmentData> segmentData);
-
-	/**
-	 * Retrieve a segment from the storage module
-	 * @param objectId ID of the object that the segment is belonged to
-	 * @param segmentId ID of the segment to retrieve
-	 * @return a SegmentData structure
-	 */
 
 	struct SegmentData getSegmentFromStroage(uint64_t objectId,
 			uint32_t segmentId);

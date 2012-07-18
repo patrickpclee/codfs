@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <vector>
 #include "osd.hh"
+#include "../config/config.hh"
+
+ConfigLayer* configLayer;
 
 Osd::Osd() {
 	cout << "OSD Created" << endl;
@@ -24,8 +27,11 @@ Osd::~Osd() {
 uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
 		list<uint32_t> osdList) {
 
+	/*
+
 	_segmentLocationCache->deleteSegmentLocation(objectId);
 	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
+	*/
 
 	return 0;
 }
@@ -37,6 +43,7 @@ uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
 uint32_t Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 	list<uint32_t> osdIdList;
 
+	/*
 	// check if I have the object
 	if (_storageModule) {
 
@@ -47,6 +54,7 @@ uint32_t Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 	} catch (CacheMissException &e) {
 
 	}
+	*/
 
 	return 0;
 
@@ -70,18 +78,18 @@ int main(void) {
 	// create new OSD object
 	Osd* osd = new Osd();
 
+	// new ConfigLayer object
+	configLayer = new ConfigLayer();
+
 	// create new communicator
 	OsdCommunicator* communicator = osd->getOsdCommunicator();
 
 	// connect to MDS
 	communicator->connectToMds();
 
-	// TEST: list directory from MDS
-//	communicator->listDirectoryRequest(1, "/");
-
-// cleanup
+	// cleanup
 	delete osd;
-	cout << "OSD Destroyed" << endl;
+	delete configLayer;
 
 	return 0;
 }

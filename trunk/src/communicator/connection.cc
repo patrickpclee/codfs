@@ -75,7 +75,7 @@ uint32_t Connection::sendMessage(Message* message) {
 	struct MsgHeader msgHeader = message->getMsgHeader();
 	const uint32_t headerLength = sizeof(struct MsgHeader);
 
-	if ((byteSent = sendn(sockfd, &msgHeader, headerLength)) != -1) {
+	if ((byteSent = sendn(sockfd, (const char*)&msgHeader, headerLength)) != -1) {
 		totalByteSent += byteSent;
 	} else {
 		cerr << "Error in sending MsgHeader" << endl;
@@ -121,7 +121,7 @@ char* Connection::recvMessage() {
 	struct MsgHeader msgHeader;
 	const uint32_t headerLength = sizeof(struct MsgHeader);
 
-	if ((byteReceived = recvn(sockfd, &msgHeader, headerLength)) != -1) {
+	if ((byteReceived = recvn(sockfd, (char*)&msgHeader, headerLength)) != -1) {
 		totalByteReceived += byteReceived;
 	} else {
 		cerr << "Error in receiving MsgHeader" << endl;
@@ -182,8 +182,7 @@ ComponentType Connection::getConnectionType() {
 //
 // PRIVATE METHODS
 //
-
-uint32_t sendn(uint32_t sd, const char* buf, uint32_t buf_len) {
+uint32_t Connection::sendn(uint32_t sd, const char* buf, uint32_t buf_len) {
 	uint32_t n_left = buf_len; // actual data bytes sent
 	uint32_t n;
 	while (n_left > 0) {
@@ -197,7 +196,7 @@ uint32_t sendn(uint32_t sd, const char* buf, uint32_t buf_len) {
 	return buf_len;
 }
 
-uint32_t recvn(uint32_t sd, char* buf, uint32_t buf_len) {
+uint32_t Connection::recvn(uint32_t sd, char* buf, uint32_t buf_len) {
 	uint32_t n_left = buf_len;
 	uint32_t n = 0;
 	while (n_left > 0) {

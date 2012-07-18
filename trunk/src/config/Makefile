@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS_OBJ = -g -Wall `pkg-config fuse --cflags`
+CFLAGS_OBJ = -g -Wall
 
 all:
 	@echo "Compiling objects"

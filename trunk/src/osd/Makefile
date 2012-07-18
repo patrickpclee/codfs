@@ -1,17 +1,23 @@
 CC=			g++
 CFLAGS=		-g -Wall
 LDFLAGS=	`pkg-config --cflags --libs protobuf`
-COMM_OBJ=	../communicator/communicator.o ../communicator/connection.o
-PROTO_OBJ=	../protocol/listdirectoryrequest.o ../protocol/message.o ../protocol/message.pb.o
-OBJ=		osd_communicator.o osd.o segmentlocationcache.o
-EXE=		osd
+COMMON_OBJ=	../common/*.o
+COMM_OBJ=	../communicator/*.o
+CONFIG_OBJ=	../config/*.o
+PROTO_OBJ=	../protocol/*.o
+EXE=		OSD
 
-all: ${OBJ} ${COMM_OBJ} ${PROTO_OBJ}
+all:
+	pkg-config --cflags protobuf
+	cd ../common; make; cd ../osd
+	cd ../config; make; cd ../osd
 	cd ../communicator; make; cd ../osd
 	cd ../protocol; make; cd ../osd
-	pkg-config --cflags protobuf
-	${CC} ${OBJ} ${COMM_OBJ} ${PROTO_OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
+	${CC} ${CFLAGS} -c *.cc
+	${CC} *.o ${COMMON_OBJ} ${COMM_OBJ} ${CONFIG_OBJ} ${PROTO_OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
 	
 clean:
-	cd ../communicator; make clean; cd ../protocol; make clean; cd ../osd;
+	cd ../config; make clean; cd ../osd
+	cd ../communicator; make clean; cd ../osd
+	cd ../protocol; make clean; cd ../osd
 	rm -f ${OBJ} ${EXE}
