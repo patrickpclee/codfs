@@ -71,7 +71,7 @@ public:
 	 * Parse Message (binary) and store information into class variables
 	 */
 
-	virtual void parse() = 0;
+	virtual void parse(char* buf) = 0;
 
 	/**
 	 * After parsing, carry out action to handle the message
