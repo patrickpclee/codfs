@@ -33,7 +33,7 @@ void protobuf_AssignDesc_message_2eproto();
 void protobuf_ShutdownFile_message_2eproto();
 
 class ListDirectoryRequest;
-class FileList;
+class ListDirectoryReply;
 class FileInfo;
 
 // ===================================================================
@@ -134,14 +134,14 @@ class ListDirectoryRequest : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class FileList : public ::google::protobuf::Message {
+class ListDirectoryReply : public ::google::protobuf::Message {
  public:
-  FileList();
-  virtual ~FileList();
+  ListDirectoryReply();
+  virtual ~ListDirectoryReply();
   
-  FileList(const FileList& from);
+  ListDirectoryReply(const ListDirectoryReply& from);
   
-  inline FileList& operator=(const FileList& from) {
+  inline ListDirectoryReply& operator=(const ListDirectoryReply& from) {
     CopyFrom(from);
     return *this;
   }
@@ -155,17 +155,17 @@ class FileList : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const FileList& default_instance();
+  static const ListDirectoryReply& default_instance();
   
-  void Swap(FileList* other);
+  void Swap(ListDirectoryReply* other);
   
   // implements Message ----------------------------------------------
   
-  FileList* New() const;
+  ListDirectoryReply* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const FileList& from);
-  void MergeFrom(const FileList& from);
+  void CopyFrom(const ListDirectoryReply& from);
+  void MergeFrom(const ListDirectoryReply& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -200,7 +200,7 @@ class FileList : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo >*
       mutable_fileinfo();
   
-  // @@protoc_insertion_point(class_scope:ncvfs.FileList)
+  // @@protoc_insertion_point(class_scope:ncvfs.ListDirectoryReply)
  private:
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
@@ -215,7 +215,7 @@ class FileList : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static FileList* default_instance_;
+  static ListDirectoryReply* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -273,19 +273,19 @@ class FileInfo : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional int32 fileId = 1;
+  // optional fixed32 fileId = 1;
   inline bool has_fileid() const;
   inline void clear_fileid();
   static const int kFileIdFieldNumber = 1;
-  inline ::google::protobuf::int32 fileid() const;
-  inline void set_fileid(::google::protobuf::int32 value);
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
   
-  // optional int32 filesize = 2;
+  // optional fixed64 filesize = 2;
   inline bool has_filesize() const;
   inline void clear_filesize();
   static const int kFilesizeFieldNumber = 2;
-  inline ::google::protobuf::int32 filesize() const;
-  inline void set_filesize(::google::protobuf::int32 value);
+  inline ::google::protobuf::uint64 filesize() const;
+  inline void set_filesize(::google::protobuf::uint64 value);
   
   // optional string filename = 3;
   inline bool has_filename() const;
@@ -309,9 +309,9 @@ class FileInfo : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::int32 fileid_;
-  ::google::protobuf::int32 filesize_;
+  ::google::protobuf::uint64 filesize_;
   ::std::string* filename_;
+  ::google::protobuf::uint32 fileid_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
@@ -412,30 +412,30 @@ inline ::std::string* ListDirectoryRequest::release_directorypath() {
 
 // -------------------------------------------------------------------
 
-// FileList
+// ListDirectoryReply
 
 // repeated .ncvfs.FileInfo fileInfo = 1;
-inline int FileList::fileinfo_size() const {
+inline int ListDirectoryReply::fileinfo_size() const {
   return fileinfo_.size();
 }
-inline void FileList::clear_fileinfo() {
+inline void ListDirectoryReply::clear_fileinfo() {
   fileinfo_.Clear();
 }
-inline const ::ncvfs::FileInfo& FileList::fileinfo(int index) const {
+inline const ::ncvfs::FileInfo& ListDirectoryReply::fileinfo(int index) const {
   return fileinfo_.Get(index);
 }
-inline ::ncvfs::FileInfo* FileList::mutable_fileinfo(int index) {
+inline ::ncvfs::FileInfo* ListDirectoryReply::mutable_fileinfo(int index) {
   return fileinfo_.Mutable(index);
 }
-inline ::ncvfs::FileInfo* FileList::add_fileinfo() {
+inline ::ncvfs::FileInfo* ListDirectoryReply::add_fileinfo() {
   return fileinfo_.Add();
 }
 inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo >&
-FileList::fileinfo() const {
+ListDirectoryReply::fileinfo() const {
   return fileinfo_;
 }
 inline ::google::protobuf::RepeatedPtrField< ::ncvfs::FileInfo >*
-FileList::mutable_fileinfo() {
+ListDirectoryReply::mutable_fileinfo() {
   return &fileinfo_;
 }
 
@@ -443,7 +443,7 @@ FileList::mutable_fileinfo() {
 
 // FileInfo
 
-// optional int32 fileId = 1;
+// optional fixed32 fileId = 1;
 inline bool FileInfo::has_fileid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -454,18 +454,18 @@ inline void FileInfo::clear_has_fileid() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void FileInfo::clear_fileid() {
-  fileid_ = 0;
+  fileid_ = 0u;
   clear_has_fileid();
 }
-inline ::google::protobuf::int32 FileInfo::fileid() const {
+inline ::google::protobuf::uint32 FileInfo::fileid() const {
   return fileid_;
 }
-inline void FileInfo::set_fileid(::google::protobuf::int32 value) {
+inline void FileInfo::set_fileid(::google::protobuf::uint32 value) {
   set_has_fileid();
   fileid_ = value;
 }
 
-// optional int32 filesize = 2;
+// optional fixed64 filesize = 2;
 inline bool FileInfo::has_filesize() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -476,13 +476,13 @@ inline void FileInfo::clear_has_filesize() {
   _has_bits_[0] &= ~0x00000002u;
 }
 inline void FileInfo::clear_filesize() {
-  filesize_ = 0;
+  filesize_ = GOOGLE_ULONGLONG(0);
   clear_has_filesize();
 }
-inline ::google::protobuf::int32 FileInfo::filesize() const {
+inline ::google::protobuf::uint64 FileInfo::filesize() const {
   return filesize_;
 }
-inline void FileInfo::set_filesize(::google::protobuf::int32 value) {
+inline void FileInfo::set_filesize(::google::protobuf::uint64 value) {
   set_has_filesize();
   filesize_ = value;
 }

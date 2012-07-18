@@ -8,6 +8,7 @@ using namespace std;
 struct FileMetaData {
 	string _path;
 	uint32_t _id;
+	uint64_t _size;
 	unsigned char* _checksum;
 	uint64_t* _objectList[];
 };

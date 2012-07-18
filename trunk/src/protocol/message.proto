@@ -13,12 +13,12 @@ message ListDirectoryRequest {
 // MDS -> OSD
 //
 
-message FileList {
+message ListDirectoryReply {
 	repeated FileInfo fileInfo = 1;
 } 
 
 message FileInfo {
-	optional int32 fileId = 1;
-	optional int32 filesize = 2;
-	optional string filename = 3;
+	optional fixed32 fileId = 1;
+	optional fixed64 fileSize = 2;
+	optional string fileName = 3;
 }
