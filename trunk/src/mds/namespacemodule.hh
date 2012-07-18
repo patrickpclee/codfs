@@ -5,13 +5,14 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 class NameSpaceModule {
 public:
 	uint32_t createFile (uint32_t clientId, string path);
 //	uint32_t deleteFile (string path, uint32_t clientId);
 	uint32_t openFile (uint32_t clientId, string path);
-//	FileMetaData* listFolder (string path);
+	vector<FileMetaData> listFolder (uint32_t clientId, string path);
 private:
 	uint32_t newFileId (string path);
 };
