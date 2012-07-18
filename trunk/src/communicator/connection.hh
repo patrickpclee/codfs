@@ -67,8 +67,8 @@ public:
 
 
 private:
-	uint32_t sendn (int sd, const void* buf, int buf_len);
-	uint32_t recvn (int sd, const void* buf, int buf_len);
+	uint32_t sendn (uint32_t sd, const char* buf, uint32_t buf_len);
+	uint32_t recvn (uint32_t sd, char* buf, uint32_t buf_len);
 
 	uint32_t _sockfd;
 	string _ip;

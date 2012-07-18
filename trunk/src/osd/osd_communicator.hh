@@ -21,7 +21,7 @@ public:
 	OsdCommunicator();
 	~OsdCommunicator();
 //	void listDirectoryRequest(uint32_t osdId, string directoryPath);
-	void connectToMds ();
+	void connectToMds();
 
 	/**
 	 * Send a failure report to MDS / Monitor
@@ -62,10 +62,21 @@ public:
 	/**
 	 * Send a request to get the secondary OSD list of an object from MDS/Monitor
 	 * @param objectId Object ID for query
+	 * @param dstComponent Type of the component to request (OSD / MONITOR)
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t getSecOsdListRequest(uint64_t objectId);
+	uint32_t getOsdListRequest(uint64_t objectId, ComponentType dstComponent);
+
+	/**
+	 * Send an acknowledgement to inform the dstComponent that the segment is stored
+	 * @param objectId ID of the object that the segment is belonged to
+	 * @param segmentId ID of the segment received and stored
+	 * @param dstComponent Type of the component to ACK
+	 * @return 0 if success, -1 if failure
+	 */
+	uint32_t sendSegmentAck(uint64_t objectId, uint32_t segmentId,
+			ComponentType dstComponent);
 
 private:
 };

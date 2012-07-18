@@ -5,13 +5,17 @@
 
 using namespace std;
 
-struct SegmentData {
+struct SegmentInfo {
 	uint64_t objectId;
 	uint32_t segmentId;
-	uint32_t offsetInObject;
-	uint32_t length;
+	uint32_t segmentLength;
 	string segmentPath;
-	vector <unsigned char>* buf;
+};
+
+struct SegmentData {
+	struct SegmentInfo info;
+	uint32_t offsetInObject;
+	char* buf;
 };
 
 #endif
