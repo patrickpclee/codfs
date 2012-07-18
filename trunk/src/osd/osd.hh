@@ -169,6 +169,13 @@ public:
 
 private:
 
+	/**
+	 * Retrieve a segment from the storage
+	 * @param objectId ID of the object that the segment is belonged to
+	 * @param segmentId Target Segment ID
+	 * @return SegmentData structure
+	 */
+
 	struct SegmentData getSegmentFromStroage(uint64_t objectId,
 			uint32_t segmentId);
 

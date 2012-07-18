@@ -54,10 +54,6 @@ void Communicator::sendMessage() {
 
 }
 
-void Communicator::dispatch(char* buf, uint32_t sockfd) {
-
-}
-
 /**
  * 1. Connect to target component
  * 2. Add the connection to the corresponding map

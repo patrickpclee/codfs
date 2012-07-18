@@ -16,9 +16,9 @@ using namespace std;
  * Request to list files in a directory from MDS
  */
 
-class ListDirectoryRequestMessage : public Message {
+class ListDirectoryRequestMsg : public Message {
 public:
-	ListDirectoryRequestMessage(uint32_t osdId, string directoryPath, uint32_t mdsSockfd);
+	ListDirectoryRequestMsg(uint32_t osdId, string directoryPath, uint32_t mdsSockfd);
 	void prepareProtocolMsg();
 	void printProtocol();
 private:
