@@ -113,8 +113,9 @@ public:
 
 	virtual void printProtocol() = 0;
 
-private:
+protected:
 	uint32_t _sockfd;		// destination
+	uint32_t _requestId;
 	struct MsgHeader _msgHeader;
 	string _protocolMsg;
 	char* _payload;

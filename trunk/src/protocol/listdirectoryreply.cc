@@ -9,14 +9,18 @@
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
 
-ListDirectoryReplyMessage::ListDirectoryReplyMessage(uint32_t requestId, uint32_t connectionId, string path, vector<FileMetaData> folderData)
+ListDirectoryReplyMessage::ListDirectoryReplyMessage(uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
 {
 	_requestId = requestId;
-	_connectiondId = connectionId;
 	_path = path;
 	_folderData = folderData;
+	_sockfd = sockfd;
 }
 
+/**
+ * @brief	Copy values in private variables to protocol message
+ * Serialize protocol message and copy to private variable
+ */
 void ListDirectoryReplyMessage::prepareProtocolMsg() {
 	string serializedString;
 
@@ -30,7 +34,6 @@ void ListDirectoryReplyMessage::prepareProtocolMsg() {
 		fileInfo->set_fileid((*it)._id);
 		fileInfo->set_filesize((*it)._size);
 		fileInfo->set_filename((*it)._path);
-	
 	}
 
 	if (!listDirectoryReply.SerializeToString(&serializedString)) {
