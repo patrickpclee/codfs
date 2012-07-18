@@ -34,7 +34,27 @@ public:
 
 	virtual ~Communicator(); // destructor
 
-//	void waitForMessage();
+	/**
+	 * Listen to all the socket descriptors and call select for I/O multiplexing
+	 * When a Message is received, call dispatch() to execute handler
+	 */
+
+	void waitForMessage();
+
+	/**
+	 * Check the Message queue, when there is Message pending, dequeue and send
+	 */
+
+	void sendMessage();
+
+	/**
+	 * Aanalyze the MsgHeader and create the corresponding Message class
+	 * Execute message.handle() in a separate thread
+	 * @param buf Pointer to the buffer holding the Message
+	 * @param sockfd Socket Descriptor of incoming connection
+	 */
+
+	void dispatch(char* buf, uint32_t sockfd);
 
 	/**
 	 * Establish a connection to a component. Save the connection to list
@@ -67,10 +87,7 @@ public:
 	uint32_t getMonitorSockfd();
 
 private:
-	map<uint32_t, Connection> _mdsConnectionMap;
-	map<uint32_t, Connection> _osdConnectionMap;
-	map<uint32_t, Connection> _monitorConnectionMap;
-	map<uint32_t, Connection> _clientConnectionMap;
-	list<Message *> _outMessageList; // queue of message to be sent
+	map<uint32_t, Connection> _connectionMap;
+	list<Message *> _outMessageQueue; // queue of message to be sent
 };
 #endif

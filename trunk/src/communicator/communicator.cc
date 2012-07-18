@@ -7,8 +7,12 @@
 #include "../common/enums.hh"
 #include "communicator.hh"
 #include "../protocol/message.pb.h"
+#include "../config/config.hh"
 
 using namespace std;
+
+// global variable defined in each component
+extern ConfigLayer* configLayer;
 
 Communicator::Communicator() {
 
@@ -23,6 +27,42 @@ Communicator::~Communicator() {
 	cout << "Communicator Destroyed" << endl;
 }
 
+void Communicator::waitForMessage() {
+	// TODO: wait for message
+
+}
+
+void Communicator::sendMessage() {
+
+	// get config: polling interval
+	const uint32_t pollingInterval = configLayer->getConfigInt(
+			"Communication>SendPollingInterval");
+
+	// TODO: poll outMessageQueue to send message for now
+	while (1) {
+
+		// send all message in the outMessageQueue
+		while (!_outMessageQueue.empty()) {
+			Message* message = _outMessageQueue.front();
+			_outMessageQueue.pop_front();
+			const uint32_t sockfd = message->getSockfd();
+			_connectionMap[sockfd].sendMessage(message);
+		}
+
+		sleep (pollingInterval);
+	}
+
+}
+
+void Communicator::dispatch(char* buf, uint32_t sockfd) {
+
+}
+
+/**
+ * 1. Connect to target component
+ * 2. Add the connection to the corresponding map
+ */
+
 void Communicator::addConnection(string ip, uint16_t port,
 		ComponentType connectionType) {
 
@@ -30,52 +70,55 @@ void Communicator::addConnection(string ip, uint16_t port,
 	Connection conn;
 	const uint32_t sockfd = conn.doConnect(ip, port, connectionType);
 
+	// CAUTION: Single Thread Only
 	// Save the connection into corresponding list
-	switch (connectionType) {
-	case MDS:
-		_mdsConnectionMap[sockfd] = conn;
-		break;
-	case OSD:
-		_osdConnectionMap[sockfd] = conn;
-		break;
-	case MONITOR:
-		_monitorConnectionMap[sockfd] = conn;
-		break;
-	case CLIENT:
-		_clientConnectionMap[sockfd] = conn;
-		break;
+	// Delete existing connection if sockfd present
+	if (_connectionMap.count(sockfd)) {
+		_connectionMap.erase(sockfd);
 	}
+	_connectionMap[sockfd] = conn;
 
 	cout << "Connection Added" << endl;
 }
 
+/**
+ * 1. Disconnect the connection
+ * 2. Remove the connection from map
+ */
+
 void Communicator::removeConnection(uint32_t sockfd) {
 
-	if (_mdsConnectionMap.count(sockfd)) {
-		_mdsConnectionMap[sockfd].disconnect();
-		_mdsConnectionMap.erase(sockfd);
-	} else if (_osdConnectionMap.count(sockfd)) {
-		_osdConnectionMap[sockfd].disconnect();
-		_osdConnectionMap.erase(sockfd);
-	} else if (_clientConnectionMap.count(sockfd)) {
-		_clientConnectionMap[sockfd].disconnect();
-		_clientConnectionMap.erase(sockfd);
-	} else if (_monitorConnectionMap.count(sockfd)) {
-		_monitorConnectionMap[sockfd].disconnect();
-		_monitorConnectionMap.erase(sockfd);
+	if (_connectionMap.count(sockfd)) {
+		_connectionMap[sockfd].disconnect();
+		_connectionMap.erase(sockfd);
 	} else {
-		cerr << "Cannot remove connection. Socket Descriptor not found."
-				<< endl;
+		cerr << "Connection not found, cannot remove connection" << endl;
 	}
 
 }
 
 uint32_t Communicator::getMdsSockfd() {
 	// TODO: assume return first MDS
-	return _mdsConnectionMap.begin()->second.getSockfd();
+	map<uint32_t, Connection>::iterator p;
+
+	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+		if (p->second.getConnectionType() == MDS) {
+			return p->second.getSockfd();
+		}
+	}
+
+	return -1;
 }
 
 uint32_t Communicator::getMonitorSockfd() {
 	// TODO: assume return first Monitor
-	return _monitorConnectionMap.begin()->second.getSockfd();
+	map<uint32_t, Connection>::iterator p;
+
+	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+		if (p->second.getConnectionType() == MONITOR) {
+			return p->second.getSockfd();
+		}
+	}
+
+	return -1;
 }
