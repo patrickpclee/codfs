@@ -8,6 +8,8 @@
 #include <string>
 #include "../common/enums.hh"
 #include "message.hh"
+#include "../common/metadata.hh"
+#include <vector>
 
 using namespace std;
 
@@ -26,7 +28,8 @@ public:
 
 	void handle ();
 private:
-	uint32_t _osdId;
+	promise< vector<FileMetaData> > folderData;
+//	uint32_t _osdId;
 	string _directoryPath;
 };
 
