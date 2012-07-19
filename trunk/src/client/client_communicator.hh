@@ -12,6 +12,14 @@ public:
 	void osdIdListRequest ();
 	void objectMessageHandler ();
 
+	/**
+	 * @brief	Send List Folder Request to MDS (Blocking)
+	 *
+	 * @param	clientId	Client ID
+	 * @param	path	Path to the Folder
+	 *
+	 * @return	Folder Data
+	 */
 	vector<FileMetaData> listFolderData (uint32_t clientId, string path);
 private:
 };

@@ -15,13 +15,10 @@ ListDirectoryRequestMsg::ListDirectoryRequestMsg() {
 
 }
 
+
 /**
  * Constructor - Save parameters in private variables
- * @param osdId My OSD ID
- * @param directoryPath Requested directory path
- * @param mdsSockfd Socket descriptor of MDS
  */
-
 ListDirectoryRequestMsg::ListDirectoryRequestMsg(uint32_t clientId, uint32_t mdsSockfd, string path)
 {
 	_clientId = clientId;
@@ -62,6 +59,11 @@ void ListDirectoryRequestMsg::printProtocol() {
 			<< _directoryPath << endl;
 }
 
+/**
+ * @brief	Get the Future of the Folder Data
+ *
+ * @return	Future of the Folder Data
+ */
 future< vector<FileMetaData> > ListDirectoryRequestMsg::getFolderDataFuture()
 {
 	return folderData.get_future();

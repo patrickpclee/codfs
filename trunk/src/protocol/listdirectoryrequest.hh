@@ -68,6 +68,11 @@ public:
 
 	void printProtocol();
 
+	/**
+	 * @brief	Get the Future of the Folder Data
+	 *
+	 * @return	Future of the Folder Data
+	 */
 	future< vector<FileMetaData> > getFolderDataFuture();
 
 private:
