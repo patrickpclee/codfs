@@ -5,6 +5,7 @@
 #include "../common/enums.hh"
 #include "../protocol/message.hh"
 #include "../protocol/listdirectoryrequest.hh"
+#include "../protocol/listdirectoryreply.hh"
 #include "messagefactory.hh"
 
 MessageFactory::MessageFactory() {

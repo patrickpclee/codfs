@@ -87,6 +87,9 @@ int main(void) {
 	// connect to MDS
 	communicator->connectToMds();
 
+	// wait for message
+	communicator->waitForMessage();
+
 	// cleanup
 	delete osd;
 	delete configLayer;

@@ -78,6 +78,16 @@ public:
 	uint32_t sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 			ComponentType dstComponent);
 
+	/**
+	 * Override
+	 * Aanalyze the MsgHeader and create the corresponding Message class
+	 * Execute message.handle() in a separate thread
+	 * @param buf Pointer to the buffer holding the Message
+	 * @param sockfd Socket Descriptor of incoming connection
+	 */
+
+	// void dispatch(char* buf, uint32_t sockfd);
+
 private:
 };
 
