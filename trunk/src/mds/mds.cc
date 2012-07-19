@@ -4,6 +4,17 @@
 
 #include <cstdio>
 #include "mds.hh"
+#include "../config/config.hh"
+
+/**
+ *	Global Variables
+ */
+
+/// MDS Object
+Mds* mds;
+
+/// Config Layer
+ConfigLayer* configLayer;
 
 /**
  * Initialise MDS Communicator and MetaData Modules
@@ -13,6 +24,13 @@ Mds::Mds()
 	_metaDataModule = new MetaDataModule();
 	_nameSpaceModule = new NameSpaceModule();
 	_mdsCommunicator = new MdsCommunicator();
+}
+
+Mds::~Mds()
+{
+	delete _mdsCommunicator;
+	delete _metaDataModule;
+	delete _nameSpaceModule;
 }
 
 /**
@@ -195,6 +213,11 @@ void Mds::recoveryProcessor (uint32_t requestId, uint32_t connectionId, uint32_t
 	return ;
 }
 
+MdsCommunicator* Mds::getMdsCommunicator()
+{
+	return _mdsCommunicator;
+}
+
 /**
  * @brief	Handle Object Node List Update from Osd
  */
@@ -205,8 +228,25 @@ void Mds::nodeListUpdateProcessor (uint32_t requestId, uint32_t connectionId, ui
 	return ;
 }
 
+/**
+ * @brief	Run the MDS
+ */
+void Mds::run()
+{
+	running = true;
+	while(running);
+	return ;
+}
+
 int main (void)
 {
-	printf ("MDS\n");
+	mds = new Mds();
+	mds->run();
+
+	MdsCommunicator* communicator = mds->getMdsCommunicator();
+	communicator->waitForMessage();
+
+	delete mds;
+	delete configLayer;
 	return 0;
 }

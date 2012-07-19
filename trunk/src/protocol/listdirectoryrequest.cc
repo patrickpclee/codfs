@@ -15,17 +15,14 @@ ListDirectoryRequestMsg::ListDirectoryRequestMsg() {
 
 }
 
+
 /**
  * Constructor - Save parameters in private variables
- * @param osdId My OSD ID
- * @param directoryPath Requested directory path
- * @param mdsSockfd Socket descriptor of MDS
  */
-
-ListDirectoryRequestMsg::ListDirectoryRequestMsg(uint32_t osdId,
-		string directoryPath, uint32_t mdsSockfd) {
-	_osdId = osdId;
-	_directoryPath = directoryPath;
+ListDirectoryRequestMsg::ListDirectoryRequestMsg(uint32_t clientId, uint32_t mdsSockfd, string path)
+{
+	_clientId = clientId;
+	_directoryPath = path;
 	_sockfd = mdsSockfd;
 }
 
@@ -35,7 +32,7 @@ void ListDirectoryRequestMsg::prepareProtocolMsg() {
 
 	ncvfs::ListDirectoryRequestPro listDirectoryRequestPro;
 	listDirectoryRequestPro.set_directorypath(_directoryPath);
-	listDirectoryRequestPro.set_osdid(_osdId);
+	listDirectoryRequestPro.set_osdid(_clientId);
 
 	if (!listDirectoryRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -58,6 +55,16 @@ void ListDirectoryRequestMsg::handle() {
 
 
 void ListDirectoryRequestMsg::printProtocol() {
-	cout << "[LIST_DIRECTORY_REQUEST] osdID = " << _osdId << " Path = "
+	cout << "[LIST_DIRECTORY_REQUEST] osdID = " << _clientId << " Path = "
 			<< _directoryPath << endl;
+}
+
+/**
+ * @brief	Get the Future of the Folder Data
+ *
+ * @return	Future of the Folder Data
+ */
+future< vector<FileMetaData> > ListDirectoryRequestMsg::getFolderDataFuture()
+{
+	return folderData.get_future();
 }

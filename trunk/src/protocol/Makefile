@@ -1,6 +1,6 @@
 CC=			g++
-CFLAGS=		-g -Wall
-SRC=		listdirectoryrequest.cc message.cc message.pb.cc
+CFLAGS=		-g -Wall -std=c++0x
+SRC=	*.cc	
 
 all: ${SRC}
 	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS}

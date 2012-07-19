@@ -40,3 +40,22 @@ vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, string path
 	}
 	return folderData;
 }
+
+
+uint32_t NameSpaceModule::createFile(uint32_t clientId, string path)
+{
+	return 0;
+}
+
+
+uint32_t NameSpaceModule::newFileId(string path)
+{
+	return 0;
+}
+
+
+uint32_t NameSpaceModule::openFile(uint32_t clientId, string path)
+{
+	return 0;
+}
+

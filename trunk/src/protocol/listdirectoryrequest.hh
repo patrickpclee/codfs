@@ -6,8 +6,13 @@
 #define __LISTDIRECTORYREQUESTHH__
 
 #include <string>
-#include "../common/enums.hh"
+#include <vector>
+#include <future>
+
 #include "message.hh"
+
+#include "../common/enums.hh"
+#include "../common/metadata.hh"
 
 using namespace std;
 
@@ -27,13 +32,12 @@ public:
 
 	/**
 	 * Constructor - Save parameters in private variables
-	 * @param osdId My OSD ID
-	 * @param directoryPath Requested directory path
-	 * @param mdsSockfd Socket descriptor of MDS
+	 * @param	clientId	Client ID
+	 * @param	mdsSockfd	Socket descriptor of MDS
+	 * @param	path	Requested directory path
 	 */
 
-	ListDirectoryRequestMsg(uint32_t osdId, string directoryPath,
-			uint32_t mdsSockfd);
+	ListDirectoryRequestMsg(uint32_t clientId, uint32_t mdsSockfd, string path);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -64,8 +68,17 @@ public:
 
 	void printProtocol();
 
+	/**
+	 * @brief	Get the Future of the Folder Data
+	 *
+	 * @return	Future of the Folder Data
+	 */
+	future< vector<FileMetaData> > getFolderDataFuture();
+
 private:
-	uint32_t _osdId;
+	promise< vector<FileMetaData> > folderData;
+	uint32_t _clientId;
+//	uint32_t _osdId;
 	string _directoryPath;
 };
 
