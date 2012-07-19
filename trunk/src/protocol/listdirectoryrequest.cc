@@ -8,6 +8,14 @@
 #include "../common/enums.hh"
 
 /**
+ * Default Constructor
+ */
+
+ListDirectoryRequestMsg::ListDirectoryRequestMsg() {
+
+}
+
+/**
  * Constructor - Save parameters in private variables
  * @param osdId My OSD ID
  * @param directoryPath Requested directory path
@@ -21,10 +29,6 @@ ListDirectoryRequestMsg::ListDirectoryRequestMsg(uint32_t osdId,
 	_sockfd = mdsSockfd;
 }
 
-/**
- * Copy values in private variables to protocol message
- * Serialize protocol message and copy to private variable
- */
 
 void ListDirectoryRequestMsg::prepareProtocolMsg() {
 	string serializedString;
@@ -44,9 +48,14 @@ void ListDirectoryRequestMsg::prepareProtocolMsg() {
 
 }
 
-/**
- * DEBUG: override method: print protocol message
- */
+void ListDirectoryRequestMsg::parse(char* buf) {
+
+}
+
+void ListDirectoryRequestMsg::handle() {
+
+}
+
 
 void ListDirectoryRequestMsg::printProtocol() {
 	cout << "[LIST_DIRECTORY_REQUEST] osdID = " << _osdId << " Path = "

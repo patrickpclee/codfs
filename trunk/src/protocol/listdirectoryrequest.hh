@@ -18,15 +18,54 @@ using namespace std;
  * Request to list files in a directory from MDS
  */
 
-class ListDirectoryRequestMsg : public Message {
+class ListDirectoryRequestMsg: public Message {
 public:
-	ListDirectoryRequestMsg(uint32_t osdId, string directoryPath, uint32_t mdsSockfd);
+
+	/**
+	 * Default Constructor
+	 */
+
+	ListDirectoryRequestMsg();
+
+	/**
+	 * Constructor - Save parameters in private variables
+	 * @param osdId My OSD ID
+	 * @param directoryPath Requested directory path
+	 * @param mdsSockfd Socket descriptor of MDS
+	 */
+
+	ListDirectoryRequestMsg(uint32_t osdId, string directoryPath,
+			uint32_t mdsSockfd);
+
+	/**
+	 * Copy values in private variables to protocol message
+	 * Serialize protocol message and copy to private variable
+	 */
+
 	void prepareProtocolMsg();
+
+	/**
+	 * Override
+	 * Parse message from raw buffer
+	 * @param buf Raw buffer storing header + protocol + payload
+	 */
+
+	void parse(char* buf);
+
+	/**
+	 * Override
+	 * Execute the corresponding Processor
+	 */
+
+	void handle();
+
+	/**
+	 * Override
+	 * DEBUG: print protocol message
+	 */
+
 	void printProtocol();
 
-	void parse (char* buf);
-
-	void handle ();
 private:
 	promise< vector<FileMetaData> > folderData;
 //	uint32_t _osdId;

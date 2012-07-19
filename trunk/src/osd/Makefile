@@ -1,6 +1,6 @@
 CC=			g++
-CFLAGS=		-g -Wall
-LDFLAGS=	`pkg-config --cflags --libs protobuf`
+CFLAGS=		-g -Wall -std=c++0x
+LDFLAGS=	`pkg-config --cflags --libs protobuf` -lpthread
 COMMON_OBJ=	../common/*.o
 COMM_OBJ=	../communicator/*.o
 CONFIG_OBJ=	../config/*.o
@@ -15,6 +15,7 @@ all:
 	cd ../protocol; make; cd ../osd
 	${CC} ${CFLAGS} -c *.cc
 	${CC} *.o ${COMMON_OBJ} ${COMM_OBJ} ${CONFIG_OBJ} ${PROTO_OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
+	cp ${EXE} ../../
 	
 clean:
 	cd ../config; make clean; cd ../osd

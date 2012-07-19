@@ -3,11 +3,16 @@
  */
 
 #include <iostream>
+#include <thread>
+#include <sys/types.h>		// required by select()
+#include <unistd.h>		// required by select()
+#include <sys/select.h>	// required by select()
 #include "connection.hh"
-#include "../common/enums.hh"
 #include "communicator.hh"
-#include "../protocol/message.pb.h"
 #include "../config/config.hh"
+#include "../common/enums.hh"
+#include "../protocol/message.pb.h"
+#include "../protocol/messagefactory.hh"
 
 using namespace std;
 
@@ -15,6 +20,9 @@ using namespace std;
 extern ConfigLayer* configLayer;
 
 Communicator::Communicator() {
+
+	// initialize requestID
+	_requestId = 0;
 
 	cout << "Checking Protocol Buffer Version...";
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -28,8 +36,65 @@ Communicator::~Communicator() {
 }
 
 void Communicator::waitForMessage() {
-	// TODO: wait for message
+	char* buf;
+	uint32_t maxFd = 0;
+	fd_set sockfdSet;
+	struct timeval tv; // timeout for select
+	map<uint32_t, Connection>::iterator p;
 
+	// get the maximum socket descriptor in the connectionMap
+	maxFd = _connectionMap.rbegin()->first;
+
+	// set select timeout value
+	tv.tv_sec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
+	tv.tv_usec = configLayer->getConfigInt("Communication>SelectTimeout>usec");
+
+	cout << "[WAIT FOR MESSAGE] Max SockFD = " << maxFd << endl;
+	cout << "[WAIT FOR MESSAGE] Select Timeout = " << tv.tv_sec << "."
+			<< tv.tv_usec << endl;
+
+	while (1) {
+
+		FD_ZERO(&sockfdSet);
+
+		// add all socket descriptors into sockfdSet
+		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+			FD_SET(p->second.getSockfd(), &sockfdSet);
+		}
+
+		// invoke select
+		if (select(maxFd + 1, &sockfdSet, NULL, NULL, &tv) == -1) {
+			cerr << "select error" << endl;
+			return;
+		}
+
+		cout << "[WAIT FOR MESSAGE] Select returns" << endl;
+
+		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+			cout << "[WAIT FOR MESSAGE] Checking sockfd = " << p->first << endl;
+			// if socket has data available
+			if (FD_ISSET(p->second.getSockfd(), &sockfdSet)) {
+				// receive message into buffer, memory allocated in recvMessage
+				buf = p->second.recvMessage();
+				dispatch(buf, p->first);
+			}
+		}
+
+		// TODO: ping all nodes after timeout
+		// pingAllConnections();
+		cout << "[WAIT FOR MESSAGE] Checking connections..." << endl;
+
+	} // end while (1)
+}
+
+void Communicator::addMessage(Message* message) {
+	// check if request ID = 0
+	if (message->getMsgHeader().requestId == 0) {
+		message->setRequestId(generateRequestId());
+	}
+	cout << "Message ID = " << message->getMsgHeader().requestId
+			<< " added to queue" << endl;
+	_outMessageQueue.push_back(message);
 }
 
 void Communicator::sendMessage() {
@@ -47,9 +112,11 @@ void Communicator::sendMessage() {
 			_outMessageQueue.pop_front();
 			const uint32_t sockfd = message->getSockfd();
 			_connectionMap[sockfd].sendMessage(message);
+			cout << "Message ID = " << message->getMsgHeader().requestId
+					<< " remove from queue" << endl;
 		}
 
-		sleep (pollingInterval);
+		sleep(pollingInterval);
 	}
 
 }
@@ -66,12 +133,8 @@ void Communicator::addConnection(string ip, uint16_t port,
 	Connection conn;
 	const uint32_t sockfd = conn.doConnect(ip, port, connectionType);
 
-	// CAUTION: Single Thread Only
+	// Single Thread Only
 	// Save the connection into corresponding list
-	// Delete existing connection if sockfd present
-	if (_connectionMap.count(sockfd)) {
-		_connectionMap.erase(sockfd);
-	}
 	_connectionMap[sockfd] = conn;
 
 	cout << "Connection Added" << endl;
@@ -117,4 +180,37 @@ uint32_t Communicator::getMonitorSockfd() {
 	}
 
 	return -1;
+}
+
+/**
+ * 1. Get the MsgHeader from the receive buffer
+ * 2. Get the MsgType from the MsgHeader
+ * 3. Use the MessageFactory to obtain a new Message object
+ * 4. Fill in the socket descriptor into the Message
+ * 5. message->parse()
+ * 6. start new thread for message->handle()
+ */
+
+void Communicator::handleThread(Message* message) {
+	message->handle();
+}
+
+void Communicator::dispatch(char* buf, uint32_t sockfd) {
+	struct MsgHeader msgHeader;
+	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+
+	const MsgType msgType = msgHeader.protocolMsgType;
+
+	Message* message = MessageFactory::createMessage(msgType);
+	message->setSockfd(sockfd);
+	message->parse(buf);
+
+	thread t(handleThread, message);
+	t.detach();
+
+	// TODO: when to free message?
+}
+
+uint32_t Communicator::generateRequestId() {
+	return ++_requestId;
 }

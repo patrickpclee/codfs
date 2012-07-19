@@ -8,6 +8,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <atomic>
 #include "../protocol/messagefactory.hh"
 #include "../protocol/message.hh"
 #include "connection.hh"
@@ -43,20 +44,19 @@ public:
 	void waitForMessage();
 
 	/**
+	 * Add message to _outMessageQueue
+	 * Set a unique request ID if request ID = 0
+	 * @param message Message to send
+	 */
+
+	void addMessage(Message* message);
+
+	/**
 	 * Check the Message queue, when there is Message pending, dequeue and send
 	 */
 
+
 	void sendMessage();
-
-	/**
-	 * Abstract function
-	 * Aanalyze the MsgHeader and create the corresponding Message class
-	 * Execute message.handle() in a separate thread
-	 * @param buf Pointer to the buffer holding the Message
-	 * @param sockfd Socket Descriptor of incoming connection
-	 */
-
-	virtual void dispatch(char* buf, uint32_t sockfd) = 0;
 
 	/**
 	 * Establish a connection to a component. Save the connection to list
@@ -76,26 +76,45 @@ public:
 
 	/**
 	 * When there are multiple MDS, choose one
-	 * @return Socket descriptor of chosen MDS
+	 * @return Socket descriptor of chosen MDS, -1 if no MDS found
 	 */
 
 	uint32_t getMdsSockfd();
 
 	/**
 	 * When there are multiple monitor, choose one
-	 * @return Socket descriptor of chosen Monitor
+	 * @return Socket descriptor of chosen Monitor -1 if no monitor found
 	 */
 
 	uint32_t getMonitorSockfd();
 
 	/**
-	 *
+	 * Generate a monotonically increasing requestID
+	 * @return Generated requestID
 	 */
 
-	void setMessageFactory (MessageFactory* messageFactory);
+	uint32_t generateRequestId ();
 
 private:
-	MessageFactory* _messageFactory;
+
+	/**
+	 * Runs in separate detached thread
+	 * Execute message->parse function
+	 * @param message
+	 */
+
+	static void handleThread(Message* message);
+
+	/**
+	 * Get the MsgType from raw buffer and get a Message object from the MessageFactory
+	 * Execute message.handle() in a separate thread
+	 * @param buf Pointer to the buffer holding the Message
+	 * @param sockfd Socket Descriptor of incoming connection
+	 */
+
+	void dispatch(char* buf, uint32_t sockfd);
+
+	static atomic<uint32_t> _requestId;
 	map<uint32_t, Connection> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
 };

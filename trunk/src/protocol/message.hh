@@ -18,7 +18,7 @@ using namespace std;
 #pragma pack(1)
 struct MsgHeader {
 	uint32_t requestId;
-	uint32_t protocolMsgType;
+	MsgType protocolMsgType;
 	uint32_t protocolMsgSize;
 	uint32_t payloadSize;
 };
@@ -62,6 +62,7 @@ public:
 	 */
 
 	uint32_t preparePayload(string filepath, uint32_t offset, uint32_t length);
+
 
 	//
 	// for receive
@@ -115,7 +116,6 @@ public:
 
 protected:
 	uint32_t _sockfd;		// destination
-	uint32_t _requestId;
 	struct MsgHeader _msgHeader;
 	string _protocolMsg;
 	char* _payload;

@@ -17,7 +17,7 @@ Message::Message() {
 	_sockfd = 0;
 	_msgHeader.payloadSize = 0;
 	_msgHeader.protocolMsgSize = 0;
-	_msgHeader.protocolMsgType = 0;
+	_msgHeader.protocolMsgType = DEFAULT;
 	_payload = NULL;
 }
 

@@ -27,6 +27,7 @@ OsdCommunicator::~OsdCommunicator() {
 	cout << "OSD Communicator Destroyed" << endl;
 }
 
+
 /*
 
 void OsdCommunicator::listDirectoryRequest(uint32_t osdId,
@@ -68,3 +69,4 @@ void OsdCommunicator::connectToMds() {
 	// do connection
 	addConnection(ip, port, connectionType);
 }
+

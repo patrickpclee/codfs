@@ -22,7 +22,7 @@ ListDirectoryReplyMsg::ListDirectoryReplyMsg (uint32_t requestId, uint32_t sockf
 void ListDirectoryReplyMsg::setVariables (uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
 {
 	_sockfd = sockfd;
-	_requestId = requestId;
+	_msgHeader.requestId = requestId;
 	_path = path;
 	_folderData = folderData;
 
