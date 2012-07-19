@@ -9,6 +9,7 @@
 #include <list>
 #include <map>
 #include <atomic>
+#include "socket.hh"
 #include "../protocol/messagefactory.hh"
 #include "../protocol/message.hh"
 #include "connection.hh"
@@ -55,8 +56,15 @@ public:
 	 * Check the Message queue, when there is Message pending, dequeue and send
 	 */
 
-
 	void sendMessage();
+
+	/**
+	 * Create a server socket at the specified port
+	 * @param port Port to listen to
+	 * @return Binded Socket
+	 */
+
+	void createServerSocket (uint16_t port);
 
 	/**
 	 * Establish a connection to a component. Save the connection to list
@@ -114,8 +122,9 @@ private:
 
 	void dispatch(char* buf, uint32_t sockfd);
 
-	static atomic<uint32_t> _requestId;
-	map<uint32_t, Connection> _connectionMap;
+	Socket _serverSocket;
+	atomic<uint32_t> _requestId;
+	map<uint32_t, Connection*> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
 };
 #endif

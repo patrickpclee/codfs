@@ -21,6 +21,11 @@ public:
 	OsdCommunicator();
 	~OsdCommunicator();
 //	void listDirectoryRequest(uint32_t osdId, string directoryPath);
+
+	/**
+	 * Initiate a connection to the MDS
+	 */
+
 	void connectToMds();
 
 	/**

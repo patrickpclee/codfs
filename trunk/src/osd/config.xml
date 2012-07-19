@@ -1,17 +1,13 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
     <Communication>
-    
         <!-- polling interval in terms of ms -->
         <SendPollingInterval>100</SendPollingInterval>
-        
         <!-- timeout for select -->
         <SelectTimeout>
             <sec>15</sec>
             <usec>0</usec>
         </SelectTimeout>
-        
         <ServerPort>50000</ServerPort>
-        
     </Communication>
 </NcvfsConfig>

@@ -29,9 +29,9 @@ uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
 
 	/*
 
-	_segmentLocationCache->deleteSegmentLocation(objectId);
-	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
-	*/
+	 _segmentLocationCache->deleteSegmentLocation(objectId);
+	 _segmentLocationCache->writeSegmentLocation(objectId, osdList);
+	 */
 
 	return 0;
 }
@@ -44,17 +44,17 @@ uint32_t Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 	list<uint32_t> osdIdList;
 
 	/*
-	// check if I have the object
-	if (_storageModule) {
+	 // check if I have the object
+	 if (_storageModule) {
 
-	}
+	 }
 
-	try {
-		osdIdList = getSegmentLocationCache()->readSegmentLocation(objectId);
-	} catch (CacheMissException &e) {
+	 try {
+	 osdIdList = getSegmentLocationCache()->readSegmentLocation(objectId);
+	 } catch (CacheMissException &e) {
 
-	}
-	*/
+	 }
+	 */
 
 	return 0;
 
@@ -84,8 +84,14 @@ int main(void) {
 	// create new communicator
 	OsdCommunicator* communicator = osd->getOsdCommunicator();
 
+	const uint16_t serverPort = configLayer->getConfigInt(
+			"Communication>ServerPort");
+	cout << "ServerPort = " << serverPort << endl;
+
+	communicator->createServerSocket(serverPort);
+
 	// connect to MDS
-	communicator->connectToMds();
+	//communicator->connectToMds();
 
 	// wait for message
 	communicator->waitForMessage();

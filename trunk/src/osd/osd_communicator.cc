@@ -63,7 +63,7 @@ void OsdCommunicator::connectToMds() {
 	// TESTING: Hardcode destination info
 	// TODO: Read connection information from cache / XML
 	string ip = "127.0.0.1";
-	uint16_t port = 12345;
+	uint16_t port = 30000;
 	ComponentType connectionType = MDS;
 
 	// do connection

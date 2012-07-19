@@ -1,15 +1,12 @@
 #include <iostream>
-#include <sys/socket.h>		// for socket() and connect()
-#include <sys/types.h>			// for connect()
-#include <netinet/in.h>		// for struct sockaddr_in
-#include <arpa/inet.h>			// for ip conversion
-#include <netdb.h>				// for gethostbyname()
 #include <string.h>
 #include <stdio.h>
 #include "connection.hh"
+#include "socket.hh"
 #include "../common/enums.hh"
 #include "../protocol/message.hh"
 #include "../common/memorypool.hh"
+#include "socketexception.hh"
 
 using namespace std;
 
@@ -23,6 +20,17 @@ Connection::Connection(string ip, uint16_t port, ComponentType connectionType) {
 
 uint32_t Connection::doConnect(string ip, uint16_t port,
 		ComponentType connectionType) {
+
+	if (!_socket.create()) {
+		throw SocketException("Could not create client socket.");
+	}
+
+	if (!_socket.connect(ip, (int)port)) {
+		throw SocketException("Could not bind to port.");
+	}
+
+	/*
+
 	struct sockaddr_in servaddr; // connection struct
 	uint32_t sockfd; // resulting sockfd
 	uint32_t co; // connection result
@@ -54,19 +62,20 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 		return -1;
 	}
 
-	printf("Connected to sockfd = %d\n", sockfd);
+	*/
+
+	printf("Connected to sockfd = %d\n", _socket.getSockfd());
 
 	// save connection info in private variables
-	_sockfd = sockfd;
-	_ip = ip;
-	_port = port;
+//	_sockfd = _socket.getSockfd();
+//	_ip = ip;
+//	_port = port;
 	_connectionType = connectionType;
 
-	return sockfd;
+	return _socket.getSockfd();
 }
 
 uint32_t Connection::sendMessage(Message* message) {
-	const uint32_t sockfd = _sockfd;
 	uint32_t byteSent = 0;
 	uint32_t totalByteSent = 0;
 
@@ -75,7 +84,8 @@ uint32_t Connection::sendMessage(Message* message) {
 	struct MsgHeader msgHeader = message->getMsgHeader();
 	const uint32_t headerLength = sizeof(struct MsgHeader);
 
-	if ((byteSent = sendn(sockfd, (const char*)&msgHeader, headerLength)) != -1) {
+	if ((byteSent = _socket.sendn((const char*) &msgHeader, headerLength))
+			!= -1) {
 		totalByteSent += byteSent;
 	} else {
 		cerr << "Error in sending MsgHeader" << endl;
@@ -86,7 +96,7 @@ uint32_t Connection::sendMessage(Message* message) {
 	string protocolMessage = message->getProtocolMsg();
 	const uint32_t protocolLength = protocolMessage.length();
 
-	if ((byteSent = sendn(sockfd, protocolMessage.data(), protocolLength))
+	if ((byteSent = _socket.sendn(protocolMessage.data(), protocolLength))
 			!= -1) {
 		totalByteSent += byteSent;
 	} else {
@@ -99,7 +109,7 @@ uint32_t Connection::sendMessage(Message* message) {
 		char* payload = message->getPayload();
 		const uint32_t payloadLength = msgHeader.payloadSize;
 
-		if ((byteSent = sendn(sockfd, payload, payloadLength)) != -1) {
+		if ((byteSent = _socket.sendn(payload, payloadLength)) != -1) {
 			totalByteSent += byteSent;
 		} else {
 			cerr << "Error in sending Protocol Message" << endl;
@@ -111,7 +121,6 @@ uint32_t Connection::sendMessage(Message* message) {
 }
 
 char* Connection::recvMessage() {
-	const uint32_t sockfd = _sockfd;
 	char* buf;
 	uint32_t byteReceived = 0;
 	uint32_t totalByteReceived = 0;
@@ -121,7 +130,8 @@ char* Connection::recvMessage() {
 	struct MsgHeader msgHeader;
 	const uint32_t headerLength = sizeof(struct MsgHeader);
 
-	if ((byteReceived = recvn(sockfd, (char*)&msgHeader, headerLength)) != -1) {
+	if ((byteReceived = _socket.recvn((char*) &msgHeader, headerLength))
+			!= -1) {
 		totalByteReceived += byteReceived;
 	} else {
 		cerr << "Error in receiving MsgHeader" << endl;
@@ -142,7 +152,7 @@ char* Connection::recvMessage() {
 
 	const uint32_t protocolLength = msgHeader.protocolMsgSize;
 
-	if ((byteReceived = recvn(sockfd, buf + totalByteReceived, protocolLength))
+	if ((byteReceived = _socket.recvn(buf + totalByteReceived, protocolLength))
 			!= -1) {
 		totalByteReceived += byteReceived;
 	} else {
@@ -154,7 +164,7 @@ char* Connection::recvMessage() {
 	if (msgHeader.payloadSize > 0) {
 		const uint32_t payloadLength = msgHeader.payloadSize;
 
-		if ((byteReceived = recvn(sockfd, buf + totalByteReceived,
+		if ((byteReceived = _socket.recvn(buf + totalByteReceived,
 				payloadLength)) != -1) {
 			totalByteReceived += byteReceived;
 		} else {
@@ -168,44 +178,17 @@ char* Connection::recvMessage() {
 }
 
 void Connection::disconnect() {
-	close(_sockfd);
+	_socket.~Socket();
 }
 
 uint32_t Connection::getSockfd() {
-	return _sockfd;
+	return _socket.getSockfd();
 }
 
 ComponentType Connection::getConnectionType() {
 	return _connectionType;
 }
 
-//
-// PRIVATE METHODS
-//
-uint32_t Connection::sendn(uint32_t sd, const char* buf, uint32_t buf_len) {
-	uint32_t n_left = buf_len; // actual data bytes sent
-	uint32_t n;
-	while (n_left > 0) {
-		if ((n = send(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
-			return -1;
-		} else if (n == 0) {
-			return 0;
-		}
-		n_left -= n;
-	}
-	return buf_len;
-}
-
-uint32_t Connection::recvn(uint32_t sd, char* buf, uint32_t buf_len) {
-	uint32_t n_left = buf_len;
-	uint32_t n = 0;
-	while (n_left > 0) {
-		if ((n = recv(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
-			return -1;
-		} else if (n == 0) {
-			return 0;
-		}
-		n_left -= n;
-	}
-	return buf_len;
+Socket* Connection::getSocket() {
+	return &_socket;
 }

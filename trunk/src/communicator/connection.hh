@@ -1,11 +1,11 @@
 #ifndef __CONNECTION_HH__
 #define __CONNECTION_HH__
 
+#include <stdint.h>
 #include <string>
 #include "../common/enums.hh"
 #include "../protocol/message.hh"
-
-#include <stdint.h>
+#include "socket.hh"
 
 using namespace std;
 
@@ -30,6 +30,13 @@ public:
 	 */
 
 	Connection(string ip, uint16_t port, ComponentType connectionType);
+
+	/**
+	 * Constructor (for saving incoming connection)
+	 * @param socket Socket of incoming connection
+	 */
+
+//	Connection(Socket socket);
 
 	/**
 	 * Establish connection with a component
@@ -62,17 +69,16 @@ public:
 
 	char* recvMessage ();
 
+	Socket* getSocket();
 	uint32_t getSockfd();
 	ComponentType getConnectionType();
 
 
 private:
-	uint32_t sendn (uint32_t sd, const char* buf, uint32_t buf_len);
-	uint32_t recvn (uint32_t sd, char* buf, uint32_t buf_len);
-
-	uint32_t _sockfd;
-	string _ip;
-	uint16_t _port;
+	Socket _socket;
+//	uint32_t _sockfd;
+//	string _ip;
+//	uint16_t _port;
 	ComponentType _connectionType;
 };
 
