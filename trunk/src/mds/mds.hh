@@ -127,6 +127,18 @@ public:
 	 */
 	void nodeListUpdateProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t> objectNodeList);
 
+	/**
+	 * @brief	Get the MDS Communicator
+	 *
+	 * @return	Pointer to the MDS Communicator Module
+	 */
+	MdsCommunicator* getMdsCommunicator();
+
+	/**
+	 * @brief	Run the MDS
+	 */
+	void run();
+
 private:
 
 	/**
@@ -148,5 +160,8 @@ private:
 
 	/// Handle Namespace Operations
 	NameSpaceModule* _nameSpaceModule;
+
+	/// Running Indicator
+	bool running;
 };
 #endif

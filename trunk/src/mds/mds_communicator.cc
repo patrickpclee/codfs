@@ -8,9 +8,52 @@
  */
 void MdsCommunicator::replyFolderData(uint32_t requestId, uint32_t connectionId, string path, vector<FileMetaData> folderData)
 {
-	ListDirectoryReplyMsg listDirectoryReplyMsg* = new ListDirectoryReplyMsg(requestId, connectionId, path, folderData);
+	ListDirectoryReplyMsg* listDirectoryReplyMsg = new ListDirectoryReplyMsg(requestId, connectionId, path, folderData);
 	listDirectoryReplyMsg->prepareProtocolMsg();
 	
 	addMessage(listDirectoryReplyMsg);
 	return ;
 }
+
+
+vector<uint32_t> MdsCommunicator::askPrimaryList(uint32_t numOfObjs)
+{
+	return {0};
+}
+
+
+void MdsCommunicator::display()
+{
+	return ;
+}
+
+
+void MdsCommunicator::replyNodeList(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList)
+{
+	return ;
+}
+
+
+void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList, unsigned char* checksum)
+{
+	return ;
+}
+
+
+void MdsCommunicator::replyPrimary(uint32_t requestId, uint32_t connectionId, uint64_t objectId, uint32_t osdId)
+{
+	return ;
+}
+
+
+void MdsCommunicator::replyRecoveryInfo(uint32_t requestId, uint32_t connectionId, uint32_t osdId, vector<uint64_t> objectList, vector<uint32_t> primaryList, vector< vector<uint32_t> > objectNodeList)
+{
+	return ;
+}
+
+
+void MdsCommunicator::reportFailure(uint32_t osdId, FailureReason reason)
+{
+	return ;
+}
+

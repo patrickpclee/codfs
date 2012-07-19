@@ -59,3 +59,21 @@ void ListDirectoryReplyMsg::prepareProtocolMsg () {
 
 	return ;
 }
+
+void ListDirectoryReplyMsg::handle()
+{
+	return ;
+}
+
+
+void ListDirectoryReplyMsg::parse(char* buf)
+{
+	return ;
+}
+
+
+void ListDirectoryReplyMsg::printProtocol()
+{
+	return ;
+}
+

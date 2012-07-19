@@ -114,7 +114,7 @@ private:
 
 	void dispatch(char* buf, uint32_t sockfd);
 
-	static atomic<uint32_t> _requestId;
+	atomic<uint32_t> _requestId;
 	map<uint32_t, Connection> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
 };
