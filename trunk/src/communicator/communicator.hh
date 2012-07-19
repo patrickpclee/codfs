@@ -8,6 +8,7 @@
 #include <string>
 #include <list>
 #include <map>
+#include <atomic>
 #include "../protocol/messagefactory.hh"
 #include "../protocol/message.hh"
 #include "connection.hh"
@@ -43,8 +44,17 @@ public:
 	void waitForMessage();
 
 	/**
+	 * Add message to _outMessageQueue
+	 * Set a unique request ID if request ID = 0
+	 * @param message Message to send
+	 */
+
+	void addMessage(Message* message);
+
+	/**
 	 * Check the Message queue, when there is Message pending, dequeue and send
 	 */
+
 
 	void sendMessage();
 
@@ -78,6 +88,13 @@ public:
 
 	uint32_t getMonitorSockfd();
 
+	/**
+	 * Generate a monotonically increasing requestID
+	 * @return Generated requestID
+	 */
+
+	uint32_t generateRequestId ();
+
 private:
 
 	/**
@@ -97,6 +114,7 @@ private:
 
 	void dispatch(char* buf, uint32_t sockfd);
 
+	static atomic<uint32_t> _requestId;
 	map<uint32_t, Connection> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
 };

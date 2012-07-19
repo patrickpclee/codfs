@@ -21,6 +21,9 @@ extern ConfigLayer* configLayer;
 
 Communicator::Communicator() {
 
+	// initialize requestID
+	_requestId = 0;
+
 	cout << "Checking Protocol Buffer Version...";
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	cout << "Success" << endl;
@@ -34,7 +37,7 @@ Communicator::~Communicator() {
 
 void Communicator::waitForMessage() {
 	char* buf;
-	uint32_t maxFd;
+	uint32_t maxFd = 0;
 	fd_set sockfdSet;
 	struct timeval tv; // timeout for select
 	map<uint32_t, Connection>::iterator p;
@@ -46,9 +49,9 @@ void Communicator::waitForMessage() {
 	tv.tv_sec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
 	tv.tv_usec = configLayer->getConfigInt("Communication>SelectTimeout>usec");
 
-	cout << "[WAIT FOR MESSAGE] Select Timeout = " << tv.tv_sec << " "
+	cout << "[WAIT FOR MESSAGE] Max SockFD = " << maxFd << endl;
+	cout << "[WAIT FOR MESSAGE] Select Timeout = " << tv.tv_sec << "."
 			<< tv.tv_usec << endl;
-	cout << "[WAIT FOR MESSAGE] Ready" << endl;
 
 	while (1) {
 
@@ -84,6 +87,16 @@ void Communicator::waitForMessage() {
 	} // end while (1)
 }
 
+void Communicator::addMessage(Message* message) {
+	// check if request ID = 0
+	if (message->getMsgHeader().requestId == 0) {
+		message->setRequestId(generateRequestId());
+	}
+	cout << "Message ID = " << message->getMsgHeader().requestId
+			<< " added to queue" << endl;
+	_outMessageQueue.push_back(message);
+}
+
 void Communicator::sendMessage() {
 
 	// get config: polling interval
@@ -99,6 +112,8 @@ void Communicator::sendMessage() {
 			_outMessageQueue.pop_front();
 			const uint32_t sockfd = message->getSockfd();
 			_connectionMap[sockfd].sendMessage(message);
+			cout << "Message ID = " << message->getMsgHeader().requestId
+					<< " remove from queue" << endl;
 		}
 
 		sleep(pollingInterval);
@@ -194,4 +209,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	t.detach();
 
 	// TODO: when to free message?
+}
+
+uint32_t Communicator::generateRequestId() {
+	return ++_requestId;
 }
