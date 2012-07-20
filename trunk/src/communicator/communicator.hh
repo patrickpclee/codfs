@@ -50,7 +50,7 @@ public:
 	 * @param message Message to send
 	 */
 
-	void addMessage(Message* message, bool expectReply);
+	void addMessage(Message* message, bool expectReply = false);
 
 	/**
 	 * Check the Message queue, when there is Message pending, dequeue and send

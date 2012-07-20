@@ -138,7 +138,7 @@ void Communicator::waitForMessage() {
 	} // end while (1)
 }
 
-void Communicator::addMessage(Message* message, bool expectReply = false) {
+void Communicator::addMessage(Message* message, bool expectReply) {
 	// check if request ID = 0
 	const uint32_t requestId = generateRequestId();
 
