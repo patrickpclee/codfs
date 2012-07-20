@@ -90,7 +90,7 @@ void ListDirectoryReplyMsg::parse(char* buf)
 		tempFileMetaData._size = listDirectoryReplyPro.fileinfopro(i).filesize();
 		tempFileMetaData._path = listDirectoryReplyPro.fileinfopro(i).filename();
 
-		debug("%d %llu %s\n",tempFileMetaData._id,tempFileMetaData._size,tempFileMetaData._path.c_str());
+//		debug("%d %llu %s\n",tempFileMetaData._id,tempFileMetaData._size,tempFileMetaData._path.c_str());
 		_folderData.push_back(tempFileMetaData);
 	}
 

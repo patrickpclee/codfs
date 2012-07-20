@@ -29,12 +29,12 @@ vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, string path
 			tempFileMetaData._id = 0;
 //			printf ("%s\n", ent->d_name);
 			tempFilePath = path + '/' + ent->d_name;
-			debug("path: %s\n",tempFilePath.c_str());
+//			debug("path: %s\n",tempFilePath.c_str());
 			stat(tempFilePath.c_str(),&tempFileStat);
 
 			tempFileMetaData._path = ent->d_name;
 			tempFileMetaData._size = tempFileStat.st_size;
-			debug("name: %s size: %d\n",ent->d_name,(int)tempFileStat.st_size);
+//			debug("name: %s size: %d\n",ent->d_name,(int)tempFileStat.st_size);
 			folderData.push_back(tempFileMetaData);
 		}
 		closedir (dir);
