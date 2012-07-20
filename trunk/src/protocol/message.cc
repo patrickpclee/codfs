@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include "../communicator/communicator.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
 #include "message.hh"

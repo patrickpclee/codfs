@@ -8,6 +8,7 @@
 #include <string>
 #include <stdint.h>
 #include "../common/enums.hh"
+#include "../communicator/communicator.hh"
 
 using namespace std;
 
