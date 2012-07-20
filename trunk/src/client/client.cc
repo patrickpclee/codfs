@@ -13,10 +13,9 @@ ConfigLayer* configLayer;
 
 void* processor;
 
-Client::Client()
-{
+Client::Client() {
 	_clientCommunicator = new ClientCommunicator();
-	processor = (void*)this;
+	processor = (void*) this;
 }
 
 /**
@@ -24,32 +23,29 @@ Client::Client()
  *
  * @return	Pointer to the Client Communicator Module
  */
-ClientCommunicator* Client::getCommunicator()
-{
+ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
-void sendThread()
-{
-	debug("%s","Send Thread Start\n");
+void sendThread() {
+	debug("%s", "Send Thread Start\n");
 	client->getCommunicator()->sendMessage();
-	debug("%s","Send Thread End\n");
+	debug("%s", "Send Thread End\n");
 }
 
-void sleepThread(ClientCommunicator* communicator)
-{
-	
+void sleepThread(ClientCommunicator* communicator) {
+
 	usleep(2000000);
 	vector<FileMetaData> folderData;
-	folderData = communicator->listFolderData(1,".");
+	folderData = communicator->listFolderData(1, ".");
 
 	vector<FileMetaData>::iterator it;
-	for(it = folderData.begin(); it < folderData.end(); ++it) {
-		debug("name: %s size: %d\n",((*it)._path).c_str(),(int)(*it)._size);
+	for (it = folderData.begin(); it < folderData.end(); ++it) {
+		debug("name: %s size: %d\n", ((*it)._path).c_str(), (int)(*it)._size);
 	}
 }
 
-int main (void) {
+int main(void) {
 
 	configLayer = new ConfigLayer("clientconfig.xml");
 
@@ -60,23 +56,22 @@ int main (void) {
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
 
-	debug ("Start server on port %d\n", serverPort);
+	debug("Start server on port %d\n", serverPort);
 
 	communicator->createServerSocket(serverPort);
 
 	// connect to MDS
 	communicator->connectToMds();
 
-	thread t (sendThread);
+	thread t(sendThread);
 	t.detach();
-	thread t1 (sleepThread,communicator);
+	thread t1(sleepThread, communicator);
 	t1.detach();
 
 	// wait for message
 	communicator->waitForMessage();
 
-
-	printf ("CLIENT\n");
+	printf("CLIENT\n");
 	return 0;
 }
 

@@ -70,7 +70,7 @@ public:
 	 * @return Binded Socket
 	 */
 
-	void createServerSocket (uint16_t port);
+	void createServerSocket(uint16_t port);
 
 	/**
 	 * Establish a connection to a component. Save the connection to list
@@ -107,7 +107,7 @@ public:
 	 * @return Generated requestID
 	 */
 
-	uint32_t generateRequestId ();
+	uint32_t generateRequestId();
 
 	/**
 	 * Retrieve the pointer to a sent message by its requestId
@@ -116,7 +116,7 @@ public:
 	 * @return Pointer to sent message
 	 */
 
-	Message* findSentMessage (uint32_t requestId);
+	Message* findSentMessage(uint32_t requestId);
 
 	static void sendThread(Communicator* communicator);
 private:
@@ -128,7 +128,6 @@ private:
 	 */
 
 	static void handleThread(Message* message);
-
 
 	/**
 	 * Get the MsgType from raw buffer and get a Message object from the MessageFactory
@@ -143,7 +142,7 @@ private:
 	atomic<uint32_t> _requestId;
 	map<uint32_t, Connection*> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
-	map <uint32_t, Message *> _sentMessageMap;
+	map<uint32_t, Message *> _sentMessageMap;
 	uint32_t _maxFd;
 };
 #endif

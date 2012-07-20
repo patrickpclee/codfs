@@ -30,47 +30,9 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 		throw SocketException("Could not bind to port.");
 	}
 
-	/*
-
-	struct sockaddr_in servaddr; // connection struct
-	uint32_t sockfd; // resulting sockfd
-	uint32_t co; // connection result
-	struct hostent *ht; // lookup result
-
-	printf("Connecting to %s:%d (Type: %d)\n", ip.c_str(), port,
-			connectionType);
-
-	// create socket
-	sockfd = socket(AF_INET, SOCK_STREAM, 0);
-
-	// fill up destination info in servaddr
-	memset(&servaddr, 0, sizeof(servaddr));
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(port);
-	ht = gethostbyname(ip.c_str());
-
-	if (ht == NULL) {
-		cerr << "ERROR: invalid host";
-		return -1;
-	}
-
-	memcpy(&servaddr.sin_addr, ht->h_addr, ht->h_length);
-
-	// establish connection
-	co = connect(sockfd, (struct sockaddr*) &servaddr, sizeof(servaddr));
-	if (co < 0) {
-		cerr << "ERROR: connect failed";
-		return -1;
-	}
-
-	*/
-
-	printf("Connected to sockfd = %d\n", _socket.getSockfd());
+	debug ("Connected to sockfd = %d\n", _socket.getSockfd());
 
 	// save connection info in private variables
-//	_sockfd = _socket.getSockfd();
-//	_ip = ip;
-//	_port = port;
 	_connectionType = connectionType;
 
 	return _socket.getSockfd();

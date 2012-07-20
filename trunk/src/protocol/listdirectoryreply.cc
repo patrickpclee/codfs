@@ -15,40 +15,41 @@
 
 extern Client* client;
 
-
-ListDirectoryReplyMsg::ListDirectoryReplyMsg (Communicator* communicator) : Message (communicator)
-{
+ListDirectoryReplyMsg::ListDirectoryReplyMsg(Communicator* communicator) :
+		Message(communicator) {
 }
 
-ListDirectoryReplyMsg::ListDirectoryReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData) : Message (communicator)
-{
+ListDirectoryReplyMsg::ListDirectoryReplyMsg(Communicator* communicator,
+		uint32_t requestId, uint32_t sockfd, string path,
+		vector<FileMetaData> folderData) :
+		Message(communicator) {
 	setVariables(requestId, sockfd, path, folderData);
 }
 
-void ListDirectoryReplyMsg::setVariables (uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
-{
+void ListDirectoryReplyMsg::setVariables(uint32_t requestId, uint32_t sockfd,
+		string path, vector<FileMetaData> folderData) {
 	_sockfd = sockfd;
 	_msgHeader.requestId = requestId;
 	_path = path;
 	_folderData = folderData;
 
-	return ;
+	return;
 }
 
 /**
  * @brief	Copy values in private variables to protocol message
  * Serialize protocol message and copy to private variable
  */
-void ListDirectoryReplyMsg::prepareProtocolMsg () {
+void ListDirectoryReplyMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::ListDirectoryReplyPro listDirectoryReplyPro;
 
 	vector<FileMetaData>::iterator it;
 
-	for (it = _folderData.begin(); it < _folderData.end(); ++it)
-	{
-		ncvfs::FileInfoPro* fileInfoPro = listDirectoryReplyPro.add_fileinfopro();
+	for (it = _folderData.begin(); it < _folderData.end(); ++it) {
+		ncvfs::FileInfoPro* fileInfoPro =
+				listDirectoryReplyPro.add_fileinfopro();
 		fileInfoPro->set_fileid((*it)._id);
 		fileInfoPro->set_filesize((*it)._size);
 		fileInfoPro->set_filename((*it)._path);
@@ -56,50 +57,50 @@ void ListDirectoryReplyMsg::prepareProtocolMsg () {
 
 	if (!listDirectoryReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
-		return ;
+		return;
 	}
 
 	setProtocolSize(serializedString.length());
 	setProtocolType(LIST_DIRECTORY_REPLY);
 	setProtocolMsg(serializedString);
-	return ;
+	return;
 }
 
-void ListDirectoryReplyMsg::handle()
-{
-	ListDirectoryRequestMsg* listdirectoryrequest = (ListDirectoryRequestMsg*)_communicator->findSentMessage(_msgHeader.requestId);
-	listdirectoryrequest->setFolderDataValue(_folderData);	
-	return ;
+void ListDirectoryReplyMsg::handle() {
+	ListDirectoryRequestMsg* listdirectoryrequest =
+			(ListDirectoryRequestMsg*) _communicator->findSentMessage(
+					_msgHeader.requestId);
+	listdirectoryrequest->setFolderDataValue(_folderData);
+	return;
 }
-
 
 /**
  * @brief	Parse the Binary to Variables
  */
-void ListDirectoryReplyMsg::parse(char* buf)
-{
+void ListDirectoryReplyMsg::parse(char* buf) {
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
 	ncvfs::ListDirectoryReplyPro listDirectoryReplyPro;
-	listDirectoryReplyPro.ParseFromArray(buf+sizeof(struct MsgHeader) , _msgHeader.protocolMsgSize);
+	listDirectoryReplyPro.ParseFromArray(buf + sizeof(struct MsgHeader),
+			_msgHeader.protocolMsgSize);
 //	listDirectoryReplyPro.ParseFromString(buf + sizeof(struct MsgHeader));
-	for (int i = 0; i < listDirectoryReplyPro.fileinfopro_size(); ++i)
-	{
+	for (int i = 0; i < listDirectoryReplyPro.fileinfopro_size(); ++i) {
 		FileMetaData tempFileMetaData;
 		tempFileMetaData._id = listDirectoryReplyPro.fileinfopro(i).fileid();
-		tempFileMetaData._size = listDirectoryReplyPro.fileinfopro(i).filesize();
-		tempFileMetaData._path = listDirectoryReplyPro.fileinfopro(i).filename();
+		tempFileMetaData._size =
+				listDirectoryReplyPro.fileinfopro(i).filesize();
+		tempFileMetaData._path =
+				listDirectoryReplyPro.fileinfopro(i).filename();
 
-		debug("%d %llu %s\n",tempFileMetaData._id,tempFileMetaData._size,tempFileMetaData._path.c_str());
+		debug("%d %llu %s\n",
+				tempFileMetaData._id, (unsigned long long)tempFileMetaData._size, tempFileMetaData._path.c_str());
 		_folderData.push_back(tempFileMetaData);
 	}
 
-	return ;
+	return;
 }
 
-
-void ListDirectoryReplyMsg::printProtocol()
-{
-	return ;
+void ListDirectoryReplyMsg::printProtocol() {
+	return;
 }
 

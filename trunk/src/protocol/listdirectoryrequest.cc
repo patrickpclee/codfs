@@ -16,20 +16,20 @@ extern Mds* mds;
  * Default Constructor
  */
 
-ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator) : Message (communicator){
+ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator) :
+		Message(communicator) {
 }
-
 
 /**
  * Constructor - Save parameters in private variables
  */
-ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path) : Message (communicator)
-{
+ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator,
+		uint32_t clientId, uint32_t mdsSockfd, string path) :
+		Message(communicator) {
 	_clientId = clientId;
 	_directoryPath = path;
 	_sockfd = mdsSockfd;
 }
-
 
 void ListDirectoryRequestMsg::prepareProtocolMsg() {
 	string serializedString;
@@ -66,7 +66,6 @@ void ListDirectoryRequestMsg::handle() {
 #endif
 }
 
-
 void ListDirectoryRequestMsg::printProtocol() {
 	cout << "[LIST_DIRECTORY_REQUEST] osdID = " << _clientId << " Path = "
 			<< _directoryPath << endl;
@@ -77,17 +76,16 @@ void ListDirectoryRequestMsg::printProtocol() {
  *
  * @return	Future of the Folder Data
  */
-future< vector<FileMetaData> > ListDirectoryRequestMsg::getFolderDataFuture()
-{
+future<vector<FileMetaData> > ListDirectoryRequestMsg::getFolderDataFuture() {
 	return _folderData.get_future();
 }
 
 /**
  * @brief	Set the Folder Data (Fulfill Promise)
  */
-void ListDirectoryRequestMsg::setFolderDataValue(vector<FileMetaData> folderData)
-{
+void ListDirectoryRequestMsg::setFolderDataValue(
+		vector<FileMetaData> folderData) {
 	_folderData.set_value(folderData);
 
-	return ;
+	return;
 }

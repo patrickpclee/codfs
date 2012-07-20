@@ -12,7 +12,9 @@ all:
 	make monitor;
 
 test:
-	make clean; make mds; make client;
+	make clean; 
+	make mds; 
+	make client;
 	
 mds:
 	cd ${MDS_DIR}; make

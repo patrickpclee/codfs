@@ -10,7 +10,8 @@
  */
 vector<FileMetaData> ClientCommunicator::listFolderData (uint32_t clientId, string path)
 {
-	ListDirectoryRequestMsg* listDirectoryRequestMsg = new ListDirectoryRequestMsg(this,clientId,getMdsSockfd(), path);
+	ListDirectoryRequestMsg* listDirectoryRequestMsg =
+			new ListDirectoryRequestMsg(this, clientId, getMdsSockfd(), path);
 	listDirectoryRequestMsg->prepareProtocolMsg();
 
 	future< vector<FileMetaData> > folderData = listDirectoryRequestMsg->getFolderDataFuture();

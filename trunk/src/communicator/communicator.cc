@@ -8,6 +8,7 @@
 #include <unistd.h>		// required by select()
 #include <sys/select.h>	// required by select()
 #include <algorithm>
+#include <sys/ioctl.h>
 #include "connection.hh"
 #include "communicator.hh"
 #include "../config/config.hh"
@@ -99,7 +100,7 @@ void Communicator::waitForMessage() {
 
 		// invoke select
 		int result;
-		debug("Max FD %d\n",_maxFd);
+		debug("Max FD %d\n", _maxFd);
 		result = select(_maxFd + 100, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
@@ -121,10 +122,10 @@ void Communicator::waitForMessage() {
 			// add connection to _connectionMap
 			_connectionMap[conn->getSockfd()] = conn;
 
-			debug ("New connection sockfd = %d\n", conn->getSockfd());
+			debug("New connection sockfd = %d\n", conn->getSockfd());
 
 			// adjust _maxFd if needed
-			if ((uint32_t)conn->getSockfd() > _maxFd) {
+			if ((uint32_t) conn->getSockfd() > _maxFd) {
 				_maxFd = conn->getSockfd();
 			}
 		}
@@ -133,7 +134,17 @@ void Communicator::waitForMessage() {
 		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 			// if socket has data available
 			if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
-				debug("%d is set\n",p->first);
+
+				// check if connection is lost
+				int nbytes = 0;
+				ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
+				if (nbytes == 0) {
+					// disconnect and remove from _connectionMap
+					p->second->disconnect();
+					_connectionMap.erase(p->first);
+					continue;
+				}
+
 				// receive message into buffer, memory allocated in recvMessage
 				buf = p->second->recvMessage();
 				dispatch(buf, p->first);
@@ -187,15 +198,25 @@ void Communicator::sendMessage() {
 	const uint32_t pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
 
-	// TODO: poll outMessageQueue to send message for now
 	while (1) {
-//		debug("%s","Checking outMessageQueue\n");
 		// send all message in the outMessageQueue
 		while (!_outMessageQueue.empty()) {
+
+			// get and remove from queue
 			Message* message = _outMessageQueue.front();
 			_outMessageQueue.pop_front();
+
 			const uint32_t sockfd = message->getSockfd();
-			debug("Message (ID: %d) FD = %d\n",message->getMsgHeader().requestId, sockfd);
+
+			// handle disconnected component
+			if (sockfd == (uint32_t) -1) {
+				debug("Message (ID: %d) disconnected, ignore\n",
+						message->getMsgHeader().requestId);
+				continue;
+			}
+
+			debug("Message (ID: %d) FD = %d\n",
+					message->getMsgHeader().requestId, sockfd);
 			message->printHeader();
 			_connectionMap[sockfd]->sendMessage(message);
 			debug("Message (ID: %d) removed from queue\n",
@@ -226,7 +247,7 @@ void Communicator::addConnection(string ip, uint16_t port,
 	if (sockfd > _maxFd)
 		_maxFd = sockfd;
 
-	debug ("Connected to sockfd %d - %d\n", sockfd,_maxFd);
+	debug("Connected to sockfd %d - %d\n", sockfd, _maxFd);
 }
 
 /**
@@ -284,10 +305,9 @@ uint32_t Communicator::getMonitorSockfd() {
 
 void Communicator::handleThread(Message* message) {
 	message->handle();
-} 
+}
 
-void Communicator::sendThread(Communicator* communicator)
-{
+void Communicator::sendThread(Communicator* communicator) {
 	communicator->sendMessage();
 }
 
