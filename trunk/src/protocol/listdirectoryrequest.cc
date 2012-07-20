@@ -66,5 +66,15 @@ void ListDirectoryRequestMsg::printProtocol() {
  */
 future< vector<FileMetaData> > ListDirectoryRequestMsg::getFolderDataFuture()
 {
-	return folderData.get_future();
+	return _folderData.get_future();
+}
+
+/**
+ * @brief	Set the Folder Data (Fulfill Promise)
+ */
+void ListDirectoryRequestMsg::setFolderDataValue(vector<FileMetaData> folderData)
+{
+	_folderData.set_value(folderData);
+
+	return ;
 }

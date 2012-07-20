@@ -56,6 +56,11 @@ public:
 
 	void printProtocol ();
 
+	/**
+	 * @brief	Parse the Binary to Variables
+	 *
+	 * @param	buf	Message Binary
+	 */
 	void parse (char* buf);
 
 	void handle ();
