@@ -7,6 +7,7 @@
 #include "osd_communicator.hh"
 #include "../common/enums.hh"
 #include "../protocol/listdirectoryrequest.hh"
+#include "../common/debug.hh"
 
 using namespace std;
 
@@ -15,7 +16,6 @@ using namespace std;
  */
 
 OsdCommunicator::OsdCommunicator() {
-	cout << "OSD Communicator Created" << endl;
 
 }
 
@@ -24,7 +24,7 @@ OsdCommunicator::OsdCommunicator() {
  */
 
 OsdCommunicator::~OsdCommunicator() {
-	cout << "OSD Communicator Destroyed" << endl;
+
 }
 
 

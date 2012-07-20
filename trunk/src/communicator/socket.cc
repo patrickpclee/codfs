@@ -6,6 +6,7 @@
 #include <iostream>
 #include <errno.h>
 #include <fcntl.h>
+#include "../common/debug.hh"
 
 using namespace std;
 
@@ -19,12 +20,12 @@ Socket::Socket() :
 Socket::~Socket() {
 	if (is_valid())
 		::close(m_sock);
-	cout << "Socket closed sockfd = " << m_sock << endl;
+	debug ("Socket %d closed\n", m_sock);
 }
 
 bool Socket::create() {
 	m_sock = socket(AF_INET, SOCK_STREAM, 0);
-	cout << "Socket Created sockfd = " << m_sock << endl;
+	debug ("Socket %d created\n", m_sock);
 
 	if (!is_valid())
 		return false;

@@ -5,12 +5,12 @@
 #include <stdio.h>
 #include <vector>
 #include "osd.hh"
+#include "../common/debug.hh"
 #include "../config/config.hh"
 
 ConfigLayer* configLayer;
 
 Osd::Osd() {
-	cout << "OSD Created" << endl;
 	_osdCommunicator = new OsdCommunicator();
 }
 
@@ -86,7 +86,8 @@ int main(void) {
 
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
-	cout << "ServerPort = " << serverPort << endl;
+
+	debug ("Start server on port %d\n", serverPort);
 
 	communicator->createServerSocket(serverPort);
 
