@@ -50,7 +50,7 @@ public:
 	 * @param message Message to send
 	 */
 
-	void addMessage(Message* message);
+	void addMessage(Message* message, bool expectReply);
 
 	/**
 	 * Check the Message queue, when there is Message pending, dequeue and send
@@ -103,6 +103,15 @@ public:
 
 	uint32_t generateRequestId ();
 
+	/**
+	 * Retrieve the pointer to a sent message by its requestId
+	 * Remove the message from sentMessageQueue
+	 * @param requestId Request ID
+	 * @return Pointer to sent message
+	 */
+
+	Message* findSentMessage (uint32_t requestId);
+
 private:
 
 	/**
@@ -126,5 +135,6 @@ private:
 	atomic<uint32_t> _requestId;
 	map<uint32_t, Connection*> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
+	map <uint32_t, Message *> _sentMessageMap;
 };
 #endif

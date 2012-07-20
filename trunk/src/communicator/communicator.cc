@@ -15,6 +15,7 @@
 #include "../protocol/message.pb.h"
 #include "../protocol/messagefactory.hh"
 #include "socketexception.hh"
+#include "../common/debug.hh"
 
 using namespace std;
 
@@ -26,15 +27,14 @@ Communicator::Communicator() {
 	// initialize requestID
 	_requestId = 0;
 
-	cout << "Checking Protocol Buffer Version...";
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
-	cout << "Success" << endl;
+	debug("%s\n", "ProtoBuf Version Verified");
 
-	cout << "Communicator Initialised" << endl;
+	debug("%s\n", "Communicator constructed");
 }
 
 Communicator::~Communicator() {
-	cout << "Communicator Destroyed" << endl;
+	debug("%s\n", "Communicator destructed");
 }
 
 void Communicator::createServerSocket(uint16_t port) {
@@ -52,7 +52,7 @@ void Communicator::createServerSocket(uint16_t port) {
 		throw SocketException("Could not listen to socket.");
 	}
 
-	cout << "Server Socket Created, sockfd = " << _serverSocket.getSockfd() << endl;
+	debug("Server socket sockfd = %d\n", _serverSocket.getSockfd());
 }
 
 void Communicator::waitForMessage() {
@@ -67,15 +67,20 @@ void Communicator::waitForMessage() {
 	int maxFd;
 	fd_set sockfdSet;
 	struct timeval tv; // timeout for select
+
+	// initialize maxFd
 	const uint32_t serverSockfd = _serverSocket.getSockfd();
 	maxFd = serverSockfd;
 
 	// set select timeout value
-	const uint32_t timeoutSec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
-	const uint32_t timeoutUsec = configLayer->getConfigInt("Communication>SelectTimeout>usec");
+	const uint32_t timeoutSec = configLayer->getConfigInt(
+			"Communication>SelectTimeout>sec");
+	const uint32_t timeoutUsec = configLayer->getConfigInt(
+			"Communication>SelectTimeout>usec");
 
 	while (1) {
 
+		// reset timeout
 		tv.tv_sec = timeoutSec;
 		tv.tv_usec = timeoutUsec;
 
@@ -84,19 +89,21 @@ void Communicator::waitForMessage() {
 
 		// add all socket descriptors into sockfdSet
 		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-			cout << "[SELECT] FD_SET = " << p->second->getSockfd() << endl;
 			FD_SET(p->second->getSockfd(), &sockfdSet);
 		}
 
 		// invoke select
-		cout << "maxFd = " << maxFd << endl;
-		if (select(maxFd + 1, &sockfdSet, NULL, NULL, &tv) < 0) {
-			perror ("select");
+		int result;
+		result = select(maxFd + 1, &sockfdSet, NULL, NULL, &tv);
+
+		if (result < 0) {
 			cerr << "select error" << endl;
 			return;
+		} else if (result == 0) {
+			debug("%s\n", "select timeout");
+		} else {
+			debug("%s\n", "select returns");
 		}
-
-		cout << "[SELECT] Select returns" << endl;
 
 		// if there is a new connection
 		if (FD_ISSET(_serverSocket.getSockfd(), &sockfdSet)) {
@@ -116,7 +123,6 @@ void Communicator::waitForMessage() {
 
 		// if there is data in existing connections
 		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-			cout << "[WAIT FOR MESSAGE] Checking sockfd = " << p->first << endl;
 			// if socket has data available
 			if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
 				// receive message into buffer, memory allocated in recvMessage
@@ -125,22 +131,45 @@ void Communicator::waitForMessage() {
 			}
 		}
 
-
 		// TODO: ping all nodes after timeout
 		// pingAllConnections();
-		cout << "[WAIT FOR MESSAGE] Checking connections..." << endl;
+		debug("%s\n", "checking all connections...");
 
 	} // end while (1)
 }
 
-void Communicator::addMessage(Message* message) {
+void Communicator::addMessage(Message* message, bool expectReply = false) {
 	// check if request ID = 0
+	const uint32_t requestId = generateRequestId();
+
 	if (message->getMsgHeader().requestId == 0) {
-		message->setRequestId(generateRequestId());
+		message->setRequestId(requestId);
 	}
-	cout << "Message ID = " << message->getMsgHeader().requestId
-			<< " added to queue" << endl;
+	debug("Message (ID: %d) added to queue\n",
+			message->getMsgHeader().requestId);
 	_outMessageQueue.push_back(message);
+
+	if (expectReply) {
+		debug("Message (ID: %d) added to sentMessageMap\n",
+				message->getMsgHeader().requestId);
+		_sentMessageMap[requestId] = message;
+	}
+}
+
+Message* Communicator::findSentMessage(uint32_t requestId) {
+
+	// check if message is in map
+	if (_sentMessageMap.count(requestId)) {
+
+		// find message
+		Message* message = _sentMessageMap[requestId];
+
+		// remove message from map
+		_sentMessageMap.erase(requestId);
+
+		return message;
+	}
+	return NULL;
 }
 
 void Communicator::sendMessage() {
@@ -158,8 +187,8 @@ void Communicator::sendMessage() {
 			_outMessageQueue.pop_front();
 			const uint32_t sockfd = message->getSockfd();
 			_connectionMap[sockfd]->sendMessage(message);
-			cout << "Message ID = " << message->getMsgHeader().requestId
-					<< " remove from queue" << endl;
+			debug("Message (ID: %d) removed from queue\n",
+					message->getMsgHeader().requestId);
 		}
 
 		sleep(pollingInterval);
@@ -183,7 +212,7 @@ void Communicator::addConnection(string ip, uint16_t port,
 	// Save the connection into corresponding list
 	_connectionMap[sockfd] = conn;
 
-	cout << "Connection Added sockfd = " << sockfd << endl;
+	debug ("Connected to sockfd %d\n", sockfd);
 }
 
 /**

@@ -70,7 +70,7 @@ public:
 	char* recvMessage ();
 
 	Socket* getSocket();
-	uint32_t getSockfd();
+	int getSockfd();
 	ComponentType getConnectionType();
 
 

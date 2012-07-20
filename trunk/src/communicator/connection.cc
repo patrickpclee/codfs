@@ -181,7 +181,7 @@ void Connection::disconnect() {
 	_socket.~Socket();
 }
 
-uint32_t Connection::getSockfd() {
+int Connection::getSockfd() {
 	return _socket.getSockfd();
 }
 
