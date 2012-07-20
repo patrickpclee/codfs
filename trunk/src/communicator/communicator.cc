@@ -182,7 +182,7 @@ void Communicator::sendMessage() {
 
 	// TODO: poll outMessageQueue to send message for now
 	while (1) {
-		debug("%s","Checking outMessageQueue\n");
+//		debug("%s","Checking outMessageQueue\n");
 		// send all message in the outMessageQueue
 		while (!_outMessageQueue.empty()) {
 			Message* message = _outMessageQueue.front();
@@ -195,7 +195,7 @@ void Communicator::sendMessage() {
 					message->getMsgHeader().requestId);
 		}
 
-		sleep(pollingInterval);
+		usleep(pollingInterval);
 	}
 
 }
@@ -292,6 +292,7 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	message->parse(buf);
 
 	message->printHeader();
+	message->printProtocol();
 
 	thread t(handleThread, message);
 	t.detach();

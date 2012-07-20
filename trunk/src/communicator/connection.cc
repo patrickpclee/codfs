@@ -157,6 +157,8 @@ char* Connection::recvMessage() {
 	// copy header to buffer
 	memcpy(buf, &msgHeader, headerLength);
 
+	debug ("Type %d\n",msgHeader.protocolMsgType);
+	debug ("Buffer Size %d\n",bufferSize);
 	// receive protocol message
 
 	const uint32_t protocolLength = msgHeader.protocolMsgSize;

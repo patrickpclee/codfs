@@ -11,6 +11,8 @@
  *	Global Variables
  */
 
+void* processor;
+
 /// MDS Object
 Mds* mds;
 
@@ -25,6 +27,7 @@ Mds::Mds()
 	_metaDataModule = new MetaDataModule();
 	_nameSpaceModule = new NameSpaceModule();
 	_mdsCommunicator = new MdsCommunicator();
+	processor = (void*)this;
 }
 
 Mds::~Mds()
@@ -150,6 +153,7 @@ void Mds::listFolderProcessor (uint32_t requestId, uint32_t connectionId, uint32
 {
 	vector<FileMetaData> folderData;
 
+	debug("List %s by %d\n",path.c_str(),clientId);
 	folderData = _nameSpaceModule->listFolder(clientId, path);
 	_mdsCommunicator->replyFolderData(requestId, connectionId, path, folderData);
 

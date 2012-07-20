@@ -1,4 +1,5 @@
 #include "namespacemodule.hh"
+#include "../common/debug.hh"
 
 #include <stdio.h>
 #include <dirent.h>
@@ -31,6 +32,7 @@ vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, string path
 
 			tempFileMetaData._path = ent->d_name;
 			tempFileMetaData._size = tempFileStat.st_size;
+			debug("name: %s size: %d\n",ent->d_name,tempFileStat.st_size);
 			folderData.push_back(tempFileMetaData);
 		}
 		closedir (dir);

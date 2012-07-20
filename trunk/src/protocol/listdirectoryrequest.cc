@@ -6,6 +6,9 @@
 #include "listdirectoryrequest.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../mds/mds.hh"
+
+extern void* processor;
 
 /**
  * Default Constructor
@@ -45,11 +48,19 @@ void ListDirectoryRequestMsg::prepareProtocolMsg() {
 }
 
 void ListDirectoryRequestMsg::parse(char* buf) {
+	memcpy(&_msgHeader, buf, sizeof(MsgHeader));
+
+	ncvfs::ListDirectoryRequestPro listDirectoryRequestPro;
+	listDirectoryRequestPro.ParseFromString(buf + sizeof(MsgHeader));
+
+	_clientId = listDirectoryRequestPro.osdid();
+	_directoryPath = listDirectoryRequestPro.directorypath();
 
 }
 
 void ListDirectoryRequestMsg::handle() {
-
+	Mds* mds = (Mds*)processor;
+	mds->listFolderProcessor(_msgHeader.requestId,_clientId,_sockfd,_directoryPath);
 }
 
 

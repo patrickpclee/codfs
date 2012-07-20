@@ -11,9 +11,12 @@ Client* client;
 /// Config Layer
 ConfigLayer* configLayer;
 
+void* processor;
+
 Client::Client()
 {
 	_clientCommunicator = new ClientCommunicator();
+	processor = (void*)this;
 }
 
 /**
