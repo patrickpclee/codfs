@@ -118,6 +118,7 @@ public:
 
 	Message* findSentMessage (uint32_t requestId);
 
+	static void sendThread(Communicator* communicator);
 private:
 
 	/**
@@ -127,6 +128,7 @@ private:
 	 */
 
 	static void handleThread(Message* message);
+
 
 	/**
 	 * Get the MsgType from raw buffer and get a Message object from the MessageFactory

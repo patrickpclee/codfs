@@ -115,6 +115,8 @@ void Communicator::waitForMessage() {
 			// add connection to _connectionMap
 			_connectionMap[conn->getSockfd()] = conn;
 
+			debug ("New connection sockfd = %d\n", conn->getSockfd());
+
 			// adjust maxFd if needed
 			if (conn->getSockfd() > maxFd) {
 				maxFd = conn->getSockfd();
@@ -180,12 +182,14 @@ void Communicator::sendMessage() {
 
 	// TODO: poll outMessageQueue to send message for now
 	while (1) {
-
+		debug("%s","Checking outMessageQueue\n");
 		// send all message in the outMessageQueue
 		while (!_outMessageQueue.empty()) {
 			Message* message = _outMessageQueue.front();
 			_outMessageQueue.pop_front();
 			const uint32_t sockfd = message->getSockfd();
+			debug("Message (ID: %d) FD = %d\n",message->getMsgHeader().requestId, sockfd);
+			message->printHeader();
 			_connectionMap[sockfd]->sendMessage(message);
 			debug("Message (ID: %d) removed from queue\n",
 					message->getMsgHeader().requestId);
@@ -270,6 +274,11 @@ uint32_t Communicator::getMonitorSockfd() {
 
 void Communicator::handleThread(Message* message) {
 	message->handle();
+} 
+
+void Communicator::sendThread(Communicator* communicator)
+{
+	communicator->sendMessage();
 }
 
 void Communicator::dispatch(char* buf, uint32_t sockfd) {
@@ -281,6 +290,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	Message* message = MessageFactory::createMessage(this, msgType);
 	message->setSockfd(sockfd);
 	message->parse(buf);
+
+	message->printHeader();
 
 	thread t(handleThread, message);
 	t.detach();

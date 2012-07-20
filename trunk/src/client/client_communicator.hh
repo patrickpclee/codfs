@@ -21,6 +21,8 @@ public:
 	 * @return	Folder Data
 	 */
 	vector<FileMetaData> listFolderData (uint32_t clientId, string path);
+
+	void connectToMds();
 private:
 };
 #endif

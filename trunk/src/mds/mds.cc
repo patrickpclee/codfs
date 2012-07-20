@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include "mds.hh"
+#include "../common/debug.hh"
 #include "../config/config.hh"
 
 /**
@@ -243,9 +244,16 @@ int main (void)
 	configLayer = new ConfigLayer("mdsconfig.xml");
 
 	mds = new Mds();
-	mds->run();
 
 	MdsCommunicator* communicator = mds->getMdsCommunicator();
+
+	const uint16_t serverPort = configLayer->getConfigInt(
+			"Communication>ServerPort");
+
+	debug ("Start server on port %d\n", serverPort);
+
+	communicator->createServerSocket(serverPort);
+
 	communicator->waitForMessage();
 
 	delete mds;

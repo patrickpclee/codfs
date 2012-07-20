@@ -6,6 +6,7 @@
 #include "../common/enums.hh"
 #include "../protocol/message.hh"
 #include "../common/memorypool.hh"
+#include "../common/debug.hh"
 #include "socketexception.hh"
 
 using namespace std;
@@ -91,6 +92,8 @@ uint32_t Connection::sendMessage(Message* message) {
 		cerr << "Error in sending MsgHeader" << endl;
 	}
 
+	debug ("Header sent %d bytes\n", byteSent);
+
 	// send protocol message
 
 	string protocolMessage = message->getProtocolMsg();
@@ -102,6 +105,8 @@ uint32_t Connection::sendMessage(Message* message) {
 	} else {
 		cerr << "Error in sending Protocol Message" << endl;
 	}
+
+	debug ("Protocol sent %d bytes\n", byteSent);
 
 	// send payload if there is one
 
@@ -116,6 +121,8 @@ uint32_t Connection::sendMessage(Message* message) {
 		}
 
 	}
+
+	debug ("Payload sent %d bytes\n", byteSent);
 
 	return totalByteSent;
 }
@@ -136,6 +143,8 @@ char* Connection::recvMessage() {
 	} else {
 		cerr << "Error in receiving MsgHeader" << endl;
 	}
+
+	debug ("Header received %d bytes\n", byteReceived);
 
 	// allocate buffer
 
@@ -159,6 +168,8 @@ char* Connection::recvMessage() {
 		cerr << "Error in receiving protocol message" << endl;
 	}
 
+	debug ("Protocol received %d bytes\n", byteReceived);
+
 	// receive payload if needed
 
 	if (msgHeader.payloadSize > 0) {
@@ -172,6 +183,8 @@ char* Connection::recvMessage() {
 		}
 
 	}
+
+	debug ("Payload received %d bytes\n", byteReceived);
 
 	return buf;
 

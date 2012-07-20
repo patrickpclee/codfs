@@ -18,3 +18,14 @@ vector<FileMetaData> ClientCommunicator::listFolderData (uint32_t clientId, stri
 	addMessage(listDirectoryRequestMsg,true);
 	return folderData.get();
 }
+
+void ClientCommunicator::connectToMds()
+{
+	uint16_t port = 50000;
+	string ip = "127.0.0.1";
+	ComponentType connectionType = MDS;
+
+	addConnection(ip, port, connectionType);
+
+	return ;
+}
