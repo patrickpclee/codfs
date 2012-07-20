@@ -12,7 +12,8 @@
 
 using namespace std;
 
-Message::Message() {
+Message::Message(Communicator* communicator) {
+	_communicator = communicator;
 	_protocolMsg = "";
 	_sockfd = 0;
 	_msgHeader.payloadSize = 0;

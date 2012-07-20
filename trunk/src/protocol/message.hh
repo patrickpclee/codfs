@@ -35,7 +35,7 @@ public:
 	 * Constructor
 	 */
 
-	Message();
+	Message(Communicator* communicator);
 
 	/**
 	 * Destructor
@@ -119,6 +119,7 @@ protected:
 	struct MsgHeader _msgHeader;
 	string _protocolMsg;
 	char* _payload;
+	Communicator* _communicator;
 };
 
 #endif
