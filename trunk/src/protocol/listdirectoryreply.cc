@@ -5,9 +5,13 @@
 #include <iostream>
 
 #include "listdirectoryreply.hh"
+#include "listdirectoryrequest.hh"
 
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../client/client.hh"
+
+extern Client* client;
 
 ListDirectoryReplyMsg::ListDirectoryReplyMsg ()
 {
@@ -62,12 +66,30 @@ void ListDirectoryReplyMsg::prepareProtocolMsg () {
 
 void ListDirectoryReplyMsg::handle()
 {
+	ListDirectoryRequestMsg* listdirectoryrequest = client->getClientCommunicator()->findSentMessage(_msgHeader.requestId);
+	listdirectoryrequest->setFolderDataValue(_folderData);	
 	return ;
 }
 
 
+/**
+ * @brief	Parse the Binary to Variables
+ */
 void ListDirectoryReplyMsg::parse(char* buf)
 {
+	memcpy(&_msgHeader, buf, sizeof(MsgHeader));
+
+	ncvfs::ListDirectoryReplyPro listDirectoryReplyPro;
+	listDirectoryReplyPro.ParseFromString(buf + sizeof(MsgHeader));
+	for (int i = 0; i < listDirectoryReplyPro.fileinfopro_size(); ++i)
+	{
+		FileMetaData tempFileMetaData;
+		tempFileMetaData._id = listDirectoryReplyPro.fileinfopro(i).fileid();
+		tempFileMetaData._size = listDirectoryReplyPro.fileinfopro(i).filesize();
+		tempFileMetaData._path = listDirectoryReplyPro.fileinfopro(i).filename();
+		_folderData.push_back(tempFileMetaData);
+	}
+
 	return ;
 }
 

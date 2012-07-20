@@ -15,6 +15,6 @@ vector<FileMetaData> ClientCommunicator::listFolderData (uint32_t clientId, stri
 
 	future< vector<FileMetaData> > folderData = listDirectoryRequestMsg->getFolderDataFuture();
 
-	addMessage(listDirectoryRequestMsg);
+	addMessage(listDirectoryRequestMsg,true);
 	return folderData.get();
 }

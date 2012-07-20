@@ -75,8 +75,15 @@ public:
 	 */
 	future< vector<FileMetaData> > getFolderDataFuture();
 
+	/**
+	 * @brief	Set the Folder Data (Fulfill Promise)
+	 *
+	 * @param	folderData	Vector of File Meta Data
+	 */
+	void setFolderDataValue(vector<FileMetaData> folderData);
+
 private:
-	promise< vector<FileMetaData> > folderData;
+	promise< vector<FileMetaData> > _folderData;
 	uint32_t _clientId;
 //	uint32_t _osdId;
 	string _directoryPath;
