@@ -8,6 +8,10 @@
 #include "message.hh"
 #include "../common/enums.hh"
 
+class Message;
+
+class Communicator;
+
 class MessageFactory {
 public:
 	MessageFactory();

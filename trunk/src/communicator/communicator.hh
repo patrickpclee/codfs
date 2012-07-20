@@ -17,6 +17,12 @@
 
 using namespace std;
 
+class Message;
+
+class MessageFactory;
+
+class Connection;
+
 /**
  * Abstract Communication module for all components.
  * Handles I/O Multiplexing

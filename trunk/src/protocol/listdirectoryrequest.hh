@@ -30,7 +30,7 @@ public:
 	 * @param	communicator	Communicator the Message belongs to
 	 */
 
-	ListDirectoryRequestMsg (Communicator* communicator) : Message (communicator);
+	ListDirectoryRequestMsg (Communicator* communicator);
 
 	/**
 	 * Constructor - Save parameters in private variables
@@ -41,7 +41,7 @@ public:
 	 * @param	path	Requested directory path
 	 */
 
-	ListDirectoryRequestMsg (Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path) : Message (communicator);
+	ListDirectoryRequestMsg (Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path);
 
 	/**
 	 * Copy values in private variables to protocol message

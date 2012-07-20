@@ -14,11 +14,11 @@
 extern Client* client;
 
 
-ListDirectoryReplyMsg::ListDirectoryReplyMsg (Communicator* communicator)
+ListDirectoryReplyMsg::ListDirectoryReplyMsg (Communicator* communicator) : Message (communicator)
 {
 }
 
-ListDirectoryReplyMsg::ListDirectoryReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData)
+ListDirectoryReplyMsg::ListDirectoryReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData) : Message (communicator)
 {
 	setVariables(requestId, sockfd, path, folderData);
 }
@@ -66,7 +66,7 @@ void ListDirectoryReplyMsg::prepareProtocolMsg () {
 
 void ListDirectoryReplyMsg::handle()
 {
-	ListDirectoryRequestMsg* listdirectoryrequest = _communicator->findSentMessage(_msgHeader.requestId);
+	ListDirectoryRequestMsg* listdirectoryrequest = (ListDirectoryRequestMsg*)_communicator->findSentMessage(_msgHeader.requestId);
 	listdirectoryrequest->setFolderDataValue(_folderData);	
 	return ;
 }

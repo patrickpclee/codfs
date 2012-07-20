@@ -10,6 +10,8 @@
 #include "../common/enums.hh"
 #include "../communicator/communicator.hh"
 
+class Communicator;
+
 using namespace std;
 
 /**
@@ -37,6 +39,7 @@ public:
 	 */
 
 	Message ();
+
 	Message(Communicator* communicator);
 
 	/**
