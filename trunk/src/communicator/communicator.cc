@@ -278,7 +278,7 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
-	Message* message = MessageFactory::createMessage(msgType);
+	Message* message = MessageFactory::createMessage(this, msgType);
 	message->setSockfd(sockfd);
 	message->parse(buf);
 

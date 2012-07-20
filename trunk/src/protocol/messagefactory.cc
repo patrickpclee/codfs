@@ -17,13 +17,13 @@ MessageFactory::~MessageFactory() {
 
 }
 
-Message* MessageFactory::createMessage(MsgType messageType) {
+Message* MessageFactory::createMessage(Communicator* communicator, MsgType messageType) {
 	switch (messageType) {
 	case (LIST_DIRECTORY_REQUEST):
-		return new ListDirectoryRequestMsg();
+		return new ListDirectoryRequestMsg(communicator);
 		break;
 	case (LIST_DIRECTORY_REPLY):
-		return new ListDirectoryReplyMsg();
+		return new ListDirectoryReplyMsg(communicator);
 		break;
 	default:
 		debug ("%s\n", "Invalid message type");

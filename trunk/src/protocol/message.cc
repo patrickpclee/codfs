@@ -13,6 +13,10 @@
 
 using namespace std;
 
+Message::Message() {
+
+}
+
 Message::Message(Communicator* communicator) {
 	_communicator = communicator;
 	_protocolMsg = "";

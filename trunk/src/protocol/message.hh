@@ -36,6 +36,7 @@ public:
 	 * Constructor
 	 */
 
+	Message ();
 	Message(Communicator* communicator);
 
 	/**

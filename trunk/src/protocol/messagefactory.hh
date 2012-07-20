@@ -12,7 +12,7 @@ class MessageFactory {
 public:
 	MessageFactory();
 	~MessageFactory();
-	static Message* createMessage (MsgType messageType);
+	static Message* createMessage (Communicator* communicator, MsgType messageType);
 };
 
 #endif
