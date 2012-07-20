@@ -25,18 +25,21 @@ public:
 
 	/**
 	 * @brief	Default Constructor
+	 *
+	 * @param	communicator	Communicator the Message belongs to
 	 */
-	ListDirectoryReplyMsg ();
+	ListDirectoryReplyMsg (Communicator* communicator) : Message (communicator);
 
 	/**
 	 * @brief	Constructor - Save Parameters in Private Variables
 	 *
+	 * @param	communicator	Communicator the Message belongs to
 	 * @param	requestId	Request ID
 	 * @param	connectionId	connection ID
 	 * @param	path	Path to the Folder
 	 * @param	folderData	Folder Data
 	 */
-	ListDirectoryReplyMsg (uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData);
+	ListDirectoryReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, string path, vector<FileMetaData> folderData) : Message (communicator);
 
 	/**
 	 * @brief	Save Parameters in Private Variables

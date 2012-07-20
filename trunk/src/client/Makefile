@@ -1,11 +1,24 @@
 CC=			g++
-CFLAGS=		-g -Wall
-LDFLAGS=
-OBJ=		client_communicator.o client.o	
-EXE=		client
+CFLAGS=		-g -Wall -std=c++0x
+LDFLAGS=	`pkg-config --cflags --libs protobuf` -lpthread
+COMMON_OBJ=	../common/*.o
+COMM_OBJ=	../communicator/*.o
+CONFIG_OBJ=	../config/*.o
+PROTO_OBJ=	../protocol/*.o
+EXE=		CLIENT
 
-all: ${OBJ}
-	${CC} ${OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
+all:
+	pkg-config --cflags protobuf
+	cd ../common; make; cd ../client
+	cd ../config; make; cd ../client
+	cd ../communicator; make; cd ../client
+	cd ../protocol; make; cd ../client
+	${CC} ${CFLAGS} -c *.cc
+	${CC} *.o ${COMMON_OBJ} ${COMM_OBJ} ${CONFIG_OBJ} ${PROTO_OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
+	cp ${EXE} ../../
 	
 clean:
+	cd ../config; make clean; cd ../osd
+	cd ../communicator; make clean; cd ../osd
+	cd ../protocol; make clean; cd ../osd
 	rm -f ${OBJ} ${EXE}

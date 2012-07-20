@@ -11,15 +11,14 @@
  * Default Constructor
  */
 
-ListDirectoryRequestMsg::ListDirectoryRequestMsg() {
-
+ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator) {
 }
 
 
 /**
  * Constructor - Save parameters in private variables
  */
-ListDirectoryRequestMsg::ListDirectoryRequestMsg(uint32_t clientId, uint32_t mdsSockfd, string path)
+ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path)
 {
 	_clientId = clientId;
 	_directoryPath = path;

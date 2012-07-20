@@ -1,7 +1,12 @@
 #include <cstdio>
 #include "client.hh"
+#include "../config/config.hh"
 
+/// Client Object
 Client* client;
+
+/// Config Layer
+ConfigLayer* configLayer;
 
 Client::Client()
 {
@@ -13,13 +18,15 @@ Client::Client()
  *
  * @return	Pointer to the Client Communicator Module
  */
-ClientCommunicator* getClientCommunicator()
+ClientCommunicator* Client::getClientCommunicator()
 {
 	return _clientCommunicator;
 }
 
 
 int main (void) {
+
+	configLayer = new ConfigLayer("clientconfig.xml");
 
 	client = new Client();
 	printf ("CLIENT\n");

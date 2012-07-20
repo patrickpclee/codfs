@@ -26,18 +26,22 @@ public:
 
 	/**
 	 * Default Constructor
+	 *
+	 * @param	communicator	Communicator the Message belongs to
 	 */
 
-	ListDirectoryRequestMsg();
+	ListDirectoryRequestMsg (Communicator* communicator) : Message (communicator);
 
 	/**
 	 * Constructor - Save parameters in private variables
+	 *
+	 * @param	communicator	Communicator the Message belongs to
 	 * @param	clientId	Client ID
 	 * @param	mdsSockfd	Socket descriptor of MDS
 	 * @param	path	Requested directory path
 	 */
 
-	ListDirectoryRequestMsg(uint32_t clientId, uint32_t mdsSockfd, string path);
+	ListDirectoryRequestMsg (Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path) : Message (communicator);
 
 	/**
 	 * Copy values in private variables to protocol message

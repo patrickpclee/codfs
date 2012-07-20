@@ -240,6 +240,8 @@ void Mds::run()
 
 int main (void)
 {
+	configLayer = new ConfigLayer("mdsconfig.xml");
+
 	mds = new Mds();
 	mds->run();
 

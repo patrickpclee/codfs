@@ -8,7 +8,7 @@
  */
 void MdsCommunicator::replyFolderData(uint32_t requestId, uint32_t connectionId, string path, vector<FileMetaData> folderData)
 {
-	ListDirectoryReplyMsg* listDirectoryReplyMsg = new ListDirectoryReplyMsg(requestId, connectionId, path, folderData);
+	ListDirectoryReplyMsg* listDirectoryReplyMsg = new ListDirectoryReplyMsg(this,requestId, connectionId, path, folderData);
 	listDirectoryReplyMsg->prepareProtocolMsg();
 	
 	addMessage(listDirectoryReplyMsg);
