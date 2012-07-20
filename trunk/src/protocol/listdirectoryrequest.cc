@@ -8,7 +8,9 @@
 #include "../common/enums.hh"
 #include "../mds/mds.hh"
 
-extern void* processor;
+#ifdef COMPILE_FOR_MDS
+extern Mds* mds;
+#endif
 
 /**
  * Default Constructor
@@ -59,8 +61,9 @@ void ListDirectoryRequestMsg::parse(char* buf) {
 }
 
 void ListDirectoryRequestMsg::handle() {
-	Mds* mds = (Mds*)processor;
+#ifdef COMPILE_FOR_MDS
 	mds->listFolderProcessor(_msgHeader.requestId,_clientId,_sockfd,_directoryPath);
+#endif
 }
 
 

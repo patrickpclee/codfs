@@ -24,7 +24,7 @@ Client::Client()
  *
  * @return	Pointer to the Client Communicator Module
  */
-ClientCommunicator* Client::getClientCommunicator()
+ClientCommunicator* Client::getCommunicator()
 {
 	return _clientCommunicator;
 }
@@ -32,7 +32,7 @@ ClientCommunicator* Client::getClientCommunicator()
 void sendThread()
 {
 	debug("%s","Send Thread Start\n");
-	client->getClientCommunicator()->sendMessage();
+	client->getCommunicator()->sendMessage();
 	debug("%s","Send Thread End\n");
 }
 
@@ -42,7 +42,7 @@ int main (void) {
 
 	client = new Client();
 
-	ClientCommunicator* communicator = client->getClientCommunicator();
+	ClientCommunicator* communicator = client->getCommunicator();
 
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
@@ -57,7 +57,13 @@ int main (void) {
 	thread t (sendThread);
 	t.detach();
 
-	communicator->listFolderData(1,".");
+	vector<FileMetaData> folderData;
+	folderData = communicator->listFolderData(1,".");
+
+	vector<FileMetaData>::iterator it;
+	for(it = folderData.begin(); it < folderData.end(); ++it) {
+		debug("name: %s size: %d\n",((*it)._path).c_str(),(int)(*it)._size);
+	}
 
 	// wait for message
 	communicator->waitForMessage();

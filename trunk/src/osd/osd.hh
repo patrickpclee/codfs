@@ -159,7 +159,7 @@ public:
 	 * @return Pointer to OSD communication module
 	 */
 
-	OsdCommunicator* getOsdCommunicator();
+	OsdCommunicator* getCommunicator();
 
 	/**
 	 * Get a reference of OSD Cache

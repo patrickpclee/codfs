@@ -3,15 +3,16 @@
  */
 
 #include <cstdio>
+#include <thread>
+
 #include "mds.hh"
+
 #include "../common/debug.hh"
 #include "../config/config.hh"
 
 /**
  *	Global Variables
  */
-
-void* processor;
 
 /// MDS Object
 Mds* mds;
@@ -27,7 +28,6 @@ Mds::Mds()
 	_metaDataModule = new MetaDataModule();
 	_nameSpaceModule = new NameSpaceModule();
 	_mdsCommunicator = new MdsCommunicator();
-	processor = (void*)this;
 }
 
 Mds::~Mds()
@@ -218,7 +218,7 @@ void Mds::recoveryProcessor (uint32_t requestId, uint32_t connectionId, uint32_t
 	return ;
 }
 
-MdsCommunicator* Mds::getMdsCommunicator()
+MdsCommunicator* Mds::getCommunicator()
 {
 	return _mdsCommunicator;
 }
@@ -243,13 +243,20 @@ void Mds::run()
 	return ;
 }
 
+void sendThread()
+{
+	debug("%s","Send Thread Start\n");
+	mds->getCommunicator()->sendMessage();
+	debug("%s","Send Thread End\n");
+}
+
 int main (void)
 {
 	configLayer = new ConfigLayer("mdsconfig.xml");
 
 	mds = new Mds();
 
-	MdsCommunicator* communicator = mds->getMdsCommunicator();
+	MdsCommunicator* communicator = mds->getCommunicator();
 
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
@@ -257,6 +264,9 @@ int main (void)
 	debug ("Start server on port %d\n", serverPort);
 
 	communicator->createServerSocket(serverPort);
+
+	thread t (sendThread);
+	t.detach();
 
 	communicator->waitForMessage();
 

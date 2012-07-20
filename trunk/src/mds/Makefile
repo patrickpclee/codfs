@@ -12,7 +12,7 @@ all:
 	cd ../common; make; cd ../mds
 	cd ../config; make; cd ../mds
 	cd ../communicator; make; cd ../mds
-	cd ../protocol; make; cd ../mds
+	cd ../protocol; make mds; cd ../mds
 	${CC} ${CFLAGS} -c *.cc
 	${CC} *.o ${COMMON_OBJ} ${COMM_OBJ} ${CONFIG_OBJ} ${PROTO_OBJ} -o ${EXE} ${CFLAGS} ${LDFLAGS}
 	cp ${EXE} ../../

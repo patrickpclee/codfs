@@ -29,7 +29,7 @@ public:
 	 *
 	 * @return	Pointer to the Client Communicator Module
 	 */
-	ClientCommunicator* getClientCommunicator();
+	ClientCommunicator* getCommunicator();
 //	void downloadFileRequest(char* srcPath, char* dstPath);
 //	void downloadFileRequest(uint32_t fileId, char* dstPath);
 

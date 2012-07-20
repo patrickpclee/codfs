@@ -60,7 +60,7 @@ uint32_t Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 
 }
 
-OsdCommunicator* Osd::getOsdCommunicator() {
+OsdCommunicator* Osd::getCommunicator() {
 	return _osdCommunicator;
 }
 
@@ -82,7 +82,7 @@ int main(void) {
 	configLayer = new ConfigLayer();
 
 	// create new communicator
-	OsdCommunicator* communicator = osd->getOsdCommunicator();
+	OsdCommunicator* communicator = osd->getCommunicator();
 
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");

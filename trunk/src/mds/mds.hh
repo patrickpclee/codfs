@@ -132,7 +132,7 @@ public:
 	 *
 	 * @return	Pointer to the MDS Communicator Module
 	 */
-	MdsCommunicator* getMdsCommunicator();
+	MdsCommunicator* getCommunicator();
 
 	/**
 	 * @brief	Run the MDS
