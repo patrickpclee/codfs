@@ -26,8 +26,10 @@ vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, string path
 
 		/* print all the files and directories within directory */
 		while ((ent = readdir (dir)) != NULL) {
+			tempFileMetaData._id = 0;
 //			printf ("%s\n", ent->d_name);
-			tempFilePath = path + ent->d_name;
+			tempFilePath = path + '/' + ent->d_name;
+			debug("path: %s\n",tempFilePath.c_str());
 			stat(tempFilePath.c_str(),&tempFileStat);
 
 			tempFileMetaData._path = ent->d_name;

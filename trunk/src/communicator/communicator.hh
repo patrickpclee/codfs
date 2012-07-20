@@ -144,5 +144,6 @@ private:
 	map<uint32_t, Connection*> _connectionMap;
 	list<Message *> _outMessageQueue; // queue of message to be sent
 	map <uint32_t, Message *> _sentMessageMap;
+	uint32_t _maxFd;
 };
 #endif

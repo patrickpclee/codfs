@@ -11,6 +11,8 @@
 #include "../common/enums.hh"
 #include "../client/client.hh"
 
+#include "../common/debug.hh"
+
 extern Client* client;
 
 
@@ -60,7 +62,6 @@ void ListDirectoryReplyMsg::prepareProtocolMsg () {
 	setProtocolSize(serializedString.length());
 	setProtocolType(LIST_DIRECTORY_REPLY);
 	setProtocolMsg(serializedString);
-
 	return ;
 }
 
@@ -77,16 +78,19 @@ void ListDirectoryReplyMsg::handle()
  */
 void ListDirectoryReplyMsg::parse(char* buf)
 {
-	memcpy(&_msgHeader, buf, sizeof(MsgHeader));
+	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
 	ncvfs::ListDirectoryReplyPro listDirectoryReplyPro;
-	listDirectoryReplyPro.ParseFromString(buf + sizeof(MsgHeader));
+	listDirectoryReplyPro.ParseFromArray(buf+sizeof(struct MsgHeader) , _msgHeader.protocolMsgSize);
+//	listDirectoryReplyPro.ParseFromString(buf + sizeof(struct MsgHeader));
 	for (int i = 0; i < listDirectoryReplyPro.fileinfopro_size(); ++i)
 	{
 		FileMetaData tempFileMetaData;
 		tempFileMetaData._id = listDirectoryReplyPro.fileinfopro(i).fileid();
 		tempFileMetaData._size = listDirectoryReplyPro.fileinfopro(i).filesize();
 		tempFileMetaData._path = listDirectoryReplyPro.fileinfopro(i).filename();
+
+		debug("%d %llu %s\n",tempFileMetaData._id,tempFileMetaData._size,tempFileMetaData._path.c_str());
 		_folderData.push_back(tempFileMetaData);
 	}
 

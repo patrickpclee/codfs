@@ -36,6 +36,19 @@ void sendThread()
 	debug("%s","Send Thread End\n");
 }
 
+void sleepThread(ClientCommunicator* communicator)
+{
+	
+	usleep(2000000);
+	vector<FileMetaData> folderData;
+	folderData = communicator->listFolderData(1,".");
+
+	vector<FileMetaData>::iterator it;
+	for(it = folderData.begin(); it < folderData.end(); ++it) {
+		debug("name: %s size: %d\n",((*it)._path).c_str(),(int)(*it)._size);
+	}
+}
+
 int main (void) {
 
 	configLayer = new ConfigLayer("clientconfig.xml");
@@ -56,17 +69,13 @@ int main (void) {
 
 	thread t (sendThread);
 	t.detach();
-
-	vector<FileMetaData> folderData;
-	folderData = communicator->listFolderData(1,".");
-
-	vector<FileMetaData>::iterator it;
-	for(it = folderData.begin(); it < folderData.end(); ++it) {
-		debug("name: %s size: %d\n",((*it)._path).c_str(),(int)(*it)._size);
-	}
+	thread t1 (sleepThread,communicator);
+	t1.detach();
 
 	// wait for message
 	communicator->waitForMessage();
+
+
 	printf ("CLIENT\n");
 	return 0;
 }

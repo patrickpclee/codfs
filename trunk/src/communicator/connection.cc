@@ -95,6 +95,8 @@ uint32_t Connection::sendMessage(Message* message) {
 	debug ("Header sent %d bytes\n", byteSent);
 
 	// send protocol message
+	
+	byteSent = 0;
 
 	string protocolMessage = message->getProtocolMsg();
 	const uint32_t protocolLength = protocolMessage.length();
@@ -109,6 +111,8 @@ uint32_t Connection::sendMessage(Message* message) {
 	debug ("Protocol sent %d bytes\n", byteSent);
 
 	// send payload if there is one
+	
+	byteSent = 0;
 
 	if (msgHeader.payloadSize > 0) {
 		char* payload = message->getPayload();
@@ -163,6 +167,7 @@ char* Connection::recvMessage() {
 
 	const uint32_t protocolLength = msgHeader.protocolMsgSize;
 
+	byteReceived = 0;
 	if ((byteReceived = _socket.recvn(buf + totalByteReceived, protocolLength))
 			!= -1) {
 		totalByteReceived += byteReceived;
@@ -174,6 +179,7 @@ char* Connection::recvMessage() {
 
 	// receive payload if needed
 
+	byteReceived = 0;
 	if (msgHeader.payloadSize > 0) {
 		const uint32_t payloadLength = msgHeader.payloadSize;
 

@@ -27,6 +27,9 @@ Communicator::Communicator() {
 	// initialize requestID
 	_requestId = 0;
 
+	// initialize maxFd
+	_maxFd = 0;
+
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	debug("%s\n", "ProtoBuf Version Verified");
 
@@ -64,13 +67,15 @@ void Communicator::waitForMessage() {
 	map<uint32_t, Connection*>::iterator p;
 
 	// for select
-	int maxFd;
 	fd_set sockfdSet;
 	struct timeval tv; // timeout for select
 
 	// initialize maxFd
 	const uint32_t serverSockfd = _serverSocket.getSockfd();
-	maxFd = serverSockfd;
+
+	if (serverSockfd > _maxFd) {
+		_maxFd = serverSockfd;
+	}
 
 	// set select timeout value
 	const uint32_t timeoutSec = configLayer->getConfigInt(
@@ -94,7 +99,8 @@ void Communicator::waitForMessage() {
 
 		// invoke select
 		int result;
-		result = select(maxFd + 1, &sockfdSet, NULL, NULL, &tv);
+		debug("Max FD %d\n",_maxFd);
+		result = select(_maxFd + 100, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
 			cerr << "select error" << endl;
@@ -117,9 +123,9 @@ void Communicator::waitForMessage() {
 
 			debug ("New connection sockfd = %d\n", conn->getSockfd());
 
-			// adjust maxFd if needed
-			if (conn->getSockfd() > maxFd) {
-				maxFd = conn->getSockfd();
+			// adjust _maxFd if needed
+			if ((uint32_t)conn->getSockfd() > _maxFd) {
+				_maxFd = conn->getSockfd();
 			}
 		}
 
@@ -127,6 +133,7 @@ void Communicator::waitForMessage() {
 		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 			// if socket has data available
 			if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
+				debug("%d is set\n",p->first);
 				// receive message into buffer, memory allocated in recvMessage
 				buf = p->second->recvMessage();
 				dispatch(buf, p->first);
@@ -216,7 +223,10 @@ void Communicator::addConnection(string ip, uint16_t port,
 	// Save the connection into corresponding list
 	_connectionMap[sockfd] = conn;
 
-	debug ("Connected to sockfd %d\n", sockfd);
+	if (sockfd > _maxFd)
+		_maxFd = sockfd;
+
+	debug ("Connected to sockfd %d - %d\n", sockfd,_maxFd);
 }
 
 /**
