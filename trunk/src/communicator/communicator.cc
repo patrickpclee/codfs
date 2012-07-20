@@ -7,16 +7,15 @@
 #include <sys/types.h>		// required by select()
 #include <unistd.h>		// required by select()
 #include <sys/select.h>	// required by select()
-#include <algorithm>
 #include <sys/ioctl.h>
 #include "connection.hh"
 #include "communicator.hh"
+#include "socketexception.hh"
 #include "../config/config.hh"
 #include "../common/enums.hh"
+#include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../protocol/messagefactory.hh"
-#include "socketexception.hh"
-#include "../common/debug.hh"
 
 using namespace std;
 
@@ -25,14 +24,11 @@ extern ConfigLayer* configLayer;
 
 Communicator::Communicator() {
 
-	// initialize requestID
-	_requestId = 0;
-
-	// initialize maxFd
-	_maxFd = 0;
-
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	debug("%s\n", "ProtoBuf Version Verified");
+
+	_requestId = 0;
+	_maxFd = 0;
 
 	debug("%s\n", "Communicator constructed");
 }
@@ -59,26 +55,34 @@ void Communicator::createServerSocket(uint16_t port) {
 	debug("Server socket sockfd = %d\n", _serverSocket.getSockfd());
 }
 
+/*
+ * Runs in a while (1) loop
+ * 1. Add serverSockfd to fd_set
+ * 2. Add sockfd for all connections to fd_set
+ * 3. Use select to monitor all fds
+ * 4. If select returns:
+ * 		serverSockfd is set : accept connection and save in map
+ * 		other sockfd is set : receive a header
+ * 		timeout: check if all connections are still alive
+ */
+
 void Communicator::waitForMessage() {
 
-	// for receive
-	char* buf;
+	char* buf; // message receive buffer
+	map<uint32_t, Connection*>::iterator p; // connectionMap iterator
 
-	// connectionMap iterator
-	map<uint32_t, Connection*>::iterator p;
-
-	// for select
-	fd_set sockfdSet;
+	int result; // return value for select
+	fd_set sockfdSet; // fd_set for select
 	struct timeval tv; // timeout for select
 
-	// initialize maxFd
 	const uint32_t serverSockfd = _serverSocket.getSockfd();
 
+	// adjust _maxFd
 	if (serverSockfd > _maxFd) {
 		_maxFd = serverSockfd;
 	}
 
-	// set select timeout value
+	// read select timeout value from config
 	const uint32_t timeoutSec = configLayer->getConfigInt(
 			"Communication>SelectTimeout>sec");
 	const uint32_t timeoutUsec = configLayer->getConfigInt(
@@ -92,6 +96,7 @@ void Communicator::waitForMessage() {
 
 		FD_ZERO(&sockfdSet);
 		FD_SET(serverSockfd, &sockfdSet);
+		// add listen socket
 
 		// add all socket descriptors into sockfdSet
 		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
@@ -99,8 +104,6 @@ void Communicator::waitForMessage() {
 		}
 
 		// invoke select
-		int result;
-		debug("Max FD %d\n", _maxFd);
 		result = select(_maxFd + 100, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
@@ -124,7 +127,7 @@ void Communicator::waitForMessage() {
 
 			debug("New connection sockfd = %d\n", conn->getSockfd());
 
-			// adjust _maxFd if needed
+			// adjust _maxFd
 			if ((uint32_t) conn->getSockfd() > _maxFd) {
 				_maxFd = conn->getSockfd();
 			}
@@ -151,12 +154,14 @@ void Communicator::waitForMessage() {
 			}
 		}
 
-		// TODO: ping all nodes after timeout
-		// pingAllConnections();
-		debug("%s\n", "checking all connections...");
-
 	} // end while (1)
 }
+
+/**
+ * 1. Set a requestId for a message if it is 0
+ * 2. Push the message to _outMessageQueue
+ * 3. If need to wait for reply, add the message to waitReplyMessageMap
+ */
 
 void Communicator::addMessage(Message* message, bool expectReply) {
 	// check if request ID = 0
@@ -170,22 +175,22 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	_outMessageQueue.push_back(message);
 
 	if (expectReply) {
-		debug("Message (ID: %d) added to sentMessageMap\n",
+		debug("Message (ID: %d) added to waitReplyMessageMap\n",
 				message->getMsgHeader().requestId);
-		_sentMessageMap[requestId] = message;
+		_waitReplyMessageMap[requestId] = message;
 	}
 }
 
 Message* Communicator::findSentMessage(uint32_t requestId) {
 
 	// check if message is in map
-	if (_sentMessageMap.count(requestId)) {
+	if (_waitReplyMessageMap.count(requestId)) {
 
 		// find message
-		Message* message = _sentMessageMap[requestId];
+		Message* message = _waitReplyMessageMap[requestId];
 
 		// remove message from map
-		_sentMessageMap.erase(requestId);
+		_waitReplyMessageMap.erase(requestId);
 
 		return message;
 	}
@@ -215,14 +220,16 @@ void Communicator::sendMessage() {
 				continue;
 			}
 
-			debug("Message (ID: %d) FD = %d\n",
-					message->getMsgHeader().requestId, sockfd);
-			message->printHeader();
 			_connectionMap[sockfd]->sendMessage(message);
-			debug("Message (ID: %d) removed from queue\n",
-					message->getMsgHeader().requestId);
+
+			// debug
+
+			message->printHeader();
+			debug("Message (ID: %d) FD = %d removed from queue\n",
+					message->getMsgHeader().requestId, sockfd);
 		}
 
+		// in terms of 10^-6 seconds
 		usleep(pollingInterval);
 	}
 
@@ -240,14 +247,12 @@ void Communicator::addConnection(string ip, uint16_t port,
 	Connection* conn = new Connection();
 	const uint32_t sockfd = conn->doConnect(ip, port, connectionType);
 
-	// Single Thread Only
 	// Save the connection into corresponding list
 	_connectionMap[sockfd] = conn;
 
+	// adjust _maxFd
 	if (sockfd > _maxFd)
 		_maxFd = sockfd;
-
-	debug("Connected to sockfd %d - %d\n", sockfd, _maxFd);
 }
 
 /**
@@ -294,6 +299,17 @@ uint32_t Communicator::getMonitorSockfd() {
 	return -1;
 }
 
+// static function
+void Communicator::handleThread(Message* message) {
+	message->handle();
+}
+
+// static function
+void Communicator::sendThread(Communicator* communicator) {
+	communicator->sendMessage();
+}
+
+
 /**
  * 1. Get the MsgHeader from the receive buffer
  * 2. Get the MsgType from the MsgHeader
@@ -302,14 +318,6 @@ uint32_t Communicator::getMonitorSockfd() {
  * 5. message->parse()
  * 6. start new thread for message->handle()
  */
-
-void Communicator::handleThread(Message* message) {
-	message->handle();
-}
-
-void Communicator::sendThread(Communicator* communicator) {
-	communicator->sendMessage();
-}
 
 void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	struct MsgHeader msgHeader;
@@ -321,6 +329,7 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	message->setSockfd(sockfd);
 	message->parse(buf);
 
+	// debug
 	message->printHeader();
 	message->printProtocol();
 
@@ -331,5 +340,5 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 }
 
 uint32_t Communicator::generateRequestId() {
-	return ++_requestId;
+	return ++_requestId; // requestId is atomic
 }

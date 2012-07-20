@@ -85,37 +85,6 @@ bool Socket::accept(Socket* new_socket) const {
 		return true;
 }
 
-
-
-bool Socket::sendString(const std::string s) const {
-	int status = ::send(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL);
-	if (status == -1) {
-		return false;
-	} else {
-		return true;
-	}
-}
-
-int Socket::recvString(std::string& s) const {
-	char buf[MAXRECV + 1];
-
-	s = "";
-
-	memset(buf, 0, MAXRECV + 1);
-
-	int status = ::recv(m_sock, buf, MAXRECV, 0);
-
-	if (status == -1) {
-		cout << "status == -1   errno == " << errno << "  in Socket::recv\n";
-		return 0;
-	} else if (status == 0) {
-		return 0;
-	} else {
-		s = buf;
-		return status;
-	}
-}
-
 uint32_t Socket::sendn(const char* buf, uint32_t buf_len) {
 	const uint32_t sd = m_sock;
 	uint32_t n_left = buf_len; // actual data bytes sent

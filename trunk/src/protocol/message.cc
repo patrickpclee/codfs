@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <ios>
 #include "../communicator/communicator.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
@@ -67,12 +68,15 @@ uint32_t Message::preparePayload(string filepath, uint32_t offset,
 		uint32_t length) {
 
 	ifstream file;
-	file.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
+
+	_Ios_Iostate exceptionMask = ifstream::eofbit | ifstream::failbit | ifstream::badbit;
+	file.exceptions(exceptionMask);
 
 	try {
 
 		// open file
-		file.open(filepath.c_str(), ios::in | ios::binary);
+		_Ios_Openmode openMode = ios::in | ios::binary;
+		file.open(filepath.c_str(), openMode);
 
 		// seek file
 		file.seekg(offset, ios_base::beg);

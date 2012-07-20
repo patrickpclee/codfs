@@ -17,10 +17,9 @@
 
 using namespace std;
 
+// forward declaration to avoid circular dependency
 class Message;
-
 class MessageFactory;
-
 class Connection;
 
 /**
@@ -54,6 +53,7 @@ public:
 	 * Add message to _outMessageQueue
 	 * Set a unique request ID if request ID = 0
 	 * @param message Message to send
+	 * @param expectReply Whether or not this message should wait for a reply
 	 */
 
 	void addMessage(Message* message, bool expectReply = false);
@@ -118,11 +118,17 @@ public:
 
 	Message* findSentMessage(uint32_t requestId);
 
+	/**
+	 * Runs in a separate detached thread
+	 * Execute communicator->sendMessage function
+	 * @param communicator Corresponding communicator of the component
+	 */
 	static void sendThread(Communicator* communicator);
+
 private:
 
 	/**
-	 * Runs in separate detached thread
+	 * Runs in a separate detached thread
 	 * Execute message->parse function
 	 * @param message
 	 */
@@ -138,11 +144,11 @@ private:
 
 	void dispatch(char* buf, uint32_t sockfd);
 
-	Socket _serverSocket;
-	atomic<uint32_t> _requestId;
-	map<uint32_t, Connection*> _connectionMap;
+	Socket _serverSocket; // socket for accepting incoming connections
+	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
+	map<uint32_t, Connection*> _connectionMap; // a map of all connections
 	list<Message *> _outMessageQueue; // queue of message to be sent
-	map<uint32_t, Message *> _sentMessageMap;
-	uint32_t _maxFd;
+	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
+	uint32_t _maxFd; // maximum number of socket descriptors among connections
 };
 #endif
