@@ -84,7 +84,6 @@ void Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 
 	// memory of objectData is allocated in decodeSegmentToObject
 	// TODO: decodeSegmentToObject should free memory in segmentDataList
-	struct ObjectData objectData;
 	objectData = _codingModule->decodeSegmentToObject(objectId,
 			segmentDataList);
 

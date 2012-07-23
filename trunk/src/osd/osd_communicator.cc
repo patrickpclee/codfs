@@ -9,6 +9,8 @@
 #include "../protocol/listdirectoryrequest.hh"
 #include "../common/debug.hh"
 #include "segmentlocationcache.hh"
+#include "segmentdata.hh"
+#include "objectdata.hh"
 
 using namespace std;
 

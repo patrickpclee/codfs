@@ -13,6 +13,7 @@
 #include "segmentdata.hh"
 #include "segmentlocationcache.hh"
 #include "storagemodule.hh"
+#include "codingmodule.hh"
 
 /**
  * Central class of OSD
