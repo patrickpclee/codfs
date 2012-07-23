@@ -241,7 +241,7 @@ void Communicator::sendMessage() {
  * 2. Add the connection to the corresponding map
  */
 
-void Communicator::conenctAndAdd(string ip, uint16_t port,
+void Communicator::connectAndAdd(string ip, uint16_t port,
 		ComponentType connectionType) {
 
 	// Construct a Connection object and connect to component

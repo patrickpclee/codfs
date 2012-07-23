@@ -11,7 +11,7 @@
             <usec>0</usec>
         </SelectTimeout>
         
-        <ServerPort>50000</ServerPort>
+        <ServerPort>52000</ServerPort>
         
     </Communication>
 </NcvfsConfig>

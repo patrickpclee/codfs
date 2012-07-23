@@ -57,21 +57,22 @@ public:
 
 	/**
 	 * Send a request to get a segment to other OSD
+	 * @param connectionId ID of the target component connection
 	 * @param objectId ID of the object that the segment is belonged to
 	 * @param segmentId
-	 * @return 0 if success, -1 if failure
+	 * @return SegmentData structure
 	 */
 
-	uint32_t getSegmentRequest(uint64_t objectId, uint32_t segmentId);
+	struct SegmentData getSegmentRequest(uint32_t osdId, uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Send a request to get the secondary OSD list of an object from MDS/Monitor
 	 * @param objectId Object ID for query
-	 * @param dstComponent Type of the component to request (OSD / MONITOR)
-	 * @return 0 if success, -1 if failure
+	 * @param dstComponent Type of the component to request (MDS / MONITOR)
+	 * @return List of OSD ID that should contain the object
 	 */
 
-	uint32_t getOsdListRequest(uint64_t objectId, ComponentType dstComponent);
+	list <uint32_t> getOsdListRequest(uint64_t objectId, ComponentType dstComponent);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored

@@ -39,6 +39,6 @@ void OsdCommunicator::connectToMds() {
 	ComponentType connectionType = MDS;
 
 	// do connection
-	addConnection(ip, port, connectionType);
+	connectAndAdd(ip, port, connectionType);
 }
 

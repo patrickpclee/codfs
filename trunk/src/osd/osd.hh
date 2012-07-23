@@ -67,16 +67,16 @@ public:
 	 */
 
 	uint32_t osdListProcessor(uint32_t sockfd, uint64_t objectId,
-			list<uint32_t> osdList);
+			list<struct SegmentLocation> osdList);
 
 	/**
 	 * Action when a getObjectRequest is received
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of the object to send
-	 * @return 0 if success, -1 if failure
+	 * @return ObjectData structure
 	 */
 
-	uint32_t getObjectProcessor(uint32_t sockfd, uint64_t objectId);
+	struct ObjectData getObjectProcessor(uint32_t sockfd, uint64_t objectId);
 
 	/**
 	 * Action when a getSegmentRequest is received
@@ -212,6 +212,12 @@ private:
 	 */
 
 	StorageModule* _storageModule;
+
+	/**
+	 * Handles coding and decoding
+	 */
+
+	CodingModule* _codingModule;
 
 //	Coding _cunit; // encode & decode done here
 //	OsdInfo _info;

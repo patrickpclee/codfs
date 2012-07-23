@@ -79,7 +79,7 @@ public:
 	 * @param Destination type: MDS/CLIENT/MONITOR/OSD
 	 */
 
-	void conenctAndAdd(string ip, uint16_t port, ComponentType connectionType); // establish a connection
+	void connectAndAdd(string ip, uint16_t port, ComponentType connectionType); // establish a connection
 
 	/**
 	 * Disconnect from component and remove from list

@@ -11,10 +11,10 @@ class StorageModule {
 public:
 
 	bool isObjectExist(uint64_t objectId);
-	uint32_t writeObject(uint64_t objectId, char* buf);
-	uint32_t readObject(uint64_t objectId, char* buf);
-	uint32_t readSegment(uint64_t objectId, uint32_t segmentId, char* buf);
-	uint32_t writeSegment(uint64_t objectId, uint32_t segmentId, char* buf);
+	struct ObjectData readObject(uint64_t objectId);
+	struct SegmentData readSegment(uint64_t objectId, uint32_t segmentId);
+	uint32_t writeObject(struct ObjectData);
+	uint32_t writeSegment(struct SegmentData);
 	uint32_t getCapacity();
 	uint32_t getFreespace();
 private:

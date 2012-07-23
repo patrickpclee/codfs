@@ -5,16 +5,22 @@
 #include <stdio.h>
 #include <vector>
 #include "osd.hh"
+#include "segmentlocationcache.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
 
 ConfigLayer* configLayer;
 
 Osd::Osd() {
+	_segmentLocationCache = new SegmentLocationCache();
+	_storageModule = new StorageModule();
 	_osdCommunicator = new OsdCommunicator();
+	_codingModule = new CodingModule();
 }
 
 Osd::~Osd() {
+	delete _segmentLocationCache;
+	delete _storageModule;
 	delete _osdCommunicator;
 }
 
@@ -25,13 +31,10 @@ Osd::~Osd() {
  */
 
 uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
-		list<uint32_t> osdList) {
+		list<SegmentLocation> osdList) {
 
-	/*
-
-	 _segmentLocationCache->deleteSegmentLocation(objectId);
-	 _segmentLocationCache->writeSegmentLocation(objectId, osdList);
-	 */
+	_segmentLocationCache->deleteSegmentLocation(objectId);
+	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
 
 	return 0;
 }
@@ -40,24 +43,46 @@ uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
  * Send the object to the target
  */
 
-uint32_t Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
-	list<uint32_t> osdIdList;
+struct ObjectData Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 
-	/*
-	 // check if I have the object
-	 if (_storageModule) {
+	list<struct SegmentData> segmentDataList;
+	list<struct SegmentLocation> osdIdList;
+	struct ObjectData objectData;
 
-	 }
+	if (_storageModule->isObjectExist(objectId)) {
+		// if object exists in cache
+		objectData = _storageModule->readObject(objectId);
+	} else {
 
-	 try {
-	 osdIdList = getSegmentLocationCache()->readSegmentLocation(objectId);
-	 } catch (CacheMissException &e) {
+		// get osdIDList from cache, if cannot update it from MDS
+		try {
+			osdIdList = _segmentLocationCache->readSegmentLocation(objectId);
+		} catch (CacheMissException &e) {
+			osdIdList = _osdCommunicator->getOsdListRequest(objectId, MDS);
+			_segmentLocationCache->writeSegmentLocation(objectId, osdIdList);
+		}
 
-	 }
-	 */
+		// get segments from the OSD one by one
+		list<struct SegmentLocation>::const_iterator it;
 
-	return 0;
+		for (it = osdIdList.begin(); it != osdIdList.end(); ++it) {
+			// memory of SegmentData is allocated in getSegmentRequest
+			struct SegmentData segmentData;
+			uint32_t osdId = (*it).osdId;
+			uint32_t segmentId = (*it).segmentId;
 
+			segmentData = _osdCommunicator->getSegmentRequest(osdId, objectId,
+					segmentId);
+			segmentDataList.push_back(segmentData);
+		}
+	}
+
+	// memory of objectData is allocated in decodeSegmentToObject
+	// TODO: decodeSegmentToObject should free memory in segmentDataList
+	struct ObjectData objectData;
+	objectData = _codingModule->decodeSegmentToObject(objectId, segmentDataList);
+
+	return objectData;
 }
 
 OsdCommunicator* Osd::getCommunicator() {
@@ -87,7 +112,7 @@ int main(void) {
 	// start server
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
-	debug ("Start server on port %d\n", serverPort);
+	debug("Start server on port %d\n", serverPort);
 	communicator->createServerSocket(serverPort);
 
 	// connect to MDS
