@@ -19,7 +19,7 @@ Message::Message() {
 }
 
 Message::Message(Communicator* communicator) {
-	_communicator = communicator;
+	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
 	_protocolMsg = "";
 	_sockfd = 0;
 	_msgHeader.payloadSize = 0;
@@ -69,7 +69,8 @@ uint32_t Message::preparePayload(string filepath, uint32_t offset,
 
 	ifstream file;
 
-	_Ios_Iostate exceptionMask = ifstream::eofbit | ifstream::failbit | ifstream::badbit;
+	_Ios_Iostate exceptionMask = ifstream::eofbit | ifstream::failbit
+			| ifstream::badbit;
 	file.exceptions(exceptionMask);
 
 	try {

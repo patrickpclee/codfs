@@ -76,9 +76,6 @@ public:
 
 private:
 	Socket _socket;
-//	uint32_t _sockfd;
-//	string _ip;
-//	uint16_t _port;
 	ComponentType _connectionType;
 };
 

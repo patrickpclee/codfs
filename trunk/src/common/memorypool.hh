@@ -10,6 +10,7 @@
 /**
  * Provide a memory pool for optimizing frequent malloc / free calls
  * TODO: A dummy memory pool using singleton pattern for now
+ * TODO: Should be thread-safe in c++11 (verification needed)
  * Singleton Reference: http://stackoverflow.com/questions/1008019/c-singleton-design-pattern
  */
 

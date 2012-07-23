@@ -39,6 +39,8 @@ void sleepThread(ClientCommunicator* communicator) {
 	vector<FileMetaData> folderData;
 	folderData = communicator->listFolderData(1, ".");
 
+	// TODO: when to delete listFolderDataRequest and listFolderDataReply?
+
 	vector<FileMetaData>::iterator it;
 	for (it = folderData.begin(); it < folderData.end(); ++it) {
 		debug("name: %s size: %d\n", ((*it)._path).c_str(), (int)(*it)._size);

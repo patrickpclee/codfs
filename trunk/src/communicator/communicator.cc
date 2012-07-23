@@ -95,8 +95,9 @@ void Communicator::waitForMessage() {
 		tv.tv_usec = timeoutUsec;
 
 		FD_ZERO(&sockfdSet);
-		FD_SET(serverSockfd, &sockfdSet);
+
 		// add listen socket
+		FD_SET(serverSockfd, &sockfdSet);
 
 		// add all socket descriptors into sockfdSet
 		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
@@ -181,7 +182,7 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	}
 }
 
-Message* Communicator::findSentMessage(uint32_t requestId) {
+Message* Communicator::findWaitReplyMessage(uint32_t requestId) {
 
 	// check if message is in map
 	if (_waitReplyMessageMap.count(requestId)) {
@@ -240,7 +241,7 @@ void Communicator::sendMessage() {
  * 2. Add the connection to the corresponding map
  */
 
-void Communicator::addConnection(string ip, uint16_t port,
+void Communicator::conenctAndAdd(string ip, uint16_t port,
 		ComponentType connectionType) {
 
 	// Construct a Connection object and connect to component
@@ -258,9 +259,10 @@ void Communicator::addConnection(string ip, uint16_t port,
 /**
  * 1. Disconnect the connection
  * 2. Remove the connection from map
+ * 3. Run the connection destructor
  */
 
-void Communicator::removeConnection(uint32_t sockfd) {
+void Communicator::disconnectAndRemove(uint32_t sockfd) {
 
 	if (_connectionMap.count(sockfd)) {
 		Connection* conn = _connectionMap[sockfd];

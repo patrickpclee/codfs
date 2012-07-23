@@ -75,31 +75,30 @@ SegmentLocationCache* Osd::getSegmentLocationCache() {
 
 int main(void) {
 
-	// create new OSD object
+	// create new OSD object and communicator
 	Osd* osd = new Osd();
 
-	// new ConfigLayer object
+	// new ConfigLayer object (global)
 	configLayer = new ConfigLayer();
 
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
 
+	// start server
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
-
 	debug ("Start server on port %d\n", serverPort);
-
 	communicator->createServerSocket(serverPort);
 
 	// connect to MDS
 	//communicator->connectToMds();
 
-	// wait for message
+	// wait for message (blocking)
 	communicator->waitForMessage();
 
 	// cleanup
-	delete osd;
 	delete configLayer;
+	delete osd;
 
 	return 0;
 }

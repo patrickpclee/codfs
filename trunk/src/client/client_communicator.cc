@@ -26,7 +26,7 @@ void ClientCommunicator::connectToMds()
 	string ip = "127.0.0.1";
 	ComponentType connectionType = MDS;
 
-	addConnection(ip, port, connectionType);
+	conenctAndAdd(ip, port, connectionType);
 
 	return ;
 }

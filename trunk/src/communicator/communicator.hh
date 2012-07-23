@@ -79,14 +79,14 @@ public:
 	 * @param Destination type: MDS/CLIENT/MONITOR/OSD
 	 */
 
-	void addConnection(string ip, uint16_t port, ComponentType connectionType); // establish a connection
+	void conenctAndAdd(string ip, uint16_t port, ComponentType connectionType); // establish a connection
 
 	/**
 	 * Disconnect from component and remove from list
 	 * @param sockfd
 	 */
 
-	void removeConnection(uint32_t sockfd); // kill and remove connection
+	void disconnectAndRemove(uint32_t sockfd); // kill and remove connection
 
 	/**
 	 * When there are multiple MDS, choose one
@@ -116,7 +116,7 @@ public:
 	 * @return Pointer to sent message
 	 */
 
-	Message* findSentMessage(uint32_t requestId);
+	Message* findWaitReplyMessage(uint32_t requestId);
 
 	/**
 	 * Runs in a separate detached thread
