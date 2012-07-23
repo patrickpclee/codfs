@@ -38,22 +38,21 @@ public:
 
 	/**
 	 * Send a segment to another OSD
-	 * @param segmentData a SegmentData structure
-	 * @param osdId ID of the destination OSD
+	 * @param sockfd Socket Descriptor of the destination
+	 * @param segmentData SegmentData structure
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendSegmentToOsd(struct SegmentData segmentData, uint32_t osdId);
+	uint32_t sendSegment(uint32_t sockfd, struct SegmentData segmentData);
 
 	/**
 	 * Send an object to a client
-	 * @param objectData an objectData structure
-	 * @param clientId ID of the destination client
+	 * @param sockfd Socket Descriptor of the destination
+	 * @param objectData OjectData structure
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendObjectToClient(struct ObjectData objectData,
-			uint32_t clientId);
+	uint32_t sendObject(uint32_t sockfd, struct ObjectData objectData);
 
 	/**
 	 * Send a request to get a segment to other OSD

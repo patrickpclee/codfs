@@ -43,7 +43,7 @@ uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
  * Send the object to the target
  */
 
-struct ObjectData Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
+void Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 
 	list<struct SegmentData> segmentDataList;
 	list<struct SegmentLocation> osdIdList;
@@ -53,8 +53,7 @@ struct ObjectData Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 		// if object exists in cache
 		objectData = _storageModule->readObject(objectId);
 	} else {
-
-		// get osdIDList from cache, if cannot update it from MDS
+		// get osdIDList from cache, if failed update it from MDS
 		try {
 			osdIdList = _segmentLocationCache->readSegmentLocation(objectId);
 		} catch (CacheMissException &e) {
@@ -71,8 +70,14 @@ struct ObjectData Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 			uint32_t osdId = (*it).osdId;
 			uint32_t segmentId = (*it).segmentId;
 
-			segmentData = _osdCommunicator->getSegmentRequest(osdId, objectId,
-					segmentId);
+			if (_osdId == osdId) {
+				// case 1: local segment
+				segmentData = _storageModule->readSegment(objectId, segmentId);
+			} else {
+				// case 2: foreign segment
+				segmentData = _osdCommunicator->getSegmentRequest(osdId,
+						objectId, segmentId);
+			}
 			segmentDataList.push_back(segmentData);
 		}
 	}
@@ -80,9 +85,22 @@ struct ObjectData Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 	// memory of objectData is allocated in decodeSegmentToObject
 	// TODO: decodeSegmentToObject should free memory in segmentDataList
 	struct ObjectData objectData;
-	objectData = _codingModule->decodeSegmentToObject(objectId, segmentDataList);
+	objectData = _codingModule->decodeSegmentToObject(objectId,
+			segmentDataList);
 
-	return objectData;
+	_osdCommunicator->sendObject(sockfd, objectData);
+
+	return;
+}
+
+void Osd::getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
+		uint32_t segmentId) {
+
+	struct SegmentData segmentData;
+	segmentData = _storageModule->readSegment(objectId, segmentId);
+	_osdCommunicator->sendSegment(sockfd, segmentData);
+
+	return;
 }
 
 OsdCommunicator* Osd::getCommunicator() {

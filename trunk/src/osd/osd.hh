@@ -73,20 +73,18 @@ public:
 	 * Action when a getObjectRequest is received
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of the object to send
-	 * @return ObjectData structure
 	 */
 
-	struct ObjectData getObjectProcessor(uint32_t sockfd, uint64_t objectId);
+	void getObjectProcessor(uint32_t sockfd, uint64_t objectId);
 
 	/**
 	 * Action when a getSegmentRequest is received
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of Object that the segment is belonged to
 	 * @param segmentId ID of the segment to send
-	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
+	void getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
 			uint32_t segmentId);
 
 	/**
@@ -220,7 +218,7 @@ private:
 	CodingModule* _codingModule;
 
 //	Coding _cunit; // encode & decode done here
-//	OsdInfo _info;
+	uint32_t _osdId;
 
 };
 #endif
