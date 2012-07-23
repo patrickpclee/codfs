@@ -8,6 +8,7 @@
 #include <iostream>
 #include <stdint.h>
 #include "../communicator/communicator.hh"
+#include "segmentlocationcache.hh"
 
 using namespace std;
 
@@ -71,7 +72,7 @@ public:
 	 * @return List of OSD ID that should contain the object
 	 */
 
-	list <uint32_t> getOsdListRequest(uint64_t objectId, ComponentType dstComponent);
+	list <struct SegmentLocation> getOsdListRequest(uint64_t objectId, ComponentType dstComponent);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored
