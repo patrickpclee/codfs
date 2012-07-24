@@ -1,10 +1,10 @@
-CC = g++
-CFLAGS_OBJ = -g -Wall
+CC=			g++
+CFLAGS=		-g -Wall -std=c++0x
+LDFLAGS=	-lpthread
+SRC=		*.cc
 
-all:
-	@echo "Compiling objects"
-	$(CC) $(CFLAGS_OBJ) -c *.cc
-
+all: ${SRC}
+	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS}
+	
 clean:
-	@echo "Deleting objects"
-	rm -f *.o *~
+	rm -f *.o

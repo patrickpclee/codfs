@@ -1,14 +1,16 @@
 CC=			g++
 CFLAGS=		-g -Wall -std=c++0x
-SRC=	*.cc	
+LDFLAGS=	-lpthread
+SRC=		*.cc	
 
 all: ${SRC}
+	make message
 	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS}
 
 message: ${PROTO_SRC}
 	protoc -I=. --cpp_out=. ./message.proto
 
-mds: 
+mds: ${SRC}
 	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS} -DCOMPILE_FOR_MDS
 	
 clean:

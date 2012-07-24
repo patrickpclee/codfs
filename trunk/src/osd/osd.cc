@@ -121,7 +121,7 @@ int main(void) {
 	Osd* osd = new Osd();
 
 	// new ConfigLayer object (global)
-	configLayer = new ConfigLayer();
+	configLayer = new ConfigLayer("osdconfig.xml");
 
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();

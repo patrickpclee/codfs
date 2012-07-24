@@ -11,7 +11,7 @@ uint32_t MongoDB::connect(){
 
 void MongoDB::read(string table, uint64_t id, vector<uint64_t>data){
 	string targetTable = COLLECTION + (string)"." + table;
-	auto_ptr<DBClientCursor> cursor =
+	unique_ptr<DBClientCursor> cursor =
 		_connection.query(targetTable, QUERY( "id" << (long long)id ) );
 	while( cursor->more() ) {
 		BSONObj p = cursor->next();

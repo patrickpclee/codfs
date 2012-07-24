@@ -1,10 +1,9 @@
 CC=			g++
-CFLAGS=		-g -Wall
-LDFLAGS=	#`pkg-config --cflags --libs protobuf`
-SRC=		memorypool.cc
+CFLAGS=		-g -Wall -std=c++0x
+LDFLAGS=	-lpthread
+SRC=		*.cc
 
 all: ${SRC}
-#	pkg-config --cflags protobuf
 	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS}
 	
 clean:
