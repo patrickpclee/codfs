@@ -94,12 +94,10 @@ public:
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param length Object size, equals the total length of all the trunks
-	 * @param trunkCount Total number of trunks that will be sent
-	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t putObjectProcessor(uint32_t sockfd, uint64_t objectId,
-			uint32_t length, uint32_t trunkCount);
+	void putObjectProcessor(uint32_t sockfd, uint64_t objectId,
+			uint32_t length);
 
 	/**
 	 * Action when an object trunk is received
@@ -107,13 +105,12 @@ public:
 	 * @param objectId Object ID
 	 * @param offset Offset of the trunk in the object
 	 * @param length Length of trunk
-	 * @param trunkId ID of the trunk in this object
 	 * @param buf Pointer to buffer
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
 	uint32_t objectTrunkProcessor(uint32_t sockfd, uint64_t objectId,
-			uint32_t offset, uint32_t length, uint32_t trunkId, char* buf);
+			uint64_t offset, uint32_t length, char* buf);
 
 	/**
 	 * Action when a put object request is received
@@ -122,12 +119,10 @@ public:
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
 	 * @param length Segment size, equals the total length of all the trunks
-	 * @param trunkCount Total number of trunks that will be sent
-	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t putSegmentProcessor(uint32_t sockfd, uint64_t objectId,
-			uint32_t segmentId, uint32_t length, uint32_t trunkCount);
+	void putSegmentProcessor(uint32_t sockfd, uint64_t objectId,
+			uint32_t segmentId, uint32_t length);
 
 	/**
 	 * Action when a segment trunk is received
