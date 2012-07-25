@@ -62,8 +62,8 @@ struct SegmentData OsdCommunicator::getSegmentRequest(uint32_t osdId, uint64_t o
 	return segmentData;
 }
 
-list <struct SegmentLocation> OsdCommunicator::getOsdListRequest(uint64_t objectId, ComponentType dstComponent) {
-	list <struct SegmentLocation> osdList;
+vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(uint64_t objectId, ComponentType dstComponent) {
+	vector<struct SegmentLocation> osdList;
 	return osdList;
 }
 

@@ -4,7 +4,7 @@
 
 #ifndef __CODINGMODULE_HH__
 #define __CODINGMODULE_HH__
-#include <list>
+#include <vector>
 #include <stdint.h>
 #include "segmentdata.hh"
 #include "objectdata.hh"
@@ -18,7 +18,7 @@ public:
 	 * @return A list of SegmentData structure
 	 */
 
-	list<struct SegmentData> encodeObjectToSegment(
+	vector<struct SegmentData> encodeObjectToSegment(
 			struct ObjectData objectData);
 
 	/**
@@ -29,7 +29,7 @@ public:
 	 */
 
 	struct ObjectData decodeSegmentToObject(uint64_t objectId,
-			list<struct SegmentData> segmentData);
+			vector<struct SegmentData> segmentData);
 
 	/**
 	 * Retrieve a segment from the storage module

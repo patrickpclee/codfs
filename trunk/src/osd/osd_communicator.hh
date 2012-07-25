@@ -63,7 +63,8 @@ public:
 	 * @return SegmentData structure
 	 */
 
-	struct SegmentData getSegmentRequest(uint32_t osdId, uint64_t objectId, uint32_t segmentId);
+	struct SegmentData getSegmentRequest(uint32_t osdId, uint64_t objectId,
+			uint32_t segmentId);
 
 	/**
 	 * Send a request to get the secondary OSD list of an object from MDS/Monitor
@@ -72,7 +73,8 @@ public:
 	 * @return List of OSD ID that should contain the object
 	 */
 
-	list <struct SegmentLocation> getOsdListRequest(uint64_t objectId, ComponentType dstComponent);
+	vector<struct SegmentLocation> getOsdListRequest(uint64_t objectId,
+			ComponentType dstComponent);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored
@@ -93,7 +95,6 @@ public:
 	 */
 
 	// void dispatch(char* buf, uint32_t sockfd);
-
 private:
 };
 

@@ -68,7 +68,7 @@ public:
 	 */
 
 	uint32_t osdListProcessor(uint32_t sockfd, uint64_t objectId,
-			list<struct SegmentLocation> osdList);
+			vector<struct SegmentLocation> osdList);
 
 	/**
 	 * Action when a getObjectRequest is received

@@ -31,7 +31,7 @@ Osd::~Osd() {
  */
 
 uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
-		list<SegmentLocation> osdList) {
+		vector<SegmentLocation> osdList) {
 
 	_segmentLocationCache->deleteSegmentLocation(objectId);
 	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
@@ -45,8 +45,8 @@ uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
 
 void Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 
-	list<struct SegmentData> segmentDataList;
-	list<struct SegmentLocation> osdIdList;
+	vector<struct SegmentData> segmentDataList;
+	vector<struct SegmentLocation> osdIdList;
 	struct ObjectData objectData;
 
 	if (_storageModule->isObjectExist(objectId)) {
@@ -62,7 +62,7 @@ void Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 		}
 
 		// get segments from the OSD one by one
-		list<struct SegmentLocation>::const_iterator it;
+		vector<struct SegmentLocation>::const_iterator it;
 
 		for (it = osdIdList.begin(); it != osdIdList.end(); ++it) {
 			// memory of SegmentData is allocated in getSegmentRequest

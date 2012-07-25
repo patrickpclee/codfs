@@ -4,15 +4,15 @@
 
 #include "codingmodule.hh"
 
-list<struct SegmentData> CodingModule::encodeObjectToSegment(
+vector<struct SegmentData> CodingModule::encodeObjectToSegment(
 		struct ObjectData objectData) {
-	list <struct SegmentData> segmentDataList;
+	vector<struct SegmentData> segmentDataList;
 	return segmentDataList;
 }
 
 
 struct ObjectData CodingModule::decodeSegmentToObject(uint64_t objectId,
-		list<struct SegmentData> segmentData) {
+		vector<struct SegmentData> segmentData) {
 	struct ObjectData objectData;
 	return objectData;
 }
