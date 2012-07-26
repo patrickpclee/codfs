@@ -71,6 +71,7 @@ void ConfigLayer::setConfigBool(const char* propertyTree, bool boolValue){
 }
 
 ///TODO: Init with both specific and common Config
+///TODO: Throw Execepion
 void ConfigLayer::init(const char* configPath, const char* commonConfigPath){
 	doc_ = new TiXmlDocument(configPath);
 	inited_ = doc_->LoadFile();
@@ -88,14 +89,34 @@ void ConfigLayer::init(const char* configPath, const char* commonConfigPath){
 	}
 	delete(configHandle_);
 	configHandle_ = new TiXmlHandle(configElement_);
+
+	_commonDoc = new TiXmlDocument(commonConfigPath);
+	_commonInited = _commonDoc->LoadFile();
+	if(!_commonInited){
+		fprintf(stderr,"Failed to load %s\n",commonConfigPath);
+		return;
+	} else {
+		fprintf(stderr,"Inited with %s\n",commonConfigPath);
+	}
+	_commonConfigHandle = new TiXmlHandle(_commonDoc);
+	_commonConfigElement = _commonConfigHandle->FirstChild(XML_ROOT_NODE).Element();
+	if(_commonConfigElement == NULL){
+		fprintf(stderr,"Failed to load2 %s\n",commonConfigPath);
+		return;
+	}
+	delete(_commonConfigHandle);
+	_commonConfigHandle = new TiXmlHandle(_commonConfigElement);
 }
 
 ///TODO: Use strtok_r() for thread safety
 ///TODO: Read from Common Config if "Common" Tag is encountered
 TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 	char propertyTree_[strlen(propertyTree)+1];
-	strcpy(propertyTree_,propertyTree);
 	char* namePtr;
+	bool found = false;
+
+	strcpy(propertyTree_,propertyTree);
+
 	namePtr = strtok(propertyTree_,">");
 	TiXmlHandle tempHandle = TiXmlHandle(configElement_);
 	TiXmlElement* tempElement = tempHandle.Element();
@@ -103,11 +124,30 @@ TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 		tempHandle = tempHandle.FirstChild(namePtr);
 		tempElement = tempHandle.Element();
 		if(tempElement == NULL){
-			fprintf(stderr,"%s: %s not found\n",propertyTree,namePtr);
-			return NULL;
+			fprintf(stderr,"%s: %s not found in config\n",propertyTree,namePtr);
+			break;
 		}
 		namePtr = strtok(NULL,">");
 	}
+
+	if(tempElement != NULL)
+		found = true;
+	// Search in Common Config
+	if(!found){
+		namePtr = strtok(propertyTree_,">");
+		tempHandle = TiXmlHandle(_commonConfigElement);
+		tempElement = tempHandle.Element();
+		while (namePtr != NULL){
+			tempHandle = tempHandle.FirstChild(namePtr);
+			tempElement = tempHandle.Element();
+			if(tempElement == NULL){
+				fprintf(stderr,"%s: %s not found in common config\n",propertyTree,namePtr);
+				break;
+			}
+			namePtr = strtok(NULL,">");
+		}
+	}
+
 	return tempElement;
 }
 

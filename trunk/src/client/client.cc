@@ -60,10 +60,14 @@ int main(void) {
 
 	debug("Start server on port %d\n", serverPort);
 
+	const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
+
+	debug("Segment Number = %d\n",segmentNumber);
+
 	communicator->createServerSocket(serverPort);
 
 	// connect to MDS
-	communicator->connectToMds();
+//	communicator->connectToMds();
 
 	thread t(sendThread);
 	t.detach();

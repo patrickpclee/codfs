@@ -27,6 +27,7 @@ class ConfigLayer{
 		TiXmlElement* advanceToElement(const char* propertyTree);
 
 		bool inited_;
+		bool _commonInited;
 
 		TiXmlDocument* doc_;
 		TiXmlHandle* configHandle_;
