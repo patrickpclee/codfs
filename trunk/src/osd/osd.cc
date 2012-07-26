@@ -113,7 +113,7 @@ uint32_t Osd::objectTrunkProcessor(uint32_t sockfd, uint64_t objectId,
 		uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeObjectTrunk(objectId, buf, offset,
+	byteWritten = _storageModule->writeObject(objectId, buf, offset,
 			length);
 
 	return byteWritten;
@@ -139,7 +139,7 @@ uint32_t Osd::segmentTrunkProcessor(uint32_t sockfd, uint64_t objectId,
 		uint32_t segmentId, uint32_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeSegmentTrunk(objectId, segmentId, buf,
+	byteWritten = _storageModule->writeSegment(objectId, segmentId, buf,
 			offset, length);
 
 	return byteWritten;

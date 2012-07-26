@@ -8,13 +8,13 @@ using namespace std;
 struct SegmentInfo {
 	uint64_t objectId;
 	uint32_t segmentId;
-	uint32_t segmentLength;
+	uint32_t segmentSize;
 	string segmentPath;
+	uint32_t offsetInObject;
 };
 
 struct SegmentData {
 	struct SegmentInfo info;
-	uint32_t offsetInObject;
 	char* buf;
 };
 
