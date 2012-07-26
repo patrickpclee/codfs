@@ -2,11 +2,11 @@
 #include <string.h>
 
 ConfigLayer::ConfigLayer(){	
-	init(DEFAULT_CONFIG_PATH);
+	init(DEFAULT_CONFIG_PATH, DEFAUTT_COMMON_CONFIG);
 }
 
-ConfigLayer::ConfigLayer(const char* configPath){
-	init(configPath);
+ConfigLayer::ConfigLayer(const char* configPath, const char* commonConfigPath){
+	init(configPath, commonConfigPath);
 }
 
 const char* ConfigLayer::getConfigString(const char* propertyTree){
@@ -70,7 +70,8 @@ void ConfigLayer::setConfigBool(const char* propertyTree, bool boolValue){
 	setConfigString(propertyTree,"false");
 }
 
-void ConfigLayer::init(const char* configPath){
+///TODO: Init with both specific and common Config
+void ConfigLayer::init(const char* configPath, const char* commonConfigPath){
 	doc_ = new TiXmlDocument(configPath);
 	inited_ = doc_->LoadFile();
 	if(!inited_){
@@ -89,6 +90,8 @@ void ConfigLayer::init(const char* configPath){
 	configHandle_ = new TiXmlHandle(configElement_);
 }
 
+///TODO: Use strtok_r() for thread safety
+///TODO: Read from Common Config if "Common" Tag is encountered
 TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 	char propertyTree_[strlen(propertyTree)+1];
 	strcpy(propertyTree_,propertyTree);
@@ -110,4 +113,5 @@ TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 
 ConfigLayer::~ConfigLayer(){
 	doc_->SaveFile();
+	_commonDoc->SaveFile();
 }

@@ -3,12 +3,13 @@
 #include "tinyxml.hh"
 
 #define DEFAULT_CONFIG_PATH	"config.xml"
+#define DEFAUTT_COMMON_CONFIG "common.xml"
 #define XML_ROOT_NODE "NcvfsConfig"
 
 class ConfigLayer{
 	public:
 		ConfigLayer();
-		ConfigLayer(const char* configPath);
+		ConfigLayer(const char* configPath, const char* commonConfigPath=DEFAUTT_COMMON_CONFIG);
 
 		const char* getConfigString(const char* propertyTree);
 		long long getConfigLong(const char* propertyTree);
@@ -22,13 +23,19 @@ class ConfigLayer{
 		
 		~ConfigLayer();
 	private:
-		void init(const char* configPath);
+		void init(const char* configPath, const char* commonConfigPath);
 		TiXmlElement* advanceToElement(const char* propertyTree);
 
 		bool inited_;
+
 		TiXmlDocument* doc_;
 		TiXmlHandle* configHandle_;
+		///Root node of Config
 		TiXmlElement* configElement_;
 
+		TiXmlDocument* _commonDoc;
+		TiXmlHandle* _commonConfigHandle;
+		///Root node of Common Config
+		TiXmlElement* _commonConfigElement;
 };
 #endif
