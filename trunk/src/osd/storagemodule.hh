@@ -100,6 +100,21 @@ public:
 
 	void createSegment(uint64_t objectId, uint32_t segmentId, uint32_t length);
 
+	/**
+	 * Close the object after the transfer is finished
+	 * @param objectId Object ID
+	 */
+
+	void closeObject (uint64_t objectId);
+
+	/**
+	 * Close the segment after the transfer is finished
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 */
+
+	void closeSegment (uint64_t objectId, uint32_t segmentId);
+
 	// getters
 	uint32_t getCapacity();
 	uint32_t getFreespace();

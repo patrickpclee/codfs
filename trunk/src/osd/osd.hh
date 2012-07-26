@@ -113,6 +113,15 @@ public:
 			uint64_t offset, uint32_t length, char* buf);
 
 	/**
+	 * Action when the object done message is received
+	 * Verify and close the object in the storage
+	 * @param sockfd Socket Descriptor of message source
+	 * @param objectId Object ID
+	 */
+
+	void putObjectDoneProcessor(uint32_t sockfd, uint64_t objectId);
+
+	/**
 	 * Action when a put object request is received
 	 * A number of trunks are expected to receive afterwards
 	 * @param sockfd Socket descriptor of message source
@@ -139,12 +148,21 @@ public:
 			uint32_t segmentId, uint32_t offset, uint32_t length, char* buf);
 
 	/**
-	 * Action when a recovery request is received
-	 * @param sockfd Socket descriptor of message source
-	 * @return 0 if success, -1 if failure
+	 * Action when the segment done message is received
+	 * @param sockfd Socket Descriptor of the message source
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
 	 */
 
-	uint32_t recoveryProcessor(uint32_t sockfd);
+	void putSegmentDoneProcessor (uint32_t sockfd, uint64_t objectId, uint32_t segmentId);
+
+	/**
+	 * Action when a recovery request is received
+	 * @param sockfd Socket descriptor of message source
+	 */
+
+
+	void recoveryProcessor(uint32_t sockfd);
 
 	// getters
 

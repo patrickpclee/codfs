@@ -119,11 +119,20 @@ uint32_t Osd::objectTrunkProcessor(uint32_t sockfd, uint64_t objectId,
 	return byteWritten;
 }
 
+void Osd::putObjectDoneProcessor(uint32_t sockfd, uint64_t objectId) {
+	_storageModule->closeObject(objectId);
+}
+
 void Osd::putSegmentProcessor(uint32_t sockfd, uint64_t objectId,
 		uint32_t segmentId, uint32_t length) {
 
 	_storageModule->createSegment(objectId, segmentId, length);
 
+}
+
+void Osd::putSegmentDoneProcessor(uint32_t sockfd, uint64_t objectId,
+		uint32_t segmentId) {
+	_storageModule->closeSegment(objectId, segmentId);
 }
 
 uint32_t Osd::segmentTrunkProcessor(uint32_t sockfd, uint64_t objectId,
@@ -134,6 +143,10 @@ uint32_t Osd::segmentTrunkProcessor(uint32_t sockfd, uint64_t objectId,
 			offset, length);
 
 	return byteWritten;
+}
+
+void Osd::recoveryProcessor(uint32_t sockfd) {
+	// TODO: recovery to be implemented
 }
 
 OsdCommunicator* Osd::getCommunicator() {

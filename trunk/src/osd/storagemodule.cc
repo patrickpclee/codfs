@@ -50,6 +50,14 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 
 }
 
+void StorageModule::closeObject(uint64_t objectID) {
+
+}
+
+void StorageModule::closeSegment(uint64_t objectID, uint32_t segmentID) {
+
+}
+
 uint32_t StorageModule::getCapacity() {
 	return 0;
 }
