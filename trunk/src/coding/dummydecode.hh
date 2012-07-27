@@ -7,6 +7,8 @@ using namespace std;
 
 class DummyDecode : public DecodingBehaviour {
 public:
+	DummyDecode();
+	~DummyDecode();
 	struct ObjectData decode(vector<struct SegmentData> segmentData);
 };
 #endif

@@ -5,10 +5,10 @@
 
 using namespace std;
 
-class CodingBehaviour {
+class EncodingBehaviour {
 public:
-	CodingBehaviour();
-	virtual ~CodingBehaviour();
+	EncodingBehaviour();
+	virtual ~EncodingBehaviour();
 	virtual vector<struct SegmentData> encode(struct ObjectData objectData) = 0;
 };
 

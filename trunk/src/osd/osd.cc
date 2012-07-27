@@ -103,7 +103,7 @@ void Osd::getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
 	return;
 }
 
-void Osd::putObjectProcessor(uint32_t sockfd, uint64_t objectId,
+void Osd::putObjectInitProcessor(uint32_t sockfd, uint64_t objectId,
 		uint32_t length) {
 
 	_storageModule->createObject(objectId, length);
@@ -119,11 +119,11 @@ uint32_t Osd::putObjectDataProcessor(uint32_t sockfd, uint64_t objectId,
 	return byteWritten;
 }
 
-void Osd::putObjectDoneProcessor(uint32_t sockfd, uint64_t objectId) {
+void Osd::putObjectEndProcessor(uint32_t sockfd, uint64_t objectId) {
 	_storageModule->closeObject(objectId);
 }
 
-void Osd::putSegmentProcessor(uint32_t sockfd, uint64_t objectId,
+void Osd::putSegmentInitProcessor(uint32_t sockfd, uint64_t objectId,
 		uint32_t segmentId, uint32_t length) {
 
 	_storageModule->createSegment(objectId, segmentId, length);
@@ -140,7 +140,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t sockfd, uint64_t objectId,
 	return byteWritten;
 }
 
-void Osd::putSegmentDoneProcessor(uint32_t sockfd, uint64_t objectId,
+void Osd::putSegmentEndProcessor(uint32_t sockfd, uint64_t objectId,
 		uint32_t segmentId) {
 	_storageModule->closeSegment(objectId, segmentId);
 }
@@ -174,21 +174,21 @@ int main(void) {
 	OsdCommunicator* communicator = osd->getCommunicator();
 
 	// TEST FILE WRITE
-	char* testBuf = "abcdefghijklmnopqrstuvwxyz";
-	osd->putObjectProcessor(1, 1, strlen(testBuf));
-	osd->putObjectDataProcessor(1, 1, 0, strlen(testBuf), testBuf);
-	osd->putObjectDoneProcessor(1, 1);
+	const char* testBuf = "abcdefghijklmnopqrstuvwxyz";
+	osd->putObjectInitProcessor(1, 1, strlen(testBuf));
+	osd->putObjectDataProcessor(1, 1, 0, strlen(testBuf), (char*)testBuf);
+	osd->putObjectEndProcessor(1, 1);
 
 	// TEST FILE READ
 	osd->getObjectProcessor(1, 1);
 
-	/*
 
 	 // start server
 	 const uint16_t serverPort = configLayer->getConfigInt(
 	 "Communication>ServerPort");
 	 debug("Start server on port %d\n", serverPort);
 	 communicator->createServerSocket(serverPort);
+	/*
 
 	 // connect to MDS
 	 //communicator->connectToMds();

@@ -22,3 +22,44 @@ message FileInfoPro {
 	optional fixed64 fileSize = 2;
 	optional string fileName = 3;
 }
+
+//
+// CLIENT -> OSD
+//
+
+message PutObjectInitPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 objectSize = 2;
+}
+
+message PutObjectEndPro {
+	optional fixed64 objectId = 1;
+}
+
+message ObjectDataPro {
+	optional fixed64 objectId = 1;
+	optional fixed64 offset = 2;
+	optional fixed32 length = 3;
+}
+
+//
+// OSD -> OSD
+//
+
+message PutSegmentInitPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+	optional fixed32 segmentSize = 3;
+}
+
+message PutSegmentEndPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message SegmentDataPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+	optional fixed64 offset = 3;
+	optional fixed32 length = 4;
+}

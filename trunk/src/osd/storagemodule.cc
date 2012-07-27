@@ -208,7 +208,6 @@ struct ObjectInfo StorageModule::readObjectInfo(uint64_t objectId) {
 
 	// TEST OBJECT READ
 	objectInfo.objectSize = 26; // HARDCODE;
-	objectInfo.offsetInFile = 0; // HARDCODE;
 
 	return objectInfo;
 }

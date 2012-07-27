@@ -3,23 +3,22 @@
  */
 
 #include "codingmodule.hh"
+#include "../coding/dummycoding.hh"
+
+CodingModule::CodingModule() {
+	// use dummy coding for now
+	_coding = new DummyCoding();
+}
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(
 		struct ObjectData objectData) {
-	vector<struct SegmentData> segmentDataList;
-	return segmentDataList;
-}
 
+	return _coding->performEncoding(objectData);
+}
 
 struct ObjectData CodingModule::decodeSegmentToObject(uint64_t objectId,
 		vector<struct SegmentData> segmentData) {
-	struct ObjectData objectData;
-	return objectData;
+
+	return _coding->performDecoding(segmentData);
 }
-
-
-
-
-
-
 

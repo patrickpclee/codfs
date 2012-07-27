@@ -9,7 +9,6 @@ struct ObjectInfo {
 	uint64_t objectId;
 	uint32_t objectSize;
 	string objectPath;
-	uint32_t offsetInFile;
 };
 
 struct ObjectData {

@@ -4,6 +4,14 @@
 #include "dummydecode.hh"
 
 DummyCoding::DummyCoding() {
-	_codingBehaviour = new DummyEncode();
+	_encodingBehaviour = new DummyEncode();
 	_decodingBehaviour = new DummyDecode();
+}
+
+DummyCoding::~DummyCoding() {
+
+}
+
+void DummyCoding::display() {
+
 }

@@ -96,7 +96,7 @@ public:
 	 * @param length Object size, equals the total length of all the trunks
 	 */
 
-	void putObjectProcessor(uint32_t sockfd, uint64_t objectId,
+	void putObjectInitProcessor(uint32_t sockfd, uint64_t objectId,
 			uint32_t length);
 
 	/**
@@ -119,7 +119,7 @@ public:
 	 * @param objectId Object ID
 	 */
 
-	void putObjectDoneProcessor(uint32_t sockfd, uint64_t objectId);
+	void putObjectEndProcessor(uint32_t sockfd, uint64_t objectId);
 
 	/**
 	 * Action when a put object request is received
@@ -130,7 +130,7 @@ public:
 	 * @param length Segment size, equals the total length of all the trunks
 	 */
 
-	void putSegmentProcessor(uint32_t sockfd, uint64_t objectId,
+	void putSegmentInitProcessor(uint32_t sockfd, uint64_t objectId,
 			uint32_t segmentId, uint32_t length);
 
 	/**
@@ -154,7 +154,7 @@ public:
 	 * @param segmentId Segment ID
 	 */
 
-	void putSegmentDoneProcessor (uint32_t sockfd, uint64_t objectId, uint32_t segmentId);
+	void putSegmentEndProcessor (uint32_t sockfd, uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Action when a recovery request is received

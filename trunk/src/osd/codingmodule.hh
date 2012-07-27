@@ -6,11 +6,14 @@
 #define __CODINGMODULE_HH__
 #include <vector>
 #include <stdint.h>
+#include "../coding/coding.hh"
 #include "segmentdata.hh"
 #include "objectdata.hh"
 
 class CodingModule {
 public:
+
+	CodingModule();
 
 	/**
 	 * Encode an object to a list of segments
@@ -37,6 +40,9 @@ public:
 	 * @param segmentId ID of the segment to retrieve
 	 * @return a SegmentData structure
 	 */
+
+private:
+	Coding* _coding;
 
 };
 

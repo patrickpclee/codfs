@@ -5,6 +5,7 @@ class DummyCoding : public Coding {
 public:
 	DummyCoding();
 	~DummyCoding();
+	void display();
 };
 
 #endif

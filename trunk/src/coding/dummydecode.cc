@@ -1,11 +1,20 @@
 #include <vector>
 #include <string.h>
 #include "dummydecode.hh"
+#include "decodingbehaviour.hh"
 #include "../osd/objectdata.hh"
 #include "../osd/segmentdata.hh"
 #include "../common/memorypool.hh"
 
 using namespace std;
+
+DummyDecode::DummyDecode() {
+
+}
+
+DummyDecode::~DummyDecode() {
+
+}
 
 struct ObjectData DummyDecode::decode(vector<struct SegmentData> segmentData) {
 	// dummy decode: n = 1, k = 0
@@ -15,7 +24,6 @@ struct ObjectData DummyDecode::decode(vector<struct SegmentData> segmentData) {
 
 	objectData.info.objectId = segmentData[0].info.objectId;
 	objectData.info.objectSize = segmentData[0].info.segmentSize;
-	objectData.info.offsetInFile = 0;
 
 	objectData.buf = MemoryPool::getInstance().poolMalloc(
 			objectData.info.objectSize);

@@ -1,11 +1,20 @@
 #include <vector>
 #include <string.h>
 #include "dummyencode.hh"
+#include "encodingbehaviour.hh"
 #include "../osd/objectdata.hh"
 #include "../osd/segmentdata.hh"
 #include "../common/memorypool.hh"
 
 using namespace std;
+
+DummyEncode::DummyEncode() {
+
+}
+
+DummyEncode::~DummyEncode() {
+
+}
 
 vector<struct SegmentData> DummyEncode::encode(struct ObjectData objectData) {
 	// dummy encode: n = 1, k = 0
