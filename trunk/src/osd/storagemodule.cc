@@ -10,8 +10,14 @@
 extern ConfigLayer* configLayer;
 
 StorageModule::StorageModule() {
-	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
-	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
+	/*
+	_objectFolder = configLayer->getConfigString(
+			"NcvfsConfig>Storage>ObjectLocation");
+	_segmentFolder = configLayer->getConfigString(
+			"NcvfsConfig>Storage>SegmentLocation");
+			*/
+	_objectFolder = "./object/";
+	_segmentFolder = "./segment/";
 	_capacity = 0;
 	_freespace = 0;
 }
@@ -21,20 +27,35 @@ StorageModule::~StorageModule() {
 }
 
 void StorageModule::createObject(uint64_t objectId, uint32_t length) {
+	createAndOpenObject(objectId, length);
 
+	string filepath = generateObjectPath(objectId, _objectFolder);
+	writeObjectInfo(objectId, length, filepath);
+
+	debug("Object created ID = %lu Length = %d Path = %s\n",
+			objectId, length, filepath.c_str());
 }
 
 void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 		uint32_t length) {
+	createAndOpenSegment(objectId, segmentId, length);
 
+	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
+	writeSegmentInfo(objectId, segmentId, length, filepath);
+
+	debug("Segment created ObjID = %lu SegmentID = %d Length = %d Path = %s\n",
+			objectId, segmentId, length, filepath.c_str());
 }
 
 bool StorageModule::isObjectExist(uint64_t objectId) {
 
+	// TEST OBJECT READ
+	/*
 	ObjectInfo objectInfo = readObjectInfo(objectId);
 	if (objectInfo.objectSize == 0) {
 		return false;
 	}
+	*/
 
 	return true;
 }
@@ -44,9 +65,6 @@ struct ObjectData StorageModule::readObject(uint64_t objectId,
 
 	struct ObjectData objectData;
 	objectData.info = readObjectInfo(objectId);
-
-	// obtain enough memory for the object
-	char* buf = objectData.buf;
 
 	// check num of bytes to read
 	// if length = 0, read whole object
@@ -59,10 +77,12 @@ struct ObjectData StorageModule::readObject(uint64_t objectId,
 
 	// TODO: check maximum malloc size
 	// TODO: when free?
-	buf = MemoryPool::getInstance().poolMalloc(byteToRead);
+	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
-	readFile(objectData.info.objectPath, buf,
-			offsetInObject, byteToRead);
+	readFile(objectData.info.objectPath, objectData.buf, offsetInObject, byteToRead);
+
+	debug("Object ID = %lu read %d bytes at offset %lu\n",
+			objectId, byteToRead, offsetInObject);
 
 	return objectData;
 
@@ -73,9 +93,6 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 
 	struct SegmentData segmentData;
 	segmentData.info = readSegmentInfo(objectId, segmentId);
-
-	// obtain enough memory for the segment
-	char* buf = segmentData.buf;
 
 	// check num of bytes to read
 	// if length = 0, read whole segment
@@ -88,10 +105,12 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 
 	// TODO: check maximum malloc size
 	// TODO: when free?
-	buf = MemoryPool::getInstance().poolMalloc(byteToRead);
+	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
-	readFile(segmentData.info.segmentPath, buf,
-			offsetInSegment, byteToRead);
+	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment, byteToRead);
+
+	debug("Object ID = %lu Segment ID = %d read %d bytes at offset %lu\n",
+			objectId, segmentId, byteToRead, offsetInSegment);
 
 	return segmentData;
 }
@@ -104,6 +123,9 @@ uint32_t StorageModule::writeObject(uint64_t objectId, char* buf,
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	byteWritten = writeFile(filepath, buf, offsetInObject, length);
 
+	debug("Object ID = %lu write %d bytes at offset %lu\n",
+			objectId, length, offsetInObject);
+
 	return byteWritten;
 }
 
@@ -115,6 +137,9 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
 
+	debug("Object ID = %lu Segment ID = %d write %d bytes at offset %lu\n",
+			objectId, segmentId, length, offsetInSegment);
+
 	return byteWritten;
 }
 
@@ -122,6 +147,8 @@ FILE* StorageModule::createAndOpenObject(uint64_t objectId, uint32_t length) {
 
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
+
+	debug ("Object ID = %lu created\n", objectId);
 
 	return createFile(filepath);
 }
@@ -132,24 +159,32 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	writeSegmentInfo(objectId, segmentId, length, filepath);
 
+	debug ("Object ID = %lu Segment ID = %d created\n", objectId, segmentId);
+
 	return createFile(filepath);
 }
 
 void StorageModule::closeObject(uint64_t objectId) {
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	closeFile(filepath);
+
+	debug ("Object ID = %lu closed\n", objectId);
 }
 
 void StorageModule::closeSegment(uint64_t objectId, uint32_t segmentId) {
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	closeFile(filepath);
+
+	debug ("Object ID = %lu Segment ID = %d closed\n", objectId, segmentId);
 }
 
 uint32_t StorageModule::getCapacity() {
+	// change in capacity to be implemented
 	return _capacity;
 }
 
 uint32_t StorageModule::getFreespace() {
+	// change in capacity to be implemented
 	return _freespace;
 }
 
@@ -160,20 +195,33 @@ uint32_t StorageModule::getFreespace() {
 void StorageModule::writeObjectInfo(uint64_t objectId, uint32_t objectSize,
 		string filepath) {
 
+	// TODO: Database to be implemented
+
 }
 
 struct ObjectInfo StorageModule::readObjectInfo(uint64_t objectId) {
+	// TODO: Database to be implemented
 	struct ObjectInfo objectInfo;
+
+	objectInfo.objectId = objectId;
+	objectInfo.objectPath = generateObjectPath(objectId, _objectFolder);
+
+	// TEST OBJECT READ
+	objectInfo.objectSize = 26; // HARDCODE;
+	objectInfo.offsetInFile = 0; // HARDCODE;
+
 	return objectInfo;
 }
 
 void StorageModule::writeSegmentInfo(uint64_t objectId, uint32_t segmentId,
 		uint32_t segmentSize, string filepath) {
+	// TODO: Database to be implemented
 
 }
 
 struct SegmentInfo StorageModule::readSegmentInfo(uint64_t objectId,
 		uint32_t segmentId) {
+	// TODO: Database to be implemented
 	struct SegmentInfo segmentInfo;
 	return segmentInfo;
 }
@@ -190,7 +238,7 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 
 	// Read file contents into buffer
 	fseek(file, offset, SEEK_SET);
-	uint32_t byteRead = fread(buf, length, 1, file);
+	uint32_t byteRead = fread(buf, 1, length, file);
 
 	if (byteRead != length) {
 		debug("ERROR: Length = %d, byteRead = %d\n", length, byteRead);
@@ -214,10 +262,10 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	// Write file contents from buffer
 	fseek(file, offset, SEEK_SET);
 
-	uint32_t byteWritten = fwrite(buf, length, 1, file);
+	uint32_t byteWritten = fwrite(buf, 1, length, file);
 
 	if (byteWritten != length) {
-		debug("ERROR: Length = %d, byteRead = %d\n", length, byteWritten);
+		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
 	}
 
 	return byteWritten;
@@ -274,6 +322,7 @@ FILE* StorageModule::openFile(string filepath) {
 
 	// find file in map
 	if (_openedFile.count(filepath)) {
+		debug ("%s\n", "File already opened");
 		return _openedFile[filepath];
 	}
 
@@ -281,7 +330,7 @@ FILE* StorageModule::openFile(string filepath) {
 	filePtr = fopen(filepath.c_str(), "rb+");
 
 	if (filePtr == NULL) {
-		debug("%s\n", "Unable to open file!");
+		debug("Unable to open file at %s\n", filepath.c_str());
 		return NULL;
 	}
 

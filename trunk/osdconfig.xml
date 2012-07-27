@@ -14,4 +14,9 @@
         <ServerPort>52000</ServerPort>
         
     </Communication>
+    
+    <Storage>
+    	<ObjectLocation>./object/</ObjectLocation>
+    	<SegmentLocation>./segment/</SegmentLocation>
+    </Storage>
 </NcvfsConfig>

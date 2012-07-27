@@ -109,7 +109,7 @@ public:
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
-	uint32_t objectTrunkProcessor(uint32_t sockfd, uint64_t objectId,
+	uint32_t putObjectDataProcessor(uint32_t sockfd, uint64_t objectId,
 			uint64_t offset, uint32_t length, char* buf);
 
 	/**
@@ -144,7 +144,7 @@ public:
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
-	uint32_t segmentTrunkProcessor(uint32_t sockfd, uint64_t objectId,
+	uint32_t putSegmentDataProcessor(uint32_t sockfd, uint64_t objectId,
 			uint32_t segmentId, uint32_t offset, uint32_t length, char* buf);
 
 	/**

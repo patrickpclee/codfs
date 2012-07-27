@@ -49,20 +49,27 @@ uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 	return 0;
 }
 
-uint32_t OsdCommunicator::sendSegment(uint32_t sockfd, struct SegmentData segmentData) {
+uint32_t OsdCommunicator::sendSegment(uint32_t sockfd,
+		struct SegmentData segmentData) {
 	return 0;
 }
 
-uint32_t OsdCommunicator::sendObject(uint32_t sockfd, struct ObjectData objectData) {
+uint32_t OsdCommunicator::sendObject(uint32_t sockfd,
+		struct ObjectData objectData) {
+	// TEST
+	debug("Send object ID = %lu to sockfd = %d, content = %s\n",
+			objectData.info.objectId, sockfd, objectData.buf);
 	return 0;
 }
 
-struct SegmentData OsdCommunicator::getSegmentRequest(uint32_t osdId, uint64_t objectId, uint32_t segmentId) {
+struct SegmentData OsdCommunicator::getSegmentRequest(uint32_t osdId,
+		uint64_t objectId, uint32_t segmentId) {
 	struct SegmentData segmentData;
 	return segmentData;
 }
 
-vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(uint64_t objectId, ComponentType dstComponent) {
+vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
+		uint64_t objectId, ComponentType dstComponent) {
 	vector<struct SegmentLocation> osdList;
 	return osdList;
 }
