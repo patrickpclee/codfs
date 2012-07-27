@@ -301,6 +301,19 @@ uint32_t Communicator::getMonitorSockfd() {
 	return -1;
 }
 
+uint32_t Communicator::getOsdSockfd() {
+	// TODO: assume return first Osd
+	map<uint32_t, Connection*>::iterator p;
+
+	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+		if (p->second->getConnectionType() == OSD) {
+			return p->second->getSockfd();
+		}
+	}
+
+	return -1;
+}
+
 // static function
 void Communicator::handleThread(Message* message) {
 	message->handle();
@@ -310,7 +323,6 @@ void Communicator::handleThread(Message* message) {
 void Communicator::sendThread(Communicator* communicator) {
 	communicator->sendMessage();
 }
-
 
 /**
  * 1. Get the MsgHeader from the receive buffer

@@ -50,10 +50,10 @@ void ListDirectoryRequestMsg::prepareProtocolMsg() {
 }
 
 void ListDirectoryRequestMsg::parse(char* buf) {
-	memcpy(&_msgHeader, buf, sizeof(MsgHeader));
+	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
 	ncvfs::ListDirectoryRequestPro listDirectoryRequestPro;
-	listDirectoryRequestPro.ParseFromString(buf + sizeof(MsgHeader));
+	listDirectoryRequestPro.ParseFromString(buf + sizeof(struct MsgHeader));
 
 	_clientId = listDirectoryRequestPro.osdid();
 	_directoryPath = listDirectoryRequestPro.directorypath();

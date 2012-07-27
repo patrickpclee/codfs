@@ -35,11 +35,11 @@ void protobuf_ShutdownFile_message_2eproto();
 class ListDirectoryRequestPro;
 class ListDirectoryReplyPro;
 class FileInfoPro;
-class BeginPutObjectPro;
-class EndPutObjectPro;
+class PutObjectInitPro;
+class PutObjectEndPro;
 class ObjectDataPro;
-class BeginPutSegmentPro;
-class EndPutSegmentPro;
+class PutSegmentInitPro;
+class PutSegmentEndPro;
 class SegmentDataPro;
 
 // ===================================================================
@@ -331,14 +331,14 @@ class FileInfoPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class BeginPutObjectPro : public ::google::protobuf::Message {
+class PutObjectInitPro : public ::google::protobuf::Message {
  public:
-  BeginPutObjectPro();
-  virtual ~BeginPutObjectPro();
+  PutObjectInitPro();
+  virtual ~PutObjectInitPro();
   
-  BeginPutObjectPro(const BeginPutObjectPro& from);
+  PutObjectInitPro(const PutObjectInitPro& from);
   
-  inline BeginPutObjectPro& operator=(const BeginPutObjectPro& from) {
+  inline PutObjectInitPro& operator=(const PutObjectInitPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -352,17 +352,17 @@ class BeginPutObjectPro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const BeginPutObjectPro& default_instance();
+  static const PutObjectInitPro& default_instance();
   
-  void Swap(BeginPutObjectPro* other);
+  void Swap(PutObjectInitPro* other);
   
   // implements Message ----------------------------------------------
   
-  BeginPutObjectPro* New() const;
+  PutObjectInitPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const BeginPutObjectPro& from);
-  void MergeFrom(const BeginPutObjectPro& from);
+  void CopyFrom(const PutObjectInitPro& from);
+  void MergeFrom(const PutObjectInitPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -399,7 +399,7 @@ class BeginPutObjectPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 objectsize() const;
   inline void set_objectsize(::google::protobuf::uint32 value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.BeginPutObjectPro)
+  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectInitPro)
  private:
   inline void set_has_objectid();
   inline void clear_has_objectid();
@@ -419,18 +419,18 @@ class BeginPutObjectPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static BeginPutObjectPro* default_instance_;
+  static PutObjectInitPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class EndPutObjectPro : public ::google::protobuf::Message {
+class PutObjectEndPro : public ::google::protobuf::Message {
  public:
-  EndPutObjectPro();
-  virtual ~EndPutObjectPro();
+  PutObjectEndPro();
+  virtual ~PutObjectEndPro();
   
-  EndPutObjectPro(const EndPutObjectPro& from);
+  PutObjectEndPro(const PutObjectEndPro& from);
   
-  inline EndPutObjectPro& operator=(const EndPutObjectPro& from) {
+  inline PutObjectEndPro& operator=(const PutObjectEndPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -444,17 +444,17 @@ class EndPutObjectPro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const EndPutObjectPro& default_instance();
+  static const PutObjectEndPro& default_instance();
   
-  void Swap(EndPutObjectPro* other);
+  void Swap(PutObjectEndPro* other);
   
   // implements Message ----------------------------------------------
   
-  EndPutObjectPro* New() const;
+  PutObjectEndPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const EndPutObjectPro& from);
-  void MergeFrom(const EndPutObjectPro& from);
+  void CopyFrom(const PutObjectEndPro& from);
+  void MergeFrom(const PutObjectEndPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -484,7 +484,7 @@ class EndPutObjectPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 objectid() const;
   inline void set_objectid(::google::protobuf::uint64 value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.EndPutObjectPro)
+  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectEndPro)
  private:
   inline void set_has_objectid();
   inline void clear_has_objectid();
@@ -501,7 +501,7 @@ class EndPutObjectPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static EndPutObjectPro* default_instance_;
+  static PutObjectEndPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -607,14 +607,14 @@ class ObjectDataPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class BeginPutSegmentPro : public ::google::protobuf::Message {
+class PutSegmentInitPro : public ::google::protobuf::Message {
  public:
-  BeginPutSegmentPro();
-  virtual ~BeginPutSegmentPro();
+  PutSegmentInitPro();
+  virtual ~PutSegmentInitPro();
   
-  BeginPutSegmentPro(const BeginPutSegmentPro& from);
+  PutSegmentInitPro(const PutSegmentInitPro& from);
   
-  inline BeginPutSegmentPro& operator=(const BeginPutSegmentPro& from) {
+  inline PutSegmentInitPro& operator=(const PutSegmentInitPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -628,17 +628,17 @@ class BeginPutSegmentPro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const BeginPutSegmentPro& default_instance();
+  static const PutSegmentInitPro& default_instance();
   
-  void Swap(BeginPutSegmentPro* other);
+  void Swap(PutSegmentInitPro* other);
   
   // implements Message ----------------------------------------------
   
-  BeginPutSegmentPro* New() const;
+  PutSegmentInitPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const BeginPutSegmentPro& from);
-  void MergeFrom(const BeginPutSegmentPro& from);
+  void CopyFrom(const PutSegmentInitPro& from);
+  void MergeFrom(const PutSegmentInitPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -682,7 +682,7 @@ class BeginPutSegmentPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 segmentsize() const;
   inline void set_segmentsize(::google::protobuf::uint32 value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.BeginPutSegmentPro)
+  // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentInitPro)
  private:
   inline void set_has_objectid();
   inline void clear_has_objectid();
@@ -705,18 +705,18 @@ class BeginPutSegmentPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static BeginPutSegmentPro* default_instance_;
+  static PutSegmentInitPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class EndPutSegmentPro : public ::google::protobuf::Message {
+class PutSegmentEndPro : public ::google::protobuf::Message {
  public:
-  EndPutSegmentPro();
-  virtual ~EndPutSegmentPro();
+  PutSegmentEndPro();
+  virtual ~PutSegmentEndPro();
   
-  EndPutSegmentPro(const EndPutSegmentPro& from);
+  PutSegmentEndPro(const PutSegmentEndPro& from);
   
-  inline EndPutSegmentPro& operator=(const EndPutSegmentPro& from) {
+  inline PutSegmentEndPro& operator=(const PutSegmentEndPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -730,17 +730,17 @@ class EndPutSegmentPro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const EndPutSegmentPro& default_instance();
+  static const PutSegmentEndPro& default_instance();
   
-  void Swap(EndPutSegmentPro* other);
+  void Swap(PutSegmentEndPro* other);
   
   // implements Message ----------------------------------------------
   
-  EndPutSegmentPro* New() const;
+  PutSegmentEndPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const EndPutSegmentPro& from);
-  void MergeFrom(const EndPutSegmentPro& from);
+  void CopyFrom(const PutSegmentEndPro& from);
+  void MergeFrom(const PutSegmentEndPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -777,7 +777,7 @@ class EndPutSegmentPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint32 value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.EndPutSegmentPro)
+  // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentEndPro)
  private:
   inline void set_has_objectid();
   inline void clear_has_objectid();
@@ -797,7 +797,7 @@ class EndPutSegmentPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static EndPutSegmentPro* default_instance_;
+  static PutSegmentEndPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1135,74 +1135,74 @@ inline ::std::string* FileInfoPro::release_filename() {
 
 // -------------------------------------------------------------------
 
-// BeginPutObjectPro
+// PutObjectInitPro
 
 // optional fixed64 objectId = 1;
-inline bool BeginPutObjectPro::has_objectid() const {
+inline bool PutObjectInitPro::has_objectid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void BeginPutObjectPro::set_has_objectid() {
+inline void PutObjectInitPro::set_has_objectid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void BeginPutObjectPro::clear_has_objectid() {
+inline void PutObjectInitPro::clear_has_objectid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void BeginPutObjectPro::clear_objectid() {
+inline void PutObjectInitPro::clear_objectid() {
   objectid_ = GOOGLE_ULONGLONG(0);
   clear_has_objectid();
 }
-inline ::google::protobuf::uint64 BeginPutObjectPro::objectid() const {
+inline ::google::protobuf::uint64 PutObjectInitPro::objectid() const {
   return objectid_;
 }
-inline void BeginPutObjectPro::set_objectid(::google::protobuf::uint64 value) {
+inline void PutObjectInitPro::set_objectid(::google::protobuf::uint64 value) {
   set_has_objectid();
   objectid_ = value;
 }
 
 // optional fixed32 objectSize = 2;
-inline bool BeginPutObjectPro::has_objectsize() const {
+inline bool PutObjectInitPro::has_objectsize() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void BeginPutObjectPro::set_has_objectsize() {
+inline void PutObjectInitPro::set_has_objectsize() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void BeginPutObjectPro::clear_has_objectsize() {
+inline void PutObjectInitPro::clear_has_objectsize() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void BeginPutObjectPro::clear_objectsize() {
+inline void PutObjectInitPro::clear_objectsize() {
   objectsize_ = 0u;
   clear_has_objectsize();
 }
-inline ::google::protobuf::uint32 BeginPutObjectPro::objectsize() const {
+inline ::google::protobuf::uint32 PutObjectInitPro::objectsize() const {
   return objectsize_;
 }
-inline void BeginPutObjectPro::set_objectsize(::google::protobuf::uint32 value) {
+inline void PutObjectInitPro::set_objectsize(::google::protobuf::uint32 value) {
   set_has_objectsize();
   objectsize_ = value;
 }
 
 // -------------------------------------------------------------------
 
-// EndPutObjectPro
+// PutObjectEndPro
 
 // optional fixed64 objectId = 1;
-inline bool EndPutObjectPro::has_objectid() const {
+inline bool PutObjectEndPro::has_objectid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void EndPutObjectPro::set_has_objectid() {
+inline void PutObjectEndPro::set_has_objectid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void EndPutObjectPro::clear_has_objectid() {
+inline void PutObjectEndPro::clear_has_objectid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void EndPutObjectPro::clear_objectid() {
+inline void PutObjectEndPro::clear_objectid() {
   objectid_ = GOOGLE_ULONGLONG(0);
   clear_has_objectid();
 }
-inline ::google::protobuf::uint64 EndPutObjectPro::objectid() const {
+inline ::google::protobuf::uint64 PutObjectEndPro::objectid() const {
   return objectid_;
 }
-inline void EndPutObjectPro::set_objectid(::google::protobuf::uint64 value) {
+inline void PutObjectEndPro::set_objectid(::google::protobuf::uint64 value) {
   set_has_objectid();
   objectid_ = value;
 }
@@ -1279,118 +1279,118 @@ inline void ObjectDataPro::set_length(::google::protobuf::uint32 value) {
 
 // -------------------------------------------------------------------
 
-// BeginPutSegmentPro
+// PutSegmentInitPro
 
 // optional fixed64 objectId = 1;
-inline bool BeginPutSegmentPro::has_objectid() const {
+inline bool PutSegmentInitPro::has_objectid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void BeginPutSegmentPro::set_has_objectid() {
+inline void PutSegmentInitPro::set_has_objectid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void BeginPutSegmentPro::clear_has_objectid() {
+inline void PutSegmentInitPro::clear_has_objectid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void BeginPutSegmentPro::clear_objectid() {
+inline void PutSegmentInitPro::clear_objectid() {
   objectid_ = GOOGLE_ULONGLONG(0);
   clear_has_objectid();
 }
-inline ::google::protobuf::uint64 BeginPutSegmentPro::objectid() const {
+inline ::google::protobuf::uint64 PutSegmentInitPro::objectid() const {
   return objectid_;
 }
-inline void BeginPutSegmentPro::set_objectid(::google::protobuf::uint64 value) {
+inline void PutSegmentInitPro::set_objectid(::google::protobuf::uint64 value) {
   set_has_objectid();
   objectid_ = value;
 }
 
 // optional fixed32 segmentId = 2;
-inline bool BeginPutSegmentPro::has_segmentid() const {
+inline bool PutSegmentInitPro::has_segmentid() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void BeginPutSegmentPro::set_has_segmentid() {
+inline void PutSegmentInitPro::set_has_segmentid() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void BeginPutSegmentPro::clear_has_segmentid() {
+inline void PutSegmentInitPro::clear_has_segmentid() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void BeginPutSegmentPro::clear_segmentid() {
+inline void PutSegmentInitPro::clear_segmentid() {
   segmentid_ = 0u;
   clear_has_segmentid();
 }
-inline ::google::protobuf::uint32 BeginPutSegmentPro::segmentid() const {
+inline ::google::protobuf::uint32 PutSegmentInitPro::segmentid() const {
   return segmentid_;
 }
-inline void BeginPutSegmentPro::set_segmentid(::google::protobuf::uint32 value) {
+inline void PutSegmentInitPro::set_segmentid(::google::protobuf::uint32 value) {
   set_has_segmentid();
   segmentid_ = value;
 }
 
 // optional fixed32 segmentSize = 3;
-inline bool BeginPutSegmentPro::has_segmentsize() const {
+inline bool PutSegmentInitPro::has_segmentsize() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void BeginPutSegmentPro::set_has_segmentsize() {
+inline void PutSegmentInitPro::set_has_segmentsize() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void BeginPutSegmentPro::clear_has_segmentsize() {
+inline void PutSegmentInitPro::clear_has_segmentsize() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void BeginPutSegmentPro::clear_segmentsize() {
+inline void PutSegmentInitPro::clear_segmentsize() {
   segmentsize_ = 0u;
   clear_has_segmentsize();
 }
-inline ::google::protobuf::uint32 BeginPutSegmentPro::segmentsize() const {
+inline ::google::protobuf::uint32 PutSegmentInitPro::segmentsize() const {
   return segmentsize_;
 }
-inline void BeginPutSegmentPro::set_segmentsize(::google::protobuf::uint32 value) {
+inline void PutSegmentInitPro::set_segmentsize(::google::protobuf::uint32 value) {
   set_has_segmentsize();
   segmentsize_ = value;
 }
 
 // -------------------------------------------------------------------
 
-// EndPutSegmentPro
+// PutSegmentEndPro
 
 // optional fixed64 objectId = 1;
-inline bool EndPutSegmentPro::has_objectid() const {
+inline bool PutSegmentEndPro::has_objectid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void EndPutSegmentPro::set_has_objectid() {
+inline void PutSegmentEndPro::set_has_objectid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void EndPutSegmentPro::clear_has_objectid() {
+inline void PutSegmentEndPro::clear_has_objectid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void EndPutSegmentPro::clear_objectid() {
+inline void PutSegmentEndPro::clear_objectid() {
   objectid_ = GOOGLE_ULONGLONG(0);
   clear_has_objectid();
 }
-inline ::google::protobuf::uint64 EndPutSegmentPro::objectid() const {
+inline ::google::protobuf::uint64 PutSegmentEndPro::objectid() const {
   return objectid_;
 }
-inline void EndPutSegmentPro::set_objectid(::google::protobuf::uint64 value) {
+inline void PutSegmentEndPro::set_objectid(::google::protobuf::uint64 value) {
   set_has_objectid();
   objectid_ = value;
 }
 
 // optional fixed32 segmentId = 2;
-inline bool EndPutSegmentPro::has_segmentid() const {
+inline bool PutSegmentEndPro::has_segmentid() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void EndPutSegmentPro::set_has_segmentid() {
+inline void PutSegmentEndPro::set_has_segmentid() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void EndPutSegmentPro::clear_has_segmentid() {
+inline void PutSegmentEndPro::clear_has_segmentid() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void EndPutSegmentPro::clear_segmentid() {
+inline void PutSegmentEndPro::clear_segmentid() {
   segmentid_ = 0u;
   clear_has_segmentid();
 }
-inline ::google::protobuf::uint32 EndPutSegmentPro::segmentid() const {
+inline ::google::protobuf::uint32 PutSegmentEndPro::segmentid() const {
   return segmentid_;
 }
-inline void EndPutSegmentPro::set_segmentid(::google::protobuf::uint32 value) {
+inline void PutSegmentEndPro::set_segmentid(::google::protobuf::uint32 value) {
   set_has_segmentid();
   segmentid_ = value;
 }

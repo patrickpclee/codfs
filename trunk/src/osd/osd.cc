@@ -173,6 +173,8 @@ int main(void) {
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
 
+	/*
+
 	// TEST FILE WRITE
 	const char* testBuf = "abcdefghijklmnopqrstuvwxyz";
 	osd->putObjectInitProcessor(1, 1, strlen(testBuf));
@@ -181,6 +183,8 @@ int main(void) {
 
 	// TEST FILE READ
 	osd->getObjectProcessor(1, 1);
+
+	*/
 
 
 	 // start server
@@ -192,11 +196,11 @@ int main(void) {
 
 	 // connect to MDS
 	 //communicator->connectToMds();
+	 */
 
 	 // wait for message (blocking)
 	 communicator->waitForMessage();
 
-	 */
 
 	// cleanup
 	delete configLayer;

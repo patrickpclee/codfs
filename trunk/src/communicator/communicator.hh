@@ -102,6 +102,9 @@ public:
 
 	uint32_t getMonitorSockfd();
 
+	// FOR TESTING ONLY
+	uint32_t getOsdSockfd();
+
 	/**
 	 * Generate a monotonically increasing requestID
 	 * @return Generated requestID

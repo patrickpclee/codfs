@@ -36,6 +36,13 @@ void sendThread() {
 void sleepThread(ClientCommunicator* communicator) {
 
 	usleep(2000000);
+
+	// TEST PUT OBJECT
+	communicator->uploadObject(1, 1, "./testfile", 0, 1048576);
+
+	/*
+
+	// TEST LIST FOLDER
 	vector<FileMetaData> folderData;
 	folderData = communicator->listFolderData(1, ".");
 
@@ -45,6 +52,7 @@ void sleepThread(ClientCommunicator* communicator) {
 	for (it = folderData.begin(); it < folderData.end(); ++it) {
 		debug("name: %s size: %d\n", ((*it)._path).c_str(), (int)(*it)._size);
 	}
+	*/
 }
 
 int main(void) {
@@ -60,14 +68,17 @@ int main(void) {
 
 	debug("Start server on port %d\n", serverPort);
 
-	const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
+	//const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
 
-	debug("Segment Number = %d\n",segmentNumber);
+	//debug("Segment Number = %d\n",segmentNumber);
 
 	communicator->createServerSocket(serverPort);
 
 	// connect to MDS
 //	communicator->connectToMds();
+
+	// connect to OSD
+	communicator->connectToOsd();
 
 	thread t(sendThread);
 	t.detach();

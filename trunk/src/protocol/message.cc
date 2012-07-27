@@ -10,6 +10,7 @@
 #include "../communicator/communicator.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
+#include "../common/debug.hh"
 #include "message.hh"
 
 using namespace std;
@@ -19,6 +20,7 @@ Message::Message() {
 }
 
 Message::Message(Communicator* communicator) {
+
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
 	_protocolMsg = "";
 	_sockfd = 0;

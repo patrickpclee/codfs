@@ -17,8 +17,8 @@ all:
 test:
 	make clean; 
 	make libraries;
-	make mds; 
 	make client;
+	make osd;
 	
 mds:
 	cd ${MDS_DIR}; make mds
@@ -38,6 +38,7 @@ libraries:
 	cd ${SRC}/config; make; cd ${CURRENT}
 	cd ${SRC}/communicator; make; cd ${CURRENT}
 	cd ${SRC}/protocol; make; cd ${CURRENT}
+	cd ${SRC}/coding; make; cd ${CURRENT}
 
 clean:
 	cd ${OSD_DIR}; make clean
