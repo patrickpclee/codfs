@@ -60,6 +60,10 @@ void Message::setRequestId(uint32_t requestId) {
 	_msgHeader.requestId = requestId;
 }
 
+void Message::setPayload(char* payload) {
+	_payload = payload;
+}
+
 void Message::printHeader() {
 	cout << "[MsgHeader] Type = " << _msgHeader.protocolMsgType << " Size = "
 			<< _msgHeader.protocolMsgSize << " Payload Size = "
@@ -122,6 +126,7 @@ uint32_t Message::getSockfd() {
 	return _sockfd;
 }
 
+
 MessageStatus Message::waitForStatusChange () {
 	return _status.get_future().get();	
 }
@@ -130,3 +135,4 @@ void Message::setStatus (MessageStatus status) {
 	_status.set_value(status);
 	return ;
 }
+

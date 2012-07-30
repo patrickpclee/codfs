@@ -1,5 +1,6 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
+	<Coding><SegmentNumber>1</SegmentNumber></Coding>
     <Communication>
     
         <!-- polling interval in terms of ms -->

@@ -37,6 +37,7 @@ Communicator::Communicator() {
 
 	// chunk size
 	_chunkSize = configLayer->getConfigInt("Communication>ChunkSize");
+	debug("Chunk Size = %d\n", _chunkSize);
 
 	debug("%s\n", "Communicator constructed");
 }
@@ -173,8 +174,8 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	if (message->getMsgHeader().requestId == 0) {
 		message->setRequestId(requestId);
 	}
-	debug("Message (ID: %d) added to queue\n",
-			message->getMsgHeader().requestId);
+	//debug("Message (ID: %d) added to queue\n",
+	//		message->getMsgHeader().requestId);
 	_outMessageQueue.push_back(message);
 
 	if (expectReply) {
@@ -344,6 +345,11 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	Message* message = MessageFactory::createMessage(this, msgType);
 	message->setSockfd(sockfd);
 	message->parse(buf);
+
+	if (msgHeader.payloadSize > 0) {
+		message->setPayload(
+				buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
+	}
 
 	// debug
 	message->printHeader();

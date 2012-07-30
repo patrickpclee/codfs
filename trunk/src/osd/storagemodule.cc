@@ -4,6 +4,7 @@
 
 #include <sstream>
 #include "storagemodule.hh"
+#include "stdlib.h"
 #include "../common/debug.hh"
 
 // global variable defined in each component
@@ -120,7 +121,7 @@ uint32_t StorageModule::writeObject(uint64_t objectId, char* buf,
 	byteWritten = writeFile(filepath, buf, offsetInObject, length);
 
 	debug("Object ID = %lu write %d bytes at offset %lu\n",
-			objectId, length, offsetInObject);
+			objectId, byteWritten, offsetInObject);
 
 	return byteWritten;
 }
@@ -134,7 +135,7 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
 
 	debug("Object ID = %lu Segment ID = %d write %d bytes at offset %lu\n",
-			objectId, segmentId, length, offsetInSegment);
+			objectId, segmentId, byteWritten, offsetInSegment);
 
 	return byteWritten;
 }
@@ -246,6 +247,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length) {
 
 	FILE* file = openFile(filepath);
+	debug ("fileptr = %p\n", file);
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot write");
@@ -257,10 +259,14 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	// Write file contents from buffer
 	fseek(file, offset, SEEK_SET);
 
+	debug ("fseek to %lu\n", offset);
+
 	uint32_t byteWritten = fwrite(buf, 1, length, file);
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
+		perror ("fwrite");
+		exit (-1);
 	}
 
 	return byteWritten;
@@ -298,6 +304,8 @@ FILE* StorageModule::createFile(string filepath) {
 	// create new if not exist
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "wb+");
+
+	debug ("fileptr = %p\n", filePtr);
 
 	if (filePtr == NULL) {
 		debug("%s\n", "Unable to create file!");

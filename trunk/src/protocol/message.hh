@@ -97,6 +97,7 @@ public:
 	void setProtocolSize (uint32_t protocolSize);
 	void setPayloadSize (uint32_t payloadSize);
 	void setProtocolMsg(string protocolMsg);
+	void setPayload(char* payload);
 
 	//
 	// getter

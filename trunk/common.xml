@@ -2,7 +2,7 @@
 <NcvfsConfig>
 
 	<Coding>
-		<SegmentNumber>1</SegmentNumber>
+		<!--<SegmentNumber>1</SegmentNumber>-->
 	</Coding>
 	
 	<Communication>
