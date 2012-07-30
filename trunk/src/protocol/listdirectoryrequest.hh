@@ -73,21 +73,16 @@ public:
 	void printProtocol ();
 
 	/**
-	 * @brief	Get the Future of the Folder Data
-	 *
-	 * @return	Future of the Folder Data
-	 */
-	future< vector<FileMetaData> > getFolderDataFuture ();
-
-	/**
-	 * @brief	Set the Folder Data (Fulfill Promise)
+	 * @brief	Set the Folder Data
 	 *
 	 * @param	folderData	Vector of File Meta Data
 	 */
-	void setFolderDataValue (vector<FileMetaData> folderData);
+	void setFolderData (vector<FileMetaData> folderData);
+
+	vector<FileMetaData> getFolderData ();
 
 private:
-	promise< vector<FileMetaData> > _folderData;
+	vector<FileMetaData> _folderData;
 	uint32_t _clientId;
 //	uint32_t _osdId;
 	string _directoryPath;

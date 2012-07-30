@@ -6,6 +6,7 @@
 #include "listdirectoryrequest.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/debug.hh"
 #include "../mds/mds.hh"
 
 #ifdef COMPILE_FOR_MDS
@@ -63,6 +64,7 @@ void ListDirectoryRequestMsg::parse(char* buf) {
 
 void ListDirectoryRequestMsg::handle() {
 #ifdef COMPILE_FOR_MDS
+	debug("LDR Handle\n",0);
 	mds->listFolderProcessor(_msgHeader.requestId,_sockfd,_clientId,_directoryPath);
 #endif
 }
@@ -73,20 +75,14 @@ void ListDirectoryRequestMsg::printProtocol() {
 }
 
 /**
- * @brief	Get the Future of the Folder Data
- *
- * @return	Future of the Folder Data
+ * @brief	Set the Folder Data
  */
-future<vector<FileMetaData> > ListDirectoryRequestMsg::getFolderDataFuture() {
-	return _folderData.get_future();
+void ListDirectoryRequestMsg::setFolderData (vector<FileMetaData> folderData) {
+	_folderData = folderData;
+
+	return ;
 }
 
-/**
- * @brief	Set the Folder Data (Fulfill Promise)
- */
-void ListDirectoryRequestMsg::setFolderDataValue(
-		vector<FileMetaData> folderData) {
-	_folderData.set_value(folderData);
-
-	return;
+vector<FileMetaData> ListDirectoryRequestMsg::getFolderData () {
+	return _folderData;
 }

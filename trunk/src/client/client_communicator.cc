@@ -16,11 +16,18 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 			new ListDirectoryRequestMsg(this, clientId, getMdsSockfd(), path);
 	listDirectoryRequestMsg->prepareProtocolMsg();
 
-	future<vector<FileMetaData> > folderData =
-			listDirectoryRequestMsg->getFolderDataFuture();
+//	future<vector<FileMetaData> > folderData =
+//			listDirectoryRequestMsg->getFolderDataFuture();
 
 	addMessage(listDirectoryRequestMsg, true);
-	return folderData.get();
+	MessageStatus status = listDirectoryRequestMsg->waitForStatusChange();
+	if(status == READY) {
+		return listDirectoryRequestMsg->getFolderData();
+	} else {
+		debug("%s\n","List Directory Request Failed");
+		return {};
+	}
+	return {};
 }
 
 /**
