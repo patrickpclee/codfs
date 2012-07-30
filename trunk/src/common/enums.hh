@@ -9,6 +9,10 @@ enum FailureReason {
 	UNREACHABLE, DISKFAILURE, OBJECTLOST
 };
 
+enum MessageStatus {
+	WAITING, READY, TIMEOUT
+};
+
 enum MsgType {
 	DEFAULT,
 	LIST_DIRECTORY_REQUEST,

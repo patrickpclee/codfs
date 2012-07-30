@@ -121,3 +121,12 @@ char* Message::getPayload() {
 uint32_t Message::getSockfd() {
 	return _sockfd;
 }
+
+MessageStatus Message::waitForStatusChange () {
+	return _status.get_future().get();	
+}
+
+void Message::setStatus (MessageStatus status) {
+	_status.set_value(status);
+	return ;
+}

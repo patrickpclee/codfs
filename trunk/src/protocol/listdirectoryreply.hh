@@ -28,7 +28,7 @@ public:
 	 *
 	 * @param	communicator	Communicator the Message belongs to
 	 */
-	ListDirectoryReplyMsg(Communicator* communicator);
+	ListDirectoryReplyMsg (Communicator* communicator);
 
 	/**
 	 * @brief	Constructor - Save Parameters in Private Variables
@@ -39,7 +39,7 @@ public:
 	 * @param	path	Path to the Folder
 	 * @param	folderData	Folder Data
 	 */
-	ListDirectoryReplyMsg(Communicator* communicator, uint32_t requestId,
+	ListDirectoryReplyMsg (Communicator* communicator, uint32_t requestId,
 			uint32_t sockfd, string path, vector<FileMetaData> folderData);
 
 	/**
@@ -50,25 +50,25 @@ public:
 	 * @param	path	Path to the Folder
 	 * @param	folderData	Folder Data
 	 */
-	void setVariables(uint32_t requestId, uint32_t sockfd, string path,
+	void setVariables (uint32_t requestId, uint32_t sockfd, string path,
 			vector<FileMetaData> folderData);
 
 	/**
 	 * @brief	Copy values in private variables to protocol message
 	 * Serialize protocol message and copy to private variable
 	 */
-	void prepareProtocolMsg();
+	void prepareProtocolMsg ();
 
-	void printProtocol();
+	void printProtocol ();
 
 	/**
 	 * @brief	Parse the Binary to Variables
 	 *
 	 * @param	buf	Message Binary
 	 */
-	void parse(char* buf);
+	void parse (char* buf);
 
-	void handle();
+	void handle ();
 private:
 	string _path;
 	vector<FileMetaData> _folderData;

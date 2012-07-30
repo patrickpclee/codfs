@@ -1,7 +1,7 @@
 package ncvfs;
 
 //
-// OSD -> MDS
+// CLIENT -> MDS
 //
 
 message ListDirectoryRequestPro {
@@ -9,8 +9,13 @@ message ListDirectoryRequestPro {
 	optional string directoryPath = 2;
 }
 
+message UploadFileRequestPro {
+	required string fileName = 1;
+	required fixed32 numOfObj = 2;
+}
+
 //
-// MDS -> OSD
+// MDS -> CLIENT
 //
 
 message ListDirectoryReplyPro {
@@ -21,6 +26,13 @@ message FileInfoPro {
 	optional fixed32 fileId = 1;
 	optional fixed64 fileSize = 2;
 	optional string fileName = 3;
+}
+
+message UploadFileReplyPro {
+	required fixed32 fileId = 1;
+	required fixed32 numOfObj = 2;
+	repeated fixed64 objectIdList = 3;
+	repeated fixed32 primaryList = 4;
 }
 
 //

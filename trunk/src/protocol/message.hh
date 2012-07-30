@@ -7,6 +7,8 @@
 
 #include <string>
 #include <stdint.h>
+#include <future>
+
 #include "../common/enums.hh"
 #include "../communicator/communicator.hh"
 
@@ -107,6 +109,20 @@ public:
 
 
 	/**
+	 * @brief	Wait for Message Status Change
+	 *
+	 * @return	Status of the Message Reply
+	 */
+	MessageStatus waitForStatusChange();
+
+	/**
+	 * @brief	Set Message Status
+	 *
+	 * @param	status	New Status of the Message
+	 */
+	void setStatus (MessageStatus status);
+
+	/**
 	 * DEBUG: Print the MsgHeader
 	 */
 
@@ -124,6 +140,8 @@ protected:
 	string _protocolMsg;
 	char* _payload;
 	Communicator* _communicator;
+	
+	promise <MessageStatus> _status;
 };
 
 #endif
