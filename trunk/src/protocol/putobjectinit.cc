@@ -37,17 +37,16 @@ void PutObjectInitMsg::prepareProtocolMsg() {
 	setProtocolSize(serializedString.length());
 	setProtocolType(PUT_OBJECT_INIT);
 	setProtocolMsg(serializedString);
+
 }
 
 void PutObjectInitMsg::parse(char* buf) {
 
-	// DEBUG
-	printhex (buf + sizeof (struct MsgHeader), _msgHeader.protocolMsgSize);
-
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
 	ncvfs::PutObjectInitPro putObjectInitPro;
-	putObjectInitPro.ParseFromString(buf + sizeof(struct MsgHeader));
+	putObjectInitPro.ParseFromArray(buf + sizeof(struct MsgHeader),
+			_msgHeader.protocolMsgSize);
 
 	_objectId = putObjectInitPro.objectid();
 	_objectSize = putObjectInitPro.objectsize();

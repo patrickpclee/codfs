@@ -4,10 +4,14 @@
 #include "connection.hh"
 #include "socket.hh"
 #include "../common/enums.hh"
+#include "../common/debug.hh"
 #include "../protocol/message.hh"
 #include "../common/memorypool.hh"
-#include "../common/debug.hh"
 #include "socketexception.hh"
+
+// debug
+#include "../protocol/message.pb.h"
+#include "../common/debug.hh"
 
 using namespace std;
 

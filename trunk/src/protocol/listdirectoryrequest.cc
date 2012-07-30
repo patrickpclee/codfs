@@ -53,7 +53,8 @@ void ListDirectoryRequestMsg::parse(char* buf) {
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
 	ncvfs::ListDirectoryRequestPro listDirectoryRequestPro;
-	listDirectoryRequestPro.ParseFromString(buf + sizeof(struct MsgHeader));
+	listDirectoryRequestPro.ParseFromArray(buf + sizeof(struct MsgHeader),
+			_msgHeader.protocolMsgSize);
 
 	_clientId = listDirectoryRequestPro.osdid();
 	_directoryPath = listDirectoryRequestPro.directorypath();
