@@ -1,8 +1,12 @@
 #include "client_communicator.hh"
 
 #include "../common/debug.hh"
+#include "../common/objectdata.hh"
 #include "../protocol/listdirectoryrequest.hh"
+
 #include "../protocol/putobjectinit.hh"
+#include "../protocol/objectdatamsg.hh"
+#include "../protocol/putobjectend.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
@@ -23,29 +27,95 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 	return folderData.get();
 }
 
-/**
- * 1. Send a putObjectInitMsg
- * 2. Send multiple putObjectDataMsg
- * 3. Send a putObjectDoneMsg
- */
+void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
+		struct ObjectData objectData) {
 
-void ClientCommunicator::uploadObject(uint32_t clientId, uint64_t objectId,
-		string path, uint64_t offset, uint32_t length) {
+	const uint64_t totalSize = objectData.info.objectSize;
+	const uint64_t objectId = objectData.info.objectId;
+	char* buf = objectData.buf;
 
-	// Step 1
 
-	PutObjectInitMsg * putObjectInitMsg = new PutObjectInitMsg(this,
-			getOsdSockfd(), objectId, length);
+	// Step 1 : Send Init message
+
+	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize);
+	debug ("%s\n", "Put Object Init Sent");
+
+	// Step 2 : Send data chunk by chunk
+
+	uint64_t byteToSend = 0;
+	uint64_t byteProcessed = 0;
+	uint64_t byteRemaining = totalSize;
+
+	while (byteProcessed < totalSize) {
+
+		if (byteRemaining > _chunkSize) {
+			byteToSend = _chunkSize;
+		} else {
+			byteToSend = byteRemaining;
+		}
+
+		putObjectData(clientId, dstOsdSockfd, objectId, buf, byteProcessed,
+				byteToSend);
+		byteProcessed += byteToSend;
+		byteRemaining -= byteToSend;
+	}
+
+	debug ("%s\n", "All Put Object Data Sent");
+
+	// Step 3: Send End message
+
+	putObjectEnd(clientId, dstOsdSockfd, objectId);
+
+	debug ("%s\n", "Put Object End Sent");
+
+}
+
+//
+// PRIVATE FUNCTIONS
+//
+
+void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
+		uint64_t objectId, uint32_t length) {
+
+	// Step 1 of the upload process
+
+	PutObjectInitMsg* putObjectInitMsg = new PutObjectInitMsg(this,
+			dstOsdSockfd, objectId, length);
 
 	putObjectInitMsg->prepareProtocolMsg();
 	addMessage(putObjectInitMsg, false);
 
-	putObjectInitMsg->printHeader();
-	putObjectInitMsg->printProtocol();
-
-
+	// putObjectInitMsg->printHeader();
+	// putObjectInitMsg->printProtocol();
 
 }
+
+void ClientCommunicator::putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
+		uint64_t objectId, char* buf, uint64_t offset, uint32_t length) {
+
+	// Step 2 of the upload process
+	ObjectDataMsg* objectDataMsg = new ObjectDataMsg(this, dstOsdSockfd, objectId, offset, length);
+
+	objectDataMsg->prepareProtocolMsg();
+	objectDataMsg->preparePayload(buf + offset, length);
+	addMessage(objectDataMsg, false);
+
+}
+
+void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
+		uint64_t objectId) {
+
+	// Step 3 of the upload process
+
+	PutObjectEndMsg* putObjectEndMsg = new PutObjectEndMsg (this, dstOsdSockfd, objectId);
+
+	putObjectEndMsg->prepareProtocolMsg();
+	addMessage(putObjectEndMsg, false);
+}
+
+//
+// TODO: DUMMY CONNECTION FOR NOW
+//
 
 void ClientCommunicator::connectToMds() {
 	uint16_t port = 50000;
@@ -57,7 +127,6 @@ void ClientCommunicator::connectToMds() {
 	return;
 }
 
-// TESTING
 void ClientCommunicator::connectToOsd() {
 	uint16_t port = 52000;
 	string ip = "127.0.0.1";

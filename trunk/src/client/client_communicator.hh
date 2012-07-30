@@ -23,19 +23,53 @@ public:
 	vector<FileMetaData> listFolderData(uint32_t clientId, string path);
 
 	/**
-	 * Upload an object to OSD (blocking)
-	 * @param clientId Client ID
-	 * @param objectId Object ID
-	 * @param path Path to local file
-	 * @param offset Offset of the object in file
-	 * @param length Size of the object
+	 * 1. Send an init message
+	 * 2. Repeatedly send data chunks to OSD
+	 * 3. Send an end message
+	 * @param clientID Client ID
+	 * @param dstOsdSockfd Destination OSD Socket Descriptor
+	 * @param objectData ObjectData Structure
 	 */
 
-	void uploadObject(uint32_t clientId, uint64_t objectId, string path,
-			uint64_t offset, uint32_t length);
+	void putObject (uint32_t clientId, uint32_t dstOsdSockfd, struct ObjectData objectData);
 
+	// TODO: CONNECT TO COMPONENT: PRIMITIVE DESIGN
 	void connectToMds();
 	void connectToOsd();
 private:
+
+	/**
+	 * Initiate upload process to OSD (Step 1)
+	 * @param clientId Client ID
+	 * @param dstOsdSockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 * @param length Size of the object
+	 */
+
+	void putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd, uint64_t objectId,
+			uint32_t length);
+
+	/**
+	 * Send an object chunk to OSD (Step 2)
+	 * @param clientId Client ID
+	 * @param dstOsdSockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 * @param buf Buffer containing the object
+	 * @param offset Offset of the chunk inside the buffer
+	 * @param length Length of the chunk
+	 */
+
+	void putObjectData(uint32_t clientID, uint32_t dstOsdSockfd, uint64_t objectId,
+			char* buf, uint64_t offset, uint32_t length);
+
+	/**
+	 * Finalise upload process to OSD (Step 3)
+	 * @param clientId Client ID
+	 * @param dstOsdSockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 */
+
+	void putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd, uint64_t objectId);
+
 };
 #endif

@@ -60,13 +60,12 @@ public:
 
 	/**
 	 * Load the file contents into the payload
-	 * @param filepath File to send
-	 * @param offset Offset in file
+	 * @param buf Buffer containing raw data
 	 * @param length num of bytes to copy
 	 * @return Num of bytes copied
 	 */
 
-	uint32_t preparePayload(string filepath, uint32_t offset, uint32_t length);
+	uint32_t preparePayload(char* buf, uint32_t length);
 
 
 	//

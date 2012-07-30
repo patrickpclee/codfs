@@ -7,8 +7,8 @@
 #include <vector>
 #include <stdint.h>
 #include "../coding/coding.hh"
-#include "segmentdata.hh"
-#include "objectdata.hh"
+#include "../common/segmentdata.hh"
+#include "../common/objectdata.hh"
 
 class CodingModule {
 public:

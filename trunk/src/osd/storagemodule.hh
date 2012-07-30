@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include "../config/config.hh"
 #include "../common/memorypool.hh"
-#include "segmentdata.hh"
-#include "objectdata.hh"
+#include "../common/segmentdata.hh"
+#include "../common/objectdata.hh"
 using namespace std;
 
 class StorageModule {

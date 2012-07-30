@@ -1,5 +1,5 @@
 CC=			g++
-CFLAGS=		-g -Wall -std=c++0x
+CFLAGS=		-g -Wall -std=c++0x -DCOMPILE_FOR_MONITOR
 LDFLAGS=	`pkg-config --cflags --libs protobuf` -lpthread
 CACHE_OBJ=	../cache/*.o
 COMMON_OBJ=	../common/*.o

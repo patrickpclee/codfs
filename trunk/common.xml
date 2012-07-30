@@ -1,6 +1,14 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
+
 	<Coding>
 		<SegmentNumber>1</SegmentNumber>
 	</Coding>
+	
+	<Communication>
+	
+		<!-- Chunk Size used in transfer in Byte-->
+		<ChunkSize>8192</ChunkSize>
+	</Communication>
+	
 </NcvfsConfig>

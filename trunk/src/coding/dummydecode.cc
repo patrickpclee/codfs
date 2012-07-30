@@ -2,8 +2,8 @@
 #include <string.h>
 #include "dummydecode.hh"
 #include "decodingbehaviour.hh"
-#include "../osd/objectdata.hh"
-#include "../osd/segmentdata.hh"
+#include "../common/objectdata.hh"
+#include "../common/segmentdata.hh"
 #include "../common/memorypool.hh"
 
 using namespace std;

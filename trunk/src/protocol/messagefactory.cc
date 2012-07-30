@@ -8,6 +8,8 @@
 #include "../protocol/listdirectoryrequest.hh"
 #include "../protocol/listdirectoryreply.hh"
 #include "../protocol/putobjectinit.hh"
+#include "../protocol/objectdatamsg.hh"
+#include "../protocol/putobjectend.hh"
 #include "messagefactory.hh"
 
 MessageFactory::MessageFactory() {
@@ -30,6 +32,13 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (PUT_OBJECT_INIT):
 		return new PutObjectInitMsg(communicator);
 		break;
+	case (OBJECT_DATA):
+		return new ObjectDataMsg(communicator);
+		break;
+	case (PUT_OBJECT_END):
+		return new PutObjectEndMsg(communicator);
+		break;
+
 	default:
 		debug("%s\n", "Invalid message type");
 		break;

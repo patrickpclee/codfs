@@ -2,8 +2,11 @@
 #include <thread>
 
 #include "client.hh"
+#include "client_storagemodule.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
+#include "../common/objectdata.hh"
+#include "../common/segmentdata.hh"
 
 /// Client Object
 Client* client;
@@ -11,11 +14,15 @@ Client* client;
 /// Config Layer
 ConfigLayer* configLayer;
 
-void* processor;
+// HARDCODE FOR TESTING
 
 Client::Client() {
 	_clientCommunicator = new ClientCommunicator();
-	processor = (void*) this;
+	_storageModule = new ClientStorageModule();
+
+	// TODO: HARDCODE CLIENT ID
+	_clientId = 0;
+
 }
 
 /**
@@ -27,32 +34,58 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
+/**
+ * 1. Divide the file into fixed size objects
+ * 2. For each object, contact MDS to obtain objectId and dstOsdID
+ * 3. Call uploadObjectRequest()
+ */
+
+uint32_t Client::uploadFileRequest(string filepath) {
+
+	const uint32_t objectCount = _storageModule->getObjectCount(filepath);
+
+	debug ("Object Count of %s = %d\n", filepath.c_str(), objectCount);
+
+	for (uint32_t i = 0; i < objectCount; ++i) {
+		struct ObjectData objectData = _storageModule->readObjectFromFile(
+				filepath, i);
+
+		// TODO: HARDCODE FOR NOW!
+		uint32_t dstOsdId = _clientCommunicator->getOsdSockfd();
+		objectData.info.objectId = i;
+
+		_clientCommunicator->putObject(_clientId, dstOsdId, objectData);
+	}
+
+	return 0;
+}
+
 void sendThread() {
 	debug("%s", "Send Thread Start\n");
 	client->getCommunicator()->sendMessage();
 	debug("%s", "Send Thread End\n");
 }
 
-void sleepThread(ClientCommunicator* communicator) {
+void sleepThread(Client* client, ClientCommunicator* communicator) {
 
 	usleep(2000000);
 
 	// TEST PUT OBJECT
-	communicator->uploadObject(1, 1, "./testfile", 0, 1048576);
+	client->uploadFileRequest("./testfile");
 
 	/*
 
-	// TEST LIST FOLDER
-	vector<FileMetaData> folderData;
-	folderData = communicator->listFolderData(1, ".");
+	 // TEST LIST FOLDER
+	 vector<FileMetaData> folderData;
+	 folderData = communicator->listFolderData(1, ".");
 
-	// TODO: when to delete listFolderDataRequest and listFolderDataReply?
+	 // TODO: when to delete listFolderDataRequest and listFolderDataReply?
 
-	vector<FileMetaData>::iterator it;
-	for (it = folderData.begin(); it < folderData.end(); ++it) {
-		debug("name: %s size: %d\n", ((*it)._path).c_str(), (int)(*it)._size);
-	}
-	*/
+	 vector<FileMetaData>::iterator it;
+	 for (it = folderData.begin(); it < folderData.end(); ++it) {
+	 debug("name: %s size: %d\n", ((*it)._path).c_str(), (int)(*it)._size);
+	 }
+	 */
 }
 
 int main(void) {
@@ -77,12 +110,12 @@ int main(void) {
 	// connect to MDS
 //	communicator->connectToMds();
 
-	// connect to OSD
+// connect to OSD
 	communicator->connectToOsd();
 
 	thread t(sendThread);
 	t.detach();
-	thread t1(sleepThread, communicator);
+	thread t1(sleepThread, client, communicator);
 	t1.detach();
 
 	// wait for message

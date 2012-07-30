@@ -30,6 +30,14 @@ Communicator::Communicator() {
 	_requestId = 0;
 	_maxFd = 0;
 
+	// select timeout
+	_timeoutSec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
+	_timeoutUsec = configLayer->getConfigInt(
+			"Communication>SelectTimeout>usec");
+
+	// chunk size
+	_chunkSize = configLayer->getConfigInt("Communication>ChunkSize");
+
 	debug("%s\n", "Communicator constructed");
 }
 
@@ -82,17 +90,11 @@ void Communicator::waitForMessage() {
 		_maxFd = serverSockfd;
 	}
 
-	// read select timeout value from config
-	const uint32_t timeoutSec = configLayer->getConfigInt(
-			"Communication>SelectTimeout>sec");
-	const uint32_t timeoutUsec = configLayer->getConfigInt(
-			"Communication>SelectTimeout>usec");
-
 	while (1) {
 
 		// reset timeout
-		tv.tv_sec = timeoutSec;
-		tv.tv_usec = timeoutUsec;
+		tv.tv_sec = _timeoutSec;
+		tv.tv_usec = _timeoutUsec;
 
 		FD_ZERO(&sockfdSet);
 

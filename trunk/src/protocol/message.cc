@@ -66,38 +66,44 @@ void Message::printHeader() {
 			<< _msgHeader.payloadSize << endl;
 }
 
-uint32_t Message::preparePayload(string filepath, uint32_t offset,
-		uint32_t length) {
+uint32_t Message::preparePayload(char* buf, uint32_t length) {
 
-	ifstream file;
-
-	_Ios_Iostate exceptionMask = ifstream::eofbit | ifstream::failbit
-			| ifstream::badbit;
-	file.exceptions(exceptionMask);
-
-	try {
-
-		// open file
-		_Ios_Openmode openMode = ios::in | ios::binary;
-		file.open(filepath.c_str(), openMode);
-
-		// seek file
-		file.seekg(offset, ios_base::beg);
-
-		// allocate memory:
-		_payload = MemoryPool::getInstance().poolMalloc(length);
-
-		// read data as a block:
-		file.read(_payload, length);
-
-	} catch (ifstream::failure &e) {
-		cerr << "Exception reading file" << endl;
-	}
-
-	// close file
-	file.close();
+	_payload = buf;
+	_msgHeader.payloadSize = length;
 
 	return 0;
+
+	// disabled as reading from file is performed in storagemodule
+
+	/*
+	 ifstream file;
+
+	 _Ios_Iostate exceptionMask = ifstream::eofbit | ifstream::failbit
+	 | ifstream::badbit;
+	 file.exceptions(exceptionMask);
+
+	 try {
+
+	 // open file
+	 _Ios_Openmode openMode = ios::in | ios::binary;
+	 file.open(filepath.c_str(), openMode);
+
+	 // seek file
+	 file.seekg(offset, ios_base::beg);
+
+	 // allocate memory:
+	 _payload = MemoryPool::getInstance().poolMalloc(length);
+
+	 // read data as a block:
+	 file.read(_payload, length);
+
+	 } catch (ifstream::failure &e) {
+	 cerr << "Exception reading file" << endl;
+	 }
+
+	 // close file
+	 file.close();
+	 */
 }
 
 struct MsgHeader Message::getMsgHeader() {

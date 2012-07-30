@@ -12,6 +12,15 @@ message: ${PROTO_SRC}
 
 mds: ${SRC}
 	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS} -DCOMPILE_FOR_MDS
+
+client: ${SRC}
+	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS} -DCOMPILE_FOR_CLIENT
+	
+monitor: ${SRC}
+	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS} -DCOMPILE_FOR_MONITOR
+	
+osd: ${SRC}
+	${CC} -c ${SRC} ${CFLAGS} ${LDFLAGS} -DCOMPILE_FOR_OSD
 	
 clean:
 	rm -f *.o

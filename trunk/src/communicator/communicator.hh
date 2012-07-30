@@ -128,7 +128,7 @@ public:
 	 */
 	static void sendThread(Communicator* communicator);
 
-private:
+protected:
 
 	/**
 	 * Runs in a separate detached thread
@@ -153,5 +153,9 @@ private:
 	list<Message *> _outMessageQueue; // queue of message to be sent
 	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
 	uint32_t _maxFd; // maximum number of socket descriptors among connections
+
+	// config values
+	uint32_t _timeoutSec, _timeoutUsec;
+	uint32_t _chunkSize;
 };
 #endif

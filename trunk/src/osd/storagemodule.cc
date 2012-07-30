@@ -10,14 +10,10 @@
 extern ConfigLayer* configLayer;
 
 StorageModule::StorageModule() {
-	/*
 	_objectFolder = configLayer->getConfigString(
-			"NcvfsConfig>Storage>ObjectLocation");
+			"Storage>ObjectLocation");
 	_segmentFolder = configLayer->getConfigString(
-			"NcvfsConfig>Storage>SegmentLocation");
-			*/
-	_objectFolder = "./object/";
-	_segmentFolder = "./segment/";
+			"Storage>SegmentLocation");
 	_capacity = 0;
 	_freespace = 0;
 }

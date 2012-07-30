@@ -16,7 +16,7 @@
     </Communication>
     
     <Storage>
-    	<ObjectLocation>./object/</ObjectLocation>
-    	<SegmentLocation>./segment/</SegmentLocation>
+    	<ObjectLocation>./osd_object/</ObjectLocation>
+    	<SegmentLocation>./osd_segment/</SegmentLocation>
     </Storage>
 </NcvfsConfig>
