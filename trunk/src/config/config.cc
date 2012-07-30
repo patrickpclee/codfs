@@ -124,7 +124,7 @@ TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 		tempHandle = tempHandle.FirstChild(namePtr);
 		tempElement = tempHandle.Element();
 		if(tempElement == NULL){
-			fprintf(stderr,"%s: %s not found in config\n",propertyTree,namePtr);
+			fprintf(stderr,"%s: %s Not in Specific Config, Cont. to Common Config\n",propertyTree,namePtr);
 			break;
 		}
 		namePtr = strtok(NULL,">");
@@ -132,6 +132,7 @@ TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 
 	if(tempElement != NULL)
 		found = true;
+	strcpy(propertyTree_,propertyTree);
 	// Search in Common Config
 	if(!found){
 		namePtr = strtok(propertyTree_,">");
@@ -141,7 +142,7 @@ TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 			tempHandle = tempHandle.FirstChild(namePtr);
 			tempElement = tempHandle.Element();
 			if(tempElement == NULL){
-				fprintf(stderr,"%s: %s not found in common config\n",propertyTree,namePtr);
+				fprintf(stderr,"%s: %s Not in Common Config\n",propertyTree,namePtr);
 				break;
 			}
 			namePtr = strtok(NULL,">");
