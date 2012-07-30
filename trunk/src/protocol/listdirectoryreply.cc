@@ -71,7 +71,6 @@ void ListDirectoryReplyMsg::handle() {
 			(ListDirectoryRequestMsg*) _communicator->findWaitReplyMessage(
 					_msgHeader.requestId);
 	listdirectoryrequest->setFolderData(_folderData);
-	debug("READY\n",1);
 	listdirectoryrequest->setStatus(READY);
 	return;
 }

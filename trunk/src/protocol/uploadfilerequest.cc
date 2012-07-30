@@ -84,7 +84,7 @@ void UploadFileRequestMsg::setPrimaryList (vector<uint32_t> primaryList) {
 	return ;
 }
 
-void UploadFileRequestMsg::setfileId (uint32_t fileId) {
+void UploadFileRequestMsg::setFileId (uint32_t fileId) {
 	_fileId = fileId;	
 
 	return ;

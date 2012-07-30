@@ -64,7 +64,6 @@ void ListDirectoryRequestMsg::parse(char* buf) {
 
 void ListDirectoryRequestMsg::handle() {
 #ifdef COMPILE_FOR_MDS
-	debug("LDR Handle\n",0);
 	mds->listFolderProcessor(_msgHeader.requestId,_sockfd,_clientId,_directoryPath);
 #endif
 }
