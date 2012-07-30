@@ -72,52 +72,32 @@ void UploadFileRequestMsg::printProtocol() {
 			<< _path << endl;
 }
 
-/**
- * @brief	Get the Future of the Folder Data
- *
- * @return	Future of the Folder Data
- */
-//future<vector<FileMetaData> > UploadFileRequestMsg::getFolderDataFuture() {
-//	return _folderData.get_future();
-//}
-
-future< vector<uint64_t> > UploadFileRequestMsg::getObjectIdListFuture () {
-	return _objectIdList.get_future();
-}
-
-future< vector<uint32_t> > UploadFileRequestMsg::getPrimaryListFuture () {
-	return _primaryList.get_future();
-}
-future< uint32_t > UploadFileRequestMsg::getFileIdFuture ()
-{
-	return _fileId.get_future();
-}
-
-/**
- * @brief	Set the Folder Data (Fulfill Promise)
- */
-//void UploadFileRequestMsg::setFolderDataValue(
-//		vector<FileMetaData> folderData) {
-//	_folderData.set_value(folderData);
-//
-//	return;
-//}
-void UploadFileRequestMsg::setObjectIdListValue (vector<uint64_t> objectIdList) {
-	_objectIdList.set_value(objectIdList);
+void UploadFileRequestMsg::setObjectIdList (vector<uint64_t> objectIdList) {
+	_objectIdList = objectIdList;
 
 	return ;
 }
 
-void UploadFileRequestMsg::setPrimaryListValue (vector<uint32_t> primaryList)
-{
-	_primaryList.set_value(primaryList);
+void UploadFileRequestMsg::setPrimaryList (vector<uint32_t> primaryList) {
+	_primaryList = primaryList;
 
 	return ;
 }
 
-void UploadFileRequestMsg::setfileIdValue (uint32_t fileId)
-{
-	_fileId.set_value(fileId);
+void UploadFileRequestMsg::setfileId (uint32_t fileId) {
+	_fileId = fileId;	
 
 	return ;
+}
+
+vector<uint64_t> UploadFileRequestMsg::getObjectIdList () {
+	return _objectIdList;
+}
+
+vector<uint32_t> UploadFileRequestMsg::getPrimaryList () {
+	return _primaryList;
+}
+
+uint32_t UploadFileRequestMsg::getFileId () {
+	return _fileId;
 }

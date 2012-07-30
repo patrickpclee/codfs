@@ -73,34 +73,25 @@ public:
 	void printProtocol ();
 
 	/**
-	 * @brief	Get the Future of the Folder Data
-	 *
-	 * @return	Future of the Folder Data
-	 */
-	//future< vector<FileMetaData> > getFolderDataFuture();
-	
-	future< vector<uint64_t> > getObjectIdListFuture ();
-	future< vector<uint32_t> > getPrimaryListFuture ();
-	future< uint32_t > getFileIdFuture ();
-
-
-	/**
-	 * @brief	Set the Object ID List (Fulfill Promise)
+	 * @brief	Set the Object ID List
 	 *
 	 * @param	objectList	Vector of Object ID
 	 */
-	void setObjectIdListValue (vector<uint64_t> objectIdList);
+	void setObjectIdList (vector<uint64_t> objectIdList);
+	void setPrimaryList (vector<uint32_t> primaryList);
+	void setFileId (uint32_t fileId);
 
-	void setPrimaryListValue (vector<uint32_t> primaryList);
-	void setfileIdValue (uint32_t fileId);
+	vector<uint64_t> getObjectIdList ();
+	vector<uint32_t> getPrimaryList ();
+	uint32_t getFileId ();
 
 private:
 	uint32_t _clientId;
 	string _path;
 
-	promise< vector<uint64_t> > _objectIdList;
-	promise< vector<uint32_t> > _primaryList;
-	promise< uint32_t > _fileId;
+	vector<uint64_t> _objectIdList;
+	vector<uint32_t> _primaryList;
+	uint32_t _fileId;
 };
 
 #endif
