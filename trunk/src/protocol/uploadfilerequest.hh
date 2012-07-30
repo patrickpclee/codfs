@@ -1,9 +1,9 @@
 /**
- * listdirectoryrequest.hh
+ * uploadfilerequest.hh
  */
 
-#ifndef __LISTDIRECTORYREQUESTHH__
-#define __LISTDIRECTORYREQUESTHH__
+#ifndef __UPLOAD_FILE_REQUEST_HH__
+#define __UPLOAD_FILE_REQUEST_HH__
 
 #include <string>
 #include <vector>
@@ -18,10 +18,10 @@ using namespace std;
 
 /**
  * Extends the Message class
- * Request to list files in a directory from MDS
+ * Requset to upload file
  */
 
-class ListDirectoryRequestMsg: public Message {
+class UploadFileRequestMsg: public Message {
 public:
 
 	/**
@@ -30,7 +30,7 @@ public:
 	 * @param	communicator	Communicator the Message belongs to
 	 */
 
-	ListDirectoryRequestMsg (Communicator* communicator);
+	UploadFileRequestMsg (Communicator* communicator);
 
 	/**
 	 * Constructor - Save parameters in private variables
@@ -41,7 +41,7 @@ public:
 	 * @param	path	Requested directory path
 	 */
 
-	ListDirectoryRequestMsg (Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path);
+	UploadFileRequestMsg (Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -77,20 +77,30 @@ public:
 	 *
 	 * @return	Future of the Folder Data
 	 */
-	future< vector<FileMetaData> > getFolderDataFuture ();
+	//future< vector<FileMetaData> > getFolderDataFuture();
+	
+	future< vector<uint64_t> > getObjectIdListFuture ();
+	future< vector<uint32_t> > getPrimaryListFuture ();
+	future< uint32_t > getFileIdFuture ();
+
 
 	/**
-	 * @brief	Set the Folder Data (Fulfill Promise)
+	 * @brief	Set the Object ID List (Fulfill Promise)
 	 *
-	 * @param	folderData	Vector of File Meta Data
+	 * @param	objectList	Vector of Object ID
 	 */
-	void setFolderDataValue (vector<FileMetaData> folderData);
+	void setObjectIdListValue (vector<uint64_t> objectIdList);
+
+	void setPrimaryListValue (vector<uint32_t> primaryList);
+	void setfileIdValue (uint32_t fileId);
 
 private:
-	promise< vector<FileMetaData> > _folderData;
 	uint32_t _clientId;
-//	uint32_t _osdId;
-	string _directoryPath;
+	string _path;
+
+	promise< vector<uint64_t> > _objectIdList;
+	promise< vector<uint32_t> > _primaryList;
+	promise< uint32_t > _fileId;
 };
 
 #endif
