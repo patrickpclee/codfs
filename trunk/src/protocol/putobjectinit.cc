@@ -60,6 +60,5 @@ void PutObjectInitMsg::handle() {
 }
 
 void PutObjectInitMsg::printProtocol() {
-	cout << "[PUT_OBJECT_INIT] objectID = " << _objectId << " Length = "
-			<< _objectSize << endl;
+	debug ("[PUT_OBJECT_INIT] Object ID = %lu, Length = %lu\n", _objectId, _objectSize);
 }

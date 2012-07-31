@@ -8,6 +8,7 @@
 #include <fstream>
 #include <ios>
 #include "../communicator/communicator.hh"
+#include "../common/debug.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
 #include "../common/debug.hh"
@@ -65,13 +66,12 @@ void Message::setPayload(char* payload) {
 }
 
 void Message::printHeader() {
-	cout << "[MsgHeader] Type = " << _msgHeader.protocolMsgType << " Size = "
-			<< _msgHeader.protocolMsgSize << " Payload Size = "
-			<< _msgHeader.payloadSize << endl;
+	debug("[MsgHeader] Type = %d Size = %d, PayloadSize = %d\n",
+			_msgHeader.protocolMsgType, _msgHeader.protocolMsgSize, _msgHeader.payloadSize);
 }
 
 void Message::printPayloadHex() {
-	printhex (_payload, _msgHeader.payloadSize);
+	printhex(_payload, _msgHeader.payloadSize);
 }
 
 uint32_t Message::preparePayload(char* buf, uint32_t length) {
@@ -80,38 +80,6 @@ uint32_t Message::preparePayload(char* buf, uint32_t length) {
 	_msgHeader.payloadSize = length;
 
 	return 0;
-
-	// disabled as reading from file is performed in storagemodule
-
-	/*
-	 ifstream file;
-
-	 _Ios_Iostate exceptionMask = ifstream::eofbit | ifstream::failbit
-	 | ifstream::badbit;
-	 file.exceptions(exceptionMask);
-
-	 try {
-
-	 // open file
-	 _Ios_Openmode openMode = ios::in | ios::binary;
-	 file.open(filepath.c_str(), openMode);
-
-	 // seek file
-	 file.seekg(offset, ios_base::beg);
-
-	 // allocate memory:
-	 _payload = MemoryPool::getInstance().poolMalloc(length);
-
-	 // read data as a block:
-	 file.read(_payload, length);
-
-	 } catch (ifstream::failure &e) {
-	 cerr << "Exception reading file" << endl;
-	 }
-
-	 // close file
-	 file.close();
-	 */
 }
 
 struct MsgHeader Message::getMsgHeader() {
@@ -130,13 +98,12 @@ uint32_t Message::getSockfd() {
 	return _sockfd;
 }
 
-
-MessageStatus Message::waitForStatusChange () {
-	return _status.get_future().get();	
+MessageStatus Message::waitForStatusChange() {
+	return _status.get_future().get();
 }
 
-void Message::setStatus (MessageStatus status) {
+void Message::setStatus(MessageStatus status) {
 	_status.set_value(status);
-	return ;
+	return;
 }
 

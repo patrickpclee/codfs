@@ -6,6 +6,7 @@
 #include "uploadfilerequest.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/debug.hh"
 #include "../mds/mds.hh"
 
 #ifdef COMPILE_FOR_MDS
@@ -68,36 +69,36 @@ void UploadFileRequestMsg::handle() {
 }
 
 void UploadFileRequestMsg::printProtocol() {
-	cout << "[UPLOAD_FILE_REQUEST] client ID = " << _clientId << " Path = "
-			<< _path << endl;
+	debug("[UPLOAD_FILE_REQUEST] Client ID = %d, Path = %s\n", _clientId,
+			_path.c_str());
 }
 
-void UploadFileRequestMsg::setObjectIdList (vector<uint64_t> objectIdList) {
+void UploadFileRequestMsg::setObjectIdList(vector<uint64_t> objectIdList) {
 	_objectIdList = objectIdList;
 
-	return ;
+	return;
 }
 
-void UploadFileRequestMsg::setPrimaryList (vector<uint32_t> primaryList) {
+void UploadFileRequestMsg::setPrimaryList(vector<uint32_t> primaryList) {
 	_primaryList = primaryList;
 
-	return ;
+	return;
 }
 
-void UploadFileRequestMsg::setFileId (uint32_t fileId) {
-	_fileId = fileId;	
+void UploadFileRequestMsg::setFileId(uint32_t fileId) {
+	_fileId = fileId;
 
-	return ;
+	return;
 }
 
-vector<uint64_t> UploadFileRequestMsg::getObjectIdList () {
+vector<uint64_t> UploadFileRequestMsg::getObjectIdList() {
 	return _objectIdList;
 }
 
-vector<uint32_t> UploadFileRequestMsg::getPrimaryList () {
+vector<uint32_t> UploadFileRequestMsg::getPrimaryList() {
 	return _primaryList;
 }
 
-uint32_t UploadFileRequestMsg::getFileId () {
+uint32_t UploadFileRequestMsg::getFileId() {
 	return _fileId;
 }

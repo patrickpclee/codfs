@@ -69,19 +69,19 @@ void ListDirectoryRequestMsg::handle() {
 }
 
 void ListDirectoryRequestMsg::printProtocol() {
-	cout << "[LIST_DIRECTORY_REQUEST] osdID = " << _clientId << " Path = "
-			<< _directoryPath << endl;
+	debug("[LIST_DIRECTORY_REQUEST] OSD ID = %d Path = %s\n",
+			_clientId, _directoryPath.c_str());
 }
 
 /**
  * @brief	Set the Folder Data
  */
-void ListDirectoryRequestMsg::setFolderData (vector<FileMetaData> folderData) {
+void ListDirectoryRequestMsg::setFolderData(vector<FileMetaData> folderData) {
 	_folderData = folderData;
 
-	return ;
+	return;
 }
 
-vector<FileMetaData> ListDirectoryRequestMsg::getFolderData () {
+vector<FileMetaData> ListDirectoryRequestMsg::getFolderData() {
 	return _folderData;
 }

@@ -333,7 +333,7 @@ void Communicator::sendThread(Communicator* communicator) {
  * 2. Get the MsgType from the MsgHeader
  * 3. Use the MessageFactory to obtain a new Message object
  * 4. Fill in the socket descriptor into the Message
- * 5. message->parse()
+ * 5. message->parse() and fill in payload pointer
  * 6. start new thread for message->handle()
  */
 
@@ -363,5 +363,10 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 }
 
 uint32_t Communicator::generateRequestId() {
-	return ++_requestId; // requestId is atomic
+
+	// increment _requestId
+	
+	_requestId.store(_requestId.load() + 1);
+	return _requestId.load();
+	
 }

@@ -111,15 +111,12 @@ void Osd::getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
 void Osd::putObjectInitProcessor(uint32_t sockfd, uint64_t objectId,
 		uint32_t length) {
 
-	debug ("%s\n", "putObjectInitProcessor");
 	_storageModule->createObject(objectId, length);
 
 }
 
 uint32_t Osd::putObjectDataProcessor(uint32_t sockfd, uint64_t objectId,
 		uint64_t offset, uint32_t length, char* buf) {
-
-	debug ("%s\n", "putObjectDataProcessor");
 
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeObject(objectId, buf, offset, length);
@@ -128,7 +125,6 @@ uint32_t Osd::putObjectDataProcessor(uint32_t sockfd, uint64_t objectId,
 }
 
 void Osd::putObjectEndProcessor(uint32_t sockfd, uint64_t objectId) {
-	debug ("%s\n", "putObjectEndProcessor");
 	_storageModule->closeObject(objectId);
 }
 

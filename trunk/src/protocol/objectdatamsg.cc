@@ -6,11 +6,11 @@
 #include "../client/client.hh"
 
 #ifdef COMPILE_FOR_OSD
-	extern Osd* osd;
+extern Osd* osd;
 #endif
 
 #ifdef COMPILE_FOR_CLIENT
-	extern Client* client;
+extern Client* client;
 #endif
 
 ObjectDataMsg::ObjectDataMsg(Communicator* communicator) :
@@ -68,6 +68,6 @@ void ObjectDataMsg::handle() {
 }
 
 void ObjectDataMsg::printProtocol() {
-	cout << "[OBJECT_DATA] objectID = " << _objectId << " Offset = " << _offset << " Length = " << _length
-			<< endl;
+	debug("[OBJECT_DATA] Object ID = %lu, offset = %lu, length = %d\n",
+			_objectId, _offset, _length);
 }

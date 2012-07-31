@@ -1,3 +1,4 @@
+#include <iostream>
 #include "client_communicator.hh"
 
 #include "../common/debug.hh"
@@ -80,6 +81,8 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 	putObjectEnd(clientId, dstOsdSockfd, objectId);
 
 	debug ("%s\n", "Put Object End Sent");
+
+	cout << "Put Object Finished" << endl;
 
 }
 

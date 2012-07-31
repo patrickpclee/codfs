@@ -49,7 +49,7 @@ public:
 
 private:
 	uint64_t _objectId;
-	uint32_t _objectSize;
+	uint64_t _objectSize;
 };
 
 #endif

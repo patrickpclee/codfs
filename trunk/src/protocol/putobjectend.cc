@@ -57,5 +57,5 @@ void PutObjectEndMsg::handle() {
 }
 
 void PutObjectEndMsg::printProtocol() {
-	cout << "[PUT_OBJECT_END] objectID = " << _objectId << endl;
+	debug ("[PUT_OBJECT_END] Object ID = %lu\n", _objectId);
 }

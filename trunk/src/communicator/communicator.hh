@@ -147,8 +147,9 @@ protected:
 
 	void dispatch(char* buf, uint32_t sockfd);
 
-	Socket _serverSocket; // socket for accepting incoming connections
 	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
+
+	Socket _serverSocket; // socket for accepting incoming connections
 	map<uint32_t, Connection*> _connectionMap; // a map of all connections
 	list<Message *> _outMessageQueue; // queue of message to be sent
 	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
