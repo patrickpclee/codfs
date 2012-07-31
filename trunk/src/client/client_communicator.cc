@@ -5,7 +5,7 @@
 #include "../common/objectdata.hh"
 #include "../protocol/listdirectoryrequest.hh"
 
-#include "../protocol/putobjectinit.hh"
+#include "../protocol/putobjectinitrequest.hh"
 #include "../protocol/objectdatamsg.hh"
 #include "../protocol/putobjectend.hh"
 
@@ -47,8 +47,6 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize);
 	debug ("%s\n", "Put Object Init Sent");
-
-	sleep (1);
 
 	// Step 2 : Send data chunk by chunk
 
@@ -95,14 +93,19 @@ void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	// Step 1 of the upload process
 
-	PutObjectInitMsg* putObjectInitMsg = new PutObjectInitMsg(this,
+	PutObjectInitRequestMsg* putObjectInitRequestMsg = new PutObjectInitRequestMsg(this,
 			dstOsdSockfd, objectId, length);
 
-	putObjectInitMsg->prepareProtocolMsg();
-	addMessage(putObjectInitMsg, false);
+	putObjectInitRequestMsg->prepareProtocolMsg();
+	addMessage(putObjectInitRequestMsg, true);
 
-	// putObjectInitMsg->printHeader();
-	// putObjectInitMsg->printProtocol();
+	MessageStatus status = putObjectInitRequestMsg->waitForStatusChange();
+	if(status == READY) {
+		return;
+	} else {
+		debug("%s\n", "Put Object Init Failed");
+		exit (-1);
+	}
 
 }
 

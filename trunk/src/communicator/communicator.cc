@@ -224,6 +224,12 @@ void Communicator::sendMessage() {
 				continue;
 			}
 
+			if (!(_connectionMap.count(sockfd))) {
+				debug ("%s\n", "Connection not found!");
+				map<uint32_t, Connection*>::iterator p; // connectionMap iterator
+				exit (-1);
+			}
+
 			_connectionMap[sockfd]->sendMessage(message);
 
 			// debug

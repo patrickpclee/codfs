@@ -1,5 +1,5 @@
-#ifndef __PUTOBJECTINIT_HH__
-#define __PUTOBJECTINIT_HH__
+#ifndef __PUTOBJECTINITREPLY_HH__
+#define __PUTOBJECTINITREPLY_HH__
 
 #include "message.hh"
 
@@ -10,13 +10,13 @@ using namespace std;
  * Initiate an object upload
  */
 
-class PutObjectInitMsg: public Message {
+class PutObjectInitReplyMsg: public Message {
 public:
 
-	PutObjectInitMsg(Communicator* communicator);
+	PutObjectInitReplyMsg(Communicator* communicator);
 
-	PutObjectInitMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t objectId, uint32_t objectSize);
+	PutObjectInitReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t osdSockfd,
+			uint64_t objectId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -49,7 +49,6 @@ public:
 
 private:
 	uint64_t _objectId;
-	uint64_t _objectSize;
 };
 
 #endif

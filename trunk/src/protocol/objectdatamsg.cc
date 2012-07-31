@@ -63,7 +63,7 @@ void ObjectDataMsg::parse(char* buf) {
 
 void ObjectDataMsg::handle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putObjectDataProcessor(_sockfd, _objectId, _offset, _length, _payload);
+	osd->putObjectDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _offset, _length, _payload);
 #endif
 }
 

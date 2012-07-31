@@ -35,8 +35,8 @@ Osd::~Osd() {
  * 2. Insert the new list into the cache
  */
 
-uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
-		vector<SegmentLocation> osdList) {
+uint32_t Osd::osdListProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, vector<SegmentLocation> osdList) {
 
 	_segmentLocationCache->deleteSegmentLocation(objectId);
 	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
@@ -48,7 +48,8 @@ uint32_t Osd::osdListProcessor(uint32_t sockfd, uint64_t objectId,
  * Send the object to the target
  */
 
-void Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
+void Osd::getObjectProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId) {
 
 	vector<struct SegmentData> segmentDataList;
 	vector<struct SegmentLocation> osdIdList;
@@ -57,7 +58,7 @@ void Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 	if (_storageModule->isObjectExist(objectId)) {
 		// if object exists in cache
 		objectData = _storageModule->readObject(objectId, 0);
-		debug ("Object read from cache data = %s\n", objectData.buf);
+		debug("Object read from cache data = %s\n", objectData.buf);
 	} else {
 		// get osdIDList from cache, if failed update it from MDS
 		try {
@@ -98,8 +99,8 @@ void Osd::getObjectProcessor(uint32_t sockfd, uint64_t objectId) {
 	return;
 }
 
-void Osd::getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
-		uint32_t segmentId) {
+void Osd::getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId) {
 
 	struct SegmentData segmentData;
 	segmentData = _storageModule->readSegment(objectId, segmentId);
@@ -108,15 +109,16 @@ void Osd::getSegmentProcessor(uint32_t sockfd, uint64_t objectId,
 	return;
 }
 
-void Osd::putObjectInitProcessor(uint32_t sockfd, uint64_t objectId,
-		uint32_t length) {
+void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint32_t length) {
 
 	_storageModule->createObject(objectId, length);
+	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
 }
 
-uint32_t Osd::putObjectDataProcessor(uint32_t sockfd, uint64_t objectId,
-		uint64_t offset, uint32_t length, char* buf) {
+uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeObject(objectId, buf, offset, length);
@@ -124,19 +126,21 @@ uint32_t Osd::putObjectDataProcessor(uint32_t sockfd, uint64_t objectId,
 	return byteWritten;
 }
 
-void Osd::putObjectEndProcessor(uint32_t sockfd, uint64_t objectId) {
+void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId) {
 	_storageModule->closeObject(objectId);
 }
 
-void Osd::putSegmentInitProcessor(uint32_t sockfd, uint64_t objectId,
-		uint32_t segmentId, uint32_t length) {
+void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId, uint32_t length) {
 
 	_storageModule->createSegment(objectId, segmentId, length);
 
 }
 
-uint32_t Osd::putSegmentDataProcessor(uint32_t sockfd, uint64_t objectId,
-		uint32_t segmentId, uint32_t offset, uint32_t length, char* buf) {
+uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId, uint32_t offset, uint32_t length,
+		char* buf) {
 
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeSegment(objectId, segmentId, buf, offset,
@@ -145,12 +149,12 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t sockfd, uint64_t objectId,
 	return byteWritten;
 }
 
-void Osd::putSegmentEndProcessor(uint32_t sockfd, uint64_t objectId,
-		uint32_t segmentId) {
+void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId) {
 	_storageModule->closeSegment(objectId, segmentId);
 }
 
-void Osd::recoveryProcessor(uint32_t sockfd) {
+void Osd::recoveryProcessor(uint32_t requestId, uint32_t sockfd) {
 	// TODO: recovery to be implemented
 }
 
@@ -160,6 +164,12 @@ OsdCommunicator* Osd::getCommunicator() {
 
 SegmentLocationCache* Osd::getSegmentLocationCache() {
 	return _segmentLocationCache;
+}
+
+void sendThread() {
+	debug("%s", "Send Thread Start\n");
+	osd->getCommunicator()->sendMessage();
+	debug("%s", "Send Thread End\n");
 }
 
 /**
@@ -172,38 +182,25 @@ int main(void) {
 	// create new OSD object and communicator
 	osd = new Osd();
 
-
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
 
-	/*
-
-	// TEST FILE WRITE
-	const char* testBuf = "abcdefghijklmnopqrstuvwxyz";
-	osd->putObjectInitProcessor(1, 1, strlen(testBuf));
-	osd->putObjectDataProcessor(1, 1, 0, strlen(testBuf), (char*)testBuf);
-	osd->putObjectEndProcessor(1, 1);
-
-	// TEST FILE READ
-	osd->getObjectProcessor(1, 1);
-
-	*/
-
-
-	 // start server
-	 const uint16_t serverPort = configLayer->getConfigInt(
-	 "Communication>ServerPort");
-	 debug("Start server on port %d\n", serverPort);
-	 communicator->createServerSocket(serverPort);
+	// start server
+	const uint16_t serverPort = configLayer->getConfigInt(
+			"Communication>ServerPort");
+	debug("Start server on port %d\n", serverPort);
+	communicator->createServerSocket(serverPort);
 	/*
 
 	 // connect to MDS
 	 //communicator->connectToMds();
 	 */
 
-	 // wait for message (blocking)
-	 communicator->waitForMessage();
+	thread t(sendThread);
+	t.detach();
 
+	// wait for message (blocking)
+	communicator->waitForMessage();
 
 	// cleanup
 	delete configLayer;

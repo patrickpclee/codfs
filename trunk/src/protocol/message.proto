@@ -39,7 +39,7 @@ message UploadFileReplyPro {
 // CLIENT -> OSD
 //
 
-message PutObjectInitPro {
+message PutObjectInitRequestPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 objectSize = 2;
 }
@@ -52,6 +52,14 @@ message ObjectDataPro {
 	optional fixed64 objectId = 1;
 	optional fixed64 offset = 2;
 	optional fixed32 length = 3;
+}
+
+//
+// OSD -> CLIENT
+//
+
+message PutObjectInitReplyPro {
+	optional fixed64 objectId = 1;
 }
 
 //

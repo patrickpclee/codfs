@@ -7,6 +7,7 @@
 #include "osd_communicator.hh"
 #include "../common/enums.hh"
 #include "../protocol/listdirectoryrequest.hh"
+#include "../protocol/putobjectinitreply.hh"
 #include "../common/debug.hh"
 #include "segmentlocationcache.hh"
 #include "../common/segmentdata.hh"
@@ -43,6 +44,19 @@ void OsdCommunicator::connectToMds() {
 
 	// do connection
 	connectAndAdd(ip, port, connectionType);
+}
+
+void OsdCommunicator::replyPutObjectInit(uint32_t requestId,
+		uint32_t connectionId, uint64_t objectId) {
+
+	PutObjectInitReplyMsg* putObjectInitReplyMsg = new PutObjectInitReplyMsg(
+			this, requestId, connectionId, objectId);
+	putObjectInitReplyMsg->prepareProtocolMsg();
+
+	debug ("REPLY requestID = %d, sockfd = %d\n", requestId, connectionId);
+
+	addMessage(putObjectInitReplyMsg);
+	return;
 }
 
 uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {

@@ -7,7 +7,8 @@
 #include "../protocol/message.hh"
 #include "../protocol/listdirectoryrequest.hh"
 #include "../protocol/listdirectoryreply.hh"
-#include "../protocol/putobjectinit.hh"
+#include "../protocol/putobjectinitrequest.hh"
+#include "../protocol/putobjectinitreply.hh"
 #include "../protocol/objectdatamsg.hh"
 #include "../protocol/putobjectend.hh"
 #include "messagefactory.hh"
@@ -29,8 +30,11 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (LIST_DIRECTORY_REPLY):
 		return new ListDirectoryReplyMsg(communicator);
 		break;
-	case (PUT_OBJECT_INIT):
-		return new PutObjectInitMsg(communicator);
+	case (PUT_OBJECT_INIT_REQUEST):
+		return new PutObjectInitRequestMsg(communicator);
+		break;
+	case (PUT_OBJECT_INIT_REPLY):
+		return new PutObjectInitReplyMsg(communicator);
 		break;
 	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);
