@@ -18,7 +18,7 @@ mutex fileMutex;
 ClientStorageModule::ClientStorageModule() {
 	// read config value
 	_objectSize = configLayer->getConfigLong("Storage>ObjectSize") * 1024;
-	debug ("Config Object Size = %lu Bytes\n", _objectSize);
+	debug("Config Object Size = %lu Bytes\n", _objectSize);
 }
 
 uint32_t ClientStorageModule::getObjectCount(string filepath) {
@@ -26,7 +26,7 @@ uint32_t ClientStorageModule::getObjectCount(string filepath) {
 
 	if (!in) {
 		debug("%s\n", "ERROR: Cannot open file");
-		exit (-1);
+		exit(-1);
 	}
 
 	// check filesize
@@ -56,26 +56,26 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 	// index starts from 0
 	const uint64_t offset = objectIndex * _objectSize;
 
-	FILE* file = fopen (filepath.c_str(), "rb");
+	FILE* file = fopen(filepath.c_str(), "rb");
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot open");
-		exit (-1);
+		exit(-1);
 	}
 
 	// Read Lock
-	if (flock(fileno(file),LOCK_SH) == -1) {
-		debug ("%s\n", "ERROR: Cannot LOCK_SH");
-		exit (-1);
+	if (flock(fileno(file), LOCK_SH) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_SH");
+		exit(-1);
 	}
 
 	// check filesize
-	fseek (file, 0, SEEK_END);
-	uint64_t filesize = ftell (file);
+	fseek(file, 0, SEEK_END);
+	uint64_t filesize = ftell(file);
 
 	if (offset >= filesize) {
 		debug("%s\n", "ERROR: offset exceeds filesize");
-		exit (-1);
+		exit(-1);
 	}
 
 	if (filesize - offset > _objectSize) {
@@ -86,21 +86,20 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 
 	// Read file contents into buffer
 	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead); // TODO: when free object?
-	fseek(file, offset, SEEK_SET);
-	uint32_t byteRead = fread(objectData.buf, 1, byteToRead, file);
+	uint32_t byteRead = pread(fileno(file), objectData.buf, byteToRead, offset);
 
 	// Release lock
-	if (flock(fileno(file),LOCK_UN) == -1) {
-		debug ("%s\n", "ERROR: Cannot LOCK_UN");
-		exit (-1);
+	if (flock(fileno(file), LOCK_UN) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_UN");
+		exit(-1);
 	}
 
 	if (byteRead != byteToRead) {
 		debug("ERROR: Length = %d, byteRead = %d\n", byteToRead, byteRead);
-		exit (-1);
+		exit(-1);
 	}
 
-	fclose (file);
+	fclose(file);
 
 	// fill in information about object
 	objectData.info.objectSize = byteToRead;

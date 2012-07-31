@@ -19,10 +19,8 @@ mutex fileMutex;
 mutex openedFileMutex;
 
 StorageModule::StorageModule() {
-	_objectFolder = configLayer->getConfigString(
-			"Storage>ObjectLocation");
-	_segmentFolder = configLayer->getConfigString(
-			"Storage>SegmentLocation");
+	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
+	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
 	_capacity = 0;
 	_freespace = 0;
 }
@@ -56,11 +54,11 @@ bool StorageModule::isObjectExist(uint64_t objectId) {
 
 	// TEST OBJECT READ
 	/*
-	ObjectInfo objectInfo = readObjectInfo(objectId);
-	if (objectInfo.objectSize == 0) {
-		return false;
-	}
-	*/
+	 ObjectInfo objectInfo = readObjectInfo(objectId);
+	 if (objectInfo.objectSize == 0) {
+	 return false;
+	 }
+	 */
 
 	return true;
 }
@@ -84,7 +82,8 @@ struct ObjectData StorageModule::readObject(uint64_t objectId,
 	// TODO: when free?
 	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
-	readFile(objectData.info.objectPath, objectData.buf, offsetInObject, byteToRead);
+	readFile(objectData.info.objectPath, objectData.buf, offsetInObject,
+			byteToRead);
 
 	debug("Object ID = %lu read %d bytes at offset %lu\n",
 			objectId, byteToRead, offsetInObject);
@@ -112,7 +111,8 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 	// TODO: when free?
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
-	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment, byteToRead);
+	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,
+			byteToRead);
 
 	debug("Object ID = %lu Segment ID = %d read %d bytes at offset %lu\n",
 			objectId, segmentId, byteToRead, offsetInSegment);
@@ -153,7 +153,7 @@ FILE* StorageModule::createAndOpenObject(uint64_t objectId, uint32_t length) {
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
 
-	debug ("Object ID = %lu created\n", objectId);
+	debug("Object ID = %lu created\n", objectId);
 
 	return createFile(filepath);
 }
@@ -164,7 +164,7 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	writeSegmentInfo(objectId, segmentId, length, filepath);
 
-	debug ("Object ID = %lu Segment ID = %d created\n", objectId, segmentId);
+	debug("Object ID = %lu Segment ID = %d created\n", objectId, segmentId);
 
 	return createFile(filepath);
 }
@@ -173,14 +173,14 @@ void StorageModule::closeObject(uint64_t objectId) {
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	closeFile(filepath);
 
-	debug ("Object ID = %lu closed\n", objectId);
+	debug("Object ID = %lu closed\n", objectId);
 }
 
 void StorageModule::closeSegment(uint64_t objectId, uint32_t segmentId) {
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	closeFile(filepath);
 
-	debug ("Object ID = %lu Segment ID = %d closed\n", objectId, segmentId);
+	debug("Object ID = %lu Segment ID = %d closed\n", objectId, segmentId);
 }
 
 uint32_t StorageModule::getCapacity() {
@@ -240,28 +240,27 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot read");
-		exit (-1);
+		exit(-1);
 	}
 
 	// Read Lock
-	if (flock(fileno(file),LOCK_SH) == -1) {
-		debug ("%s\n", "ERROR: Cannot LOCK_SH");
-		exit (-1);
+	if (flock(fileno(file), LOCK_SH) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_SH");
+		exit(-1);
 	}
 
 	// Read file contents into buffer
-	fseek(file, offset, SEEK_SET);
-	uint32_t byteRead = fread(buf, 1, length, file);
+	uint32_t byteRead = pread(fileno(file), buf, length, offset);
 
 	// Release lock
-	if (flock(fileno(file),LOCK_UN) == -1) {
-		debug ("%s\n", "ERROR: Cannot LOCK_UN");
-		exit (-1);
+	if (flock(fileno(file), LOCK_UN) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_UN");
+		exit(-1);
 	}
 
 	if (byteRead != length) {
 		debug("ERROR: Length = %d, byteRead = %d\n", length, byteRead);
-		exit (-1);
+		exit(-1);
 	}
 
 	return byteRead;
@@ -274,33 +273,32 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	lock_guard<mutex> lk(fileMutex);
 
 	FILE* file = openFile(filepath);
-	debug ("fileptr = %p\n", file);
+	debug("fileptr = %p\n", file);
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot write");
-		exit (-1);
+		exit(-1);
 	}
 
 	// Write Lock
-	if (flock(fileno(file),LOCK_EX) == -1) {
-		debug ("%s\n", "ERROR: Cannot LOCK_EX");
-		exit (-1);
+	if (flock(fileno(file), LOCK_EX) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_EX");
+		exit(-1);
 	}
 
 	// Write file contents from buffer
-	fseek(file, offset, SEEK_SET);
-	uint32_t byteWritten = fwrite(buf, 1, length, file);
-	fflush (file);
+	uint32_t byteWritten = pwrite (fileno(file), buf, length, offset);
+	fflush(file);
 
 	// Release lock
-	if (flock(fileno(file),LOCK_UN) == -1) {
-		debug ("%s\n", "ERROR: Cannot LOCK_UN");
-		exit (-1);
+	if (flock(fileno(file), LOCK_UN) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_UN");
+		exit(-1);
 	}
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
-		exit (-1);
+		exit(-1);
 	}
 
 	return byteWritten;
@@ -339,7 +337,7 @@ FILE* StorageModule::createFile(string filepath) {
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "wb+");
 
-	debug ("fileptr = %p\n", filePtr);
+	debug("fileptr = %p\n", filePtr);
 
 	if (filePtr == NULL) {
 		debug("%s\n", "Unable to create file!");
@@ -360,12 +358,11 @@ FILE* StorageModule::createFile(string filepath) {
 
 FILE* StorageModule::openFile(string filepath) {
 
-
 	openedFileMutex.lock();
 
 	// find file in map
 	if (_openedFile.count(filepath)) {
-		debug ("%s\n", "File already opened");
+		debug("%s\n", "File already opened");
 		FILE* openedFile = _openedFile[filepath];
 		openedFileMutex.unlock();
 		return openedFile;

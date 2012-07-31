@@ -94,6 +94,7 @@ uint32_t Connection::sendMessage(Message* message) {
 
 	debug ("Payload sent %d bytes\n", byteSent);
 
+
 	return totalByteSent;
 }
 
