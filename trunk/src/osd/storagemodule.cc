@@ -3,12 +3,17 @@
  */
 
 #include <sstream>
+#include <stdlib.h>
+#include <thread>
+#include <sys/file.h>
 #include "storagemodule.hh"
-#include "stdlib.h"
 #include "../common/debug.hh"
 
 // global variable defined in each component
 extern ConfigLayer* configLayer;
+
+// Global Mutex for locking file during read / write
+mutex fileMutex;
 
 StorageModule::StorageModule() {
 	_objectFolder = configLayer->getConfigString(
@@ -225,19 +230,35 @@ struct SegmentInfo StorageModule::readSegmentInfo(uint64_t objectId,
 uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length) {
 
+	// lock file access function
+	lock_guard<mutex> lk(fileMutex);
+
 	FILE* file = openFile(filepath);
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot read");
-		return -1;
+		exit (-1);
+	}
+
+	// Read Lock
+	if (flock(fileno(file),LOCK_SH) == -1) {
+		debug ("%s\n", "ERROR: Cannot LOCK_SH");
+		exit (-1);
 	}
 
 	// Read file contents into buffer
 	fseek(file, offset, SEEK_SET);
 	uint32_t byteRead = fread(buf, 1, length, file);
 
+	// Release lock
+	if (flock(fileno(file),LOCK_UN) == -1) {
+		debug ("%s\n", "ERROR: Cannot LOCK_UN");
+		exit (-1);
+	}
+
 	if (byteRead != length) {
 		debug("ERROR: Length = %d, byteRead = %d\n", length, byteRead);
+		exit (-1);
 	}
 
 	return byteRead;
@@ -246,26 +267,36 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length) {
 
+	// lock file access function
+	lock_guard<mutex> lk(fileMutex);
+
 	FILE* file = openFile(filepath);
 	debug ("fileptr = %p\n", file);
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot write");
-		return -1;
+		exit (-1);
 	}
 
-	// TODO: lock here
+	// Write Lock
+	if (flock(fileno(file),LOCK_EX) == -1) {
+		debug ("%s\n", "ERROR: Cannot LOCK_EX");
+		exit (-1);
+	}
 
 	// Write file contents from buffer
 	fseek(file, offset, SEEK_SET);
-
-	debug ("fseek to %lu\n", offset);
-
 	uint32_t byteWritten = fwrite(buf, 1, length, file);
+	fflush (file);
+
+	// Release lock
+	if (flock(fileno(file),LOCK_UN) == -1) {
+		debug ("%s\n", "ERROR: Cannot LOCK_UN");
+		exit (-1);
+	}
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
-		perror ("fwrite");
 		exit (-1);
 	}
 

@@ -47,6 +47,8 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize);
 	debug ("%s\n", "Put Object Init Sent");
 
+	sleep (1);
+
 	// Step 2 : Send data chunk by chunk
 
 	uint64_t byteToSend = 0;
@@ -65,7 +67,11 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 				byteToSend);
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
+
+//		usleep (100*1000);
 	}
+
+	sleep (1);
 
 	debug ("%s\n", "All Put Object Data Sent");
 
@@ -105,6 +111,7 @@ void ClientCommunicator::putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
 
 	objectDataMsg->prepareProtocolMsg();
 	objectDataMsg->preparePayload(buf + offset, length);
+
 	addMessage(objectDataMsg, false);
 
 }

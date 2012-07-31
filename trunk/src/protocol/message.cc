@@ -70,6 +70,10 @@ void Message::printHeader() {
 			<< _msgHeader.payloadSize << endl;
 }
 
+void Message::printPayloadHex() {
+	printhex (_payload, _msgHeader.payloadSize);
+}
+
 uint32_t Message::preparePayload(char* buf, uint32_t length) {
 
 	_payload = buf;

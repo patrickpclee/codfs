@@ -135,6 +135,12 @@ public:
 
 	virtual void printProtocol() = 0;
 
+	/**
+	 * DEBUG: Dump the payload to stdout in hex format
+	 */
+
+	void printPayloadHex();
+
 protected:
 	uint32_t _sockfd;		// destination
 	struct MsgHeader _msgHeader;

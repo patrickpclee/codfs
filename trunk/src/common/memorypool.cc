@@ -15,7 +15,7 @@ MemoryPool::~MemoryPool() {
 
 char* MemoryPool::poolMalloc(uint32_t length) {
 	// TODO: use malloc for now, real pool implementation needed
-	return (char*)malloc(length);
+	return (char*)calloc(length, 1);
 }
 
 void MemoryPool::poolFree(char* ptr) {

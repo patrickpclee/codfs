@@ -229,6 +229,7 @@ void Communicator::sendMessage() {
 			// debug
 
 			message->printHeader();
+			//message->printPayloadHex();
 			debug("Message (ID: %d) FD = %d removed from queue\n",
 					message->getMsgHeader().requestId, sockfd);
 		}
@@ -346,14 +347,14 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	message->setSockfd(sockfd);
 	message->parse(buf);
 
-	if (msgHeader.payloadSize > 0) {
-		message->setPayload(
-				buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
-	}
+	// set payload pointer
+	message->setPayload(
+			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
 
 	// debug
 	message->printHeader();
 	message->printProtocol();
+	//message->printPayloadHex();
 
 	thread t(handleThread, message);
 	t.detach();
