@@ -15,6 +15,9 @@ extern ConfigLayer* configLayer;
 // Global Mutex for locking file during read / write
 mutex fileMutex;
 
+// Global Mutex for locking _openedFile
+mutex openedFileMutex;
+
 StorageModule::StorageModule() {
 	_objectFolder = configLayer->getConfigString(
 			"Storage>ObjectLocation");
@@ -344,7 +347,10 @@ FILE* StorageModule::createFile(string filepath) {
 	}
 
 	// add file pointer to map
+	openedFileMutex.lock();
 	_openedFile[filepath] = filePtr;
+	openedFileMutex.unlock();
+
 	return filePtr;
 }
 
@@ -354,11 +360,18 @@ FILE* StorageModule::createFile(string filepath) {
 
 FILE* StorageModule::openFile(string filepath) {
 
+
+	openedFileMutex.lock();
+
 	// find file in map
 	if (_openedFile.count(filepath)) {
 		debug ("%s\n", "File already opened");
-		return _openedFile[filepath];
+		FILE* openedFile = _openedFile[filepath];
+		openedFileMutex.unlock();
+		return openedFile;
 	}
+
+	openedFileMutex.unlock();
 
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "rb+");
@@ -369,7 +382,11 @@ FILE* StorageModule::openFile(string filepath) {
 	}
 
 	// add file pointer to map
+
+	openedFileMutex.lock();
 	_openedFile[filepath] = filePtr;
+	openedFileMutex.unlock();
+
 	return filePtr;
 }
 
@@ -380,6 +397,10 @@ FILE* StorageModule::openFile(string filepath) {
 void StorageModule::closeFile(string filepath) {
 
 	FILE* filePtr = openFile(filepath);
+
+	openedFileMutex.lock();
 	_openedFile.erase(filepath);
+	openedFileMutex.unlock();
+
 	fclose(filePtr);
 }
