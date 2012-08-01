@@ -10,7 +10,6 @@
 #include "../protocol/putobjectinitrequest.hh"
 #include "../protocol/putobjectinitreply.hh"
 #include "../protocol/objectdatamsg.hh"
-#include "../protocol/putobjectend.hh"
 #include "messagefactory.hh"
 
 MessageFactory::MessageFactory() {
@@ -38,9 +37,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);
-		break;
-	case (PUT_OBJECT_END):
-		return new PutObjectEndMsg(communicator);
 		break;
 
 	default:

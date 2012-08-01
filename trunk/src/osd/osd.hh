@@ -94,10 +94,11 @@ public:
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param length Object size, equals the total length of all the trunks
+	 * @param chunkCount number of chunks that will be received
 	 */
 
 	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
-			uint32_t length);
+			uint32_t length, uint32_t chunkCount);
 
 	/**
 	 * Action when an object trunk is received
@@ -111,15 +112,6 @@ public:
 
 	uint32_t putObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
 			uint64_t offset, uint32_t length, char* buf);
-
-	/**
-	 * Action when the object done message is received
-	 * Verify and close the object in the storage
-	 * @param sockfd Socket Descriptor of message source
-	 * @param objectId Object ID
-	 */
-
-	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
 
 	/**
 	 * Action when a put object request is received
@@ -146,15 +138,6 @@ public:
 
 	uint32_t putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
 			uint32_t segmentId, uint32_t offset, uint32_t length, char* buf);
-
-	/**
-	 * Action when the segment done message is received
-	 * @param sockfd Socket Descriptor of the message source
-	 * @param objectId Object ID
-	 * @param segmentId Segment ID
-	 */
-
-	void putSegmentEndProcessor (uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Action when a recovery request is received
@@ -233,6 +216,8 @@ private:
 
 //	Coding _cunit; // encode & decode done here
 	uint32_t _osdId;
+
+	map <uint64_t, uint32_t> _pendingObjectChunk;
 
 };
 #endif

@@ -42,10 +42,7 @@ message UploadFileReplyPro {
 message PutObjectInitRequestPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 objectSize = 2;
-}
-
-message PutObjectEndPro {
-	optional fixed64 objectId = 1;
+	optional fixed32 chunkCount = 3;
 }
 
 message ObjectDataPro {
@@ -70,11 +67,7 @@ message PutSegmentInitPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 segmentId = 2;
 	optional fixed32 segmentSize = 3;
-}
-
-message PutSegmentEndPro {
-	optional fixed64 objectId = 1;
-	optional fixed32 segmentId = 2;
+	optional fixed32 chunkCount = 4;
 }
 
 message SegmentDataPro {

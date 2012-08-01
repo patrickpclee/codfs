@@ -2,6 +2,7 @@
  * osd.cc
  */
 
+#include <thread>
 #include <stdio.h>
 #include <vector>
 #include "osd.hh"
@@ -14,6 +15,9 @@ Osd* osd;
 
 /// Config Object
 ConfigLayer* configLayer;
+
+// Global Mutex for locking _pendingObjectChunk
+mutex pendingObjectChunkMutex;
 
 Osd::Osd() {
 	configLayer = new ConfigLayer("osdconfig.xml", "common.xml");
@@ -110,7 +114,13 @@ void Osd::getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint32_t length) {
+		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
+
+	// initialize chunkCount value
+	pendingObjectChunkMutex.lock();
+	_pendingObjectChunk [objectId] = chunkCount;
+	debug ("pending object chunk = %d chunkCount = %d \n", _pendingObjectChunk[objectId], chunkCount);
+	pendingObjectChunkMutex.unlock();
 
 	_storageModule->createObject(objectId, length);
 	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
@@ -123,12 +133,20 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeObject(objectId, buf, offset, length);
 
-	return byteWritten;
-}
+	pendingObjectChunkMutex.lock();
 
-void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId) {
-	_storageModule->closeObject(objectId);
+	// update pendingObjectChunk value
+	_pendingObjectChunk [objectId] = _pendingObjectChunk[objectId] - 1;
+
+	// close object if no more chunks
+	if (_pendingObjectChunk[objectId] == 0) {
+		_storageModule->closeObject(objectId);
+		_pendingObjectChunk.erase(objectId);
+	}
+
+	pendingObjectChunkMutex.unlock();
+
+	return byteWritten;
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
@@ -147,11 +165,6 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 			length);
 
 	return byteWritten;
-}
-
-void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint32_t segmentId) {
-	_storageModule->closeSegment(objectId, segmentId);
 }
 
 void Osd::recoveryProcessor(uint32_t requestId, uint32_t sockfd) {

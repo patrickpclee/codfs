@@ -35,9 +35,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* PutObjectInitRequestPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   PutObjectInitRequestPro_reflection_ = NULL;
-const ::google::protobuf::Descriptor* PutObjectEndPro_descriptor_ = NULL;
-const ::google::protobuf::internal::GeneratedMessageReflection*
-  PutObjectEndPro_reflection_ = NULL;
 const ::google::protobuf::Descriptor* ObjectDataPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ObjectDataPro_reflection_ = NULL;
@@ -47,9 +44,6 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* PutSegmentInitPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   PutSegmentInitPro_reflection_ = NULL;
-const ::google::protobuf::Descriptor* PutSegmentEndPro_descriptor_ = NULL;
-const ::google::protobuf::internal::GeneratedMessageReflection*
-  PutSegmentEndPro_reflection_ = NULL;
 const ::google::protobuf::Descriptor* SegmentDataPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   SegmentDataPro_reflection_ = NULL;
@@ -146,9 +140,10 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(UploadFileReplyPro));
   PutObjectInitRequestPro_descriptor_ = file->message_type(5);
-  static const int PutObjectInitRequestPro_offsets_[2] = {
+  static const int PutObjectInitRequestPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, objectsize_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, chunkcount_),
   };
   PutObjectInitRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -161,22 +156,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutObjectInitRequestPro));
-  PutObjectEndPro_descriptor_ = file->message_type(6);
-  static const int PutObjectEndPro_offsets_[1] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectEndPro, objectid_),
-  };
-  PutObjectEndPro_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
-      PutObjectEndPro_descriptor_,
-      PutObjectEndPro::default_instance_,
-      PutObjectEndPro_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectEndPro, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectEndPro, _unknown_fields_),
-      -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(PutObjectEndPro));
-  ObjectDataPro_descriptor_ = file->message_type(7);
+  ObjectDataPro_descriptor_ = file->message_type(6);
   static const int ObjectDataPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ObjectDataPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ObjectDataPro, offset_),
@@ -193,7 +173,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ObjectDataPro));
-  PutObjectInitReplyPro_descriptor_ = file->message_type(8);
+  PutObjectInitReplyPro_descriptor_ = file->message_type(7);
   static const int PutObjectInitReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitReplyPro, objectid_),
   };
@@ -208,11 +188,12 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutObjectInitReplyPro));
-  PutSegmentInitPro_descriptor_ = file->message_type(9);
-  static const int PutSegmentInitPro_offsets_[3] = {
+  PutSegmentInitPro_descriptor_ = file->message_type(8);
+  static const int PutSegmentInitPro_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentInitPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentInitPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentInitPro, segmentsize_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentInitPro, chunkcount_),
   };
   PutSegmentInitPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -225,23 +206,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutSegmentInitPro));
-  PutSegmentEndPro_descriptor_ = file->message_type(10);
-  static const int PutSegmentEndPro_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentEndPro, objectid_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentEndPro, segmentid_),
-  };
-  PutSegmentEndPro_reflection_ =
-    new ::google::protobuf::internal::GeneratedMessageReflection(
-      PutSegmentEndPro_descriptor_,
-      PutSegmentEndPro::default_instance_,
-      PutSegmentEndPro_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentEndPro, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentEndPro, _unknown_fields_),
-      -1,
-      ::google::protobuf::DescriptorPool::generated_pool(),
-      ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(PutSegmentEndPro));
-  SegmentDataPro_descriptor_ = file->message_type(11);
+  SegmentDataPro_descriptor_ = file->message_type(9);
   static const int SegmentDataPro_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SegmentDataPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SegmentDataPro, segmentid_),
@@ -284,15 +249,11 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     PutObjectInitRequestPro_descriptor_, &PutObjectInitRequestPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    PutObjectEndPro_descriptor_, &PutObjectEndPro::default_instance());
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     ObjectDataPro_descriptor_, &ObjectDataPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     PutObjectInitReplyPro_descriptor_, &PutObjectInitReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     PutSegmentInitPro_descriptor_, &PutSegmentInitPro::default_instance());
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    PutSegmentEndPro_descriptor_, &PutSegmentEndPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     SegmentDataPro_descriptor_, &SegmentDataPro::default_instance());
 }
@@ -312,16 +273,12 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete UploadFileReplyPro_reflection_;
   delete PutObjectInitRequestPro::default_instance_;
   delete PutObjectInitRequestPro_reflection_;
-  delete PutObjectEndPro::default_instance_;
-  delete PutObjectEndPro_reflection_;
   delete ObjectDataPro::default_instance_;
   delete ObjectDataPro_reflection_;
   delete PutObjectInitReplyPro::default_instance_;
   delete PutObjectInitReplyPro_reflection_;
   delete PutSegmentInitPro::default_instance_;
   delete PutSegmentInitPro_reflection_;
-  delete PutSegmentEndPro::default_instance_;
-  delete PutSegmentEndPro_reflection_;
   delete SegmentDataPro::default_instance_;
   delete SegmentDataPro_reflection_;
 }
@@ -342,18 +299,16 @@ void protobuf_AddDesc_message_2eproto() {
     " \001(\007\022\020\n\010fileSize\030\002 \001(\006\022\020\n\010fileName\030\003 \001(\t"
     "\"a\n\022UploadFileReplyPro\022\016\n\006fileId\030\001 \002(\007\022\020"
     "\n\010numOfObj\030\002 \002(\007\022\024\n\014objectIdList\030\003 \003(\006\022\023"
-    "\n\013primaryList\030\004 \003(\007\"\?\n\027PutObjectInitRequ"
+    "\n\013primaryList\030\004 \003(\007\"S\n\027PutObjectInitRequ"
     "estPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobjectSize\030\002"
-    " \001(\007\"#\n\017PutObjectEndPro\022\020\n\010objectId\030\001 \001("
-    "\006\"A\n\rObjectDataPro\022\020\n\010objectId\030\001 \001(\006\022\016\n\006"
-    "offset\030\002 \001(\006\022\016\n\006length\030\003 \001(\007\")\n\025PutObjec"
-    "tInitReplyPro\022\020\n\010objectId\030\001 \001(\006\"M\n\021PutSe"
-    "gmentInitPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmen"
-    "tId\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001(\007\"7\n\020PutSeg"
-    "mentEndPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentI"
-    "d\030\002 \001(\007\"U\n\016SegmentDataPro\022\020\n\010objectId\030\001 "
-    "\001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016"
-    "\n\006length\030\004 \001(\007", 814);
+    " \001(\007\022\022\n\nchunkCount\030\003 \001(\007\"A\n\rObjectDataPr"
+    "o\022\020\n\010objectId\030\001 \001(\006\022\016\n\006offset\030\002 \001(\006\022\016\n\006l"
+    "ength\030\003 \001(\007\")\n\025PutObjectInitReplyPro\022\020\n\010"
+    "objectId\030\001 \001(\006\"a\n\021PutSegmentInitPro\022\020\n\010o"
+    "bjectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013segm"
+    "entSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"U\n\016Seg"
+    "mentDataPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegment"
+    "Id\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006length\030\004 \001(\007", 760);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   ListDirectoryRequestPro::default_instance_ = new ListDirectoryRequestPro();
@@ -362,11 +317,9 @@ void protobuf_AddDesc_message_2eproto() {
   FileInfoPro::default_instance_ = new FileInfoPro();
   UploadFileReplyPro::default_instance_ = new UploadFileReplyPro();
   PutObjectInitRequestPro::default_instance_ = new PutObjectInitRequestPro();
-  PutObjectEndPro::default_instance_ = new PutObjectEndPro();
   ObjectDataPro::default_instance_ = new ObjectDataPro();
   PutObjectInitReplyPro::default_instance_ = new PutObjectInitReplyPro();
   PutSegmentInitPro::default_instance_ = new PutSegmentInitPro();
-  PutSegmentEndPro::default_instance_ = new PutSegmentEndPro();
   SegmentDataPro::default_instance_ = new SegmentDataPro();
   ListDirectoryRequestPro::default_instance_->InitAsDefaultInstance();
   UploadFileRequestPro::default_instance_->InitAsDefaultInstance();
@@ -374,11 +327,9 @@ void protobuf_AddDesc_message_2eproto() {
   FileInfoPro::default_instance_->InitAsDefaultInstance();
   UploadFileReplyPro::default_instance_->InitAsDefaultInstance();
   PutObjectInitRequestPro::default_instance_->InitAsDefaultInstance();
-  PutObjectEndPro::default_instance_->InitAsDefaultInstance();
   ObjectDataPro::default_instance_->InitAsDefaultInstance();
   PutObjectInitReplyPro::default_instance_->InitAsDefaultInstance();
   PutSegmentInitPro::default_instance_->InitAsDefaultInstance();
-  PutSegmentEndPro::default_instance_->InitAsDefaultInstance();
   SegmentDataPro::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
 }
@@ -1759,6 +1710,7 @@ void UploadFileReplyPro::Swap(UploadFileReplyPro* other) {
 #ifndef _MSC_VER
 const int PutObjectInitRequestPro::kObjectIdFieldNumber;
 const int PutObjectInitRequestPro::kObjectSizeFieldNumber;
+const int PutObjectInitRequestPro::kChunkCountFieldNumber;
 #endif  // !_MSC_VER
 
 PutObjectInitRequestPro::PutObjectInitRequestPro()
@@ -1779,6 +1731,7 @@ void PutObjectInitRequestPro::SharedCtor() {
   _cached_size_ = 0;
   objectid_ = GOOGLE_ULONGLONG(0);
   objectsize_ = 0u;
+  chunkcount_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1815,6 +1768,7 @@ void PutObjectInitRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     objectid_ = GOOGLE_ULONGLONG(0);
     objectsize_ = 0u;
+    chunkcount_ = 0u;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1853,6 +1807,22 @@ bool PutObjectInitRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(29)) goto parse_chunkCount;
+        break;
+      }
+      
+      // optional fixed32 chunkCount = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_chunkCount:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &chunkcount_)));
+          set_has_chunkcount();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1885,6 +1855,11 @@ void PutObjectInitRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->objectsize(), output);
   }
   
+  // optional fixed32 chunkCount = 3;
+  if (has_chunkcount()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->chunkcount(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1901,6 +1876,11 @@ void PutObjectInitRequestPro::SerializeWithCachedSizes(
   // optional fixed32 objectSize = 2;
   if (has_objectsize()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->objectsize(), target);
+  }
+  
+  // optional fixed32 chunkCount = 3;
+  if (has_chunkcount()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->chunkcount(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -1921,6 +1901,11 @@ int PutObjectInitRequestPro::ByteSize() const {
     
     // optional fixed32 objectSize = 2;
     if (has_objectsize()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 chunkCount = 3;
+    if (has_chunkcount()) {
       total_size += 1 + 4;
     }
     
@@ -1957,6 +1942,9 @@ void PutObjectInitRequestPro::MergeFrom(const PutObjectInitRequestPro& from) {
     if (from.has_objectsize()) {
       set_objectsize(from.objectsize());
     }
+    if (from.has_chunkcount()) {
+      set_chunkcount(from.chunkcount());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1982,6 +1970,7 @@ void PutObjectInitRequestPro::Swap(PutObjectInitRequestPro* other) {
   if (other != this) {
     std::swap(objectid_, other->objectid_);
     std::swap(objectsize_, other->objectsize_);
+    std::swap(chunkcount_, other->chunkcount_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -1993,211 +1982,6 @@ void PutObjectInitRequestPro::Swap(PutObjectInitRequestPro* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = PutObjectInitRequestPro_descriptor_;
   metadata.reflection = PutObjectInitRequestPro_reflection_;
-  return metadata;
-}
-
-
-// ===================================================================
-
-#ifndef _MSC_VER
-const int PutObjectEndPro::kObjectIdFieldNumber;
-#endif  // !_MSC_VER
-
-PutObjectEndPro::PutObjectEndPro()
-  : ::google::protobuf::Message() {
-  SharedCtor();
-}
-
-void PutObjectEndPro::InitAsDefaultInstance() {
-}
-
-PutObjectEndPro::PutObjectEndPro(const PutObjectEndPro& from)
-  : ::google::protobuf::Message() {
-  SharedCtor();
-  MergeFrom(from);
-}
-
-void PutObjectEndPro::SharedCtor() {
-  _cached_size_ = 0;
-  objectid_ = GOOGLE_ULONGLONG(0);
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
-}
-
-PutObjectEndPro::~PutObjectEndPro() {
-  SharedDtor();
-}
-
-void PutObjectEndPro::SharedDtor() {
-  if (this != default_instance_) {
-  }
-}
-
-void PutObjectEndPro::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* PutObjectEndPro::descriptor() {
-  protobuf_AssignDescriptorsOnce();
-  return PutObjectEndPro_descriptor_;
-}
-
-const PutObjectEndPro& PutObjectEndPro::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
-}
-
-PutObjectEndPro* PutObjectEndPro::default_instance_ = NULL;
-
-PutObjectEndPro* PutObjectEndPro::New() const {
-  return new PutObjectEndPro;
-}
-
-void PutObjectEndPro::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    objectid_ = GOOGLE_ULONGLONG(0);
-  }
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
-  mutable_unknown_fields()->Clear();
-}
-
-bool PutObjectEndPro::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
-  ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional fixed64 objectId = 1;
-      case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
-                 input, &objectid_)));
-          set_has_objectid();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectAtEnd()) return true;
-        break;
-      }
-      
-      default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-  return true;
-#undef DO_
-}
-
-void PutObjectEndPro::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // optional fixed64 objectId = 1;
-  if (has_objectid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed64(1, this->objectid(), output);
-  }
-  
-  if (!unknown_fields().empty()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        unknown_fields(), output);
-  }
-}
-
-::google::protobuf::uint8* PutObjectEndPro::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // optional fixed64 objectId = 1;
-  if (has_objectid()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(1, this->objectid(), target);
-  }
-  
-  if (!unknown_fields().empty()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        unknown_fields(), target);
-  }
-  return target;
-}
-
-int PutObjectEndPro::ByteSize() const {
-  int total_size = 0;
-  
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional fixed64 objectId = 1;
-    if (has_objectid()) {
-      total_size += 1 + 8;
-    }
-    
-  }
-  if (!unknown_fields().empty()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        unknown_fields());
-  }
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-  return total_size;
-}
-
-void PutObjectEndPro::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const PutObjectEndPro* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const PutObjectEndPro*>(
-      &from);
-  if (source == NULL) {
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-    MergeFrom(*source);
-  }
-}
-
-void PutObjectEndPro::MergeFrom(const PutObjectEndPro& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_objectid()) {
-      set_objectid(from.objectid());
-    }
-  }
-  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
-}
-
-void PutObjectEndPro::CopyFrom(const ::google::protobuf::Message& from) {
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void PutObjectEndPro::CopyFrom(const PutObjectEndPro& from) {
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool PutObjectEndPro::IsInitialized() const {
-  
-  return true;
-}
-
-void PutObjectEndPro::Swap(PutObjectEndPro* other) {
-  if (other != this) {
-    std::swap(objectid_, other->objectid_);
-    std::swap(_has_bits_[0], other->_has_bits_[0]);
-    _unknown_fields_.Swap(&other->_unknown_fields_);
-    std::swap(_cached_size_, other->_cached_size_);
-  }
-}
-
-::google::protobuf::Metadata PutObjectEndPro::GetMetadata() const {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::Metadata metadata;
-  metadata.descriptor = PutObjectEndPro_descriptor_;
-  metadata.reflection = PutObjectEndPro_reflection_;
   return metadata;
 }
 
@@ -2694,6 +2478,7 @@ void PutObjectInitReplyPro::Swap(PutObjectInitReplyPro* other) {
 const int PutSegmentInitPro::kObjectIdFieldNumber;
 const int PutSegmentInitPro::kSegmentIdFieldNumber;
 const int PutSegmentInitPro::kSegmentSizeFieldNumber;
+const int PutSegmentInitPro::kChunkCountFieldNumber;
 #endif  // !_MSC_VER
 
 PutSegmentInitPro::PutSegmentInitPro()
@@ -2715,6 +2500,7 @@ void PutSegmentInitPro::SharedCtor() {
   objectid_ = GOOGLE_ULONGLONG(0);
   segmentid_ = 0u;
   segmentsize_ = 0u;
+  chunkcount_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -2752,6 +2538,7 @@ void PutSegmentInitPro::Clear() {
     objectid_ = GOOGLE_ULONGLONG(0);
     segmentid_ = 0u;
     segmentsize_ = 0u;
+    chunkcount_ = 0u;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -2806,6 +2593,22 @@ bool PutSegmentInitPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(37)) goto parse_chunkCount;
+        break;
+      }
+      
+      // optional fixed32 chunkCount = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_chunkCount:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &chunkcount_)));
+          set_has_chunkcount();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -2843,6 +2646,11 @@ void PutSegmentInitPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->segmentsize(), output);
   }
   
+  // optional fixed32 chunkCount = 4;
+  if (has_chunkcount()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(4, this->chunkcount(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2864,6 +2672,11 @@ void PutSegmentInitPro::SerializeWithCachedSizes(
   // optional fixed32 segmentSize = 3;
   if (has_segmentsize()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->segmentsize(), target);
+  }
+  
+  // optional fixed32 chunkCount = 4;
+  if (has_chunkcount()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(4, this->chunkcount(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -2889,6 +2702,11 @@ int PutSegmentInitPro::ByteSize() const {
     
     // optional fixed32 segmentSize = 3;
     if (has_segmentsize()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 chunkCount = 4;
+    if (has_chunkcount()) {
       total_size += 1 + 4;
     }
     
@@ -2928,6 +2746,9 @@ void PutSegmentInitPro::MergeFrom(const PutSegmentInitPro& from) {
     if (from.has_segmentsize()) {
       set_segmentsize(from.segmentsize());
     }
+    if (from.has_chunkcount()) {
+      set_chunkcount(from.chunkcount());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2954,6 +2775,7 @@ void PutSegmentInitPro::Swap(PutSegmentInitPro* other) {
     std::swap(objectid_, other->objectid_);
     std::swap(segmentid_, other->segmentid_);
     std::swap(segmentsize_, other->segmentsize_);
+    std::swap(chunkcount_, other->chunkcount_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -2965,249 +2787,6 @@ void PutSegmentInitPro::Swap(PutSegmentInitPro* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = PutSegmentInitPro_descriptor_;
   metadata.reflection = PutSegmentInitPro_reflection_;
-  return metadata;
-}
-
-
-// ===================================================================
-
-#ifndef _MSC_VER
-const int PutSegmentEndPro::kObjectIdFieldNumber;
-const int PutSegmentEndPro::kSegmentIdFieldNumber;
-#endif  // !_MSC_VER
-
-PutSegmentEndPro::PutSegmentEndPro()
-  : ::google::protobuf::Message() {
-  SharedCtor();
-}
-
-void PutSegmentEndPro::InitAsDefaultInstance() {
-}
-
-PutSegmentEndPro::PutSegmentEndPro(const PutSegmentEndPro& from)
-  : ::google::protobuf::Message() {
-  SharedCtor();
-  MergeFrom(from);
-}
-
-void PutSegmentEndPro::SharedCtor() {
-  _cached_size_ = 0;
-  objectid_ = GOOGLE_ULONGLONG(0);
-  segmentid_ = 0u;
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
-}
-
-PutSegmentEndPro::~PutSegmentEndPro() {
-  SharedDtor();
-}
-
-void PutSegmentEndPro::SharedDtor() {
-  if (this != default_instance_) {
-  }
-}
-
-void PutSegmentEndPro::SetCachedSize(int size) const {
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-}
-const ::google::protobuf::Descriptor* PutSegmentEndPro::descriptor() {
-  protobuf_AssignDescriptorsOnce();
-  return PutSegmentEndPro_descriptor_;
-}
-
-const PutSegmentEndPro& PutSegmentEndPro::default_instance() {
-  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
-}
-
-PutSegmentEndPro* PutSegmentEndPro::default_instance_ = NULL;
-
-PutSegmentEndPro* PutSegmentEndPro::New() const {
-  return new PutSegmentEndPro;
-}
-
-void PutSegmentEndPro::Clear() {
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    objectid_ = GOOGLE_ULONGLONG(0);
-    segmentid_ = 0u;
-  }
-  ::memset(_has_bits_, 0, sizeof(_has_bits_));
-  mutable_unknown_fields()->Clear();
-}
-
-bool PutSegmentEndPro::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
-  ::google::protobuf::uint32 tag;
-  while ((tag = input->ReadTag()) != 0) {
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional fixed64 objectId = 1;
-      case 1: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
-                 input, &objectid_)));
-          set_has_objectid();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectTag(21)) goto parse_segmentId;
-        break;
-      }
-      
-      // optional fixed32 segmentId = 2;
-      case 2: {
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
-         parse_segmentId:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
-                 input, &segmentid_)));
-          set_has_segmentid();
-        } else {
-          goto handle_uninterpreted;
-        }
-        if (input->ExpectAtEnd()) return true;
-        break;
-      }
-      
-      default: {
-      handle_uninterpreted:
-        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
-          return true;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-  return true;
-#undef DO_
-}
-
-void PutSegmentEndPro::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // optional fixed64 objectId = 1;
-  if (has_objectid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed64(1, this->objectid(), output);
-  }
-  
-  // optional fixed32 segmentId = 2;
-  if (has_segmentid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->segmentid(), output);
-  }
-  
-  if (!unknown_fields().empty()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        unknown_fields(), output);
-  }
-}
-
-::google::protobuf::uint8* PutSegmentEndPro::SerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // optional fixed64 objectId = 1;
-  if (has_objectid()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(1, this->objectid(), target);
-  }
-  
-  // optional fixed32 segmentId = 2;
-  if (has_segmentid()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->segmentid(), target);
-  }
-  
-  if (!unknown_fields().empty()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        unknown_fields(), target);
-  }
-  return target;
-}
-
-int PutSegmentEndPro::ByteSize() const {
-  int total_size = 0;
-  
-  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional fixed64 objectId = 1;
-    if (has_objectid()) {
-      total_size += 1 + 8;
-    }
-    
-    // optional fixed32 segmentId = 2;
-    if (has_segmentid()) {
-      total_size += 1 + 4;
-    }
-    
-  }
-  if (!unknown_fields().empty()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        unknown_fields());
-  }
-  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
-  _cached_size_ = total_size;
-  GOOGLE_SAFE_CONCURRENT_WRITES_END();
-  return total_size;
-}
-
-void PutSegmentEndPro::MergeFrom(const ::google::protobuf::Message& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  const PutSegmentEndPro* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const PutSegmentEndPro*>(
-      &from);
-  if (source == NULL) {
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-    MergeFrom(*source);
-  }
-}
-
-void PutSegmentEndPro::MergeFrom(const PutSegmentEndPro& from) {
-  GOOGLE_CHECK_NE(&from, this);
-  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_objectid()) {
-      set_objectid(from.objectid());
-    }
-    if (from.has_segmentid()) {
-      set_segmentid(from.segmentid());
-    }
-  }
-  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
-}
-
-void PutSegmentEndPro::CopyFrom(const ::google::protobuf::Message& from) {
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void PutSegmentEndPro::CopyFrom(const PutSegmentEndPro& from) {
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool PutSegmentEndPro::IsInitialized() const {
-  
-  return true;
-}
-
-void PutSegmentEndPro::Swap(PutSegmentEndPro* other) {
-  if (other != this) {
-    std::swap(objectid_, other->objectid_);
-    std::swap(segmentid_, other->segmentid_);
-    std::swap(_has_bits_[0], other->_has_bits_[0]);
-    _unknown_fields_.Swap(&other->_unknown_fields_);
-    std::swap(_cached_size_, other->_cached_size_);
-  }
-}
-
-::google::protobuf::Metadata PutSegmentEndPro::GetMetadata() const {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::Metadata metadata;
-  metadata.descriptor = PutSegmentEndPro_descriptor_;
-  metadata.reflection = PutSegmentEndPro_reflection_;
   return metadata;
 }
 

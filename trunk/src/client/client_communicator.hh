@@ -44,10 +44,11 @@ private:
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
 	 * @param objectId Object ID
 	 * @param length Size of the object
+	 * @param chunkCount Number of chunks that will be sent
 	 */
 
 	void putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd, uint64_t objectId,
-			uint32_t length);
+			uint32_t length, uint32_t chunkCount);
 
 	/**
 	 * Send an object chunk to OSD (Step 2)

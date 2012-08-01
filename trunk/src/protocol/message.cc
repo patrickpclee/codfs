@@ -25,6 +25,7 @@ Message::Message(Communicator* communicator) {
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
 	_protocolMsg = "";
 	_sockfd = 0;
+	_msgHeader.requestId = 0;
 	_msgHeader.payloadSize = 0;
 	_msgHeader.protocolMsgSize = 0;
 	_msgHeader.protocolMsgType = DEFAULT;

@@ -27,7 +27,8 @@ Communicator::Communicator() {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 	debug("%s\n", "ProtoBuf Version Verified");
 
-	_requestId = 0;
+	_requestId.store(0);
+	debug ("Initialized _requestId = %d\n", _requestId.load());
 	_maxFd = 0;
 
 	// select timeout

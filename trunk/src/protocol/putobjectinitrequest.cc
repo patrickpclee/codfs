@@ -14,12 +14,13 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator) :
 }
 
 PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
-		uint32_t osdSockfd, uint64_t objectId, uint32_t objectSize) :
+		uint32_t osdSockfd, uint64_t objectId, uint32_t objectSize, uint32_t chunkCount) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
 	_objectId = objectId;
 	_objectSize = objectSize;
+	_chunkCount = chunkCount;
 }
 
 void PutObjectInitRequestMsg::prepareProtocolMsg() {
@@ -28,6 +29,7 @@ void PutObjectInitRequestMsg::prepareProtocolMsg() {
 	ncvfs::PutObjectInitRequestPro putObjectInitRequestPro;
 	putObjectInitRequestPro.set_objectid(_objectId);
 	putObjectInitRequestPro.set_objectsize(_objectSize);
+	putObjectInitRequestPro.set_chunkcount(_chunkCount);
 
 	if (!putObjectInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -50,16 +52,17 @@ void PutObjectInitRequestMsg::parse(char* buf) {
 
 	_objectId = putObjectInitRequestPro.objectid();
 	_objectSize = putObjectInitRequestPro.objectsize();
+	_chunkCount = putObjectInitRequestPro.chunkcount();
 
 }
 
 void PutObjectInitRequestMsg::handle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _objectSize);
+	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _objectSize, _chunkCount);
 #endif
 }
 
 void PutObjectInitRequestMsg::printProtocol() {
-	debug("[PUT_OBJECT_INIT_REQUEST] Object ID = %lu, Length = %lu\n",
-			_objectId, _objectSize);
+	debug("[PUT_OBJECT_INIT_REQUEST] Object ID = %lu, Length = %lu, Count = %d\n",
+			_objectId, _objectSize, _chunkCount);
 }

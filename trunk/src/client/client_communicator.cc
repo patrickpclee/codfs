@@ -7,7 +7,6 @@
 
 #include "../protocol/putobjectinitrequest.hh"
 #include "../protocol/objectdatamsg.hh"
-#include "../protocol/putobjectend.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
@@ -42,10 +41,11 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 	const uint64_t objectId = objectData.info.objectId;
 	char* buf = objectData.buf;
 
+	const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
 
-	// Step 1 : Send Init message
+	// Step 1 : Send Init message (wait for reply)
 
-	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize);
+	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount);
 	debug ("%s\n", "Put Object Init Sent");
 
 	// Step 2 : Send data chunk by chunk
@@ -70,16 +70,6 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 //		usleep (100*1000);
 	}
 
-	sleep (1);
-
-	debug ("%s\n", "All Put Object Data Sent");
-
-	// Step 3: Send End message
-
-	putObjectEnd(clientId, dstOsdSockfd, objectId);
-
-	debug ("%s\n", "Put Object End Sent");
-
 	cout << "Put Object Finished" << endl;
 
 }
@@ -89,12 +79,12 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 //
 
 void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
-		uint64_t objectId, uint32_t length) {
+		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
 
 	// Step 1 of the upload process
 
 	PutObjectInitRequestMsg* putObjectInitRequestMsg = new PutObjectInitRequestMsg(this,
-			dstOsdSockfd, objectId, length);
+			dstOsdSockfd, objectId, length, chunkCount);
 
 	putObjectInitRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectInitRequestMsg, true);
@@ -120,17 +110,6 @@ void ClientCommunicator::putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
 
 	addMessage(objectDataMsg, false);
 
-}
-
-void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
-		uint64_t objectId) {
-
-	// Step 3 of the upload process
-
-	PutObjectEndMsg* putObjectEndMsg = new PutObjectEndMsg (this, dstOsdSockfd, objectId);
-
-	putObjectEndMsg->prepareProtocolMsg();
-	addMessage(putObjectEndMsg, false);
 }
 
 //
