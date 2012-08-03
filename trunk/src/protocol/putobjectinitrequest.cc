@@ -2,6 +2,7 @@
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../osd/osd.hh"
 
 #ifdef COMPILE_FOR_OSD
@@ -60,6 +61,8 @@ void PutObjectInitRequestMsg::handle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _objectSize, _chunkCount);
 #endif
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutObjectInitRequestMsg::printProtocol() {

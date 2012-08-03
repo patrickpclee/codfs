@@ -30,12 +30,10 @@ Message::Message(Communicator* communicator) {
 	_msgHeader.protocolMsgSize = 0;
 	_msgHeader.protocolMsgType = DEFAULT;
 	_payload = NULL;
+	_recvBuf = NULL;
 }
 
 Message::~Message() {
-	if (_payload != NULL) {
-		MemoryPool::getInstance().poolFree(_payload);
-	}
 }
 
 void Message::setProtocolType(MsgType protocolType) {
@@ -64,6 +62,10 @@ void Message::setRequestId(uint32_t requestId) {
 
 void Message::setPayload(char* payload) {
 	_payload = payload;
+}
+
+void Message::setRecvBuf(char* recvBuf) {
+	_recvBuf = recvBuf;
 }
 
 void Message::printHeader() {

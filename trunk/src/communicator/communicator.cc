@@ -28,7 +28,7 @@ Communicator::Communicator() {
 	debug("%s\n", "ProtoBuf Version Verified");
 
 	_requestId.store(0);
-	debug ("Initialized _requestId = %d\n", _requestId.load());
+	debug("Initialized _requestId = %d\n", _requestId.load());
 	_maxFd = 0;
 
 	// select timeout
@@ -186,7 +186,7 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	}
 }
 
-Message* Communicator::findWaitReplyMessage(uint32_t requestId) {
+Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 
 	// check if message is in map
 	if (_waitReplyMessageMap.count(requestId)) {
@@ -226,9 +226,9 @@ void Communicator::sendMessage() {
 			}
 
 			if (!(_connectionMap.count(sockfd))) {
-				debug ("%s\n", "Connection not found!");
+				debug("%s\n", "Connection not found!");
 				map<uint32_t, Connection*>::iterator p; // connectionMap iterator
-				exit (-1);
+				exit(-1);
 			}
 
 			_connectionMap[sockfd]->sendMessage(message);
@@ -239,6 +239,14 @@ void Communicator::sendMessage() {
 			//message->printPayloadHex();
 			debug("Message (ID: %d) FD = %d removed from queue\n",
 					message->getMsgHeader().requestId, sockfd);
+
+			// delete message if it is not waiting for reply
+			if (!_waitReplyMessageMap.count(message->getMsgHeader().requestId)) {
+				debug("Message (ID: %d) deleted\n",
+						message->getMsgHeader().requestId);
+				delete message;
+			}
+
 		}
 
 		// in terms of 10^-6 seconds
@@ -354,6 +362,9 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	message->setSockfd(sockfd);
 	message->parse(buf);
 
+	// set recv buffer
+	message->setRecvBuf (buf);
+
 	// set payload pointer
 	message->setPayload(
 			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
@@ -372,8 +383,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 uint32_t Communicator::generateRequestId() {
 
 	// increment _requestId
-	
+
 	_requestId.store(_requestId.load() + 1);
 	return _requestId.load();
-	
+
 }

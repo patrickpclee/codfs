@@ -8,6 +8,7 @@
 #include "../common/enums.hh"
 #include "../protocol/listdirectoryrequest.hh"
 #include "../protocol/putobjectinitreply.hh"
+#include "../protocol/putobjectendreply.hh"
 #include "../common/debug.hh"
 #include "segmentlocationcache.hh"
 #include "../common/segmentdata.hh"
@@ -53,10 +54,17 @@ void OsdCommunicator::replyPutObjectInit(uint32_t requestId,
 			this, requestId, connectionId, objectId);
 	putObjectInitReplyMsg->prepareProtocolMsg();
 
-	debug ("REPLY requestID = %d, sockfd = %d\n", requestId, connectionId);
-
 	addMessage(putObjectInitReplyMsg);
-	return;
+}
+
+void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
+		uint32_t connectionId, uint64_t objectId) {
+
+	PutObjectEndReplyMsg* putObjectEndReplyMsg = new PutObjectEndReplyMsg(this,
+			requestId, connectionId, objectId);
+	putObjectEndReplyMsg->prepareProtocolMsg();
+
+	addMessage(putObjectEndReplyMsg);
 }
 
 uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {

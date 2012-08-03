@@ -4,12 +4,14 @@
 
 #include "../common/debug.hh"
 #include "../common/enums.hh"
-#include "../protocol/message.hh"
-#include "../protocol/listdirectoryrequest.hh"
-#include "../protocol/listdirectoryreply.hh"
-#include "../protocol/putobjectinitrequest.hh"
-#include "../protocol/putobjectinitreply.hh"
-#include "../protocol/objectdatamsg.hh"
+#include "message.hh"
+#include "listdirectoryrequest.hh"
+#include "listdirectoryreply.hh"
+#include "putobjectinitrequest.hh"
+#include "putobjectinitreply.hh"
+#include "putobjectendrequest.hh"
+#include "putobjectendreply.hh"
+#include "objectdatamsg.hh"
 #include "messagefactory.hh"
 
 MessageFactory::MessageFactory() {
@@ -34,6 +36,13 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (PUT_OBJECT_INIT_REPLY):
 		return new PutObjectInitReplyMsg(communicator);
+		break;
+	case (PUT_OBJECT_END_REQUEST):
+		return new PutObjectEndRequestMsg(communicator);
+		break;
+	case (PUT_OBJECT_END_REPLY):
+		return new PutObjectEndReplyMsg(communicator);
+		//return new PutObjectEndReplyMsg(communicator);
 		break;
 	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);

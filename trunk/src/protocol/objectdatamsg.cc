@@ -2,6 +2,7 @@
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../osd/osd.hh"
 #include "../client/client.hh"
 
@@ -65,6 +66,8 @@ void ObjectDataMsg::handle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _offset, _length, _payload);
 #endif
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void ObjectDataMsg::printProtocol() {

@@ -6,6 +6,7 @@
 #include "uploadfilerequest.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../common/debug.hh"
 #include "../mds/mds.hh"
 
@@ -66,6 +67,8 @@ void UploadFileRequestMsg::handle() {
 #ifdef COMPILE_FOR_MDS
 	//mds->listFolderProcessor(_msgHeader.requestId,_sockfd,_clientId,_directoryPath);
 #endif
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void UploadFileRequestMsg::printProtocol() {

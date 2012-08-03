@@ -118,12 +118,22 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// initialize chunkCount value
 	pendingObjectChunkMutex.lock();
-	_pendingObjectChunk [objectId] = chunkCount;
-	debug ("pending object chunk = %d chunkCount = %d \n", _pendingObjectChunk[objectId], chunkCount);
+	_pendingObjectChunk[objectId] = chunkCount;
+	debug("pending object chunk = %d chunkCount = %d \n",
+			_pendingObjectChunk[objectId], chunkCount);
 	pendingObjectChunkMutex.unlock();
 
 	_storageModule->createObject(objectId, length);
 	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
+
+}
+
+void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId) {
+
+	// TODO: check integrity of object received
+
+	_osdCommunicator->replyPutObjectEnd (requestId, sockfd, objectId);
 
 }
 
@@ -136,7 +146,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 	pendingObjectChunkMutex.lock();
 
 	// update pendingObjectChunk value
-	_pendingObjectChunk [objectId] = _pendingObjectChunk[objectId] - 1;
+	_pendingObjectChunk[objectId] = _pendingObjectChunk[objectId] - 1;
 
 	// close object if no more chunks
 	if (_pendingObjectChunk[objectId] == 0) {

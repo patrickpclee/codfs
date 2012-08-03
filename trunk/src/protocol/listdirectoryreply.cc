@@ -9,6 +9,7 @@
 
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../client/client.hh"
 
 #include "../common/debug.hh"
@@ -68,11 +69,12 @@ void ListDirectoryReplyMsg::prepareProtocolMsg() {
 
 void ListDirectoryReplyMsg::handle() {
 	ListDirectoryRequestMsg* listdirectoryrequest =
-			(ListDirectoryRequestMsg*) _communicator->findWaitReplyMessage(
+			(ListDirectoryRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	listdirectoryrequest->setFolderData(_folderData);
 	listdirectoryrequest->setStatus(READY);
-	return;
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 /**

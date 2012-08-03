@@ -40,6 +40,16 @@ public:
 			uint32_t connectionId, uint64_t objectId);
 
 	/**
+	 * Reply PutObjectEndRequest
+	 * @param requestId Request ID
+	 * @param connectionId Connection ID
+	 * @param objectId Object ID
+	 */
+
+	void replyPutObjectEnd(uint32_t requestId,
+			uint32_t connectionId, uint64_t objectId);
+
+	/**
 	 * Send a failure report to MDS / Monitor
 	 * @param osdId ID of the OSD that failed
 	 * @return 0 if success, -1 if failure

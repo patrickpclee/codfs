@@ -7,6 +7,7 @@
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
 #include "../common/debug.hh"
+#include "../common/memorypool.hh"
 #include "../mds/mds.hh"
 
 #ifdef COMPILE_FOR_MDS
@@ -66,6 +67,8 @@ void ListDirectoryRequestMsg::handle() {
 #ifdef COMPILE_FOR_MDS
 	mds->listFolderProcessor(_msgHeader.requestId,_sockfd,_clientId,_directoryPath);
 #endif
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void ListDirectoryRequestMsg::printProtocol() {

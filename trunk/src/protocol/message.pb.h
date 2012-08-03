@@ -39,9 +39,14 @@ class FileInfoPro;
 class UploadFileReplyPro;
 class PutObjectInitRequestPro;
 class ObjectDataPro;
+class PutObjectEndRequestPro;
 class PutObjectInitReplyPro;
-class PutSegmentInitPro;
+class PutObjectEndReplyPro;
+class PutSegmentInitRequestPro;
 class SegmentDataPro;
+class PutSegmentEndRequestPro;
+class PutSegmentInitReplyPro;
+class PutSegmentEndReplyPro;
 
 // ===================================================================
 
@@ -750,6 +755,88 @@ class ObjectDataPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class PutObjectEndRequestPro : public ::google::protobuf::Message {
+ public:
+  PutObjectEndRequestPro();
+  virtual ~PutObjectEndRequestPro();
+  
+  PutObjectEndRequestPro(const PutObjectEndRequestPro& from);
+  
+  inline PutObjectEndRequestPro& operator=(const PutObjectEndRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutObjectEndRequestPro& default_instance();
+  
+  void Swap(PutObjectEndRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutObjectEndRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutObjectEndRequestPro& from);
+  void MergeFrom(const PutObjectEndRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectEndRequestPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutObjectEndRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class PutObjectInitReplyPro : public ::google::protobuf::Message {
  public:
   PutObjectInitReplyPro();
@@ -832,14 +919,14 @@ class PutObjectInitReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class PutSegmentInitPro : public ::google::protobuf::Message {
+class PutObjectEndReplyPro : public ::google::protobuf::Message {
  public:
-  PutSegmentInitPro();
-  virtual ~PutSegmentInitPro();
+  PutObjectEndReplyPro();
+  virtual ~PutObjectEndReplyPro();
   
-  PutSegmentInitPro(const PutSegmentInitPro& from);
+  PutObjectEndReplyPro(const PutObjectEndReplyPro& from);
   
-  inline PutSegmentInitPro& operator=(const PutSegmentInitPro& from) {
+  inline PutObjectEndReplyPro& operator=(const PutObjectEndReplyPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -853,17 +940,99 @@ class PutSegmentInitPro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const PutSegmentInitPro& default_instance();
+  static const PutObjectEndReplyPro& default_instance();
   
-  void Swap(PutSegmentInitPro* other);
+  void Swap(PutObjectEndReplyPro* other);
   
   // implements Message ----------------------------------------------
   
-  PutSegmentInitPro* New() const;
+  PutObjectEndReplyPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const PutSegmentInitPro& from);
-  void MergeFrom(const PutSegmentInitPro& from);
+  void CopyFrom(const PutObjectEndReplyPro& from);
+  void MergeFrom(const PutObjectEndReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectEndReplyPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutObjectEndReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PutSegmentInitRequestPro : public ::google::protobuf::Message {
+ public:
+  PutSegmentInitRequestPro();
+  virtual ~PutSegmentInitRequestPro();
+  
+  PutSegmentInitRequestPro(const PutSegmentInitRequestPro& from);
+  
+  inline PutSegmentInitRequestPro& operator=(const PutSegmentInitRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutSegmentInitRequestPro& default_instance();
+  
+  void Swap(PutSegmentInitRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutSegmentInitRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutSegmentInitRequestPro& from);
+  void MergeFrom(const PutSegmentInitRequestPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -914,7 +1083,7 @@ class PutSegmentInitPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 chunkcount() const;
   inline void set_chunkcount(::google::protobuf::uint32 value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentInitPro)
+  // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentInitRequestPro)
  private:
   inline void set_has_objectid();
   inline void clear_has_objectid();
@@ -940,7 +1109,7 @@ class PutSegmentInitPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static PutSegmentInitPro* default_instance_;
+  static PutSegmentInitRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1053,6 +1222,282 @@ class SegmentDataPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static SegmentDataPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PutSegmentEndRequestPro : public ::google::protobuf::Message {
+ public:
+  PutSegmentEndRequestPro();
+  virtual ~PutSegmentEndRequestPro();
+  
+  PutSegmentEndRequestPro(const PutSegmentEndRequestPro& from);
+  
+  inline PutSegmentEndRequestPro& operator=(const PutSegmentEndRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutSegmentEndRequestPro& default_instance();
+  
+  void Swap(PutSegmentEndRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutSegmentEndRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutSegmentEndRequestPro& from);
+  void MergeFrom(const PutSegmentEndRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // optional fixed32 segmentId = 2;
+  inline bool has_segmentid() const;
+  inline void clear_segmentid();
+  static const int kSegmentIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 segmentid() const;
+  inline void set_segmentid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentEndRequestPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  inline void set_has_segmentid();
+  inline void clear_has_segmentid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::uint32 segmentid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutSegmentEndRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PutSegmentInitReplyPro : public ::google::protobuf::Message {
+ public:
+  PutSegmentInitReplyPro();
+  virtual ~PutSegmentInitReplyPro();
+  
+  PutSegmentInitReplyPro(const PutSegmentInitReplyPro& from);
+  
+  inline PutSegmentInitReplyPro& operator=(const PutSegmentInitReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutSegmentInitReplyPro& default_instance();
+  
+  void Swap(PutSegmentInitReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutSegmentInitReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutSegmentInitReplyPro& from);
+  void MergeFrom(const PutSegmentInitReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // optional fixed32 segmentId = 2;
+  inline bool has_segmentid() const;
+  inline void clear_segmentid();
+  static const int kSegmentIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 segmentid() const;
+  inline void set_segmentid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentInitReplyPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  inline void set_has_segmentid();
+  inline void clear_has_segmentid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::uint32 segmentid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutSegmentInitReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PutSegmentEndReplyPro : public ::google::protobuf::Message {
+ public:
+  PutSegmentEndReplyPro();
+  virtual ~PutSegmentEndReplyPro();
+  
+  PutSegmentEndReplyPro(const PutSegmentEndReplyPro& from);
+  
+  inline PutSegmentEndReplyPro& operator=(const PutSegmentEndReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutSegmentEndReplyPro& default_instance();
+  
+  void Swap(PutSegmentEndReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutSegmentEndReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutSegmentEndReplyPro& from);
+  void MergeFrom(const PutSegmentEndReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // optional fixed32 segmentId = 2;
+  inline bool has_segmentid() const;
+  inline void clear_segmentid();
+  static const int kSegmentIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 segmentid() const;
+  inline void set_segmentid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentEndReplyPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  inline void set_has_segmentid();
+  inline void clear_has_segmentid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::uint32 segmentid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutSegmentEndReplyPro* default_instance_;
 };
 // ===================================================================
 
@@ -1600,6 +2045,32 @@ inline void ObjectDataPro::set_length(::google::protobuf::uint32 value) {
 
 // -------------------------------------------------------------------
 
+// PutObjectEndRequestPro
+
+// optional fixed64 objectId = 1;
+inline bool PutObjectEndRequestPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutObjectEndRequestPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutObjectEndRequestPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutObjectEndRequestPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 PutObjectEndRequestPro::objectid() const {
+  return objectid_;
+}
+inline void PutObjectEndRequestPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // PutObjectInitReplyPro
 
 // optional fixed64 objectId = 1;
@@ -1626,92 +2097,118 @@ inline void PutObjectInitReplyPro::set_objectid(::google::protobuf::uint64 value
 
 // -------------------------------------------------------------------
 
-// PutSegmentInitPro
+// PutObjectEndReplyPro
 
 // optional fixed64 objectId = 1;
-inline bool PutSegmentInitPro::has_objectid() const {
+inline bool PutObjectEndReplyPro::has_objectid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void PutSegmentInitPro::set_has_objectid() {
+inline void PutObjectEndReplyPro::set_has_objectid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void PutSegmentInitPro::clear_has_objectid() {
+inline void PutObjectEndReplyPro::clear_has_objectid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void PutSegmentInitPro::clear_objectid() {
+inline void PutObjectEndReplyPro::clear_objectid() {
   objectid_ = GOOGLE_ULONGLONG(0);
   clear_has_objectid();
 }
-inline ::google::protobuf::uint64 PutSegmentInitPro::objectid() const {
+inline ::google::protobuf::uint64 PutObjectEndReplyPro::objectid() const {
   return objectid_;
 }
-inline void PutSegmentInitPro::set_objectid(::google::protobuf::uint64 value) {
+inline void PutObjectEndReplyPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PutSegmentInitRequestPro
+
+// optional fixed64 objectId = 1;
+inline bool PutSegmentInitRequestPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutSegmentInitRequestPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutSegmentInitRequestPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutSegmentInitRequestPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 PutSegmentInitRequestPro::objectid() const {
+  return objectid_;
+}
+inline void PutSegmentInitRequestPro::set_objectid(::google::protobuf::uint64 value) {
   set_has_objectid();
   objectid_ = value;
 }
 
 // optional fixed32 segmentId = 2;
-inline bool PutSegmentInitPro::has_segmentid() const {
+inline bool PutSegmentInitRequestPro::has_segmentid() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void PutSegmentInitPro::set_has_segmentid() {
+inline void PutSegmentInitRequestPro::set_has_segmentid() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void PutSegmentInitPro::clear_has_segmentid() {
+inline void PutSegmentInitRequestPro::clear_has_segmentid() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void PutSegmentInitPro::clear_segmentid() {
+inline void PutSegmentInitRequestPro::clear_segmentid() {
   segmentid_ = 0u;
   clear_has_segmentid();
 }
-inline ::google::protobuf::uint32 PutSegmentInitPro::segmentid() const {
+inline ::google::protobuf::uint32 PutSegmentInitRequestPro::segmentid() const {
   return segmentid_;
 }
-inline void PutSegmentInitPro::set_segmentid(::google::protobuf::uint32 value) {
+inline void PutSegmentInitRequestPro::set_segmentid(::google::protobuf::uint32 value) {
   set_has_segmentid();
   segmentid_ = value;
 }
 
 // optional fixed32 segmentSize = 3;
-inline bool PutSegmentInitPro::has_segmentsize() const {
+inline bool PutSegmentInitRequestPro::has_segmentsize() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void PutSegmentInitPro::set_has_segmentsize() {
+inline void PutSegmentInitRequestPro::set_has_segmentsize() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void PutSegmentInitPro::clear_has_segmentsize() {
+inline void PutSegmentInitRequestPro::clear_has_segmentsize() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void PutSegmentInitPro::clear_segmentsize() {
+inline void PutSegmentInitRequestPro::clear_segmentsize() {
   segmentsize_ = 0u;
   clear_has_segmentsize();
 }
-inline ::google::protobuf::uint32 PutSegmentInitPro::segmentsize() const {
+inline ::google::protobuf::uint32 PutSegmentInitRequestPro::segmentsize() const {
   return segmentsize_;
 }
-inline void PutSegmentInitPro::set_segmentsize(::google::protobuf::uint32 value) {
+inline void PutSegmentInitRequestPro::set_segmentsize(::google::protobuf::uint32 value) {
   set_has_segmentsize();
   segmentsize_ = value;
 }
 
 // optional fixed32 chunkCount = 4;
-inline bool PutSegmentInitPro::has_chunkcount() const {
+inline bool PutSegmentInitRequestPro::has_chunkcount() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void PutSegmentInitPro::set_has_chunkcount() {
+inline void PutSegmentInitRequestPro::set_has_chunkcount() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void PutSegmentInitPro::clear_has_chunkcount() {
+inline void PutSegmentInitRequestPro::clear_has_chunkcount() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void PutSegmentInitPro::clear_chunkcount() {
+inline void PutSegmentInitRequestPro::clear_chunkcount() {
   chunkcount_ = 0u;
   clear_has_chunkcount();
 }
-inline ::google::protobuf::uint32 PutSegmentInitPro::chunkcount() const {
+inline ::google::protobuf::uint32 PutSegmentInitRequestPro::chunkcount() const {
   return chunkcount_;
 }
-inline void PutSegmentInitPro::set_chunkcount(::google::protobuf::uint32 value) {
+inline void PutSegmentInitRequestPro::set_chunkcount(::google::protobuf::uint32 value) {
   set_has_chunkcount();
   chunkcount_ = value;
 }
@@ -1806,6 +2303,150 @@ inline ::google::protobuf::uint32 SegmentDataPro::length() const {
 inline void SegmentDataPro::set_length(::google::protobuf::uint32 value) {
   set_has_length();
   length_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PutSegmentEndRequestPro
+
+// optional fixed64 objectId = 1;
+inline bool PutSegmentEndRequestPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutSegmentEndRequestPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutSegmentEndRequestPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutSegmentEndRequestPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 PutSegmentEndRequestPro::objectid() const {
+  return objectid_;
+}
+inline void PutSegmentEndRequestPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// optional fixed32 segmentId = 2;
+inline bool PutSegmentEndRequestPro::has_segmentid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PutSegmentEndRequestPro::set_has_segmentid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PutSegmentEndRequestPro::clear_has_segmentid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PutSegmentEndRequestPro::clear_segmentid() {
+  segmentid_ = 0u;
+  clear_has_segmentid();
+}
+inline ::google::protobuf::uint32 PutSegmentEndRequestPro::segmentid() const {
+  return segmentid_;
+}
+inline void PutSegmentEndRequestPro::set_segmentid(::google::protobuf::uint32 value) {
+  set_has_segmentid();
+  segmentid_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PutSegmentInitReplyPro
+
+// optional fixed64 objectId = 1;
+inline bool PutSegmentInitReplyPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutSegmentInitReplyPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutSegmentInitReplyPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutSegmentInitReplyPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 PutSegmentInitReplyPro::objectid() const {
+  return objectid_;
+}
+inline void PutSegmentInitReplyPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// optional fixed32 segmentId = 2;
+inline bool PutSegmentInitReplyPro::has_segmentid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PutSegmentInitReplyPro::set_has_segmentid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PutSegmentInitReplyPro::clear_has_segmentid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PutSegmentInitReplyPro::clear_segmentid() {
+  segmentid_ = 0u;
+  clear_has_segmentid();
+}
+inline ::google::protobuf::uint32 PutSegmentInitReplyPro::segmentid() const {
+  return segmentid_;
+}
+inline void PutSegmentInitReplyPro::set_segmentid(::google::protobuf::uint32 value) {
+  set_has_segmentid();
+  segmentid_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PutSegmentEndReplyPro
+
+// optional fixed64 objectId = 1;
+inline bool PutSegmentEndReplyPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutSegmentEndReplyPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutSegmentEndReplyPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutSegmentEndReplyPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 PutSegmentEndReplyPro::objectid() const {
+  return objectid_;
+}
+inline void PutSegmentEndReplyPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// optional fixed32 segmentId = 2;
+inline bool PutSegmentEndReplyPro::has_segmentid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PutSegmentEndReplyPro::set_has_segmentid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PutSegmentEndReplyPro::clear_has_segmentid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PutSegmentEndReplyPro::clear_segmentid() {
+  segmentid_ = 0u;
+  clear_has_segmentid();
+}
+inline ::google::protobuf::uint32 PutSegmentEndReplyPro::segmentid() const {
+  return segmentid_;
+}
+inline void PutSegmentEndReplyPro::set_segmentid(::google::protobuf::uint32 value) {
+  set_has_segmentid();
+  segmentid_ = value;
 }
 
 

@@ -98,6 +98,7 @@ public:
 	void setPayloadSize (uint32_t payloadSize);
 	void setProtocolMsg(string protocolMsg);
 	void setPayload(char* payload);
+	void setRecvBuf (char* recvBuf);
 
 	//
 	// getter
@@ -146,6 +147,7 @@ protected:
 	struct MsgHeader _msgHeader;
 	string _protocolMsg;
 	char* _payload;
+	char* _recvBuf;		// buffer created to store header + protocol + payload in recvMessage
 	Communicator* _communicator;
 	
 	promise <MessageStatus> _status;

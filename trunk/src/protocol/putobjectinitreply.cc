@@ -3,11 +3,8 @@
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../osd/osd.hh"
-
-#ifdef COMPILE_FOR_OSD
-extern Osd* osd;
-#endif
 
 PutObjectInitReplyMsg::PutObjectInitReplyMsg(Communicator* communicator) :
 		Message(communicator) {
@@ -54,10 +51,11 @@ void PutObjectInitReplyMsg::parse(char* buf) {
 
 void PutObjectInitReplyMsg::handle() {
 	PutObjectInitRequestMsg* putObjectInitRequestMsg =
-			(PutObjectInitRequestMsg*) _communicator->findWaitReplyMessage(
+			(PutObjectInitRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	putObjectInitRequestMsg->setStatus(READY);
-	return;
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutObjectInitReplyMsg::printProtocol() {
