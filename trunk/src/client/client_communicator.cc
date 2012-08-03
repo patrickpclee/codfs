@@ -3,10 +3,13 @@
 
 #include "../common/debug.hh"
 #include "../common/objectdata.hh"
+#include "../common/memorypool.hh"
 #include "../protocol/listdirectoryrequest.hh"
 
 #include "../protocol/putobjectinitrequest.hh"
+#include "../protocol/putobjectendrequest.hh"
 #include "../protocol/objectdatamsg.hh"
+
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
@@ -25,11 +28,14 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 
 	addMessage(listDirectoryRequestMsg, true);
 	MessageStatus status = listDirectoryRequestMsg->waitForStatusChange();
+
 	if(status == READY) {
-		return listDirectoryRequestMsg->getFolderData();
+		vector <FileMetaData> fileMetaData = listDirectoryRequestMsg->getFolderData();
+		delete listDirectoryRequestMsg;
+		return fileMetaData;
 	} else {
 		debug("%s\n","List Directory Request Failed");
-		return {};
+		exit (-1);
 	}
 	return {};
 }
@@ -46,7 +52,7 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 	// Step 1 : Send Init message (wait for reply)
 
 	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount);
-	debug ("%s\n", "Put Object Init Sent");
+	debug ("%s\n", "Put Object Init ACK-ed");
 
 	// Step 2 : Send data chunk by chunk
 
@@ -70,6 +76,14 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 //		usleep (100*1000);
 	}
 
+	// Step 3: Send End message
+
+	putObjectEnd(clientId, dstOsdSockfd, objectId);
+	debug ("%s\n", "Put Object End ACK-ed");
+
+	// free buf
+	MemoryPool::getInstance().poolFree(objectData.buf);
+
 	cout << "Put Object Finished" << endl;
 
 }
@@ -91,6 +105,7 @@ void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	MessageStatus status = putObjectInitRequestMsg->waitForStatusChange();
 	if(status == READY) {
+		delete putObjectInitRequestMsg;
 		return;
 	} else {
 		debug("%s\n", "Put Object Init Failed");
@@ -109,7 +124,26 @@ void ClientCommunicator::putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
 	objectDataMsg->preparePayload(buf + offset, length);
 
 	addMessage(objectDataMsg, false);
+}
 
+void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
+		uint64_t objectId) {
+
+	// Step 3 of the upload process
+
+	PutObjectEndRequestMsg* putObjectEndRequestMsg = new PutObjectEndRequestMsg (this, dstOsdSockfd, objectId);
+
+	putObjectEndRequestMsg->prepareProtocolMsg();
+	addMessage(putObjectEndRequestMsg, true);
+
+	MessageStatus status = putObjectEndRequestMsg->waitForStatusChange();
+	if(status == READY) {
+		delete putObjectEndRequestMsg;
+		return;
+	} else {
+		debug("%s\n", "Put Object Init Failed");
+		exit (-1);
+	}
 }
 
 //

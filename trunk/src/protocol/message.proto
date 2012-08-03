@@ -51,6 +51,10 @@ message ObjectDataPro {
 	optional fixed32 length = 3;
 }
 
+message PutObjectEndRequestPro {
+	optional fixed64 objectId = 1;
+}
+
 //
 // OSD -> CLIENT
 //
@@ -59,11 +63,15 @@ message PutObjectInitReplyPro {
 	optional fixed64 objectId = 1;
 }
 
+message PutObjectEndReplyPro {
+	optional fixed64 objectId = 1;
+}
+
 //
 // OSD -> OSD
 //
 
-message PutSegmentInitPro {
+message PutSegmentInitRequestPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 segmentId = 2;
 	optional fixed32 segmentSize = 3;
@@ -75,4 +83,19 @@ message SegmentDataPro {
 	optional fixed32 segmentId = 2;
 	optional fixed64 offset = 3;
 	optional fixed32 length = 4;
+}
+
+message PutSegmentEndRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message PutSegmentInitReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message PutSegmentEndReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
 }

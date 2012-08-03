@@ -119,7 +119,7 @@ public:
 	 * @return Pointer to sent message
 	 */
 
-	Message* findWaitReplyMessage(uint32_t requestId);
+	Message* popWaitReplyMessage(uint32_t requestId);
 
 	/**
 	 * Runs in a separate detached thread

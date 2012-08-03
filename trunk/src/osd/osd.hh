@@ -61,6 +61,7 @@ public:
 
 	/**
 	 * Action when an OSD list is received
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	Object ID
 	 * @param osdList 	Secondary OSD List
@@ -72,6 +73,7 @@ public:
 
 	/**
 	 * Action when a getObjectRequest is received
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of the object to send
 	 */
@@ -80,6 +82,7 @@ public:
 
 	/**
 	 * Action when a getSegmentRequest is received
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of Object that the segment is belonged to
 	 * @param segmentId ID of the segment to send
@@ -91,6 +94,7 @@ public:
 	/**
 	 * Action when a put object request is received
 	 * A number of trunks are expected to receive afterwards
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param length Object size, equals the total length of all the trunks
@@ -101,7 +105,17 @@ public:
 			uint32_t length, uint32_t chunkCount);
 
 	/**
+	 * Action when a put object end is received
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param objectId Object ID
+	 */
+
+	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
+
+	/**
 	 * Action when an object trunk is received
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param offset Offset of the trunk in the object
@@ -116,6 +130,7 @@ public:
 	/**
 	 * Action when a put object request is received
 	 * A number of trunks are expected to receive afterwards
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
@@ -127,6 +142,7 @@ public:
 
 	/**
 	 * Action when a segment trunk is received
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
@@ -141,6 +157,7 @@ public:
 
 	/**
 	 * Action when a recovery request is received
+	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 */
 

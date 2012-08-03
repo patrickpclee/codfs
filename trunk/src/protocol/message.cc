@@ -33,9 +33,6 @@ Message::Message(Communicator* communicator) {
 }
 
 Message::~Message() {
-	if (_payload != NULL) {
-		MemoryPool::getInstance().poolFree(_payload);
-	}
 }
 
 void Message::setProtocolType(MsgType protocolType) {
