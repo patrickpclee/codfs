@@ -273,7 +273,6 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	lock_guard<mutex> lk(fileMutex);
 
 	FILE* file = openFile(filepath);
-	debug("fileptr = %p\n", file);
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot write");
@@ -362,7 +361,6 @@ FILE* StorageModule::openFile(string filepath) {
 
 	// find file in map
 	if (_openedFile.count(filepath)) {
-		debug("%s\n", "File already opened");
 		FILE* openedFile = _openedFile[filepath];
 		openedFileMutex.unlock();
 		return openedFile;

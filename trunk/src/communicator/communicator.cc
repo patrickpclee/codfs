@@ -362,6 +362,9 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	message->setSockfd(sockfd);
 	message->parse(buf);
 
+	// set recv buffer
+	message->setRecvBuf (buf);
+
 	// set payload pointer
 	message->setPayload(
 			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);

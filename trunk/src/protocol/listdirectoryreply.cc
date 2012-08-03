@@ -9,6 +9,7 @@
 
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../client/client.hh"
 
 #include "../common/debug.hh"
@@ -72,7 +73,8 @@ void ListDirectoryReplyMsg::handle() {
 					_msgHeader.requestId);
 	listdirectoryrequest->setFolderData(_folderData);
 	listdirectoryrequest->setStatus(READY);
-	return;
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 /**

@@ -3,6 +3,7 @@
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../osd/osd.hh"
 
 PutObjectInitReplyMsg::PutObjectInitReplyMsg(Communicator* communicator) :
@@ -53,7 +54,8 @@ void PutObjectInitReplyMsg::handle() {
 			(PutObjectInitRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	putObjectInitRequestMsg->setStatus(READY);
-	return;
+
+	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutObjectInitReplyMsg::printProtocol() {
