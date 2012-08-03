@@ -47,6 +47,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);
 		break;
+	case (SEGMENT_DATA):
+		return new SegmentDataMsg(communicator);
+		break;
 
 	default:
 		debug("%s\n", "Invalid message type");

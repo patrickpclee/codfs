@@ -60,6 +60,14 @@ uint32_t Client::uploadFileRequest(string filepath) {
 	return 0;
 }
 
+uint32_t Client::downloadFileRequest(string dstPath) {
+	return 0;
+}
+
+uint32_t Client:: downloadFileRequest(uint32_t fileId) {
+	return 0;
+}
+
 void sendThread() {
 	debug("%s", "Send Thread Start\n");
 	client->getCommunicator()->sendMessage();
