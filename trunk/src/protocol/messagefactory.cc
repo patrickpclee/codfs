@@ -11,7 +11,9 @@
 #include "putobjectinitreply.hh"
 #include "putobjectendrequest.hh"
 #include "putobjectendreply.hh"
+#include "putsegmentinitrequest.hh"
 #include "objectdatamsg.hh"
+#include "segmentdatamsg.hh"
 #include "messagefactory.hh"
 
 MessageFactory::MessageFactory() {
@@ -42,13 +44,28 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (PUT_OBJECT_END_REPLY):
 		return new PutObjectEndReplyMsg(communicator);
-		//return new PutObjectEndReplyMsg(communicator);
+		break;
+	case (PUT_SEGMENT_INIT_REQUEST):
+		return new PutSegmentInitRequestMsg(communicator);
+		break;
+	case (PUT_SEGMENT_INIT_REPLY):
+		// return new PutSegmentInitReplyMsg(communicator);
+		return NULL; // to be implemented
+		break;
+	case (PUT_SEGMENT_END_REQUEST):
+		// return new PutSegmentEndRequestMsg(communicator);
+		return NULL; // to be implemented
+		break;
+	case (PUT_SEGMENT_END_REPLY):
+		// return new PutSegmentEndReplyMsg(communicator);
+		return NULL; // to be implemented
 		break;
 	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);
 		break;
 	case (SEGMENT_DATA):
-		return new SegmentDataMsg(communicator);
+		// return new SegmentDataMsg(communicator);
+		return NULL; // to be implemented
 		break;
 
 	default:

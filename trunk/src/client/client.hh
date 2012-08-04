@@ -38,8 +38,16 @@ public:
 	 * @return	Pointer to the Client Communicator Module
 	 */
 	ClientCommunicator* getCommunicator();
+
 //	void downloadFileRequest(char* srcPath, char* dstPath);
-//	void downloadFileRequest(uint32_t fileId, char* dstPath);
+
+	/**
+	 * @brief	Download a file from OSDs
+	 * @param	fileId	File ID
+	 * @param	dstPath	Location to save the file
+	 */
+
+	void downloadFileRequest(uint32_t fileId, string dstPath);
 
 private:
 
