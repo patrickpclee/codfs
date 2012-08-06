@@ -82,10 +82,16 @@ public:
 
 	/**
 	 * After parsing, carry out action to handle the message
-	 * (action should be run in separate thread)
+	 * handle() executes doHandle() and free memory afterwards
 	 */
 
-	virtual void handle() = 0;
+	void handle();
+
+	/**
+	 * Message-specific handler
+	 */
+
+	virtual void doHandle() = 0;
 
 	//
 	// setters

@@ -121,9 +121,9 @@ char* Connection::recvMessage() {
 
 	const uint32_t bufferSize = headerLength + msgHeader.protocolMsgSize
 			+ msgHeader.payloadSize;
-	buf = MemoryPool::getInstance().poolMalloc(bufferSize);
 
-	// TODO: free buf
+	// poolFree in message.cc->handle()
+	buf = MemoryPool::getInstance().poolMalloc(bufferSize);
 
 	// copy header to buffer
 	memcpy(buf, &msgHeader, headerLength);

@@ -67,14 +67,12 @@ void ListDirectoryReplyMsg::prepareProtocolMsg() {
 	return;
 }
 
-void ListDirectoryReplyMsg::handle() {
+void ListDirectoryReplyMsg::doHandle() {
 	ListDirectoryRequestMsg* listdirectoryrequest =
 			(ListDirectoryRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	listdirectoryrequest->setFolderData(_folderData);
 	listdirectoryrequest->setStatus(READY);
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 /**

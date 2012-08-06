@@ -22,13 +22,21 @@ using namespace std;
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
+// mutex
+mutex outMessageQueueMutex;
+mutex waitReplyMessageMapMutex;
+
 Communicator::Communicator() {
 
+	// verify protobuf version
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
-	debug("%s\n", "ProtoBuf Version Verified");
 
+	// initialize variables
 	_requestId.store(0);
-	debug("Initialized _requestId = %d\n", _requestId.load());
+	_serverSocket = {};
+	_connectionMap = {};
+	_outMessageQueue = {};
+	_waitReplyMessageMap = {};
 	_maxFd = 0;
 
 	// select timeout
@@ -38,7 +46,6 @@ Communicator::Communicator() {
 
 	// chunk size
 	_chunkSize = configLayer->getConfigInt("Communication>ChunkSize");
-	debug("Chunk Size = %d\n", _chunkSize);
 
 	debug("%s\n", "Communicator constructed");
 }
@@ -177,16 +184,25 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	}
 	//debug("Message (ID: %d) added to queue\n",
 	//		message->getMsgHeader().requestId);
-	_outMessageQueue.push_back(message);
+	{
+		lock_guard<mutex> lk(outMessageQueueMutex);
+		_outMessageQueue.push_back(message);
+	}
 
 	if (expectReply) {
 		debug("Message (ID: %d) added to waitReplyMessageMap\n",
 				message->getMsgHeader().requestId);
-		_waitReplyMessageMap[requestId] = message;
+
+		{
+			lock_guard<mutex> lk(waitReplyMessageMapMutex);
+			_waitReplyMessageMap[requestId] = message;
+		}
 	}
 }
 
 Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
+
+	lock_guard<mutex> lk(waitReplyMessageMapMutex);
 
 	// check if message is in map
 	if (_waitReplyMessageMap.count(requestId)) {
@@ -209,12 +225,15 @@ void Communicator::sendMessage() {
 			"Communication>SendPollingInterval");
 
 	while (1) {
+
 		// send all message in the outMessageQueue
 		while (!_outMessageQueue.empty()) {
 
 			// get and remove from queue
+			outMessageQueueMutex.lock();
 			Message* message = _outMessageQueue.front();
 			_outMessageQueue.pop_front();
+			outMessageQueueMutex.unlock();
 
 			const uint32_t sockfd = message->getSockfd();
 
@@ -230,7 +249,6 @@ void Communicator::sendMessage() {
 				map<uint32_t, Connection*>::iterator p; // connectionMap iterator
 				exit(-1);
 			}
-
 			_connectionMap[sockfd]->sendMessage(message);
 
 			// debug
@@ -240,11 +258,16 @@ void Communicator::sendMessage() {
 			debug("Message (ID: %d) FD = %d removed from queue\n",
 					message->getMsgHeader().requestId, sockfd);
 
-			// delete message if it is not waiting for reply
-			if (!_waitReplyMessageMap.count(message->getMsgHeader().requestId)) {
-				debug("Message (ID: %d) deleted\n",
-						message->getMsgHeader().requestId);
-				delete message;
+			{
+				// delete message if it is not waiting for reply
+				lock_guard<mutex> lk(waitReplyMessageMapMutex);
+				if (!_waitReplyMessageMap.count(
+						message->getMsgHeader().requestId)) {
+					debug("Deleting Message (ID: %d)\n",
+							message->getMsgHeader().requestId);
+					delete message;
+					debug("%s\n", "Message Deleted");
+				}
 			}
 
 		}
@@ -358,12 +381,12 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
+	// delete after message is handled
 	Message* message = MessageFactory::createMessage(this, msgType);
-	message->setSockfd(sockfd);
-	message->parse(buf);
 
-	// set recv buffer
-	message->setRecvBuf (buf);
+	message->setSockfd(sockfd);
+	message->setRecvBuf(buf);
+	message->parse(buf);
 
 	// set payload pointer
 	message->setPayload(
@@ -376,8 +399,6 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 
 	thread t(handleThread, message);
 	t.detach();
-
-	// TODO: when to free message?
 }
 
 uint32_t Communicator::generateRequestId() {

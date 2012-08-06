@@ -69,10 +69,26 @@ public:
 
 	char* recvMessage ();
 
-	Socket* getSocket();
-	int getSockfd();
-	ComponentType getConnectionType();
+	/**
+	 * Retrive the underlying Socket
+	 * @return Socket object of the connection
+	 */
 
+	Socket* getSocket();
+
+	/**
+	 * Retrive the underlying Socket Descriptor
+	 * @return Socket Descriptor of the connection
+	 */
+
+	int getSockfd();
+
+	/**
+	 * Retrive the type of desintation component
+	 * @return Destination component type
+	 */
+
+	ComponentType getConnectionType();
 
 private:
 	Socket _socket;

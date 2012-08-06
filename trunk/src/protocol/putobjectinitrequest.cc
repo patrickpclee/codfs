@@ -57,12 +57,10 @@ void PutObjectInitRequestMsg::parse(char* buf) {
 
 }
 
-void PutObjectInitRequestMsg::handle() {
+void PutObjectInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _objectSize, _chunkCount);
 #endif
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutObjectInitRequestMsg::printProtocol() {

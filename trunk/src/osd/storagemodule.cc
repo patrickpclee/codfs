@@ -19,10 +19,11 @@ mutex fileMutex;
 mutex openedFileMutex;
 
 StorageModule::StorageModule() {
-	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
-	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
 	_capacity = 0;
 	_freespace = 0;
+	_openedFile = {};
+	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
+	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
 }
 
 StorageModule::~StorageModule() {
@@ -63,6 +64,10 @@ bool StorageModule::isObjectExist(uint64_t objectId) {
 	return true;
 }
 
+/**
+ * Default length = 0 (read whole object)
+ */
+
 struct ObjectData StorageModule::readObject(uint64_t objectId,
 		uint64_t offsetInObject, uint32_t length) {
 
@@ -79,7 +84,7 @@ struct ObjectData StorageModule::readObject(uint64_t objectId,
 	}
 
 	// TODO: check maximum malloc size
-	// TODO: when free?
+	// poolFree in osd_communicator::sendObject
 	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
 	readFile(objectData.info.objectPath, objectData.buf, offsetInObject,
@@ -108,7 +113,7 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 	}
 
 	// TODO: check maximum malloc size
-	// TODO: when free?
+	// poolFree in osd_communicator::sendSegment
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
 	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,

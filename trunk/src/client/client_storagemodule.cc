@@ -85,7 +85,8 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 	}
 
 	// Read file contents into buffer
-	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead); // TODO: when free object?
+	// poolFree in ClientCommunicator::putObject
+	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 	uint32_t byteRead = pread(fileno(file), objectData.buf, byteToRead, offset);
 
 	// Release lock

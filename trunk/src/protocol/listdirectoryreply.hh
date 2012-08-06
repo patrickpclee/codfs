@@ -68,7 +68,7 @@ public:
 	 */
 	void parse (char* buf);
 
-	void handle ();
+	void doHandle ();
 private:
 	string _path;
 	vector<FileMetaData> _folderData;

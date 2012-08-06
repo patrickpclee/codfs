@@ -22,18 +22,16 @@ Message::Message() {
 
 Message::Message(Communicator* communicator) {
 
-	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
-	_protocolMsg = "";
 	_sockfd = 0;
-	_msgHeader.requestId = 0;
-	_msgHeader.payloadSize = 0;
-	_msgHeader.protocolMsgSize = 0;
-	_msgHeader.protocolMsgType = DEFAULT;
+	memset (&_msgHeader, 0, sizeof (struct MsgHeader));
+	_protocolMsg = "";
 	_payload = NULL;
 	_recvBuf = NULL;
+	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
 }
 
 Message::~Message() {
+	debug ("%s\n", "message destructor");
 }
 
 void Message::setProtocolType(MsgType protocolType) {
@@ -110,3 +108,11 @@ void Message::setStatus(MessageStatus status) {
 	return;
 }
 
+void Message::handle() {
+	// message-specific handler
+	doHandle();
+
+	// cleanup
+	MemoryPool::getInstance().poolFree(_recvBuf);
+	delete this;
+}

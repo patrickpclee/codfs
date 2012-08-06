@@ -41,7 +41,7 @@ public:
 	 * Execute the corresponding Processor
 	 */
 
-	void handle();
+	void doHandle();
 
 	/**
 	 * Override

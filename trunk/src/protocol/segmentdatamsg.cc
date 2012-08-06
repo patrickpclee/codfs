@@ -64,7 +64,7 @@ void SegmentDataMsg::parse(char* buf) {
 
 }
 
-void SegmentDataMsg::handle() {
+void SegmentDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putSegmentDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _segmentId, _offset, _length, _payload);
 #endif

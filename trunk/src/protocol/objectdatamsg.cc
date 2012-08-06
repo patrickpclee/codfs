@@ -62,12 +62,10 @@ void ObjectDataMsg::parse(char* buf) {
 
 }
 
-void ObjectDataMsg::handle() {
+void ObjectDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _offset, _length, _payload);
 #endif
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void ObjectDataMsg::printProtocol() {
