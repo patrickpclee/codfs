@@ -3,6 +3,10 @@
 
 #define DEBUG 1
 
+// for PRIu64, PRIu32, etc
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
+
 #define debug(fmt, ...) \
         do { if (DEBUG) fprintf(stderr, "%s:%d:%s(): " fmt, __FILE__, \
                                 __LINE__, __func__, __VA_ARGS__); } while (0)

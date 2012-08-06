@@ -36,7 +36,7 @@ void StorageModule::createObject(uint64_t objectId, uint32_t length) {
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
 
-	debug("Object created ID = %lu Length = %d Path = %s\n",
+	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 " Path = %s\n",
 			objectId, length, filepath.c_str());
 }
 
@@ -47,7 +47,8 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	writeSegmentInfo(objectId, segmentId, length, filepath);
 
-	debug("Segment created ObjID = %lu SegmentID = %d Length = %d Path = %s\n",
+	debug(
+			"Segment created ObjID = %" PRIu64 " SegmentID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
 			objectId, segmentId, length, filepath.c_str());
 }
 
@@ -90,7 +91,8 @@ struct ObjectData StorageModule::readObject(uint64_t objectId,
 	readFile(objectData.info.objectPath, objectData.buf, offsetInObject,
 			byteToRead);
 
-	debug("Object ID = %lu read %d bytes at offset %lu\n",
+	debug(
+			"Object ID = %" PRIu64 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, byteToRead, offsetInObject);
 
 	return objectData;
@@ -119,7 +121,8 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,
 			byteToRead);
 
-	debug("Object ID = %lu Segment ID = %d read %d bytes at offset %lu\n",
+	debug(
+			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteToRead, offsetInSegment);
 
 	return segmentData;
@@ -133,7 +136,7 @@ uint32_t StorageModule::writeObject(uint64_t objectId, char* buf,
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	byteWritten = writeFile(filepath, buf, offsetInObject, length);
 
-	debug("Object ID = %lu write %d bytes at offset %lu\n",
+	debug("Object ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, byteWritten, offsetInObject);
 
 	return byteWritten;
@@ -147,7 +150,7 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
 
-	debug("Object ID = %lu Segment ID = %d write %d bytes at offset %lu\n",
+	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " write %" PRIu32 "bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteWritten, offsetInSegment);
 
 	return byteWritten;
@@ -158,7 +161,7 @@ FILE* StorageModule::createAndOpenObject(uint64_t objectId, uint32_t length) {
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
 
-	debug("Object ID = %lu created\n", objectId);
+	debug("Object ID = %" PRIu64 " created\n", objectId);
 
 	return createFile(filepath);
 }
@@ -169,7 +172,7 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	writeSegmentInfo(objectId, segmentId, length, filepath);
 
-	debug("Object ID = %lu Segment ID = %d created\n", objectId, segmentId);
+	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " created\n", objectId, segmentId);
 
 	return createFile(filepath);
 }
@@ -178,14 +181,14 @@ void StorageModule::closeObject(uint64_t objectId) {
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	closeFile(filepath);
 
-	debug("Object ID = %lu closed\n", objectId);
+	debug("Object ID = %" PRIu64 " closed\n", objectId);
 }
 
 void StorageModule::closeSegment(uint64_t objectId, uint32_t segmentId) {
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	closeFile(filepath);
 
-	debug("Object ID = %lu Segment ID = %d closed\n", objectId, segmentId);
+	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " closed\n", objectId, segmentId);
 }
 
 uint32_t StorageModule::getCapacity() {
@@ -264,7 +267,7 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 	}
 
 	if (byteRead != length) {
-		debug("ERROR: Length = %d, byteRead = %d\n", length, byteRead);
+		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n", length, byteRead);
 		exit(-1);
 	}
 
@@ -291,7 +294,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	}
 
 	// Write file contents from buffer
-	uint32_t byteWritten = pwrite (fileno(file), buf, length, offset);
+	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
 	fflush(file);
 
 	// Release lock

@@ -91,8 +91,8 @@ uint32_t OsdCommunicator::sendObject(uint32_t sockfd,
 		struct ObjectData objectData) {
 	// TEST
 
-	debug("Send object ID = %lu to sockfd = %d, content = %s\n",
-			objectData.info.objectId, sockfd, objectData.buf);
+	debug("Send object ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
+			objectData.info.objectId, sockfd);
 
 	// step 1: send init message, wait for ack
 

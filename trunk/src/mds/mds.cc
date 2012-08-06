@@ -153,7 +153,7 @@ void Mds::listFolderProcessor (uint32_t requestId, uint32_t connectionId, uint32
 {
 	vector<FileMetaData> folderData;
 
-	debug("List %s by %d\n",path.c_str(),clientId);
+	debug("List %s by %" PRIu32 "\n",path.c_str(),clientId);
 	folderData = _nameSpaceModule->listFolder(clientId, path);
 	_mdsCommunicator->replyFolderData(requestId, connectionId, path, folderData);
 
@@ -261,7 +261,7 @@ int main (void)
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
 
-	debug ("Start server on port %d\n", serverPort);
+	debug ("Start server on port %" PRIu16 "\n", serverPort);
 
 	communicator->createServerSocket(serverPort);
 

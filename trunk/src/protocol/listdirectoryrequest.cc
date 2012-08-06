@@ -70,7 +70,7 @@ void ListDirectoryRequestMsg::doHandle() {
 }
 
 void ListDirectoryRequestMsg::printProtocol() {
-	debug("[LIST_DIRECTORY_REQUEST] OSD ID = %d Path = %s\n",
+	debug("[LIST_DIRECTORY_REQUEST] OSD ID = %" PRIu32 " Path = %s\n",
 			_clientId, _directoryPath.c_str());
 }
 

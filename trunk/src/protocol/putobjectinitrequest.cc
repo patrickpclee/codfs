@@ -64,6 +64,6 @@ void PutObjectInitRequestMsg::doHandle() {
 }
 
 void PutObjectInitRequestMsg::printProtocol() {
-	debug("[PUT_OBJECT_INIT_REQUEST] Object ID = %lu, Length = %lu, Count = %d\n",
+	debug("[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 "\n",
 			_objectId, _objectSize, _chunkCount);
 }

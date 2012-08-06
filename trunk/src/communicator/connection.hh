@@ -81,7 +81,7 @@ public:
 	 * @return Socket Descriptor of the connection
 	 */
 
-	int getSockfd();
+	uint32_t getSockfd();
 
 	/**
 	 * Retrive the type of desintation component

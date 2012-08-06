@@ -44,7 +44,7 @@ uint32_t Client::uploadFileRequest(string filepath) {
 
 	const uint32_t objectCount = _storageModule->getObjectCount(filepath);
 
-	debug("Object Count of %s = %d\n", filepath.c_str(), objectCount);
+	debug("Object Count of %s is %" PRIu32 "\n", filepath.c_str(), objectCount);
 
 	for (uint32_t i = 0; i < objectCount; ++i) {
 		struct ObjectData objectData = _storageModule->readObjectFromFile(
@@ -109,7 +109,7 @@ int main(void) {
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
 
-	debug("Start server on port %d\n", serverPort);
+	debug("Start server on port %" PRIu16 "\n", serverPort);
 
 	const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
 	debug("Segment Number = %d\n", segmentNumber);

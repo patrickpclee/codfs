@@ -67,8 +67,8 @@ void Message::setRecvBuf(char* recvBuf) {
 }
 
 void Message::printHeader() {
-	debug("[MsgHeader] Type = %d Size = %d, PayloadSize = %d\n",
-			_msgHeader.protocolMsgType, _msgHeader.protocolMsgSize, _msgHeader.payloadSize);
+	debug("[MsgHeader] Type = %d Size = %" PRIu32 ", PayloadSize = %" PRIu32 "\n",
+			(int)_msgHeader.protocolMsgType, _msgHeader.protocolMsgSize, _msgHeader.payloadSize);
 }
 
 void Message::printPayloadHex() {

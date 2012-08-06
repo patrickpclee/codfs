@@ -66,6 +66,6 @@ void PutSegmentInitRequestMsg::doHandle() {
 }
 
 void PutSegmentInitRequestMsg::printProtocol() {
-	debug("[PUT_SEGMENT_INIT] Object ID = %lu, Segment ID = %u, Length = %u, Count = %d\n",
+	debug("[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
 			_objectId, _segmentId, _segmentSize, _chunkCount);
 }

@@ -69,6 +69,6 @@ void ObjectDataMsg::doHandle() {
 }
 
 void ObjectDataMsg::printProtocol() {
-	debug("[OBJECT_DATA] Object ID = %lu, offset = %lu, length = %d\n",
+	debug("[OBJECT_DATA] Object ID = %" PRIu64 ", offset = %" PRIu64 ", length = %" PRIu32 "\n",
 			_objectId, _offset, _length);
 }

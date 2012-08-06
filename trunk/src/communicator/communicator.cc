@@ -69,7 +69,7 @@ void Communicator::createServerSocket(uint16_t port) {
 		throw SocketException("Could not listen to socket.");
 	}
 
-	debug("Server socket sockfd = %d\n", _serverSocket.getSockfd());
+	debug("Server socket sockfd = %" PRIu32 "\n", _serverSocket.getSockfd());
 }
 
 /*
@@ -137,10 +137,10 @@ void Communicator::waitForMessage() {
 			// add connection to _connectionMap
 			_connectionMap[conn->getSockfd()] = conn;
 
-			debug("New connection sockfd = %d\n", conn->getSockfd());
+			debug("New connection sockfd = %" PRIu32 "\n", conn->getSockfd());
 
 			// adjust _maxFd
-			if ((uint32_t) conn->getSockfd() > _maxFd) {
+			if (conn->getSockfd() > _maxFd) {
 				_maxFd = conn->getSockfd();
 			}
 		}
@@ -182,15 +182,13 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	if (message->getMsgHeader().requestId == 0) {
 		message->setRequestId(requestId);
 	}
-	//debug("Message (ID: %d) added to queue\n",
-	//		message->getMsgHeader().requestId);
 	{
 		lock_guard<mutex> lk(outMessageQueueMutex);
 		_outMessageQueue.push_back(message);
 	}
 
 	if (expectReply) {
-		debug("Message (ID: %d) added to waitReplyMessageMap\n",
+		debug("Message (ID: %" PRIu32 ") added to waitReplyMessageMap\n",
 				message->getMsgHeader().requestId);
 
 		{
@@ -239,7 +237,7 @@ void Communicator::sendMessage() {
 
 			// handle disconnected component
 			if (sockfd == (uint32_t) -1) {
-				debug("Message (ID: %d) disconnected, ignore\n",
+				debug("Message (ID: %" PRIu32 ") disconnected, ignore\n",
 						message->getMsgHeader().requestId);
 				continue;
 			}
@@ -255,7 +253,7 @@ void Communicator::sendMessage() {
 
 			message->printHeader();
 			//message->printPayloadHex();
-			debug("Message (ID: %d) FD = %d removed from queue\n",
+			debug("Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
 					message->getMsgHeader().requestId, sockfd);
 
 			{
@@ -263,7 +261,7 @@ void Communicator::sendMessage() {
 				lock_guard<mutex> lk(waitReplyMessageMapMutex);
 				if (!_waitReplyMessageMap.count(
 						message->getMsgHeader().requestId)) {
-					debug("Deleting Message (ID: %d)\n",
+					debug("Deleting Message (ID: %" PRIu32 ")\n",
 							message->getMsgHeader().requestId);
 					delete message;
 					debug("%s\n", "Message Deleted");

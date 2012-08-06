@@ -34,7 +34,7 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 		throw SocketException("Could not bind to port.");
 	}
 
-	debug ("Connected to sockfd = %d\n", _socket.getSockfd());
+	debug ("Connected to sockfd = %" PRIu32 "\n", _socket.getSockfd());
 
 	// save connection info in private variables
 	_connectionType = connectionType;
@@ -58,7 +58,7 @@ uint32_t Connection::sendMessage(Message* message) {
 		cerr << "Error in sending MsgHeader" << endl;
 	}
 
-	debug ("Header sent %d bytes\n", byteSent);
+	debug ("Header sent %" PRIu32 " bytes\n", byteSent);
 
 	// send protocol message
 	
@@ -74,7 +74,7 @@ uint32_t Connection::sendMessage(Message* message) {
 		cerr << "Error in sending Protocol Message" << endl;
 	}
 
-	debug ("Protocol sent %d bytes\n", byteSent);
+	debug ("Protocol sent %" PRIu32 " bytes\n", byteSent);
 
 	// send payload if there is one
 	
@@ -92,7 +92,7 @@ uint32_t Connection::sendMessage(Message* message) {
 
 	}
 
-	debug ("Payload sent %d bytes\n", byteSent);
+	debug ("Payload sent %" PRIu32 " bytes\n", byteSent);
 
 
 	return totalByteSent;
@@ -115,7 +115,7 @@ char* Connection::recvMessage() {
 		cerr << "Error in receiving MsgHeader" << endl;
 	}
 
-	debug ("Header received %d bytes\n", byteReceived);
+	debug ("Header received %" PRIu32 " bytes\n", byteReceived);
 
 	// allocate buffer
 
@@ -128,8 +128,8 @@ char* Connection::recvMessage() {
 	// copy header to buffer
 	memcpy(buf, &msgHeader, headerLength);
 
-	debug ("Type %d\n",msgHeader.protocolMsgType);
-	debug ("Buffer Size %d\n",bufferSize);
+	debug ("Type %d\n", (int)msgHeader.protocolMsgType);
+	debug ("Buffer Size %" PRIu32 "\n",bufferSize);
 	// receive protocol message
 
 	const uint32_t protocolLength = msgHeader.protocolMsgSize;
@@ -142,7 +142,7 @@ char* Connection::recvMessage() {
 		cerr << "Error in receiving protocol message" << endl;
 	}
 
-	debug ("Protocol received %d bytes\n", byteReceived);
+	debug ("Protocol received %" PRIu32 " bytes\n", byteReceived);
 
 	// receive payload if needed
 
@@ -159,7 +159,7 @@ char* Connection::recvMessage() {
 
 	}
 
-	debug ("Payload received %d bytes\n", byteReceived);
+	debug ("Payload received %" PRIu32 " bytes\n", byteReceived);
 
 	return buf;
 
@@ -169,7 +169,7 @@ void Connection::disconnect() {
 	_socket.~Socket();
 }
 
-int Connection::getSockfd() {
+uint32_t Connection::getSockfd() {
 	return _socket.getSockfd();
 }
 

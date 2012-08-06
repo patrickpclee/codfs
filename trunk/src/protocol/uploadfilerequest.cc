@@ -70,7 +70,7 @@ void UploadFileRequestMsg::doHandle() {
 }
 
 void UploadFileRequestMsg::printProtocol() {
-	debug("[UPLOAD_FILE_REQUEST] Client ID = %d, Path = %s\n", _clientId,
+	debug("[UPLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", Path = %s\n", _clientId,
 			_path.c_str());
 }
 
