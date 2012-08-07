@@ -33,7 +33,6 @@ Communicator::Communicator() {
 
 	// initialize variables
 	_requestId.store(0);
-	_serverSocket = {};
 	_connectionMap = {};
 	_outMessageQueue = {};
 	_waitReplyMessageMap = {};
@@ -182,12 +181,15 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	if (message->getMsgHeader().requestId == 0) {
 		message->setRequestId(requestId);
 	}
+
 	{
 		lock_guard<mutex> lk(outMessageQueueMutex);
 		_outMessageQueue.push_back(message);
 	}
 
 	if (expectReply) {
+
+		message->setExpectReply(true);
 		debug("Message (ID: %" PRIu32 ") added to waitReplyMessageMap\n",
 				message->getMsgHeader().requestId);
 
@@ -253,27 +255,23 @@ void Communicator::sendMessage() {
 
 			message->printHeader();
 			//message->printPayloadHex();
-			debug("Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
+			debug(
+					"Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
 					message->getMsgHeader().requestId, sockfd);
 
-			{
-				// delete message if it is not waiting for reply
-				lock_guard<mutex> lk(waitReplyMessageMapMutex);
-				if (!_waitReplyMessageMap.count(
-						message->getMsgHeader().requestId)) {
-					debug("Deleting Message (ID: %" PRIu32 ")\n",
-							message->getMsgHeader().requestId);
-					delete message;
-					debug("%s\n", "Message Deleted");
-				}
+			// delete message if it is not waiting for reply
+			if (!(message->getExpectReply())) {
+				debug("Deleting Message (ID: %" PRIu32 ")\n",
+						message->getMsgHeader().requestId);
+				delete message;
+				debug("%s\n", "Message Deleted");
 			}
-
 		}
 
-		// in terms of 10^-6 seconds
-		usleep(pollingInterval);
 	}
 
+	// in terms of 10^-6 seconds
+	usleep(pollingInterval);
 }
 
 /**
