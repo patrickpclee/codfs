@@ -63,5 +63,5 @@ void PutSegmentEndRequestMsg::handle() {
 }
 
 void PutSegmentEndRequestMsg::printProtocol() {
-	debug("[PUT_SEGMENT_END_REQUEST] Object ID = %llu Segment ID = %u\n", _objectId, _segmentId);
+	debug("[PUT_SEGMENT_END_REQUEST] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 "\n", _objectId, _segmentId);
 }
