@@ -182,13 +182,7 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 		message->setRequestId(requestId);
 	}
 
-	{
-		lock_guard<mutex> lk(outMessageQueueMutex);
-		_outMessageQueue.push_back(message);
-	}
-
 	if (expectReply) {
-
 		message->setExpectReply(true);
 		debug("Message (ID: %" PRIu32 ") added to waitReplyMessageMap\n",
 				message->getMsgHeader().requestId);
@@ -198,6 +192,12 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 			_waitReplyMessageMap[requestId] = message;
 		}
 	}
+
+	{
+		lock_guard<mutex> lk(outMessageQueueMutex);
+		_outMessageQueue.push_back(message); // must be at the end of function
+	}
+
 }
 
 Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
