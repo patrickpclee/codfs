@@ -33,7 +33,6 @@ Communicator::Communicator() {
 
 	// initialize variables
 	_requestId.store(0);
-	_serverSocket = {};
 	_connectionMap = {};
 	_outMessageQueue = {};
 	_waitReplyMessageMap = {};
