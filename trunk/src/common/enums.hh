@@ -13,6 +13,10 @@ enum MessageStatus {
 	WAITING, READY, TIMEOUT
 };
 
+enum FileType {
+	NORMAL, FOLDER
+};
+
 enum MsgType {
 	DEFAULT,
 	LIST_DIRECTORY_REQUEST,

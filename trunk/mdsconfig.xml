@@ -14,4 +14,8 @@
         <ServerPort>50000</ServerPort>
         
     </Communication>
+
+	<MetaData>
+		<BasePath>.</BasePath>
+	</MetaData>
 </NcvfsConfig>

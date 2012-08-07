@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 #include <string>
+
+#include "enums.hh"
+
 using namespace std;
 
 struct FileMetaData {
@@ -11,6 +14,7 @@ struct FileMetaData {
 	uint64_t _size;
 	unsigned char* _checksum;
 	uint64_t* _objectList[];
+	FileType _fileType;	
 };
 
 struct ObjectMetaData {
