@@ -60,5 +60,5 @@ void PutObjectEndRequestMsg::handle() {
 }
 
 void PutObjectEndRequestMsg::printProtocol() {
-	debug("[PUT_OBJECT_END_REQUEST] Object ID = %lu\n", _objectId);
+	debug("[PUT_OBJECT_END_REQUEST] Object ID = %llu\n", _objectId);
 }

@@ -71,6 +71,6 @@ void ObjectDataMsg::handle() {
 }
 
 void ObjectDataMsg::printProtocol() {
-	debug("[OBJECT_DATA] Object ID = %lu, offset = %lu, length = %d\n",
+	debug("[OBJECT_DATA] Object ID = %llu, offset = %llu, length = %d\n",
 			_objectId, _offset, _length);
 }

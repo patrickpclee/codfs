@@ -1,5 +1,5 @@
-#ifndef __SEGMENTDATAMSG_HH__
-#define __SEGMENTDATAMSG_HH__
+#ifndef __PUTSEGMENTENDREPLY_HH__
+#define __PUTSEGMENTENDREPLY_HH__
 
 #include "message.hh"
 
@@ -7,29 +7,15 @@ using namespace std;
 
 /**
  * Extends the Message class
- * Initiate an segment transfer
  */
 
-class SegmentDataMsg: public Message {
+class PutSegmentEndReplyMsg: public Message {
 public:
 
-	SegmentDataMsg(Communicator* communicator);
+	PutSegmentEndReplyMsg(Communicator* communicator);
 
-	/**
-	 *
-	 * @param communicator
-	 * @param dstSockfd
-	 * @param objectId
-	 * @param segmentId
-	 * @param offset
-	 * @param length
-	 */
-
-	SegmentDataMsg(Communicator* communicator, uint32_t dstSockfd,
-			uint64_t objectId,
-			uint32_t segmentId,
-			uint64_t offset,
-			uint32_t length);
+	PutSegmentEndReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t dstSockfd,
+			uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -63,8 +49,6 @@ public:
 private:
 	uint64_t _objectId;
 	uint32_t _segmentId;
-	uint64_t _offset;
-	uint32_t _length;
 };
 
 #endif

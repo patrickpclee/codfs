@@ -59,5 +59,5 @@ void PutObjectEndReplyMsg::handle() {
 }
 
 void PutObjectEndReplyMsg::printProtocol() {
-	debug("[PUT_OBJECT_END_REPLY] Object ID = %lu\n", _objectId);
+	debug("[PUT_OBJECT_END_REPLY] Object ID = %llu\n", _objectId);
 }

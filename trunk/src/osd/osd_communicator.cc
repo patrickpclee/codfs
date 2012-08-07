@@ -67,6 +67,19 @@ void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 	addMessage(putObjectEndReplyMsg);
 }
 
+void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
+		uint32_t connectionId, uint64_t objectId, uint32_t segmentId) {
+
+//	PutObjectEndReplyMsg* putObjectEndReplyMsg = new PutObjectEndReplyMsg(this,
+//			requestId, connectionId, objectId);
+//	putObjectEndReplyMsg->prepareProtocolMsg();
+//
+//	addMessage(putObjectEndReplyMsg);
+
+	//TODO
+}
+
+
 uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 	return 0;
 }

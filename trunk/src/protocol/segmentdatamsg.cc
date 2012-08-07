@@ -71,6 +71,6 @@ void SegmentDataMsg::handle() {
 }
 
 void SegmentDataMsg::printProtocol() {
-	debug("[SEGMENT_DATA] Object ID = %lu, Segment ID = %u, offset = %lu, length = %d\n",
+	debug("[SEGMENT_DATA] Object ID = %llu, Segment ID = %u, offset = %llu, length = %d\n",
 			_objectId, _segmentId, _offset, _length);
 }

@@ -137,6 +137,15 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 }
 
+void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId) {
+
+	// TODO: check integrity of segment received
+
+	_osdCommunicator->replyPutSegmentEnd (requestId, sockfd, objectId, segmentId);
+
+}
+
 uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 

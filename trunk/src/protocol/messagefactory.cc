@@ -12,6 +12,7 @@
 #include "putobjectendrequest.hh"
 #include "putobjectendreply.hh"
 #include "objectdatamsg.hh"
+#include "segmentdatamsg.hh"
 #include "messagefactory.hh"
 
 MessageFactory::MessageFactory() {
@@ -42,7 +43,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (PUT_OBJECT_END_REPLY):
 		return new PutObjectEndReplyMsg(communicator);
-		//return new PutObjectEndReplyMsg(communicator);
 		break;
 	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);

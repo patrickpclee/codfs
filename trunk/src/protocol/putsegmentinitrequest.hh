@@ -1,5 +1,5 @@
-#ifndef __PUTOBJECTINITREQUEST_HH__
-#define __PUTOBJECTINITREQUEST_HH__
+#ifndef __PUTSEGMENTINITREQUEST_HH__
+#define __PUTSEGMENTINITREQUEST_HH__
 
 #include "message.hh"
 
@@ -7,15 +7,15 @@ using namespace std;
 
 /**
  * Extends the Message class
- * Initiate an segment transfer
+ * Initiate an segment trasfer
  */
 
-class PutSegmentInitMsg: public Message {
+class PutSegmentInitRequestMsg: public Message {
 public:
 
-	PutSegmentInitMsg(Communicator* communicator);
+	PutSegmentInitRequestMsg(Communicator* communicator);
 
-	PutSegmentInitMsg(Communicator* communicator, uint32_t osdSockfd,
+	PutSegmentInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t objectId, uint32_t segmentId, uint32_t segmentSize, uint32_t chunkCount);
 
 	/**

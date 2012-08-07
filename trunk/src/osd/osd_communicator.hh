@@ -55,6 +55,9 @@ public:
 	 * @return 0 if success, -1 if failure
 	 */
 
+	void replyPutSegmentEnd(uint32_t requestId,
+			uint32_t connectionId, uint64_t objectId, uint32_t segmentId);
+
 	uint32_t reportOsdFailure(uint32_t osdId);
 
 	/**
