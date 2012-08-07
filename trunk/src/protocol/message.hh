@@ -114,7 +114,8 @@ public:
 	struct MsgHeader getMsgHeader ();
 	string getProtocolMsg();
 	char* getPayload();
-	bool getExpectReply();
+	bool isExpectReply();
+	bool isDeletable();
 
 
 	/**
@@ -166,6 +167,7 @@ protected:
 	Communicator* _communicator;
 	
 	promise <MessageStatus> _status;
+	bool _deletable;
 };
 
 #endif

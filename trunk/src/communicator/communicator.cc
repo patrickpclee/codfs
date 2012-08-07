@@ -154,7 +154,7 @@ void Communicator::waitForMessage() {
 				ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 				if (nbytes == 0) {
 					// disconnect and remove from _connectionMap
-					p->second->disconnect();
+					delete p->second;
 					_connectionMap.erase(p->first);
 					continue;
 				}
@@ -175,24 +175,25 @@ void Communicator::waitForMessage() {
  */
 
 void Communicator::addMessage(Message* message, bool expectReply) {
-	// check if request ID = 0
-	const uint32_t requestId = generateRequestId();
 
+	// if requestID == 0, generate a new one
 	if (message->getMsgHeader().requestId == 0) {
-		message->setRequestId(requestId);
+		message->setRequestId(generateRequestId());
 	}
 
+	// add message to waitReplyMessageMap if needed
 	if (expectReply) {
 		message->setExpectReply(true);
-		debug("Message (ID: %" PRIu32 ") added to waitReplyMessageMap\n",
-				message->getMsgHeader().requestId);
-
 		{
+			const uint32_t requestId = message->getMsgHeader().requestId;
 			lock_guard<mutex> lk(waitReplyMessageMapMutex);
 			_waitReplyMessageMap[requestId] = message;
+			debug("Message (ID: %" PRIu32 ") added to waitReplyMessageMap\n",
+					requestId);
 		}
 	}
 
+	// add message to outMessageQueue
 	{
 		lock_guard<mutex> lk(outMessageQueueMutex);
 		_outMessageQueue.push_back(message); // must be at the end of function
@@ -227,13 +228,15 @@ void Communicator::sendMessage() {
 	while (1) {
 
 		// send all message in the outMessageQueue
-		while (!_outMessageQueue.empty()) {
+		while (!isOutMessageQueueEmpty()) {
 
 			// get and remove from queue
-			outMessageQueueMutex.lock();
-			Message* message = _outMessageQueue.front();
-			_outMessageQueue.pop_front();
-			outMessageQueueMutex.unlock();
+			Message* message;
+			{
+				lock_guard<mutex> lk(outMessageQueueMutex);
+				message = _outMessageQueue.front();
+				_outMessageQueue.pop_front();
+			}
 
 			const uint32_t sockfd = message->getSockfd();
 
@@ -246,7 +249,6 @@ void Communicator::sendMessage() {
 
 			if (!(_connectionMap.count(sockfd))) {
 				debug("%s\n", "Connection not found!");
-				map<uint32_t, Connection*>::iterator p; // connectionMap iterator
 				exit(-1);
 			}
 			_connectionMap[sockfd]->sendMessage(message);
@@ -260,9 +262,9 @@ void Communicator::sendMessage() {
 					message->getMsgHeader().requestId, sockfd);
 
 			// delete message if it is not waiting for reply
-			if (!(message->getExpectReply())) {
-				debug("Deleting Message (ID: %" PRIu32 ")\n",
-						message->getMsgHeader().requestId);
+			if (!message->isExpectReply()) {
+				debug("Deleting Message (Type = %d ID: %" PRIu32 ")\n",
+						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
 				delete message;
 				debug("%s\n", "Message Deleted");
 			}
@@ -304,9 +306,8 @@ void Communicator::disconnectAndRemove(uint32_t sockfd) {
 
 	if (_connectionMap.count(sockfd)) {
 		Connection* conn = _connectionMap[sockfd];
-		conn->disconnect();
-		_connectionMap.erase(sockfd);
 		delete conn;
+		_connectionMap.erase(sockfd);
 	} else {
 		cerr << "Connection not found, cannot remove connection" << endl;
 	}
@@ -404,4 +405,19 @@ uint32_t Communicator::generateRequestId() {
 	_requestId.store(_requestId.load() + 1);
 	return _requestId.load();
 
+}
+
+bool Communicator::isOutMessageQueueEmpty() {
+	lock_guard<mutex> lk(outMessageQueueMutex);
+	return _outMessageQueue.empty();
+}
+
+void Communicator::waitAndDelete(Message* message) {
+	while (1) {
+		if (message->isDeletable()) {
+			delete message;
+			return;
+		}
+		usleep (100);
+	}
 }

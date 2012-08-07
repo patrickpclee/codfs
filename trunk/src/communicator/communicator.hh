@@ -147,6 +147,20 @@ protected:
 
 	void dispatch(char* buf, uint32_t sockfd);
 
+	/**
+	 * Check if out message queue is empty
+	 * @return True if empty, false otherwise
+	 */
+
+	bool isOutMessageQueueEmpty ();
+
+	/**
+	 * Delete the message when it is deletable
+	 * @param message Message pointer to delete
+	 */
+
+	void waitAndDelete (Message* message);
+
 	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
 
 	Socket _serverSocket; // socket for accepting incoming connections

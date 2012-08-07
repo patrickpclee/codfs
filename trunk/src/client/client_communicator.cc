@@ -31,7 +31,7 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 
 	if(status == READY) {
 		vector <FileMetaData> fileMetaData = listDirectoryRequestMsg->getFolderData();
-		delete listDirectoryRequestMsg;
+		waitAndDelete (listDirectoryRequestMsg);
 		return fileMetaData;
 	} else {
 		debug("%s\n","List Directory Request Failed");
@@ -105,7 +105,7 @@ void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	MessageStatus status = putObjectInitRequestMsg->waitForStatusChange();
 	if(status == READY) {
-		delete putObjectInitRequestMsg;
+		waitAndDelete (putObjectInitRequestMsg);
 		return;
 	} else {
 		debug("%s\n", "Put Object Init Failed");
@@ -136,9 +136,12 @@ void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
 	putObjectEndRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectEndRequestMsg, true);
 
+	debug ("%s\n", "before waitForStatusChange");
 	MessageStatus status = putObjectEndRequestMsg->waitForStatusChange();
 	if(status == READY) {
-		delete putObjectEndRequestMsg;
+		debug ("%s\n", "status == READY");
+		waitAndDelete (putObjectEndRequestMsg);
+		debug ("%s\n", "msg deleted");
 		return;
 	} else {
 		debug("%s\n", "Put Object Init Failed");

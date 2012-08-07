@@ -17,17 +17,16 @@
 using namespace std;
 
 Message::Message() {
-
 }
 
 Message::Message(Communicator* communicator) {
-
 	_sockfd = 0;
 	memset (&_msgHeader, 0, sizeof (struct MsgHeader));
 	_protocolMsg = "";
 	_payload = NULL;
 	_recvBuf = NULL;
 	_expectReply = false;
+	_deletable = false;
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
 }
 
@@ -100,16 +99,21 @@ uint32_t Message::getSockfd() {
 	return _sockfd;
 }
 
-bool Message::getExpectReply() {
+bool Message::isExpectReply() {
 	return _expectReply;
 }
 
 MessageStatus Message::waitForStatusChange() {
+	debug ("%s\n", "waitforstatuschange");
 	return _status.get_future().get();
 }
 
 void Message::setStatus(MessageStatus status) {
+	_deletable = false;
 	_status.set_value(status);
+
+	// after set_value has finished running, the message is deletable
+	_deletable = true;
 	return;
 }
 
@@ -124,4 +128,8 @@ void Message::handle() {
 	// cleanup
 	MemoryPool::getInstance().poolFree(_recvBuf);
 	delete this;
+}
+
+bool Message::isDeletable() {
+	return _deletable;
 }

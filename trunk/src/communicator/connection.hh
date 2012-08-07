@@ -32,13 +32,6 @@ public:
 	Connection(string ip, uint16_t port, ComponentType connectionType);
 
 	/**
-	 * Constructor (for saving incoming connection)
-	 * @param socket Socket of incoming connection
-	 */
-
-//	Connection(Socket socket);
-
-	/**
 	 * Establish connection with a component
 	 * @param ip Destination IP
 	 * @param port Destination Port
