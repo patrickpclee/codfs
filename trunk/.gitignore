@@ -2,3 +2,6 @@ CLIENT
 OSD
 MDS
 MONITOR
+testfile
+*.d
+*.o
