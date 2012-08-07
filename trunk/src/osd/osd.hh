@@ -68,8 +68,8 @@ public:
 	 * @return Length of list if success, -1 if failure
 	 */
 
-	uint32_t osdListProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
-			vector<struct SegmentLocation> osdList);
+	uint32_t osdListProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, vector<struct SegmentLocation> osdList);
 
 	/**
 	 * Action when a getObjectRequest is received
@@ -78,7 +78,8 @@ public:
 	 * @param objectId 	ID of the object to send
 	 */
 
-	void getObjectProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
+	void getObjectProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId);
 
 	/**
 	 * Action when a getSegmentRequest is received
@@ -88,8 +89,8 @@ public:
 	 * @param segmentId ID of the segment to send
 	 */
 
-	void getSegmentProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
-			uint32_t segmentId);
+	void getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Action when a put object request is received
@@ -101,8 +102,8 @@ public:
 	 * @param chunkCount number of chunks that will be received
 	 */
 
-	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
-			uint32_t length, uint32_t chunkCount);
+	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint32_t length, uint32_t chunkCount);
 
 	/**
 	 * Action when a put object end is received
@@ -111,7 +112,8 @@ public:
 	 * @param objectId Object ID
 	 */
 
-	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
+	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId);
 
 	/**
 	 * Action when an object trunk is received
@@ -124,8 +126,8 @@ public:
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
-	uint32_t putObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
-			uint64_t offset, uint32_t length, char* buf);
+	uint32_t putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
 
 	/**
 	 * Action when a put object request is received
@@ -137,8 +139,8 @@ public:
 	 * @param length Segment size, equals the total length of all the trunks
 	 */
 
-	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
-			uint32_t segmentId, uint32_t length);
+	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint32_t segmentId, uint32_t length);
 
 	/**
 	 * Action when a segment trunk is received
@@ -152,15 +154,26 @@ public:
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
-	uint32_t putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId,
-			uint32_t segmentId, uint32_t offset, uint32_t length, char* buf);
+	uint32_t putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint32_t segmentId, uint32_t offset,
+			uint32_t length, char* buf);
+
+	/**
+	 * Action when a put segment end is received
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 */
+
+	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Action when a recovery request is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 */
-
 
 	void recoveryProcessor(uint32_t requestId, uint32_t sockfd);
 
@@ -234,7 +247,7 @@ private:
 //	Coding _cunit; // encode & decode done here
 	uint32_t _osdId;
 
-	map <uint64_t, uint32_t> _pendingObjectChunk;
+	map<uint64_t, uint32_t> _pendingObjectChunk;
 
 };
 #endif

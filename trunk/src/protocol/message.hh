@@ -114,6 +114,7 @@ public:
 	struct MsgHeader getMsgHeader ();
 	string getProtocolMsg();
 	char* getPayload();
+	bool getExpectReply();
 
 
 	/**
@@ -129,6 +130,13 @@ public:
 	 * @param	status	New Status of the Message
 	 */
 	void setStatus (MessageStatus status);
+
+	/**
+	 * Set if message expects reply
+	 * @param expectReply New expectReply value
+	 */
+
+	void setExpectReply (bool expectReply);
 
 	/**
 	 * DEBUG: Print the MsgHeader
@@ -154,6 +162,7 @@ protected:
 	string _protocolMsg;
 	char* _payload;
 	char* _recvBuf;		// buffer created to store header + protocol + payload in recvMessage
+	bool _expectReply;
 	Communicator* _communicator;
 	
 	promise <MessageStatus> _status;

@@ -27,6 +27,7 @@ Message::Message(Communicator* communicator) {
 	_protocolMsg = "";
 	_payload = NULL;
 	_recvBuf = NULL;
+	_expectReply = false;
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
 }
 
@@ -99,6 +100,10 @@ uint32_t Message::getSockfd() {
 	return _sockfd;
 }
 
+bool Message::getExpectReply() {
+	return _expectReply;
+}
+
 MessageStatus Message::waitForStatusChange() {
 	return _status.get_future().get();
 }
@@ -106,6 +111,10 @@ MessageStatus Message::waitForStatusChange() {
 void Message::setStatus(MessageStatus status) {
 	_status.set_value(status);
 	return;
+}
+
+void Message::setExpectReply (bool expectReply) {
+	_expectReply = expectReply;
 }
 
 void Message::handle() {
