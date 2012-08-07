@@ -51,14 +51,12 @@ void PutObjectEndRequestMsg::parse(char* buf) {
 
 }
 
-void PutObjectEndRequestMsg::handle() {
+void PutObjectEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectEndProcessor (_msgHeader.requestId, _sockfd, _objectId);
 #endif
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutObjectEndRequestMsg::printProtocol() {
-	debug("[PUT_OBJECT_END_REQUEST] Object ID = %llu\n", _objectId);
+	debug("[PUT_OBJECT_END_REQUEST] Object ID = %" PRIu64 "\n", _objectId);
 }

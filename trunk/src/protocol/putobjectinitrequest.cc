@@ -57,15 +57,13 @@ void PutObjectInitRequestMsg::parse(char* buf) {
 
 }
 
-void PutObjectInitRequestMsg::handle() {
+void PutObjectInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _objectSize, _chunkCount);
 #endif
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutObjectInitRequestMsg::printProtocol() {
-	debug("[PUT_OBJECT_INIT_REQUEST] Object ID = %llu, Length = %llu, Count = %d\n",
+	debug("[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 "\n",
 			_objectId, _objectSize, _chunkCount);
 }

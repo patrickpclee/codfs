@@ -103,7 +103,7 @@ public:
 		return m_sock != -1;
 	}
 
-	int getSockfd();
+	uint32_t getSockfd();
 
 private:
 

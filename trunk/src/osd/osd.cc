@@ -62,7 +62,6 @@ void Osd::getObjectProcessor(uint32_t requestId, uint32_t sockfd,
 	if (_storageModule->isObjectExist(objectId)) {
 		// if object exists in cache
 		objectData = _storageModule->readObject(objectId, 0);
-		debug("Object read from cache data = %s\n", objectData.buf);
 	} else {
 		// get osdIDList from cache, if failed update it from MDS
 		try {
@@ -119,8 +118,6 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	// initialize chunkCount value
 	pendingObjectChunkMutex.lock();
 	_pendingObjectChunk[objectId] = chunkCount;
-	debug("pending object chunk = %d chunkCount = %d \n",
-			_pendingObjectChunk[objectId], chunkCount);
 	pendingObjectChunkMutex.unlock();
 
 	_storageModule->createObject(objectId, length);
@@ -133,7 +130,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// TODO: check integrity of object received
 
-	_osdCommunicator->replyPutObjectEnd (requestId, sockfd, objectId);
+	_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
 }
 
@@ -220,7 +217,7 @@ int main(void) {
 	// start server
 	const uint16_t serverPort = configLayer->getConfigInt(
 			"Communication>ServerPort");
-	debug("Start server on port %d\n", serverPort);
+	debug("Start server on port %" PRIu16 " \n", serverPort);
 	communicator->createServerSocket(serverPort);
 	/*
 

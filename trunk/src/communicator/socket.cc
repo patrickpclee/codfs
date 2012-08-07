@@ -154,6 +154,6 @@ void Socket::set_non_blocking(const bool b) {
 
 }
 
-int Socket::getSockfd() {
-	return m_sock;
+uint32_t Socket::getSockfd() {
+	return (uint32_t)m_sock;
 }

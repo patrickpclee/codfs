@@ -6,6 +6,7 @@
 #include <cstdio>
 #include "osd_communicator.hh"
 #include "../common/enums.hh"
+#include "../common/memorypool.hh"
 #include "../protocol/listdirectoryrequest.hh"
 #include "../protocol/putobjectinitreply.hh"
 #include "../protocol/putobjectendreply.hh"
@@ -86,14 +87,35 @@ uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 
 uint32_t OsdCommunicator::sendSegment(uint32_t sockfd,
 		struct SegmentData segmentData) {
+
+	// step 1: send init message, wait for ack
+
+	// step 2: send data
+
+	// step 3: send end message, wait for ack
+
+	// step 4: free memory
+	MemoryPool::getInstance().poolFree(segmentData.buf);
+
 	return 0;
 }
 
 uint32_t OsdCommunicator::sendObject(uint32_t sockfd,
 		struct ObjectData objectData) {
 	// TEST
-	debug("Send object ID = %lu to sockfd = %d, content = %s\n",
-			objectData.info.objectId, sockfd, objectData.buf);
+
+	debug("Send object ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
+			objectData.info.objectId, sockfd);
+
+	// step 1: send init message, wait for ack
+
+	// step 2: send data
+
+	// step 3: send end message, wait for ack
+
+	// step 4: free memory
+	MemoryPool::getInstance().poolFree(objectData.buf);
+
 	return 0;
 }
 

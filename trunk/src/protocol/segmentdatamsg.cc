@@ -64,13 +64,13 @@ void SegmentDataMsg::parse(char* buf) {
 
 }
 
-void SegmentDataMsg::handle() {
+void SegmentDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putSegmentDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _segmentId, _offset, _length, _payload);
 #endif
 }
 
 void SegmentDataMsg::printProtocol() {
-	debug("[SEGMENT_DATA] Object ID = %llu, Segment ID = %u, offset = %llu, length = %d\n",
+	debug("[SEGMENT_DATA] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", offset = %" PRIu64 ", length = %" PRIu32 "\n",
 			_objectId, _segmentId, _offset, _length);
 }

@@ -26,14 +26,13 @@ PutSegmentInitRequestMsg::PutSegmentInitRequestMsg(Communicator* communicator,
 
 void PutSegmentInitRequestMsg::prepareProtocolMsg() {
 	string serializedString;
+	ncvfs::PutSegmentInitRequestPro putSegmentInitRequestPro;
+	putSegmentInitRequestPro.set_objectid(_objectId);
+	putSegmentInitRequestPro.set_segmentid(_segmentId);
+	putSegmentInitRequestPro.set_segmentsize(_segmentSize);
+	putSegmentInitRequestPro.set_chunkcount(_chunkCount);
 
-	ncvfs::PutSegmentInitRequestPro putSegmentInitRquestPro;
-	putSegmentInitRquestPro.set_objectid(_objectId);
-	putSegmentInitRquestPro.set_segmentid(_segmentId);
-	putSegmentInitRquestPro.set_segmentsize(_segmentSize);
-	putSegmentInitRquestPro.set_chunkcount(_chunkCount);
-
-	if (!putSegmentInitRquestPro.SerializeToString(&serializedString)) {
+	if (!putSegmentInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
 		return;
 	}
@@ -59,13 +58,13 @@ void PutSegmentInitRequestMsg::parse(char* buf) {
 
 }
 
-void PutSegmentInitRequestMsg::handle() {
+void PutSegmentInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putSegmentInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId, _segmentSize, _chunkCount);
+	//osd->putSegmentInitRequestProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId, _segmentSize, _chunkCount);
 #endif
 }
 
 void PutSegmentInitRequestMsg::printProtocol() {
-	debug("[PUT_SEGMENT_INIT_REQUEST] Object ID = %llu, Segment ID = %u, Length = %u, Count = %d\n",
+	debug("[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
 			_objectId, _segmentId, _segmentSize, _chunkCount);
 }

@@ -49,15 +49,13 @@ void PutObjectInitReplyMsg::parse(char* buf) {
 
 }
 
-void PutObjectInitReplyMsg::handle() {
+void PutObjectInitReplyMsg::doHandle() {
 	PutObjectInitRequestMsg* putObjectInitRequestMsg =
 			(PutObjectInitRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	putObjectInitRequestMsg->setStatus(READY);
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutObjectInitReplyMsg::printProtocol() {
-	debug("[PUT_OBJECT_INIT_REPLY] Object ID = %llu\n", _objectId);
+	debug("[PUT_OBJECT_INIT_REPLY] Object ID = %" PRIu64 "\n", _objectId);
 }

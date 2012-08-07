@@ -63,16 +63,14 @@ void ListDirectoryRequestMsg::parse(char* buf) {
 
 }
 
-void ListDirectoryRequestMsg::handle() {
+void ListDirectoryRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
 	mds->listFolderProcessor(_msgHeader.requestId,_sockfd,_clientId,_directoryPath);
 #endif
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void ListDirectoryRequestMsg::printProtocol() {
-	debug("[LIST_DIRECTORY_REQUEST] OSD ID = %d Path = %s\n",
+	debug("[LIST_DIRECTORY_REQUEST] OSD ID = %" PRIu32 " Path = %s\n",
 			_clientId, _directoryPath.c_str());
 }
 

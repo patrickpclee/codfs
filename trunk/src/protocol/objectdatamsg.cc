@@ -62,15 +62,13 @@ void ObjectDataMsg::parse(char* buf) {
 
 }
 
-void ObjectDataMsg::handle() {
+void ObjectDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _offset, _length, _payload);
 #endif
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void ObjectDataMsg::printProtocol() {
-	debug("[OBJECT_DATA] Object ID = %llu, offset = %llu, length = %d\n",
+	debug("[OBJECT_DATA] Object ID = %" PRIu64 ", offset = %" PRIu64 ", length = %" PRIu32 "\n",
 			_objectId, _offset, _length);
 }

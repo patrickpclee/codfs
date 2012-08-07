@@ -7,8 +7,11 @@ using namespace std;
 
 /**
  * Extends the Message class
+<<<<<<< HEAD
  * Initiate an segment trasfer
  */
+
+
 
 class PutSegmentInitRequestMsg: public Message {
 public:
@@ -38,7 +41,7 @@ public:
 	 * Execute the corresponding Processor
 	 */
 
-	void handle();
+	void doHandle();
 
 	/**
 	 * Override

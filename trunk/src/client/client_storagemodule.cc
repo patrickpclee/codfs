@@ -18,7 +18,7 @@ mutex fileMutex;
 ClientStorageModule::ClientStorageModule() {
 	// read config value
 	_objectSize = configLayer->getConfigLong("Storage>ObjectSize") * 1024;
-	debug("Config Object Size = %lu Bytes\n", _objectSize);
+	debug("Config Object Size = %" PRIu64 " Bytes\n", _objectSize);
 }
 
 uint32_t ClientStorageModule::getObjectCount(string filepath) {
@@ -85,7 +85,8 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 	}
 
 	// Read file contents into buffer
-	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead); // TODO: when free object?
+	// poolFree in ClientCommunicator::putObject
+	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 	uint32_t byteRead = pread(fileno(file), objectData.buf, byteToRead, offset);
 
 	// Release lock
@@ -95,7 +96,8 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 	}
 
 	if (byteRead != byteToRead) {
-		debug("ERROR: Length = %d, byteRead = %d\n", byteToRead, byteRead);
+		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
+				byteToRead, byteRead);
 		exit(-1);
 	}
 
