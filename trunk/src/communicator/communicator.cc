@@ -12,6 +12,7 @@
 #include "communicator.hh"
 #include "socketexception.hh"
 #include "../config/config.hh"
+#include "../common/garbagecollector.hh"
 #include "../common/enums.hh"
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
@@ -46,6 +47,8 @@ Communicator::Communicator() {
 	// chunk size
 	_chunkSize = configLayer->getConfigInt("Communication>ChunkSize");
 
+	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
+
 	debug("%s\n", "Communicator constructed");
 }
 
@@ -53,14 +56,14 @@ Communicator::~Communicator() {
 	debug("%s\n", "Communicator destructed");
 }
 
-void Communicator::createServerSocket(uint16_t port) {
+void Communicator::createServerSocket() {
 
 	// create a socket for accepting new peers
 	if (!_serverSocket.create()) {
 		throw SocketException("Could not create server socket.");
 	}
 
-	if (!_serverSocket.bind(port)) {
+	if (!_serverSocket.bind(_serverPort)) {
 		throw SocketException("Could not bind to port.");
 	}
 
@@ -68,7 +71,8 @@ void Communicator::createServerSocket(uint16_t port) {
 		throw SocketException("Could not listen to socket.");
 	}
 
-	debug("Server socket sockfd = %" PRIu32 "\n", _serverSocket.getSockfd());
+	debug("Server Port = %" PRIu16 " sockfd = %" PRIu32 "\n",
+			_serverPort, _serverSocket.getSockfd());
 }
 
 /*
@@ -413,11 +417,14 @@ bool Communicator::isOutMessageQueueEmpty() {
 }
 
 void Communicator::waitAndDelete(Message* message) {
-	while (1) {
-		if (message->isDeletable()) {
-			delete message;
-			return;
-		}
-		usleep (100);
-	}
+	/*
+	 while (1) {
+	 if (message->isDeletable()) {
+	 delete message;
+	 return;
+	 }
+	 usleep (100);
+	 }
+	 */
+	GarbageCollector::getInstance().addToDeleteList(message);
 }

@@ -3,6 +3,7 @@
 
 #include "client.hh"
 #include "client_storagemodule.hh"
+#include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
 #include "../common/objectdata.hh"
@@ -13,8 +14,6 @@ Client* client;
 
 /// Config Layer
 ConfigLayer* configLayer;
-
-// HARDCODE FOR TESTING
 
 Client::Client() {
 	_clientCommunicator = new ClientCommunicator();
@@ -61,24 +60,60 @@ uint32_t Client::uploadFileRequest(string filepath) {
 }
 
 /*
-uint32_t Client::downloadFileRequest(string dstPath) {
-	return 0;
-}
-*/
+ uint32_t Client::downloadFileRequest(string dstPath) {
+ return 0;
+ }
+ */
 
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	// to be implemented
 }
 
-void sendThread() {
-	debug("%s", "Send Thread Start\n");
-	client->getCommunicator()->sendMessage();
-	debug("%s", "Send Thread End\n");
+void startGarbageCollectionThread() {
+	GarbageCollector::getInstance().start();
 }
 
-void sleepThread(Client* client, ClientCommunicator* communicator) {
+void startSendThread() {
+	client->getCommunicator()->sendMessage();
+}
 
-	usleep(2000000);
+void startReceiveThread(Communicator* communicator) {
+	// wait for message
+	communicator->waitForMessage();
+
+}
+
+int main(void) {
+
+	configLayer = new ConfigLayer("clientconfig.xml");
+	client = new Client();
+	ClientCommunicator* communicator = client->getCommunicator();
+
+	// start server
+	communicator->createServerSocket();
+
+	/*
+	const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
+	debug("Segment Number = %d\n", segmentNumber);
+	*/
+
+
+	// connect to MDS
+	//	communicator->connectToMds();
+
+	// connect to OSD
+	communicator->connectToOsd();
+
+	// 1. Garbage Collection Thread
+	thread garbageCollectionThread(startGarbageCollectionThread);
+
+	// 2. Receive Thread
+	thread receiveThread(startReceiveThread, communicator);
+
+	// 3. Send Thread
+	thread sendThread(startSendThread);
+
+	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
 	client->uploadFileRequest("./testfile");
@@ -96,41 +131,11 @@ void sleepThread(Client* client, ClientCommunicator* communicator) {
 	 debug("name: %s size: %d\n", ((*it)._path).c_str(), (int)(*it)._size);
 	 }
 	 */
-}
 
-int main(void) {
+	garbageCollectionThread.join();
+	receiveThread.join();
+	sendThread.join();
 
-	configLayer = new ConfigLayer("clientconfig.xml");
-
-	client = new Client();
-
-	ClientCommunicator* communicator = client->getCommunicator();
-
-	const uint16_t serverPort = configLayer->getConfigInt(
-			"Communication>ServerPort");
-
-	debug("Start server on port %" PRIu16 "\n", serverPort);
-
-	const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
-	debug("Segment Number = %d\n", segmentNumber);
-
-	communicator->createServerSocket(serverPort);
-
-	// connect to MDS
-//	communicator->connectToMds();
-
-// connect to OSD
-	communicator->connectToOsd();
-
-	thread t(sendThread);
-	t.detach();
-	thread t1(sleepThread, client, communicator);
-	t1.detach();
-
-	// wait for message
-	communicator->waitForMessage();
-
-	printf("CLIENT\n");
 	return 0;
 }
 

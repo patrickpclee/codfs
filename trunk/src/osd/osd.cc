@@ -9,6 +9,7 @@
 #include "segmentlocationcache.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
+#include "../common/garbagecollector.hh"
 
 /// Osd Object
 Osd* osd;
@@ -195,10 +196,18 @@ SegmentLocationCache* Osd::getSegmentLocationCache() {
 	return _segmentLocationCache;
 }
 
-void sendThread() {
-	debug("%s", "Send Thread Start\n");
+void startGarbageCollectionThread() {
+	GarbageCollector::getInstance().start();
+}
+
+void startSendThread() {
 	osd->getCommunicator()->sendMessage();
-	debug("%s", "Send Thread End\n");
+}
+
+void startReceiveThread(Communicator* communicator) {
+	// wait for message
+	communicator->waitForMessage();
+
 }
 
 /**
@@ -214,22 +223,25 @@ int main(void) {
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
 
-	// start server
-	const uint16_t serverPort = configLayer->getConfigInt(
-			"Communication>ServerPort");
-	debug("Start server on port %" PRIu16 " \n", serverPort);
-	communicator->createServerSocket(serverPort);
-	/*
+	communicator->createServerSocket();
 
+	/*
 	 // connect to MDS
 	 //communicator->connectToMds();
 	 */
 
-	thread t(sendThread);
-	t.detach();
+	// 1. Garbage Collection Thread
+	thread garbageCollectionThread(startGarbageCollectionThread);
 
-	// wait for message (blocking)
-	communicator->waitForMessage();
+	// 2. Receive Thread
+	thread receiveThread(startReceiveThread, communicator);
+
+	// 3. Send Thread
+	thread sendThread(startSendThread);
+
+	garbageCollectionThread.join();
+	receiveThread.join();
+	sendThread.join();
 
 	// cleanup
 	delete configLayer;

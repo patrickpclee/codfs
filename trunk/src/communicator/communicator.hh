@@ -66,11 +66,10 @@ public:
 
 	/**
 	 * Create a server socket at the specified port
-	 * @param port Port to listen to
 	 * @return Binded Socket
 	 */
 
-	void createServerSocket(uint16_t port);
+	void createServerSocket();
 
 	/**
 	 * Establish a connection to a component. Save the connection to list
@@ -163,6 +162,7 @@ protected:
 
 	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
 
+	uint16_t _serverPort;	// listening port for incoming connections
 	Socket _serverSocket; // socket for accepting incoming connections
 	map<uint32_t, Connection*> _connectionMap; // a map of all connections
 	list<Message *> _outMessageQueue; // queue of message to be sent

@@ -7,6 +7,7 @@
 
 #include "mds.hh"
 
+#include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
 
@@ -233,21 +234,18 @@ void Mds::nodeListUpdateProcessor (uint32_t requestId, uint32_t connectionId, ui
 	return ;
 }
 
-/**
- * @brief	Run the MDS
- */
-void Mds::run()
-{
-	running = true;
-	while(running);
-	return ;
+void startGarbageCollectionThread() {
+	GarbageCollector::getInstance().start();
 }
 
-void sendThread()
-{
-	debug("%s","Send Thread Start\n");
+void startSendThread() {
 	mds->getCommunicator()->sendMessage();
-	debug("%s","Send Thread End\n");
+}
+
+void startReceiveThread(Communicator* communicator) {
+	// wait for message
+	communicator->waitForMessage();
+
 }
 
 int main (void)
@@ -258,17 +256,20 @@ int main (void)
 
 	MdsCommunicator* communicator = mds->getCommunicator();
 
-	const uint16_t serverPort = configLayer->getConfigInt(
-			"Communication>ServerPort");
+	communicator->createServerSocket();
 
-	debug ("Start server on port %" PRIu16 "\n", serverPort);
+	// 1. Garbage Collection Thread
+	thread garbageCollectionThread(startGarbageCollectionThread);
 
-	communicator->createServerSocket(serverPort);
+	// 2. Receive Thread
+	thread receiveThread(startReceiveThread, communicator);
 
-	thread t (sendThread);
-	t.detach();
+	// 3. Send Thread
+	thread sendThread(startSendThread);
 
-	communicator->waitForMessage();
+	garbageCollectionThread.join();
+	receiveThread.join();
+	sendThread.join();
 
 	delete mds;
 	delete configLayer;
