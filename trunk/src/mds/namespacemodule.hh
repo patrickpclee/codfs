@@ -9,6 +9,7 @@
 
 class NameSpaceModule {
 public:
+	NameSpaceModule ();
 	uint32_t createFile (uint32_t clientId, string path);
 //	uint32_t deleteFile (string path, uint32_t clientId);
 	uint32_t openFile (uint32_t clientId, string path);
@@ -22,5 +23,8 @@ public:
 	vector<FileMetaData> listFolder (uint32_t clientId, string path);
 private:
 	uint32_t newFileId (string path);
+	string convertPath (string path);
+
+	string _basePath;
 };
 #endif
