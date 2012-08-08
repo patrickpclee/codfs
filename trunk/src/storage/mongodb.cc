@@ -9,6 +9,8 @@ MongoDB::MongoDB ()
 	// TODO: Handle Exception 
 	_host = configLayer->getConfigString("MetaData>MongoDB>Host");
 	_database = configLayer->getConfigString("MetaData>MongoDB>Database");
+	_user = configLayer->getConfigString("MetaData>MongoDB>User");
+	_password = configLayer->getConfigString("MetaData>MongoDB>Password");
 }
 
 MongoDB::MongoDB (string host, string database) :
@@ -23,6 +25,8 @@ void MongoDB::connect ()
 {
 	_connection.connect(_host);
 	_connection.setWriteConcern(W_NORMAL);
+	string errMsg;
+	_connection.auth(_database, _user, _password, errMsg, false);
 	
 	return ;
 }

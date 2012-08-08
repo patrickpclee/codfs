@@ -30,8 +30,11 @@ public:
 	void update (string collection, Query queryObject, BSONObj updateObject);
 
 private:
+	string _user;
+	string _password;
 	string _host;
 	string _database;
+
 	DBClientConnection _connection;
 };
 

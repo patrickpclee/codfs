@@ -21,6 +21,10 @@
 		<MongoDB>
 			<Host>localhost</Host>
 			<Database>ncvfs</Database>
+			<User>admin</User>
+
+			<!-- Digested Password -->
+			<Password>cf8b7fa0b1bcd277da8217f04f498bd0</Password>
 		</MongoDB>
 	</MetaData>
 </NcvfsConfig>
