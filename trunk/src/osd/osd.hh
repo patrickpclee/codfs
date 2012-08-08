@@ -192,6 +192,13 @@ public:
 	 */
 	SegmentLocationCache* getSegmentLocationCache();
 
+	/**
+	 * Get the ID
+	 * @return OSD ID
+	 */
+
+	uint32_t getOsdId ();
+
 private:
 
 	/**

@@ -6,6 +6,7 @@
 #define __COMMUNICATOR_HH__
 
 #include <string>
+#include <vector>
 #include <list>
 #include <map>
 #include <atomic>
@@ -14,6 +15,7 @@
 #include "../protocol/message.hh"
 #include "connection.hh"
 #include "../common/enums.hh"
+#include "component.hh"
 
 using namespace std;
 
@@ -76,9 +78,11 @@ public:
 	 * @param ip Destination IP
 	 * @param port Destination Port
 	 * @param Destination type: MDS/CLIENT/MONITOR/OSD
+	 * @return Sockfd Descriptor of the new connection
 	 */
 
-	void connectAndAdd(string ip, uint16_t port, ComponentType connectionType); // establish a connection
+	uint32_t connectAndAdd(string ip, uint16_t port,
+			ComponentType connectionType); // establish a connection
 
 	/**
 	 * Disconnect from component and remove from list
@@ -133,6 +137,20 @@ public:
 	 */
 	static void sendThread(Communicator* communicator);
 
+	/**
+	 * Set the Component ID
+	 * @param id Component ID
+	 */
+
+	void setId(uint32_t id);
+
+	/**
+	 * Set the Component Type
+	 * @param componentType Component Type
+	 */
+
+	void setComponentType(ComponentType componentType);
+
 protected:
 
 	/**
@@ -157,24 +175,53 @@ protected:
 	 * @return True if empty, false otherwise
 	 */
 
-	bool isOutMessageQueueEmpty ();
+	bool isOutMessageQueueEmpty();
 
 	/**
 	 * Delete the message when it is deletable
 	 * @param message Message pointer to delete
 	 */
 
-	void waitAndDelete (Message* message);
+	void waitAndDelete(Message* message);
+
+	/**
+	 * Connect to all the component in the list
+	 * @param componentList Component List
+	 */
+
+	void connectToComponents(vector<Component> componentList);
+
+	/**
+	 * Parse the config file and extract information about components
+	 * @param componentType Type of components to extract
+	 * @return List of the component information
+	 */
+
+	vector<struct Component> parseConfigFile(
+			string componentType);
+
+	/**
+	 * DEBUG: Print the component information saved in the list
+	 * @param componentType Type of component to print (for heading)
+	 * @param componentList List of component information
+	 */
+
+	void printComponents(string componentType,
+			vector<Component> componentList);
 
 	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
 
-	uint16_t _serverPort;	// listening port for incoming connections
+	uint16_t _serverPort; // listening port for incoming connections
 	Socket _serverSocket; // socket for accepting incoming connections
 	map<uint32_t, Connection*> _connectionMap; // a map of all connections
 	map<uint32_t, uint32_t> _componentIdMap; // a map from component ID to sockfd
 	list<Message *> _outMessageQueue; // queue of message to be sent
 	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
 	uint32_t _maxFd; // maximum number of socket descriptors among connections
+
+	// self identity
+	ComponentType _componentType;
+	uint32_t _id; // id of myself
 
 	// config values
 	uint32_t _timeoutSec, _timeoutUsec;

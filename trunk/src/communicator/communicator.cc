@@ -298,7 +298,7 @@ void Communicator::sendMessage() {
  * 2. Add the connection to the corresponding map
  */
 
-void Communicator::connectAndAdd(string ip, uint16_t port,
+uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 		ComponentType connectionType) {
 
 	// Construct a Connection object and connect to component
@@ -312,8 +312,11 @@ void Communicator::connectAndAdd(string ip, uint16_t port,
 	}
 
 	// adjust _maxFd
-	if (sockfd > _maxFd)
+	if (sockfd > _maxFd) {
 		_maxFd = sockfd;
+	}
+
+	return sockfd;
 }
 
 /**
@@ -443,7 +446,15 @@ void Communicator::waitAndDelete(Message* message) {
 	GarbageCollector::getInstance().addToDeleteList(message);
 }
 
-vector<struct Component> parseConfigFile(string componentType) {
+void Communicator::setId(uint32_t id) {
+	_id = id;
+}
+
+void Communicator::setComponentType(ComponentType componentType) {
+	_componentType = componentType;
+}
+
+vector<struct Component> Communicator::parseConfigFile(string componentType) {
 	vector<struct Component> componentList;
 
 	// get count
@@ -464,6 +475,16 @@ vector<struct Component> parseConfigFile(string componentType) {
 		const uint32_t port = configLayer->getConfigInt(portQuery.c_str());
 
 		struct Component component;
+
+		if (componentType == "MDS")
+			component.type = MDS;
+		else if (componentType == "OSD")
+			component.type = OSD;
+		else if (componentType == "MONITOR")
+			component.type = MONITOR;
+		else if (componentType == "CLIENT")
+			component.type = CLIENT;
+
 		component.id = id;
 		component.ip = ip;
 		component.port = (uint16_t) port;
@@ -474,6 +495,37 @@ vector<struct Component> parseConfigFile(string componentType) {
 	return componentList;
 }
 
+void Communicator::printComponents(string componentType, vector<Component> componentList) {
+
+	cout << "========== " << componentType << " LIST ==========" << endl;
+	for (Component component : componentList) {
+		if (_id == component.id) {
+			cout << "(*)";
+		}
+		cout << "ID: " << component.id << " IP: " << component.ip << ":"
+				<< component.port << endl;
+	}
+}
+
+void Communicator::connectToComponents(vector<Component> componentList) {
+
+	// if destination is of different type, connect and save to map
+	// if destination is of the same type, only connect if _id > destination ID
+
+	for (Component component : componentList) {
+		if (_componentType != component.type
+				|| (_componentType == component.type && _id > component.id)) {
+			debug("Connecting to %s:%" PRIu16 "\n",
+					component.ip.c_str(), component.port);
+			uint32_t sockfd = connectAndAdd(component.ip, component.port, MDS);
+			_componentIdMap[component.id] = sockfd;
+		} else {
+			debug("Skipping %s:%" PRIu16 "\n",
+					component.ip.c_str(), component.port);
+		}
+	}
+}
+
 void Communicator::connectAllComponents() {
 
 	// parse config file
@@ -481,31 +533,14 @@ void Communicator::connectAllComponents() {
 	vector<Component> osdList = parseConfigFile("OSD");
 	vector<Component> monitorList = parseConfigFile("MONITOR");
 
-	// debug: print all components
-	cout << "========== MDS LIST ==========" << endl;
-	for (uint32_t i = 0; i < mdsList.size(); i++) {
-		cout << i << ": ID: " << mdsList[i].id << " IP: " << mdsList[i].ip
-				<< ":" << mdsList[i].port << endl;
-	}
+	// debug
+	printComponents("MDS", mdsList);
+	printComponents("OSD", osdList);
+	printComponents("MONITOR", monitorList);
 
-	cout << "========== OSD LIST ==========" << endl;
-	for (uint32_t i = 0; i < osdList.size(); i++) {
-		cout << i << ": ID: " << osdList[i].id << " IP: " << osdList[i].ip
-				<< ":" << osdList[i].port << endl;
-	}
-
-	cout << "========== MONITOR LIST ==========" << endl;
-	for (uint32_t i = 0; i < monitorList.size(); i++) {
-		cout << i << ": ID: " << monitorList[i].id << " IP: "
-				<< monitorList[i].ip << ":" << monitorList[i].port << endl;
-	}
-
-	// connect to MDS
-
-	// connect to OSD
-
-	// connect to MONITOR
-
-	// if not connected, make connection and save to map
+	// connect to components
+//	connectToComponents(mdsList);
+	connectToComponents(osdList);
+//	connectToComponents(monitorList);
 
 }

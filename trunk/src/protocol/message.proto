@@ -1,11 +1,25 @@
 package ncvfs;
 
+///////////////// UNIVERSAL /////////////////
+
+message HandShakeRequestPro {
+	optional fixed32 componentId = 1;
+	optional fixed32 componentType = 2; 
+}
+
+message HandShakeReplyPro {
+	optional fixed32 componentId = 1;
+	optional fixed32 componentType = 2; 
+}
+
+///////////////// FROM CLIENT /////////////////
+
 //
 // CLIENT -> MDS
 //
 
 message ListDirectoryRequestPro {
-	optional int32 osdId = 1;
+	optional fixed32 osdId = 1;
 	optional string directoryPath = 2;
 }
 
@@ -13,6 +27,28 @@ message UploadFileRequestPro {
 	required string fileName = 1;
 	required fixed32 numOfObj = 2;
 }
+
+//
+// CLIENT -> OSD
+//
+
+message PutObjectInitRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 objectSize = 2;
+	optional fixed32 chunkCount = 3;
+}
+
+message ObjectDataPro {
+	optional fixed64 objectId = 1;
+	optional fixed64 offset = 2;
+	optional fixed32 length = 3;
+}
+
+message PutObjectEndRequestPro {
+	optional fixed64 objectId = 1;
+}
+
+///////////////// FROM MDS /////////////////
 
 //
 // MDS -> CLIENT
@@ -35,25 +71,7 @@ message UploadFileReplyPro {
 	repeated fixed32 primaryList = 4;
 }
 
-//
-// CLIENT -> OSD
-//
-
-message PutObjectInitRequestPro {
-	optional fixed64 objectId = 1;
-	optional fixed32 objectSize = 2;
-	optional fixed32 chunkCount = 3;
-}
-
-message ObjectDataPro {
-	optional fixed64 objectId = 1;
-	optional fixed64 offset = 2;
-	optional fixed32 length = 3;
-}
-
-message PutObjectEndRequestPro {
-	optional fixed64 objectId = 1;
-}
+///////////////// FROM OSD /////////////////
 
 //
 // OSD -> CLIENT
@@ -99,3 +117,7 @@ message PutSegmentEndReplyPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 segmentId = 2;
 }
+
+//
+// 
+// 

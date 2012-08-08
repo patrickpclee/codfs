@@ -32,14 +32,16 @@ void  protobuf_AddDesc_message_2eproto();
 void protobuf_AssignDesc_message_2eproto();
 void protobuf_ShutdownFile_message_2eproto();
 
+class HandShakeRequestPro;
+class HandShakeReplyPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
-class ListDirectoryReplyPro;
-class FileInfoPro;
-class UploadFileReplyPro;
 class PutObjectInitRequestPro;
 class ObjectDataPro;
 class PutObjectEndRequestPro;
+class ListDirectoryReplyPro;
+class FileInfoPro;
+class UploadFileReplyPro;
 class PutObjectInitReplyPro;
 class PutObjectEndReplyPro;
 class PutSegmentInitRequestPro;
@@ -49,6 +51,190 @@ class PutSegmentInitReplyPro;
 class PutSegmentEndReplyPro;
 
 // ===================================================================
+
+class HandShakeRequestPro : public ::google::protobuf::Message {
+ public:
+  HandShakeRequestPro();
+  virtual ~HandShakeRequestPro();
+  
+  HandShakeRequestPro(const HandShakeRequestPro& from);
+  
+  inline HandShakeRequestPro& operator=(const HandShakeRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const HandShakeRequestPro& default_instance();
+  
+  void Swap(HandShakeRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  HandShakeRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const HandShakeRequestPro& from);
+  void MergeFrom(const HandShakeRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 componentId = 1;
+  inline bool has_componentid() const;
+  inline void clear_componentid();
+  static const int kComponentIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 componentid() const;
+  inline void set_componentid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 componentType = 2;
+  inline bool has_componenttype() const;
+  inline void clear_componenttype();
+  static const int kComponentTypeFieldNumber = 2;
+  inline ::google::protobuf::uint32 componenttype() const;
+  inline void set_componenttype(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.HandShakeRequestPro)
+ private:
+  inline void set_has_componentid();
+  inline void clear_has_componentid();
+  inline void set_has_componenttype();
+  inline void clear_has_componenttype();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 componentid_;
+  ::google::protobuf::uint32 componenttype_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static HandShakeRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class HandShakeReplyPro : public ::google::protobuf::Message {
+ public:
+  HandShakeReplyPro();
+  virtual ~HandShakeReplyPro();
+  
+  HandShakeReplyPro(const HandShakeReplyPro& from);
+  
+  inline HandShakeReplyPro& operator=(const HandShakeReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const HandShakeReplyPro& default_instance();
+  
+  void Swap(HandShakeReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  HandShakeReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const HandShakeReplyPro& from);
+  void MergeFrom(const HandShakeReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 componentId = 1;
+  inline bool has_componentid() const;
+  inline void clear_componentid();
+  static const int kComponentIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 componentid() const;
+  inline void set_componentid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 componentType = 2;
+  inline bool has_componenttype() const;
+  inline void clear_componenttype();
+  static const int kComponentTypeFieldNumber = 2;
+  inline ::google::protobuf::uint32 componenttype() const;
+  inline void set_componenttype(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.HandShakeReplyPro)
+ private:
+  inline void set_has_componentid();
+  inline void clear_has_componentid();
+  inline void set_has_componenttype();
+  inline void clear_has_componenttype();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 componentid_;
+  ::google::protobuf::uint32 componenttype_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static HandShakeReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
 
 class ListDirectoryRequestPro : public ::google::protobuf::Message {
  public:
@@ -104,12 +290,12 @@ class ListDirectoryRequestPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional int32 osdId = 1;
+  // optional fixed32 osdId = 1;
   inline bool has_osdid() const;
   inline void clear_osdid();
   static const int kOsdIdFieldNumber = 1;
-  inline ::google::protobuf::int32 osdid() const;
-  inline void set_osdid(::google::protobuf::int32 value);
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
   
   // optional string directoryPath = 2;
   inline bool has_directorypath() const;
@@ -132,7 +318,7 @@ class ListDirectoryRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::std::string* directorypath_;
-  ::google::protobuf::int32 osdid_;
+  ::google::protobuf::uint32 osdid_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
@@ -239,6 +425,292 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static UploadFileRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PutObjectInitRequestPro : public ::google::protobuf::Message {
+ public:
+  PutObjectInitRequestPro();
+  virtual ~PutObjectInitRequestPro();
+  
+  PutObjectInitRequestPro(const PutObjectInitRequestPro& from);
+  
+  inline PutObjectInitRequestPro& operator=(const PutObjectInitRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutObjectInitRequestPro& default_instance();
+  
+  void Swap(PutObjectInitRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutObjectInitRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutObjectInitRequestPro& from);
+  void MergeFrom(const PutObjectInitRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // optional fixed32 objectSize = 2;
+  inline bool has_objectsize() const;
+  inline void clear_objectsize();
+  static const int kObjectSizeFieldNumber = 2;
+  inline ::google::protobuf::uint32 objectsize() const;
+  inline void set_objectsize(::google::protobuf::uint32 value);
+  
+  // optional fixed32 chunkCount = 3;
+  inline bool has_chunkcount() const;
+  inline void clear_chunkcount();
+  static const int kChunkCountFieldNumber = 3;
+  inline ::google::protobuf::uint32 chunkcount() const;
+  inline void set_chunkcount(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectInitRequestPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  inline void set_has_objectsize();
+  inline void clear_has_objectsize();
+  inline void set_has_chunkcount();
+  inline void clear_has_chunkcount();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::uint32 objectsize_;
+  ::google::protobuf::uint32 chunkcount_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutObjectInitRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ObjectDataPro : public ::google::protobuf::Message {
+ public:
+  ObjectDataPro();
+  virtual ~ObjectDataPro();
+  
+  ObjectDataPro(const ObjectDataPro& from);
+  
+  inline ObjectDataPro& operator=(const ObjectDataPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ObjectDataPro& default_instance();
+  
+  void Swap(ObjectDataPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  ObjectDataPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ObjectDataPro& from);
+  void MergeFrom(const ObjectDataPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // optional fixed64 offset = 2;
+  inline bool has_offset() const;
+  inline void clear_offset();
+  static const int kOffsetFieldNumber = 2;
+  inline ::google::protobuf::uint64 offset() const;
+  inline void set_offset(::google::protobuf::uint64 value);
+  
+  // optional fixed32 length = 3;
+  inline bool has_length() const;
+  inline void clear_length();
+  static const int kLengthFieldNumber = 3;
+  inline ::google::protobuf::uint32 length() const;
+  inline void set_length(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.ObjectDataPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  inline void set_has_offset();
+  inline void clear_has_offset();
+  inline void set_has_length();
+  inline void clear_has_length();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::uint64 offset_;
+  ::google::protobuf::uint32 length_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static ObjectDataPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PutObjectEndRequestPro : public ::google::protobuf::Message {
+ public:
+  PutObjectEndRequestPro();
+  virtual ~PutObjectEndRequestPro();
+  
+  PutObjectEndRequestPro(const PutObjectEndRequestPro& from);
+  
+  inline PutObjectEndRequestPro& operator=(const PutObjectEndRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutObjectEndRequestPro& default_instance();
+  
+  void Swap(PutObjectEndRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutObjectEndRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutObjectEndRequestPro& from);
+  void MergeFrom(const PutObjectEndRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectEndRequestPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutObjectEndRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -548,292 +1020,6 @@ class UploadFileReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static UploadFileReplyPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class PutObjectInitRequestPro : public ::google::protobuf::Message {
- public:
-  PutObjectInitRequestPro();
-  virtual ~PutObjectInitRequestPro();
-  
-  PutObjectInitRequestPro(const PutObjectInitRequestPro& from);
-  
-  inline PutObjectInitRequestPro& operator=(const PutObjectInitRequestPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const PutObjectInitRequestPro& default_instance();
-  
-  void Swap(PutObjectInitRequestPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  PutObjectInitRequestPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const PutObjectInitRequestPro& from);
-  void MergeFrom(const PutObjectInitRequestPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed64 objectId = 1;
-  inline bool has_objectid() const;
-  inline void clear_objectid();
-  static const int kObjectIdFieldNumber = 1;
-  inline ::google::protobuf::uint64 objectid() const;
-  inline void set_objectid(::google::protobuf::uint64 value);
-  
-  // optional fixed32 objectSize = 2;
-  inline bool has_objectsize() const;
-  inline void clear_objectsize();
-  static const int kObjectSizeFieldNumber = 2;
-  inline ::google::protobuf::uint32 objectsize() const;
-  inline void set_objectsize(::google::protobuf::uint32 value);
-  
-  // optional fixed32 chunkCount = 3;
-  inline bool has_chunkcount() const;
-  inline void clear_chunkcount();
-  static const int kChunkCountFieldNumber = 3;
-  inline ::google::protobuf::uint32 chunkcount() const;
-  inline void set_chunkcount(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectInitRequestPro)
- private:
-  inline void set_has_objectid();
-  inline void clear_has_objectid();
-  inline void set_has_objectsize();
-  inline void clear_has_objectsize();
-  inline void set_has_chunkcount();
-  inline void clear_has_chunkcount();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint64 objectid_;
-  ::google::protobuf::uint32 objectsize_;
-  ::google::protobuf::uint32 chunkcount_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static PutObjectInitRequestPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class ObjectDataPro : public ::google::protobuf::Message {
- public:
-  ObjectDataPro();
-  virtual ~ObjectDataPro();
-  
-  ObjectDataPro(const ObjectDataPro& from);
-  
-  inline ObjectDataPro& operator=(const ObjectDataPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const ObjectDataPro& default_instance();
-  
-  void Swap(ObjectDataPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  ObjectDataPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ObjectDataPro& from);
-  void MergeFrom(const ObjectDataPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed64 objectId = 1;
-  inline bool has_objectid() const;
-  inline void clear_objectid();
-  static const int kObjectIdFieldNumber = 1;
-  inline ::google::protobuf::uint64 objectid() const;
-  inline void set_objectid(::google::protobuf::uint64 value);
-  
-  // optional fixed64 offset = 2;
-  inline bool has_offset() const;
-  inline void clear_offset();
-  static const int kOffsetFieldNumber = 2;
-  inline ::google::protobuf::uint64 offset() const;
-  inline void set_offset(::google::protobuf::uint64 value);
-  
-  // optional fixed32 length = 3;
-  inline bool has_length() const;
-  inline void clear_length();
-  static const int kLengthFieldNumber = 3;
-  inline ::google::protobuf::uint32 length() const;
-  inline void set_length(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.ObjectDataPro)
- private:
-  inline void set_has_objectid();
-  inline void clear_has_objectid();
-  inline void set_has_offset();
-  inline void clear_has_offset();
-  inline void set_has_length();
-  inline void clear_has_length();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint64 objectid_;
-  ::google::protobuf::uint64 offset_;
-  ::google::protobuf::uint32 length_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static ObjectDataPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class PutObjectEndRequestPro : public ::google::protobuf::Message {
- public:
-  PutObjectEndRequestPro();
-  virtual ~PutObjectEndRequestPro();
-  
-  PutObjectEndRequestPro(const PutObjectEndRequestPro& from);
-  
-  inline PutObjectEndRequestPro& operator=(const PutObjectEndRequestPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const PutObjectEndRequestPro& default_instance();
-  
-  void Swap(PutObjectEndRequestPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  PutObjectEndRequestPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const PutObjectEndRequestPro& from);
-  void MergeFrom(const PutObjectEndRequestPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed64 objectId = 1;
-  inline bool has_objectid() const;
-  inline void clear_objectid();
-  static const int kObjectIdFieldNumber = 1;
-  inline ::google::protobuf::uint64 objectid() const;
-  inline void set_objectid(::google::protobuf::uint64 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.PutObjectEndRequestPro)
- private:
-  inline void set_has_objectid();
-  inline void clear_has_objectid();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint64 objectid_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static PutObjectEndRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1504,9 +1690,105 @@ class PutSegmentEndReplyPro : public ::google::protobuf::Message {
 
 // ===================================================================
 
+// HandShakeRequestPro
+
+// optional fixed32 componentId = 1;
+inline bool HandShakeRequestPro::has_componentid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void HandShakeRequestPro::set_has_componentid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void HandShakeRequestPro::clear_has_componentid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void HandShakeRequestPro::clear_componentid() {
+  componentid_ = 0u;
+  clear_has_componentid();
+}
+inline ::google::protobuf::uint32 HandShakeRequestPro::componentid() const {
+  return componentid_;
+}
+inline void HandShakeRequestPro::set_componentid(::google::protobuf::uint32 value) {
+  set_has_componentid();
+  componentid_ = value;
+}
+
+// optional fixed32 componentType = 2;
+inline bool HandShakeRequestPro::has_componenttype() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void HandShakeRequestPro::set_has_componenttype() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void HandShakeRequestPro::clear_has_componenttype() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void HandShakeRequestPro::clear_componenttype() {
+  componenttype_ = 0u;
+  clear_has_componenttype();
+}
+inline ::google::protobuf::uint32 HandShakeRequestPro::componenttype() const {
+  return componenttype_;
+}
+inline void HandShakeRequestPro::set_componenttype(::google::protobuf::uint32 value) {
+  set_has_componenttype();
+  componenttype_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// HandShakeReplyPro
+
+// optional fixed32 componentId = 1;
+inline bool HandShakeReplyPro::has_componentid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void HandShakeReplyPro::set_has_componentid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void HandShakeReplyPro::clear_has_componentid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void HandShakeReplyPro::clear_componentid() {
+  componentid_ = 0u;
+  clear_has_componentid();
+}
+inline ::google::protobuf::uint32 HandShakeReplyPro::componentid() const {
+  return componentid_;
+}
+inline void HandShakeReplyPro::set_componentid(::google::protobuf::uint32 value) {
+  set_has_componentid();
+  componentid_ = value;
+}
+
+// optional fixed32 componentType = 2;
+inline bool HandShakeReplyPro::has_componenttype() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void HandShakeReplyPro::set_has_componenttype() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void HandShakeReplyPro::clear_has_componenttype() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void HandShakeReplyPro::clear_componenttype() {
+  componenttype_ = 0u;
+  clear_has_componenttype();
+}
+inline ::google::protobuf::uint32 HandShakeReplyPro::componenttype() const {
+  return componenttype_;
+}
+inline void HandShakeReplyPro::set_componenttype(::google::protobuf::uint32 value) {
+  set_has_componenttype();
+  componenttype_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // ListDirectoryRequestPro
 
-// optional int32 osdId = 1;
+// optional fixed32 osdId = 1;
 inline bool ListDirectoryRequestPro::has_osdid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -1517,13 +1799,13 @@ inline void ListDirectoryRequestPro::clear_has_osdid() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void ListDirectoryRequestPro::clear_osdid() {
-  osdid_ = 0;
+  osdid_ = 0u;
   clear_has_osdid();
 }
-inline ::google::protobuf::int32 ListDirectoryRequestPro::osdid() const {
+inline ::google::protobuf::uint32 ListDirectoryRequestPro::osdid() const {
   return osdid_;
 }
-inline void ListDirectoryRequestPro::set_osdid(::google::protobuf::int32 value) {
+inline void ListDirectoryRequestPro::set_osdid(::google::protobuf::uint32 value) {
   set_has_osdid();
   osdid_ = value;
 }
@@ -1668,6 +1950,172 @@ inline ::google::protobuf::uint32 UploadFileRequestPro::numofobj() const {
 inline void UploadFileRequestPro::set_numofobj(::google::protobuf::uint32 value) {
   set_has_numofobj();
   numofobj_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PutObjectInitRequestPro
+
+// optional fixed64 objectId = 1;
+inline bool PutObjectInitRequestPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutObjectInitRequestPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutObjectInitRequestPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutObjectInitRequestPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 PutObjectInitRequestPro::objectid() const {
+  return objectid_;
+}
+inline void PutObjectInitRequestPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// optional fixed32 objectSize = 2;
+inline bool PutObjectInitRequestPro::has_objectsize() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PutObjectInitRequestPro::set_has_objectsize() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PutObjectInitRequestPro::clear_has_objectsize() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PutObjectInitRequestPro::clear_objectsize() {
+  objectsize_ = 0u;
+  clear_has_objectsize();
+}
+inline ::google::protobuf::uint32 PutObjectInitRequestPro::objectsize() const {
+  return objectsize_;
+}
+inline void PutObjectInitRequestPro::set_objectsize(::google::protobuf::uint32 value) {
+  set_has_objectsize();
+  objectsize_ = value;
+}
+
+// optional fixed32 chunkCount = 3;
+inline bool PutObjectInitRequestPro::has_chunkcount() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void PutObjectInitRequestPro::set_has_chunkcount() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void PutObjectInitRequestPro::clear_has_chunkcount() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void PutObjectInitRequestPro::clear_chunkcount() {
+  chunkcount_ = 0u;
+  clear_has_chunkcount();
+}
+inline ::google::protobuf::uint32 PutObjectInitRequestPro::chunkcount() const {
+  return chunkcount_;
+}
+inline void PutObjectInitRequestPro::set_chunkcount(::google::protobuf::uint32 value) {
+  set_has_chunkcount();
+  chunkcount_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// ObjectDataPro
+
+// optional fixed64 objectId = 1;
+inline bool ObjectDataPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void ObjectDataPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void ObjectDataPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void ObjectDataPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 ObjectDataPro::objectid() const {
+  return objectid_;
+}
+inline void ObjectDataPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// optional fixed64 offset = 2;
+inline bool ObjectDataPro::has_offset() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void ObjectDataPro::set_has_offset() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void ObjectDataPro::clear_has_offset() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void ObjectDataPro::clear_offset() {
+  offset_ = GOOGLE_ULONGLONG(0);
+  clear_has_offset();
+}
+inline ::google::protobuf::uint64 ObjectDataPro::offset() const {
+  return offset_;
+}
+inline void ObjectDataPro::set_offset(::google::protobuf::uint64 value) {
+  set_has_offset();
+  offset_ = value;
+}
+
+// optional fixed32 length = 3;
+inline bool ObjectDataPro::has_length() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void ObjectDataPro::set_has_length() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void ObjectDataPro::clear_has_length() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void ObjectDataPro::clear_length() {
+  length_ = 0u;
+  clear_has_length();
+}
+inline ::google::protobuf::uint32 ObjectDataPro::length() const {
+  return length_;
+}
+inline void ObjectDataPro::set_length(::google::protobuf::uint32 value) {
+  set_has_length();
+  length_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PutObjectEndRequestPro
+
+// optional fixed64 objectId = 1;
+inline bool PutObjectEndRequestPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutObjectEndRequestPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutObjectEndRequestPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutObjectEndRequestPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 PutObjectEndRequestPro::objectid() const {
+  return objectid_;
+}
+inline void PutObjectEndRequestPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -1901,172 +2349,6 @@ UploadFileReplyPro::primarylist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
 UploadFileReplyPro::mutable_primarylist() {
   return &primarylist_;
-}
-
-// -------------------------------------------------------------------
-
-// PutObjectInitRequestPro
-
-// optional fixed64 objectId = 1;
-inline bool PutObjectInitRequestPro::has_objectid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void PutObjectInitRequestPro::set_has_objectid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void PutObjectInitRequestPro::clear_has_objectid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void PutObjectInitRequestPro::clear_objectid() {
-  objectid_ = GOOGLE_ULONGLONG(0);
-  clear_has_objectid();
-}
-inline ::google::protobuf::uint64 PutObjectInitRequestPro::objectid() const {
-  return objectid_;
-}
-inline void PutObjectInitRequestPro::set_objectid(::google::protobuf::uint64 value) {
-  set_has_objectid();
-  objectid_ = value;
-}
-
-// optional fixed32 objectSize = 2;
-inline bool PutObjectInitRequestPro::has_objectsize() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void PutObjectInitRequestPro::set_has_objectsize() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void PutObjectInitRequestPro::clear_has_objectsize() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void PutObjectInitRequestPro::clear_objectsize() {
-  objectsize_ = 0u;
-  clear_has_objectsize();
-}
-inline ::google::protobuf::uint32 PutObjectInitRequestPro::objectsize() const {
-  return objectsize_;
-}
-inline void PutObjectInitRequestPro::set_objectsize(::google::protobuf::uint32 value) {
-  set_has_objectsize();
-  objectsize_ = value;
-}
-
-// optional fixed32 chunkCount = 3;
-inline bool PutObjectInitRequestPro::has_chunkcount() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void PutObjectInitRequestPro::set_has_chunkcount() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void PutObjectInitRequestPro::clear_has_chunkcount() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void PutObjectInitRequestPro::clear_chunkcount() {
-  chunkcount_ = 0u;
-  clear_has_chunkcount();
-}
-inline ::google::protobuf::uint32 PutObjectInitRequestPro::chunkcount() const {
-  return chunkcount_;
-}
-inline void PutObjectInitRequestPro::set_chunkcount(::google::protobuf::uint32 value) {
-  set_has_chunkcount();
-  chunkcount_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// ObjectDataPro
-
-// optional fixed64 objectId = 1;
-inline bool ObjectDataPro::has_objectid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void ObjectDataPro::set_has_objectid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void ObjectDataPro::clear_has_objectid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void ObjectDataPro::clear_objectid() {
-  objectid_ = GOOGLE_ULONGLONG(0);
-  clear_has_objectid();
-}
-inline ::google::protobuf::uint64 ObjectDataPro::objectid() const {
-  return objectid_;
-}
-inline void ObjectDataPro::set_objectid(::google::protobuf::uint64 value) {
-  set_has_objectid();
-  objectid_ = value;
-}
-
-// optional fixed64 offset = 2;
-inline bool ObjectDataPro::has_offset() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void ObjectDataPro::set_has_offset() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void ObjectDataPro::clear_has_offset() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void ObjectDataPro::clear_offset() {
-  offset_ = GOOGLE_ULONGLONG(0);
-  clear_has_offset();
-}
-inline ::google::protobuf::uint64 ObjectDataPro::offset() const {
-  return offset_;
-}
-inline void ObjectDataPro::set_offset(::google::protobuf::uint64 value) {
-  set_has_offset();
-  offset_ = value;
-}
-
-// optional fixed32 length = 3;
-inline bool ObjectDataPro::has_length() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void ObjectDataPro::set_has_length() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void ObjectDataPro::clear_has_length() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void ObjectDataPro::clear_length() {
-  length_ = 0u;
-  clear_has_length();
-}
-inline ::google::protobuf::uint32 ObjectDataPro::length() const {
-  return length_;
-}
-inline void ObjectDataPro::set_length(::google::protobuf::uint32 value) {
-  set_has_length();
-  length_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// PutObjectEndRequestPro
-
-// optional fixed64 objectId = 1;
-inline bool PutObjectEndRequestPro::has_objectid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void PutObjectEndRequestPro::set_has_objectid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void PutObjectEndRequestPro::clear_has_objectid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void PutObjectEndRequestPro::clear_objectid() {
-  objectid_ = GOOGLE_ULONGLONG(0);
-  clear_has_objectid();
-}
-inline ::google::protobuf::uint64 PutObjectEndRequestPro::objectid() const {
-  return objectid_;
-}
-inline void PutObjectEndRequestPro::set_objectid(::google::protobuf::uint64 value) {
-  set_has_objectid();
-  objectid_ = value;
 }
 
 // -------------------------------------------------------------------

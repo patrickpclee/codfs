@@ -27,7 +27,7 @@ Osd::Osd() {
 	_osdCommunicator = new OsdCommunicator();
 	_codingModule = new CodingModule();
 
-	_osdId = configLayer->getConfigInt("OSDID");
+	_osdId = configLayer->getConfigInt("Osdid");
 }
 
 Osd::~Osd() {
@@ -222,6 +222,10 @@ SegmentLocationCache* Osd::getSegmentLocationCache() {
 	return _segmentLocationCache;
 }
 
+uint32_t Osd::getOsdId() {
+	return _osdId;
+}
+
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
 }
@@ -249,10 +253,12 @@ int main(void) {
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
 
+	// set identity
+	communicator->setId(osd->getOsdId());
+	communicator->setComponentType(OSD);
+
 	communicator->createServerSocket();
-
 	communicator->connectAllComponents();
-
 
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);
