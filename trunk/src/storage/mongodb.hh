@@ -3,6 +3,7 @@
 
 //#define COLLECTION "ncvfs"
 
+#include "mongo/db/jsobj.h"
 #include "mongo/client/dbclient.h"
 
 using namespace mongo;
@@ -28,6 +29,7 @@ public:
 	vector<BSONObj> read(string collection, Query queryObject);
 	void insert (string collection, BSONObj insertObject);
 	void update (string collection, Query queryObject, BSONObj updateObject);
+	void remove (string collection, Query queryObject);
 
 private:
 	string _user;

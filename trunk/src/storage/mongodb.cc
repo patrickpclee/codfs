@@ -58,3 +58,11 @@ void MongoDB::update (string collection, Query queryObject, BSONObj updateObject
 
 	return ;
 }
+
+void MongoDB::remove (string collection, Query queryObject)
+{
+	_connection.remove(_database + "." + collection, queryObject);
+
+	return ;
+
+}
