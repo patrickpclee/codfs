@@ -10,6 +10,7 @@
 #include <sys/ioctl.h>
 #include "connection.hh"
 #include "communicator.hh"
+#include "component.hh"
 #include "socketexception.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
@@ -36,6 +37,7 @@ Communicator::Communicator() {
 	// initialize variables
 	_requestId.store(0);
 	_connectionMap = {};
+	_componentIdMap = {};
 	_outMessageQueue = {};
 	_waitReplyMessageMap = {};
 	_maxFd = 0;
@@ -441,3 +443,69 @@ void Communicator::waitAndDelete(Message* message) {
 	GarbageCollector::getInstance().addToDeleteList(message);
 }
 
+vector<struct Component> parseConfigFile(string componentType) {
+	vector<struct Component> componentList;
+
+	// get count
+	const string componentCountQuery = "Components>" + componentType + ">count";
+	const uint32_t componentCount = configLayer->getConfigInt(
+			componentCountQuery.c_str());
+
+	for (uint32_t i = 0; i < componentCount; i++) {
+		const string idQuery = "Components>" + componentType + ">"
+				+ componentType + to_string(i) + ">id";
+		const string ipQuery = "Components>" + componentType + ">"
+				+ componentType + to_string(i) + ">ip";
+		const string portQuery = "Components>" + componentType + ">"
+				+ componentType + to_string(i) + ">port";
+
+		const uint32_t id = configLayer->getConfigInt(idQuery.c_str());
+		const string ip = configLayer->getConfigString(ipQuery.c_str());
+		const uint32_t port = configLayer->getConfigInt(portQuery.c_str());
+
+		struct Component component;
+		component.id = id;
+		component.ip = ip;
+		component.port = (uint16_t) port;
+
+		componentList.push_back(component);
+	}
+
+	return componentList;
+}
+
+void Communicator::connectAllComponents() {
+
+	// parse config file
+	vector<Component> mdsList = parseConfigFile("MDS");
+	vector<Component> osdList = parseConfigFile("OSD");
+	vector<Component> monitorList = parseConfigFile("MONITOR");
+
+	// debug: print all components
+	cout << "========== MDS LIST ==========" << endl;
+	for (uint32_t i = 0; i < mdsList.size(); i++) {
+		cout << i << ": ID: " << mdsList[i].id << " IP: " << mdsList[i].ip
+				<< ":" << mdsList[i].port << endl;
+	}
+
+	cout << "========== OSD LIST ==========" << endl;
+	for (uint32_t i = 0; i < osdList.size(); i++) {
+		cout << i << ": ID: " << osdList[i].id << " IP: " << osdList[i].ip
+				<< ":" << osdList[i].port << endl;
+	}
+
+	cout << "========== MONITOR LIST ==========" << endl;
+	for (uint32_t i = 0; i < monitorList.size(); i++) {
+		cout << i << ": ID: " << monitorList[i].id << " IP: "
+				<< monitorList[i].ip << ":" << monitorList[i].port << endl;
+	}
+
+	// connect to MDS
+
+	// connect to OSD
+
+	// connect to MONITOR
+
+	// if not connected, make connection and save to map
+
+}

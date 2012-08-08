@@ -26,6 +26,8 @@ Osd::Osd() {
 	_storageModule = new StorageModule();
 	_osdCommunicator = new OsdCommunicator();
 	_codingModule = new CodingModule();
+
+	_osdId = configLayer->getConfigInt("OSDID");
 }
 
 Osd::~Osd() {
@@ -73,13 +75,13 @@ void Osd::getObjectProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 
 		// get segments from the OSD one by one
-		vector<struct SegmentLocation>::const_iterator it;
+		vector<struct SegmentLocation>::const_iterator p;
 
-		for (it = osdIdList.begin(); it != osdIdList.end(); ++it) {
+		for (p = osdIdList.begin(); p != osdIdList.end(); ++p) {
 			// memory of SegmentData is allocated in getSegmentRequest
 			struct SegmentData segmentData;
-			uint32_t osdId = (*it).osdId;
-			uint32_t segmentId = (*it).segmentId;
+			uint32_t osdId = (*p).osdId;
+			uint32_t segmentId = (*p).segmentId;
 
 			if (_osdId == osdId) {
 				// case 1: local segment
@@ -133,6 +135,29 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 	_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
+	// Encode object to segment and push to other OSDs
+
+	// TODO: instead of reading from disk again, should leave a copy in memory during receive
+
+	// 1. read object
+	struct ObjectData objectData = _storageModule->readObject(objectId, 0);
+
+	// 2. encode to list of segments
+	vector<struct SegmentData> segmentDataList =
+			_codingModule->encodeObjectToSegment(objectData);
+
+	// 3. obtain a list of OSD IDs from MONITOR
+	vector<struct SegmentLocation> osdIdList = _osdCommunicator->getOsdListRequest(objectId, MONITOR);
+
+	vector<struct SegmentLocation>::const_iterator p;
+	for (p = osdIdList.begin(); p != osdIdList.end(); ++p) {
+		/*
+		uint32_t dstSockfd = _osdCommunicator->getSockfdFromId
+		_osdCommunicator->sendSegment()
+		*/
+
+	}
+
 }
 
 void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
@@ -140,7 +165,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// TODO: check integrity of segment received
 
-	_osdCommunicator->replyPutSegmentEnd (requestId, sockfd, objectId, segmentId);
+	_osdCommunicator->replyPutSegmentEnd(requestId, sockfd, objectId,
+			segmentId);
 
 }
 
@@ -225,10 +251,8 @@ int main(void) {
 
 	communicator->createServerSocket();
 
-	/*
-	 // connect to MDS
-	 //communicator->connectToMds();
-	 */
+	communicator->connectAllComponents();
+
 
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);

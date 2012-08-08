@@ -121,6 +121,12 @@ public:
 	Message* popWaitReplyMessage(uint32_t requestId);
 
 	/**
+	 * Connect to all components specified in the config file
+	 */
+
+	void connectAllComponents();
+
+	/**
 	 * Runs in a separate detached thread
 	 * Execute communicator->sendMessage function
 	 * @param communicator Corresponding communicator of the component
@@ -165,6 +171,7 @@ protected:
 	uint16_t _serverPort;	// listening port for incoming connections
 	Socket _serverSocket; // socket for accepting incoming connections
 	map<uint32_t, Connection*> _connectionMap; // a map of all connections
+	map<uint32_t, uint32_t> _componentIdMap; // a map from component ID to sockfd
 	list<Message *> _outMessageQueue; // queue of message to be sent
 	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
 	uint32_t _maxFd; // maximum number of socket descriptors among connections

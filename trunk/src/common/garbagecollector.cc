@@ -24,21 +24,21 @@ void GarbageCollector::addToDeleteList(Message* ptr) {
 
 void GarbageCollector::start() {
 
-	list<Message*>::iterator itr;
+	list<Message*>::iterator p;
 
 	while (1) {
 		{
 			//debug ("%s\n", "Collecting Garbage");
 			lock_guard<mutex> lk(_pendingDeleteListMutex);
 
-			for (itr = _pendingDeleteList.begin();
-					itr != _pendingDeleteList.end();) {
-				Message* message = *itr;
+			for (p = _pendingDeleteList.begin();
+					p != _pendingDeleteList.end();) {
+				Message* message = *p;
 				if (message->isDeletable()) {
 					delete message;
-					itr = _pendingDeleteList.erase(itr);
+					p = _pendingDeleteList.erase(p);
 				} else {
-					++itr;
+					++p;
 				}
 
 			}

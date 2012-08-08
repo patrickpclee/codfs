@@ -124,7 +124,7 @@ TiXmlElement* ConfigLayer::advanceToElement(const char* propertyTree){
 		tempHandle = tempHandle.FirstChild(namePtr);
 		tempElement = tempHandle.Element();
 		if(tempElement == NULL){
-			fprintf(stderr,"%s: %s Not in Specific Config, Cont. to Common Config\n",propertyTree,namePtr);
+	//		fprintf(stderr,"%s: %s Not in Specific Config, Cont. to Common Config\n",propertyTree,namePtr);
 			break;
 		}
 		namePtr = strtok(NULL,">");
