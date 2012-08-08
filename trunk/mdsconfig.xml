@@ -17,5 +17,10 @@
 
 	<MetaData>
 		<BasePath>.</BasePath>
+
+		<MongoDB>
+			<Host>localhost</Host>
+			<Database>ncvfs</Database>
+		</MongoDB>
 	</MetaData>
 </NcvfsConfig>

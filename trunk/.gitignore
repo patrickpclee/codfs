@@ -5,3 +5,6 @@ MONITOR
 testfile
 *.d
 *.o
+*.log
+*.swp
+osd_object/
