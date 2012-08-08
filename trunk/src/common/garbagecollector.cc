@@ -28,7 +28,7 @@ void GarbageCollector::start() {
 
 	while (1) {
 		{
-			debug ("%s\n", "Collecting Garbage");
+			//debug ("%s\n", "Collecting Garbage");
 			lock_guard<mutex> lk(_pendingDeleteListMutex);
 
 			for (itr = _pendingDeleteList.begin();

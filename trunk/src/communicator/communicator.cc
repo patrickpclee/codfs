@@ -26,6 +26,7 @@ extern ConfigLayer* configLayer;
 // mutex
 mutex outMessageQueueMutex;
 mutex waitReplyMessageMapMutex;
+mutex connectionMapMutex;
 
 Communicator::Communicator() {
 
@@ -114,8 +115,11 @@ void Communicator::waitForMessage() {
 		FD_SET(serverSockfd, &sockfdSet);
 
 		// add all socket descriptors into sockfdSet
-		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-			FD_SET(p->second->getSockfd(), &sockfdSet);
+		{
+			lock_guard<mutex> lk(connectionMapMutex);
+			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+				FD_SET(p->second->getSockfd(), &sockfdSet);
+			}
 		}
 
 		// invoke select
@@ -138,7 +142,10 @@ void Communicator::waitForMessage() {
 			_serverSocket.accept(conn->getSocket());
 
 			// add connection to _connectionMap
-			_connectionMap[conn->getSockfd()] = conn;
+			{
+				lock_guard<mutex> lk(connectionMapMutex);
+				_connectionMap[conn->getSockfd()] = conn;
+			}
 
 			debug("New connection sockfd = %" PRIu32 "\n", conn->getSockfd());
 
@@ -149,25 +156,28 @@ void Communicator::waitForMessage() {
 		}
 
 		// if there is data in existing connections
-		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-			// if socket has data available
-			if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
+		{ // start critical session
+			lock_guard<mutex> lk(connectionMapMutex);
+			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+				// if socket has data available
+				if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
 
-				// check if connection is lost
-				int nbytes = 0;
-				ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
-				if (nbytes == 0) {
-					// disconnect and remove from _connectionMap
-					delete p->second;
-					_connectionMap.erase(p->first);
-					continue;
+					// check if connection is lost
+					int nbytes = 0;
+					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
+					if (nbytes == 0) {
+						// disconnect and remove from _connectionMap
+						delete p->second;
+						_connectionMap.erase(p->first);
+						continue;
+					}
+
+					// receive message into buffer, memory allocated in recvMessage
+					buf = p->second->recvMessage();
+					dispatch(buf, p->first);
 				}
-
-				// receive message into buffer, memory allocated in recvMessage
-				buf = p->second->recvMessage();
-				dispatch(buf, p->first);
 			}
-		}
+		} // end critical session
 
 	} // end while (1)
 }
@@ -251,16 +261,18 @@ void Communicator::sendMessage() {
 				continue;
 			}
 
-			if (!(_connectionMap.count(sockfd))) {
-				debug("%s\n", "Connection not found!");
-				exit(-1);
+			{
+				lock_guard<mutex> lk(connectionMapMutex);
+				if (!(_connectionMap.count(sockfd))) {
+					debug("%s\n", "Connection not found!");
+					exit(-1);
+				}
+				_connectionMap[sockfd]->sendMessage(message);
 			}
-			_connectionMap[sockfd]->sendMessage(message);
 
 			// debug
 
 			message->printHeader();
-			//message->printPayloadHex();
 			debug(
 					"Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
 					message->getMsgHeader().requestId, sockfd);
@@ -270,7 +282,6 @@ void Communicator::sendMessage() {
 				debug("Deleting Message (Type = %d ID: %" PRIu32 ")\n",
 						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
 				delete message;
-				debug("%s\n", "Message Deleted");
 			}
 		}
 
@@ -293,7 +304,10 @@ void Communicator::connectAndAdd(string ip, uint16_t port,
 	const uint32_t sockfd = conn->doConnect(ip, port, connectionType);
 
 	// Save the connection into corresponding list
-	_connectionMap[sockfd] = conn;
+	{
+		lock_guard<mutex> lk(connectionMapMutex);
+		_connectionMap[sockfd] = conn;
+	}
 
 	// adjust _maxFd
 	if (sockfd > _maxFd)
@@ -307,6 +321,7 @@ void Communicator::connectAndAdd(string ip, uint16_t port,
  */
 
 void Communicator::disconnectAndRemove(uint32_t sockfd) {
+	lock_guard<mutex> lk(connectionMapMutex);
 
 	if (_connectionMap.count(sockfd)) {
 		Connection* conn = _connectionMap[sockfd];
@@ -322,6 +337,8 @@ uint32_t Communicator::getMdsSockfd() {
 	// TODO: assume return first MDS
 	map<uint32_t, Connection*>::iterator p;
 
+	lock_guard<mutex> lk(connectionMapMutex);
+
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MDS) {
 			return p->second->getSockfd();
@@ -335,6 +352,8 @@ uint32_t Communicator::getMonitorSockfd() {
 	// TODO: assume return first Monitor
 	map<uint32_t, Connection*>::iterator p;
 
+	lock_guard<mutex> lk(connectionMapMutex);
+
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MONITOR) {
 			return p->second->getSockfd();
@@ -347,6 +366,8 @@ uint32_t Communicator::getMonitorSockfd() {
 uint32_t Communicator::getOsdSockfd() {
 	// TODO: assume return first Osd
 	map<uint32_t, Connection*>::iterator p;
+
+	lock_guard<mutex> lk(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == OSD) {
@@ -417,14 +438,6 @@ bool Communicator::isOutMessageQueueEmpty() {
 }
 
 void Communicator::waitAndDelete(Message* message) {
-	/*
-	 while (1) {
-	 if (message->isDeletable()) {
-	 delete message;
-	 return;
-	 }
-	 usleep (100);
-	 }
-	 */
 	GarbageCollector::getInstance().addToDeleteList(message);
 }
+
