@@ -17,5 +17,14 @@
 
 	<MetaData>
 		<BasePath>.</BasePath>
+
+		<MongoDB>
+			<Host>localhost</Host>
+			<Database>ncvfs</Database>
+
+			<User>ncvfs</User>
+			<!-- Digested Password -->
+			<Password>95b30ec31ac788b8fceeeeec7b0aa319</Password>
+		</MongoDB>
 	</MetaData>
 </NcvfsConfig>

@@ -1,21 +1,68 @@
 #include "mongodb.hh"
 
-MongoDB::MongoDB (string host){
-	_host = host;
+#include "../config/config.hh"
+
+extern ConfigLayer* configLayer;
+
+MongoDB::MongoDB ()
+{
+	// TODO: Handle Exception 
+	_host = configLayer->getConfigString("MetaData>MongoDB>Host");
+	_database = configLayer->getConfigString("MetaData>MongoDB>Database");
+	_user = configLayer->getConfigString("MetaData>MongoDB>User");
+	_password = configLayer->getConfigString("MetaData>MongoDB>Password");
 }
 
-uint32_t MongoDB::connect(){
+MongoDB::MongoDB (string host, string database) :
+	_host(host), _database(database)
+{
+}
+
+/**
+ * @brief	Connect to the Data Base
+ */
+void MongoDB::connect ()
+{
 	_connection.connect(_host);
-	return 0;
+	_connection.setWriteConcern(W_NORMAL);
+	string errMsg;
+	_connection.auth(_database, _user, _password, errMsg, false);
+	
+	return ;
 }
 
-void MongoDB::read(string table, uint64_t id, vector<uint64_t>data){
-	string targetTable = COLLECTION + (string)"." + table;
-	unique_ptr<DBClientCursor> cursor =
-		_connection.query(targetTable, QUERY( "id" << (long long)id ) );
+vector<BSONObj> MongoDB::read (string collection, Query queryObject)
+{
+	auto_ptr<DBClientCursor> cursor =
+		_connection.query(_database +"." + collection, queryObject);
+	vector<BSONObj> result;
+	BSONObj tempObj;
 	while( cursor->more() ) {
-		BSONObj p = cursor->next();
-		cout << p.getStringField("name") << endl;
+		tempObj = cursor->next();
+		result.push_back(tempObj);
 	}
+	
+	return result;
+}
+
+void MongoDB::insert (string collection, BSONObj insertObject)
+{
+	_connection.insert(_database + "." + collection, insertObject);
+
+	return ;
+}
+
+void MongoDB::update (string collection, Query queryObject, BSONObj updateObject)
+{
+	_connection.update(_database + "." + collection, queryObject, updateObject);
+
+	return ;
+}
+
+void MongoDB::remove (string collection, Query queryObject)
+{
+	_connection.remove(_database + "." + collection, queryObject);
+
+	return ;
 
 }
