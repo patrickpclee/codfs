@@ -2,6 +2,7 @@
 #define __SEGMENTDATA_HH__
 
 #include <string>
+#include "../common/enums.hh"
 
 using namespace std;
 
@@ -10,7 +11,8 @@ struct SegmentInfo {
 	uint32_t segmentId;
 	uint32_t segmentSize;
 	string segmentPath;
-	uint32_t offsetInObject;
+	CodingScheme codingScheme;
+//	uint32_t offsetInObject;
 };
 
 struct SegmentData {

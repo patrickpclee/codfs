@@ -24,7 +24,7 @@ vector<struct SegmentData> DummyEncode::encode(struct ObjectData objectData) {
 
 	struct SegmentData segmentData;
 	segmentData.info.objectId = objectData.info.objectId;
-	segmentData.info.offsetInObject = 0;
+//	segmentData.info.offsetInObject = 0;
 	segmentData.info.segmentId = 0;
 	segmentData.info.segmentSize = objectData.info.objectSize;
 

@@ -37,4 +37,8 @@ enum StorageType {
 	MONGODB, MYSQL
 };
 
+enum CodingScheme {
+	DUMMY_CODING, REPLICATION_CODING
+};
+
 #endif

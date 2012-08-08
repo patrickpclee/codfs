@@ -43,6 +43,8 @@ uint32_t Client::uploadFileRequest(string filepath) {
 
 	const uint32_t objectCount = _storageModule->getObjectCount(filepath);
 
+	// TODO: obtain a list of OSD for upload from MDS
+
 	debug("Object Count of %s is %" PRIu32 "\n", filepath.c_str(), objectCount);
 
 	for (uint32_t i = 0; i < objectCount; ++i) {
@@ -50,10 +52,10 @@ uint32_t Client::uploadFileRequest(string filepath) {
 				filepath, i);
 
 		// TODO: HARDCODE FOR NOW!
-		uint32_t dstOsdId = _clientCommunicator->getOsdSockfd();
+		uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
 		objectData.info.objectId = i;
 
-		_clientCommunicator->putObject(_clientId, dstOsdId, objectData);
+		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
 	}
 
 	return 0;

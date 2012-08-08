@@ -93,11 +93,12 @@ public:
 	 * Send a request to get the secondary OSD list of an object from MDS/Monitor
 	 * @param objectId Object ID for query
 	 * @param dstComponent Type of the component to request (MDS / MONITOR)
+	 * @param segmentCount (optional) Request a specific number of OSD to hold data
 	 * @return List of OSD ID that should contain the object
 	 */
 
 	vector<struct SegmentLocation> getOsdListRequest(uint64_t objectId,
-			ComponentType dstComponent);
+			ComponentType dstComponent, uint32_t segmentCount = 0);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored

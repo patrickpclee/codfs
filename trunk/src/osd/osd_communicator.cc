@@ -126,8 +126,17 @@ struct SegmentData OsdCommunicator::getSegmentRequest(uint32_t osdId,
 }
 
 vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
-		uint64_t objectId, ComponentType dstComponent) {
+		uint64_t objectId, ComponentType dstComponent, uint32_t segmentCount) {
 	vector<struct SegmentLocation> osdList;
+
+	// TODO: HARDCODE request to MONITOR
+	for (uint32_t i = 0; i < segmentCount; i++) {
+		struct SegmentLocation segmentLocation;
+		segmentLocation.osdId = i;
+		segmentLocation.segmentId = i;
+		osdList.push_back(segmentLocation);
+	}
+
 	return osdList;
 }
 

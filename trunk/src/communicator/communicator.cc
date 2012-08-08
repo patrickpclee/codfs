@@ -10,6 +10,7 @@
 #include <sys/ioctl.h>
 #include "connection.hh"
 #include "communicator.hh"
+#include "component.hh"
 #include "socketexception.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
@@ -26,6 +27,7 @@ extern ConfigLayer* configLayer;
 // mutex
 mutex outMessageQueueMutex;
 mutex waitReplyMessageMapMutex;
+mutex connectionMapMutex;
 
 Communicator::Communicator() {
 
@@ -35,6 +37,7 @@ Communicator::Communicator() {
 	// initialize variables
 	_requestId.store(0);
 	_connectionMap = {};
+	_componentIdMap = {};
 	_outMessageQueue = {};
 	_waitReplyMessageMap = {};
 	_maxFd = 0;
@@ -114,8 +117,11 @@ void Communicator::waitForMessage() {
 		FD_SET(serverSockfd, &sockfdSet);
 
 		// add all socket descriptors into sockfdSet
-		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-			FD_SET(p->second->getSockfd(), &sockfdSet);
+		{
+			lock_guard<mutex> lk(connectionMapMutex);
+			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+				FD_SET(p->second->getSockfd(), &sockfdSet);
+			}
 		}
 
 		// invoke select
@@ -138,7 +144,10 @@ void Communicator::waitForMessage() {
 			_serverSocket.accept(conn->getSocket());
 
 			// add connection to _connectionMap
-			_connectionMap[conn->getSockfd()] = conn;
+			{
+				lock_guard<mutex> lk(connectionMapMutex);
+				_connectionMap[conn->getSockfd()] = conn;
+			}
 
 			debug("New connection sockfd = %" PRIu32 "\n", conn->getSockfd());
 
@@ -149,25 +158,28 @@ void Communicator::waitForMessage() {
 		}
 
 		// if there is data in existing connections
-		for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-			// if socket has data available
-			if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
+		{ // start critical session
+			lock_guard<mutex> lk(connectionMapMutex);
+			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+				// if socket has data available
+				if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
 
-				// check if connection is lost
-				int nbytes = 0;
-				ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
-				if (nbytes == 0) {
-					// disconnect and remove from _connectionMap
-					delete p->second;
-					_connectionMap.erase(p->first);
-					continue;
+					// check if connection is lost
+					int nbytes = 0;
+					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
+					if (nbytes == 0) {
+						// disconnect and remove from _connectionMap
+						delete p->second;
+						_connectionMap.erase(p->first);
+						continue;
+					}
+
+					// receive message into buffer, memory allocated in recvMessage
+					buf = p->second->recvMessage();
+					dispatch(buf, p->first);
 				}
-
-				// receive message into buffer, memory allocated in recvMessage
-				buf = p->second->recvMessage();
-				dispatch(buf, p->first);
 			}
-		}
+		} // end critical session
 
 	} // end while (1)
 }
@@ -251,16 +263,18 @@ void Communicator::sendMessage() {
 				continue;
 			}
 
-			if (!(_connectionMap.count(sockfd))) {
-				debug("%s\n", "Connection not found!");
-				exit(-1);
+			{
+				lock_guard<mutex> lk(connectionMapMutex);
+				if (!(_connectionMap.count(sockfd))) {
+					debug("%s\n", "Connection not found!");
+					exit(-1);
+				}
+				_connectionMap[sockfd]->sendMessage(message);
 			}
-			_connectionMap[sockfd]->sendMessage(message);
 
 			// debug
 
 			message->printHeader();
-			//message->printPayloadHex();
 			debug(
 					"Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
 					message->getMsgHeader().requestId, sockfd);
@@ -270,7 +284,6 @@ void Communicator::sendMessage() {
 				debug("Deleting Message (Type = %d ID: %" PRIu32 ")\n",
 						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
 				delete message;
-				debug("%s\n", "Message Deleted");
 			}
 		}
 
@@ -293,7 +306,10 @@ void Communicator::connectAndAdd(string ip, uint16_t port,
 	const uint32_t sockfd = conn->doConnect(ip, port, connectionType);
 
 	// Save the connection into corresponding list
-	_connectionMap[sockfd] = conn;
+	{
+		lock_guard<mutex> lk(connectionMapMutex);
+		_connectionMap[sockfd] = conn;
+	}
 
 	// adjust _maxFd
 	if (sockfd > _maxFd)
@@ -307,6 +323,7 @@ void Communicator::connectAndAdd(string ip, uint16_t port,
  */
 
 void Communicator::disconnectAndRemove(uint32_t sockfd) {
+	lock_guard<mutex> lk(connectionMapMutex);
 
 	if (_connectionMap.count(sockfd)) {
 		Connection* conn = _connectionMap[sockfd];
@@ -322,6 +339,8 @@ uint32_t Communicator::getMdsSockfd() {
 	// TODO: assume return first MDS
 	map<uint32_t, Connection*>::iterator p;
 
+	lock_guard<mutex> lk(connectionMapMutex);
+
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MDS) {
 			return p->second->getSockfd();
@@ -335,6 +354,8 @@ uint32_t Communicator::getMonitorSockfd() {
 	// TODO: assume return first Monitor
 	map<uint32_t, Connection*>::iterator p;
 
+	lock_guard<mutex> lk(connectionMapMutex);
+
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MONITOR) {
 			return p->second->getSockfd();
@@ -347,6 +368,8 @@ uint32_t Communicator::getMonitorSockfd() {
 uint32_t Communicator::getOsdSockfd() {
 	// TODO: assume return first Osd
 	map<uint32_t, Connection*>::iterator p;
+
+	lock_guard<mutex> lk(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == OSD) {
@@ -417,14 +440,72 @@ bool Communicator::isOutMessageQueueEmpty() {
 }
 
 void Communicator::waitAndDelete(Message* message) {
-	/*
-	 while (1) {
-	 if (message->isDeletable()) {
-	 delete message;
-	 return;
-	 }
-	 usleep (100);
-	 }
-	 */
 	GarbageCollector::getInstance().addToDeleteList(message);
+}
+
+vector<struct Component> parseConfigFile(string componentType) {
+	vector<struct Component> componentList;
+
+	// get count
+	const string componentCountQuery = "Components>" + componentType + ">count";
+	const uint32_t componentCount = configLayer->getConfigInt(
+			componentCountQuery.c_str());
+
+	for (uint32_t i = 0; i < componentCount; i++) {
+		const string idQuery = "Components>" + componentType + ">"
+				+ componentType + to_string(i) + ">id";
+		const string ipQuery = "Components>" + componentType + ">"
+				+ componentType + to_string(i) + ">ip";
+		const string portQuery = "Components>" + componentType + ">"
+				+ componentType + to_string(i) + ">port";
+
+		const uint32_t id = configLayer->getConfigInt(idQuery.c_str());
+		const string ip = configLayer->getConfigString(ipQuery.c_str());
+		const uint32_t port = configLayer->getConfigInt(portQuery.c_str());
+
+		struct Component component;
+		component.id = id;
+		component.ip = ip;
+		component.port = (uint16_t) port;
+
+		componentList.push_back(component);
+	}
+
+	return componentList;
+}
+
+void Communicator::connectAllComponents() {
+
+	// parse config file
+	vector<Component> mdsList = parseConfigFile("MDS");
+	vector<Component> osdList = parseConfigFile("OSD");
+	vector<Component> monitorList = parseConfigFile("MONITOR");
+
+	// debug: print all components
+	cout << "========== MDS LIST ==========" << endl;
+	for (uint32_t i = 0; i < mdsList.size(); i++) {
+		cout << i << ": ID: " << mdsList[i].id << " IP: " << mdsList[i].ip
+				<< ":" << mdsList[i].port << endl;
+	}
+
+	cout << "========== OSD LIST ==========" << endl;
+	for (uint32_t i = 0; i < osdList.size(); i++) {
+		cout << i << ": ID: " << osdList[i].id << " IP: " << osdList[i].ip
+				<< ":" << osdList[i].port << endl;
+	}
+
+	cout << "========== MONITOR LIST ==========" << endl;
+	for (uint32_t i = 0; i < monitorList.size(); i++) {
+		cout << i << ": ID: " << monitorList[i].id << " IP: "
+				<< monitorList[i].ip << ":" << monitorList[i].port << endl;
+	}
+
+	// connect to MDS
+
+	// connect to OSD
+
+	// connect to MONITOR
+
+	// if not connected, make connection and save to map
+
 }

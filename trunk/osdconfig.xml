@@ -1,5 +1,7 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
+    <OSDID>1</OSDID>
+    
     <Communication>
     
         <!-- polling interval in terms of ms -->
@@ -19,4 +21,5 @@
     	<ObjectLocation>./osd_object/</ObjectLocation>
     	<SegmentLocation>./osd_segment/</SegmentLocation>
     </Storage>
+    
 </NcvfsConfig>
