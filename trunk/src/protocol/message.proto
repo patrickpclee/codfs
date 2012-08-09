@@ -2,14 +2,23 @@ package ncvfs;
 
 ///////////////// UNIVERSAL /////////////////
 
-message HandShakeRequestPro {
+message HandshakeRequestPro {
 	optional fixed32 componentId = 1;
-	optional fixed32 componentType = 2; 
+	 
+	
+	enum ComponentType {
+		CLIENT = 1;
+		OSD = 2;
+		MDS = 3;
+		MONITOR = 4;
+	}
+  
+  	optional ComponentType componentType = 2;
 }
 
-message HandShakeReplyPro {
+message HandshakeReplyPro {
 	optional fixed32 componentId = 1;
-	optional fixed32 componentType = 2; 
+	optional HandshakeRequestPro.ComponentType componentType = 2; 
 }
 
 ///////////////// FROM CLIENT /////////////////

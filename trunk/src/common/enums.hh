@@ -2,7 +2,7 @@
 #define __ENUMS_HH__
 
 enum ComponentType {
-	CLIENT, OSD, MDS, MONITOR
+	CLIENT = 1, OSD = 2 , MDS = 3, MONITOR = 4	// numbers match message.proto
 };
 
 enum FailureReason {
@@ -19,6 +19,8 @@ enum FileType {
 
 enum MsgType {
 	DEFAULT,
+	HANDSHAKE_REQUEST,
+	HANDSHAKE_REPLY,
 	LIST_DIRECTORY_REQUEST,
 	LIST_DIRECTORY_REPLY,
 	PUT_OBJECT_INIT_REQUEST,
