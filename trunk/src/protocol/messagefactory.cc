@@ -15,6 +15,8 @@
 #include "objectdatamsg.hh"
 #include "segmentdatamsg.hh"
 #include "messagefactory.hh"
+#include "handshakerequest.hh"
+#include "handshakereply.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -27,6 +29,12 @@ MessageFactory::~MessageFactory() {
 Message* MessageFactory::createMessage(Communicator* communicator,
 		MsgType messageType) {
 	switch (messageType) {
+	case (HANDSHAKE_REQUEST):
+		return new HandshakeRequestMsg(communicator);
+		break;
+	case (HANDSHAKE_REPLY):
+		return new HandshakeReplyMsg(communicator);
+		break;
 	case (LIST_DIRECTORY_REQUEST):
 		return new ListDirectoryRequestMsg(communicator);
 		break;

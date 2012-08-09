@@ -7,7 +7,7 @@
         
         <!-- timeout for select -->
         <SelectTimeout>
-            <sec>15</sec>
+            <sec>1</sec>
             <usec>0</usec>
         </SelectTimeout>
         

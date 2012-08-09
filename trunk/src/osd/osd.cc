@@ -20,8 +20,8 @@ ConfigLayer* configLayer;
 // Global Mutex for locking _pendingObjectChunk
 mutex pendingObjectChunkMutex;
 
-Osd::Osd() {
-	configLayer = new ConfigLayer("osdconfig.xml", "common.xml");
+Osd::Osd(string configFilePath) {
+	configLayer = new ConfigLayer(configFilePath.c_str(), "common.xml");
 	_segmentLocationCache = new SegmentLocationCache();
 	_storageModule = new StorageModule();
 	_osdCommunicator = new OsdCommunicator();
@@ -147,14 +147,15 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_codingModule->encodeObjectToSegment(objectData);
 
 	// 3. obtain a list of OSD IDs from MONITOR
-	vector<struct SegmentLocation> osdIdList = _osdCommunicator->getOsdListRequest(objectId, MONITOR);
+	vector<struct SegmentLocation> osdIdList =
+			_osdCommunicator->getOsdListRequest(objectId, MONITOR);
 
 	vector<struct SegmentLocation>::const_iterator p;
 	for (p = osdIdList.begin(); p != osdIdList.end(); ++p) {
 		/*
-		uint32_t dstSockfd = _osdCommunicator->getSockfdFromId
-		_osdCommunicator->sendSegment()
-		*/
+		 uint32_t dstSockfd = _osdCommunicator->getSockfdFromId
+		 _osdCommunicator->sendSegment()
+		 */
 
 	}
 
@@ -245,10 +246,19 @@ void startReceiveThread(Communicator* communicator) {
  * @return 0 if success;
  */
 
-int main(void) {
+int main(int argc, char* argv[]) {
+
+	string configFilePath;
+
+	if (argc < 2) {
+		cout << "Usage: ./OSD [OSD CONFIG FILE]" << endl;
+		exit (0);
+	} else {
+		configFilePath = string (argv[1]);
+	}
 
 	// create new OSD object and communicator
-	osd = new Osd();
+	osd = new Osd(configFilePath);
 
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
@@ -259,7 +269,6 @@ int main(void) {
 
 	// create server
 	communicator->createServerSocket();
-	communicator->connectAllComponents();
 
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);
@@ -269,6 +278,11 @@ int main(void) {
 
 	// 3. Send Thread
 	thread sendThread(startSendThread);
+
+	// TODO: add sleep for now to ensure that all components are started before connect
+	sleep(2);
+
+	communicator->connectAllComponents();
 
 	garbageCollectionThread.join();
 	receiveThread.join();

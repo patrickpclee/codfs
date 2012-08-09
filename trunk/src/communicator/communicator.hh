@@ -151,6 +151,14 @@ public:
 
 	void setComponentType(ComponentType componentType);
 
+	/**
+	 * Process handshake request and send reply
+	 * @param requestId Request ID
+	 * @param _sockfd Socket Descriptor of the source
+	 * @param componentId Component ID of the source
+	 * @param componentType Component Type of the source
+	 */
+
 	void handshakeRequestProcessor(uint32_t requestId, uint32_t _sockfd,
 			uint32_t componentId, ComponentType componentType);
 
@@ -209,7 +217,7 @@ protected:
 	 * @param componentType My Component Type
 	 */
 
-	void sendHandshakeRequest(uint32_t sockfd, uint32_t componentId,
+	void requestHandshake(uint32_t sockfd, uint32_t componentId,
 			ComponentType componentType);
 
 
@@ -233,10 +241,11 @@ protected:
 
 	// self identity
 	ComponentType _componentType;
-	uint32_t _id; // id of myself
+	uint32_t _componentId; // id of myself
 
 	// config values
 	uint32_t _timeoutSec, _timeoutUsec;
 	uint32_t _chunkSize;
+	uint32_t _pollingInterval;
 };
 #endif
