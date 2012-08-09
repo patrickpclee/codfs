@@ -7,10 +7,10 @@ MDS_DIR=			${SRC}/mds
 
 
 all:
-	make mds;
+#	make mds;
 	make client;
 	make osd;
-	make monitor;
+#	make monitor;
 
 mds:
 	cd ${MDS_DIR}; make -j6

@@ -6,6 +6,14 @@
 #define __MEMORYPOOL_HH__
 
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <assert.h>
+
+#include <apr-1.0/apr_lib.h>
+#include <apr-1.0/apr_buckets.h>
+#include <apr-1.0/apr_general.h>
+#include <apr-1.0/apr_pools.h>
 
 /**
  * Provide a memory pool for optimizing frequent malloc / free calls
@@ -63,6 +71,10 @@ private:
 
 	MemoryPool(MemoryPool const&); // Don't Implement
 	void operator=(MemoryPool const&); // Don't implement
+
+	apr_pool_t *pool;
+	apr_allocator_t* alloc;
+	apr_bucket_alloc_t* balloc;
 };
 
 #endif

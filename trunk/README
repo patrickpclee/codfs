@@ -7,7 +7,7 @@ Aug. 9th
 
 Please install apr-1.0 and apr-util-1.0 packages
 
-> apt-get install libapr1 libaprutil1
+> apt-get install libaprutil1-dev libapr1-dev
 
 compiling add link lib: -lapr-1 -laprutil-1
 
