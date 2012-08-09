@@ -2,4 +2,15 @@ This is the master branch.
 
 All the stable codes are here.
 
+========================================================================================
+Aug. 9th
+
+Please install apr-1.0 and apr-util-1.0 packages
+
+> apt-get install libapr1 libaprutil1
+
+compiling add link lib: -lapr-1 -laprutil-1
+
+now the memorypool.hh & memorypool.cc are still the same with previous version.
+memorypool_apr.hh & memorypool_apr.cc are added.
 

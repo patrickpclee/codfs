@@ -2,6 +2,8 @@
 #define __MONITOR_HH__
 
 #include "../cache/cache.hh"
+#include "../common/osdstat.hh"
+#include "monitor_communicator.hh"
 #include "selectionmodule.hh"
 #include "recoverymodule.hh"
 #include "statmodule.hh"
@@ -18,16 +20,19 @@ public:
 	void osdRecoveryRequest(uint32_t osdId);
 	void recoveryResultHandler(uint32_t osdId, bool success);
 
+	MonitorCommunicator* getCommunicator();
+
 private:
 //	MonitorInfo _info;
 	Cache _cache;
-//	Communicator _communicator;
+	MonitorCommunicator* _monitorCommunicator;
 
-	SelectionModule _selectionModule;
-	RecoveryModule _recoveryModule;
-	StatModule _statModule;
+	SelectionModule* _selectionModule;
+	RecoveryModule* _recoveryModule;
+	StatModule* _statModule;
 
 //	struct OsdStat [] osdStat;
+	vector<struct OsdStat> _osdStats;
 };
 
 #endif

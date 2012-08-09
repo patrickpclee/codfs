@@ -17,7 +17,7 @@ DEFS     := -DCOMPILE_FOR_MDS
 EXTRA_CFLAGS := -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../config ../protocol
+SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../storage
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 
@@ -103,7 +103,7 @@ $(TARGET): $(all_objs)
 else
 $(TARGET): LD = $(if $(strip $(src-cpp) $(src-cc) $(src-cxx)),$(G++),$(GCC))
 $(TARGET): $(all_objs)
-	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf` -lpthread
+	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf` -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system
 endif
 
 .mkdir:

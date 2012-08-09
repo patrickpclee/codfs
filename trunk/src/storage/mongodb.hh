@@ -6,7 +6,6 @@
 #include "mongo/db/jsobj.h"
 #include "mongo/client/dbclient.h"
 
-using namespace mongo;
 
 #include <string>
 #include <vector>
@@ -24,12 +23,12 @@ public:
 	/**
 	 * @brief	Connect to the Data Base
 	 */
-	void connect();
+	void connect(bool writeConcern = true);
 
-	vector<BSONObj> read(string collection, Query queryObject);
-	void insert (string collection, BSONObj insertObject);
-	void update (string collection, Query queryObject, BSONObj updateObject);
-	void remove (string collection, Query queryObject);
+	vector<mongo::BSONObj> read(string collection, mongo::Query queryObject);
+	void insert (string collection, mongo::BSONObj insertObject);
+	void update (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
+	void remove (string collection, mongo::Query queryObject);
 
 private:
 	string _user;
@@ -37,7 +36,7 @@ private:
 	string _host;
 	string _database;
 
-	DBClientConnection _connection;
+	mongo::DBClientConnection _connection;
 };
 
 #endif

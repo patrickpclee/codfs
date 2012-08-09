@@ -13,6 +13,7 @@ using namespace std;
 
 class MetaDataModule {
 public:
+	MetaDataModule();
 	
 	/**
 	 * @brief	Create Meta Data Entry for a New File

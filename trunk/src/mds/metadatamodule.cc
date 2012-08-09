@@ -1,5 +1,12 @@
 #include "metadatamodule.hh"
 
+MetaDataModule::MetaDataModule()
+{
+	_fileMetaDataModule = new FileMetaDataModule();
+	_objectMetaDataModule = new ObjectMetaDataModule();
+	_osdMetaDataModule = new OsdMetaDataModule();
+}
+
 string MetaDataModule::lookupFilePath(uint32_t fileId)
 {
 	return "";
@@ -7,8 +14,10 @@ string MetaDataModule::lookupFilePath(uint32_t fileId)
 
 
 uint32_t MetaDataModule::createFile(uint32_t clientId, string path)
-{
-	return 0;
+{	
+	uint32_t fileId = _fileMetaDataModule->generateFileId();	
+
+	return fileId;
 }
 
 
