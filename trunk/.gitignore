@@ -7,4 +7,5 @@ testfile
 *.o
 *.log
 *.swp
+core
 osd_object/

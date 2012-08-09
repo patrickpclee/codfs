@@ -2,6 +2,8 @@
 
 #include "../config/config.hh"
 
+using namespace mongo;
+
 extern ConfigLayer* configLayer;
 
 MongoDB::MongoDB ()
@@ -21,10 +23,11 @@ MongoDB::MongoDB (string host, string database) :
 /**
  * @brief	Connect to the Data Base
  */
-void MongoDB::connect ()
+void MongoDB::connect (bool writeConcern)
 {
 	_connection.connect(_host);
-	_connection.setWriteConcern(W_NORMAL);
+	if(writeConcern)
+		_connection.setWriteConcern(W_NORMAL);
 	string errMsg;
 	_connection.auth(_database, _user, _password, errMsg, false);
 	
@@ -33,7 +36,7 @@ void MongoDB::connect ()
 
 vector<BSONObj> MongoDB::read (string collection, Query queryObject)
 {
-	auto_ptr<DBClientCursor> cursor =
+	unique_ptr<DBClientCursor> cursor =
 		_connection.query(_database +"." + collection, queryObject);
 	vector<BSONObj> result;
 	BSONObj tempObj;

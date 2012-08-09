@@ -11,6 +11,8 @@
 #include "../common/debug.hh"
 #include "../config/config.hh"
 
+using namespace std;
+
 /**
  *	Global Variables
  */
@@ -248,6 +250,15 @@ void startReceiveThread(Communicator* communicator) {
 
 }
 
+void Mds::test ()
+{
+	debug("%s\n","Test\n");
+	for(int i = 0; i < 10; ++i) {
+		uint32_t temp = _metaDataModule->createFile(1,".");
+		debug("Temp = %d\n",temp);
+	}
+}
+
 int main (void)
 {
 	configLayer = new ConfigLayer("mdsconfig.xml");
@@ -266,6 +277,8 @@ int main (void)
 
 	// 3. Send Thread
 	thread sendThread(startSendThread);
+
+	mds->test();
 
 	garbageCollectionThread.join();
 	receiveThread.join();

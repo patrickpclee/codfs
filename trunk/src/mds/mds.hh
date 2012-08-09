@@ -13,6 +13,8 @@
 #include <string.h>
 #include <vector>
 
+using namespace std;
+
 class Mds {
 public:
 	/**
@@ -138,6 +140,8 @@ public:
 	 * @brief	Run the MDS
 	 */
 	void run();
+
+	void test();
 
 private:
 

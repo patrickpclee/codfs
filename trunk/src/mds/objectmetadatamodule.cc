@@ -1,25 +1,27 @@
 #include "objectmetadatamodule.hh"
 
-uint32_t ObjectMetaDataModule::createObjectMetaData(uint64_t objectId)
+#include "../storage/mongodb.hh"
+
+void ObjectMetaDataModule::createObjectMetaData(uint64_t objectId)
 {
-	return 0;
+	return ;
 }
 
 
-uint32_t ObjectMetaDataModule::deleteObjectMetaData(uint64_t objectId)
+void ObjectMetaDataModule::deleteObjectMetaData(uint64_t objectId)
 {
-	return 0;
+	return ;
 }
 
 
-uint32_t ObjectMetaDataModule::readObjectMetaData(uint64_t objectId)
+void ObjectMetaDataModule::readObjectMetaData(uint64_t objectId)
 {
-	return 0;
+	return ;
 }
 
 
-uint32_t ObjectMetaDataModule::writeObjectMetaData(uint64_t objectId, ObjectMetaData objectMetaData)
+void ObjectMetaDataModule::writeObjectMetaData(uint64_t objectId, ObjectMetaData objectMetaData)
 {
-	return 0;
+	return ;
 }
 

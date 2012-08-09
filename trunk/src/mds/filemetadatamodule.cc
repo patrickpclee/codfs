@@ -1,25 +1,38 @@
 #include "filemetadatamodule.hh"
 
-uint32_t FileMetaDataModule::createFileMetaData(uint32_t fileId)
+#include "../config/config.hh"
+
+#include "../common/debug.hh"
+
+extern ConfigLayer *configLayer;
+
+FileMetaDataModule::FileMetaDataModule()
 {
-	return 0;
+	// TODO: Contact MDS other than MDS0
+
+	_collection = "File Meta Data";
+
+	_fileMetaDataStorage = new MongoDB();
+	_fileMetaDataStorage->connect();
+	
+	_nextFileId = 0;
+	mongo::BSONObj temp = _fileMetaDataStorage->read(_collection, BSON("id" << "config")).at(0);
+
+	debug("%s\n","Get Max File ID");
+	_nextFileId = temp.getField("nextFileId").Int();
+
 }
 
-
-uint32_t FileMetaDataModule::deleteFileMetaData(uint32_t fileId)
+uint32_t FileMetaDataModule::generateFileId()
 {
-	return 0;
+	_nextFileId++;
+	uint32_t fileId = _nextFileId;
+	debug("%d\n",fileId);
+	_fileMetaDataStorage->update(_collection, BSON("id" << "config"), BSON("id" << "config" << "nextFileId" << fileId));
+	return fileId - 1;
 }
 
-
-uint32_t FileMetaDataModule::readFileMetaData(uint32_t fileId)
+FileMetaDataModule::~FileMetaDataModule()
 {
-	return 0;
+	//_fileMetaDataStorage->update(_collection, BSON("id" << "config"), BSON("nextFileId" << _nextFileId));
 }
-
-
-uint32_t FileMetaDataModule::writeFileMetaData(uint32_t fileId, FileMetaData fileMetaData)
-{
-	return 0;
-}
-
