@@ -23,19 +23,17 @@
 		</MDS>
 		
 		<OSD>
-			<count>1</count>
+			<count>2</count>
 			<OSD0>
 				<id>52000</id>
 				<ip>127.0.0.1</ip>
 				<port>52000</port>
 			</OSD0>
-			<!--
 			<OSD1>
 				<id>52001</id>
 				<ip>127.0.0.1</ip>
 				<port>52001</port>
 			</OSD1>
-			-->
 		</OSD>
 		
 		<MONITOR>

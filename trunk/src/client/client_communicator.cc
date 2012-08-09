@@ -73,7 +73,6 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
 
-//		usleep (100*1000);
 	}
 
 	// Step 3: Send End message

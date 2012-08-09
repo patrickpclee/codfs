@@ -4,6 +4,7 @@
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
+#include "handshakerequest.hh"
 
 HandshakeReplyMsg::HandshakeReplyMsg(Communicator* communicator) :
 		Message(communicator) {
@@ -48,15 +49,20 @@ void HandshakeReplyMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_componentId = handshakeReplyPro.componentid();
-	_componentType = (ComponentType)handshakeReplyPro.componenttype();
+	_componentType = (ComponentType) handshakeReplyPro.componenttype();
 
 }
 
 void HandshakeReplyMsg::doHandle() {
-
+	HandshakeRequestMsg* handshakeRequestMsg =
+			(HandshakeRequestMsg*) _communicator->popWaitReplyMessage(
+					_msgHeader.requestId);
+	handshakeRequestMsg->setTargetComponentId(_componentId);
+	handshakeRequestMsg->setTargetComponentType(_componentType);
+	handshakeRequestMsg->setStatus(READY);
 }
 
 void HandshakeReplyMsg::printProtocol() {
-	debug("[HANDSHAKE_REPLY] Component ID = %" PRIu32 "Type = %d\n",
+	debug("[HANDSHAKE_REPLY] Component ID = %" PRIu32 " Type = %d\n",
 			_componentId, _componentType);
 }

@@ -54,6 +54,9 @@ Communicator::Communicator() {
 
 	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
 
+	_pollingInterval = configLayer->getConfigInt(
+			"Communication>SendPollingInterval");
+
 	debug("%s\n", "Communicator constructed");
 }
 
@@ -127,13 +130,13 @@ void Communicator::waitForMessage() {
 		}
 
 		// invoke select
-		result = select(_maxFd + 100, &sockfdSet, NULL, NULL, &tv);
+		result = select(_maxFd + 1, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
 			cerr << "select error" << endl;
 			return;
 		} else if (result == 0) {
-			debug("%s\n", "select timeout");
+//			debug("%s\n", "select timeout");
 		} else {
 			debug("%s\n", "select returns");
 		}
@@ -239,10 +242,6 @@ Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 
 void Communicator::sendMessage() {
 
-	// get config: polling interval
-	const uint32_t pollingInterval = configLayer->getConfigInt(
-			"Communication>SendPollingInterval");
-
 	while (1) {
 
 		// send all message in the outMessageQueue
@@ -292,7 +291,7 @@ void Communicator::sendMessage() {
 	}
 
 	// in terms of 10^-6 seconds
-	usleep(pollingInterval);
+	usleep(_pollingInterval);
 }
 
 /**
@@ -422,6 +421,7 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
 
 	// debug
+	debug ("%s\n", "running dispatch");
 	message->printHeader();
 	message->printProtocol();
 	//message->printPayloadHex();
@@ -449,36 +449,40 @@ void Communicator::waitAndDelete(Message* message) {
 }
 
 void Communicator::setId(uint32_t id) {
-	_id = id;
+	_componentId = id;
 }
 
 void Communicator::setComponentType(ComponentType componentType) {
 	_componentType = componentType;
 }
 
-void Communicator::sendHandshakeRequest(uint32_t sockfd, uint32_t componentId,
+void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		ComponentType componentType) {
 
-	HandshakeRequestMsg* handshakeRequestMsg = new HandshakeRequestMsg(this,
+	debug ("Send sendshake to FD = %" PRIu32 "\n", sockfd);
+
+	HandshakeRequestMsg* requestHandshakeMsg = new HandshakeRequestMsg(this,
 			sockfd, componentId, componentType);
 
-	handshakeRequestMsg->prepareProtocolMsg();
-	addMessage(handshakeRequestMsg, true);
+	requestHandshakeMsg->prepareProtocolMsg();
+	addMessage(requestHandshakeMsg, true);
 
-	MessageStatus status = handshakeRequestMsg->waitForStatusChange();
+	MessageStatus status = requestHandshakeMsg->waitForStatusChange();
 	if (status == READY) {
 
 		// retrieve replied values
 		uint32_t targetComponentId =
-				handshakeRequestMsg->getTargetComponentId();
+				requestHandshakeMsg->getTargetComponentId();
 		//ComponentType targetComponentType =
-		//		handshakeRequestMsg->getTargetComponentType();
+		//		requestHandshakeMsg->getTargetComponentType();
 
 		// delete message
-		waitAndDelete(handshakeRequestMsg);
+		waitAndDelete(requestHandshakeMsg);
 
 		// add ID -> sockfd mapping to map
 		_componentIdMap[targetComponentId] = sockfd;
+		debug("[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
+				targetComponentId, sockfd);
 
 	} else {
 		debug("%s\n", "Handshake Request Failed");
@@ -486,9 +490,19 @@ void Communicator::sendHandshakeRequest(uint32_t sockfd, uint32_t componentId,
 	}
 }
 
-void Communicator::handshakeRequestProcessor(uint32_t requestId, uint32_t _sockfd,
-		uint32_t componentId, ComponentType componentType) {
+void Communicator::handshakeRequestProcessor(uint32_t requestId,
+		uint32_t sockfd, uint32_t componentId, ComponentType componentType) {
 
+	// add ID -> sockfd mapping to map
+	_componentIdMap[componentId] = sockfd;
+	debug("[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
+			componentId, sockfd);
+
+	// prepare reply message
+	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this, sockfd,
+			_componentId, _componentType);
+	handshakeReplyMsg->prepareProtocolMsg();
+	addMessage(handshakeReplyMsg, false);
 }
 
 vector<struct Component> Communicator::parseConfigFile(string componentType) {
@@ -537,7 +551,7 @@ void Communicator::printComponents(string componentType,
 
 	cout << "========== " << componentType << " LIST ==========" << endl;
 	for (Component component : componentList) {
-		if (_id == component.id) {
+		if (_componentId == component.id) {
 			cout << "(*)";
 		}
 		cout << "ID: " << component.id << " IP: " << component.ip << ":"
@@ -548,17 +562,17 @@ void Communicator::printComponents(string componentType,
 void Communicator::connectToComponents(vector<Component> componentList) {
 
 	// if destination is of different type, connect and save to map
-	// if destination is of the same type, only connect if _id > destination ID
+	// if destination is of the same type, only connect if _componentId > destination ID
 
 	for (Component component : componentList) {
 		if (_componentType != component.type
-				|| (_componentType == component.type && _id > component.id)) {
+				|| (_componentType == component.type && _componentId > component.id)) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port, MDS);
 
 			// send HandshakeRequest
-			sendHandshakeRequest(sockfd, component.id, component.type);
+			requestHandshake(sockfd, _componentId, _componentType);
 
 		} else {
 			debug("Skipping %s:%" PRIu16 "\n",

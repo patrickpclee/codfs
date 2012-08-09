@@ -51,7 +51,7 @@ public:
 	 * Constructor
 	 */
 
-	Osd();
+	Osd(string configFilePath);
 
 	/**
 	 * Destructor
