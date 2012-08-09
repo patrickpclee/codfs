@@ -599,3 +599,7 @@ void Communicator::connectAllComponents() {
 //	connectToComponents(monitorList);
 
 }
+
+uint32_t Communicator::getSockfdFromId (uint32_t componentId) {
+	return _componentIdMap[componentId];
+}

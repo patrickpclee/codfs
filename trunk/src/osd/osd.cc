@@ -123,6 +123,7 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_pendingObjectChunk[objectId] = chunkCount;
 	pendingObjectChunkMutex.unlock();
 
+	// create object and cache
 	_storageModule->createObject(objectId, length);
 	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
@@ -133,31 +134,37 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// TODO: check integrity of object received
 
-	_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
-
 	// Encode object to segment and push to other OSDs
 
 	// TODO: instead of reading from disk again, should leave a copy in memory during receive
 
-	// 1. read object
-	struct ObjectData objectData = _storageModule->readObject(objectId, 0);
+	/*
 
-	// 2. encode to list of segments
-	vector<struct SegmentData> segmentDataList =
-			_codingModule->encodeObjectToSegment(objectData);
+	 // 1. read object
+	 debug("Reading object ID = %" PRIu64 " for encoding...\n", objectId);
+	 struct ObjectData objectData = _storageModule->readObject(objectId, 0);
 
-	// 3. obtain a list of OSD IDs from MONITOR
-	vector<struct SegmentLocation> osdIdList =
-			_osdCommunicator->getOsdListRequest(objectId, MONITOR);
+	 // 2. encode to list of segments
+	 debug("%s\n", "Performing encoding...");
+	 vector<struct SegmentData> segmentDataList =
+	 _codingModule->encodeObjectToSegment(objectData);
+	 debug("No of segments = %zu\n", segmentDataList.size());
 
-	vector<struct SegmentLocation>::const_iterator p;
-	for (p = osdIdList.begin(); p != osdIdList.end(); ++p) {
-		/*
-		 uint32_t dstSockfd = _osdCommunicator->getSockfdFromId
-		 _osdCommunicator->sendSegment()
-		 */
+	 // 3. obtain a list of OSD IDs from MONITOR with the same number of segments
+	 vector<struct SegmentLocation> osdIdList =
+	 _osdCommunicator->getOsdListRequest(objectId, MONITOR,
+	 segmentDataList.size());
 
-	}
+	 for (uint32_t i = 0; i < segmentDataList.size(); i++) {
+	 uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
+	 osdIdList[i].osdId);
+	 //_osdCommunicator->sendSegment(dstSockfd, segmentDataList[i]);
+	 debug("Send segment ID = %" PRIu32 " to FD = %" PRIu32 "\n",
+	 segmentDataList[i].info.segmentId, dstSockfd);
+	 }
+	 */
+
+	_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
 }
 
@@ -175,15 +182,20 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeObject(objectId, buf, offset, length);
+	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
+			length);
 
 	pendingObjectChunkMutex.lock();
 
 	// update pendingObjectChunk value
 	_pendingObjectChunk[objectId] = _pendingObjectChunk[objectId] - 1;
 
-	// close object if no more chunks
+	// flush and close object if no more chunks
 	if (_pendingObjectChunk[objectId] == 0) {
+		struct ObjectCache objectCache = _storageModule->getObjectCache(
+				objectId);
+		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
+				objectCache.length);
 		_storageModule->closeObject(objectId);
 		_pendingObjectChunk.erase(objectId);
 	}
@@ -252,9 +264,9 @@ int main(int argc, char* argv[]) {
 
 	if (argc < 2) {
 		cout << "Usage: ./OSD [OSD CONFIG FILE]" << endl;
-		exit (0);
+		exit(0);
 	} else {
-		configFilePath = string (argv[1]);
+		configFilePath = string(argv[1]);
 	}
 
 	// create new OSD object and communicator

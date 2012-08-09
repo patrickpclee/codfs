@@ -77,9 +77,8 @@ void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
 //
 //	addMessage(putObjectEndReplyMsg);
 
-	//TODO
+//TODO
 }
-
 
 uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 	return 0;
@@ -129,13 +128,12 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 		uint64_t objectId, ComponentType dstComponent, uint32_t segmentCount) {
 	vector<struct SegmentLocation> osdList;
 
-	// TODO: HARDCODE request to MONITOR
-	for (uint32_t i = 0; i < segmentCount; i++) {
-		struct SegmentLocation segmentLocation;
-		segmentLocation.osdId = i;
-		segmentLocation.segmentId = i;
-		osdList.push_back(segmentLocation);
-	}
+	// TODO: request to MONITOR (HARDCODE FOR NOW)
+
+	struct SegmentLocation segmentLocation;
+	segmentLocation.osdId = 52000;
+	segmentLocation.segmentId = 0;
+	osdList.push_back(segmentLocation);
 
 	return osdList;
 }

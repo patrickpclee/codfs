@@ -12,16 +12,15 @@
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
-// Global Mutex for locking file during read / write
 mutex fileMutex;
-
-// Global Mutex for locking _openedFile
 mutex openedFileMutex;
+mutex cacheMutex;
 
 StorageModule::StorageModule() {
 	_capacity = 0;
 	_freespace = 0;
 	_openedFile = {};
+	_objectCache = {};
 	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
 	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
 }
@@ -31,8 +30,19 @@ StorageModule::~StorageModule() {
 }
 
 void StorageModule::createObject(uint64_t objectId, uint32_t length) {
+
+	// create cache
+	{
+		lock_guard<mutex> lk(cacheMutex);
+		_objectCache[objectId].length = length;
+		_objectCache[objectId].buf = MemoryPool::getInstance().poolMalloc(
+				length);
+	}
+
+	// create object
 	createAndOpenObject(objectId, length);
 
+	// write info
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
 
@@ -128,6 +138,25 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 	return segmentData;
 }
 
+uint32_t StorageModule::writeObjectCache(uint64_t objectId, char* buf,
+		uint64_t offsetInObject, uint32_t length) {
+
+	char* recvCache;
+
+	{
+		lock_guard<mutex> lk(cacheMutex);
+		if (!_objectCache.count(objectId)) {
+			debug("%s\n", "cannot find cache for object");
+			exit(-1);
+		}
+		recvCache = _objectCache[objectId].buf;
+	}
+
+	memcpy(recvCache + offsetInObject, buf, length);
+
+	return length;
+}
+
 uint32_t StorageModule::writeObject(uint64_t objectId, char* buf,
 		uint64_t offsetInObject, uint32_t length) {
 
@@ -136,7 +165,8 @@ uint32_t StorageModule::writeObject(uint64_t objectId, char* buf,
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	byteWritten = writeFile(filepath, buf, offsetInObject, length);
 
-	debug("Object ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
+	debug(
+			"Object ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, byteWritten, offsetInObject);
 
 	return byteWritten;
@@ -150,7 +180,8 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
 
-	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " write %" PRIu32 "bytes at offset %" PRIu64 "\n",
+	debug(
+			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " write %" PRIu32 "bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteWritten, offsetInSegment);
 
 	return byteWritten;
@@ -172,7 +203,8 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	writeSegmentInfo(objectId, segmentId, length, filepath);
 
-	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " created\n", objectId, segmentId);
+	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " created\n",
+			objectId, segmentId);
 
 	return createFile(filepath);
 }
@@ -181,6 +213,15 @@ void StorageModule::closeObject(uint64_t objectId) {
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	closeFile(filepath);
 
+	// close cache
+	struct ObjectCache objectCache = getObjectCache(objectId);
+	MemoryPool::getInstance().poolFree(objectCache.buf);
+
+	{
+		lock_guard<mutex> lk(cacheMutex);
+		_objectCache.erase(objectId);
+	}
+
 	debug("Object ID = %" PRIu64 " closed\n", objectId);
 }
 
@@ -188,7 +229,8 @@ void StorageModule::closeSegment(uint64_t objectId, uint32_t segmentId) {
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	closeFile(filepath);
 
-	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " closed\n", objectId, segmentId);
+	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " closed\n",
+			objectId, segmentId);
 }
 
 uint32_t StorageModule::getCapacity() {
@@ -267,7 +309,8 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 	}
 
 	if (byteRead != length) {
-		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n", length, byteRead);
+		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
+				length, byteRead);
 		exit(-1);
 	}
 
@@ -406,4 +449,13 @@ void StorageModule::closeFile(string filepath) {
 	openedFileMutex.unlock();
 
 	fclose(filePtr);
+}
+
+struct ObjectCache StorageModule::getObjectCache(uint64_t objectId) {
+	lock_guard<mutex> lk(cacheMutex);
+	if (!_objectCache.count(objectId)) {
+		debug("%s\n", "object cache not found");
+		exit(-1);
+	}
+	return _objectCache[objectId];
 }

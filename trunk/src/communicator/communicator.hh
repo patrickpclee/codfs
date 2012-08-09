@@ -162,6 +162,14 @@ public:
 	void handshakeRequestProcessor(uint32_t requestId, uint32_t _sockfd,
 			uint32_t componentId, ComponentType componentType);
 
+	/**
+	 * Obtain the sockfd concerning the component's connection
+	 * @param componentId Component ID
+	 * @return Socket descriptor of the component
+	 */
+
+	uint32_t getSockfdFromId (uint32_t componentId);
+
 protected:
 
 	/**

@@ -11,6 +11,11 @@
 #include "../common/objectdata.hh"
 using namespace std;
 
+struct ObjectCache {
+	uint64_t length;
+	char* buf;
+};
+
 class StorageModule {
 public:
 
@@ -72,6 +77,9 @@ public:
 	uint32_t writeObject(uint64_t objectId, char* buf,
 			uint64_t offsetInObject, uint32_t length);
 
+	uint32_t writeObjectCache(uint64_t objectId, char* buf,
+			uint64_t offsetInObject, uint32_t length);
+
 	/**
 	 * Write a partial Segment ID to the storage
 	 * @param objectId Object ID
@@ -120,6 +128,7 @@ public:
 	// getters
 	uint32_t getCapacity();
 	uint32_t getFreespace();
+	struct ObjectCache getObjectCache(uint64_t objectId);
 
 private:
 
@@ -214,6 +223,7 @@ private:
 	uint32_t _capacity; // total capacity of the node
 	uint32_t _freespace; // remaining capacity of the node
 	map <string, FILE*> _openedFile;
+	map <uint64_t, struct ObjectCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
 };
