@@ -32,8 +32,8 @@ void  protobuf_AddDesc_message_2eproto();
 void protobuf_AssignDesc_message_2eproto();
 void protobuf_ShutdownFile_message_2eproto();
 
-class HandShakeRequestPro;
-class HandShakeReplyPro;
+class HandshakeRequestPro;
+class HandshakeReplyPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
 class PutObjectInitRequestPro;
@@ -50,16 +50,37 @@ class PutSegmentEndRequestPro;
 class PutSegmentInitReplyPro;
 class PutSegmentEndReplyPro;
 
+enum HandshakeRequestPro_ComponentType {
+  HandshakeRequestPro_ComponentType_CLIENT = 1,
+  HandshakeRequestPro_ComponentType_OSD = 2,
+  HandshakeRequestPro_ComponentType_MDS = 3,
+  HandshakeRequestPro_ComponentType_MONITOR = 4
+};
+bool HandshakeRequestPro_ComponentType_IsValid(int value);
+const HandshakeRequestPro_ComponentType HandshakeRequestPro_ComponentType_ComponentType_MIN = HandshakeRequestPro_ComponentType_CLIENT;
+const HandshakeRequestPro_ComponentType HandshakeRequestPro_ComponentType_ComponentType_MAX = HandshakeRequestPro_ComponentType_MONITOR;
+const int HandshakeRequestPro_ComponentType_ComponentType_ARRAYSIZE = HandshakeRequestPro_ComponentType_ComponentType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* HandshakeRequestPro_ComponentType_descriptor();
+inline const ::std::string& HandshakeRequestPro_ComponentType_Name(HandshakeRequestPro_ComponentType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    HandshakeRequestPro_ComponentType_descriptor(), value);
+}
+inline bool HandshakeRequestPro_ComponentType_Parse(
+    const ::std::string& name, HandshakeRequestPro_ComponentType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<HandshakeRequestPro_ComponentType>(
+    HandshakeRequestPro_ComponentType_descriptor(), name, value);
+}
 // ===================================================================
 
-class HandShakeRequestPro : public ::google::protobuf::Message {
+class HandshakeRequestPro : public ::google::protobuf::Message {
  public:
-  HandShakeRequestPro();
-  virtual ~HandShakeRequestPro();
+  HandshakeRequestPro();
+  virtual ~HandshakeRequestPro();
   
-  HandShakeRequestPro(const HandShakeRequestPro& from);
+  HandshakeRequestPro(const HandshakeRequestPro& from);
   
-  inline HandShakeRequestPro& operator=(const HandShakeRequestPro& from) {
+  inline HandshakeRequestPro& operator=(const HandshakeRequestPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -73,17 +94,17 @@ class HandShakeRequestPro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const HandShakeRequestPro& default_instance();
+  static const HandshakeRequestPro& default_instance();
   
-  void Swap(HandShakeRequestPro* other);
+  void Swap(HandshakeRequestPro* other);
   
   // implements Message ----------------------------------------------
   
-  HandShakeRequestPro* New() const;
+  HandshakeRequestPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const HandShakeRequestPro& from);
-  void MergeFrom(const HandShakeRequestPro& from);
+  void CopyFrom(const HandshakeRequestPro& from);
+  void MergeFrom(const HandshakeRequestPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -104,6 +125,32 @@ class HandShakeRequestPro : public ::google::protobuf::Message {
   
   // nested types ----------------------------------------------------
   
+  typedef HandshakeRequestPro_ComponentType ComponentType;
+  static const ComponentType CLIENT = HandshakeRequestPro_ComponentType_CLIENT;
+  static const ComponentType OSD = HandshakeRequestPro_ComponentType_OSD;
+  static const ComponentType MDS = HandshakeRequestPro_ComponentType_MDS;
+  static const ComponentType MONITOR = HandshakeRequestPro_ComponentType_MONITOR;
+  static inline bool ComponentType_IsValid(int value) {
+    return HandshakeRequestPro_ComponentType_IsValid(value);
+  }
+  static const ComponentType ComponentType_MIN =
+    HandshakeRequestPro_ComponentType_ComponentType_MIN;
+  static const ComponentType ComponentType_MAX =
+    HandshakeRequestPro_ComponentType_ComponentType_MAX;
+  static const int ComponentType_ARRAYSIZE =
+    HandshakeRequestPro_ComponentType_ComponentType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  ComponentType_descriptor() {
+    return HandshakeRequestPro_ComponentType_descriptor();
+  }
+  static inline const ::std::string& ComponentType_Name(ComponentType value) {
+    return HandshakeRequestPro_ComponentType_Name(value);
+  }
+  static inline bool ComponentType_Parse(const ::std::string& name,
+      ComponentType* value) {
+    return HandshakeRequestPro_ComponentType_Parse(name, value);
+  }
+  
   // accessors -------------------------------------------------------
   
   // optional fixed32 componentId = 1;
@@ -113,14 +160,14 @@ class HandShakeRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 componentid() const;
   inline void set_componentid(::google::protobuf::uint32 value);
   
-  // optional fixed32 componentType = 2;
+  // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
   inline bool has_componenttype() const;
   inline void clear_componenttype();
   static const int kComponentTypeFieldNumber = 2;
-  inline ::google::protobuf::uint32 componenttype() const;
-  inline void set_componenttype(::google::protobuf::uint32 value);
+  inline ::ncvfs::HandshakeRequestPro_ComponentType componenttype() const;
+  inline void set_componenttype(::ncvfs::HandshakeRequestPro_ComponentType value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.HandShakeRequestPro)
+  // @@protoc_insertion_point(class_scope:ncvfs.HandshakeRequestPro)
  private:
   inline void set_has_componentid();
   inline void clear_has_componentid();
@@ -130,7 +177,7 @@ class HandShakeRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 componentid_;
-  ::google::protobuf::uint32 componenttype_;
+  int componenttype_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
@@ -140,18 +187,18 @@ class HandShakeRequestPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static HandShakeRequestPro* default_instance_;
+  static HandshakeRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
-class HandShakeReplyPro : public ::google::protobuf::Message {
+class HandshakeReplyPro : public ::google::protobuf::Message {
  public:
-  HandShakeReplyPro();
-  virtual ~HandShakeReplyPro();
+  HandshakeReplyPro();
+  virtual ~HandshakeReplyPro();
   
-  HandShakeReplyPro(const HandShakeReplyPro& from);
+  HandshakeReplyPro(const HandshakeReplyPro& from);
   
-  inline HandShakeReplyPro& operator=(const HandShakeReplyPro& from) {
+  inline HandshakeReplyPro& operator=(const HandshakeReplyPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -165,17 +212,17 @@ class HandShakeReplyPro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const HandShakeReplyPro& default_instance();
+  static const HandshakeReplyPro& default_instance();
   
-  void Swap(HandShakeReplyPro* other);
+  void Swap(HandshakeReplyPro* other);
   
   // implements Message ----------------------------------------------
   
-  HandShakeReplyPro* New() const;
+  HandshakeReplyPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const HandShakeReplyPro& from);
-  void MergeFrom(const HandShakeReplyPro& from);
+  void CopyFrom(const HandshakeReplyPro& from);
+  void MergeFrom(const HandshakeReplyPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -205,14 +252,14 @@ class HandShakeReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 componentid() const;
   inline void set_componentid(::google::protobuf::uint32 value);
   
-  // optional fixed32 componentType = 2;
+  // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
   inline bool has_componenttype() const;
   inline void clear_componenttype();
   static const int kComponentTypeFieldNumber = 2;
-  inline ::google::protobuf::uint32 componenttype() const;
-  inline void set_componenttype(::google::protobuf::uint32 value);
+  inline ::ncvfs::HandshakeRequestPro_ComponentType componenttype() const;
+  inline void set_componenttype(::ncvfs::HandshakeRequestPro_ComponentType value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.HandShakeReplyPro)
+  // @@protoc_insertion_point(class_scope:ncvfs.HandshakeReplyPro)
  private:
   inline void set_has_componentid();
   inline void clear_has_componentid();
@@ -222,7 +269,7 @@ class HandShakeReplyPro : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 componentid_;
-  ::google::protobuf::uint32 componenttype_;
+  int componenttype_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
@@ -232,7 +279,7 @@ class HandShakeReplyPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static HandShakeReplyPro* default_instance_;
+  static HandshakeReplyPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1690,96 +1737,98 @@ class PutSegmentEndReplyPro : public ::google::protobuf::Message {
 
 // ===================================================================
 
-// HandShakeRequestPro
+// HandshakeRequestPro
 
 // optional fixed32 componentId = 1;
-inline bool HandShakeRequestPro::has_componentid() const {
+inline bool HandshakeRequestPro::has_componentid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void HandShakeRequestPro::set_has_componentid() {
+inline void HandshakeRequestPro::set_has_componentid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void HandShakeRequestPro::clear_has_componentid() {
+inline void HandshakeRequestPro::clear_has_componentid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void HandShakeRequestPro::clear_componentid() {
+inline void HandshakeRequestPro::clear_componentid() {
   componentid_ = 0u;
   clear_has_componentid();
 }
-inline ::google::protobuf::uint32 HandShakeRequestPro::componentid() const {
+inline ::google::protobuf::uint32 HandshakeRequestPro::componentid() const {
   return componentid_;
 }
-inline void HandShakeRequestPro::set_componentid(::google::protobuf::uint32 value) {
+inline void HandshakeRequestPro::set_componentid(::google::protobuf::uint32 value) {
   set_has_componentid();
   componentid_ = value;
 }
 
-// optional fixed32 componentType = 2;
-inline bool HandShakeRequestPro::has_componenttype() const {
+// optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
+inline bool HandshakeRequestPro::has_componenttype() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void HandShakeRequestPro::set_has_componenttype() {
+inline void HandshakeRequestPro::set_has_componenttype() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void HandShakeRequestPro::clear_has_componenttype() {
+inline void HandshakeRequestPro::clear_has_componenttype() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void HandShakeRequestPro::clear_componenttype() {
-  componenttype_ = 0u;
+inline void HandshakeRequestPro::clear_componenttype() {
+  componenttype_ = 1;
   clear_has_componenttype();
 }
-inline ::google::protobuf::uint32 HandShakeRequestPro::componenttype() const {
-  return componenttype_;
+inline ::ncvfs::HandshakeRequestPro_ComponentType HandshakeRequestPro::componenttype() const {
+  return static_cast< ::ncvfs::HandshakeRequestPro_ComponentType >(componenttype_);
 }
-inline void HandShakeRequestPro::set_componenttype(::google::protobuf::uint32 value) {
+inline void HandshakeRequestPro::set_componenttype(::ncvfs::HandshakeRequestPro_ComponentType value) {
+  GOOGLE_DCHECK(::ncvfs::HandshakeRequestPro_ComponentType_IsValid(value));
   set_has_componenttype();
   componenttype_ = value;
 }
 
 // -------------------------------------------------------------------
 
-// HandShakeReplyPro
+// HandshakeReplyPro
 
 // optional fixed32 componentId = 1;
-inline bool HandShakeReplyPro::has_componentid() const {
+inline bool HandshakeReplyPro::has_componentid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void HandShakeReplyPro::set_has_componentid() {
+inline void HandshakeReplyPro::set_has_componentid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void HandShakeReplyPro::clear_has_componentid() {
+inline void HandshakeReplyPro::clear_has_componentid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void HandShakeReplyPro::clear_componentid() {
+inline void HandshakeReplyPro::clear_componentid() {
   componentid_ = 0u;
   clear_has_componentid();
 }
-inline ::google::protobuf::uint32 HandShakeReplyPro::componentid() const {
+inline ::google::protobuf::uint32 HandshakeReplyPro::componentid() const {
   return componentid_;
 }
-inline void HandShakeReplyPro::set_componentid(::google::protobuf::uint32 value) {
+inline void HandshakeReplyPro::set_componentid(::google::protobuf::uint32 value) {
   set_has_componentid();
   componentid_ = value;
 }
 
-// optional fixed32 componentType = 2;
-inline bool HandShakeReplyPro::has_componenttype() const {
+// optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
+inline bool HandshakeReplyPro::has_componenttype() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void HandShakeReplyPro::set_has_componenttype() {
+inline void HandshakeReplyPro::set_has_componenttype() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void HandShakeReplyPro::clear_has_componenttype() {
+inline void HandshakeReplyPro::clear_has_componenttype() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void HandShakeReplyPro::clear_componenttype() {
-  componenttype_ = 0u;
+inline void HandshakeReplyPro::clear_componenttype() {
+  componenttype_ = 1;
   clear_has_componenttype();
 }
-inline ::google::protobuf::uint32 HandShakeReplyPro::componenttype() const {
-  return componenttype_;
+inline ::ncvfs::HandshakeRequestPro_ComponentType HandshakeReplyPro::componenttype() const {
+  return static_cast< ::ncvfs::HandshakeRequestPro_ComponentType >(componenttype_);
 }
-inline void HandShakeReplyPro::set_componenttype(::google::protobuf::uint32 value) {
+inline void HandshakeReplyPro::set_componenttype(::ncvfs::HandshakeRequestPro_ComponentType value) {
+  GOOGLE_DCHECK(::ncvfs::HandshakeRequestPro_ComponentType_IsValid(value));
   set_has_componenttype();
   componenttype_ = value;
 }
@@ -2740,6 +2789,10 @@ inline void PutSegmentEndReplyPro::set_segmentid(::google::protobuf::uint32 valu
 namespace google {
 namespace protobuf {
 
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::HandshakeRequestPro_ComponentType>() {
+  return ::ncvfs::HandshakeRequestPro_ComponentType_descriptor();
+}
 
 }  // namespace google
 }  // namespace protobuf

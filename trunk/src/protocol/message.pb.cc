@@ -17,12 +17,13 @@ namespace ncvfs {
 
 namespace {
 
-const ::google::protobuf::Descriptor* HandShakeRequestPro_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* HandshakeRequestPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  HandShakeRequestPro_reflection_ = NULL;
-const ::google::protobuf::Descriptor* HandShakeReplyPro_descriptor_ = NULL;
+  HandshakeRequestPro_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* HandshakeRequestPro_ComponentType_descriptor_ = NULL;
+const ::google::protobuf::Descriptor* HandshakeReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
-  HandShakeReplyPro_reflection_ = NULL;
+  HandshakeReplyPro_reflection_ = NULL;
 const ::google::protobuf::Descriptor* ListDirectoryRequestPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ListDirectoryRequestPro_reflection_ = NULL;
@@ -78,38 +79,39 @@ void protobuf_AssignDesc_message_2eproto() {
     ::google::protobuf::DescriptorPool::generated_pool()->FindFileByName(
       "message.proto");
   GOOGLE_CHECK(file != NULL);
-  HandShakeRequestPro_descriptor_ = file->message_type(0);
-  static const int HandShakeRequestPro_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeRequestPro, componentid_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeRequestPro, componenttype_),
+  HandshakeRequestPro_descriptor_ = file->message_type(0);
+  static const int HandshakeRequestPro_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeRequestPro, componentid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeRequestPro, componenttype_),
   };
-  HandShakeRequestPro_reflection_ =
+  HandshakeRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      HandShakeRequestPro_descriptor_,
-      HandShakeRequestPro::default_instance_,
-      HandShakeRequestPro_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeRequestPro, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeRequestPro, _unknown_fields_),
+      HandshakeRequestPro_descriptor_,
+      HandshakeRequestPro::default_instance_,
+      HandshakeRequestPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeRequestPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeRequestPro, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(HandShakeRequestPro));
-  HandShakeReplyPro_descriptor_ = file->message_type(1);
-  static const int HandShakeReplyPro_offsets_[2] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeReplyPro, componentid_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeReplyPro, componenttype_),
+      sizeof(HandshakeRequestPro));
+  HandshakeRequestPro_ComponentType_descriptor_ = HandshakeRequestPro_descriptor_->enum_type(0);
+  HandshakeReplyPro_descriptor_ = file->message_type(1);
+  static const int HandshakeReplyPro_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeReplyPro, componentid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeReplyPro, componenttype_),
   };
-  HandShakeReplyPro_reflection_ =
+  HandshakeReplyPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
-      HandShakeReplyPro_descriptor_,
-      HandShakeReplyPro::default_instance_,
-      HandShakeReplyPro_offsets_,
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeReplyPro, _has_bits_[0]),
-      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandShakeReplyPro, _unknown_fields_),
+      HandshakeReplyPro_descriptor_,
+      HandshakeReplyPro::default_instance_,
+      HandshakeReplyPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeReplyPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(HandshakeReplyPro, _unknown_fields_),
       -1,
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
-      sizeof(HandShakeReplyPro));
+      sizeof(HandshakeReplyPro));
   ListDirectoryRequestPro_descriptor_ = file->message_type(2);
   static const int ListDirectoryRequestPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ListDirectoryRequestPro, osdid_),
@@ -368,9 +370,9 @@ inline void protobuf_AssignDescriptorsOnce() {
 void protobuf_RegisterTypes(const ::std::string&) {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    HandShakeRequestPro_descriptor_, &HandShakeRequestPro::default_instance());
+    HandshakeRequestPro_descriptor_, &HandshakeRequestPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
-    HandShakeReplyPro_descriptor_, &HandShakeReplyPro::default_instance());
+    HandshakeReplyPro_descriptor_, &HandshakeReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     ListDirectoryRequestPro_descriptor_, &ListDirectoryRequestPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -406,10 +408,10 @@ void protobuf_RegisterTypes(const ::std::string&) {
 }  // namespace
 
 void protobuf_ShutdownFile_message_2eproto() {
-  delete HandShakeRequestPro::default_instance_;
-  delete HandShakeRequestPro_reflection_;
-  delete HandShakeReplyPro::default_instance_;
-  delete HandShakeReplyPro_reflection_;
+  delete HandshakeRequestPro::default_instance_;
+  delete HandshakeRequestPro_reflection_;
+  delete HandshakeReplyPro::default_instance_;
+  delete HandshakeReplyPro_reflection_;
   delete ListDirectoryRequestPro::default_instance_;
   delete ListDirectoryRequestPro_reflection_;
   delete UploadFileRequestPro::default_instance_;
@@ -449,40 +451,43 @@ void protobuf_AddDesc_message_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-    "\n\rmessage.proto\022\005ncvfs\"A\n\023HandShakeReque"
-    "stPro\022\023\n\013componentId\030\001 \001(\007\022\025\n\rcomponentT"
-    "ype\030\002 \001(\007\"\?\n\021HandShakeReplyPro\022\023\n\013compon"
-    "entId\030\001 \001(\007\022\025\n\rcomponentType\030\002 \001(\007\"\?\n\027Li"
-    "stDirectoryRequestPro\022\r\n\005osdId\030\001 \001(\007\022\025\n\r"
-    "directoryPath\030\002 \001(\t\":\n\024UploadFileRequest"
-    "Pro\022\020\n\010fileName\030\001 \002(\t\022\020\n\010numOfObj\030\002 \002(\007\""
-    "S\n\027PutObjectInitRequestPro\022\020\n\010objectId\030\001"
-    " \001(\006\022\022\n\nobjectSize\030\002 \001(\007\022\022\n\nchunkCount\030\003"
-    " \001(\007\"A\n\rObjectDataPro\022\020\n\010objectId\030\001 \001(\006\022"
-    "\016\n\006offset\030\002 \001(\006\022\016\n\006length\030\003 \001(\007\"*\n\026PutOb"
-    "jectEndRequestPro\022\020\n\010objectId\030\001 \001(\006\"@\n\025L"
-    "istDirectoryReplyPro\022\'\n\013fileInfoPro\030\001 \003("
-    "\0132\022.ncvfs.FileInfoPro\"A\n\013FileInfoPro\022\016\n\006"
-    "fileId\030\001 \001(\007\022\020\n\010fileSize\030\002 \001(\006\022\020\n\010fileNa"
-    "me\030\003 \001(\t\"a\n\022UploadFileReplyPro\022\016\n\006fileId"
-    "\030\001 \002(\007\022\020\n\010numOfObj\030\002 \002(\007\022\024\n\014objectIdList"
-    "\030\003 \003(\006\022\023\n\013primaryList\030\004 \003(\007\")\n\025PutObject"
-    "InitReplyPro\022\020\n\010objectId\030\001 \001(\006\"(\n\024PutObj"
-    "ectEndReplyPro\022\020\n\010objectId\030\001 \001(\006\"h\n\030PutS"
-    "egmentInitRequestPro\022\020\n\010objectId\030\001 \001(\006\022\021"
-    "\n\tsegmentId\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001(\007\022\022"
-    "\n\nchunkCount\030\004 \001(\007\"U\n\016SegmentDataPro\022\020\n\010"
-    "objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\016\n\006off"
-    "set\030\003 \001(\006\022\016\n\006length\030\004 \001(\007\">\n\027PutSegmentE"
-    "ndRequestPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmen"
-    "tId\030\002 \001(\007\"=\n\026PutSegmentInitReplyPro\022\020\n\010o"
-    "bjectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"<\n\025PutS"
-    "egmentEndReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\ts"
-    "egmentId\030\002 \001(\007", 1174);
+    "\n\rmessage.proto\022\005ncvfs\"\247\001\n\023HandshakeRequ"
+    "estPro\022\023\n\013componentId\030\001 \001(\007\022\?\n\rcomponent"
+    "Type\030\002 \001(\0162(.ncvfs.HandshakeRequestPro.C"
+    "omponentType\":\n\rComponentType\022\n\n\006CLIENT\020"
+    "\001\022\007\n\003OSD\020\002\022\007\n\003MDS\020\003\022\013\n\007MONITOR\020\004\"i\n\021Hand"
+    "shakeReplyPro\022\023\n\013componentId\030\001 \001(\007\022\?\n\rco"
+    "mponentType\030\002 \001(\0162(.ncvfs.HandshakeReque"
+    "stPro.ComponentType\"\?\n\027ListDirectoryRequ"
+    "estPro\022\r\n\005osdId\030\001 \001(\007\022\025\n\rdirectoryPath\030\002"
+    " \001(\t\":\n\024UploadFileRequestPro\022\020\n\010fileName"
+    "\030\001 \002(\t\022\020\n\010numOfObj\030\002 \002(\007\"S\n\027PutObjectIni"
+    "tRequestPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobjectS"
+    "ize\030\002 \001(\007\022\022\n\nchunkCount\030\003 \001(\007\"A\n\rObjectD"
+    "ataPro\022\020\n\010objectId\030\001 \001(\006\022\016\n\006offset\030\002 \001(\006"
+    "\022\016\n\006length\030\003 \001(\007\"*\n\026PutObjectEndRequestP"
+    "ro\022\020\n\010objectId\030\001 \001(\006\"@\n\025ListDirectoryRep"
+    "lyPro\022\'\n\013fileInfoPro\030\001 \003(\0132\022.ncvfs.FileI"
+    "nfoPro\"A\n\013FileInfoPro\022\016\n\006fileId\030\001 \001(\007\022\020\n"
+    "\010fileSize\030\002 \001(\006\022\020\n\010fileName\030\003 \001(\t\"a\n\022Upl"
+    "oadFileReplyPro\022\016\n\006fileId\030\001 \002(\007\022\020\n\010numOf"
+    "Obj\030\002 \002(\007\022\024\n\014objectIdList\030\003 \003(\006\022\023\n\013prima"
+    "ryList\030\004 \003(\007\")\n\025PutObjectInitReplyPro\022\020\n"
+    "\010objectId\030\001 \001(\006\"(\n\024PutObjectEndReplyPro\022"
+    "\020\n\010objectId\030\001 \001(\006\"h\n\030PutSegmentInitReque"
+    "stPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001"
+    "(\007\022\023\n\013segmentSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 "
+    "\001(\007\"U\n\016SegmentDataPro\022\020\n\010objectId\030\001 \001(\006\022"
+    "\021\n\tsegmentId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006le"
+    "ngth\030\004 \001(\007\">\n\027PutSegmentEndRequestPro\022\020\n"
+    "\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026Pu"
+    "tSegmentInitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021"
+    "\n\tsegmentId\030\002 \001(\007\"<\n\025PutSegmentEndReplyP"
+    "ro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007", 1319);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
-  HandShakeRequestPro::default_instance_ = new HandShakeRequestPro();
-  HandShakeReplyPro::default_instance_ = new HandShakeReplyPro();
+  HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
+  HandshakeReplyPro::default_instance_ = new HandshakeReplyPro();
   ListDirectoryRequestPro::default_instance_ = new ListDirectoryRequestPro();
   UploadFileRequestPro::default_instance_ = new UploadFileRequestPro();
   PutObjectInitRequestPro::default_instance_ = new PutObjectInitRequestPro();
@@ -498,8 +503,8 @@ void protobuf_AddDesc_message_2eproto() {
   PutSegmentEndRequestPro::default_instance_ = new PutSegmentEndRequestPro();
   PutSegmentInitReplyPro::default_instance_ = new PutSegmentInitReplyPro();
   PutSegmentEndReplyPro::default_instance_ = new PutSegmentEndReplyPro();
-  HandShakeRequestPro::default_instance_->InitAsDefaultInstance();
-  HandShakeReplyPro::default_instance_->InitAsDefaultInstance();
+  HandshakeRequestPro::default_instance_->InitAsDefaultInstance();
+  HandshakeReplyPro::default_instance_->InitAsDefaultInstance();
   ListDirectoryRequestPro::default_instance_->InitAsDefaultInstance();
   UploadFileRequestPro::default_instance_->InitAsDefaultInstance();
   PutObjectInitRequestPro::default_instance_->InitAsDefaultInstance();
@@ -528,71 +533,96 @@ struct StaticDescriptorInitializer_message_2eproto {
 
 // ===================================================================
 
+const ::google::protobuf::EnumDescriptor* HandshakeRequestPro_ComponentType_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return HandshakeRequestPro_ComponentType_descriptor_;
+}
+bool HandshakeRequestPro_ComponentType_IsValid(int value) {
+  switch(value) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
 #ifndef _MSC_VER
-const int HandShakeRequestPro::kComponentIdFieldNumber;
-const int HandShakeRequestPro::kComponentTypeFieldNumber;
+const HandshakeRequestPro_ComponentType HandshakeRequestPro::CLIENT;
+const HandshakeRequestPro_ComponentType HandshakeRequestPro::OSD;
+const HandshakeRequestPro_ComponentType HandshakeRequestPro::MDS;
+const HandshakeRequestPro_ComponentType HandshakeRequestPro::MONITOR;
+const HandshakeRequestPro_ComponentType HandshakeRequestPro::ComponentType_MIN;
+const HandshakeRequestPro_ComponentType HandshakeRequestPro::ComponentType_MAX;
+const int HandshakeRequestPro::ComponentType_ARRAYSIZE;
+#endif  // _MSC_VER
+#ifndef _MSC_VER
+const int HandshakeRequestPro::kComponentIdFieldNumber;
+const int HandshakeRequestPro::kComponentTypeFieldNumber;
 #endif  // !_MSC_VER
 
-HandShakeRequestPro::HandShakeRequestPro()
+HandshakeRequestPro::HandshakeRequestPro()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void HandShakeRequestPro::InitAsDefaultInstance() {
+void HandshakeRequestPro::InitAsDefaultInstance() {
 }
 
-HandShakeRequestPro::HandShakeRequestPro(const HandShakeRequestPro& from)
+HandshakeRequestPro::HandshakeRequestPro(const HandshakeRequestPro& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void HandShakeRequestPro::SharedCtor() {
+void HandshakeRequestPro::SharedCtor() {
   _cached_size_ = 0;
   componentid_ = 0u;
-  componenttype_ = 0u;
+  componenttype_ = 1;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-HandShakeRequestPro::~HandShakeRequestPro() {
+HandshakeRequestPro::~HandshakeRequestPro() {
   SharedDtor();
 }
 
-void HandShakeRequestPro::SharedDtor() {
+void HandshakeRequestPro::SharedDtor() {
   if (this != default_instance_) {
   }
 }
 
-void HandShakeRequestPro::SetCachedSize(int size) const {
+void HandshakeRequestPro::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* HandShakeRequestPro::descriptor() {
+const ::google::protobuf::Descriptor* HandshakeRequestPro::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return HandShakeRequestPro_descriptor_;
+  return HandshakeRequestPro_descriptor_;
 }
 
-const HandShakeRequestPro& HandShakeRequestPro::default_instance() {
+const HandshakeRequestPro& HandshakeRequestPro::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
 }
 
-HandShakeRequestPro* HandShakeRequestPro::default_instance_ = NULL;
+HandshakeRequestPro* HandshakeRequestPro::default_instance_ = NULL;
 
-HandShakeRequestPro* HandShakeRequestPro::New() const {
-  return new HandShakeRequestPro;
+HandshakeRequestPro* HandshakeRequestPro::New() const {
+  return new HandshakeRequestPro;
 }
 
-void HandShakeRequestPro::Clear() {
+void HandshakeRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     componentid_ = 0u;
-    componenttype_ = 0u;
+    componenttype_ = 1;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
-bool HandShakeRequestPro::MergePartialFromCodedStream(
+bool HandshakeRequestPro::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -609,19 +639,24 @@ bool HandShakeRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(21)) goto parse_componentType;
+        if (input->ExpectTag(16)) goto parse_componentType;
         break;
       }
       
-      // optional fixed32 componentType = 2;
+      // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
          parse_componentType:
+          int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
-                 input, &componenttype_)));
-          set_has_componenttype();
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::ncvfs::HandshakeRequestPro_ComponentType_IsValid(value)) {
+            set_componenttype(static_cast< ::ncvfs::HandshakeRequestPro_ComponentType >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(2, value);
+          }
         } else {
           goto handle_uninterpreted;
         }
@@ -645,16 +680,17 @@ bool HandShakeRequestPro::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void HandShakeRequestPro::SerializeWithCachedSizes(
+void HandshakeRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional fixed32 componentId = 1;
   if (has_componentid()) {
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->componentid(), output);
   }
   
-  // optional fixed32 componentType = 2;
+  // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
   if (has_componenttype()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->componenttype(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      2, this->componenttype(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -663,16 +699,17 @@ void HandShakeRequestPro::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* HandShakeRequestPro::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* HandshakeRequestPro::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional fixed32 componentId = 1;
   if (has_componentid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->componentid(), target);
   }
   
-  // optional fixed32 componentType = 2;
+  // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
   if (has_componenttype()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->componenttype(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      2, this->componenttype(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -682,7 +719,7 @@ void HandShakeRequestPro::SerializeWithCachedSizes(
   return target;
 }
 
-int HandShakeRequestPro::ByteSize() const {
+int HandshakeRequestPro::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -691,9 +728,10 @@ int HandShakeRequestPro::ByteSize() const {
       total_size += 1 + 4;
     }
     
-    // optional fixed32 componentType = 2;
+    // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
     if (has_componenttype()) {
-      total_size += 1 + 4;
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->componenttype());
     }
     
   }
@@ -708,10 +746,10 @@ int HandShakeRequestPro::ByteSize() const {
   return total_size;
 }
 
-void HandShakeRequestPro::MergeFrom(const ::google::protobuf::Message& from) {
+void HandshakeRequestPro::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const HandShakeRequestPro* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const HandShakeRequestPro*>(
+  const HandshakeRequestPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const HandshakeRequestPro*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -720,7 +758,7 @@ void HandShakeRequestPro::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void HandShakeRequestPro::MergeFrom(const HandShakeRequestPro& from) {
+void HandshakeRequestPro::MergeFrom(const HandshakeRequestPro& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_componentid()) {
@@ -733,24 +771,24 @@ void HandShakeRequestPro::MergeFrom(const HandShakeRequestPro& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void HandShakeRequestPro::CopyFrom(const ::google::protobuf::Message& from) {
+void HandshakeRequestPro::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void HandShakeRequestPro::CopyFrom(const HandShakeRequestPro& from) {
+void HandshakeRequestPro::CopyFrom(const HandshakeRequestPro& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool HandShakeRequestPro::IsInitialized() const {
+bool HandshakeRequestPro::IsInitialized() const {
   
   return true;
 }
 
-void HandShakeRequestPro::Swap(HandShakeRequestPro* other) {
+void HandshakeRequestPro::Swap(HandshakeRequestPro* other) {
   if (other != this) {
     std::swap(componentid_, other->componentid_);
     std::swap(componenttype_, other->componenttype_);
@@ -760,11 +798,11 @@ void HandShakeRequestPro::Swap(HandShakeRequestPro* other) {
   }
 }
 
-::google::protobuf::Metadata HandShakeRequestPro::GetMetadata() const {
+::google::protobuf::Metadata HandshakeRequestPro::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = HandShakeRequestPro_descriptor_;
-  metadata.reflection = HandShakeRequestPro_reflection_;
+  metadata.descriptor = HandshakeRequestPro_descriptor_;
+  metadata.reflection = HandshakeRequestPro_reflection_;
   return metadata;
 }
 
@@ -772,70 +810,70 @@ void HandShakeRequestPro::Swap(HandShakeRequestPro* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int HandShakeReplyPro::kComponentIdFieldNumber;
-const int HandShakeReplyPro::kComponentTypeFieldNumber;
+const int HandshakeReplyPro::kComponentIdFieldNumber;
+const int HandshakeReplyPro::kComponentTypeFieldNumber;
 #endif  // !_MSC_VER
 
-HandShakeReplyPro::HandShakeReplyPro()
+HandshakeReplyPro::HandshakeReplyPro()
   : ::google::protobuf::Message() {
   SharedCtor();
 }
 
-void HandShakeReplyPro::InitAsDefaultInstance() {
+void HandshakeReplyPro::InitAsDefaultInstance() {
 }
 
-HandShakeReplyPro::HandShakeReplyPro(const HandShakeReplyPro& from)
+HandshakeReplyPro::HandshakeReplyPro(const HandshakeReplyPro& from)
   : ::google::protobuf::Message() {
   SharedCtor();
   MergeFrom(from);
 }
 
-void HandShakeReplyPro::SharedCtor() {
+void HandshakeReplyPro::SharedCtor() {
   _cached_size_ = 0;
   componentid_ = 0u;
-  componenttype_ = 0u;
+  componenttype_ = 1;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
-HandShakeReplyPro::~HandShakeReplyPro() {
+HandshakeReplyPro::~HandshakeReplyPro() {
   SharedDtor();
 }
 
-void HandShakeReplyPro::SharedDtor() {
+void HandshakeReplyPro::SharedDtor() {
   if (this != default_instance_) {
   }
 }
 
-void HandShakeReplyPro::SetCachedSize(int size) const {
+void HandshakeReplyPro::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
   GOOGLE_SAFE_CONCURRENT_WRITES_END();
 }
-const ::google::protobuf::Descriptor* HandShakeReplyPro::descriptor() {
+const ::google::protobuf::Descriptor* HandshakeReplyPro::descriptor() {
   protobuf_AssignDescriptorsOnce();
-  return HandShakeReplyPro_descriptor_;
+  return HandshakeReplyPro_descriptor_;
 }
 
-const HandShakeReplyPro& HandShakeReplyPro::default_instance() {
+const HandshakeReplyPro& HandshakeReplyPro::default_instance() {
   if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
 }
 
-HandShakeReplyPro* HandShakeReplyPro::default_instance_ = NULL;
+HandshakeReplyPro* HandshakeReplyPro::default_instance_ = NULL;
 
-HandShakeReplyPro* HandShakeReplyPro::New() const {
-  return new HandShakeReplyPro;
+HandshakeReplyPro* HandshakeReplyPro::New() const {
+  return new HandshakeReplyPro;
 }
 
-void HandShakeReplyPro::Clear() {
+void HandshakeReplyPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     componentid_ = 0u;
-    componenttype_ = 0u;
+    componenttype_ = 1;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
 
-bool HandShakeReplyPro::MergePartialFromCodedStream(
+bool HandshakeReplyPro::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!(EXPRESSION)) return false
   ::google::protobuf::uint32 tag;
@@ -852,19 +890,24 @@ bool HandShakeReplyPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(21)) goto parse_componentType;
+        if (input->ExpectTag(16)) goto parse_componentType;
         break;
       }
       
-      // optional fixed32 componentType = 2;
+      // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
          parse_componentType:
+          int value;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
-                 input, &componenttype_)));
-          set_has_componenttype();
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::ncvfs::HandshakeRequestPro_ComponentType_IsValid(value)) {
+            set_componenttype(static_cast< ::ncvfs::HandshakeRequestPro_ComponentType >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(2, value);
+          }
         } else {
           goto handle_uninterpreted;
         }
@@ -888,16 +931,17 @@ bool HandShakeReplyPro::MergePartialFromCodedStream(
 #undef DO_
 }
 
-void HandShakeReplyPro::SerializeWithCachedSizes(
+void HandshakeReplyPro::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
   // optional fixed32 componentId = 1;
   if (has_componentid()) {
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->componentid(), output);
   }
   
-  // optional fixed32 componentType = 2;
+  // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
   if (has_componenttype()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->componenttype(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      2, this->componenttype(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -906,16 +950,17 @@ void HandShakeReplyPro::SerializeWithCachedSizes(
   }
 }
 
-::google::protobuf::uint8* HandShakeReplyPro::SerializeWithCachedSizesToArray(
+::google::protobuf::uint8* HandshakeReplyPro::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
   // optional fixed32 componentId = 1;
   if (has_componentid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->componentid(), target);
   }
   
-  // optional fixed32 componentType = 2;
+  // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
   if (has_componenttype()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->componenttype(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      2, this->componenttype(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -925,7 +970,7 @@ void HandShakeReplyPro::SerializeWithCachedSizes(
   return target;
 }
 
-int HandShakeReplyPro::ByteSize() const {
+int HandshakeReplyPro::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
@@ -934,9 +979,10 @@ int HandShakeReplyPro::ByteSize() const {
       total_size += 1 + 4;
     }
     
-    // optional fixed32 componentType = 2;
+    // optional .ncvfs.HandshakeRequestPro.ComponentType componentType = 2;
     if (has_componenttype()) {
-      total_size += 1 + 4;
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->componenttype());
     }
     
   }
@@ -951,10 +997,10 @@ int HandShakeReplyPro::ByteSize() const {
   return total_size;
 }
 
-void HandShakeReplyPro::MergeFrom(const ::google::protobuf::Message& from) {
+void HandshakeReplyPro::MergeFrom(const ::google::protobuf::Message& from) {
   GOOGLE_CHECK_NE(&from, this);
-  const HandShakeReplyPro* source =
-    ::google::protobuf::internal::dynamic_cast_if_available<const HandShakeReplyPro*>(
+  const HandshakeReplyPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const HandshakeReplyPro*>(
       &from);
   if (source == NULL) {
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
@@ -963,7 +1009,7 @@ void HandShakeReplyPro::MergeFrom(const ::google::protobuf::Message& from) {
   }
 }
 
-void HandShakeReplyPro::MergeFrom(const HandShakeReplyPro& from) {
+void HandshakeReplyPro::MergeFrom(const HandshakeReplyPro& from) {
   GOOGLE_CHECK_NE(&from, this);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_componentid()) {
@@ -976,24 +1022,24 @@ void HandShakeReplyPro::MergeFrom(const HandShakeReplyPro& from) {
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
-void HandShakeReplyPro::CopyFrom(const ::google::protobuf::Message& from) {
+void HandshakeReplyPro::CopyFrom(const ::google::protobuf::Message& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void HandShakeReplyPro::CopyFrom(const HandShakeReplyPro& from) {
+void HandshakeReplyPro::CopyFrom(const HandshakeReplyPro& from) {
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool HandShakeReplyPro::IsInitialized() const {
+bool HandshakeReplyPro::IsInitialized() const {
   
   return true;
 }
 
-void HandShakeReplyPro::Swap(HandShakeReplyPro* other) {
+void HandshakeReplyPro::Swap(HandshakeReplyPro* other) {
   if (other != this) {
     std::swap(componentid_, other->componentid_);
     std::swap(componenttype_, other->componenttype_);
@@ -1003,11 +1049,11 @@ void HandShakeReplyPro::Swap(HandShakeReplyPro* other) {
   }
 }
 
-::google::protobuf::Metadata HandShakeReplyPro::GetMetadata() const {
+::google::protobuf::Metadata HandshakeReplyPro::GetMetadata() const {
   protobuf_AssignDescriptorsOnce();
   ::google::protobuf::Metadata metadata;
-  metadata.descriptor = HandShakeReplyPro_descriptor_;
-  metadata.reflection = HandShakeReplyPro_reflection_;
+  metadata.descriptor = HandshakeReplyPro_descriptor_;
+  metadata.reflection = HandshakeReplyPro_reflection_;
   return metadata;
 }
 

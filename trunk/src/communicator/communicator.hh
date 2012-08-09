@@ -151,6 +151,9 @@ public:
 
 	void setComponentType(ComponentType componentType);
 
+	void handshakeRequestProcessor(uint32_t requestId, uint32_t _sockfd,
+			uint32_t componentId, ComponentType componentType);
+
 protected:
 
 	/**
@@ -197,8 +200,18 @@ protected:
 	 * @return List of the component information
 	 */
 
-	vector<struct Component> parseConfigFile(
-			string componentType);
+	vector<struct Component> parseConfigFile(string componentType);
+
+	/**
+	 * Send a handshake request to the destination component
+	 * @param sockfd My Socket Descriptor
+	 * @param componentId My Component ID
+	 * @param componentType My Component Type
+	 */
+
+	void sendHandshakeRequest(uint32_t sockfd, uint32_t componentId,
+			ComponentType componentType);
+
 
 	/**
 	 * DEBUG: Print the component information saved in the list
@@ -206,8 +219,7 @@ protected:
 	 * @param componentList List of component information
 	 */
 
-	void printComponents(string componentType,
-			vector<Component> componentList);
+	void printComponents(string componentType, vector<Component> componentList);
 
 	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
 

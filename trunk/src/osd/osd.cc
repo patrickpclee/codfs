@@ -257,6 +257,7 @@ int main(void) {
 	communicator->setId(osd->getOsdId());
 	communicator->setComponentType(OSD);
 
+	// create server
 	communicator->createServerSocket();
 	communicator->connectAllComponents();
 

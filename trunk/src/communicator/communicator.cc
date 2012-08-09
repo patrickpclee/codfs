@@ -18,6 +18,8 @@
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../protocol/messagefactory.hh"
+#include "../protocol/handshakerequest.hh"
+#include "../protocol/handshakereply.hh"
 
 using namespace std;
 
@@ -454,6 +456,41 @@ void Communicator::setComponentType(ComponentType componentType) {
 	_componentType = componentType;
 }
 
+void Communicator::sendHandshakeRequest(uint32_t sockfd, uint32_t componentId,
+		ComponentType componentType) {
+
+	HandshakeRequestMsg* handshakeRequestMsg = new HandshakeRequestMsg(this,
+			sockfd, componentId, componentType);
+
+	handshakeRequestMsg->prepareProtocolMsg();
+	addMessage(handshakeRequestMsg, true);
+
+	MessageStatus status = handshakeRequestMsg->waitForStatusChange();
+	if (status == READY) {
+
+		// retrieve replied values
+		uint32_t targetComponentId =
+				handshakeRequestMsg->getTargetComponentId();
+		//ComponentType targetComponentType =
+		//		handshakeRequestMsg->getTargetComponentType();
+
+		// delete message
+		waitAndDelete(handshakeRequestMsg);
+
+		// add ID -> sockfd mapping to map
+		_componentIdMap[targetComponentId] = sockfd;
+
+	} else {
+		debug("%s\n", "Handshake Request Failed");
+		exit(-1);
+	}
+}
+
+void Communicator::handshakeRequestProcessor(uint32_t requestId, uint32_t _sockfd,
+		uint32_t componentId, ComponentType componentType) {
+
+}
+
 vector<struct Component> Communicator::parseConfigFile(string componentType) {
 	vector<struct Component> componentList;
 
@@ -495,7 +532,8 @@ vector<struct Component> Communicator::parseConfigFile(string componentType) {
 	return componentList;
 }
 
-void Communicator::printComponents(string componentType, vector<Component> componentList) {
+void Communicator::printComponents(string componentType,
+		vector<Component> componentList) {
 
 	cout << "========== " << componentType << " LIST ==========" << endl;
 	for (Component component : componentList) {
@@ -518,7 +556,10 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port, MDS);
-			_componentIdMap[component.id] = sockfd;
+
+			// send HandshakeRequest
+			sendHandshakeRequest(sockfd, component.id, component.type);
+
 		} else {
 			debug("Skipping %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
