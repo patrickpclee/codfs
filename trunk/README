@@ -4,10 +4,14 @@ All the stable codes are here.
 
 ========================================================================================
 
+Install Protobuf
+
+> cd lib/protobuf;  ./configure; make; make install
+
 Install Prerequsite for MongoDB C++ Driver
 
 > apt-get install build-essential scons libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
-> cd lib/mongo; scons
+> cd lib/mongo; scons install
 
 Aug. 9th
 
