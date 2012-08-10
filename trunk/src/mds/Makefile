@@ -14,7 +14,7 @@ CROSS_COMPILE =
 OPTIMIZE := 
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_MDS
-EXTRA_CFLAGS := -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
+EXTRA_CFLAGS := -O2 -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
 
 INC_DIR   =
 SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../storage ../../lib/tinyxml

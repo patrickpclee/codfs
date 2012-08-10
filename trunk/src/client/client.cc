@@ -1,3 +1,5 @@
+#include <signal.h>
+
 #include <cstdio>
 #include <thread>
 
@@ -8,6 +10,11 @@
 #include "../config/config.hh"
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
+
+
+void sighandler(int signum) {
+  if (signum == SIGINT) exit(42);
+}
 
 /// Client Object
 Client* client;
@@ -86,6 +93,8 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 int main(void) {
+
+	signal(SIGINT, sighandler);
 
 	configLayer = new ConfigLayer("clientconfig.xml");
 	client = new Client();

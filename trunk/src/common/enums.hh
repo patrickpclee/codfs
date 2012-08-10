@@ -40,7 +40,7 @@ enum StorageType {
 };
 
 enum CodingScheme {
-	DUMMY_CODING, REPLICATION_CODING
+	RAID0_CODING, RAID1_CODING
 };
 
 #endif

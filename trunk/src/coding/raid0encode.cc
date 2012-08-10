@@ -41,6 +41,7 @@ vector<struct SegmentData> Raid0Encode::encode(struct ObjectData objectData) {
 			segmentData.info.segmentSize = stripSize;
 		}
 
+		// TODO: free
 		segmentData.buf = MemoryPool::getInstance().poolMalloc(stripSize);
 
 		char* bufPos = objectData.buf + i * stripSize;

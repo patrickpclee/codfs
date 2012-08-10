@@ -2,6 +2,7 @@
  * osd.cc
  */
 
+#include <signal.h>
 #include <thread>
 #include <stdio.h>
 #include <vector>
@@ -10,6 +11,10 @@
 #include "../common/debug.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
+
+void sighandler(int signum) {
+  if (signum == SIGINT) exit(42);
+}
 
 /// Osd Object
 Osd* osd;
@@ -26,6 +31,8 @@ Osd::Osd(string configFilePath) {
 	_storageModule = new StorageModule();
 	_osdCommunicator = new OsdCommunicator();
 	_codingModule = new CodingModule();
+
+	_codingModule->setCodingScheme(RAID1_CODING);
 
 	_osdId = configLayer->getConfigInt("Osdid");
 }
@@ -257,6 +264,8 @@ void startReceiveThread(Communicator* communicator) {
  */
 
 int main(int argc, char* argv[]) {
+
+	signal(SIGINT, sighandler);
 
 	string configFilePath;
 

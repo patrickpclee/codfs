@@ -14,7 +14,7 @@ CROSS_COMPILE =
 OPTIMIZE := 
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_OSD
-EXTRA_CFLAGS := -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
+EXTRA_CFLAGS := -O2 -pg -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
 
 INC_DIR   =
 SRC_DIR   =	../cache ../common ../coding ../communicator ../config ../protocol ../../lib/tinyxml
@@ -103,7 +103,7 @@ $(TARGET): $(all_objs)
 else
 $(TARGET): LD = $(if $(strip $(src-cpp) $(src-cc) $(src-cxx)),$(G++),$(GCC))
 $(TARGET): $(all_objs)
-	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf` -lpthread  -lapr-1 -laprutil-1
+	$(LD) $(LDFLAGS)  $(all_objs) -pg -o $@ `pkg-config --cflags --libs protobuf` -lpthread  -lapr-1 -laprutil-1
 
 endif
 

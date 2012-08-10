@@ -9,6 +9,7 @@
 #include "../coding/coding.hh"
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
+#include "../common/enums.hh"
 
 class CodingModule {
 public:
@@ -17,15 +18,23 @@ public:
 
 	/**
 	 * Encode an object to a list of segments
-	 * @param objectData
+	 * @param objectData ObjectData structure
 	 * @return A list of SegmentData structure
 	 */
 
 	vector<struct SegmentData> encodeObjectToSegment(
 			struct ObjectData objectData);
 
-	vector<struct SegmentData> encodeObjectToSegment(uint64_t objectId, char* buf,
-			uint64_t length);
+	/**
+	 * Encode an object to a list of segments
+	 * @param objectId Object ID
+	 * @param buf Pointer to buffer holding object data
+	 * @param length length of the object
+	 * @return A list of SegmentData structure
+	 */
+
+	vector<struct SegmentData> encodeObjectToSegment(uint64_t objectId,
+			char* buf, uint64_t length);
 
 	/**
 	 * Decode a list of segments into an object
@@ -36,6 +45,13 @@ public:
 
 	struct ObjectData decodeSegmentToObject(uint64_t objectId,
 			vector<struct SegmentData> segmentData);
+
+	/**
+	 * Set the coding scheme used by the coding module
+	 * @param codingScheme New coding scheme
+	 */
+
+	void setCodingScheme (CodingScheme codingScheme);
 
 	/**
 	 * Retrieve a segment from the storage module
