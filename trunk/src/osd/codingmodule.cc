@@ -16,6 +16,15 @@ vector<struct SegmentData> CodingModule::encodeObjectToSegment(
 	return _coding->performEncoding(objectData);
 }
 
+vector<struct SegmentData> CodingModule::encodeObjectToSegment(uint64_t objectId,
+		char* buf, uint64_t length) {
+	struct ObjectData objectData;
+	objectData.buf = buf;
+	objectData.info.objectId = objectId;
+	objectData.info.objectSize = length;
+	return _coding->performEncoding(objectData);
+}
+
 struct ObjectData CodingModule::decodeSegmentToObject(uint64_t objectId,
 		vector<struct SegmentData> segmentData) {
 

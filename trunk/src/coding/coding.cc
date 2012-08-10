@@ -7,12 +7,13 @@ Coding::~Coding() {
 
 }
 
-vector <struct SegmentData> Coding::performEncoding(struct ObjectData objectData) {
+vector<struct SegmentData> Coding::performEncoding(
+		struct ObjectData objectData) {
 	return _encodingBehaviour->encode(objectData);
 }
 
-
-struct ObjectData Coding::performDecoding(vector <struct SegmentData> segmentData) {
+struct ObjectData Coding::performDecoding(
+		vector<struct SegmentData> segmentData) {
 	return _decodingBehaviour->decode(segmentData);
 }
 

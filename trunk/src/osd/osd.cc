@@ -133,38 +133,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId) {
 
 	// TODO: check integrity of object received
-
-	// Encode object to segment and push to other OSDs
-
-	// TODO: instead of reading from disk again, should leave a copy in memory during receive
-
-	/*
-
-	 // 1. read object
-	 debug("Reading object ID = %" PRIu64 " for encoding...\n", objectId);
-	 struct ObjectData objectData = _storageModule->readObject(objectId, 0);
-
-	 // 2. encode to list of segments
-	 debug("%s\n", "Performing encoding...");
-	 vector<struct SegmentData> segmentDataList =
-	 _codingModule->encodeObjectToSegment(objectData);
-	 debug("No of segments = %zu\n", segmentDataList.size());
-
-	 // 3. obtain a list of OSD IDs from MONITOR with the same number of segments
-	 vector<struct SegmentLocation> osdIdList =
-	 _osdCommunicator->getOsdListRequest(objectId, MONITOR,
-	 segmentDataList.size());
-
-	 for (uint32_t i = 0; i < segmentDataList.size(); i++) {
-	 uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
-	 osdIdList[i].osdId);
-	 //_osdCommunicator->sendSegment(dstSockfd, segmentDataList[i]);
-	 debug("Send segment ID = %" PRIu32 " to FD = %" PRIu32 "\n",
-	 segmentDataList[i].info.segmentId, dstSockfd);
-	 }
-	 */
-
 	// TODO: now reply message is actually sent before all data is flushed to disk
+
 	_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
 }
@@ -187,22 +157,48 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
 			length);
 
-	pendingObjectChunkMutex.lock();
-
-	// update pendingObjectChunk value
-	_pendingObjectChunk[objectId] = _pendingObjectChunk[objectId] - 1;
-
-	// flush and close object if no more chunks
-	if (_pendingObjectChunk[objectId] == 0) {
-		struct ObjectCache objectCache = _storageModule->getObjectCache(
-				objectId);
-		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
-				objectCache.length);
-		_storageModule->closeObject(objectId);
-		_pendingObjectChunk.erase(objectId);
+	uint32_t chunkLeft = 0;
+	{
+		lock_guard<mutex> lk(pendingObjectChunkMutex);
+		// update pendingObjectChunk value
+		_pendingObjectChunk[objectId]--;
+		chunkLeft = _pendingObjectChunk[objectId];
 	}
 
-	pendingObjectChunkMutex.unlock();
+	// if all chunks have arrived
+	if (chunkLeft == 0) {
+		struct ObjectCache objectCache = _storageModule->getObjectCache(
+				objectId);
+
+		// write cache to disk
+		debug("%s\n", "flushing cache to disk");
+		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
+				objectCache.length);
+
+		// perform coding
+		debug("%s\n", "performing coding");
+		vector<struct SegmentData> segmentData =
+				_codingModule->encodeObjectToSegment(objectId, objectCache.buf,
+						objectCache.length);
+
+		// DEBUG: write segments to disk
+		debug("%s\n", "writing segments to disk");
+		for (struct SegmentData segment : segmentData) {
+			_storageModule->createAndOpenSegment(objectId,
+					segment.info.segmentId, segment.info.segmentSize);
+			_storageModule->writeSegment(objectId, segment.info.segmentId,
+					segment.buf, 0, segment.info.segmentSize);
+		}
+
+		// remove from map
+		{
+			lock_guard<mutex> lk(pendingObjectChunkMutex);
+			_pendingObjectChunk.erase(objectId);
+		}
+
+		// close file and free cache
+		_storageModule->closeObject(objectId);
+	}
 
 	return byteWritten;
 }

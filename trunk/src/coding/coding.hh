@@ -12,14 +12,15 @@ public:
 	Coding();
 	virtual ~Coding();
 
-	vector <struct SegmentData> performEncoding (struct ObjectData objectData);
-	struct ObjectData performDecoding(vector <struct SegmentData> segmentData);
+	vector<struct SegmentData> performEncoding(struct ObjectData objectData);
+	struct ObjectData performDecoding(vector<struct SegmentData> segmentData);
 	void setEncodingBehaviour(EncodingBehaviour *cb);
 	void setDecodingBehaviour(DecodingBehaviour *db);
 	virtual void display() = 0; // make class abstract
 
 	EncodingBehaviour* _encodingBehaviour;
 	DecodingBehaviour* _decodingBehaviour;
-};
+}
+;
 
 #endif

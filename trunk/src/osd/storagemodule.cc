@@ -184,7 +184,7 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
 
 	debug(
-			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " write %" PRIu32 "bytes at offset %" PRIu64 "\n",
+			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteWritten, offsetInSegment);
 
 	return byteWritten;
