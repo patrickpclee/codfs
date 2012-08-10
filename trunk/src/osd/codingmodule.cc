@@ -3,11 +3,11 @@
  */
 
 #include "codingmodule.hh"
-#include "../coding/dummycoding.hh"
+#include "../coding/raid0coding.hh"
 
 CodingModule::CodingModule() {
-	// use dummy coding for now
-	_coding = new DummyCoding();
+
+	_coding = new Raid0Coding();
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(

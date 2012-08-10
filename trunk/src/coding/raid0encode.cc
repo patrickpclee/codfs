@@ -1,6 +1,6 @@
 #include <vector>
 #include <string.h>
-#include "dummyencode.hh"
+#include "raid0encode.hh"
 #include "encodingbehaviour.hh"
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
@@ -8,17 +8,15 @@
 
 using namespace std;
 
-DummyEncode::DummyEncode() {
+Raid0Encode::Raid0Encode() {
 
 }
 
-DummyEncode::~DummyEncode() {
+Raid0Encode::~Raid0Encode() {
 
 }
 
-vector<struct SegmentData> DummyEncode::encode(struct ObjectData objectData) {
-	// dummy encode: n = 1, k = 0
-	// just copy data from object to segment
+vector<struct SegmentData> Raid0Encode::encode(struct ObjectData objectData) {
 
 	vector<struct SegmentData> segmentDataList;
 

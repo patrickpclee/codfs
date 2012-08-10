@@ -1,6 +1,6 @@
 #include <vector>
 #include <string.h>
-#include "dummydecode.hh"
+#include "raid0decode.hh"
 #include "decodingbehaviour.hh"
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
@@ -8,16 +8,16 @@
 
 using namespace std;
 
-DummyDecode::DummyDecode() {
+Raid0Decode::Raid0Decode() {
 
 }
 
-DummyDecode::~DummyDecode() {
+Raid0Decode::~Raid0Decode() {
 
 }
 
-struct ObjectData DummyDecode::decode(vector<struct SegmentData> segmentData) {
-	// dummy decode: n = 1, k = 0
+struct ObjectData Raid0Decode::decode(vector<struct SegmentData> segmentData) {
+	// raid0 decode: n = 1, k = 0
 	// just copy data from segment to object
 
 	struct ObjectData objectData;

@@ -9,7 +9,7 @@
 
 #include "memorypool.hh"
 
-#define USE_MEMORY_POOL
+//#define USE_MEMORY_POOL
 
 #ifdef USE_MEMORY_POOL
 std::mutex memoryPoolMutex;

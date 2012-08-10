@@ -110,7 +110,7 @@ endif
 	@if [ ! -d $(OBJ_DIR) ]; then mkdir -p $(OBJ_DIR); fi
 
 clean:
-	rm -f $(prefix_objdir)*.o $(TARGET)
+	rm -f $(prefix_objdir)*.o $(prefix_objdir)*.d $(TARGET)
 
 -include $(patsubst %.o,%.o.d,$(all_objs))
 
