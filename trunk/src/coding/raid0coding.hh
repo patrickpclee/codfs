@@ -3,9 +3,11 @@
 
 class Raid0Coding : public Coding {
 public:
-	Raid0Coding();
+	Raid0Coding(uint32_t noOfStrips);
 	~Raid0Coding();
 	void display();
+private:
+	uint32_t _noOfStrips;
 };
 
 #endif

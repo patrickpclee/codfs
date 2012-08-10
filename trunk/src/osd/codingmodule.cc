@@ -6,8 +6,8 @@
 #include "../coding/raid0coding.hh"
 
 CodingModule::CodingModule() {
-
-	_coding = new Raid0Coding();
+	const uint32_t noOfStrips = 2;
+	_coding = new Raid0Coding(noOfStrips);
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(

@@ -8,8 +8,8 @@
 
 using namespace std;
 
-Raid0Decode::Raid0Decode() {
-
+Raid0Decode::Raid0Decode(uint32_t noOfStrips) {
+	_noOfStrips = noOfStrips;
 }
 
 Raid0Decode::~Raid0Decode() {
@@ -17,18 +17,28 @@ Raid0Decode::~Raid0Decode() {
 }
 
 struct ObjectData Raid0Decode::decode(vector<struct SegmentData> segmentData) {
-	// raid0 decode: n = 1, k = 0
-	// just copy data from segment to object
+
+	const uint32_t segmentCount = (uint32_t) segmentData.size();
 
 	struct ObjectData objectData;
 
+	// copy objectID from first segment
 	objectData.info.objectId = segmentData[0].info.objectId;
-	objectData.info.objectSize = segmentData[0].info.segmentSize;
+
+	if (segmentCount == 1) {
+		objectData.info.objectSize = segmentData[0].info.segmentSize;
+	} else {
+		// objectsize = first segment * (segmentCount - 1) + last segment
+		objectData.info.objectSize = segmentData[0].info.segmentSize
+				* (segmentCount - 1) + segmentData.end()->info.segmentSize;
+	}
 
 	objectData.buf = MemoryPool::getInstance().poolMalloc(
 			objectData.info.objectSize);
 
-	memcpy(objectData.buf, segmentData[0].buf, objectData.info.objectSize);
+	for (struct SegmentData segment : segmentData) {
+		memcpy(objectData.buf, segment.buf, segment.info.segmentSize);
+	}
 
 	return objectData;
 }

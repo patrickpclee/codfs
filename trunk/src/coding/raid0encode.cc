@@ -8,29 +8,47 @@
 
 using namespace std;
 
-Raid0Encode::Raid0Encode() {
-
+Raid0Encode::Raid0Encode(uint32_t noOfStrips) {
+	_noOfStrips = noOfStrips;
 }
 
 Raid0Encode::~Raid0Encode() {
 
 }
 
+uint32_t roundTo(unsigned int value, unsigned int roundTo) {
+	return ((value + roundTo - 1) / roundTo) * roundTo;
+}
+
 vector<struct SegmentData> Raid0Encode::encode(struct ObjectData objectData) {
 
 	vector<struct SegmentData> segmentDataList;
 
-	struct SegmentData segmentData;
-	segmentData.info.objectId = objectData.info.objectId;
-//	segmentData.info.offsetInObject = 0;
-	segmentData.info.segmentId = 0;
-	segmentData.info.segmentSize = objectData.info.objectSize;
+	// calculate size of each strip
+	const uint32_t stripSize = roundTo(objectData.info.objectSize, _noOfStrips)
+			/ _noOfStrips;
 
-	segmentData.buf = MemoryPool::getInstance().poolMalloc(
-			segmentData.info.segmentSize);
+	for (uint32_t i = 0; i < _noOfStrips; i++) {
 
-	memcpy (segmentData.buf, objectData.buf, segmentData.info.segmentSize);
+		struct SegmentData segmentData;
+		segmentData.info.objectId = objectData.info.objectId;
+		segmentData.info.segmentId = i;
 
-	segmentDataList.push_back(segmentData);
+		if (i == _noOfStrips - 1) { // last segment
+			segmentData.info.segmentSize = objectData.info.objectSize - i * stripSize;
+
+		} else {
+			segmentData.info.segmentSize = stripSize;
+		}
+
+		segmentData.buf = MemoryPool::getInstance().poolMalloc(stripSize);
+
+		char* bufPos = objectData.buf + i * stripSize;
+
+		memcpy(segmentData.buf, bufPos, segmentData.info.segmentSize);
+
+		segmentDataList.push_back(segmentData);
+	}
+
 	return segmentDataList;
 }
