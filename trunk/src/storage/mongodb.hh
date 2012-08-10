@@ -29,6 +29,7 @@ public:
 	void insert (string collection, mongo::BSONObj insertObject);
 	void update (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
 	void remove (string collection, mongo::Query queryObject);
+	mongo::BSONObj findAndModify (string collection, mongo::BSONObj queryObject, mongo::BSONObj updateObject);
 
 private:
 	string _user;
