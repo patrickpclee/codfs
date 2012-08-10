@@ -8,31 +8,49 @@
 #include "recoverymodule.hh"
 #include "statmodule.hh"
 
+#include <map>
+
+using namespace std;
+
 class Monitor {
 
 public:
+	// constructor
+	Monitor();
+
+	// desctructor
+	~Monitor();
+
 	// handle requests from MDS / OSD
-	uint32_t* primaryOsdListHandler(uint32_t objectCount);
-	uint32_t* secondaryOsdListHandler();
-	void osdFailureHandler(uint32_t osdId);
+//	uint32_t* primaryOsdListHandler(uint32_t objectCount);
+//	uint32_t* secondaryOsdListHandler();
+//	void osdFailureHandler(uint32_t osdId);
 
 	// triggered by timeout
-	void osdRecoveryRequest(uint32_t osdId);
-	void recoveryResultHandler(uint32_t osdId, bool success);
+//	void osdRecoveryRequest(uint32_t osdId);
+//	void recoveryResultHandler(uint32_t osdId, bool success);
 
+	// Threads
+	void startGarbageCollectionThread();
+	void startSendThread(Communicator* communicator);
+	void startReceiveThread(Communicator* communicator);
+	void startUpdateThread(Communicator* communicator, StatModule* statmodule);
+
+	// get methods
 	MonitorCommunicator* getCommunicator();
+	StatModule* getStatModule();
+	uint32_t getMonitorId();
 
 private:
 //	MonitorInfo _info;
-	Cache _cache;
+//	Cache _cache;
 	MonitorCommunicator* _monitorCommunicator;
-
 	SelectionModule* _selectionModule;
 	RecoveryModule* _recoveryModule;
 	StatModule* _statModule;
-
-//	struct OsdStat [] osdStat;
-	vector<struct OsdStat> _osdStats;
+	
+	map<uint32_t, struct OsdStat> _osdStatMap;
+	uint32_t _monitorId;
 };
 
 #endif

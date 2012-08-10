@@ -10,7 +10,6 @@
 #include <iostream>
 #include <stdint.h>
 #include "../communicator/communicator.hh"
-#include "segmentlocationcache.hh"
 
 using namespace std;
 
