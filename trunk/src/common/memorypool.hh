@@ -15,6 +15,7 @@
 #include <apr-1.0/apr_general.h>
 #include <apr-1.0/apr_pools.h>
 
+const apr_size_t POOL_MAX_FREE_SIZE = 20*1024*1024;
 /**
  * Provide a memory pool for optimizing frequent malloc / free calls
  * TODO: A dummy memory pool using singleton pattern for now

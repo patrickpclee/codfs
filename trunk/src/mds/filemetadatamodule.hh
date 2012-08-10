@@ -15,7 +15,10 @@ class FileMetaDataModule {
 public:
 	FileMetaDataModule();
 	~FileMetaDataModule();
-	
+
+	void createFile (uint32_t clientId, string path, uint32_t fileId);
+	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
+
 	uint32_t generateFileId();
 private:
 	atomic<uint32_t> _nextFileId;

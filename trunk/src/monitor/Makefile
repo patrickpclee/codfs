@@ -17,7 +17,7 @@ DEFS     := -DCOMPILE_FOR_MONITOR
 EXTRA_CFLAGS := -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../config ../protocol
+SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../../lib/tinyxml
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 
@@ -110,7 +110,7 @@ endif
 	@if [ ! -d $(OBJ_DIR) ]; then mkdir -p $(OBJ_DIR); fi
 
 clean:
-	rm -f $(prefix_objdir)*.o $(TARGET)
+	rm -f $(prefix_objdir)*.o $(prefix_objdir)*.d $(TARGET)
 
 -include $(patsubst %.o,%.o.d,$(all_objs))
 

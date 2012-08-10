@@ -78,12 +78,11 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 	// Step 3: Send End message
 
 	putObjectEnd(clientId, dstOsdSockfd, objectId);
-	debug ("%s\n", "Put Object End ACK-ed");
 
 	// free buf
 	MemoryPool::getInstance().poolFree(objectData.buf);
 
-	cout << "Put Object Finished" << endl;
+	cout << "Put Object ID = " << objectId << " Finished" << endl;
 
 }
 

@@ -3,16 +3,25 @@
  */
 
 #include "codingmodule.hh"
-#include "../coding/dummycoding.hh"
+#include "../coding/raid0coding.hh"
 
 CodingModule::CodingModule() {
-	// use dummy coding for now
-	_coding = new DummyCoding();
+	const uint32_t noOfStrips = 2;
+	_coding = new Raid0Coding(noOfStrips);
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(
 		struct ObjectData objectData) {
 
+	return _coding->performEncoding(objectData);
+}
+
+vector<struct SegmentData> CodingModule::encodeObjectToSegment(uint64_t objectId,
+		char* buf, uint64_t length) {
+	struct ObjectData objectData;
+	objectData.buf = buf;
+	objectData.info.objectId = objectId;
+	objectData.info.objectSize = length;
 	return _coding->performEncoding(objectData);
 }
 

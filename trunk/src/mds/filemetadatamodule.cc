@@ -6,6 +6,8 @@
 
 extern ConfigLayer *configLayer;
 
+using namespace mongo;
+
 FileMetaDataModule::FileMetaDataModule()
 {
 	// TODO: Contact MDS other than MDS0
@@ -14,25 +16,40 @@ FileMetaDataModule::FileMetaDataModule()
 
 	_fileMetaDataStorage = new MongoDB();
 	_fileMetaDataStorage->connect();
+
+	//BSONObj queryObject = BSON ("id" << "config");
+	//BSONObj updateObject = BSON ("$set" << BSON ("fileId" << 0));
+	//_fileMetaDataStorage->update(_collection, queryObject, updateObject);
 	
-	_nextFileId = 0;
-	mongo::BSONObj temp = _fileMetaDataStorage->read(_collection, BSON("id" << "config")).at(0);
+}
 
-	debug("%s\n","Get Max File ID");
-	_nextFileId = temp.getField("nextFileId").Int();
+void FileMetaDataModule::createFile (uint32_t clientId, string path, uint32_t fileId)
+{
+	BSONObj insertObject = BSON ("id" << fileId << "path" << path << "clientId" << clientId);
+	_fileMetaDataStorage->insert(_collection, insertObject);
 
+	return;
+}
+
+void FileMetaDataModule::saveObjectList (uint32_t fileId, vector<uint64_t> objectList)
+{
+
+	return ;
 }
 
 uint32_t FileMetaDataModule::generateFileId()
 {
-	_nextFileId++;
-	uint32_t fileId = _nextFileId;
-	debug("%d\n",fileId);
-	_fileMetaDataStorage->update(_collection, BSON("id" << "config"), BSON("id" << "config" << "nextFileId" << fileId));
-	return fileId - 1;
+	uint32_t fileId;
+
+	BSONObj queryObject = BSON ("id" << "config");
+	BSONObj updateObject = BSON ("$inc" << BSON ("fileId" << 1));
+	BSONObj result = _fileMetaDataStorage->findAndModify("Configuration",queryObject,updateObject);
+	
+	fileId = result.getField("fileId").Int();
+
+	return fileId;
 }
 
 FileMetaDataModule::~FileMetaDataModule()
 {
-	//_fileMetaDataStorage->update(_collection, BSON("id" << "config"), BSON("nextFileId" << _nextFileId));
 }

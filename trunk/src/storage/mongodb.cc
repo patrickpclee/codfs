@@ -1,5 +1,7 @@
 #include "mongodb.hh"
 
+#include "../common/debug.hh"
+
 #include "../config/config.hh"
 
 using namespace mongo;
@@ -69,3 +71,16 @@ void MongoDB::remove (string collection, Query queryObject)
 	return ;
 
 }
+
+BSONObj MongoDB::findAndModify (string collection, BSONObj queryObject, BSONObj updateObject)
+{
+	//BSONObj commandObject = BSON ("findandmodify" << collection << modifyObject);
+//	BSONObj commandObject = BSON ("findandmodify" << "File Meta Data" << "query" << BSON ("id" << "config") << "update" << BSON ("$inc" << BSON ("fileId" << 1)));
+//	debug("%s\n",commandObject.jsonString().c_str());
+	BSONObj result;
+	_connection.runCommand(_database, BSON ("findandmodify" << collection << "query" << queryObject << "update" << updateObject), result);
+	//_connection.runCommand(_database,BSON ("findandmodify" << "File Meta Data" << "query" << BSON ("id" << "config") << "update" << BSON ("$inc" << BSON ("fileId" << 1))),result);
+
+	return result.getObjectField("value");
+};
+

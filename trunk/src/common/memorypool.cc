@@ -9,7 +9,7 @@
 
 #include "memorypool.hh"
 
-#define USE_MEMORY_POOL
+//#define USE_MEMORY_POOL
 
 #ifdef USE_MEMORY_POOL
 std::mutex memoryPoolMutex;
@@ -19,6 +19,7 @@ MemoryPool::MemoryPool() {
 #ifdef USE_MEMORY_POOL
 	apr_initialize();
 	apr_allocator_create(&alloc);
+	apr_allocator_max_free_set(alloc, POOL_MAX_FREE_SIZE);
 	apr_pool_create_ex(&pool, NULL, NULL, alloc);
 	balloc = apr_bucket_alloc_create(pool);
 #endif

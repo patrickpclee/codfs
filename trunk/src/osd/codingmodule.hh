@@ -24,6 +24,9 @@ public:
 	vector<struct SegmentData> encodeObjectToSegment(
 			struct ObjectData objectData);
 
+	vector<struct SegmentData> encodeObjectToSegment(uint64_t objectId, char* buf,
+			uint64_t length);
+
 	/**
 	 * Decode a list of segments into an object
 	 * @param objectId Destination object ID

@@ -3,7 +3,7 @@
 
 //#define COLLECTION "ncvfs"
 
-#include "mongo/db/jsobj.h"
+//#include "mongo/db/jsobj.h"
 #include "mongo/client/dbclient.h"
 
 
@@ -29,6 +29,7 @@ public:
 	void insert (string collection, mongo::BSONObj insertObject);
 	void update (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
 	void remove (string collection, mongo::Query queryObject);
+	mongo::BSONObj findAndModify (string collection, mongo::BSONObj queryObject, mongo::BSONObj updateObject);
 
 private:
 	string _user;
