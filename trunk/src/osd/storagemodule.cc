@@ -32,11 +32,14 @@ StorageModule::~StorageModule() {
 void StorageModule::createObject(uint64_t objectId, uint32_t length) {
 
 	// create cache
+	struct ObjectCache objectCache;
+	objectCache.length = length;
+	objectCache.buf = MemoryPool::getInstance().poolMalloc(length);
+
+	// save cache to map
 	{
 		lock_guard<mutex> lk(cacheMutex);
-		_objectCache[objectId].length = length;
-		_objectCache[objectId].buf = MemoryPool::getInstance().poolMalloc(
-				length);
+		_objectCache[objectId] = objectCache;
 	}
 
 	// create object

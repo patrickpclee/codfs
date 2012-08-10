@@ -8,7 +8,7 @@
 	<Communication>
 	
 		<!-- Chunk Size used in transfer in Byte-->
-		<ChunkSize>8192</ChunkSize>
+		<ChunkSize>524288</ChunkSize> <!-- 512KB -->
 	</Communication>
 	
 	<Components>

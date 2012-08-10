@@ -164,6 +164,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 	 }
 	 */
 
+	// TODO: now reply message is actually sent before all data is flushed to disk
 	_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
 }
@@ -172,6 +173,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId) {
 
 	// TODO: check integrity of segment received
+	// TODO: now reply message is actually sent before all data is flushed to disk
 
 	_osdCommunicator->replyPutSegmentEnd(requestId, sockfd, objectId,
 			segmentId);
@@ -291,8 +293,8 @@ int main(int argc, char* argv[]) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	// TODO: add sleep for now to ensure that all components are started before connect
-	sleep(2);
+	// TODO: pause before connect for now
+	getchar();
 
 	communicator->connectAllComponents();
 
