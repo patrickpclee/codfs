@@ -3,7 +3,7 @@
 
 //#define COLLECTION "ncvfs"
 
-#include "mongo/db/jsobj.h"
+//#include "mongo/db/jsobj.h"
 #include "mongo/client/dbclient.h"
 
 

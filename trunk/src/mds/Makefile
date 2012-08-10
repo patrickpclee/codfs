@@ -16,7 +16,7 @@ WARNINGS := -Wall
 DEFS     := -DCOMPILE_FOR_MDS
 EXTRA_CFLAGS := -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
 
-INC_DIR   =
+INC_DIR   =	../../lib/mongo/src
 SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../storage
 OBJ_DIR   = ./obj
 EXTRA_SRC = 

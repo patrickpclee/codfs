@@ -3,6 +3,12 @@ This is the master branch.
 All the stable codes are here.
 
 ========================================================================================
+
+Install Prerequsite for MongoDB C++ Driver
+
+> apt-get install build-essential scons libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
+> cd lib/mongo; scons
+
 Aug. 9th
 
 Please install apr-1.0 and apr-util-1.0 packages
