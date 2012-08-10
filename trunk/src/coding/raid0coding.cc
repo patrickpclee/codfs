@@ -3,9 +3,10 @@
 #include "raid0encode.hh"
 #include "raid0decode.hh"
 
-Raid0Coding::Raid0Coding() {
-	_encodingBehaviour = new Raid0Encode();
-	_decodingBehaviour = new Raid0Decode();
+Raid0Coding::Raid0Coding(uint32_t noOfStrips) {
+	_noOfStrips = noOfStrips;
+	_encodingBehaviour = new Raid0Encode(_noOfStrips);
+	_decodingBehaviour = new Raid0Decode(_noOfStrips);
 }
 
 Raid0Coding::~Raid0Coding() {
