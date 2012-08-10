@@ -17,7 +17,7 @@ DEFS     := -DCOMPILE_FOR_CLIENT
 EXTRA_CFLAGS := -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../config ../protocol
+SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../../lib/tinyxml
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 
