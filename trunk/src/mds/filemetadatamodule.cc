@@ -6,6 +6,8 @@
 
 extern ConfigLayer *configLayer;
 
+using namespace mongo;
+
 FileMetaDataModule::FileMetaDataModule()
 {
 	// TODO: Contact MDS other than MDS0
@@ -14,26 +16,40 @@ FileMetaDataModule::FileMetaDataModule()
 
 	_fileMetaDataStorage = new MongoDB();
 	_fileMetaDataStorage->connect();
+
+	//BSONObj queryObject = BSON ("id" << "config");
+	//BSONObj updateObject = BSON ("$set" << BSON ("fileId" << 0));
+	//_fileMetaDataStorage->update(_collection, queryObject, updateObject);
 	
+}
+
+void FileMetaDataModule::createFile (uint32_t clientId, string path, uint32_t fileId)
+{
+	BSONObj insertObject = BSON ("id" << fileId << "path" << path << "clientId" << clientId);
+	_fileMetaDataStorage->insert(_collection, insertObject);
+
+	return;
+}
+
+void FileMetaDataModule::saveObjectList (uint32_t fileId, vector<uint64_t> objectList)
+{
+
+	return ;
 }
 
 uint32_t FileMetaDataModule::generateFileId()
 {
 	uint32_t fileId;
 
-	mongo::BSONObj queryObject = BSON ("id" << "config");
-	mongo::BSONObj updateObject = BSON ("$inc" << BSON ("fileId" << 1));
-	mongo::BSONObj result = _fileMetaDataStorage->findAndModify(_collection,queryObject,updateObject);
+	BSONObj queryObject = BSON ("id" << "config");
+	BSONObj updateObject = BSON ("$inc" << BSON ("fileId" << 1));
+	BSONObj result = _fileMetaDataStorage->findAndModify("Configuration",queryObject,updateObject);
 	
-	//debug("%s\n",result.jsonString().c_str());
-
 	fileId = result.getField("fileId").Int();
-//	debug("File ID = %d\n",fileId);
 
 	return fileId;
 }
 
 FileMetaDataModule::~FileMetaDataModule()
 {
-	//_fileMetaDataStorage->update(_collection, BSON("id" << "config"), BSON("nextFileId" << _nextFileId));
 }

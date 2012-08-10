@@ -35,7 +35,7 @@ public:
 
 	uint32_t selectActingPrimary (uint64_t objectId, uint32_t exclude);
 
-	uint32_t saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
+	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
 	vector<uint64_t> readObjectList (uint32_t fileId);
 	vector<uint64_t> readOsdObjectList (uint32_t osdId);
 
