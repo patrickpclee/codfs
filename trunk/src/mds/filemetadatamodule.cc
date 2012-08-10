@@ -15,21 +15,22 @@ FileMetaDataModule::FileMetaDataModule()
 	_fileMetaDataStorage = new MongoDB();
 	_fileMetaDataStorage->connect();
 	
-	_nextFileId = 0;
-	mongo::BSONObj temp = _fileMetaDataStorage->read(_collection, BSON("id" << "config")).at(0);
-
-	debug("%s\n","Get Max File ID");
-	_nextFileId = temp.getField("nextFileId").Int();
-
 }
 
 uint32_t FileMetaDataModule::generateFileId()
 {
-	_nextFileId++;
-	uint32_t fileId = _nextFileId;
-	debug("%d\n",fileId);
-	_fileMetaDataStorage->update(_collection, BSON("id" << "config"), BSON("id" << "config" << "nextFileId" << fileId));
-	return fileId - 1;
+	uint32_t fileId;
+
+	mongo::BSONObj queryObject = BSON ("id" << "config");
+	mongo::BSONObj updateObject = BSON ("$inc" << BSON ("fileId" << 1));
+	mongo::BSONObj result = _fileMetaDataStorage->findAndModify(_collection,queryObject,updateObject);
+	
+	//debug("%s\n",result.jsonString().c_str());
+
+	fileId = result.getField("fileId").Int();
+//	debug("File ID = %d\n",fileId);
+
+	return fileId;
 }
 
 FileMetaDataModule::~FileMetaDataModule()
