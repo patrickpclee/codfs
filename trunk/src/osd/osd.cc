@@ -11,6 +11,7 @@
 #include "../common/debug.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
+#include "../protocol/osdstartupmsg.hh"
 
 void sighandler(int signum) {
 	if (signum == SIGINT)
@@ -310,6 +311,18 @@ void startReceiveThread(Communicator* communicator) {
 
 }
 
+void startTestThread(Communicator* communicator) {
+	printf("HEHE\n");
+	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
+		communicator->getMonitorSockfd(), 111, 222, 333);
+	printf("Prepared msg\n");
+	testmsg->prepareProtocolMsg();
+	communicator->addMessage(testmsg);
+	printf("Prepared add \n");
+	sleep (100);
+	printf("DONE\n");
+}
+
 /**
  * Main function
  * @return 0 if success;
@@ -350,23 +363,16 @@ int main(int argc, char* argv[]) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	// TODO: pause before connect for now
-//	getchar();
-
 	communicator->connectAllComponents();
 
+	thread testThread(startTestThread, communicator);
+	// TODO: pause before connect for now
+	//getchar();
+	
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
-
-	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-			communicator->getMonitorSockfd(), 111, 222, 333);
-	printf("Prepared msg\n");
-	communicator->addMessage(testmsg);
-	printf("Prepared add \n");
-
-	sleep(100);
-	printf("DONE\n");
+	testThread.join();
 
 	// cleanup
 	delete configLayer;
