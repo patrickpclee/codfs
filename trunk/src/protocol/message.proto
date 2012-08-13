@@ -33,8 +33,10 @@ message ListDirectoryRequestPro {
 }
 
 message UploadFileRequestPro {
-	required string fileName = 1;
-	required fixed32 numOfObj = 2;
+	optional fixed32 clientId = 1;
+	optional fixed64 fileSize = 2;
+	optional fixed32 numOfObjs = 3;
+	optional string path = 4;
 }
 
 //
@@ -74,10 +76,9 @@ message FileInfoPro {
 }
 
 message UploadFileReplyPro {
-	required fixed32 fileId = 1;
-	required fixed32 numOfObj = 2;
-	repeated fixed64 objectIdList = 3;
-	repeated fixed32 primaryList = 4;
+	optional fixed32 fileId = 1;
+	repeated fixed64 objectList = 2;
+	repeated fixed32 primaryList = 3;
 }
 
 ///////////////// FROM OSD /////////////////
@@ -145,5 +146,3 @@ message OsdStatUpdatePro {
 	optional fixed32 osdCapacity = 2;
 	optional fixed32 osdLoading = 3;
 }
-
-///////////////// FROM OSD /////////////////

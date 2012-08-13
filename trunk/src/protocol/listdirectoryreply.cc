@@ -10,11 +10,8 @@
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
-#include "../client/client.hh"
 
 #include "../common/debug.hh"
-
-extern Client* client;
 
 ListDirectoryReplyMsg::ListDirectoryReplyMsg(Communicator* communicator) :
 		Message(communicator) {

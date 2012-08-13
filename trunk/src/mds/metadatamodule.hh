@@ -20,10 +20,11 @@ public:
 	 *
 	 * @param	cleintId	ID of the Client
 	 * @param	path	Path to the File
+	 * @param	fileSize	Size of the File
 	 *
 	 * @return	File ID
 	 */
-	uint32_t createFile (uint32_t clientId, string path);
+	uint32_t createFile (uint32_t clientId, string path, uint64_t fileSize);
 
 	/**
 	 * @brief	Open a File

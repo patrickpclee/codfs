@@ -1,9 +1,9 @@
 /**
- * uploadfilerequest.hh
+ * uploadfilereply.hh
  */
 
-#ifndef __UPLOAD_FILE_REQUEST_HH__
-#define __UPLOAD_FILE_REQUEST_HH__
+#ifndef __UPLOAD_FILE_REPLY_HH__
+#define __UPLOAD_FILE_REPLY_HH__
 
 #include <string>
 #include <vector>
@@ -21,7 +21,7 @@ using namespace std;
  * Requset to upload file
  */
 
-class UploadFileRequestMsg: public Message {
+class UploadFileReplyMsg: public Message {
 public:
 
 	/**
@@ -30,20 +30,15 @@ public:
 	 * @param	communicator	Communicator the Message belongs to
 	 */
 
-	UploadFileRequestMsg (Communicator* communicator);
+	UploadFileReplyMsg (Communicator* communicator);
 
 	/**
 	 * Constructor - Save parameters in private variables
 	 *
 	 * @param	communicator	Communicator the Message belongs to
 	 * @param	mdsSockfd	Socket descriptor of MDS
-	 * @param	clientId	Client ID
-	 * @param	path	Requested directory path
-	 * @param	fileSize	Size of the File
-	 * @param	numOfObjs	Number of Objects
 	 */
-
-	UploadFileRequestMsg (Communicator* communicator, uint32_t mdsSockfd, uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs);
+	UploadFileReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -74,28 +69,10 @@ public:
 
 	void printProtocol ();
 
-	/**
-	 * @brief	Set the Object ID List
-	 *
-	 * @param	objectList	Vector of Object ID
-	 */
-	void setObjectList (vector<uint64_t> objectList);
-	void setPrimaryList (vector<uint32_t> primaryList);
-	void setFileId (uint32_t fileId);
-
-	vector<uint64_t> getObjectList ();
-	vector<uint32_t> getPrimaryList ();
-	uint32_t getFileId ();
-
 private:
-	uint32_t _clientId;
-	string _path;
-	uint64_t _fileSize;
-	uint32_t _numOfObjs;
-
+	uint32_t _fileId;
 	vector<uint64_t> _objectList;
 	vector<uint32_t> _primaryList;
-	uint32_t _fileId;
 };
 
 #endif

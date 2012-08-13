@@ -49,14 +49,14 @@ Mds::~Mds()
  * 4. Ask Monitor for Primary list \n
  * 5. Reply with Object and Primary List
  */
-uint32_t Mds::uploadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath, uint32_t numOfObjs)
+uint32_t Mds::uploadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath, uint64_t fileSize, uint32_t numOfObjs)
 {
 	vector<uint64_t> objectList(numOfObjs);
 	vector<uint32_t> primaryList(numOfObjs);
 	uint32_t fileId = 0;
 
 	_nameSpaceModule->createFile(clientId, dstPath);
-	fileId = _metaDataModule->createFile(clientId, dstPath);
+	fileId = _metaDataModule->createFile(clientId, dstPath, fileSize);
 
 	objectList = _metaDataModule->newObjectList(numOfObjs);
 	_metaDataModule->saveObjectList(fileId,objectList);
@@ -254,7 +254,7 @@ void Mds::test ()
 {
 	debug("%s\n","Test\n");
 	for(int i = 0; i < 10; ++i) {
-		uint32_t temp = _metaDataModule->createFile(1,".");
+		uint32_t temp = _metaDataModule->createFile(1,".",1024);
 		vector<uint64_t> objectList;
 		objectList = _metaDataModule->newObjectList(10);
 		_metaDataModule->saveObjectList(temp,objectList);
