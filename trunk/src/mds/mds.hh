@@ -31,11 +31,12 @@ public:
 	 * @param	conenctionId	Connection ID
 	 * @param	clientId	ID of the client
 	 * @param	dstPath		Target Path for the file uploaded
+	 * @param	fileSize	Size of the File
 	 * @param	numOfObjs	number of objects to be uploaded
 	 *
 	 * @return	File ID
 	 */
-	uint32_t uploadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath, uint32_t numOfObjs);
+	uint32_t uploadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath, uint64_t fileSize, uint32_t numOfObjs);
 
 	/**
 	 * @brief	Handle Upload Object Acknowledgement from Primary

@@ -433,38 +433,58 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required string fileName = 1;
-  inline bool has_filename() const;
-  inline void clear_filename();
-  static const int kFileNameFieldNumber = 1;
-  inline const ::std::string& filename() const;
-  inline void set_filename(const ::std::string& value);
-  inline void set_filename(const char* value);
-  inline void set_filename(const char* value, size_t size);
-  inline ::std::string* mutable_filename();
-  inline ::std::string* release_filename();
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
   
-  // required fixed32 numOfObj = 2;
-  inline bool has_numofobj() const;
-  inline void clear_numofobj();
-  static const int kNumOfObjFieldNumber = 2;
-  inline ::google::protobuf::uint32 numofobj() const;
-  inline void set_numofobj(::google::protobuf::uint32 value);
+  // optional fixed64 fileSize = 2;
+  inline bool has_filesize() const;
+  inline void clear_filesize();
+  static const int kFileSizeFieldNumber = 2;
+  inline ::google::protobuf::uint64 filesize() const;
+  inline void set_filesize(::google::protobuf::uint64 value);
+  
+  // optional fixed32 numOfObjs = 3;
+  inline bool has_numofobjs() const;
+  inline void clear_numofobjs();
+  static const int kNumOfObjsFieldNumber = 3;
+  inline ::google::protobuf::uint32 numofobjs() const;
+  inline void set_numofobjs(::google::protobuf::uint32 value);
+  
+  // optional string path = 4;
+  inline bool has_path() const;
+  inline void clear_path();
+  static const int kPathFieldNumber = 4;
+  inline const ::std::string& path() const;
+  inline void set_path(const ::std::string& value);
+  inline void set_path(const char* value);
+  inline void set_path(const char* value, size_t size);
+  inline ::std::string* mutable_path();
+  inline ::std::string* release_path();
   
   // @@protoc_insertion_point(class_scope:ncvfs.UploadFileRequestPro)
  private:
-  inline void set_has_filename();
-  inline void clear_has_filename();
-  inline void set_has_numofobj();
-  inline void clear_has_numofobj();
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
+  inline void set_has_filesize();
+  inline void clear_has_filesize();
+  inline void set_has_numofobjs();
+  inline void clear_has_numofobjs();
+  inline void set_has_path();
+  inline void clear_has_path();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::std::string* filename_;
-  ::google::protobuf::uint32 numofobj_;
+  ::google::protobuf::uint64 filesize_;
+  ::google::protobuf::uint32 clientid_;
+  ::google::protobuf::uint32 numofobjs_;
+  ::std::string* path_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -1006,36 +1026,29 @@ class UploadFileReplyPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // required fixed32 fileId = 1;
+  // optional fixed32 fileId = 1;
   inline bool has_fileid() const;
   inline void clear_fileid();
   static const int kFileIdFieldNumber = 1;
   inline ::google::protobuf::uint32 fileid() const;
   inline void set_fileid(::google::protobuf::uint32 value);
   
-  // required fixed32 numOfObj = 2;
-  inline bool has_numofobj() const;
-  inline void clear_numofobj();
-  static const int kNumOfObjFieldNumber = 2;
-  inline ::google::protobuf::uint32 numofobj() const;
-  inline void set_numofobj(::google::protobuf::uint32 value);
-  
-  // repeated fixed64 objectIdList = 3;
-  inline int objectidlist_size() const;
-  inline void clear_objectidlist();
-  static const int kObjectIdListFieldNumber = 3;
-  inline ::google::protobuf::uint64 objectidlist(int index) const;
-  inline void set_objectidlist(int index, ::google::protobuf::uint64 value);
-  inline void add_objectidlist(::google::protobuf::uint64 value);
+  // repeated fixed64 objectList = 2;
+  inline int objectlist_size() const;
+  inline void clear_objectlist();
+  static const int kObjectListFieldNumber = 2;
+  inline ::google::protobuf::uint64 objectlist(int index) const;
+  inline void set_objectlist(int index, ::google::protobuf::uint64 value);
+  inline void add_objectlist(::google::protobuf::uint64 value);
   inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
-      objectidlist() const;
+      objectlist() const;
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
-      mutable_objectidlist();
+      mutable_objectlist();
   
-  // repeated fixed32 primaryList = 4;
+  // repeated fixed32 primaryList = 3;
   inline int primarylist_size() const;
   inline void clear_primarylist();
-  static const int kPrimaryListFieldNumber = 4;
+  static const int kPrimaryListFieldNumber = 3;
   inline ::google::protobuf::uint32 primarylist(int index) const;
   inline void set_primarylist(int index, ::google::protobuf::uint32 value);
   inline void add_primarylist(::google::protobuf::uint32 value);
@@ -1048,18 +1061,15 @@ class UploadFileReplyPro : public ::google::protobuf::Message {
  private:
   inline void set_has_fileid();
   inline void clear_has_fileid();
-  inline void set_has_numofobj();
-  inline void clear_has_numofobj();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::uint32 fileid_;
-  ::google::protobuf::uint32 numofobj_;
-  ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectidlist_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectlist_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
+  ::google::protobuf::uint32 fileid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -1921,84 +1931,128 @@ inline ::std::string* ListDirectoryRequestPro::release_directorypath() {
 
 // UploadFileRequestPro
 
-// required string fileName = 1;
-inline bool UploadFileRequestPro::has_filename() const {
+// optional fixed32 clientId = 1;
+inline bool UploadFileRequestPro::has_clientid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void UploadFileRequestPro::set_has_filename() {
+inline void UploadFileRequestPro::set_has_clientid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void UploadFileRequestPro::clear_has_filename() {
+inline void UploadFileRequestPro::clear_has_clientid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void UploadFileRequestPro::clear_filename() {
-  if (filename_ != &::google::protobuf::internal::kEmptyString) {
-    filename_->clear();
-  }
-  clear_has_filename();
+inline void UploadFileRequestPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
 }
-inline const ::std::string& UploadFileRequestPro::filename() const {
-  return *filename_;
+inline ::google::protobuf::uint32 UploadFileRequestPro::clientid() const {
+  return clientid_;
 }
-inline void UploadFileRequestPro::set_filename(const ::std::string& value) {
-  set_has_filename();
-  if (filename_ == &::google::protobuf::internal::kEmptyString) {
-    filename_ = new ::std::string;
-  }
-  filename_->assign(value);
-}
-inline void UploadFileRequestPro::set_filename(const char* value) {
-  set_has_filename();
-  if (filename_ == &::google::protobuf::internal::kEmptyString) {
-    filename_ = new ::std::string;
-  }
-  filename_->assign(value);
-}
-inline void UploadFileRequestPro::set_filename(const char* value, size_t size) {
-  set_has_filename();
-  if (filename_ == &::google::protobuf::internal::kEmptyString) {
-    filename_ = new ::std::string;
-  }
-  filename_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* UploadFileRequestPro::mutable_filename() {
-  set_has_filename();
-  if (filename_ == &::google::protobuf::internal::kEmptyString) {
-    filename_ = new ::std::string;
-  }
-  return filename_;
-}
-inline ::std::string* UploadFileRequestPro::release_filename() {
-  clear_has_filename();
-  if (filename_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = filename_;
-    filename_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
+inline void UploadFileRequestPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
 }
 
-// required fixed32 numOfObj = 2;
-inline bool UploadFileRequestPro::has_numofobj() const {
+// optional fixed64 fileSize = 2;
+inline bool UploadFileRequestPro::has_filesize() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void UploadFileRequestPro::set_has_numofobj() {
+inline void UploadFileRequestPro::set_has_filesize() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void UploadFileRequestPro::clear_has_numofobj() {
+inline void UploadFileRequestPro::clear_has_filesize() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void UploadFileRequestPro::clear_numofobj() {
-  numofobj_ = 0u;
-  clear_has_numofobj();
+inline void UploadFileRequestPro::clear_filesize() {
+  filesize_ = GOOGLE_ULONGLONG(0);
+  clear_has_filesize();
 }
-inline ::google::protobuf::uint32 UploadFileRequestPro::numofobj() const {
-  return numofobj_;
+inline ::google::protobuf::uint64 UploadFileRequestPro::filesize() const {
+  return filesize_;
 }
-inline void UploadFileRequestPro::set_numofobj(::google::protobuf::uint32 value) {
-  set_has_numofobj();
-  numofobj_ = value;
+inline void UploadFileRequestPro::set_filesize(::google::protobuf::uint64 value) {
+  set_has_filesize();
+  filesize_ = value;
+}
+
+// optional fixed32 numOfObjs = 3;
+inline bool UploadFileRequestPro::has_numofobjs() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void UploadFileRequestPro::set_has_numofobjs() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void UploadFileRequestPro::clear_has_numofobjs() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void UploadFileRequestPro::clear_numofobjs() {
+  numofobjs_ = 0u;
+  clear_has_numofobjs();
+}
+inline ::google::protobuf::uint32 UploadFileRequestPro::numofobjs() const {
+  return numofobjs_;
+}
+inline void UploadFileRequestPro::set_numofobjs(::google::protobuf::uint32 value) {
+  set_has_numofobjs();
+  numofobjs_ = value;
+}
+
+// optional string path = 4;
+inline bool UploadFileRequestPro::has_path() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void UploadFileRequestPro::set_has_path() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void UploadFileRequestPro::clear_has_path() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void UploadFileRequestPro::clear_path() {
+  if (path_ != &::google::protobuf::internal::kEmptyString) {
+    path_->clear();
+  }
+  clear_has_path();
+}
+inline const ::std::string& UploadFileRequestPro::path() const {
+  return *path_;
+}
+inline void UploadFileRequestPro::set_path(const ::std::string& value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void UploadFileRequestPro::set_path(const char* value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void UploadFileRequestPro::set_path(const char* value, size_t size) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* UploadFileRequestPro::mutable_path() {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  return path_;
+}
+inline ::std::string* UploadFileRequestPro::release_path() {
+  clear_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = path_;
+    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------
@@ -2306,7 +2360,7 @@ inline ::std::string* FileInfoPro::release_filename() {
 
 // UploadFileReplyPro
 
-// required fixed32 fileId = 1;
+// optional fixed32 fileId = 1;
 inline bool UploadFileReplyPro::has_fileid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -2328,54 +2382,32 @@ inline void UploadFileReplyPro::set_fileid(::google::protobuf::uint32 value) {
   fileid_ = value;
 }
 
-// required fixed32 numOfObj = 2;
-inline bool UploadFileReplyPro::has_numofobj() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
+// repeated fixed64 objectList = 2;
+inline int UploadFileReplyPro::objectlist_size() const {
+  return objectlist_.size();
 }
-inline void UploadFileReplyPro::set_has_numofobj() {
-  _has_bits_[0] |= 0x00000002u;
+inline void UploadFileReplyPro::clear_objectlist() {
+  objectlist_.Clear();
 }
-inline void UploadFileReplyPro::clear_has_numofobj() {
-  _has_bits_[0] &= ~0x00000002u;
+inline ::google::protobuf::uint64 UploadFileReplyPro::objectlist(int index) const {
+  return objectlist_.Get(index);
 }
-inline void UploadFileReplyPro::clear_numofobj() {
-  numofobj_ = 0u;
-  clear_has_numofobj();
+inline void UploadFileReplyPro::set_objectlist(int index, ::google::protobuf::uint64 value) {
+  objectlist_.Set(index, value);
 }
-inline ::google::protobuf::uint32 UploadFileReplyPro::numofobj() const {
-  return numofobj_;
-}
-inline void UploadFileReplyPro::set_numofobj(::google::protobuf::uint32 value) {
-  set_has_numofobj();
-  numofobj_ = value;
-}
-
-// repeated fixed64 objectIdList = 3;
-inline int UploadFileReplyPro::objectidlist_size() const {
-  return objectidlist_.size();
-}
-inline void UploadFileReplyPro::clear_objectidlist() {
-  objectidlist_.Clear();
-}
-inline ::google::protobuf::uint64 UploadFileReplyPro::objectidlist(int index) const {
-  return objectidlist_.Get(index);
-}
-inline void UploadFileReplyPro::set_objectidlist(int index, ::google::protobuf::uint64 value) {
-  objectidlist_.Set(index, value);
-}
-inline void UploadFileReplyPro::add_objectidlist(::google::protobuf::uint64 value) {
-  objectidlist_.Add(value);
+inline void UploadFileReplyPro::add_objectlist(::google::protobuf::uint64 value) {
+  objectlist_.Add(value);
 }
 inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
-UploadFileReplyPro::objectidlist() const {
-  return objectidlist_;
+UploadFileReplyPro::objectlist() const {
+  return objectlist_;
 }
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
-UploadFileReplyPro::mutable_objectidlist() {
-  return &objectidlist_;
+UploadFileReplyPro::mutable_objectlist() {
+  return &objectlist_;
 }
 
-// repeated fixed32 primaryList = 4;
+// repeated fixed32 primaryList = 3;
 inline int UploadFileReplyPro::primarylist_size() const {
   return primarylist_.size();
 }

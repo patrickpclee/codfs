@@ -25,20 +25,25 @@ UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator) :
 /**
  * Constructor - Save parameters in private variables
  */
-UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator,
-		uint32_t clientId, uint32_t mdsSockfd, string path) :
+UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator, uint32_t mdsSockfd, 
+		uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs) :
 		Message(communicator) {
+	_sockfd = mdsSockfd;
 	_clientId = clientId;
 	_path = path;
-	_sockfd = mdsSockfd;
+	_fileSize = fileSize;
+	_numOfObjs = numOfObjs;
 }
 
 void UploadFileRequestMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::UploadFileRequestPro uploadFileRequestPro;
-	//uploadFileRequestPro.set_directorypath(_directoryPath);
-	//uploadFileRequestPro.set_osdid(_clientId);
+
+	uploadFileRequestPro.set_clientid(_clientId);
+	uploadFileRequestPro.set_path(_path);
+	uploadFileRequestPro.set_filesize(_fileSize);
+	uploadFileRequestPro.set_numofobjs(_numOfObjs);
 
 	if (!uploadFileRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -46,7 +51,7 @@ void UploadFileRequestMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType(LIST_DIRECTORY_REQUEST);
+	setProtocolType(UPLOAD_FILE_REQUEST);
 	setProtocolMsg(serializedString);
 
 }
@@ -58,14 +63,16 @@ void UploadFileRequestMsg::parse(char* buf) {
 	uploadFileRequestPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	//_clientId = uploadFileRequestPro.osdid();
-	//_directoryPath = uploadFileRequestPro.directorypath();
+	_clientId = uploadFileRequestPro.clientid();
+	_path = uploadFileRequestPro.path();
+	_fileSize = uploadFileRequestPro.filesize();
+	_numOfObjs = uploadFileRequestPro.numofobjs();
 
 }
 
 void UploadFileRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	//mds->listFolderProcessor(_msgHeader.requestId,_sockfd,_clientId,_directoryPath);
+	mds->uploadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _path, _fileSize, _numOfObjs);
 #endif
 }
 
@@ -74,26 +81,24 @@ void UploadFileRequestMsg::printProtocol() {
 			_path.c_str());
 }
 
-void UploadFileRequestMsg::setObjectIdList(vector<uint64_t> objectIdList) {
-	_objectIdList = objectIdList;
+void UploadFileRequestMsg::setObjectList(vector<uint64_t> objectList) {
+	_objectList = objectList;
 
 	return;
 }
 
 void UploadFileRequestMsg::setPrimaryList(vector<uint32_t> primaryList) {
 	_primaryList = primaryList;
-
 	return;
 }
 
 void UploadFileRequestMsg::setFileId(uint32_t fileId) {
 	_fileId = fileId;
-
 	return;
 }
 
-vector<uint64_t> UploadFileRequestMsg::getObjectIdList() {
-	return _objectIdList;
+vector<uint64_t> UploadFileRequestMsg::getObjectList() {
+	return _objectList;
 }
 
 vector<uint32_t> UploadFileRequestMsg::getPrimaryList() {

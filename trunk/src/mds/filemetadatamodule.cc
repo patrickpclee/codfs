@@ -21,9 +21,9 @@ FileMetaDataModule::FileMetaDataModule()
 	
 }
 
-void FileMetaDataModule::createFile (uint32_t clientId, string path, uint32_t fileId)
+void FileMetaDataModule::createFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t fileId)
 {
-	BSONObj insertObject = BSON ("id" << fileId << "path" << path << "clientId" << clientId);
+	BSONObj insertObject = BSON ("id" << fileId << "path" << path << "fileSize" << (long long int)fileSize << "clientId" << clientId);
 	_fileMetaDataStorage->insert(_collection, insertObject);
 
 	return;

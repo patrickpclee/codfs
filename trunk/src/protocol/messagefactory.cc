@@ -7,6 +7,8 @@
 #include "message.hh"
 #include "listdirectoryrequest.hh"
 #include "listdirectoryreply.hh"
+#include "uploadfilerequest.hh"
+#include "uploadfilereply.hh"
 #include "putobjectinitrequest.hh"
 #include "putobjectinitreply.hh"
 #include "putobjectendrequest.hh"
@@ -40,6 +42,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (LIST_DIRECTORY_REPLY):
 		return new ListDirectoryReplyMsg(communicator);
+		break;
+	case (UPLOAD_FILE_REQUEST):
+		return new UploadFileRequestMsg(communicator);
+		break;
+	case (UPLOAD_FILE_REPLY):
+		return new UploadFileReplyMsg(communicator);
 		break;
 	case (PUT_OBJECT_INIT_REQUEST):
 		return new PutObjectInitRequestMsg(communicator);

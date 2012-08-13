@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "enums.hh"
 
@@ -12,8 +13,11 @@ struct FileMetaData {
 	string _path;
 	uint32_t _id;
 	uint64_t _size;
+	vector<uint64_t> objectList;
+	vector<uint32_t> primaryList;
+
 	unsigned char* _checksum;
-	uint64_t* _objectList[];
+	//uint64_t* _objectList[];
 	FileType _fileType;	
 };
 
