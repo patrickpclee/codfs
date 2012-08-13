@@ -23,8 +23,8 @@ public:
 	/*  set an osd status entry, if not in the map, create it
 	 *  else update the result
 	 */
-	void setStatById (uint32_t osdId, uint32_t capacity, uint32_t loading,
-		 uint32_t health);
+	void setStatById (uint32_t osdId, uint32_t sockfd, uint32_t capacity,
+		 uint32_t loading, enum OsdHealthStat health);
 	
 
 private:
