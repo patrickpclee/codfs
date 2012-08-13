@@ -17,6 +17,7 @@
 #include "messagefactory.hh"
 #include "handshakerequest.hh"
 #include "handshakereply.hh"
+#include "osdstartupmsg.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -75,7 +76,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		// return new SegmentDataMsg(communicator);
 		return NULL; // to be implemented
 		break;
-
+	case (OSD_STARTUP):
+		return new OsdStartupMsg(communicator);
+		break;
 	default:
 		debug("%s\n", "Invalid message type");
 		break;

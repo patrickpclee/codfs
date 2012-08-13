@@ -38,7 +38,7 @@ void OsdStartupMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType(OSD_STARTUP);
+	setProtocolType (OSD_STARTUP);
 	setProtocolMsg(serializedString);
 
 }
@@ -64,6 +64,6 @@ void OsdStartupMsg::doHandle() {
 }
 
 void OsdStartupMsg::printProtocol() {
-	debug("[OBJECT_DATA] Osd ID = %" PRIu32 ", capacity = %" PRIu32 ", loading = %" PRIu32 "\n",
+	debug("[OSD_STARTUP] Osd ID = %" PRIu32 ", capacity = %" PRIu32 ", loading = %" PRIu32 "\n",
 			_osdId, _capacity, _loading);
 }

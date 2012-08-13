@@ -237,6 +237,7 @@ Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 
 		return message;
 	}
+	debug ("Request ID %" PRIu32 " not found in wait queue\n", requestId);
 	return NULL;
 }
 
@@ -570,7 +571,7 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 						&& _componentId > component.id)) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
-			uint32_t sockfd = connectAndAdd(component.ip, component.port, MDS);
+			uint32_t sockfd = connectAndAdd(component.ip, component.port, component.type);
 
 			// send HandshakeRequest
 			requestHandshake(sockfd, _componentId, _componentType);
