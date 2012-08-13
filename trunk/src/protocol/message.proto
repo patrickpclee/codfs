@@ -129,5 +129,20 @@ message PutSegmentEndReplyPro {
 }
 
 //
-// 
-// 
+// OSD -> MONITOR 
+//
+message OsdStartupPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdCapacity = 2;
+	optional fixed32 osdLoading = 3;
+}
+
+message OsdShutdownPro {
+	optional fixed32 osdId = 1;
+}
+
+message OsdStatUpdatePro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdCapacity = 2;
+	optional fixed32 osdLoading = 3;
+}

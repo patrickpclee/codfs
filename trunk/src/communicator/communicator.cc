@@ -217,7 +217,7 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	// add message to outMessageQueue
 	{
 		lock_guard<mutex> lk(outMessageQueueMutex);
-		_outMessageQueue.push_back(message); // must be at the end of function
+		_outMessageQueue.push(message); // must be at the end of function
 	}
 
 }
@@ -244,16 +244,10 @@ void Communicator::sendMessage() {
 
 	while (1) {
 
-		// send all message in the outMessageQueue
-		while (!isOutMessageQueueEmpty()) {
+		Message* message;
 
-			// get and remove from queue
-			Message* message;
-			{
-				lock_guard<mutex> lk(outMessageQueueMutex);
-				message = _outMessageQueue.front();
-				_outMessageQueue.pop_front();
-			}
+		// send all message in the outMessageQueue
+		while ((message = popMessage()) != NULL) {
 
 			const uint32_t sockfd = message->getSockfd();
 
@@ -438,9 +432,14 @@ uint32_t Communicator::generateRequestId() {
 
 }
 
-bool Communicator::isOutMessageQueueEmpty() {
+Message* Communicator::popMessage() {
+	Message* message = NULL;
 	lock_guard<mutex> lk(outMessageQueueMutex);
-	return _outMessageQueue.empty();
+	if (!_outMessageQueue.empty()) {
+		message = _outMessageQueue.front();
+		_outMessageQueue.pop();
+	}
+	return message;
 }
 
 void Communicator::waitAndDelete(Message* message) {
@@ -598,7 +597,7 @@ void Communicator::connectAllComponents() {
 	// connect to components
 //	connectToComponents(mdsList);
 	connectToComponents(osdList);
-//	connectToComponents(monitorList);
+	connectToComponents(monitorList);
 
 }
 
