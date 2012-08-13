@@ -36,8 +36,19 @@ public:
 	 * @param objectId Object ID
 	 */
 
-	void replyPutObjectInit(uint32_t requestId,
-			uint32_t connectionId, uint64_t objectId);
+	void replyPutObjectInit(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId);
+
+	/**
+	 * Reply PutSegmentInitRequest
+	 * @param requestId Request ID
+	 * @param connectionId Connection ID
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 */
+
+	void replyPutSegmentInit(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Reply PutObjectEndRequest
@@ -46,8 +57,8 @@ public:
 	 * @param objectId Object ID
 	 */
 
-	void replyPutObjectEnd(uint32_t requestId,
-			uint32_t connectionId, uint64_t objectId);
+	void replyPutObjectEnd(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId);
 
 	/**
 	 * Send a failure report to MDS / Monitor
@@ -55,19 +66,21 @@ public:
 	 * @return 0 if success, -1 if failure
 	 */
 
-	void replyPutSegmentEnd(uint32_t requestId,
-			uint32_t connectionId, uint64_t objectId, uint32_t segmentId);
+	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId, uint32_t segmentId);
 
 	uint32_t reportOsdFailure(uint32_t osdId);
 
 	/**
 	 * Send a segment to another OSD
+	 * @param osdId My OSD ID
 	 * @param sockfd Socket Descriptor of the destination
 	 * @param segmentData SegmentData structure
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendSegment(uint32_t sockfd, struct SegmentData segmentData);
+	uint32_t sendSegment(uint32_t osdId, uint32_t sockfd,
+			struct SegmentData segmentData);
 
 	/**
 	 * Send an object to a client
@@ -111,6 +124,45 @@ public:
 			ComponentType dstComponent);
 
 private:
+
+	/**
+	 * Initiate upload process to OSD (Step 1)
+	 * @param osdId OSD ID
+	 * @param sockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 * @param length Size of the object
+	 * @param chunkCount Number of chunks that will be sent
+	 */
+
+	void putSegmentInit(uint32_t osdId, uint32_t sockfd, uint64_t objectId,
+			uint32_t segmentId, uint32_t length, uint32_t chunkCount);
+
+	/**
+	 * Send an object chunk to OSD (Step 2)
+	 * @param osdId OSD ID
+	 * @param sockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 * @param buf Buffer containing the object
+	 * @param offset Offset of the chunk inside the buffer
+	 * @param length Length of the chunk
+	 */
+
+	void putSegmentData(uint32_t osdId, uint32_t sockfd,
+			uint64_t objectId, uint32_t segmentId, char* buf, uint64_t offset,
+			uint32_t length);
+
+	/**
+	 * Finalise upload process to OSD (Step 3)
+	 * @param clientId Client ID
+	 * @param sockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 */
+
+	void putSegmentEnd(uint32_t clientId, uint32_t sockfd, uint64_t objectId,
+			uint32_t segmentId);
 };
 
 #endif

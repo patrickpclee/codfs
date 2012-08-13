@@ -60,7 +60,7 @@ void PutSegmentInitRequestMsg::parse(char* buf) {
 
 void PutSegmentInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	//osd->putSegmentInitRequestProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId, _segmentSize, _chunkCount);
+	osd->putSegmentInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId, _segmentSize, _chunkCount);
 #endif
 }
 

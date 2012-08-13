@@ -1,5 +1,5 @@
-#ifndef __OBJECTDATAMSG_HH__
-#define __OBJECTDATAMSG_HH__
+#ifndef __OSDSTARTUPMSG_HH__
+#define __OSDSTARTUPMSG_HH__
 
 #include "message.hh"
 

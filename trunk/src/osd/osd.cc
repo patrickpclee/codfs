@@ -11,6 +11,7 @@
 #include "../common/debug.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
+#include "../protocol/osdstartupmsg.hh"
 
 void sighandler(int signum) {
 	if (signum == SIGINT)
@@ -23,8 +24,8 @@ Osd* osd;
 /// Config Object
 ConfigLayer* configLayer;
 
-// Global Mutex for locking _pendingObjectChunk
 mutex pendingObjectChunkMutex;
+mutex pendingSegmentChunkMutex;
 
 Osd::Osd(string configFilePath) {
 	configLayer = new ConfigLayer(configFilePath.c_str(), "common.xml");
@@ -121,7 +122,7 @@ void Osd::getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
 
 	struct SegmentData segmentData;
 	segmentData = _storageModule->readSegment(objectId, segmentId);
-	_osdCommunicator->sendSegment(sockfd, segmentData);
+	_osdCommunicator->sendSegment(_osdId, sockfd, segmentData);
 
 	return;
 }
@@ -212,7 +213,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 			uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 					segmentLocationList[i].osdId);
-			_osdCommunicator->sendSegment(dstSockfd, segmentData);
+			_osdCommunicator->sendSegment(_osdId, dstSockfd, segmentData);
 
 			// free memory
 			MemoryPool::getInstance().poolFree(segmentData.buf);
@@ -234,9 +235,18 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint32_t segmentId, uint32_t length) {
+		uint64_t objectId, uint32_t segmentId, uint32_t length,
+		uint32_t chunkCount) {
 
+	// initialize chunkCount value
+	pendingSegmentChunkMutex.lock();
+	_pendingSegmentChunk[objectId + "." + segmentId] = chunkCount;
+	pendingSegmentChunkMutex.unlock();
+
+	// create object and cache
 	_storageModule->createSegment(objectId, segmentId, length);
+	_osdCommunicator->replyPutSegmentInit(requestId, sockfd, objectId,
+			segmentId);
 
 }
 
@@ -244,9 +254,29 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, uint32_t offset, uint32_t length,
 		char* buf) {
 
+	const string segmentKey = objectId + "." + segmentId;
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeSegment(objectId, segmentId, buf, offset,
-			length);
+
+	uint32_t chunkLeft = 0;
+	{
+		lock_guard<mutex> lk(pendingSegmentChunkMutex);
+		// update pendingSegmentChunk value
+		_pendingSegmentChunk[segmentKey]--;
+		chunkLeft = _pendingSegmentChunk[segmentKey];
+	}
+
+	// if all chunks have arrived
+	if (chunkLeft == 0) {
+
+		// remove from map
+		{
+			lock_guard<mutex> lk(pendingObjectChunkMutex);
+			_pendingSegmentChunk.erase(segmentKey);
+		}
+
+		// close file and free cache
+		_storageModule->closeSegment(objectId, segmentId);
+	}
 
 	return byteWritten;
 }
@@ -279,6 +309,18 @@ void startReceiveThread(Communicator* communicator) {
 	// wait for message
 	communicator->waitForMessage();
 
+}
+
+void startTestThread(Communicator* communicator) {
+	printf("HEHE\n");
+	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
+		communicator->getMonitorSockfd(), 111, 222, 333);
+	printf("Prepared msg\n");
+	testmsg->prepareProtocolMsg();
+	communicator->addMessage(testmsg);
+	printf("Prepared add \n");
+	sleep (100);
+	printf("DONE\n");
 }
 
 /**
@@ -321,27 +363,16 @@ int main(int argc, char* argv[]) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	// TODO: pause before connect for now
-//	getchar();
-
 	communicator->connectAllComponents();
 
+	thread testThread(startTestThread, communicator);
+	// TODO: pause before connect for now
+	//getchar();
+	
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
-	
-
-	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-		communicator->getMonitorSockfd(), 111, 222, 333);
-	printf("Prepared msg\n");
-	communicator->addMessage(testmsg);
-	printf("Prepared add \n");
-
-	sleep (100);
-	printf("DONE\n");
-
-
-
+	testThread.join();
 
 	// cleanup
 	delete configLayer;

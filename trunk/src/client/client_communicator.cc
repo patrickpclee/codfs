@@ -40,6 +40,7 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 	return {};
 }
 
+/*
 struct FileMetaData ClientCommunicator::uploadFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs)
 {
 	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg (this, getMdsSockfd(), clientId, path, fileSize, numOfObjs);	
@@ -61,6 +62,7 @@ struct FileMetaData ClientCommunicator::uploadFile (uint32_t clientId, string pa
 	}
 	return {};
 }
+*/
 
 void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 		struct ObjectData objectData) {

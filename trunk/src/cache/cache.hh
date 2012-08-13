@@ -5,19 +5,12 @@
 #include <exception>
 using namespace std;
 
-class CacheMissException : public exception {
-	virtual const char* what() const throw()
-	{
-		return "Cache Miss";
-	}
-};
-
 class Cache {
 	public:
-		uint32_t read (uint32_t id);
-		uint32_t write (uint32_t id, char* data);
-		uint32_t createEntry (uint32_t id);
-		void deleteEntry (uint32_t id);
+		virtual char * read (uint64_t id){};
+		virtual void write (uint64_t id, char* data){};
+		//uint32_t createEntry (uint32_t id);
+		virtual void deleteEntry (uint64_t id){};
 	private:
 };
 #endif
