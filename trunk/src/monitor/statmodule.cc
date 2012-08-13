@@ -21,6 +21,11 @@ void StatModule::updateOsdStatMap (Communicator* communicator) {
 
 }
 
+void StatModule::removeStatById (uint32_t osdId) {
+	lock_guard<mutex> lk(osdStatMapMutex);
+	_osdStatMap.erase(osdId);
+}
+
 void StatModule::setStatById (uint32_t osdId, uint32_t sockfd, 
 	uint32_t capacity, uint32_t loading, enum OsdHealthStat health) {
 	map<uint32_t, struct OsdStat>::iterator iter;

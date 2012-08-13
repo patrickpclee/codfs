@@ -43,6 +43,7 @@ public:
 
 	void OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 		uint32_t osdId, uint32_t capacity, uint32_t loading);
+	void OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd, uint32_t osdId);
 
 private:
 //	MonitorInfo _info;

@@ -20,6 +20,7 @@
 #include "handshakerequest.hh"
 #include "handshakereply.hh"
 #include "osdstartupmsg.hh"
+#include "osdshutdownmsg.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -86,6 +87,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (OSD_STARTUP):
 		return new OsdStartupMsg(communicator);
+		break;
+	case (OSD_SHUTDOWN):
+		return new OsdShutdownMsg(communicator);
 		break;
 	default:
 		debug("%s\n", "Invalid message type");

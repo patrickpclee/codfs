@@ -12,6 +12,7 @@
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
 #include "../protocol/osdstartupmsg.hh"
+#include "../protocol/osdshutdownmsg.hh"
 
 void sighandler(int signum) {
 	if (signum == SIGINT)
@@ -290,7 +291,11 @@ void startTestThread(Communicator* communicator) {
 	testmsg->prepareProtocolMsg();
 	communicator->addMessage(testmsg);
 	printf("Prepared add \n");
-	sleep (100);
+	sleep (10);
+	OsdShutdownMsg* msg = new OsdShutdownMsg(communicator,
+		communicator->getMonitorSockfd(), 111);
+	msg->prepareProtocolMsg();
+	communicator->addMessage(msg);
 	printf("DONE\n");
 }
 
@@ -336,7 +341,7 @@ int main(int argc, char* argv[]) {
 
 	communicator->connectAllComponents();
 
-//	thread testThread(startTestThread, communicator);
+	thread testThread(startTestThread, communicator);
 	// TODO: pause before connect for now
 	//getchar();
 
