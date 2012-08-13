@@ -11,6 +11,7 @@
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
 
+#include <sys/stat.h>
 
 void sighandler(int signum) {
   if (signum == SIGINT) exit(42);
@@ -27,7 +28,7 @@ Client::Client() {
 	_storageModule = new ClientStorageModule();
 
 	// TODO: HARDCODE CLIENT ID
-	_clientId = 0;
+	_clientId = 1;
 
 }
 
@@ -40,13 +41,35 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
+uint32_t Client::uploadFileRequest (string path) {
+	uint32_t objectCount = _storageModule->getObjectCount(path);
+
+	struct stat tempFileStat;
+	stat(path.c_str(),&tempFileStat);
+
+	uint64_t fileSize = tempFileStat.st_size;
+
+	debug ("Object Count of %s: %" PRIu32 "\n",path.c_str(), objectCount);
+
+	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, fileSize, objectCount);
+
+	debug ("File ID %" PRIu32 "\n",fileMetaData._id);
+
+	debug ("%s\n", "====================");
+	for(uint32_t i = 0; i < fileMetaData._primaryList.size(); ++i) {
+		debug ("%" PRIu64 "[%" PRIu32 "]\n",fileMetaData._objectList[i],fileMetaData._primaryList[i]);
+	}
+
+	return fileMetaData._id;
+}
+
 /**
  * 1. Divide the file into fixed size objects
  * 2. For each object, contact MDS to obtain objectId and dstOsdID
  * 3. Call uploadObjectRequest()
  */
 
-uint32_t Client::uploadFileRequest(string filepath) {
+uint32_t Client::sendFileRequest(string filepath) {
 
 	const uint32_t objectCount = _storageModule->getObjectCount(filepath);
 
@@ -127,7 +150,8 @@ int main(void) {
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
-	client->uploadFileRequest("./testfile");
+	client->sendFileRequest("./testfile");
+	//client->uploadFileRequest("./testfile");
 
 	/*
 
