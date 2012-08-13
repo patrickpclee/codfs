@@ -10,8 +10,6 @@ using namespace mongo;
 
 FileMetaDataModule::FileMetaDataModule()
 {
-	// TODO: Contact MDS other than MDS0
-
 	_collection = "File Meta Data";
 
 	_fileMetaDataStorage = new MongoDB();
@@ -42,8 +40,6 @@ void FileMetaDataModule::saveObjectList (uint32_t fileId, vector<uint64_t> objec
 		debug("Push %" PRIu64 "\n",*it);
 		_fileMetaDataStorage->push(_collection, queryObject, pushObject);
 	}
-
-
 
 	return ;
 }

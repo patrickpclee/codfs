@@ -59,7 +59,7 @@ void MongoDB::insert (string collection, BSONObj insertObject)
 
 void MongoDB::update (string collection, Query queryObject, BSONObj updateObject)
 {
-	_connection.update(_database + "." + collection, queryObject, updateObject);
+	_connection.update(_database + "." + collection, queryObject, updateObject, true);
 
 	return ;
 }
@@ -74,7 +74,7 @@ void MongoDB::remove (string collection, Query queryObject)
 
 void MongoDB::push (string collection, Query queryObject, BSONObj pushObject)
 {
-	_connection.update(_database + "." + collection, queryObject, pushObject);
+	_connection.update(_database + "." + collection, queryObject, pushObject, true);
 }
 
 BSONObj MongoDB::findAndModify (string collection, BSONObj queryObject, BSONObj updateObject)

@@ -6,18 +6,33 @@ StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
 
 void StatModule::updateOsdStatMap (Communicator* communicator) {
 	while (1) {
+		printf("-----------------10s start----------------\n");
 		{
 			lock_guard<mutex> lk(osdStatMapMutex);
-			for(const auto& entry: _osdStatMap) {
-					
+			for(auto& entry: _osdStatMap) {
+				printf("Entry %3d:\n",entry.first);
+				printf("		 "); 
+				entry.second.out();			
 			}
 		}
-		usleep(1000000);
+		sleep(10);
+		printf("-----------------10s finish--------------\n");
 	}
 
 }
 
-void StatModule::setStatById (uint32_t osdId, uint32_t capacity, 
-	uint32_t loading, uint32_t health) {
+void StatModule::setStatById (uint32_t osdId, uint32_t sockfd, 
+	uint32_t capacity, uint32_t loading, enum OsdHealthStat health) {
+	map<uint32_t, struct OsdStat>::iterator iter;
 
+	lock_guard<mutex> lk(osdStatMapMutex);
+	iter = _osdStatMap.find(osdId);
+	if (iter == _osdStatMap.end()) {
+		_osdStatMap[osdId] =OsdStat(osdId, sockfd, capacity, loading, health);
+	} else {
+		iter->second.osdSockfd = sockfd;
+		iter->second.osdCapacity = capacity;
+		iter->second.osdLoading = loading;
+		iter->second.osdHealth = health;
+	}
 }

@@ -5,6 +5,7 @@
 
 ConfigLayer* configLayer;
 
+Monitor* monitor;
 
 mutex osdStatMapMutex;
 
@@ -42,6 +43,10 @@ uint32_t Monitor::getMonitorId() {
 	return _monitorId;
 }
 
+void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
+	uint32_t osdId, uint32_t capacity, uint32_t loading) {
+	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE);
+}
 
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
@@ -59,11 +64,12 @@ void startUpdateThread(Communicator* communicator, StatModule* statmodule) {
 	statmodule->updateOsdStatMap(communicator);
 }
 
+
 int main (void) {
 	
 	printf ("MONITOR\n");
 
-	Monitor* monitor = new Monitor();
+	monitor = new Monitor();
 	MonitorCommunicator* communicator = monitor->getCommunicator();
 	StatModule* statmodule = monitor->getStatModule();
 

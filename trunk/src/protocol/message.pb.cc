@@ -69,6 +69,15 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* PutSegmentEndReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   PutSegmentEndReplyPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* OsdStartupPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  OsdStartupPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* OsdShutdownPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  OsdShutdownPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* OsdStatUpdatePro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  OsdStatUpdatePro_reflection_ = NULL;
 
 }  // namespace
 
@@ -357,6 +366,55 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutSegmentEndReplyPro));
+  OsdStartupPro_descriptor_ = file->message_type(17);
+  static const int OsdStartupPro_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdcapacity_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdloading_),
+  };
+  OsdStartupPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      OsdStartupPro_descriptor_,
+      OsdStartupPro::default_instance_,
+      OsdStartupPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(OsdStartupPro));
+  OsdShutdownPro_descriptor_ = file->message_type(18);
+  static const int OsdShutdownPro_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdShutdownPro, osdid_),
+  };
+  OsdShutdownPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      OsdShutdownPro_descriptor_,
+      OsdShutdownPro::default_instance_,
+      OsdShutdownPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdShutdownPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdShutdownPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(OsdShutdownPro));
+  OsdStatUpdatePro_descriptor_ = file->message_type(19);
+  static const int OsdStatUpdatePro_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStatUpdatePro, osdid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStatUpdatePro, osdcapacity_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStatUpdatePro, osdloading_),
+  };
+  OsdStatUpdatePro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      OsdStatUpdatePro_descriptor_,
+      OsdStatUpdatePro::default_instance_,
+      OsdStatUpdatePro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStatUpdatePro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStatUpdatePro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(OsdStatUpdatePro));
 }
 
 namespace {
@@ -403,6 +461,12 @@ void protobuf_RegisterTypes(const ::std::string&) {
     PutSegmentInitReplyPro_descriptor_, &PutSegmentInitReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     PutSegmentEndReplyPro_descriptor_, &PutSegmentEndReplyPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    OsdStartupPro_descriptor_, &OsdStartupPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    OsdShutdownPro_descriptor_, &OsdShutdownPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    OsdStatUpdatePro_descriptor_, &OsdStatUpdatePro::default_instance());
 }
 
 }  // namespace
@@ -442,6 +506,12 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete PutSegmentInitReplyPro_reflection_;
   delete PutSegmentEndReplyPro::default_instance_;
   delete PutSegmentEndReplyPro_reflection_;
+  delete OsdStartupPro::default_instance_;
+  delete OsdStartupPro_reflection_;
+  delete OsdShutdownPro::default_instance_;
+  delete OsdShutdownPro_reflection_;
+  delete OsdStatUpdatePro::default_instance_;
+  delete OsdStatUpdatePro_reflection_;
 }
 
 void protobuf_AddDesc_message_2eproto() {
@@ -483,7 +553,12 @@ void protobuf_AddDesc_message_2eproto() {
     "\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026Pu"
     "tSegmentInitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021"
     "\n\tsegmentId\030\002 \001(\007\"<\n\025PutSegmentEndReplyP"
-    "ro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007", 1319);
+    "ro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\""
+    "G\n\rOsdStartupPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCa"
+    "pacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"\037\n\016OsdS"
+    "hutdownPro\022\r\n\005osdId\030\001 \001(\007\"J\n\020OsdStatUpda"
+    "tePro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001("
+    "\007\022\022\n\nosdLoading\030\003 \001(\007", 1501);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -503,6 +578,9 @@ void protobuf_AddDesc_message_2eproto() {
   PutSegmentEndRequestPro::default_instance_ = new PutSegmentEndRequestPro();
   PutSegmentInitReplyPro::default_instance_ = new PutSegmentInitReplyPro();
   PutSegmentEndReplyPro::default_instance_ = new PutSegmentEndReplyPro();
+  OsdStartupPro::default_instance_ = new OsdStartupPro();
+  OsdShutdownPro::default_instance_ = new OsdShutdownPro();
+  OsdStatUpdatePro::default_instance_ = new OsdStatUpdatePro();
   HandshakeRequestPro::default_instance_->InitAsDefaultInstance();
   HandshakeReplyPro::default_instance_->InitAsDefaultInstance();
   ListDirectoryRequestPro::default_instance_->InitAsDefaultInstance();
@@ -520,6 +598,9 @@ void protobuf_AddDesc_message_2eproto() {
   PutSegmentEndRequestPro::default_instance_->InitAsDefaultInstance();
   PutSegmentInitReplyPro::default_instance_->InitAsDefaultInstance();
   PutSegmentEndReplyPro::default_instance_->InitAsDefaultInstance();
+  OsdStartupPro::default_instance_->InitAsDefaultInstance();
+  OsdShutdownPro::default_instance_->InitAsDefaultInstance();
+  OsdStatUpdatePro::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
 }
 
@@ -4959,6 +5040,773 @@ void PutSegmentEndReplyPro::Swap(PutSegmentEndReplyPro* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = PutSegmentEndReplyPro_descriptor_;
   metadata.reflection = PutSegmentEndReplyPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int OsdStartupPro::kOsdIdFieldNumber;
+const int OsdStartupPro::kOsdCapacityFieldNumber;
+const int OsdStartupPro::kOsdLoadingFieldNumber;
+#endif  // !_MSC_VER
+
+OsdStartupPro::OsdStartupPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void OsdStartupPro::InitAsDefaultInstance() {
+}
+
+OsdStartupPro::OsdStartupPro(const OsdStartupPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void OsdStartupPro::SharedCtor() {
+  _cached_size_ = 0;
+  osdid_ = 0u;
+  osdcapacity_ = 0u;
+  osdloading_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+OsdStartupPro::~OsdStartupPro() {
+  SharedDtor();
+}
+
+void OsdStartupPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void OsdStartupPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* OsdStartupPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return OsdStartupPro_descriptor_;
+}
+
+const OsdStartupPro& OsdStartupPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+OsdStartupPro* OsdStartupPro::default_instance_ = NULL;
+
+OsdStartupPro* OsdStartupPro::New() const {
+  return new OsdStartupPro;
+}
+
+void OsdStartupPro::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    osdid_ = 0u;
+    osdcapacity_ = 0u;
+    osdloading_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool OsdStartupPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed32 osdId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdid_)));
+          set_has_osdid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_osdCapacity;
+        break;
+      }
+      
+      // optional fixed32 osdCapacity = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdCapacity:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdcapacity_)));
+          set_has_osdcapacity();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(29)) goto parse_osdLoading;
+        break;
+      }
+      
+      // optional fixed32 osdLoading = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdLoading:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdloading_)));
+          set_has_osdloading();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void OsdStartupPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->osdid(), output);
+  }
+  
+  // optional fixed32 osdCapacity = 2;
+  if (has_osdcapacity()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->osdcapacity(), output);
+  }
+  
+  // optional fixed32 osdLoading = 3;
+  if (has_osdloading()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->osdloading(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* OsdStartupPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->osdid(), target);
+  }
+  
+  // optional fixed32 osdCapacity = 2;
+  if (has_osdcapacity()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->osdcapacity(), target);
+  }
+  
+  // optional fixed32 osdLoading = 3;
+  if (has_osdloading()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->osdloading(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int OsdStartupPro::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed32 osdId = 1;
+    if (has_osdid()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdCapacity = 2;
+    if (has_osdcapacity()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdLoading = 3;
+    if (has_osdloading()) {
+      total_size += 1 + 4;
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void OsdStartupPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const OsdStartupPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const OsdStartupPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void OsdStartupPro::MergeFrom(const OsdStartupPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_osdid()) {
+      set_osdid(from.osdid());
+    }
+    if (from.has_osdcapacity()) {
+      set_osdcapacity(from.osdcapacity());
+    }
+    if (from.has_osdloading()) {
+      set_osdloading(from.osdloading());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void OsdStartupPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void OsdStartupPro::CopyFrom(const OsdStartupPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool OsdStartupPro::IsInitialized() const {
+  
+  return true;
+}
+
+void OsdStartupPro::Swap(OsdStartupPro* other) {
+  if (other != this) {
+    std::swap(osdid_, other->osdid_);
+    std::swap(osdcapacity_, other->osdcapacity_);
+    std::swap(osdloading_, other->osdloading_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata OsdStartupPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = OsdStartupPro_descriptor_;
+  metadata.reflection = OsdStartupPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int OsdShutdownPro::kOsdIdFieldNumber;
+#endif  // !_MSC_VER
+
+OsdShutdownPro::OsdShutdownPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void OsdShutdownPro::InitAsDefaultInstance() {
+}
+
+OsdShutdownPro::OsdShutdownPro(const OsdShutdownPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void OsdShutdownPro::SharedCtor() {
+  _cached_size_ = 0;
+  osdid_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+OsdShutdownPro::~OsdShutdownPro() {
+  SharedDtor();
+}
+
+void OsdShutdownPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void OsdShutdownPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* OsdShutdownPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return OsdShutdownPro_descriptor_;
+}
+
+const OsdShutdownPro& OsdShutdownPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+OsdShutdownPro* OsdShutdownPro::default_instance_ = NULL;
+
+OsdShutdownPro* OsdShutdownPro::New() const {
+  return new OsdShutdownPro;
+}
+
+void OsdShutdownPro::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    osdid_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool OsdShutdownPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed32 osdId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdid_)));
+          set_has_osdid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void OsdShutdownPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->osdid(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* OsdShutdownPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->osdid(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int OsdShutdownPro::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed32 osdId = 1;
+    if (has_osdid()) {
+      total_size += 1 + 4;
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void OsdShutdownPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const OsdShutdownPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const OsdShutdownPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void OsdShutdownPro::MergeFrom(const OsdShutdownPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_osdid()) {
+      set_osdid(from.osdid());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void OsdShutdownPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void OsdShutdownPro::CopyFrom(const OsdShutdownPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool OsdShutdownPro::IsInitialized() const {
+  
+  return true;
+}
+
+void OsdShutdownPro::Swap(OsdShutdownPro* other) {
+  if (other != this) {
+    std::swap(osdid_, other->osdid_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata OsdShutdownPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = OsdShutdownPro_descriptor_;
+  metadata.reflection = OsdShutdownPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int OsdStatUpdatePro::kOsdIdFieldNumber;
+const int OsdStatUpdatePro::kOsdCapacityFieldNumber;
+const int OsdStatUpdatePro::kOsdLoadingFieldNumber;
+#endif  // !_MSC_VER
+
+OsdStatUpdatePro::OsdStatUpdatePro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void OsdStatUpdatePro::InitAsDefaultInstance() {
+}
+
+OsdStatUpdatePro::OsdStatUpdatePro(const OsdStatUpdatePro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void OsdStatUpdatePro::SharedCtor() {
+  _cached_size_ = 0;
+  osdid_ = 0u;
+  osdcapacity_ = 0u;
+  osdloading_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+OsdStatUpdatePro::~OsdStatUpdatePro() {
+  SharedDtor();
+}
+
+void OsdStatUpdatePro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void OsdStatUpdatePro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* OsdStatUpdatePro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return OsdStatUpdatePro_descriptor_;
+}
+
+const OsdStatUpdatePro& OsdStatUpdatePro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+OsdStatUpdatePro* OsdStatUpdatePro::default_instance_ = NULL;
+
+OsdStatUpdatePro* OsdStatUpdatePro::New() const {
+  return new OsdStatUpdatePro;
+}
+
+void OsdStatUpdatePro::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    osdid_ = 0u;
+    osdcapacity_ = 0u;
+    osdloading_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool OsdStatUpdatePro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed32 osdId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdid_)));
+          set_has_osdid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_osdCapacity;
+        break;
+      }
+      
+      // optional fixed32 osdCapacity = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdCapacity:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdcapacity_)));
+          set_has_osdcapacity();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(29)) goto parse_osdLoading;
+        break;
+      }
+      
+      // optional fixed32 osdLoading = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdLoading:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdloading_)));
+          set_has_osdloading();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void OsdStatUpdatePro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->osdid(), output);
+  }
+  
+  // optional fixed32 osdCapacity = 2;
+  if (has_osdcapacity()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->osdcapacity(), output);
+  }
+  
+  // optional fixed32 osdLoading = 3;
+  if (has_osdloading()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->osdloading(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* OsdStatUpdatePro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->osdid(), target);
+  }
+  
+  // optional fixed32 osdCapacity = 2;
+  if (has_osdcapacity()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->osdcapacity(), target);
+  }
+  
+  // optional fixed32 osdLoading = 3;
+  if (has_osdloading()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->osdloading(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int OsdStatUpdatePro::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed32 osdId = 1;
+    if (has_osdid()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdCapacity = 2;
+    if (has_osdcapacity()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdLoading = 3;
+    if (has_osdloading()) {
+      total_size += 1 + 4;
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void OsdStatUpdatePro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const OsdStatUpdatePro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const OsdStatUpdatePro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void OsdStatUpdatePro::MergeFrom(const OsdStatUpdatePro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_osdid()) {
+      set_osdid(from.osdid());
+    }
+    if (from.has_osdcapacity()) {
+      set_osdcapacity(from.osdcapacity());
+    }
+    if (from.has_osdloading()) {
+      set_osdloading(from.osdloading());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void OsdStatUpdatePro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void OsdStatUpdatePro::CopyFrom(const OsdStatUpdatePro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool OsdStatUpdatePro::IsInitialized() const {
+  
+  return true;
+}
+
+void OsdStatUpdatePro::Swap(OsdStatUpdatePro* other) {
+  if (other != this) {
+    std::swap(osdid_, other->osdid_);
+    std::swap(osdcapacity_, other->osdcapacity_);
+    std::swap(osdloading_, other->osdloading_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata OsdStatUpdatePro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = OsdStatUpdatePro_descriptor_;
+  metadata.reflection = OsdStatUpdatePro_reflection_;
   return metadata;
 }
 

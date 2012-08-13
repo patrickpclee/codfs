@@ -329,6 +329,19 @@ int main(int argc, char* argv[]) {
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
+	
+
+	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
+		communicator->getMonitorSockfd(), 111, 222, 333);
+	printf("Prepared msg\n");
+	communicator->addMessage(testmsg);
+	printf("Prepared add \n");
+
+	sleep (100);
+	printf("DONE\n");
+
+
+
 
 	// cleanup
 	delete configLayer;

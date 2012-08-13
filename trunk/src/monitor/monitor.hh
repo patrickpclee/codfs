@@ -41,6 +41,9 @@ public:
 	StatModule* getStatModule();
 	uint32_t getMonitorId();
 
+	void OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
+		uint32_t osdId, uint32_t capacity, uint32_t loading);
+
 private:
 //	MonitorInfo _info;
 //	Cache _cache;
