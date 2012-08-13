@@ -21,10 +21,7 @@ public:
 
 	uint32_t generateFileId();
 private:
-	atomic<uint32_t> _nextFileId;
-
 	string _collection;
-	string _database;
 
 	MongoDB* _fileMetaDataStorage;
 	/// File Meta Data Cache

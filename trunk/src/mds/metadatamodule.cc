@@ -11,13 +11,13 @@ MetaDataModule::MetaDataModule()
 	srand(0);
 }
 
-string MetaDataModule::lookupFilePath(uint32_t fileId)
+string MetaDataModule::lookupFilePath (uint32_t fileId)
 {
 	return "";
 }
 
 
-uint32_t MetaDataModule::createFile(uint32_t clientId, string path)
+uint32_t MetaDataModule::createFile (uint32_t clientId, string path)
 {	
 	uint32_t fileId = _fileMetaDataModule->generateFileId();	
 
@@ -27,7 +27,7 @@ uint32_t MetaDataModule::createFile(uint32_t clientId, string path)
 }
 
 
-uint32_t MetaDataModule::getPrimary(uint64_t objectId)
+uint32_t MetaDataModule::getPrimary (uint64_t objectId)
 {
 	return 0;
 }
@@ -39,7 +39,7 @@ uint32_t MetaDataModule::lookupFileId(string path)
 }
 
 
-void MetaDataModule::saveObjectList(uint32_t fileId, vector<uint64_t> objectList)
+void MetaDataModule::saveObjectList (uint32_t fileId, vector<uint64_t> objectList)
 {
 	debug("Save %d %d\n",fileId,objectList.size());
 	_fileMetaDataModule->saveObjectList(fileId, objectList);
@@ -48,25 +48,25 @@ void MetaDataModule::saveObjectList(uint32_t fileId, vector<uint64_t> objectList
 }
 
 
-uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId, uint32_t exclude)
+uint32_t MetaDataModule::selectActingPrimary (uint64_t objectId, uint32_t exclude)
 {
 	return 0;
 }
 
 
-unsigned char* MetaDataModule::readChecksum(uint32_t fileId)
+unsigned char* MetaDataModule::readChecksum (uint32_t fileId)
 {
 	return 0; // null
 }
 
 
-vector<uint32_t> MetaDataModule::readNodeList(uint64_t objectId)
+vector<uint32_t> MetaDataModule::readNodeList (uint64_t objectId)
 {
 	return {0};
 }
 
 
-vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs)
+vector<uint64_t> MetaDataModule::newObjectList (uint32_t numOfObjs)
 {
 	vector<uint64_t> objectList(numOfObjs);
 	for ( uint32_t i = 0; i < numOfObjs; ++i){
@@ -83,32 +83,34 @@ uint64_t MetaDataModule::newObjectId()
 }
 
 
-vector<uint64_t> MetaDataModule::readObjectList(uint32_t fileId)
+vector<uint64_t> MetaDataModule::readObjectList (uint32_t fileId)
 {
 	return {0};
 }
 
 
-vector<uint64_t> MetaDataModule::readOsdObjectList(uint32_t osdId)
+vector<uint64_t> MetaDataModule::readOsdObjectList (uint32_t osdId)
 {
 	return {0};
 }
 
 
-void MetaDataModule::openFile(uint32_t clientId, uint32_t filieId)
+void MetaDataModule::openFile (uint32_t clientId, uint32_t filieId)
 {
 	return ;
 }
 
 
-void MetaDataModule::saveNodeList(uint64_t objectId, vector<uint32_t> objectNodeList)
+void MetaDataModule::saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList)
 {
+	_objectMetaDataModule->saveNodeList(objectId, objectNodeList);
 	return ;
 }
 
 
-void MetaDataModule::setPrimary(uint64_t objectId, uint32_t primaryOsdId)
+void MetaDataModule::setPrimary (uint64_t objectId, uint32_t primaryOsdId)
 {
+	_objectMetaDataModule->setPrimary(objectId, primaryOsdId);
 	return ;
 }
 
