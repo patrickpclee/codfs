@@ -178,7 +178,8 @@ uint32_t StorageModule::writeObject(uint64_t objectId, char* buf,
 uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 		char* buf, uint64_t offsetInSegment, uint32_t length) {
 
-	uint32_t byteWritten;
+	uint32_t byteWritten = 0;
+
 
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
@@ -323,6 +324,7 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length) {
 
+
 	// lock file access function
 	lock_guard<mutex> lk(fileMutex);
 
@@ -340,8 +342,14 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	}
 
 	// Write file contents from buffer
+
 	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
-	fflush(file);
+
+	/*
+	fseek (file, offset, SEEK_SET);
+	uint32_t byteWritten = fwrite (buf, 1, length, file);
+	fflush (file);
+	*/
 
 	// Release lock
 	if (flock(fileno(file), LOCK_UN) == -1) {
@@ -389,6 +397,8 @@ FILE* StorageModule::createFile(string filepath) {
 	// create new if not exist
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "wb+");
+
+	setvbuf (filePtr, NULL , _IONBF , 0);
 
 	debug("fileptr = %p\n", filePtr);
 

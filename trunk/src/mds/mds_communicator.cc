@@ -19,8 +19,8 @@ void MdsCommunicator::replyFolderData(uint32_t requestId, uint32_t connectionId,
 vector<uint32_t> MdsCommunicator::askPrimaryList(uint32_t numOfObjs)
 {
 	vector<uint32_t> primaryList(numOfObjs);
-	for(uint32_t i; i < numOfObjs; ++i)
-		primaryList.push_back(0);
+	for(uint32_t i = 0; i < numOfObjs; ++i)
+		primaryList.push_back(1);
 	return primaryList;
 }
 
