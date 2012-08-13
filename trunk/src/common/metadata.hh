@@ -13,8 +13,8 @@ struct FileMetaData {
 	string _path;
 	uint32_t _id;
 	uint64_t _size;
-	vector<uint64_t> objectList;
-	vector<uint32_t> primaryList;
+	vector<uint64_t> _objectList;
+	vector<uint32_t> _primaryList;
 
 	unsigned char* _checksum;
 	//uint64_t* _objectList[];

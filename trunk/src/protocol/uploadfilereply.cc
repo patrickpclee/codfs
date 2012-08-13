@@ -80,5 +80,5 @@ void UploadFileReplyMsg::doHandle() {
 }
 
 void UploadFileReplyMsg::printProtocol() {
-	debug("[UPLOAD_FILE_REPLY] File ID = %" PRIu32 , _fileId);
+	debug("[UPLOAD_FILE_REPLY] File ID = %" PRIu32 "\n", _fileId);
 }
