@@ -24,13 +24,14 @@ public:
 	 */
 	vector<FileMetaData> listFolderRequest(char* path);
 
+	uint32_t uploadFileRequest (string path); 
 	/**
 	 * Upload a file to OSD
 	 * @param filepath Location of the file to upload
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t uploadFileRequest(string filepath);
+	uint32_t sendFileRequest(string filepath);
 
 	/**
 	 * @brief	Get the Client Communicator

@@ -5,7 +5,7 @@
 #include "../common/objectdata.hh"
 #include "../common/memorypool.hh"
 #include "../protocol/listdirectoryrequest.hh"
-
+#include "../protocol/uploadfilerequest.hh"
 #include "../protocol/putobjectinitrequest.hh"
 #include "../protocol/putobjectendrequest.hh"
 #include "../protocol/objectdatamsg.hh"
@@ -40,10 +40,29 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 	return {};
 }
 
+/*
 struct FileMetaData ClientCommunicator::uploadFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs)
 {
-	UploadFileRequestMsg* uploadFileRequestPro = new UploadFileRequestMsg (this, getMdsSockfd(), clientId, path, fileSize, numOfObjs);	
+	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg (this, getMdsSockfd(), clientId, path, fileSize, numOfObjs);	
+	uploadFileRequestMsg->prepareProtocolMsg();
+
+	addMessage(uploadFileRequestMsg, true);
+	MessageStatus status = uploadFileRequestMsg->waitForStatusChange();
+
+	if(status == READY) {
+		struct FileMetaData fileMetaData {};
+		fileMetaData._id = uploadFileRequestMsg->getFileId();
+		fileMetaData._objectList = uploadFileRequestMsg->getObjectList();
+		fileMetaData._primaryList = uploadFileRequestMsg->getPrimaryList();
+		waitAndDelete (uploadFileRequestMsg);
+		return fileMetaData;
+	} else {
+		debug("%s\n","List Directory Request Failed");
+		exit (-1);
+	}
+	return {};
 }
+*/
 
 void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 		struct ObjectData objectData) {

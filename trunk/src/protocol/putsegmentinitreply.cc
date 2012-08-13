@@ -51,15 +51,12 @@ void PutSegmentInitReplyMsg::parse(char* buf) {
 
 }
 
-void PutSegmentInitReplyMsg::handle() {
+void PutSegmentInitReplyMsg::doHandle() {
 
-	PutSegmentInitReplyMsg* putSegmentInitReplyMsg =
-			(PutSegmentInitReplyMsg*) _communicator->popWaitReplyMessage(
+	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
+			(PutSegmentInitRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
-	putSegmentInitReplyMsg->setStatus(READY);
-
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
+	putSegmentInitRequestMsg->setStatus(READY);
 }
 
 void PutSegmentInitReplyMsg::printProtocol() {

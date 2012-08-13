@@ -284,7 +284,7 @@ int main (void)
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	mds->test();
+	//mds->test();
 
 	garbageCollectionThread.join();
 	receiveThread.join();

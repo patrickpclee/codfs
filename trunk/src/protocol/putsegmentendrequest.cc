@@ -54,12 +54,10 @@ void PutSegmentEndRequestMsg::parse(char* buf) {
 
 }
 
-void PutSegmentEndRequestMsg::handle() {
+void PutSegmentEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putSegmentEndProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId);
 #endif
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
 }
 
 void PutSegmentEndRequestMsg::printProtocol() {

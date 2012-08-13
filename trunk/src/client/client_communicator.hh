@@ -22,6 +22,8 @@ public:
 	 */
 	vector<FileMetaData> listFolderData(uint32_t clientId, string path);
 
+	struct FileMetaData uploadFile(uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs);	
+
 	/**
 	 * 1. Send an init message
 	 * 2. Repeatedly send data chunks to OSD
