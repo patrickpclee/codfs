@@ -1,10 +1,14 @@
 #include "metadatamodule.hh"
 
+#include "../common/debug.hh"
+
 MetaDataModule::MetaDataModule()
 {
 	_fileMetaDataModule = new FileMetaDataModule();
 	_objectMetaDataModule = new ObjectMetaDataModule();
 	_osdMetaDataModule = new OsdMetaDataModule();
+
+	srand(0);
 }
 
 string MetaDataModule::lookupFilePath(uint32_t fileId)
@@ -37,6 +41,7 @@ uint32_t MetaDataModule::lookupFileId(string path)
 
 void MetaDataModule::saveObjectList(uint32_t fileId, vector<uint64_t> objectList)
 {
+	debug("Save %d %d\n",fileId,objectList.size());
 	_fileMetaDataModule->saveObjectList(fileId, objectList);
 
 	return ;
@@ -63,11 +68,12 @@ vector<uint32_t> MetaDataModule::readNodeList(uint64_t objectId)
 
 vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs)
 {
-	vector<uint64_t> objectIdList(numOfObjs);
-	for ( uint32_t i = 0; i < numOfObjs; ++i)
-		objectIdList.push_back(newObjectId());
-
-	return objectIdList;
+	vector<uint64_t> objectList(numOfObjs);
+	for ( uint32_t i = 0; i < numOfObjs; ++i){
+		//objectList.push_back(newObjectId());
+		objectList[i] = newObjectId();
+	}
+	return objectList;
 }
 
 

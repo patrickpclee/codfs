@@ -255,7 +255,9 @@ void Mds::test ()
 	debug("%s\n","Test\n");
 	for(int i = 0; i < 10; ++i) {
 		uint32_t temp = _metaDataModule->createFile(1,".");
-		debug("Temp = %d\n",temp);
+		vector<uint64_t> objectList;
+		objectList = _metaDataModule->newObjectList(10);
+		_metaDataModule->saveObjectList(temp,objectList);
 	}
 }
 

@@ -72,6 +72,11 @@ void MongoDB::remove (string collection, Query queryObject)
 
 }
 
+void MongoDB::push (string collection, Query queryObject, BSONObj pushObject)
+{
+	_connection.update(_database + "." + collection, queryObject, pushObject);
+}
+
 BSONObj MongoDB::findAndModify (string collection, BSONObj queryObject, BSONObj updateObject)
 {
 	//BSONObj commandObject = BSON ("findandmodify" << collection << modifyObject);
@@ -83,4 +88,3 @@ BSONObj MongoDB::findAndModify (string collection, BSONObj queryObject, BSONObj 
 
 	return result.getObjectField("value");
 };
-

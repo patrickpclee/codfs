@@ -33,6 +33,17 @@ void FileMetaDataModule::createFile (uint32_t clientId, string path, uint32_t fi
 
 void FileMetaDataModule::saveObjectList (uint32_t fileId, vector<uint64_t> objectList)
 {
+	vector<uint64_t>::iterator it;
+	BSONObj queryObject = BSON ("id" << fileId);
+	BSONObj pushObject;
+	for(it = objectList.begin(); it < objectList.end(); ++it) {
+		//arr << *it;
+		pushObject = BSON ( "$push" << BSON ("objectList" << (long long int)*it));
+		debug("Push %" PRIu64 "\n",*it);
+		_fileMetaDataStorage->push(_collection, queryObject, pushObject);
+	}
+
+
 
 	return ;
 }

@@ -28,6 +28,7 @@ public:
 	vector<mongo::BSONObj> read(string collection, mongo::Query queryObject);
 	void insert (string collection, mongo::BSONObj insertObject);
 	void update (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
+	void push (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
 	void remove (string collection, mongo::Query queryObject);
 	mongo::BSONObj findAndModify (string collection, mongo::BSONObj queryObject, mongo::BSONObj updateObject);
 
