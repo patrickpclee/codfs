@@ -288,10 +288,9 @@ void Communicator::sendMessage() {
 			}
 		}
 
+		// in terms of 10^-6 seconds
+		usleep(_pollingInterval);
 	}
-
-	// in terms of 10^-6 seconds
-	usleep(_pollingInterval);
 }
 
 /**
@@ -421,7 +420,7 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
 
 	// debug
-	debug ("%s\n", "running dispatch");
+	debug("%s\n", "running dispatch");
 	message->printHeader();
 	message->printProtocol();
 	//message->printPayloadHex();
@@ -459,7 +458,7 @@ void Communicator::setComponentType(ComponentType componentType) {
 void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		ComponentType componentType) {
 
-	debug ("Send sendshake to FD = %" PRIu32 "\n", sockfd);
+	debug("Send sendshake to FD = %" PRIu32 "\n", sockfd);
 
 	HandshakeRequestMsg* requestHandshakeMsg = new HandshakeRequestMsg(this,
 			sockfd, componentId, componentType);
@@ -481,7 +480,8 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 
 		// add ID -> sockfd mapping to map
 		_componentIdMap[targetComponentId] = sockfd;
-		debug("[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
+		debug(
+				"[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
 				targetComponentId, sockfd);
 
 	} else {
@@ -495,7 +495,8 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 
 	// add ID -> sockfd mapping to map
 	_componentIdMap[componentId] = sockfd;
-	debug("[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
+	debug(
+			"[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
 			componentId, sockfd);
 
 	// prepare reply message
@@ -566,7 +567,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 
 	for (Component component : componentList) {
 		if (_componentType != component.type
-				|| (_componentType == component.type && _componentId > component.id)) {
+				|| (_componentType == component.type
+						&& _componentId > component.id)) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port, MDS);
@@ -600,6 +602,6 @@ void Communicator::connectAllComponents() {
 
 }
 
-uint32_t Communicator::getSockfdFromId (uint32_t componentId) {
+uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 	return _componentIdMap[componentId];
 }

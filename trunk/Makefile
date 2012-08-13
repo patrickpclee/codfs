@@ -10,6 +10,7 @@ all:
 #	make mds;
 	make client;
 	make osd;
+	cp ./OSD ../osd_test
 #	make monitor;
 
 mds:

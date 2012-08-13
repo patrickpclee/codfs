@@ -13,7 +13,8 @@
 #include "../common/garbagecollector.hh"
 
 void sighandler(int signum) {
-  if (signum == SIGINT) exit(42);
+	if (signum == SIGINT)
+		exit(42);
 }
 
 /// Osd Object
@@ -195,6 +196,10 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 					segment.info.segmentId, segment.info.segmentSize);
 			_storageModule->writeSegment(objectId, segment.info.segmentId,
 					segment.buf, 0, segment.info.segmentSize);
+			_storageModule->closeSegment(objectId, segment.info.segmentId);
+
+			// free memory
+			MemoryPool::getInstance().poolFree(segment.buf);
 		}
 
 		// remove from map
@@ -299,7 +304,7 @@ int main(int argc, char* argv[]) {
 	thread sendThread(startSendThread);
 
 	// TODO: pause before connect for now
-	getchar();
+//	getchar();
 
 	communicator->connectAllComponents();
 
