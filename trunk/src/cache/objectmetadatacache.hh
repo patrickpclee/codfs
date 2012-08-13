@@ -6,6 +6,7 @@
 #include "../common/metadata.hh"
 
 #include <stdint.h>
+#include <sstream>
 
 class ObjectMetaDataCache : public Cache {
 public:
@@ -13,13 +14,13 @@ public:
 
 	~ObjectMetaDataCache();
 
-	ObjectMetaData* readObjectMetaData (uint64_t objectId);
+	ObjectMetaData* readObjectMetaData (std::string objectId);
 
-	void writeObjectMetaData (uint64_t objectId, ObjectMetaData *objectMetaData);
+	void writeObjectMetaData (std::string objectId, ObjectMetaData *objectMetaData);
 
 	//uint32_t createObjectMetaData (uint64_t objectId);
 
-	void deleteObjectMetaData (uint64_t objectId);
+	void deleteObjectMetaData (std::string objectId);
 
 	char* read (uint64_t id);
 
@@ -27,6 +28,6 @@ public:
 
 	void deleteEntry (uint64_t id);
 private:
-	mm::cache_map<uint64_t, ObjectMetaData*> _objectMetaDataMap;
+	mm::cache_map<std::string, ObjectMetaData*> _objectMetaDataMap;
 };
 #endif
