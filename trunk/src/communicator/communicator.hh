@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <queue>
 #include <map>
 #include <atomic>
 #include "socket.hh"
@@ -190,11 +191,11 @@ protected:
 	void dispatch(char* buf, uint32_t sockfd);
 
 	/**
-	 * Check if out message queue is empty
-	 * @return True if empty, false otherwise
+	 * Get the first message in the queue
+	 * @return Pointer to message if not empty, NULL otherwise
 	 */
 
-	bool isOutMessageQueueEmpty();
+	Message* popMessage();
 
 	/**
 	 * Delete the message when it is deletable
@@ -243,7 +244,7 @@ protected:
 	Socket _serverSocket; // socket for accepting incoming connections
 	map<uint32_t, Connection*> _connectionMap; // a map of all connections
 	map<uint32_t, uint32_t> _componentIdMap; // a map from component ID to sockfd
-	list<Message *> _outMessageQueue; // queue of message to be sent
+	queue<Message *> _outMessageQueue; // queue of message to be sent
 	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
 	uint32_t _maxFd; // maximum number of socket descriptors among connections
 

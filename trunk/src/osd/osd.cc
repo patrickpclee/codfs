@@ -66,49 +66,52 @@ uint32_t Osd::osdListProcessor(uint32_t requestId, uint32_t sockfd,
 void Osd::getObjectProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId) {
 
-	vector<struct SegmentData> segmentDataList;
-	vector<struct SegmentLocation> osdIdList;
-	struct ObjectData objectData;
+	/*
 
-	if (_storageModule->isObjectExist(objectId)) {
-		// if object exists in cache
-		objectData = _storageModule->readObject(objectId, 0);
-	} else {
-		// get osdIDList from cache, if failed update it from MDS
-		try {
-			osdIdList = _segmentLocationCache->readSegmentLocation(objectId);
-		} catch (CacheMissException &e) {
-			osdIdList = _osdCommunicator->getOsdListRequest(objectId, MDS);
-			_segmentLocationCache->writeSegmentLocation(objectId, osdIdList);
-		}
+	 vector<struct SegmentData> segmentDataList;
+	 vector<struct SegmentLocation> osdIdList;
+	 struct ObjectData objectData;
 
-		// get segments from the OSD one by one
-		vector<struct SegmentLocation>::const_iterator p;
+	 if (_storageModule->isObjectExist(objectId)) {
+	 // if object exists in cache
+	 objectData = _storageModule->readObject(objectId, 0);
+	 } else {
+	 // get osdIDList from cache, if failed update it from MDS
+	 try {
+	 osdIdList = _segmentLocationCache->readSegmentLocation(objectId);
+	 } catch (CacheMissException &e) {
+	 osdIdList = _osdCommunicator->getOsdListRequest(objectId, MDS);
+	 _segmentLocationCache->writeSegmentLocation(objectId, osdIdList);
+	 }
 
-		for (p = osdIdList.begin(); p != osdIdList.end(); ++p) {
-			// memory of SegmentData is allocated in getSegmentRequest
-			struct SegmentData segmentData;
-			uint32_t osdId = (*p).osdId;
-			uint32_t segmentId = (*p).segmentId;
+	 // get segments from the OSD one by one
+	 vector<struct SegmentLocation>::const_iterator p;
 
-			if (_osdId == osdId) {
-				// case 1: local segment
-				segmentData = _storageModule->readSegment(objectId, segmentId);
-			} else {
-				// case 2: foreign segment
-				segmentData = _osdCommunicator->getSegmentRequest(osdId,
-						objectId, segmentId);
-			}
-			segmentDataList.push_back(segmentData);
-		}
+	 for (p = osdIdList.begin(); p != osdIdList.end(); ++p) {
+	 // memory of SegmentData is allocated in getSegmentRequest
+	 struct SegmentData segmentData;
+	 uint32_t osdId = (*p).osdId;
+	 uint32_t segmentId = (*p).segmentId;
 
-		// memory of objectData is allocated in decodeSegmentToObject
-		// TODO: decodeSegmentToObject should free memory in segmentDataList
-		objectData = _codingModule->decodeSegmentToObject(objectId,
-				segmentDataList);
-	}
+	 if (_osdId == osdId) {
+	 // case 1: local segment
+	 segmentData = _storageModule->readSegment(objectId, segmentId);
+	 } else {
+	 // case 2: foreign segment
+	 segmentData = _osdCommunicator->getSegmentRequest(osdId,
+	 objectId, segmentId);
+	 }
+	 segmentDataList.push_back(segmentData);
+	 }
 
-	_osdCommunicator->sendObject(sockfd, objectData);
+	 // memory of objectData is allocated in decodeSegmentToObject
+	 // TODO: decodeSegmentToObject should free memory in segmentDataList
+	 objectData = _codingModule->decodeSegmentToObject(objectId,
+	 segmentDataList);
+	 }
+
+	 _osdCommunicator->sendObject(sockfd, objectData);
+	 */
 
 	return;
 }
@@ -185,21 +188,36 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 		// perform coding
 		debug("%s\n", "performing coding");
-		vector<struct SegmentData> segmentData =
+		vector<struct SegmentData> segmentDataList =
 				_codingModule->encodeObjectToSegment(objectId, objectCache.buf,
 						objectCache.length);
 
-		// DEBUG: write segments to disk
-		debug("%s\n", "writing segments to disk");
-		for (struct SegmentData segment : segmentData) {
-			_storageModule->createAndOpenSegment(objectId,
-					segment.info.segmentId, segment.info.segmentSize);
-			_storageModule->writeSegment(objectId, segment.info.segmentId,
-					segment.buf, 0, segment.info.segmentSize);
-			_storageModule->closeSegment(objectId, segment.info.segmentId);
+		// request secondary OSD list
+		vector<struct SegmentLocation> segmentLocationList =
+				_osdCommunicator->getOsdListRequest(objectId, MONITOR,
+						segmentDataList.size());
+
+		uint32_t i = 0;
+		for (const auto segmentData : segmentDataList) {
+
+			/*
+			 // DEBUG: write segments to disk
+			 debug("%s\n", "writing segments to disk");
+			 _storageModule->createAndOpenSegment(objectId,
+			 segmentData.info.segmentId, segmentData.info.segmentSize);
+			 _storageModule->writeSegment(objectId, segmentData.info.segmentId,
+			 segmentData.buf, 0, segmentData.info.segmentSize);
+			 _storageModule->closeSegment(objectId, segmentData.info.segmentId);
+			 */
+
+			uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
+					segmentLocationList[i].osdId);
+			_osdCommunicator->sendSegment(dstSockfd, segmentData);
 
 			// free memory
-			MemoryPool::getInstance().poolFree(segment.buf);
+			MemoryPool::getInstance().poolFree(segmentData.buf);
+
+			i++;
 		}
 
 		// remove from map
