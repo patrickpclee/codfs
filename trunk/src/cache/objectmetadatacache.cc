@@ -44,5 +44,5 @@ void ObjectMetaDataCache::write(uint64_t id, char * data){
 
 void ObjectMetaDataCache::deleteEntry(uint64_t id){
 	std::lock_guard<std::mutex> lk(objectCacheMutex);
-	deleteaObjectMetaData(id);
+	deleteObjectMetaData(id);
 }

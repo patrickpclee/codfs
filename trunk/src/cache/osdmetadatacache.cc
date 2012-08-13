@@ -44,5 +44,5 @@ void OsdMetaDataCache::write(uint64_t id, char * data){
 
 void OsdMetaDataCache::deleteEntry(uint64_t id){
 	std::lock_guard<std::mutex> lk(osdCacheMutex);
-	deleteaOsdMetaData(id);
+	deleteOsdMetaData(id);
 }
