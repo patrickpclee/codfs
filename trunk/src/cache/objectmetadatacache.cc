@@ -25,7 +25,7 @@ void ObjectMetaDataCache::writeObjectMetaData (uint64_t objectId, ObjectMetaData
 }
 
 void ObjectMetaDataCache::deleteObjectMetaData (uint64_t objectId){
-	mm::cache_map<uint64_t, ObjectMetaData*>::iterator _it = _obejctMetaDataMap.find(objectId);
+	mm::cache_map<uint64_t, ObjectMetaData*>::iterator _it = _objectMetaDataMap.find(objectId);
 	if (_it != _objectMetaDataMap.end()) {
 		_objectMetaDataMap.erase(_it->first);
 	}
