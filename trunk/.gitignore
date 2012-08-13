@@ -9,3 +9,5 @@ testfile
 *.swp
 core
 osd_object/
+osd_segment/
+*.out

@@ -52,13 +52,11 @@ void PutSegmentEndReplyMsg::parse(char* buf) {
 
 }
 
-void PutSegmentEndReplyMsg::handle() {
-	PutSegmentEndReplyMsg* putSegmentEndReplyMsg =
-			(PutSegmentEndReplyMsg*) _communicator->popWaitReplyMessage(
+void PutSegmentEndReplyMsg::doHandle() {
+	PutSegmentEndRequestMsg* putSegmentEndRequestMsg =
+			(PutSegmentEndRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
-	putSegmentEndReplyMsg->setStatus(READY);
-
-	MemoryPool::getInstance().poolFree(_recvBuf);
+	putSegmentEndRequestMsg->setStatus(READY);
 }
 
 void PutSegmentEndReplyMsg::printProtocol() {

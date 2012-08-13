@@ -15,6 +15,12 @@
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
 
+#include "../protocol/putsegmentinitrequest.hh"
+#include "../protocol/putsegmentinitreply.hh"
+#include "../protocol/putsegmentendrequest.hh"
+#include "../protocol/putsegmentendreply.hh"
+#include "../protocol/segmentdatamsg.hh"
+
 using namespace std;
 
 /**
@@ -58,6 +64,16 @@ void OsdCommunicator::replyPutObjectInit(uint32_t requestId,
 	addMessage(putObjectInitReplyMsg);
 }
 
+void OsdCommunicator::replyPutSegmentInit(uint32_t requestId,
+		uint32_t connectionId, uint64_t objectId, uint32_t segmentId) {
+
+	PutSegmentInitReplyMsg* putSegmentInitReplyMsg = new PutSegmentInitReplyMsg(
+			this, requestId, connectionId, objectId, segmentId);
+	putSegmentInitReplyMsg->prepareProtocolMsg();
+
+	addMessage(putSegmentInitReplyMsg);
+}
+
 void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId) {
 
@@ -71,11 +87,11 @@ void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId, uint32_t segmentId) {
 
-//	PutObjectEndReplyMsg* putObjectEndReplyMsg = new PutObjectEndReplyMsg(this,
-//			requestId, connectionId, objectId);
-//	putObjectEndReplyMsg->prepareProtocolMsg();
-//
-//	addMessage(putObjectEndReplyMsg);
+	PutSegmentEndReplyMsg* putSegmentEndReplyMsg = new PutSegmentEndReplyMsg(this,
+			requestId, connectionId, objectId, segmentId);
+	putSegmentEndReplyMsg->prepareProtocolMsg();
+
+	addMessage(putSegmentEndReplyMsg);
 
 //TODO
 }
@@ -84,17 +100,46 @@ uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 	return 0;
 }
 
-uint32_t OsdCommunicator::sendSegment(uint32_t sockfd,
+uint32_t OsdCommunicator::sendSegment(uint32_t osdId, uint32_t sockfd,
 		struct SegmentData segmentData) {
 
+	uint64_t objectId = segmentData.info.objectId;
+	uint32_t segmentId = segmentData.info.segmentId;
+	uint32_t length = segmentData.info.segmentSize;
+	char* buf = segmentData.buf;
+	const uint32_t chunkCount = ((length - 1) / _chunkSize) + 1;
+
 	// step 1: send init message, wait for ack
+	putSegmentInit(osdId, sockfd, objectId, segmentId, length, chunkCount);
+	debug("%s\n", "Put Segment Init ACK-ed");
 
 	// step 2: send data
 
-	// step 3: send end message, wait for ack
+	uint64_t byteToSend = 0;
+	uint64_t byteProcessed = 0;
+	uint64_t byteRemaining = length;
 
-	// step 4: free memory
-	MemoryPool::getInstance().poolFree(segmentData.buf);
+	while (byteProcessed < length) {
+
+		if (byteRemaining > _chunkSize) {
+			byteToSend = _chunkSize;
+		} else {
+			byteToSend = byteRemaining;
+		}
+
+		putSegmentData(osdId, sockfd, objectId, segmentId, buf, byteProcessed,
+				byteToSend);
+		byteProcessed += byteToSend;
+		byteRemaining -= byteToSend;
+
+	}
+
+	// Step 3: Send End message
+
+	putSegmentEnd(osdId, sockfd, objectId, segmentId);
+
+	cout << "Put Segment ID = " << objectId << "." << segmentId << " Finished"
+			<< endl;
 
 	return 0;
 }
@@ -112,9 +157,6 @@ uint32_t OsdCommunicator::sendObject(uint32_t sockfd,
 
 	// step 3: send end message, wait for ack
 
-	// step 4: free memory
-	MemoryPool::getInstance().poolFree(objectData.buf);
-
 	return 0;
 }
 
@@ -131,7 +173,7 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 	// TODO: request to MONITOR (HARDCODE FOR NOW)
 
 	struct SegmentLocation segmentLocation;
-	segmentLocation.osdId = 52000;
+	segmentLocation.osdId = 52001;
 	segmentLocation.segmentId = 0;
 	osdList.push_back(segmentLocation);
 
@@ -141,4 +183,67 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 uint32_t OsdCommunicator::sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 		ComponentType dstComponent) {
 	return 0;
+}
+
+//
+// PRIVATE FUNCTIONS
+//
+
+void OsdCommunicator::putSegmentInit(uint32_t osdId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId, uint32_t length,
+		uint32_t chunkCount) {
+
+	// Step 1 of the upload process
+
+	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
+			new PutSegmentInitRequestMsg(this, sockfd, objectId, segmentId,
+					length, chunkCount);
+
+	putSegmentInitRequestMsg->prepareProtocolMsg();
+	addMessage(putSegmentInitRequestMsg, true);
+
+	MessageStatus status = putSegmentInitRequestMsg->waitForStatusChange();
+	if (status == READY) {
+		waitAndDelete(putSegmentInitRequestMsg);
+		return;
+	} else {
+		debug("%s\n", "Put Segment Init Failed");
+		exit(-1);
+	}
+
+}
+
+void OsdCommunicator::putSegmentData(uint32_t osdId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId, char* buf, uint64_t offset,
+		uint32_t length) {
+
+	// Step 2 of the upload process
+	SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, sockfd, objectId,
+			segmentId, offset, length);
+
+	segmentDataMsg->prepareProtocolMsg();
+	segmentDataMsg->preparePayload(buf + offset, length);
+
+	addMessage(segmentDataMsg, false);
+}
+
+void OsdCommunicator::putSegmentEnd(uint32_t osdId, uint32_t sockfd,
+		uint64_t objectId, uint32_t segmentId) {
+
+	// Step 3 of the upload process
+
+	PutSegmentEndRequestMsg* putSegmentEndRequestMsg =
+			new PutSegmentEndRequestMsg(this, sockfd, objectId, segmentId);
+
+	putSegmentEndRequestMsg->prepareProtocolMsg();
+	addMessage(putSegmentEndRequestMsg, true);
+
+	MessageStatus status = putSegmentEndRequestMsg->waitForStatusChange();
+	if (status == READY) {
+		waitAndDelete(putSegmentEndRequestMsg);
+		return;
+	} else {
+		debug("%s\n", "Put Segment Init Failed");
+		exit(-1);
+	}
 }

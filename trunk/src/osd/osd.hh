@@ -137,10 +137,11 @@ public:
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
 	 * @param length Segment size, equals the total length of all the trunks
+	 * @param chunkCount No of trunks to receive
 	 */
 
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t segmentId, uint32_t length);
+			uint64_t objectId, uint32_t segmentId, uint32_t length, uint32_t chunkCount);
 
 	/**
 	 * Action when a segment trunk is received
@@ -255,6 +256,7 @@ private:
 	uint32_t _osdId;
 
 	map<uint64_t, uint32_t> _pendingObjectChunk;
+	map<string, uint32_t> _pendingSegmentChunk;
 
 };
 #endif
