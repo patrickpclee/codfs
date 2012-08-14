@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <vector>
 #include "osd.hh"
-#include "segmentlocationcache.hh"
+#include "segmentlocation.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"

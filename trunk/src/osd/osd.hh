@@ -11,7 +11,7 @@
 #include "osd_communicator.hh"
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
-#include "segmentlocationcache.hh"
+#include "segmentlocation.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
 
@@ -191,7 +191,7 @@ public:
 	 * Get a reference of OSD Cache
 	 * @return Pointer to OSD segment location cache
 	 */
-	SegmentLocationCache* getSegmentLocationCache();
+	//SegmentLocationCache* getSegmentLocationCache();
 
 	/**
 	 * Get the ID

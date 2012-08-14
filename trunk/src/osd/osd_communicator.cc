@@ -11,7 +11,6 @@
 #include "../protocol/putobjectinitreply.hh"
 #include "../protocol/putobjectendreply.hh"
 #include "../common/debug.hh"
-#include "segmentlocationcache.hh"
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
 

@@ -7,8 +7,8 @@
 
 #include <iostream>
 #include <stdint.h>
+#include "segmentlocation.hh"
 #include "../communicator/communicator.hh"
-#include "segmentlocationcache.hh"
 
 using namespace std;
 
