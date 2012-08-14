@@ -92,22 +92,31 @@ public:
 
 	void disconnectAndRemove(uint32_t sockfd); // kill and remove connection
 
-	/**
-	 * When there are multiple MDS, choose one
-	 * @return Socket descriptor of chosen MDS, -1 if no MDS found
-	 */
-
-	uint32_t getMdsSockfd();
-
-	/**
-	 * When there are multiple monitor, choose one
-	 * @return Socket descriptor of chosen Monitor -1 if no monitor found
-	 */
-
-	uint32_t getMonitorSockfd();
-
 	// FOR TESTING ONLY
+	uint32_t getMdsSockfd();
+	uint32_t getMonitorSockfd();
 	uint32_t getOsdSockfd();
+
+	/**
+	 * Obtain a list of MDS retrieved from config file
+	 * @return list of MDS Component
+	 */
+
+	vector <Component> getMdsList ();
+
+	/**
+	 * Obtain a list of OSD retrieved from config file
+	 * @return list of OSD Component
+	 */
+
+	vector <Component> getOsdList ();
+
+	/**
+	 * Obtain a list of Monitor retrieved from config file
+	 * @return list of Monitor Component
+	 */
+
+	vector <Component> getMonitorList ();
 
 	/**
 	 * Generate a monotonically increasing requestID
@@ -256,5 +265,10 @@ protected:
 	uint32_t _timeoutSec, _timeoutUsec;
 	uint32_t _chunkSize;
 	uint32_t _pollingInterval;
+
+	// component list
+	vector<Component> mdsList;
+	vector<Component> osdList;
+	vector<Component> monitorList;
 };
 #endif
