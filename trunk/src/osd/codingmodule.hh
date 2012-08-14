@@ -4,6 +4,7 @@
 
 #ifndef __CODINGMODULE_HH__
 #define __CODINGMODULE_HH__
+#include <map>
 #include <vector>
 #include <stdint.h>
 #include "../coding/coding.hh"
@@ -22,7 +23,7 @@ public:
 	 * @return A list of SegmentData structure
 	 */
 
-	vector<struct SegmentData> encodeObjectToSegment(
+	vector<struct SegmentData> encodeObjectToSegment(CodingScheme codingScheme,
 			struct ObjectData objectData);
 
 	/**
@@ -33,8 +34,8 @@ public:
 	 * @return A list of SegmentData structure
 	 */
 
-	vector<struct SegmentData> encodeObjectToSegment(uint64_t objectId,
-			char* buf, uint64_t length);
+	vector<struct SegmentData> encodeObjectToSegment(CodingScheme codingScheme,
+			uint64_t objectId, char* buf, uint64_t length);
 
 	/**
 	 * Decode a list of segments into an object
@@ -43,15 +44,16 @@ public:
 	 * @return an ObjectData structure
 	 */
 
-	struct ObjectData decodeSegmentToObject(uint64_t objectId,
-			vector<struct SegmentData> segmentData);
+	struct ObjectData decodeSegmentToObject(CodingScheme codingScheme,
+			uint64_t objectId, vector<struct SegmentData> segmentData);
 
 	/**
-	 * Set the coding scheme used by the coding module
-	 * @param codingScheme New coding scheme
+	 * Get the Coding object according to the codingScheme specified
+	 * @param codingScheme Type of coding scheme
+	 * @return The Coding object
 	 */
 
-	void setCodingScheme (CodingScheme codingScheme);
+	Coding* getCoding(CodingScheme codingScheme);
 
 	/**
 	 * Retrieve a segment from the storage module
@@ -61,8 +63,8 @@ public:
 	 */
 
 private:
-	Coding* _coding;
-
+//	Coding* _coding;
+	map<CodingScheme, Coding*> _codingWorker;
 };
 
 #endif
