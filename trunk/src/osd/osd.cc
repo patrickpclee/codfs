@@ -365,14 +365,14 @@ int main(int argc, char* argv[]) {
 
 	communicator->connectAllComponents();
 
-	thread testThread(startTestThread, communicator);
+//	thread testThread(startTestThread, communicator);
 	// TODO: pause before connect for now
 	//getchar();
 	
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
-	testThread.join();
+//	testThread.join();
 
 	// cleanup
 	delete configLayer;
