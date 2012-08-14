@@ -42,6 +42,7 @@ class PutObjectEndRequestPro;
 class ListDirectoryReplyPro;
 class FileInfoPro;
 class UploadFileReplyPro;
+class UploadObjectAckPro;
 class PutObjectInitReplyPro;
 class PutObjectEndReplyPro;
 class PutSegmentInitRequestPro;
@@ -1134,6 +1135,101 @@ class UploadFileReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static UploadFileReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class UploadObjectAckPro : public ::google::protobuf::Message {
+ public:
+  UploadObjectAckPro();
+  virtual ~UploadObjectAckPro();
+  
+  UploadObjectAckPro(const UploadObjectAckPro& from);
+  
+  inline UploadObjectAckPro& operator=(const UploadObjectAckPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const UploadObjectAckPro& default_instance();
+  
+  void Swap(UploadObjectAckPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  UploadObjectAckPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const UploadObjectAckPro& from);
+  void MergeFrom(const UploadObjectAckPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // repeated fixed32 nodeList = 2;
+  inline int nodelist_size() const;
+  inline void clear_nodelist();
+  static const int kNodeListFieldNumber = 2;
+  inline ::google::protobuf::uint32 nodelist(int index) const;
+  inline void set_nodelist(int index, ::google::protobuf::uint32 value);
+  inline void add_nodelist(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      nodelist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_nodelist();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.UploadObjectAckPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > nodelist_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static UploadObjectAckPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -2868,6 +2964,57 @@ UploadFileReplyPro::primarylist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
 UploadFileReplyPro::mutable_primarylist() {
   return &primarylist_;
+}
+
+// -------------------------------------------------------------------
+
+// UploadObjectAckPro
+
+// optional fixed64 objectId = 1;
+inline bool UploadObjectAckPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void UploadObjectAckPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void UploadObjectAckPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void UploadObjectAckPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 UploadObjectAckPro::objectid() const {
+  return objectid_;
+}
+inline void UploadObjectAckPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// repeated fixed32 nodeList = 2;
+inline int UploadObjectAckPro::nodelist_size() const {
+  return nodelist_.size();
+}
+inline void UploadObjectAckPro::clear_nodelist() {
+  nodelist_.Clear();
+}
+inline ::google::protobuf::uint32 UploadObjectAckPro::nodelist(int index) const {
+  return nodelist_.Get(index);
+}
+inline void UploadObjectAckPro::set_nodelist(int index, ::google::protobuf::uint32 value) {
+  nodelist_.Set(index, value);
+}
+inline void UploadObjectAckPro::add_nodelist(::google::protobuf::uint32 value) {
+  nodelist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+UploadObjectAckPro::nodelist() const {
+  return nodelist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+UploadObjectAckPro::mutable_nodelist() {
+  return &nodelist_;
 }
 
 // -------------------------------------------------------------------

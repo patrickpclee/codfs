@@ -256,7 +256,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 			uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 					segmentLocationList[i].osdId);
 
-			nodeList.push_back(dstSockfd);
+			nodeList.push_back(segmentLocationList[i].osdId);
 
 			_osdCommunicator->sendSegment(_osdId, dstSockfd, segmentData);
 
@@ -276,7 +276,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 
 		// Acknowledge MDS for Object Upload Completed
-		//objectUploadAck(objectId, nodeList);
+		_osdCommunicator->objectUploadAck(objectId, nodeList);
 
 	}
 

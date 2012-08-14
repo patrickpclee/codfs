@@ -26,6 +26,7 @@
 #include "osdshutdownmsg.hh"
 #include "osdstatupdaterequestmsg.hh"
 #include "osdstatupdatereplymsg.hh"
+#include "uploadobjectack.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -84,7 +85,10 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new ObjectDataMsg(communicator);
 		break;
 	case (SEGMENT_DATA):
-		 return new SegmentDataMsg(communicator);
+		return new SegmentDataMsg(communicator);
+		break;
+	case (UPLOAD_OBJECT_ACK):
+		return new UploadObjectAckMsg(communicator);
 		break;
 	case (OSD_STARTUP):
 		return new OsdStartupMsg(communicator);

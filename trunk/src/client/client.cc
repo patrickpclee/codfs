@@ -194,8 +194,8 @@ int main(void) {
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
-	client->sendFileRequest("./testfile");
-	//client->uploadFileRequest("./testfile");
+	//client->sendFileRequest("./testfile");
+	client->uploadFileRequest("./testfile");
 
 	/*
 
