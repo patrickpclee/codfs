@@ -4,8 +4,6 @@
 #include <atomic>
 #include <stdint.h>
 
-#include "../cache/filemetadatacache.hh"
-
 #include "../storage/mongodb.hh"
 
 #include "../common/metadata.hh"
@@ -25,7 +23,7 @@ private:
 
 	MongoDB* _fileMetaDataStorage;
 	/// File Meta Data Cache
-	FileMetaDataCache* _fileMetaDataCache;
+	//FileMetaDataCache* _fileMetaDataCache;
 
 };
 #endif

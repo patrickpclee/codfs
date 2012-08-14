@@ -175,7 +175,10 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 
 	for (uint32_t i = 0; i < segmentCount; i++) {
 		struct SegmentLocation segmentLocation;
-		segmentLocation.osdId = 52001;
+		if(_componentId == 52000)
+			segmentLocation.osdId = 52001;
+		else
+			segmentLocation.osdId = 52000;
 		segmentLocation.segmentId = 0;
 		osdList.push_back(segmentLocation);
 	}
