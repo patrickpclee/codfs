@@ -596,9 +596,9 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 void Communicator::connectAllComponents() {
 
 	// parse config file
-	vector<Component> mdsList = parseConfigFile("MDS");
-	vector<Component> osdList = parseConfigFile("OSD");
-	vector<Component> monitorList = parseConfigFile("MONITOR");
+	mdsList = parseConfigFile("MDS");
+	osdList = parseConfigFile("OSD");
+	monitorList = parseConfigFile("MONITOR");
 
 	// debug
 	printComponents("MDS", mdsList);
@@ -608,7 +608,7 @@ void Communicator::connectAllComponents() {
 	// connect to components
 //	connectToComponents(mdsList);
 	connectToComponents(osdList);
-	connectToComponents(monitorList);
+//	connectToComponents(monitorList);
 
 }
 
@@ -619,4 +619,17 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 		exit (-1);
 	}
 	return _componentIdMap[componentId];
+}
+
+vector <Component> Communicator::getMdsList () {
+	return mdsList;
+}
+
+
+vector <Component> Communicator::getOsdList () {
+	return osdList;
+}
+
+vector <Component> Communicator::getMonitorList () {
+	return monitorList;
 }
