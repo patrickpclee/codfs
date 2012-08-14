@@ -24,6 +24,8 @@
 #include "handshakereply.hh"
 #include "osdstartupmsg.hh"
 #include "osdshutdownmsg.hh"
+#include "osdstatupdaterequestmsg.hh"
+#include "osdstatupdatereplymsg.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -89,6 +91,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (OSD_SHUTDOWN):
 		return new OsdShutdownMsg(communicator);
+		break;
+	case (OSDSTAT_UPDATE_REQUEST):
+		return new OsdStatUpdateRequestMsg(communicator);
+		break;
+	case (OSDSTAT_UPDATE_REPLY):
+		return new OsdStatUpdateReplyMsg(communicator);
 		break;
 	default:
 		debug("%s\n", "Invalid message type");

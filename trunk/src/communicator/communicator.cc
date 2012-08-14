@@ -608,7 +608,7 @@ void Communicator::connectAllComponents() {
 	// connect to components
 //	connectToComponents(mdsList);
 	connectToComponents(osdList);
-//	connectToComponents(monitorList);
+	connectToComponents(monitorList);
 
 }
 

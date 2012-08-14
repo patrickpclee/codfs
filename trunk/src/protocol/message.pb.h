@@ -51,7 +51,8 @@ class PutSegmentInitReplyPro;
 class PutSegmentEndReplyPro;
 class OsdStartupPro;
 class OsdShutdownPro;
-class OsdStatUpdatePro;
+class OsdStatUpdateReplyPro;
+class OsdStatUpdateRequestPro;
 
 enum HandshakeRequestPro_ComponentType {
   HandshakeRequestPro_ComponentType_CLIENT = 1,
@@ -1931,14 +1932,14 @@ class OsdShutdownPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class OsdStatUpdatePro : public ::google::protobuf::Message {
+class OsdStatUpdateReplyPro : public ::google::protobuf::Message {
  public:
-  OsdStatUpdatePro();
-  virtual ~OsdStatUpdatePro();
+  OsdStatUpdateReplyPro();
+  virtual ~OsdStatUpdateReplyPro();
   
-  OsdStatUpdatePro(const OsdStatUpdatePro& from);
+  OsdStatUpdateReplyPro(const OsdStatUpdateReplyPro& from);
   
-  inline OsdStatUpdatePro& operator=(const OsdStatUpdatePro& from) {
+  inline OsdStatUpdateReplyPro& operator=(const OsdStatUpdateReplyPro& from) {
     CopyFrom(from);
     return *this;
   }
@@ -1952,17 +1953,17 @@ class OsdStatUpdatePro : public ::google::protobuf::Message {
   }
   
   static const ::google::protobuf::Descriptor* descriptor();
-  static const OsdStatUpdatePro& default_instance();
+  static const OsdStatUpdateReplyPro& default_instance();
   
-  void Swap(OsdStatUpdatePro* other);
+  void Swap(OsdStatUpdateReplyPro* other);
   
   // implements Message ----------------------------------------------
   
-  OsdStatUpdatePro* New() const;
+  OsdStatUpdateReplyPro* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const OsdStatUpdatePro& from);
-  void MergeFrom(const OsdStatUpdatePro& from);
+  void CopyFrom(const OsdStatUpdateReplyPro& from);
+  void MergeFrom(const OsdStatUpdateReplyPro& from);
   void Clear();
   bool IsInitialized() const;
   
@@ -2006,7 +2007,7 @@ class OsdStatUpdatePro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 osdloading() const;
   inline void set_osdloading(::google::protobuf::uint32 value);
   
-  // @@protoc_insertion_point(class_scope:ncvfs.OsdStatUpdatePro)
+  // @@protoc_insertion_point(class_scope:ncvfs.OsdStatUpdateReplyPro)
  private:
   inline void set_has_osdid();
   inline void clear_has_osdid();
@@ -2029,7 +2030,79 @@ class OsdStatUpdatePro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static OsdStatUpdatePro* default_instance_;
+  static OsdStatUpdateReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class OsdStatUpdateRequestPro : public ::google::protobuf::Message {
+ public:
+  OsdStatUpdateRequestPro();
+  virtual ~OsdStatUpdateRequestPro();
+  
+  OsdStatUpdateRequestPro(const OsdStatUpdateRequestPro& from);
+  
+  inline OsdStatUpdateRequestPro& operator=(const OsdStatUpdateRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const OsdStatUpdateRequestPro& default_instance();
+  
+  void Swap(OsdStatUpdateRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  OsdStatUpdateRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const OsdStatUpdateRequestPro& from);
+  void MergeFrom(const OsdStatUpdateRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.OsdStatUpdateRequestPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[1];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static OsdStatUpdateRequestPro* default_instance_;
 };
 // ===================================================================
 
@@ -3199,73 +3272,77 @@ inline void OsdShutdownPro::set_osdid(::google::protobuf::uint32 value) {
 
 // -------------------------------------------------------------------
 
-// OsdStatUpdatePro
+// OsdStatUpdateReplyPro
 
 // optional fixed32 osdId = 1;
-inline bool OsdStatUpdatePro::has_osdid() const {
+inline bool OsdStatUpdateReplyPro::has_osdid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void OsdStatUpdatePro::set_has_osdid() {
+inline void OsdStatUpdateReplyPro::set_has_osdid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void OsdStatUpdatePro::clear_has_osdid() {
+inline void OsdStatUpdateReplyPro::clear_has_osdid() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void OsdStatUpdatePro::clear_osdid() {
+inline void OsdStatUpdateReplyPro::clear_osdid() {
   osdid_ = 0u;
   clear_has_osdid();
 }
-inline ::google::protobuf::uint32 OsdStatUpdatePro::osdid() const {
+inline ::google::protobuf::uint32 OsdStatUpdateReplyPro::osdid() const {
   return osdid_;
 }
-inline void OsdStatUpdatePro::set_osdid(::google::protobuf::uint32 value) {
+inline void OsdStatUpdateReplyPro::set_osdid(::google::protobuf::uint32 value) {
   set_has_osdid();
   osdid_ = value;
 }
 
 // optional fixed32 osdCapacity = 2;
-inline bool OsdStatUpdatePro::has_osdcapacity() const {
+inline bool OsdStatUpdateReplyPro::has_osdcapacity() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void OsdStatUpdatePro::set_has_osdcapacity() {
+inline void OsdStatUpdateReplyPro::set_has_osdcapacity() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void OsdStatUpdatePro::clear_has_osdcapacity() {
+inline void OsdStatUpdateReplyPro::clear_has_osdcapacity() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void OsdStatUpdatePro::clear_osdcapacity() {
+inline void OsdStatUpdateReplyPro::clear_osdcapacity() {
   osdcapacity_ = 0u;
   clear_has_osdcapacity();
 }
-inline ::google::protobuf::uint32 OsdStatUpdatePro::osdcapacity() const {
+inline ::google::protobuf::uint32 OsdStatUpdateReplyPro::osdcapacity() const {
   return osdcapacity_;
 }
-inline void OsdStatUpdatePro::set_osdcapacity(::google::protobuf::uint32 value) {
+inline void OsdStatUpdateReplyPro::set_osdcapacity(::google::protobuf::uint32 value) {
   set_has_osdcapacity();
   osdcapacity_ = value;
 }
 
 // optional fixed32 osdLoading = 3;
-inline bool OsdStatUpdatePro::has_osdloading() const {
+inline bool OsdStatUpdateReplyPro::has_osdloading() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void OsdStatUpdatePro::set_has_osdloading() {
+inline void OsdStatUpdateReplyPro::set_has_osdloading() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void OsdStatUpdatePro::clear_has_osdloading() {
+inline void OsdStatUpdateReplyPro::clear_has_osdloading() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void OsdStatUpdatePro::clear_osdloading() {
+inline void OsdStatUpdateReplyPro::clear_osdloading() {
   osdloading_ = 0u;
   clear_has_osdloading();
 }
-inline ::google::protobuf::uint32 OsdStatUpdatePro::osdloading() const {
+inline ::google::protobuf::uint32 OsdStatUpdateReplyPro::osdloading() const {
   return osdloading_;
 }
-inline void OsdStatUpdatePro::set_osdloading(::google::protobuf::uint32 value) {
+inline void OsdStatUpdateReplyPro::set_osdloading(::google::protobuf::uint32 value) {
   set_has_osdloading();
   osdloading_ = value;
 }
+
+// -------------------------------------------------------------------
+
+// OsdStatUpdateRequestPro
 
 
 // @@protoc_insertion_point(namespace_scope)

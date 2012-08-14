@@ -1,4 +1,5 @@
 #include "statmodule.hh"
+#include "../protocol/osdstatupdaterequestmsg.hh"
 
 /*  Constructor */
 StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
@@ -13,6 +14,12 @@ void StatModule::updateOsdStatMap (Communicator* communicator) {
 				printf("Entry %3d:\n",entry.first);
 				printf("		 "); 
 				entry.second.out();			
+
+				OsdStatUpdateRequestMsg* requestMsg = new 
+				  OsdStatUpdateRequestMsg(communicator, entry.second.osdSockfd);
+				requestMsg -> prepareProtocolMsg();
+				// Do not need to wait for reply.
+				communicator -> addMessage (requestMsg);
 			}
 		}
 		sleep(10);

@@ -13,6 +13,11 @@
 #include "../common/garbagecollector.hh"
 #include "../protocol/osdstartupmsg.hh"
 #include "../protocol/osdshutdownmsg.hh"
+#include "../protocol/osdstatupdatereplymsg.hh"
+
+// for random srand() time() rand()
+#include <stdlib.h>
+#include <time.h>
 
 void sighandler(int signum) {
 	if (signum == SIGINT)
@@ -29,6 +34,7 @@ mutex pendingObjectChunkMutex;
 mutex pendingSegmentChunkMutex;
 
 Osd::Osd(string configFilePath) {
+
 	configLayer = new ConfigLayer(configFilePath.c_str(), "common.xml");
 	//segmentLocationCache = new SegmentLocationCache();
 	_storageModule = new StorageModule();
@@ -38,6 +44,8 @@ Osd::Osd(string configFilePath) {
 	_codingModule->setCodingScheme(RAID1_CODING);
 
 	_osdId = configLayer->getConfigInt("Osdid");
+
+	srand(time (NULL));	//random test
 }
 
 Osd::~Osd() {
@@ -327,6 +335,14 @@ void Osd::recoveryProcessor(uint32_t requestId, uint32_t sockfd) {
 	// TODO: recovery to be implemented
 }
 
+void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
+	OsdStatUpdateReplyMsg* replyMsg = new OsdStatUpdateReplyMsg(
+		_osdCommunicator, sockfd, _osdId, rand()%100, rand()%200);
+	replyMsg -> prepareProtocolMsg();
+	_osdCommunicator -> addMessage (replyMsg);
+}
+
+
 OsdCommunicator* Osd::getCommunicator() {
 	return _osdCommunicator;
 }
@@ -358,14 +374,14 @@ void startReceiveThread(Communicator* communicator) {
 void startTestThread(Communicator* communicator) {
 	printf("HEHE\n");
 	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-			communicator->getMonitorSockfd(), 111, 222, 333);
+			communicator->getMonitorSockfd(), osd->getOsdId(), rand()%10, rand()%10);
 	printf("Prepared msg\n");
 	testmsg->prepareProtocolMsg();
 	communicator->addMessage(testmsg);
 	printf("Prepared add \n");
-	sleep(10);
+	sleep(120);
 	OsdShutdownMsg* msg = new OsdShutdownMsg(communicator,
-			communicator->getMonitorSockfd(), 111);
+			communicator->getMonitorSockfd(), osd->getOsdId());
 	msg->prepareProtocolMsg();
 	communicator->addMessage(msg);
 	printf("DONE\n");
@@ -413,7 +429,7 @@ int main(int argc, char* argv[]) {
 
 	communicator->connectAllComponents();
 
-//	thread testThread(startTestThread, communicator);
+	thread testThread(startTestThread, communicator);
 	// TODO: pause before connect for now
 	//getchar();
 
