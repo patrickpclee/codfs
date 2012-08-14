@@ -575,9 +575,7 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 	// if destination is of the same type, only connect if _componentId > destination ID
 
 	for (Component component : componentList) {
-		if (_componentType != component.type
-				|| (_componentType == component.type
-						&& _componentId > component.id)) {
+		if ( _componentId > component.id) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port,
