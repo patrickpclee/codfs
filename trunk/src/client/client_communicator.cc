@@ -19,8 +19,9 @@
  */
 vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 		string path) {
+	uint32_t mdsSockFd = getMdsSockfd();
 	ListDirectoryRequestMsg* listDirectoryRequestMsg =
-			new ListDirectoryRequestMsg(this, clientId, getMdsSockfd(), path);
+			new ListDirectoryRequestMsg(this, clientId, mdsSockFd, path);
 	listDirectoryRequestMsg->prepareProtocolMsg();
 
 //	future<vector<FileMetaData> > folderData =
@@ -42,7 +43,8 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 
 struct FileMetaData ClientCommunicator::uploadFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs)
 {
-	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg (this, getMdsSockfd(), clientId, path, fileSize, numOfObjs);	
+	uint32_t mdsSockFd = getMdsSockfd();
+	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg (this, mdsSockFd, clientId, path, fileSize, numOfObjs);	
 	uploadFileRequestMsg->prepareProtocolMsg();
 
 	addMessage(uploadFileRequestMsg, true);

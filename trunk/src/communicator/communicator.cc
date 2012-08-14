@@ -571,10 +571,11 @@ void Communicator::printComponents(string componentType,
 
 void Communicator::connectToComponents(vector<Component> componentList) {
 
+	// if destination is of different type, connect and save to map
+	// if destination is of the same type, only connect if _componentId > destination ID
 
 	for (Component component : componentList) {
-		// if _componentId > destination Component ID
-		if (_componentId > component.id) {
+		if ( _componentId > component.id) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port,
@@ -593,9 +594,9 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 void Communicator::connectAllComponents() {
 
 	// parse config file
-	mdsList = parseConfigFile("MDS");
-	osdList = parseConfigFile("OSD");
-	monitorList = parseConfigFile("MONITOR");
+	vector<Component> mdsList = parseConfigFile("MDS");
+	vector<Component> osdList = parseConfigFile("OSD");
+	vector<Component> monitorList = parseConfigFile("MONITOR");
 
 	// debug
 	printComponents("MDS", mdsList);
@@ -603,9 +604,9 @@ void Communicator::connectAllComponents() {
 	printComponents("MONITOR", monitorList);
 
 	// connect to components
-//	connectToComponents(mdsList);
+	connectToComponents(mdsList);
 	connectToComponents(osdList);
-//	connectToComponents(monitorList);
+	//connectToComponents(monitorList);
 
 }
 
@@ -616,17 +617,4 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 		exit (-1);
 	}
 	return _componentIdMap[componentId];
-}
-
-vector <Component> Communicator::getMdsList () {
-	return mdsList;
-}
-
-
-vector <Component> Communicator::getOsdList () {
-	return osdList;
-}
-
-vector <Component> Communicator::getMonitorList () {
-	return monitorList;
 }
