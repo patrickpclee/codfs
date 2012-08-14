@@ -1,5 +1,5 @@
-#ifndef __OSDSHUTDOWNMSG_HH__
-#define __OSDSHUTDOWNMSG_HH__
+#ifndef __OSDSTATUPDATEREQUESTMSG_HH__
+#define __OSDSTATUPDATEREQUESTMSG_HH__
 
 #include "message.hh"
 
@@ -10,12 +10,12 @@ using namespace std;
  * Initiate an object upload
  */
 
-class OsdShutdownMsg: public Message {
+class OsdStatUpdateRequestMsg: public Message {
 public:
 
-	OsdShutdownMsg(Communicator* communicator);
+	OsdStatUpdateRequestMsg(Communicator* communicator);
 
-	OsdShutdownMsg(Communicator* communicator, uint32_t dstSockfd, uint32_t osdId);
+	OsdStatUpdateRequestMsg(Communicator* communicator, uint32_t dstSockfd);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -47,7 +47,7 @@ public:
 	void printProtocol();
 
 private:
-	uint32_t _osdId;
+
 };
 
 #endif

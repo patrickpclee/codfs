@@ -48,6 +48,11 @@ void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE);
 }
 
+void Monitor::OsdStatUpdateReplyProcessor(uint32_t requestId, uint32_t sockfd,
+	uint32_t osdId, uint32_t capacity, uint32_t loading) {
+	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE);
+}
+
 void Monitor::OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd, 
 	uint32_t osdId) {
 	_statModule->removeStatById (osdId);

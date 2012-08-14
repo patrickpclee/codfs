@@ -178,6 +178,13 @@ public:
 
 	void recoveryProcessor(uint32_t requestId, uint32_t sockfd);
 
+	/**
+	 * Action when a monitor requests a status update 
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 */
+	void OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd);
+
 	// getters
 
 	/**
