@@ -253,3 +253,7 @@ void OsdCommunicator::putSegmentEnd(uint32_t osdId, uint32_t sockfd,
 		exit(-1);
 	}
 }
+
+void OsdCommunicator::objectUploadAck(uint64_t objectId, vector<uint32_t> nodeList)
+{
+}

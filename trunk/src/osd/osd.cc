@@ -242,6 +242,8 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 						segmentDataList.size());
 
 		uint32_t i = 0;
+
+		vector<uint32_t> nodeList;
 		for (const auto segmentData : segmentDataList) {
 
 			/*
@@ -256,6 +258,9 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 			uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 					segmentLocationList[i].osdId);
+
+			nodeList.push_back(dstSockfd);
+
 			_osdCommunicator->sendSegment(_osdId, dstSockfd, segmentData);
 
 			// free memory
@@ -272,6 +277,9 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 			lock_guard<mutex> lk(pendingObjectChunkMutex);
 			_pendingObjectChunk.erase(objectId);
 		}
+
+		// Acknowledge MDS for Object Upload Completed
+		//objectUploadAck(objectId, nodeList);
 
 	}
 

@@ -274,6 +274,8 @@ int main (void)
 	MdsCommunicator* communicator = mds->getCommunicator();
 
 	communicator->createServerSocket();
+	communicator->setId(50000);
+	communicator->setComponentType(MDS);
 
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);
