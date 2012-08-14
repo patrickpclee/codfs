@@ -10,4 +10,6 @@ testfile
 core
 osd_object/
 osd_segment/
+osd_object2/
+osd_segment2/
 *.out

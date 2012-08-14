@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include "../cache/objectmetadatacache.hh"
-
 #include "../storage/mongodb.hh"
 
 #include "../common/metadata.hh"
@@ -20,6 +18,6 @@ private:
 
 	MongoDB* _objectMetaDataStorage;
 
-	ObjectMetaDataCache *_objectMetaDataCache;
+	//ObjectMetaDataCache *_objectMetaDataCache;
 };
 #endif

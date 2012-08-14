@@ -60,6 +60,16 @@ uint32_t Client::uploadFileRequest (string path) {
 		debug ("%" PRIu64 "[%" PRIu32 "]\n",fileMetaData._objectList[i],fileMetaData._primaryList[i]);
 	}
 
+	for(uint32_t i = 0; i < objectCount; ++i) {
+		struct ObjectData objectData = _storageModule->readObjectFromFile(path, i);
+		uint32_t primary = fileMetaData._primaryList[i];
+		// TODO: HARDCODE FOR NOW!
+		uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
+		//uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
+		objectData.info.objectId = fileMetaData._objectList[i];
+		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
+	}
+
 	return fileMetaData._id;
 }
 
@@ -133,7 +143,7 @@ int main(void) {
 
 
 	// connect to MDS
-	//	communicator->connectToMds();
+	communicator->connectToMds();
 
 	// connect to OSD
 	communicator->connectToOsd();

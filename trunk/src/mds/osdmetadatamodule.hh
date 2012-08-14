@@ -5,12 +5,10 @@
 
 #include "../common/metadata.hh"
 
-#include "../cache/osdmetadatacache.hh"
-
 class OsdMetaDataModule {
 	public:
 	private:
-		OsdMetaDataCache* _osdMetaDataCache;
+//		OsdMetaDataCache* _osdMetaDataCache;
 };
 
 #endif
