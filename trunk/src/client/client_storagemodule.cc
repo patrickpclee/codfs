@@ -21,7 +21,8 @@ ClientStorageModule::ClientStorageModule() {
 	debug("Config Object Size = %" PRIu64 " Bytes\n", _objectSize);
 }
 
-uint32_t ClientStorageModule::getObjectCount(string filepath) {
+uint64_t ClientStorageModule::getFilesize (string filepath) {
+
 	ifstream in(filepath, ifstream::in | ifstream::binary);
 
 	if (!in) {
@@ -34,6 +35,14 @@ uint32_t ClientStorageModule::getObjectCount(string filepath) {
 	uint64_t filesize = in.tellg();
 
 	in.close();
+
+	return filesize;
+
+}
+
+uint32_t ClientStorageModule::getObjectCount(string filepath) {
+
+	const uint64_t filesize = getFilesize (filepath);
 
 	if (filesize == 0) {
 		return 0;

@@ -1,7 +1,9 @@
 #include <signal.h>
 
+#include <iostream>
 #include <cstdio>
 #include <thread>
+#include <ctime>
 
 #include "client.hh"
 #include "client_storagemodule.hh"
@@ -13,8 +15,11 @@
 
 #include <sys/stat.h>
 
+using namespace std;
+
 void sighandler(int signum) {
-  if (signum == SIGINT) exit(42);
+	if (signum == SIGINT)
+		exit(42);
 }
 
 /// Client Object
@@ -41,23 +46,25 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
-uint32_t Client::uploadFileRequest (string path) {
+uint32_t Client::uploadFileRequest(string path) {
 	uint32_t objectCount = _storageModule->getObjectCount(path);
 
 	struct stat tempFileStat;
-	stat(path.c_str(),&tempFileStat);
+	stat(path.c_str(), &tempFileStat);
 
 	uint64_t fileSize = tempFileStat.st_size;
 
-	debug ("Object Count of %s: %" PRIu32 "\n",path.c_str(), objectCount);
+	debug("Object Count of %s: %" PRIu32 "\n", path.c_str(), objectCount);
 
-	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, fileSize, objectCount);
+	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
+			_clientId, path, fileSize, objectCount);
 
-	debug ("File ID %" PRIu32 "\n",fileMetaData._id);
+	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
-	debug ("%s\n", "====================");
-	for(uint32_t i = 0; i < fileMetaData._primaryList.size(); ++i) {
-		debug ("%" PRIu64 "[%" PRIu32 "]\n",fileMetaData._objectList[i],fileMetaData._primaryList[i]);
+	debug("%s\n", "====================");
+	for (uint32_t i = 0; i < fileMetaData._primaryList.size(); ++i) {
+		debug("%" PRIu64 "[%" PRIu32 "]\n",
+				fileMetaData._objectList[i], fileMetaData._primaryList[i]);
 	}
 
 	return fileMetaData._id;
@@ -70,6 +77,9 @@ uint32_t Client::uploadFileRequest (string path) {
  */
 
 uint32_t Client::sendFileRequest(string filepath) {
+
+	// start timer
+	const clock_t start = clock();
 
 	const uint32_t objectCount = _storageModule->getObjectCount(filepath);
 
@@ -87,6 +97,17 @@ uint32_t Client::sendFileRequest(string filepath) {
 
 		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
 	}
+
+	// end timer
+	const clock_t end = clock();
+	const double duration = (end - start) / (double) CLOCKS_PER_SEC;
+	const uint64_t filesize = _storageModule->getFilesize(filepath) / 1024 / 1024;
+	const double rate = filesize / duration;
+
+	cout << "start = " << start << " end = " << end << "CLOCKS_PER_SEC = " << CLOCKS_PER_SEC << endl;
+
+	cout << filesize << " MB transferred in " << duration << " secs, Rate = "
+			<< rate << " MB/s" << endl;
 
 	return 0;
 }
@@ -127,14 +148,12 @@ int main(void) {
 	communicator->createServerSocket();
 
 	/*
-	const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
-	debug("Segment Number = %d\n", segmentNumber);
-	*/
-
+	 const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
+	 debug("Segment Number = %d\n", segmentNumber);
+	 */
 
 	// connect to MDS
 	//	communicator->connectToMds();
-
 	// connect to OSD
 	communicator->connectToOsd();
 

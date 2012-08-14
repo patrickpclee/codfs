@@ -134,9 +134,10 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
 
 	// initialize chunkCount value
-	pendingObjectChunkMutex.lock();
-	_pendingObjectChunk[objectId] = chunkCount;
-	pendingObjectChunkMutex.unlock();
+	{
+		lock_guard<mutex> lk(pendingObjectChunkMutex);
+		_pendingObjectChunk[objectId] = chunkCount;
+	}
 
 	// create object and cache
 	_storageModule->createObject(objectId, length);
@@ -148,9 +149,24 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId) {
 
 	// TODO: check integrity of object received
-	// TODO: now reply message is actually sent before all data is flushed to disk
+	bool chunkRemaining = false;
 
-	_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
+	while (1) {
+
+		{
+			lock_guard<mutex> lk(pendingObjectChunkMutex);
+			chunkRemaining = (bool) _pendingObjectChunk.count(objectId);
+		}
+
+		if (!chunkRemaining) {
+			// if all chunks have arrived, send ack
+			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
+			break;
+		} else {
+			usleep(100000); // sleep 0.1s
+		}
+
+	}
 
 }
 
@@ -158,10 +174,26 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId) {
 
 	// TODO: check integrity of segment received
-	// TODO: now reply message is actually sent before all data is flushed to disk
+	const string segmentKey = objectId + "." + segmentId;
+	bool chunkRemaining = false;
 
-	_osdCommunicator->replyPutSegmentEnd(requestId, sockfd, objectId,
-			segmentId);
+	while (1) {
+
+		{
+			lock_guard<mutex> lk(pendingObjectChunkMutex);
+			chunkRemaining = (bool) _pendingSegmentChunk.count(segmentKey);
+		}
+
+		if (!chunkRemaining) {
+			// if all chunks have arrived, send ack
+			_osdCommunicator->replyPutSegmentEnd(requestId, sockfd, objectId,
+					segmentId);
+			break;
+		} else {
+			usleep(100000); // sleep 0.1s
+		}
+
+	}
 
 }
 
@@ -224,14 +256,15 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 			i++;
 		}
 
+		// close file and free cache
+		_storageModule->closeObject(objectId);
+
 		// remove from map
 		{
 			lock_guard<mutex> lk(pendingObjectChunkMutex);
 			_pendingObjectChunk.erase(objectId);
 		}
 
-		// close file and free cache
-		_storageModule->closeObject(objectId);
 	}
 
 	return byteWritten;
@@ -241,10 +274,13 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, uint32_t length,
 		uint32_t chunkCount) {
 
+	const string segmentKey = objectId + "." + segmentId;
+
 	// initialize chunkCount value
-	pendingSegmentChunkMutex.lock();
-	_pendingSegmentChunk[objectId + "." + segmentId] = chunkCount;
-	pendingSegmentChunkMutex.unlock();
+	{
+		lock_guard <mutex> lk (pendingSegmentChunkMutex);
+		_pendingSegmentChunk[segmentKey] = chunkCount;
+	}
 
 	// create object and cache
 	_storageModule->createSegment(objectId, segmentId, length);
@@ -273,14 +309,15 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	// if all chunks have arrived
 	if (chunkLeft == 0) {
 
+		// close file and free cache
+		_storageModule->closeSegment(objectId, segmentId);
+
 		// remove from map
 		{
 			lock_guard<mutex> lk(pendingObjectChunkMutex);
 			_pendingSegmentChunk.erase(segmentKey);
 		}
 
-		// close file and free cache
-		_storageModule->closeSegment(objectId, segmentId);
 	}
 
 	return byteWritten;
