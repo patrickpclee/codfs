@@ -3,8 +3,8 @@
 #include <iostream>
 #include <cstdio>
 #include <thread>
-#include <ctime>
-
+#include <sys/time.h>
+#include <sys/types.h>
 #include "client.hh"
 #include "client_storagemodule.hh"
 #include "../common/garbagecollector.hh"
@@ -67,8 +67,9 @@ uint32_t Client::uploadFileRequest(string path) {
 				fileMetaData._objectList[i], fileMetaData._primaryList[i]);
 	}
 
-	for(uint32_t i = 0; i < objectCount; ++i) {
-		struct ObjectData objectData = _storageModule->readObjectFromFile(path, i);
+	for (uint32_t i = 0; i < objectCount; ++i) {
+		struct ObjectData objectData = _storageModule->readObjectFromFile(path,
+				i);
 		uint32_t primary = fileMetaData._primaryList[i];
 		debug("Send to Primary [%" PRIu32 "]\n", primary);
 		// TODO: HARDCODE FOR NOW!
@@ -78,7 +79,7 @@ uint32_t Client::uploadFileRequest(string path) {
 		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
 	}
 
-	debug("Upload %s Done [%" PRIu32 "]\n",path,fileMetaData._id);
+	debug("Upload %s Done [%" PRIu32 "]\n",path.c_str(),fileMetaData._id);
 
 	return fileMetaData._id;
 }
@@ -92,7 +93,12 @@ uint32_t Client::uploadFileRequest(string path) {
 uint32_t Client::sendFileRequest(string filepath) {
 
 	// start timer
-	const clock_t start = clock();
+	struct timeval tp;
+	double sec, usec, start, end;
+	gettimeofday(&tp, NULL);
+	sec = static_cast<double>(tp.tv_sec);
+	usec = static_cast<double>(tp.tv_usec) / 1E6;
+	start = sec + usec;
 
 	const uint32_t objectCount = _storageModule->getObjectCount(filepath);
 
@@ -111,13 +117,17 @@ uint32_t Client::sendFileRequest(string filepath) {
 		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
 	}
 
-	// end timer
-	const clock_t end = clock();
-	const double duration = (end - start) / (double) CLOCKS_PER_SEC;
-	const uint64_t filesize = _storageModule->getFilesize(filepath) / 1024 / 1024;
-	const double rate = filesize / duration;
+	// Time stamp after the computations
+	gettimeofday(&tp, NULL);
+	sec = static_cast<double>(tp.tv_sec);
+	usec = static_cast<double>(tp.tv_usec) / 1E6;
+	end = sec + usec;
 
-	cout << "start = " << start << " end = " << end << "CLOCKS_PER_SEC = " << CLOCKS_PER_SEC << endl;
+	// Time and Rate calculation (in seconds)
+	double duration = end - start;
+	double filesize = _storageModule->getFilesize(filepath) / 1024.0
+			/ 1024.0;
+	double rate = filesize / duration;
 
 	cout << filesize << " MB transferred in " << duration << " secs, Rate = "
 			<< rate << " MB/s" << endl;
