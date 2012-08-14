@@ -33,6 +33,7 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* PutObjectInitRequestPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   PutObjectInitRequestPro_reflection_ = NULL;
+const ::google::protobuf::EnumDescriptor* PutObjectInitRequestPro_CodingScheme_descriptor_ = NULL;
 const ::google::protobuf::Descriptor* ObjectDataPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ObjectDataPro_reflection_ = NULL;
@@ -159,10 +160,11 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(UploadFileRequestPro));
   PutObjectInitRequestPro_descriptor_ = file->message_type(4);
-  static const int PutObjectInitRequestPro_offsets_[3] = {
+  static const int PutObjectInitRequestPro_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, objectsize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, chunkcount_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, codingscheme_),
   };
   PutObjectInitRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -175,6 +177,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutObjectInitRequestPro));
+  PutObjectInitRequestPro_CodingScheme_descriptor_ = PutObjectInitRequestPro_descriptor_->enum_type(0);
   ObjectDataPro_descriptor_ = file->message_type(5);
   static const int ObjectDataPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ObjectDataPro, objectid_),
@@ -554,9 +557,12 @@ void protobuf_AddDesc_message_2eproto() {
     "estPro\022\r\n\005osdId\030\001 \001(\007\022\025\n\rdirectoryPath\030\002"
     " \001(\t\"[\n\024UploadFileRequestPro\022\020\n\010clientId"
     "\030\001 \001(\007\022\020\n\010fileSize\030\002 \001(\006\022\021\n\tnumOfObjs\030\003 "
-    "\001(\007\022\014\n\004path\030\004 \001(\t\"S\n\027PutObjectInitReques"
-    "tPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 \001"
-    "(\007\022\022\n\nchunkCount\030\003 \001(\007\"A\n\rObjectDataPro\022"
+    "\001(\007\022\014\n\004path\030\004 \001(\t\"\312\001\n\027PutObjectInitReque"
+    "stPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 "
+    "\001(\007\022\022\n\nchunkCount\030\003 \001(\007\022A\n\014codingScheme\030"
+    "\004 \001(\0162+.ncvfs.PutObjectInitRequestPro.Co"
+    "dingScheme\"2\n\014CodingScheme\022\020\n\014RAID0_CODI"
+    "NG\020\001\022\020\n\014RAID1_CODING\020\002\"A\n\rObjectDataPro\022"
     "\020\n\010objectId\030\001 \001(\006\022\016\n\006offset\030\002 \001(\006\022\016\n\006len"
     "gth\030\003 \001(\007\"*\n\026PutObjectEndRequestPro\022\020\n\010o"
     "bjectId\030\001 \001(\006\"@\n\025ListDirectoryReplyPro\022\'"
@@ -581,7 +587,7 @@ void protobuf_AddDesc_message_2eproto() {
     "\003 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001 \001(\007\"O"
     "\n\025OsdStatUpdateReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023"
     "\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\""
-    "\031\n\027OsdStatUpdateRequestPro", 1546);
+    "\031\n\027OsdStatUpdateRequestPro", 1666);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -1766,10 +1772,32 @@ void UploadFileRequestPro::Swap(UploadFileRequestPro* other) {
 
 // ===================================================================
 
+const ::google::protobuf::EnumDescriptor* PutObjectInitRequestPro_CodingScheme_descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return PutObjectInitRequestPro_CodingScheme_descriptor_;
+}
+bool PutObjectInitRequestPro_CodingScheme_IsValid(int value) {
+  switch(value) {
+    case 1:
+    case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#ifndef _MSC_VER
+const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro::RAID0_CODING;
+const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro::RAID1_CODING;
+const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro::CodingScheme_MIN;
+const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro::CodingScheme_MAX;
+const int PutObjectInitRequestPro::CodingScheme_ARRAYSIZE;
+#endif  // _MSC_VER
 #ifndef _MSC_VER
 const int PutObjectInitRequestPro::kObjectIdFieldNumber;
 const int PutObjectInitRequestPro::kObjectSizeFieldNumber;
 const int PutObjectInitRequestPro::kChunkCountFieldNumber;
+const int PutObjectInitRequestPro::kCodingSchemeFieldNumber;
 #endif  // !_MSC_VER
 
 PutObjectInitRequestPro::PutObjectInitRequestPro()
@@ -1791,6 +1819,7 @@ void PutObjectInitRequestPro::SharedCtor() {
   objectid_ = GOOGLE_ULONGLONG(0);
   objectsize_ = 0u;
   chunkcount_ = 0u;
+  codingscheme_ = 1;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1828,6 +1857,7 @@ void PutObjectInitRequestPro::Clear() {
     objectid_ = GOOGLE_ULONGLONG(0);
     objectsize_ = 0u;
     chunkcount_ = 0u;
+    codingscheme_ = 1;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1882,6 +1912,27 @@ bool PutObjectInitRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(32)) goto parse_codingScheme;
+        break;
+      }
+      
+      // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_codingScheme:
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::ncvfs::PutObjectInitRequestPro_CodingScheme_IsValid(value)) {
+            set_codingscheme(static_cast< ::ncvfs::PutObjectInitRequestPro_CodingScheme >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(4, value);
+          }
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1919,6 +1970,12 @@ void PutObjectInitRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->chunkcount(), output);
   }
   
+  // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 4;
+  if (has_codingscheme()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      4, this->codingscheme(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1940,6 +1997,12 @@ void PutObjectInitRequestPro::SerializeWithCachedSizes(
   // optional fixed32 chunkCount = 3;
   if (has_chunkcount()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->chunkcount(), target);
+  }
+  
+  // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 4;
+  if (has_codingscheme()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      4, this->codingscheme(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -1966,6 +2029,12 @@ int PutObjectInitRequestPro::ByteSize() const {
     // optional fixed32 chunkCount = 3;
     if (has_chunkcount()) {
       total_size += 1 + 4;
+    }
+    
+    // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 4;
+    if (has_codingscheme()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->codingscheme());
     }
     
   }
@@ -2004,6 +2073,9 @@ void PutObjectInitRequestPro::MergeFrom(const PutObjectInitRequestPro& from) {
     if (from.has_chunkcount()) {
       set_chunkcount(from.chunkcount());
     }
+    if (from.has_codingscheme()) {
+      set_codingscheme(from.codingscheme());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2030,6 +2102,7 @@ void PutObjectInitRequestPro::Swap(PutObjectInitRequestPro* other) {
     std::swap(objectid_, other->objectid_);
     std::swap(objectsize_, other->objectsize_);
     std::swap(chunkcount_, other->chunkcount_);
+    std::swap(codingscheme_, other->codingscheme_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

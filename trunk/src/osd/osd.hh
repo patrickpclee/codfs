@@ -100,10 +100,12 @@ public:
 	 * @param objectId Object ID
 	 * @param length Object size, equals the total length of all the trunks
 	 * @param chunkCount number of chunks that will be received
+	 * @param codingScheme Coding Scheme for the object
 	 */
 
 	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t length, uint32_t chunkCount);
+			uint64_t objectId, uint32_t length, uint32_t chunkCount,
+			CodingScheme codingScheme);
 
 	/**
 	 * Action when a put object end is received
@@ -141,7 +143,8 @@ public:
 	 */
 
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t segmentId, uint32_t length, uint32_t chunkCount);
+			uint64_t objectId, uint32_t segmentId, uint32_t length,
+			uint32_t chunkCount);
 
 	/**
 	 * Action when a segment trunk is received
@@ -199,13 +202,12 @@ public:
 	 * @return Pointer to OSD segment location cache
 	 */
 	//SegmentLocationCache* getSegmentLocationCache();
-
 	/**
 	 * Get the ID
 	 * @return OSD ID
 	 */
 
-	uint32_t getOsdId ();
+	uint32_t getOsdId();
 
 private:
 
@@ -240,7 +242,6 @@ private:
 	 */
 
 	//SegmentLocationCache* _segmentLocationCache;
-
 	/**
 	 * Handles communication with other components
 	 */
@@ -264,6 +265,7 @@ private:
 
 	map<uint64_t, uint32_t> _pendingObjectChunk;
 	map<string, uint32_t> _pendingSegmentChunk;
+	map<uint64_t, CodingScheme> _objectCodingScheme;
 
 };
 #endif

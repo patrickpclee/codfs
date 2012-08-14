@@ -47,6 +47,13 @@ message PutObjectInitRequestPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 objectSize = 2;
 	optional fixed32 chunkCount = 3;
+	
+	enum CodingScheme {
+		RAID0_CODING = 1;
+		RAID1_CODING = 2;
+	}
+	
+	optional CodingScheme codingScheme = 4;
 }
 
 message ObjectDataPro {

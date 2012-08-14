@@ -15,13 +15,15 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator) :
 }
 
 PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
-		uint32_t osdSockfd, uint64_t objectId, uint32_t objectSize, uint32_t chunkCount) :
+		uint32_t osdSockfd, uint64_t objectId, uint32_t objectSize,
+		uint32_t chunkCount, CodingScheme codingScheme) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
 	_objectId = objectId;
 	_objectSize = objectSize;
 	_chunkCount = chunkCount;
+	_codingScheme = codingScheme;
 }
 
 void PutObjectInitRequestMsg::prepareProtocolMsg() {
@@ -54,16 +56,19 @@ void PutObjectInitRequestMsg::parse(char* buf) {
 	_objectId = putObjectInitRequestPro.objectid();
 	_objectSize = putObjectInitRequestPro.objectsize();
 	_chunkCount = putObjectInitRequestPro.chunkcount();
+	_codingScheme = (CodingScheme) putObjectInitRequestPro.codingscheme();
 
 }
 
 void PutObjectInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _objectSize, _chunkCount);
+	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId,
+			_objectSize, _chunkCount, _codingScheme);
 #endif
 }
 
 void PutObjectInitRequestMsg::printProtocol() {
-	debug("[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 "\n",
-			_objectId, _objectSize, _chunkCount);
+	debug(
+			"[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 "CodingScheme = %" PRIu32 "\n",
+			_objectId, _objectSize, _chunkCount, _codingScheme);
 }

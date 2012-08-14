@@ -75,6 +75,25 @@ inline bool HandshakeRequestPro_ComponentType_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<HandshakeRequestPro_ComponentType>(
     HandshakeRequestPro_ComponentType_descriptor(), name, value);
 }
+enum PutObjectInitRequestPro_CodingScheme {
+  PutObjectInitRequestPro_CodingScheme_RAID0_CODING = 1,
+  PutObjectInitRequestPro_CodingScheme_RAID1_CODING = 2
+};
+bool PutObjectInitRequestPro_CodingScheme_IsValid(int value);
+const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro_CodingScheme_CodingScheme_MIN = PutObjectInitRequestPro_CodingScheme_RAID0_CODING;
+const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro_CodingScheme_CodingScheme_MAX = PutObjectInitRequestPro_CodingScheme_RAID1_CODING;
+const int PutObjectInitRequestPro_CodingScheme_CodingScheme_ARRAYSIZE = PutObjectInitRequestPro_CodingScheme_CodingScheme_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* PutObjectInitRequestPro_CodingScheme_descriptor();
+inline const ::std::string& PutObjectInitRequestPro_CodingScheme_Name(PutObjectInitRequestPro_CodingScheme value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    PutObjectInitRequestPro_CodingScheme_descriptor(), value);
+}
+inline bool PutObjectInitRequestPro_CodingScheme_Parse(
+    const ::std::string& name, PutObjectInitRequestPro_CodingScheme* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<PutObjectInitRequestPro_CodingScheme>(
+    PutObjectInitRequestPro_CodingScheme_descriptor(), name, value);
+}
 // ===================================================================
 
 class HandshakeRequestPro : public ::google::protobuf::Message {
@@ -551,6 +570,30 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   
   // nested types ----------------------------------------------------
   
+  typedef PutObjectInitRequestPro_CodingScheme CodingScheme;
+  static const CodingScheme RAID0_CODING = PutObjectInitRequestPro_CodingScheme_RAID0_CODING;
+  static const CodingScheme RAID1_CODING = PutObjectInitRequestPro_CodingScheme_RAID1_CODING;
+  static inline bool CodingScheme_IsValid(int value) {
+    return PutObjectInitRequestPro_CodingScheme_IsValid(value);
+  }
+  static const CodingScheme CodingScheme_MIN =
+    PutObjectInitRequestPro_CodingScheme_CodingScheme_MIN;
+  static const CodingScheme CodingScheme_MAX =
+    PutObjectInitRequestPro_CodingScheme_CodingScheme_MAX;
+  static const int CodingScheme_ARRAYSIZE =
+    PutObjectInitRequestPro_CodingScheme_CodingScheme_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  CodingScheme_descriptor() {
+    return PutObjectInitRequestPro_CodingScheme_descriptor();
+  }
+  static inline const ::std::string& CodingScheme_Name(CodingScheme value) {
+    return PutObjectInitRequestPro_CodingScheme_Name(value);
+  }
+  static inline bool CodingScheme_Parse(const ::std::string& name,
+      CodingScheme* value) {
+    return PutObjectInitRequestPro_CodingScheme_Parse(name, value);
+  }
+  
   // accessors -------------------------------------------------------
   
   // optional fixed64 objectId = 1;
@@ -574,6 +617,13 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 chunkcount() const;
   inline void set_chunkcount(::google::protobuf::uint32 value);
   
+  // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 4;
+  inline bool has_codingscheme() const;
+  inline void clear_codingscheme();
+  static const int kCodingSchemeFieldNumber = 4;
+  inline ::ncvfs::PutObjectInitRequestPro_CodingScheme codingscheme() const;
+  inline void set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.PutObjectInitRequestPro)
  private:
   inline void set_has_objectid();
@@ -582,15 +632,18 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_objectsize();
   inline void set_has_chunkcount();
   inline void clear_has_chunkcount();
+  inline void set_has_codingscheme();
+  inline void clear_has_codingscheme();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 objectid_;
   ::google::protobuf::uint32 objectsize_;
   ::google::protobuf::uint32 chunkcount_;
+  int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -2487,6 +2540,29 @@ inline void PutObjectInitRequestPro::set_chunkcount(::google::protobuf::uint32 v
   chunkcount_ = value;
 }
 
+// optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 4;
+inline bool PutObjectInitRequestPro::has_codingscheme() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void PutObjectInitRequestPro::set_has_codingscheme() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void PutObjectInitRequestPro::clear_has_codingscheme() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void PutObjectInitRequestPro::clear_codingscheme() {
+  codingscheme_ = 1;
+  clear_has_codingscheme();
+}
+inline ::ncvfs::PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro::codingscheme() const {
+  return static_cast< ::ncvfs::PutObjectInitRequestPro_CodingScheme >(codingscheme_);
+}
+inline void PutObjectInitRequestPro::set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value) {
+  GOOGLE_DCHECK(::ncvfs::PutObjectInitRequestPro_CodingScheme_IsValid(value));
+  set_has_codingscheme();
+  codingscheme_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // ObjectDataPro
@@ -3356,6 +3432,10 @@ namespace protobuf {
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::HandshakeRequestPro_ComponentType>() {
   return ::ncvfs::HandshakeRequestPro_ComponentType_descriptor();
+}
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::PutObjectInitRequestPro_CodingScheme>() {
+  return ::ncvfs::PutObjectInitRequestPro_CodingScheme_descriptor();
 }
 
 }  // namespace google

@@ -1,6 +1,7 @@
 #ifndef __PUTOBJECTINITREQUEST_HH__
 #define __PUTOBJECTINITREQUEST_HH__
 
+#include "../common/enums.hh"
 #include "message.hh"
 
 using namespace std;
@@ -16,7 +17,8 @@ public:
 	PutObjectInitRequestMsg(Communicator* communicator);
 
 	PutObjectInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t objectId, uint32_t objectSize, uint32_t chunkCount);
+			uint64_t objectId, uint32_t objectSize, uint32_t chunkCount,
+			CodingScheme codingScheme);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -51,6 +53,7 @@ private:
 	uint64_t _objectId;
 	uint64_t _objectSize;
 	uint32_t _chunkCount;
+	CodingScheme _codingScheme;
 };
 
 #endif

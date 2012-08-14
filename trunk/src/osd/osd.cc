@@ -32,6 +32,7 @@ ConfigLayer* configLayer;
 
 mutex pendingObjectChunkMutex;
 mutex pendingSegmentChunkMutex;
+mutex objectCodingSchemeMutex;
 
 Osd::Osd(string configFilePath) {
 
@@ -43,7 +44,7 @@ Osd::Osd(string configFilePath) {
 
 	_osdId = configLayer->getConfigInt("Osdid");
 
-	srand(time (NULL));	//random test
+	srand(time(NULL)); //random test
 }
 
 Osd::~Osd() {
@@ -137,12 +138,18 @@ void Osd::getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
+		uint64_t objectId, uint32_t length, uint32_t chunkCount,
+		CodingScheme codingScheme) {
 
 	// initialize chunkCount value
 	{
 		lock_guard<mutex> lk(pendingObjectChunkMutex);
 		_pendingObjectChunk[objectId] = chunkCount;
+	}
+
+	{
+		lock_guard<mutex> lk(objectCodingSchemeMutex);
+		_objectCodingScheme[objectId] = codingScheme;
 	}
 
 	// create object and cache
@@ -224,36 +231,28 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 				objectId);
 
 		// write cache to disk
-		debug("%s\n", "flushing cache to disk");
 		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
 				objectCache.length);
 
 		// perform coding
-		debug("%s\n", "performing coding");
+		CodingScheme codingScheme = -1;
+		{
+			lock_guard<mutex> lk(objectCodingSchemeMutex);
+			codingScheme = _objectCodingScheme[objectId];
+		}
+
 		vector<struct SegmentData> segmentDataList =
-				_codingModule->encodeObjectToSegment(RAID1_CODING, objectId, objectCache.buf,
-						objectCache.length);
+				_codingModule->encodeObjectToSegment(codingScheme, objectId,
+						objectCache.buf, objectCache.length);
 
 		// request secondary OSD list
 		vector<struct SegmentLocation> segmentLocationList =
 				_osdCommunicator->getOsdListRequest(objectId, MONITOR,
 						segmentDataList.size());
 
-		uint32_t i = 0;
-
 		vector<uint32_t> nodeList;
+		uint32_t i = 0;
 		for (const auto segmentData : segmentDataList) {
-
-			/*
-			 // DEBUG: write segments to disk
-			 debug("%s\n", "writing segments to disk");
-			 _storageModule->createAndOpenSegment(objectId,
-			 segmentData.info.segmentId, segmentData.info.segmentSize);
-			 _storageModule->writeSegment(objectId, segmentData.info.segmentId,
-			 segmentData.buf, 0, segmentData.info.segmentSize);
-			 _storageModule->closeSegment(objectId, segmentData.info.segmentId);
-			 */
-
 			uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 					segmentLocationList[i].osdId);
 
@@ -288,13 +287,14 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, uint32_t length,
 		uint32_t chunkCount) {
 
-	debug("[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
+	debug(
+			"[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
 			objectId, segmentId, length, chunkCount);
 	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 
 	// initialize chunkCount value
 	{
-		lock_guard <mutex> lk (pendingSegmentChunkMutex);
+		lock_guard<mutex> lk(pendingSegmentChunkMutex);
 		_pendingSegmentChunk[segmentKey] = chunkCount;
 	}
 
@@ -345,11 +345,10 @@ void Osd::recoveryProcessor(uint32_t requestId, uint32_t sockfd) {
 
 void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
 	OsdStatUpdateReplyMsg* replyMsg = new OsdStatUpdateReplyMsg(
-		_osdCommunicator, sockfd, _osdId, rand()%100, rand()%200);
-	replyMsg -> prepareProtocolMsg();
-	_osdCommunicator -> addMessage (replyMsg);
+			_osdCommunicator, sockfd, _osdId, rand() % 100, rand() % 200);
+	replyMsg->prepareProtocolMsg();
+	_osdCommunicator->addMessage(replyMsg);
 }
-
 
 OsdCommunicator* Osd::getCommunicator() {
 	return _osdCommunicator;
@@ -382,7 +381,8 @@ void startReceiveThread(Communicator* communicator) {
 void startTestThread(Communicator* communicator) {
 	printf("HEHE\n");
 	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-			communicator->getMonitorSockfd(), osd->getOsdId(), rand()%10, rand()%10);
+			communicator->getMonitorSockfd(), osd->getOsdId(), rand() % 10,
+			rand() % 10);
 	printf("Prepared msg\n");
 	testmsg->prepareProtocolMsg();
 	communicator->addMessage(testmsg);
