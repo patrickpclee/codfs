@@ -37,6 +37,7 @@ void UploadFileReplyMsg::prepareProtocolMsg()
 
 	for (it2 = _primaryList.begin(); it2 < _primaryList.end(); ++it2) {
 		uploadFileReplyPro.add_primarylist(*it2);
+		debug("%d\n",*it2);
 	}
 
 	uploadFileReplyPro.set_fileid(_fileId);

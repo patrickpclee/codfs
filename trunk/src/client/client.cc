@@ -71,12 +71,15 @@ uint32_t Client::uploadFileRequest(string path) {
 		struct ObjectData objectData = _storageModule->readObjectFromFile(path,
 				i);
 		uint32_t primary = fileMetaData._primaryList[i];
+		debug("Send to Primary [%" PRIu32 "]\n", primary);
 		// TODO: HARDCODE FOR NOW!
-		uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
-		//uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
+		//uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
+		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
 		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
 	}
+
+	debug("Upload %s Done [%" PRIu32 "]\n",path.c_str(),fileMetaData._id);
 
 	return fileMetaData._id;
 }
@@ -173,8 +176,8 @@ int main(void) {
 	 */
 
 	// connect to MDS
-//	communicator->connectToMds();
-	communicator->connectToOsd();
+	communicator->connectToMds();
+	//communicator->connectToOsd();
 
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);
@@ -185,11 +188,14 @@ int main(void) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
+	communicator->setId(51000);
+	communicator->setComponentType(CLIENT);
+	communicator->connectAllComponents();
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
-	client->sendFileRequest("./testfile");
-	//client->uploadFileRequest("./testfile");
+	//client->sendFileRequest("./testfile");
+	client->uploadFileRequest("./testfile");
 
 	/*
 

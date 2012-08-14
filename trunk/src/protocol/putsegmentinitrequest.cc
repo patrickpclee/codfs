@@ -60,6 +60,8 @@ void PutSegmentInitRequestMsg::parse(char* buf) {
 
 void PutSegmentInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
+	debug("[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
+			_objectId, _segmentId, _segmentSize, _chunkCount);
 	osd->putSegmentInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId, _segmentSize, _chunkCount);
 #endif
 }
