@@ -175,7 +175,7 @@ void Communicator::waitForMessage() {
 					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 					if (nbytes == 0) {
 						// disconnect and remove from _connectionMap
-						debug("SOCKFD = %" PRIu32 " connection lost", p->first);
+						debug("SOCKFD = %" PRIu32 " connection lost\n", p->first);
 						_connectionMap.erase(p->first);
 						continue;
 					}

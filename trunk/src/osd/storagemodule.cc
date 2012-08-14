@@ -297,20 +297,25 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 		exit(-1);
 	}
 
+	/*
+
 	// Read Lock
 	if (flock(fileno(file), LOCK_SH) == -1) {
 		debug("%s\n", "ERROR: Cannot LOCK_SH");
 		exit(-1);
 	}
+	*/
 
 	// Read file contents into buffer
 	uint32_t byteRead = pread(fileno(file), buf, length, offset);
 
+	/*
 	// Release lock
 	if (flock(fileno(file), LOCK_UN) == -1) {
 		debug("%s\n", "ERROR: Cannot LOCK_UN");
 		exit(-1);
 	}
+	*/
 
 	if (byteRead != length) {
 		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
@@ -335,11 +340,15 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 		exit(-1);
 	}
 
+	/*
+
 	// Write Lock
 	if (flock(fileno(file), LOCK_EX) == -1) {
 		debug("%s\n", "ERROR: Cannot LOCK_EX");
 		exit(-1);
 	}
+
+	*/
 
 	// Write file contents from buffer
 
@@ -351,11 +360,15 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	fflush (file);
 	*/
 
+	/*
+
 	// Release lock
 	if (flock(fileno(file), LOCK_UN) == -1) {
 		debug("%s\n", "ERROR: Cannot LOCK_UN");
 		exit(-1);
 	}
+
+	*/
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
