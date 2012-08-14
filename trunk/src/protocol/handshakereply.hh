@@ -16,7 +16,7 @@ public:
 
 	HandshakeReplyMsg(Communicator* communicator);
 
-	HandshakeReplyMsg(Communicator* communicator, uint32_t srcSockfd,
+	HandshakeReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t srcSockfd,
 			uint32_t componentId, ComponentType componentType);
 
 	/**
