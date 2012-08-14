@@ -11,10 +11,11 @@ HandshakeReplyMsg::HandshakeReplyMsg(Communicator* communicator) :
 
 }
 
-HandshakeReplyMsg::HandshakeReplyMsg(Communicator* communicator,
+HandshakeReplyMsg::HandshakeReplyMsg(Communicator* communicator, uint32_t requestId,
 		uint32_t srcSockfd, uint32_t componentId, ComponentType componentType) :
 		Message(communicator) {
 
+	_msgHeader.requestId = requestId;
 	_sockfd = srcSockfd;
 	_componentId = componentId;
 	_componentType = componentType;

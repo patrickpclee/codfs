@@ -509,7 +509,7 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 			componentId, sockfd);
 
 	// prepare reply message
-	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this, sockfd,
+	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this, requestId, sockfd,
 			_componentId, _componentType);
 	handshakeReplyMsg->prepareProtocolMsg();
 	addMessage(handshakeReplyMsg, false);

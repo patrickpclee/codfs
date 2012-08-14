@@ -411,6 +411,7 @@ FILE* StorageModule::createFile(string filepath) {
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "wb+");
 
+	// set buffer to zero to avoid memory leak
 	setvbuf (filePtr, NULL , _IONBF , 0);
 
 	debug("fileptr = %p\n", filePtr);
@@ -447,6 +448,9 @@ FILE* StorageModule::openFile(string filepath) {
 
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "rb+");
+
+	// set buffer to zero to avoid memory leak
+	setvbuf (filePtr, NULL , _IONBF , 0);
 
 	if (filePtr == NULL) {
 		debug("Unable to open file at %s\n", filepath.c_str());
