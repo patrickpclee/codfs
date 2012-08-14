@@ -174,7 +174,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId) {
 
 	// TODO: check integrity of segment received
-	const string segmentKey = objectId + "." + segmentId;
+	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 	bool chunkRemaining = false;
 
 	while (1) {
@@ -274,7 +274,9 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, uint32_t length,
 		uint32_t chunkCount) {
 
-	const string segmentKey = objectId + "." + segmentId;
+	debug("[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
+			objectId, segmentId, length, chunkCount);
+	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 
 	// initialize chunkCount value
 	{
@@ -293,7 +295,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, uint32_t offset, uint32_t length,
 		char* buf) {
 
-	const string segmentKey = objectId + "." + segmentId;
+	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 
 	uint32_t byteWritten = _storageModule->writeSegment(objectId, segmentId,
 			buf, offset, length);
