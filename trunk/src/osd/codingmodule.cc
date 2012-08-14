@@ -5,43 +5,66 @@
 #include "codingmodule.hh"
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
+#include "../common/debug.hh"
 
 CodingModule::CodingModule() {
-	_coding = NULL;
+
+	const uint32_t noOfStrips = 2;
+	_codingWorker[RAID0_CODING] = new Raid0Coding(noOfStrips);
+
+	const uint32_t noOfReplications = 3;
+	_codingWorker[RAID1_CODING] = new Raid1Coding(noOfReplications);
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(
-		struct ObjectData objectData) {
+		CodingScheme codingScheme, struct ObjectData objectData) {
 
-	return _coding->performEncoding(objectData);
+	return getCoding(codingScheme)->performEncoding(objectData);
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(
-		uint64_t objectId, char* buf, uint64_t length) {
+		CodingScheme codingScheme, uint64_t objectId, char* buf,
+		uint64_t length) {
 	struct ObjectData objectData;
 	objectData.buf = buf;
 	objectData.info.objectId = objectId;
 	objectData.info.objectSize = length;
-	return _coding->performEncoding(objectData);
+	return getCoding(codingScheme)->performEncoding(objectData);
 }
 
-struct ObjectData CodingModule::decodeSegmentToObject(uint64_t objectId,
-		vector<struct SegmentData> segmentData) {
+struct ObjectData CodingModule::decodeSegmentToObject(CodingScheme codingScheme,
+		uint64_t objectId, vector<struct SegmentData> segmentData) {
 
-	return _coding->performDecoding(segmentData);
+	return getCoding(codingScheme)->performDecoding(segmentData);
 }
 
-void CodingModule::setCodingScheme(CodingScheme codingScheme) {
-	delete _coding;
-
-	// TODO: set parameters dynamically
-
-	if (codingScheme == RAID0_CODING) {
-		const uint32_t noOfStrips = 2;
-		_coding = new Raid0Coding(noOfStrips);
-	} else if (codingScheme == RAID1_CODING) {
-		const uint32_t noOfReplications = 3;
-		_coding = new Raid1Coding(noOfReplications);
+Coding* CodingModule::getCoding(CodingScheme codingScheme) {
+	if (!_codingWorker.count(codingScheme)) {
+		debug("%s\n", "Wrong coding scheme!");
+		exit(-1);
 	}
 
+	return _codingWorker[codingScheme];
 }
+
+/*
+ Coding* CodingModule::codingWorkerFactory (CodingScheme codingScheme) {
+
+ Coding* coding = NULL;
+
+ if (codingScheme == RAID0_CODING) {
+ const uint32_t noOfStrips = 2;
+ coding = new Raid0Coding(noOfStrips);
+ } else if (codingScheme == RAID1_CODING) {
+ const uint32_t noOfReplications = 3;
+ coding = new Raid1Coding(noOfReplications);
+ }
+
+ if (coding == NULL) {
+ debug ("%s\n", "Wrong Coding Scheme specified");
+ exit (-1);
+ }
+
+ return coding;
+ }
+ */

@@ -176,7 +176,7 @@ int main(void) {
 	 */
 
 	// connect to MDS
-	communicator->connectToMds();
+	//communicator->connectToMds();
 	//communicator->connectToOsd();
 
 	// 1. Garbage Collection Thread

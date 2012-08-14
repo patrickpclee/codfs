@@ -41,8 +41,6 @@ Osd::Osd(string configFilePath) {
 	_osdCommunicator = new OsdCommunicator();
 	_codingModule = new CodingModule();
 
-	_codingModule->setCodingScheme(RAID1_CODING);
-
 	_osdId = configLayer->getConfigInt("Osdid");
 
 	srand(time (NULL));	//random test
@@ -233,7 +231,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		// perform coding
 		debug("%s\n", "performing coding");
 		vector<struct SegmentData> segmentDataList =
-				_codingModule->encodeObjectToSegment(objectId, objectCache.buf,
+				_codingModule->encodeObjectToSegment(RAID1_CODING, objectId, objectCache.buf,
 						objectCache.length);
 
 		// request secondary OSD list
