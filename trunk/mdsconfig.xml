@@ -20,7 +20,7 @@
 		<BasePath>.</BasePath>
 
 		<MongoDB>
-			<Host>localhost</Host>
+			<Host>137.189.89.130</Host>
 			<Database>ncvfs</Database>
 
 			<User>ncvfs</User>
