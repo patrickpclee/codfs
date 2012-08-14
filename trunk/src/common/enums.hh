@@ -2,7 +2,7 @@
 #define __ENUMS_HH__
 
 enum ComponentType {
-	CLIENT = 1, OSD = 2 , MDS = 3, MONITOR = 4	// numbers match message.proto
+	CLIENT = 1, OSD = 2, MDS = 3, MONITOR = 4 // numbers match message.proto
 };
 
 enum FailureReason {
@@ -47,7 +47,7 @@ enum StorageType {
 };
 
 enum CodingScheme {
-	RAID0_CODING, RAID1_CODING
+	DEFAULT_CODING = 0, RAID0_CODING = 1, RAID1_CODING = 2
 };
 
 #endif

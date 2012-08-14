@@ -46,7 +46,8 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
-uint32_t Client::uploadFileRequest(string path) {
+uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
+
 	uint32_t objectCount = _storageModule->getObjectCount(path);
 
 	struct stat tempFileStat;
@@ -57,7 +58,7 @@ uint32_t Client::uploadFileRequest(string path) {
 	debug("Object Count of %s: %" PRIu32 "\n", path.c_str(), objectCount);
 
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
-			_clientId, path, fileSize, objectCount);
+			_clientId, path, fileSize, objectCount, codingScheme);
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
@@ -76,7 +77,7 @@ uint32_t Client::uploadFileRequest(string path) {
 		//uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
-		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
+		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData, codingScheme);
 	}
 
 	debug("Upload %s Done [%" PRIu32 "]\n",path.c_str(),fileMetaData._id);
@@ -90,7 +91,7 @@ uint32_t Client::uploadFileRequest(string path) {
  * 3. Call uploadObjectRequest()
  */
 
-uint32_t Client::sendFileRequest(string filepath) {
+uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme) {
 
 	// start timer
 	struct timeval tp;
@@ -114,7 +115,7 @@ uint32_t Client::sendFileRequest(string filepath) {
 		uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
 		objectData.info.objectId = i;
 
-		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData);
+		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData, codingScheme);
 	}
 
 	// Time stamp after the computations
@@ -194,8 +195,8 @@ int main(void) {
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
-	//client->sendFileRequest("./testfile");
-	client->uploadFileRequest("./testfile");
+	client->sendFileRequest("./testfile", RAID1_CODING);
+	//client->uploadFileRequest("./testfile", RAID1_CODING);
 
 	/*
 

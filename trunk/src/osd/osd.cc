@@ -235,11 +235,14 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 				objectCache.length);
 
 		// perform coding
-		CodingScheme codingScheme = -1;
+		CodingScheme codingScheme = DEFAULT_CODING;
 		{
 			lock_guard<mutex> lk(objectCodingSchemeMutex);
 			codingScheme = _objectCodingScheme[objectId];
+			_objectCodingScheme.erase(objectId);
 		}
+
+		debug ("Coding Scheme = %d\n", (int) codingScheme);
 
 		vector<struct SegmentData> segmentDataList =
 				_codingModule->encodeObjectToSegment(codingScheme, objectId,

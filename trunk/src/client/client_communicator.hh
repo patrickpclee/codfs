@@ -22,7 +22,8 @@ public:
 	 */
 	vector<FileMetaData> listFolderData(uint32_t clientId, string path);
 
-	struct FileMetaData uploadFile(uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs);	
+	struct FileMetaData uploadFile(uint32_t clientId, string path,
+			uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme);
 
 	/**
 	 * 1. Send an init message
@@ -31,9 +32,11 @@ public:
 	 * @param clientID Client ID
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
 	 * @param objectData ObjectData Structure
+	 * @param codingScheme Coding Scheme specified
 	 */
 
-	void putObject (uint32_t clientId, uint32_t dstOsdSockfd, struct ObjectData objectData);
+	void putObject(uint32_t clientId, uint32_t dstOsdSockfd,
+			struct ObjectData objectData, CodingScheme codingScheme);
 
 	// TODO: CONNECT TO COMPONENT: PRIMITIVE DESIGN
 	void connectToMds();
@@ -47,10 +50,12 @@ private:
 	 * @param objectId Object ID
 	 * @param length Size of the object
 	 * @param chunkCount Number of chunks that will be sent
+	 * @param codingScheme Coding Scheme used
 	 */
 
-	void putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd, uint64_t objectId,
-			uint32_t length, uint32_t chunkCount);
+	void putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
+			uint64_t objectId, uint32_t length, uint32_t chunkCount,
+			CodingScheme codingScheme);
 
 	/**
 	 * Send an object chunk to OSD (Step 2)
@@ -62,8 +67,8 @@ private:
 	 * @param length Length of the chunk
 	 */
 
-	void putObjectData(uint32_t clientID, uint32_t dstOsdSockfd, uint64_t objectId,
-			char* buf, uint64_t offset, uint32_t length);
+	void putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
+			uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
 
 	/**
 	 * Finalise upload process to OSD (Step 3)
@@ -72,7 +77,8 @@ private:
 	 * @param objectId Object ID
 	 */
 
-	void putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd, uint64_t objectId);
+	void putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
+			uint64_t objectId);
 
 };
 #endif

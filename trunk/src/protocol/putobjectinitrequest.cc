@@ -33,6 +33,8 @@ void PutObjectInitRequestMsg::prepareProtocolMsg() {
 	putObjectInitRequestPro.set_objectid(_objectId);
 	putObjectInitRequestPro.set_objectsize(_objectSize);
 	putObjectInitRequestPro.set_chunkcount(_chunkCount);
+	putObjectInitRequestPro.set_codingscheme(
+			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
 
 	if (!putObjectInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -69,6 +71,6 @@ void PutObjectInitRequestMsg::doHandle() {
 
 void PutObjectInitRequestMsg::printProtocol() {
 	debug(
-			"[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 "CodingScheme = %" PRIu32 "\n",
+			"[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 " CodingScheme = %" PRIu32 "\n",
 			_objectId, _objectSize, _chunkCount, _codingScheme);
 }

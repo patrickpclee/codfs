@@ -604,7 +604,7 @@ void Communicator::connectAllComponents() {
 	printComponents("MONITOR", monitorList);
 
 	// connect to components
-	connectToComponents(mdsList);
+	//connectToComponents(mdsList);
 	connectToComponents(osdList);
 	//connectToComponents(monitorList);
 

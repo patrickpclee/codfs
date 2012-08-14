@@ -10,7 +10,6 @@
 #include "../protocol/putobjectendrequest.hh"
 #include "../protocol/objectdatamsg.hh"
 
-
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
  *
@@ -30,42 +29,47 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 	addMessage(listDirectoryRequestMsg, true);
 	MessageStatus status = listDirectoryRequestMsg->waitForStatusChange();
 
-	if(status == READY) {
-		vector <FileMetaData> fileMetaData = listDirectoryRequestMsg->getFolderData();
-		waitAndDelete (listDirectoryRequestMsg);
+	if (status == READY) {
+		vector<FileMetaData> fileMetaData =
+				listDirectoryRequestMsg->getFolderData();
+		waitAndDelete(listDirectoryRequestMsg);
 		return fileMetaData;
 	} else {
-		debug("%s\n","List Directory Request Failed");
-		exit (-1);
+		debug("%s\n", "List Directory Request Failed");
+		exit(-1);
 	}
 	return {};
 }
 
-struct FileMetaData ClientCommunicator::uploadFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs)
-{
+struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
+		string path, uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme) {
+
+	// TODO: add codingScheme to UploadFileRequestMsg
+
 	uint32_t mdsSockFd = getMdsSockfd();
-	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg (this, mdsSockFd, clientId, path, fileSize, numOfObjs);	
+	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg(this,
+			mdsSockFd, clientId, path, fileSize, numOfObjs);
 	uploadFileRequestMsg->prepareProtocolMsg();
 
 	addMessage(uploadFileRequestMsg, true);
 	MessageStatus status = uploadFileRequestMsg->waitForStatusChange();
 
-	if(status == READY) {
-		struct FileMetaData fileMetaData {};
+	if (status == READY) {
+		struct FileMetaData fileMetaData { };
 		fileMetaData._id = uploadFileRequestMsg->getFileId();
 		fileMetaData._objectList = uploadFileRequestMsg->getObjectList();
 		fileMetaData._primaryList = uploadFileRequestMsg->getPrimaryList();
-		waitAndDelete (uploadFileRequestMsg);
+		waitAndDelete(uploadFileRequestMsg);
 		return fileMetaData;
 	} else {
-		debug("%s\n","List Directory Request Failed");
-		exit (-1);
+		debug("%s\n", "List Directory Request Failed");
+		exit(-1);
 	}
 	return {};
 }
 
 void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
-		struct ObjectData objectData) {
+		struct ObjectData objectData, CodingScheme codingScheme) {
 
 	const uint64_t totalSize = objectData.info.objectSize;
 	const uint64_t objectId = objectData.info.objectId;
@@ -75,8 +79,8 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	// Step 1 : Send Init message (wait for reply)
 
-	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount);
-	debug ("%s\n", "Put Object Init ACK-ed");
+	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount, codingScheme);
+	debug("%s\n", "Put Object Init ACK-ed");
 
 	// Step 2 : Send data chunk by chunk
 
@@ -115,23 +119,25 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 //
 
 void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
-		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
+		uint64_t objectId, uint32_t length, uint32_t chunkCount,
+		CodingScheme codingScheme) {
 
 	// Step 1 of the upload process
 
-	PutObjectInitRequestMsg* putObjectInitRequestMsg = new PutObjectInitRequestMsg(this,
-			dstOsdSockfd, objectId, length, chunkCount);
+	PutObjectInitRequestMsg* putObjectInitRequestMsg =
+			new PutObjectInitRequestMsg(this, dstOsdSockfd, objectId, length,
+					chunkCount, codingScheme);
 
 	putObjectInitRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectInitRequestMsg, true);
 
 	MessageStatus status = putObjectInitRequestMsg->waitForStatusChange();
-	if(status == READY) {
-		waitAndDelete (putObjectInitRequestMsg);
+	if (status == READY) {
+		waitAndDelete(putObjectInitRequestMsg);
 		return;
 	} else {
 		debug("%s\n", "Put Object Init Failed");
-		exit (-1);
+		exit(-1);
 	}
 
 }
@@ -140,7 +146,8 @@ void ClientCommunicator::putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
 		uint64_t objectId, char* buf, uint64_t offset, uint32_t length) {
 
 	// Step 2 of the upload process
-	ObjectDataMsg* objectDataMsg = new ObjectDataMsg(this, dstOsdSockfd, objectId, offset, length);
+	ObjectDataMsg* objectDataMsg = new ObjectDataMsg(this, dstOsdSockfd,
+			objectId, offset, length);
 
 	objectDataMsg->prepareProtocolMsg();
 	objectDataMsg->preparePayload(buf + offset, length);
@@ -153,21 +160,22 @@ void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	// Step 3 of the upload process
 
-	PutObjectEndRequestMsg* putObjectEndRequestMsg = new PutObjectEndRequestMsg (this, dstOsdSockfd, objectId);
+	PutObjectEndRequestMsg* putObjectEndRequestMsg = new PutObjectEndRequestMsg(
+			this, dstOsdSockfd, objectId);
 
 	putObjectEndRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectEndRequestMsg, true);
 
-	debug ("%s\n", "before waitForStatusChange");
+	debug("%s\n", "before waitForStatusChange");
 	MessageStatus status = putObjectEndRequestMsg->waitForStatusChange();
-	if(status == READY) {
-		debug ("%s\n", "status == READY");
-		waitAndDelete (putObjectEndRequestMsg);
-		debug ("%s\n", "msg deleted");
+	if (status == READY) {
+		debug("%s\n", "status == READY");
+		waitAndDelete(putObjectEndRequestMsg);
+		debug("%s\n", "msg deleted");
 		return;
 	} else {
 		debug("%s\n", "Put Object Init Failed");
-		exit (-1);
+		exit(-1);
 	}
 }
 
