@@ -30,6 +30,7 @@ extern ConfigLayer* configLayer;
 mutex outMessageQueueMutex;
 mutex waitReplyMessageMapMutex;
 mutex connectionMapMutex;
+mutex componentIdMapMutex;
 
 Communicator::Communicator() {
 
@@ -174,7 +175,7 @@ void Communicator::waitForMessage() {
 					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 					if (nbytes == 0) {
 						// disconnect and remove from _connectionMap
-						delete p->second;
+						debug("SOCKFD = %" PRIu32 " connection lost", p->first);
 						_connectionMap.erase(p->first);
 						continue;
 					}
@@ -209,8 +210,9 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 			const uint32_t requestId = message->getMsgHeader().requestId;
 			lock_guard<mutex> lk(waitReplyMessageMapMutex);
 			_waitReplyMessageMap[requestId] = message;
-			debug("Message (ID: %" PRIu32 ") added to waitReplyMessageMap\n",
-					requestId);
+			debug(
+					"Message (ID: %" PRIu32 " FD = %" PRIu32 ") added to waitReplyMessageMap\n",
+					requestId, message->getSockfd());
 		}
 	}
 
@@ -237,7 +239,7 @@ Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 
 		return message;
 	}
-	debug ("Request ID %" PRIu32 " not found in wait queue\n", requestId);
+	debug("Request ID %" PRIu32 " not found in wait queue\n", requestId);
 	return NULL;
 }
 
@@ -262,7 +264,8 @@ void Communicator::sendMessage() {
 			{
 				lock_guard<mutex> lk(connectionMapMutex);
 				if (!(_connectionMap.count(sockfd))) {
-					debug("%s\n", "Connection not found!");
+					debug("Connection SOCKFD = %" PRIu32 " not found!\n",
+							sockfd);
 					exit(-1);
 				}
 				_connectionMap[sockfd]->sendMessage(message);
@@ -327,6 +330,7 @@ void Communicator::disconnectAndRemove(uint32_t sockfd) {
 		Connection* conn = _connectionMap[sockfd];
 		delete conn;
 		_connectionMap.erase(sockfd);
+		debug("Connection erased for sockfd = %" PRIu32 "\n", sockfd);
 	} else {
 		cerr << "Connection not found, cannot remove connection" << endl;
 	}
@@ -458,8 +462,6 @@ void Communicator::setComponentType(ComponentType componentType) {
 void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		ComponentType componentType) {
 
-	debug("Send sendshake to FD = %" PRIu32 "\n", sockfd);
-
 	HandshakeRequestMsg* requestHandshakeMsg = new HandshakeRequestMsg(this,
 			sockfd, componentId, componentType);
 
@@ -479,7 +481,10 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		waitAndDelete(requestHandshakeMsg);
 
 		// add ID -> sockfd mapping to map
-		_componentIdMap[targetComponentId] = sockfd;
+		{
+			lock_guard<mutex> lk(componentIdMapMutex);
+			_componentIdMap[targetComponentId] = sockfd;
+		}
 		debug(
 				"[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
 				targetComponentId, sockfd);
@@ -494,7 +499,11 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 		uint32_t sockfd, uint32_t componentId, ComponentType componentType) {
 
 	// add ID -> sockfd mapping to map
-	_componentIdMap[componentId] = sockfd;
+	{
+		lock_guard<mutex> lk(componentIdMapMutex);
+		_componentIdMap[componentId] = sockfd;
+	}
+
 	debug(
 			"[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
 			componentId, sockfd);
@@ -571,7 +580,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 						&& _componentId > component.id)) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
-			uint32_t sockfd = connectAndAdd(component.ip, component.port, component.type);
+			uint32_t sockfd = connectAndAdd(component.ip, component.port,
+					component.type);
 
 			// send HandshakeRequest
 			requestHandshake(sockfd, _componentId, _componentType);
@@ -603,5 +613,10 @@ void Communicator::connectAllComponents() {
 }
 
 uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
+	lock_guard <mutex> lk (componentIdMapMutex);
+	if (!_componentIdMap.count(componentId)) {
+		debug ("SOCKFD for Component ID = %" PRIu32 " not found!\n", componentId);
+		exit (-1);
+	}
 	return _componentIdMap[componentId];
 }

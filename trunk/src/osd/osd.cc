@@ -56,9 +56,9 @@ uint32_t Osd::osdListProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, vector<SegmentLocation> osdList) {
 
 	/*
-	_segmentLocationCache->deleteSegmentLocation(objectId);
-	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
-	*/
+	 _segmentLocationCache->deleteSegmentLocation(objectId);
+	 _segmentLocationCache->writeSegmentLocation(objectId, osdList);
+	 */
 
 	return 0;
 }
@@ -295,10 +295,10 @@ OsdCommunicator* Osd::getCommunicator() {
 }
 
 /*
-SegmentLocationCache* Osd::getSegmentLocationCache() {
-	return _segmentLocationCache;
-}
-*/
+ SegmentLocationCache* Osd::getSegmentLocationCache() {
+ return _segmentLocationCache;
+ }
+ */
 
 uint32_t Osd::getOsdId() {
 	return _osdId;

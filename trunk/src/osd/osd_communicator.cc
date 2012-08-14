@@ -87,8 +87,8 @@ void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId, uint32_t segmentId) {
 
-	PutSegmentEndReplyMsg* putSegmentEndReplyMsg = new PutSegmentEndReplyMsg(this,
-			requestId, connectionId, objectId, segmentId);
+	PutSegmentEndReplyMsg* putSegmentEndReplyMsg = new PutSegmentEndReplyMsg(
+			this, requestId, connectionId, objectId, segmentId);
 	putSegmentEndReplyMsg->prepareProtocolMsg();
 
 	addMessage(putSegmentEndReplyMsg);
@@ -110,8 +110,9 @@ uint32_t OsdCommunicator::sendSegment(uint32_t osdId, uint32_t sockfd,
 	const uint32_t chunkCount = ((length - 1) / _chunkSize) + 1;
 
 	// step 1: send init message, wait for ack
+	debug("Put Segment Init to FD = %" PRIu32 "\n", sockfd);
 	putSegmentInit(osdId, sockfd, objectId, segmentId, length, chunkCount);
-	debug("%s\n", "Put Segment Init ACK-ed");
+	debug("Put Segment Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
 
 	// step 2: send data
 
@@ -168,14 +169,17 @@ struct SegmentData OsdCommunicator::getSegmentRequest(uint32_t osdId,
 
 vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 		uint64_t objectId, ComponentType dstComponent, uint32_t segmentCount) {
+
 	vector<struct SegmentLocation> osdList;
 
 	// TODO: request to MONITOR (HARDCODE FOR NOW)
 
-	struct SegmentLocation segmentLocation;
-	segmentLocation.osdId = 52001;
-	segmentLocation.segmentId = 0;
-	osdList.push_back(segmentLocation);
+	for (uint32_t i = 0; i < segmentCount; i++) {
+		struct SegmentLocation segmentLocation;
+		segmentLocation.osdId = 52001;
+		segmentLocation.segmentId = 0;
+		osdList.push_back(segmentLocation);
+	}
 
 	return osdList;
 }
