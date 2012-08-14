@@ -8,6 +8,7 @@
 #include "../common/debug.hh"
 
 #ifdef COMPILE_FOR_MDS
+#include "../mds/mds.hh"
 extern Mds* mds;
 #endif
 
@@ -67,7 +68,7 @@ void UploadObjectAckMsg::parse(char* buf) {
 
 void UploadObjectAckMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->uploadObjectAckProcessor(_msgHeader.requestId, _sockFd, _objectId, nodeList);
+	mds->uploadObjectAckProcessor(_msgHeader.requestId, _sockfd, _objectId, _nodeList);
 #endif
 }
 
