@@ -232,7 +232,7 @@ private:
 	 * Stores the list of OSDs that store a certain segment
 	 */
 
-	SegmentLocationCache* _segmentLocationCache;
+	//SegmentLocationCache* _segmentLocationCache;
 
 	/**
 	 * Handles communication with other components

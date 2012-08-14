@@ -1,19 +1,14 @@
+#include <stdlib.h>
 #include "segmentlocationcache.hh"
 
-vector<struct SegmentLocation> SegmentLocationCache::readSegmentLocation(
-		uint64_t objectId) {
-	throw new CacheMissException();
+char * read(uint64_t id) {
+	return NULL;
+
 }
 
-uint32_t SegmentLocationCache::writeSegmentLocation(uint64_t objectId,
-		vector<struct SegmentLocation> osdId) {
-	throw new CacheMissException();
+void write(uint64_t id, char* data) {
+
 }
 
-uint32_t SegmentLocationCache::createSegmentLocation(uint64_t objectId) {
-	return 0;
-}
-
-uint32_t SegmentLocationCache::deleteSegmentLocation(uint64_t objectId) {
-	return 0;
+void deleteEntry(uint64_t id) {
 }

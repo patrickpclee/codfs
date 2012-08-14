@@ -71,7 +71,7 @@ private:
 	uint32_t _clientId;
 	uint32_t _ip;
 	uint16_t _port;
-	Cache _cache;
+//	Cache _cache;
 
 	ClientCommunicator* _clientCommunicator;
 	ClientStorageModule* _storageModule;

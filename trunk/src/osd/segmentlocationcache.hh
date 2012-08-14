@@ -13,11 +13,9 @@ struct SegmentLocation {
 
 class SegmentLocationCache: public Cache {
 public:
-	vector<struct SegmentLocation> readSegmentLocation(uint64_t objectId);
-	uint32_t writeSegmentLocation(uint64_t objectId,
-			vector<struct SegmentLocation> osdId);
-	uint32_t createSegmentLocation(uint64_t objectId);
-	uint32_t deleteSegmentLocation(uint64_t objectId);
+	char * read(uint64_t id);
+	void write(uint64_t id, char* data);
+	void deleteEntry(uint64_t id);
 private:
 };
 #endif

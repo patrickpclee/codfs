@@ -3,7 +3,7 @@
 
 std::mutex fileCacheMutex;
 
-FileMetaDataCache::FileMetaDataCache(){
+FileMetaDataCache::FileMetaDataCache() {
 	_fileMetaDataMap.clear();
 }
 

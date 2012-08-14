@@ -30,7 +30,7 @@ mutex pendingSegmentChunkMutex;
 
 Osd::Osd(string configFilePath) {
 	configLayer = new ConfigLayer(configFilePath.c_str(), "common.xml");
-	_segmentLocationCache = new SegmentLocationCache();
+	//segmentLocationCache = new SegmentLocationCache();
 	_storageModule = new StorageModule();
 	_osdCommunicator = new OsdCommunicator();
 	_codingModule = new CodingModule();
@@ -41,7 +41,7 @@ Osd::Osd(string configFilePath) {
 }
 
 Osd::~Osd() {
-	delete _segmentLocationCache;
+	//delete _segmentLocationCache;
 	delete _storageModule;
 	delete _osdCommunicator;
 }
@@ -55,8 +55,10 @@ Osd::~Osd() {
 uint32_t Osd::osdListProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, vector<SegmentLocation> osdList) {
 
+	/*
 	_segmentLocationCache->deleteSegmentLocation(objectId);
 	_segmentLocationCache->writeSegmentLocation(objectId, osdList);
+	*/
 
 	return 0;
 }
@@ -256,7 +258,9 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 		char* buf) {
 
 	const string segmentKey = objectId + "." + segmentId;
-	uint32_t byteWritten;
+
+	uint32_t byteWritten = _storageModule->writeSegment(objectId, segmentId,
+			buf, offset, length);
 
 	uint32_t chunkLeft = 0;
 	{
@@ -290,9 +294,11 @@ OsdCommunicator* Osd::getCommunicator() {
 	return _osdCommunicator;
 }
 
+/*
 SegmentLocationCache* Osd::getSegmentLocationCache() {
 	return _segmentLocationCache;
 }
+*/
 
 uint32_t Osd::getOsdId() {
 	return _osdId;
@@ -315,14 +321,14 @@ void startReceiveThread(Communicator* communicator) {
 void startTestThread(Communicator* communicator) {
 	printf("HEHE\n");
 	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-		communicator->getMonitorSockfd(), 111, 222, 333);
+			communicator->getMonitorSockfd(), 111, 222, 333);
 	printf("Prepared msg\n");
 	testmsg->prepareProtocolMsg();
 	communicator->addMessage(testmsg);
 	printf("Prepared add \n");
-	sleep (10);
+	sleep(10);
 	OsdShutdownMsg* msg = new OsdShutdownMsg(communicator,
-		communicator->getMonitorSockfd(), 111);
+			communicator->getMonitorSockfd(), 111);
 	msg->prepareProtocolMsg();
 	communicator->addMessage(msg);
 	printf("DONE\n");
@@ -373,7 +379,7 @@ int main(int argc, char* argv[]) {
 //	thread testThread(startTestThread, communicator);
 	// TODO: pause before connect for now
 	//getchar();
-	
+
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
