@@ -84,6 +84,14 @@ message UploadFileReplyPro {
 ///////////////// FROM OSD /////////////////
 
 //
+// OSD -> MDS
+//
+message UploadObjectAckPro {
+	optional fixed64 objectId = 1;
+	repeated fixed32 nodeList = 2;
+}
+
+//
 // OSD -> CLIENT
 //
 

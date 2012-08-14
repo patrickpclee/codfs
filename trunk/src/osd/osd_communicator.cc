@@ -20,6 +20,8 @@
 #include "../protocol/putsegmentendreply.hh"
 #include "../protocol/segmentdatamsg.hh"
 
+#include "../protocol/uploadobjectack.hh"
+
 using namespace std;
 
 /**
@@ -256,4 +258,24 @@ void OsdCommunicator::putSegmentEnd(uint32_t osdId, uint32_t sockfd,
 
 void OsdCommunicator::objectUploadAck(uint64_t objectId, vector<uint32_t> nodeList)
 {
+	uint32_t mdsSockFd = getMdsSockfd();
+
+	UploadObjectAckMsg* uploadObjectAckMsg =
+			new UploadObjectAckMsg(this, mdsSockFd, objectId, nodeList);
+
+	uploadObjectAckMsg->prepareProtocolMsg();
+	addMessage(uploadObjectAckMsg, false);
+
+	/*
+	addMessage(objectUploadAckRequestMsg, true);
+
+	MessageStatus status = objectUploadAckRequestMsg->waitForStatusChange();
+	if(status == READY) {
+		waitAndDelete(objectUploadAckMsg);
+		return ;
+	} else {
+		debug("Object Upload Ack Failed [%" PRIu64 "]\n", objectId);
+		exit(-1);
+	}
+	*/
 }

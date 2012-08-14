@@ -74,7 +74,7 @@ uint32_t Mds::uploadFileProcessor (uint32_t requestId, uint32_t connectionId, ui
  * 1. Save the Node List of the object \n
  * 2. Set the Primary for the object
  */
-void Mds::uploadObjectAckProcessor (uint32_t requestId, uint32_t connectionId, uint32_t osdId, uint32_t fileId, uint64_t objectId, vector<uint32_t> objectNodeList)
+void Mds::uploadObjectAckProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t> objectNodeList)
 {
 	_metaDataModule->saveNodeList(objectId, objectNodeList);
 	_metaDataModule->setPrimary(objectId, objectNodeList[0]);

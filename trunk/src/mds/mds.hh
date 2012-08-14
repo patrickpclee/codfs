@@ -43,12 +43,10 @@ public:
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
-	 * @param	osdId		ID of the Osd which the Acknowledgement originated
-	 * @param	fileId		ID of the File which the object associated with
 	 * @param	objectId	ID of the object uploaded
 	 * @param	objectNodeList	List of the Osd
 	 */
-	void uploadObjectAckProcessor (uint32_t requestId, uint32_t connectionId, uint32_t osdId, uint32_t fileId, uint64_t objectId, vector<uint32_t> objectNodeList);
+	void uploadObjectAckProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t> objectNodeList);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)
