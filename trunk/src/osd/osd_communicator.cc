@@ -172,15 +172,23 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 		uint64_t objectId, ComponentType dstComponent, uint32_t segmentCount) {
 
 	vector<struct SegmentLocation> osdList;
+	srand(time(NULL));
 
 	// TODO: request to MONITOR (HARDCODE FOR NOW)
 
 	for (uint32_t i = 0; i < segmentCount; i++) {
 		struct SegmentLocation segmentLocation;
-		if(_componentId == 52000)
-			segmentLocation.osdId = 52001;
-		else
-			segmentLocation.osdId = 52000;
+
+		segmentLocation.osdId = rand() % 2 + 52000;
+		cout << "OSD ID = " << segmentLocation.osdId << endl;
+
+		/*
+		 if (_componentId == 52000)
+		 segmentLocation.osdId = 52001;
+		 else
+		 segmentLocation.osdId = 52000;
+		 */
+
 		segmentLocation.segmentId = 0;
 		osdList.push_back(segmentLocation);
 	}
@@ -256,26 +264,26 @@ void OsdCommunicator::putSegmentEnd(uint32_t osdId, uint32_t sockfd,
 	}
 }
 
-void OsdCommunicator::objectUploadAck(uint64_t objectId, vector<uint32_t> nodeList)
-{
+void OsdCommunicator::objectUploadAck(uint64_t objectId,
+		vector<uint32_t> nodeList) {
 	uint32_t mdsSockFd = getMdsSockfd();
 
-	UploadObjectAckMsg* uploadObjectAckMsg =
-			new UploadObjectAckMsg(this, mdsSockFd, objectId, nodeList);
+	UploadObjectAckMsg* uploadObjectAckMsg = new UploadObjectAckMsg(this,
+			mdsSockFd, objectId, nodeList);
 
 	uploadObjectAckMsg->prepareProtocolMsg();
 	addMessage(uploadObjectAckMsg, false);
 
 	/*
-	addMessage(objectUploadAckRequestMsg, true);
+	 addMessage(objectUploadAckRequestMsg, true);
 
-	MessageStatus status = objectUploadAckRequestMsg->waitForStatusChange();
-	if(status == READY) {
-		waitAndDelete(objectUploadAckMsg);
-		return ;
-	} else {
-		debug("Object Upload Ack Failed [%" PRIu64 "]\n", objectId);
-		exit(-1);
-	}
-	*/
+	 MessageStatus status = objectUploadAckRequestMsg->waitForStatusChange();
+	 if(status == READY) {
+	 waitAndDelete(objectUploadAckMsg);
+	 return ;
+	 } else {
+	 debug("Object Upload Ack Failed [%" PRIu64 "]\n", objectId);
+	 exit(-1);
+	 }
+	 */
 }

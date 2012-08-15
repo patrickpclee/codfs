@@ -263,12 +263,24 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		vector<uint32_t> nodeList;
 		uint32_t i = 0;
 		for (const auto segmentData : segmentDataList) {
-			uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
-					segmentLocationList[i].osdId);
+
+			// if destination is myself
+			if (segmentLocationList[i].osdId == _osdId) {
+				_storageModule->createSegment(objectId,
+						segmentData.info.segmentId,
+						segmentData.info.segmentSize);
+				_storageModule->writeSegment(objectId,
+						segmentData.info.segmentId, segmentData.buf, 0,
+						segmentData.info.segmentSize);
+				_storageModule->closeSegment(objectId,
+						segmentData.info.segmentId);
+			} else {
+				uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
+						segmentLocationList[i].osdId);
+				_osdCommunicator->sendSegment(_osdId, dstSockfd, segmentData);
+			}
 
 			nodeList.push_back(segmentLocationList[i].osdId);
-
-			_osdCommunicator->sendSegment(_osdId, dstSockfd, segmentData);
 
 			// free memory
 			MemoryPool::getInstance().poolFree(segmentData.buf);

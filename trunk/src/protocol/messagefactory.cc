@@ -27,6 +27,8 @@
 #include "osdstatupdaterequestmsg.hh"
 #include "osdstatupdatereplymsg.hh"
 #include "uploadobjectack.hh"
+#include "getprimarylistrequest.hh"
+#include "getprimarylistreply.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -101,6 +103,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (OSDSTAT_UPDATE_REPLY):
 		return new OsdStatUpdateReplyMsg(communicator);
+		break;
+	case (GET_PRIMARY_LIST_REQUEST):
+		return new GetPrimaryListRequestMsg(communicator);
+		break;
+	case (GET_PRIMARY_LIST_REPLY):
+		return new GetPrimaryListReplyMsg(communicator);
 		break;
 	default:
 		debug("%s\n", "Invalid message type");
