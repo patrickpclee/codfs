@@ -2,6 +2,7 @@
 
 #include "../protocol/listdirectoryreply.hh"
 #include "../protocol/uploadfilereply.hh"
+#include "../protocol/getprimarylistrequest.hh"
 
 
 /**
@@ -25,6 +26,21 @@ vector<uint32_t> MdsCommunicator::askPrimaryList(uint32_t numOfObjs)
 	return primaryList;
 }
 
+vector<uint32_t> MdsCommunicator::getPrimaryList(uint32_t sockfd, uint32_t numOfObjs)
+{
+		GetPrimaryListRequestMsg* getPrimaryListRequestMsg =
+				new GetPrimaryListRequestMsg(this, sockfd, numOfObjs);
+		getPrimaryListRequestMsg->prepareProtocolMsg();
+
+		addMessage(getPrimaryListRequestMsg, true);
+		MessageStatus status = getPrimaryListRequestMsg->waitForStatusChange();
+
+		if (status == READY) {
+			vector<uint32_t> primaryList = getPrimaryListRequestMsg->getPrimaryList();
+			return primaryList;
+		}
+		return {};
+}
 
 void MdsCommunicator::display()
 {

@@ -68,9 +68,13 @@ public:
 
 	void printProtocol ();
 
+	void setPrimaryList(vector<uint32_t> primaryList);
+
+	vector<uint32_t> getPrimaryList();
 
 private:
 	uint32_t _numOfObjs;
+	vector<uint32_t> _primaryList;
 };
 
 #endif

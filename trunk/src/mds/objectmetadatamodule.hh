@@ -2,6 +2,7 @@
 #define __OBJECT_METADATA_MODULE_HH__
 
 #include <stdint.h>
+#include <vector>
 
 #include "../storage/mongodb.hh"
 

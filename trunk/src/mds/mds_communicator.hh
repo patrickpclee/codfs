@@ -86,6 +86,7 @@ public:
 	 * @param	numOfObjs	Number of Objects
 	 */
 	vector<uint32_t> askPrimaryList (uint32_t numOfObjs);
+	vector<uint32_t> getPrimaryList (uint32_t sockfd, uint32_t numOfObjs);
 
 private:
 };

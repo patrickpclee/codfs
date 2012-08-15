@@ -4,10 +4,14 @@
 #include <stdint.h>
 
 #include "../common/metadata.hh"
+#include "../storage/mongodb.hh"
 
 class OsdMetaDataModule {
 	public:
 	private:
+		string _collection;
+
+		MongoDB* _osdMetaDataStorage;
 //		OsdMetaDataCache* _osdMetaDataCache;
 };
 

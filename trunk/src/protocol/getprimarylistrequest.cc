@@ -65,3 +65,12 @@ void GetPrimaryListRequestMsg::doHandle() {
 void GetPrimaryListRequestMsg::printProtocol() {
 	debug("[GET_PRIMARY_LIST_REQUEST] NUMBER OF OBJS = %" PRIu32 "\n",_numOfObjs);
 }
+
+void GetPrimaryListRequestMsg::setPrimaryList(vector<uint32_t> primaryList) {
+	_primaryList = primaryList;
+	return;
+}
+
+vector<uint32_t> GetPrimaryListRequestMsg::getPrimaryList() {
+	return _primaryList;
+}

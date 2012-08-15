@@ -66,6 +66,7 @@ void GetPrimaryListReplyMsg::doHandle() {
 	GetPrimaryListRequestMsg* getPrimaryListRequestMsg =
 			(GetPrimaryListRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
+	getPrimaryListRequestMsg->setPrimaryList(_primaryList);
 	getPrimaryListRequestMsg->setStatus(READY);
 }
 
