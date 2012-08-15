@@ -44,8 +44,9 @@ uint32_t Monitor::getMonitorId() {
 }
 
 void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
-	uint32_t osdId, uint32_t capacity, uint32_t loading) {
-	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE);
+	uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip, 
+	uint16_t port ) {
+	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE, ip, port);
 }
 
 void Monitor::OsdStatUpdateReplyProcessor(uint32_t requestId, uint32_t sockfd,
@@ -61,7 +62,7 @@ void Monitor::OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd,
 void Monitor::getPrimaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfObjs){
 	vector<uint32_t> primaryList;
 	primaryList = _selectionModule->ChoosePrimary(numOfObjs);
-	_monitorCommunicator->replyPrimaryList(sockfd, primaryList);
+	_monitorCommunicator->replyPrimaryList(requestId, sockfd, primaryList);
 	return;
 }
 

@@ -25,6 +25,8 @@ public:
 	 */
 	void setStatById (uint32_t osdId, uint32_t sockfd, uint32_t capacity,
 		 uint32_t loading, enum OsdHealthStat health);
+	void setStatById (uint32_t osdId, uint32_t sockfd, uint32_t capacity,
+		 uint32_t loading, enum OsdHealthStat health, uint32_t ip, uint16_t port);
 	
 
 private:

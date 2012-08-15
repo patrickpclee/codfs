@@ -25,7 +25,8 @@ public:
 	 */
 	void connect(bool writeConcern = true);
 
-	vector<mongo::BSONObj> read(string collection, mongo::Query queryObject);
+	vector<mongo::BSONObj> read (string collection, mongo::Query queryObject);
+	mongo::BSONObj readOne (string collection, mongo::Query queryObject);
 	void insert (string collection, mongo::BSONObj insertObject);
 	void update (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
 	void push (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
@@ -36,6 +37,7 @@ private:
 	string _user;
 	string _password;
 	string _host;
+	uint32_t _port;
 	string _database;
 
 	mongo::DBClientConnection _connection;

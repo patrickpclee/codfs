@@ -160,6 +160,8 @@ message OsdStartupPro {
 	optional fixed32 osdId = 1;
 	optional fixed32 osdCapacity = 2;
 	optional fixed32 osdLoading = 3;
+	optional fixed32 osdIp = 4;
+	optional fixed32 osdPort = 5;
 }
 
 message OsdShutdownPro {

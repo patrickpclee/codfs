@@ -39,3 +39,10 @@ void ObjectMetaDataModule::setPrimary (uint64_t objectId, uint32_t primary)
 	
 	return ;
 }
+
+uint32_t ObjectMetaDataModule::getPrimary (uint64_t objectId)
+{
+	BSONObj queryObject = BSON ("id" << (long long int) objectId);
+	BSONObj temp = _objectMetaDataStorage->readOne (_collection, queryObject);
+	return (uint32_t)temp.getField("primary").Int();
+}

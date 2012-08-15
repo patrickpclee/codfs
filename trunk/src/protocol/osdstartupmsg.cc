@@ -24,6 +24,19 @@ OsdStartupMsg::OsdStartupMsg(Communicator* communicator, uint32_t osdSockfd,
 	_loading = loading;
 }
 
+OsdStartupMsg::OsdStartupMsg(Communicator* communicator, uint32_t osdSockfd,
+		uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip,
+		uint16_t port) :
+		Message(communicator) {
+
+	_sockfd = osdSockfd;
+	_osdId = osdId;
+	_capacity = capacity;
+	_loading = loading;
+	_osdIp = ip;
+	_osdPort = port;
+}
+
 void OsdStartupMsg::prepareProtocolMsg() {
 	string serializedString;
 
@@ -31,6 +44,8 @@ void OsdStartupMsg::prepareProtocolMsg() {
 	osdStartupPro.set_osdid(_osdId);
 	osdStartupPro.set_osdcapacity(_capacity);
 	osdStartupPro.set_osdloading(_loading);
+	osdStartupPro.set_osdip(_osdIp);
+	osdStartupPro.set_osdport(_osdPort);
 
 	if (!osdStartupPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -54,12 +69,15 @@ void OsdStartupMsg::parse(char* buf) {
 	_osdId = osdStartupPro.osdid();
 	_capacity = osdStartupPro.osdcapacity();
 	_loading = osdStartupPro.osdloading();
+	_osdIp = osdStartupPro.osdip();
+	_osdPort = osdStartupPro.osdport();
 
 }
 
 void OsdStartupMsg::doHandle() {
 #ifdef COMPILE_FOR_MONITOR
-	monitor->OsdStartupProcessor(_msgHeader.requestId, _sockfd, _osdId, _capacity, _loading);
+	monitor->OsdStartupProcessor(_msgHeader.requestId, _sockfd, _osdId, 
+		_capacity, _loading, _osdIp, _osdPort);
 #endif
 }
 
