@@ -40,6 +40,11 @@ message UploadFileRequestPro {
 	optional string codingSetting = 6;
 }
 
+message DownloadFileRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+}
+
 //
 // CLIENT -> OSD
 //
@@ -64,7 +69,18 @@ message ObjectDataPro {
 	optional fixed32 length = 3;
 }
 
-message PutObjectEndRequestPro {
+message GetObjectRequestPro {
+	optional fixed64 objectId = 1;
+}
+
+message GetObjectReadyPro {
+	optional fixed64 objectId = 1;
+}
+
+// Upload: CLIENT -> OSD
+// Download: OSD -> CLIENT
+
+message ObjectTransferEndRequestPro {
 	optional fixed64 objectId = 1;
 }
 
@@ -90,6 +106,22 @@ message UploadFileReplyPro {
 	repeated fixed32 primaryList = 3;
 }
 
+message DownloadFileReplyPro {
+	repeated fixed64 objectList = 1;
+	repeated fixed32 primaryList = 3;
+}
+
+//
+// MDS -> OSD
+//
+
+message GetObjectInfoReplyPro {
+	optional fixed64 objectId = 1;
+	repeated fixed32 nodeList = 2;
+	optional PutObjectInitRequestPro.CodingScheme codingScheme = 3;	
+	optional string codingSetting = 4;
+}
+
 //
 // MDS -> MONITOR
 //
@@ -103,9 +135,14 @@ message GetPrimaryListRequestPro{
 //
 // OSD -> MDS
 //
+
 message UploadObjectAckPro {
 	optional fixed64 objectId = 1;
 	repeated fixed32 nodeList = 2;
+}
+
+message GetObjectInfoRequestPro {
+	optional fixed64 objectId = 1;	
 }
 
 //
@@ -116,8 +153,17 @@ message PutObjectInitReplyPro {
 	optional fixed64 objectId = 1;
 }
 
-message PutObjectEndReplyPro {
+// Upload: OSD -> CLIENT
+// Download: CLIENT -> OSD
+
+message ObjectTransferEndReplyPro {
 	optional fixed64 objectId = 1;
+}
+
+message GetObjectReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 objectSize = 2;
+	optional fixed32 chunkCount = 3;
 }
 
 //
@@ -138,7 +184,7 @@ message SegmentDataPro {
 	optional fixed32 length = 4;
 }
 
-message PutSegmentEndRequestPro {
+message SegmentTransferEndRequestPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 segmentId = 2;
 }
@@ -148,7 +194,24 @@ message PutSegmentInitReplyPro {
 	optional fixed32 segmentId = 2;
 }
 
-message PutSegmentEndReplyPro {
+message SegmentTransferEndReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message GetSegmentInitRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message GetSegmentInitReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+	optional fixed32 segmentSize = 3;
+	optional fixed32 chunkCount = 4;
+}
+
+message GetSegmentReadyPro {
 	optional fixed64 objectId = 1;
 	optional fixed32 segmentId = 2;
 }

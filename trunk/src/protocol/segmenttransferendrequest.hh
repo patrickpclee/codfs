@@ -1,5 +1,5 @@
-#ifndef __PUTSEGMENTENDREQUEST_HH__
-#define __PUTSEGMENTENDREQUEST_HH__
+#ifndef __SEGMENT_TRANSFER_END_REQUEST_HH__
+#define __SEGMENT_TRANSFER_END_REQUEST_HH__
 
 #include "message.hh"
 
@@ -9,12 +9,12 @@ using namespace std;
  * Extends the Message class
  */
 
-class PutSegmentEndRequestMsg: public Message {
+class SegmentTransferEndRequestMsg: public Message {
 public:
 
-	PutSegmentEndRequestMsg(Communicator* communicator);
+	SegmentTransferEndRequestMsg(Communicator* communicator);
 
-	PutSegmentEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
+	SegmentTransferEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t objectId, uint32_t segmentId);
 
 	/**

@@ -1,5 +1,5 @@
-#ifndef __PUTOBJECTENDREQUEST_HH__
-#define __PUTOBJECTENDREQUEST_HH__
+#ifndef __OBJECT_TRANSFER_END_REPLY_HH__
+#define __OBJECT_TRANSFER_END_REPLY_HH__
 
 #include "message.hh"
 
@@ -10,12 +10,12 @@ using namespace std;
  * Initiate an object upload
  */
 
-class PutObjectEndRequestMsg: public Message {
+class ObjectTransferEndReplyMsg: public Message {
 public:
 
-	PutObjectEndRequestMsg(Communicator* communicator);
+	ObjectTransferEndReplyMsg(Communicator* communicator);
 
-	PutObjectEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
+	ObjectTransferEndReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t dstSockfd,
 			uint64_t objectId);
 
 	/**

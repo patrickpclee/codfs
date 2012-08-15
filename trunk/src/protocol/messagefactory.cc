@@ -11,12 +11,12 @@
 #include "uploadfilereply.hh"
 #include "putobjectinitrequest.hh"
 #include "putobjectinitreply.hh"
-#include "putobjectendrequest.hh"
-#include "putobjectendreply.hh"
+#include "segmenttransferendrequest.hh"
+#include "segmenttransferendreply.hh"
 #include "putsegmentinitrequest.hh"
 #include "putsegmentinitreply.hh"
-#include "putsegmentendrequest.hh"
-#include "putsegmentendreply.hh"
+#include "objecttransferendreply.hh"
+#include "objecttransferendrequest.hh"
 #include "objectdatamsg.hh"
 #include "segmentdatamsg.hh"
 #include "messagefactory.hh"
@@ -65,11 +65,11 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (PUT_OBJECT_INIT_REPLY):
 		return new PutObjectInitReplyMsg(communicator);
 		break;
-	case (PUT_OBJECT_END_REQUEST):
-		return new PutObjectEndRequestMsg(communicator);
+	case (OBJECT_TRANSFER_END_REQUEST):
+		return new ObjectTransferEndRequestMsg(communicator);
 		break;
-	case (PUT_OBJECT_END_REPLY):
-		return new PutObjectEndReplyMsg(communicator);
+	case (OBJECT_TRANSFER_END_REPLY):
+		return new ObjectTransferEndReplyMsg(communicator);
 		break;
 	case (PUT_SEGMENT_INIT_REQUEST):
 		return new PutSegmentInitRequestMsg(communicator);
@@ -77,11 +77,11 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (PUT_SEGMENT_INIT_REPLY):
 		return new PutSegmentInitReplyMsg(communicator);
 		break;
-	case (PUT_SEGMENT_END_REQUEST):
-		return new PutSegmentEndRequestMsg(communicator);
+	case (SEGMENT_TRANSFER_END_REQUEST):
+		return new SegmentTransferEndRequestMsg(communicator);
 		break;
-	case (PUT_SEGMENT_END_REPLY):
-		return new PutSegmentEndReplyMsg(communicator);
+	case (SEGMENT_TRANSFER_END_REPLY):
+		return new SegmentTransferEndReplyMsg(communicator);
 		break;
 	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);

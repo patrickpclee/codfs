@@ -1,5 +1,5 @@
-#ifndef __PUTSEGMENTENDREPLY_HH__
-#define __PUTSEGMENTENDREPLY_HH__
+#ifndef __SEGMENT_TRANSFER_END_REPLY_HH__
+#define __SEGMENT_TRANSFER_END_REPLY_HH__
 
 #include "message.hh"
 
@@ -9,12 +9,12 @@ using namespace std;
  * Extends the Message class
  */
 
-class PutSegmentEndReplyMsg: public Message {
+class SegmentTransferEndReplyMsg: public Message {
 public:
 
-	PutSegmentEndReplyMsg(Communicator* communicator);
+	SegmentTransferEndReplyMsg(Communicator* communicator);
 
-	PutSegmentEndReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t dstSockfd,
+	SegmentTransferEndReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t dstSockfd,
 			uint64_t objectId, uint32_t segmentId);
 
 	/**

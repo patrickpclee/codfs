@@ -69,6 +69,6 @@ void StatModule::setStatById (uint32_t osdId, uint32_t sockfd,
 		iter->second.osdHealth = health;
 		iter->second.osdIp = ip;
 		iter->second.osdPort = port;
-		iter->second.timestamp = NULL;
+		iter->second.timestamp = time(NULL);
 	}
 }

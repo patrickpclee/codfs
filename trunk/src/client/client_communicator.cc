@@ -7,7 +7,7 @@
 #include "../protocol/listdirectoryrequest.hh"
 #include "../protocol/uploadfilerequest.hh"
 #include "../protocol/putobjectinitrequest.hh"
-#include "../protocol/putobjectendrequest.hh"
+#include "../protocol/objecttransferendrequest.hh"
 #include "../protocol/objectdatamsg.hh"
 
 /**
@@ -162,7 +162,7 @@ void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	// Step 3 of the upload process
 
-	PutObjectEndRequestMsg* putObjectEndRequestMsg = new PutObjectEndRequestMsg(
+	ObjectTransferEndRequestMsg* putObjectEndRequestMsg = new ObjectTransferEndRequestMsg(
 			this, dstOsdSockfd, objectId);
 
 	putObjectEndRequestMsg->prepareProtocolMsg();

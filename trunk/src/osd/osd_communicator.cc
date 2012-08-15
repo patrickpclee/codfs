@@ -7,19 +7,18 @@
 #include "osd_communicator.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
-#include "../protocol/listdirectoryrequest.hh"
-#include "../protocol/putobjectinitreply.hh"
-#include "../protocol/putobjectendreply.hh"
 #include "../common/debug.hh"
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
 
+#include "../protocol/listdirectoryrequest.hh"
+#include "../protocol/putobjectinitreply.hh"
 #include "../protocol/putsegmentinitrequest.hh"
 #include "../protocol/putsegmentinitreply.hh"
-#include "../protocol/putsegmentendrequest.hh"
-#include "../protocol/putsegmentendreply.hh"
+#include "../protocol/objecttransferendreply.hh"
+#include "../protocol/segmenttransferendrequest.hh"
+#include "../protocol/segmenttransferendreply.hh"
 #include "../protocol/segmentdatamsg.hh"
-
 #include "../protocol/uploadobjectack.hh"
 
 using namespace std;
@@ -78,7 +77,7 @@ void OsdCommunicator::replyPutSegmentInit(uint32_t requestId,
 void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId) {
 
-	PutObjectEndReplyMsg* putObjectEndReplyMsg = new PutObjectEndReplyMsg(this,
+	ObjectTransferEndReplyMsg* putObjectEndReplyMsg = new ObjectTransferEndReplyMsg(this,
 			requestId, connectionId, objectId);
 	putObjectEndReplyMsg->prepareProtocolMsg();
 
@@ -88,11 +87,11 @@ void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId, uint32_t segmentId) {
 
-	PutSegmentEndReplyMsg* putSegmentEndReplyMsg = new PutSegmentEndReplyMsg(
+	SegmentTransferEndReplyMsg* segmentTransferEndReplyMsg = new SegmentTransferEndReplyMsg(
 			this, requestId, connectionId, objectId, segmentId);
-	putSegmentEndReplyMsg->prepareProtocolMsg();
+	segmentTransferEndReplyMsg->prepareProtocolMsg();
 
-	addMessage(putSegmentEndReplyMsg);
+	addMessage(segmentTransferEndReplyMsg);
 
 //TODO
 }
@@ -248,15 +247,15 @@ void OsdCommunicator::putSegmentEnd(uint32_t osdId, uint32_t sockfd,
 
 	// Step 3 of the upload process
 
-	PutSegmentEndRequestMsg* putSegmentEndRequestMsg =
-			new PutSegmentEndRequestMsg(this, sockfd, objectId, segmentId);
+	SegmentTransferEndRequestMsg* segmentTransferEndRequestMsg =
+			new SegmentTransferEndRequestMsg(this, sockfd, objectId, segmentId);
 
-	putSegmentEndRequestMsg->prepareProtocolMsg();
-	addMessage(putSegmentEndRequestMsg, true);
+	segmentTransferEndRequestMsg->prepareProtocolMsg();
+	addMessage(segmentTransferEndRequestMsg, true);
 
-	MessageStatus status = putSegmentEndRequestMsg->waitForStatusChange();
+	MessageStatus status = segmentTransferEndRequestMsg->waitForStatusChange();
 	if (status == READY) {
-		waitAndDelete(putSegmentEndRequestMsg);
+		waitAndDelete(segmentTransferEndRequestMsg);
 		return;
 	} else {
 		debug("%s\n", "Put Segment Init Failed");
