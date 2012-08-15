@@ -155,7 +155,7 @@ public:
 	 */
 	void run();
 
-//	void test();
+	void test();
 
 private:
 

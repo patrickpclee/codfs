@@ -31,10 +31,10 @@ void ObjectMetaDataModule::saveNodeList (uint64_t objectId, vector<uint32_t> obj
 	return ;
 }
 
-vector<uint32_t> readNodeList (uint64_t objectId)
+vector<uint32_t> ObjectMetaDataModule::readNodeList (uint64_t objectId)
 {
 	vector<uint32_t> nodeList;
-	BSONObj queryObject = BSON ("id" << objectId);
+	BSONObj queryObject = BSON ("id" << (long long int)objectId);
 	BSONObj result = _objectMetaDataStorage->readOne(_collection,queryObject);
 	BSONForEach(it, result.getObjectField("nodeList")) {
 		nodeList.push_back((uint32_t)it.numberInt());

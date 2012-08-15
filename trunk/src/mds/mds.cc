@@ -258,7 +258,6 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 
-/*
 void Mds::test() {
 	uint32_t fileId = 216;
 	vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);
@@ -282,7 +281,6 @@ void Mds::test() {
 	}
 	*/
 }
-*/
 
 int main(void) {
 	configLayer = new ConfigLayer("mdsconfig.xml");
