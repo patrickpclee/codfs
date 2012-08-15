@@ -12,6 +12,10 @@ MongoDB::MongoDB ()
 {
 	// TODO: Handle Exception 
 	_host = configLayer->getConfigString("MetaData>MongoDB>Host");
+	if(configLayer->getConfigInt("MetaData>MongoDB>Port") == -1)
+		_port = 27017;
+	else
+		_port = configLayer->getConfigInt("MetaData>MongoDB>Port");
 	_database = configLayer->getConfigString("MetaData>MongoDB>Database");
 	_user = configLayer->getConfigString("MetaData>MongoDB>User");
 	_password = configLayer->getConfigString("MetaData>MongoDB>Password");
@@ -27,7 +31,7 @@ MongoDB::MongoDB (string host, string database) :
  */
 void MongoDB::connect (bool writeConcern)
 {
-	_connection.connect(_host);
+	_connection.connect(_host + ":" + to_string(_port));
 	if(writeConcern)
 		_connection.setWriteConcern(W_NORMAL);
 	string errMsg;
@@ -48,6 +52,11 @@ vector<BSONObj> MongoDB::read (string collection, Query queryObject)
 	}
 	
 	return result;
+}
+
+BSONObj MongoDB::readOne (string collection, Query queryObject)
+{
+	return read(collection, queryObject).at(0);
 }
 
 void MongoDB::insert (string collection, BSONObj insertObject)

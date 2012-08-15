@@ -48,6 +48,16 @@ void FileMetaDataModule::saveObjectList(uint32_t fileId,
 	return;
 }
 
+vector<uint64_t> FileMetaDataModule::readObjectList(uint32_t fileId) {
+	vector<uint64_t> objectList;
+	BSONObj quertObject = BSON ("id" << fileId);
+	BSONObj result = _fileMetaDataStorage->readOne(_collection,quertObject);
+	BSONForEach(it, result.getObjectField("objectList")) {
+		objectList.push_back((uint64_t)it.numberLong());
+	}
+	return objectList;
+}
+
 uint32_t FileMetaDataModule::generateFileId() {
 	uint32_t fileId;
 
