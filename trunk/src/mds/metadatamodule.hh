@@ -14,17 +14,19 @@ using namespace std;
 class MetaDataModule {
 public:
 	MetaDataModule();
-	
+
 	/**
 	 * @brief	Create Meta Data Entry for a New File
 	 *
 	 * @param	cleintId	ID of the Client
 	 * @param	path	Path to the File
 	 * @param	fileSize	Size of the File
+	 * @param 	codingScheme	Coding Scheme of the file
 	 *
 	 * @return	File ID
 	 */
-	uint32_t createFile (uint32_t clientId, string path, uint64_t fileSize);
+	uint32_t createFile(uint32_t clientId, string path, uint64_t fileSize,
+			CodingScheme codingScheme);
 
 	/**
 	 * @brief	Open a File
@@ -32,13 +34,13 @@ public:
 	 * @param	clientId	ID of the Client
 	 * @param	fileId	ID of the File
 	 */
-	void openFile (uint32_t clientId, uint32_t filieId);
+	void openFile(uint32_t clientId, uint32_t filieId);
 
-	uint32_t selectActingPrimary (uint64_t objectId, uint32_t exclude);
+	uint32_t selectActingPrimary(uint64_t objectId, uint32_t exclude);
 
-	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
-	vector<uint64_t> readObjectList (uint32_t fileId);
-	vector<uint64_t> readOsdObjectList (uint32_t osdId);
+	void saveObjectList(uint32_t fileId, vector<uint64_t> objectList);
+	vector<uint64_t> readObjectList(uint32_t fileId);
+	vector<uint64_t> readOsdObjectList(uint32_t osdId);
 
 	/**
 	 * @brief	Read Checksum of a File
@@ -47,20 +49,20 @@ public:
 	 *
 	 * @return	Checksum
 	 */
-	unsigned char* readChecksum (uint32_t fileId);
+	unsigned char* readChecksum(uint32_t fileId);
 
 	/**
 	 * @brief	Generate List of Object ID
 	 *
 	 * @param	numOfObjs	Number of Objects
 	 */
-	vector<uint64_t> newObjectList (uint32_t numOfObjs);
+	vector<uint64_t> newObjectList(uint32_t numOfObjs);
 
-	void setPrimary (uint64_t objectId, uint32_t primaryOsdId);
-	uint32_t getPrimary (uint64_t objectId);
+	void setPrimary(uint64_t objectId, uint32_t primaryOsdId);
+	uint32_t getPrimary(uint64_t objectId);
 
-	void saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList);
-	vector<uint32_t> readNodeList (uint64_t objectId);
+	void saveNodeList(uint64_t objectId, vector<uint32_t> objectNodeList);
+	vector<uint32_t> readNodeList(uint64_t objectId);
 
 	/**
 	 * @brief	Lookup the File Path with File ID
@@ -69,7 +71,7 @@ public:
 	 * 
 	 * @return	Path to the File
 	 */
-	string lookupFilePath (uint32_t fileId);
+	string lookupFilePath(uint32_t fileId);
 
 	/**
 	 * @brief	Lookup the File ID with file Path
@@ -78,7 +80,7 @@ public:
 	 *
 	 * @return	ID of the File
 	 */
-	uint32_t lookupFileId (string path);
+	uint32_t lookupFileId(string path);
 
 private:
 	/**
@@ -86,7 +88,7 @@ private:
 	 *
 	 * @return	Object ID
 	 */
-	uint64_t newObjectId ();
+	uint64_t newObjectId();
 
 	FileMetaDataModule* _fileMetaDataModule;
 	ObjectMetaDataModule* _objectMetaDataModule;

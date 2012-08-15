@@ -14,7 +14,7 @@ public:
 	FileMetaDataModule();
 	~FileMetaDataModule();
 
-	void createFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t fileId);
+	void createFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t fileId, CodingScheme codingScheme);
 	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
 
 	uint32_t generateFileId();

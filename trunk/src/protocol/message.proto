@@ -37,7 +37,7 @@ message UploadFileRequestPro {
 	optional fixed64 fileSize = 2;
 	optional fixed32 numOfObjs = 3;
 	optional string path = 4;
-	optional PutObjectInitRequestPro.CodingScheme codingScheme = 5;
+	optional PutObjectInitRequestPro.CodingScheme codingScheme = 5;	
 }
 
 //
