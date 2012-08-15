@@ -47,6 +47,8 @@ public:
 		uint32_t osdId, uint32_t capacity, uint32_t loading);
 	void OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd, uint32_t osdId);
 
+	void getPrimaryListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t numOfObjs);
+
 private:
 //	MonitorInfo _info;
 //	Cache _cache;

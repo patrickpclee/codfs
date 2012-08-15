@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <stdint.h>
+#include <vector>
 #include "../communicator/communicator.hh"
 
 using namespace std;
@@ -23,7 +24,10 @@ public:
 	MonitorCommunicator();
 	~MonitorCommunicator();
 
+	void replyPrimaryList(uint32_t sockdf, vector<uint32_t> primaryList);
+
 private:
+
 };
 
 #endif
