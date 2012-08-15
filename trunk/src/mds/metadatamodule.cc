@@ -49,8 +49,7 @@ unsigned char* MetaDataModule::readChecksum(uint32_t fileId) {
 }
 
 vector<uint32_t> MetaDataModule::readNodeList(uint64_t objectId) {
-	//return _fileMetaDataModule->readNodeList(objectId);
-	return{0};
+	return _objectMetaDataModule->readNodeList(objectId);
 }
 
 vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs) {
