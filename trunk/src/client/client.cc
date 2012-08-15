@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <thread>
 #include <iomanip>
-#include <sys/time.h>
+#include <chrono>
 #include "client.hh"
 #include "client_storagemodule.hh"
 #include "../common/garbagecollector.hh"
@@ -22,16 +22,6 @@ using namespace std;
 void sighandler(int signum) {
 	if (signum == SIGINT)
 		exit(42);
-}
-
-// record time
-double getTime () {
-	struct timeval tp;
-	double sec, usec;
-	gettimeofday(&tp, NULL);
-	sec = static_cast<double>(tp.tv_sec);
-	usec = static_cast<double>(tp.tv_usec) / 1E6;
-	return sec + usec;
 }
 
 /// Client Object
@@ -62,7 +52,10 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		string codingSetting) {
 
 	// start timer
-	double start = getTime();
+//	double start = getTime();
+	typedef chrono::high_resolution_clock Clock;
+	typedef chrono::milliseconds milliseconds;
+	Clock::time_point t0 = Clock::now();
 
 	const uint32_t objectCount = _storageModule->getObjectCount(path);
 	const uint64_t fileSize = _storageModule->getFilesize(path);
@@ -97,14 +90,15 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);
 
 	// Time and Rate calculation (in seconds)
-	double end = getTime();
-	double duration = end - start;
+	Clock::time_point t1 = Clock::now();
+	milliseconds ms = chrono::duration_cast<milliseconds>(t1 - t0);
+	double duration = ms.count() / 1024.0;
 	double fileSizeMb = fileSize / 1048576.0;
 	double rate = fileSizeMb / duration;
 
 	cout << fixed;
 	cout << setprecision(2);
-	cout << fileSizeMb  << " MB transferred in " << duration << " secs, Rate = "
+	cout << fileSizeMb << " MB transferred in " << duration << " secs, Rate = "
 			<< rate << " MB/s" << endl;
 
 	return fileMetaData._id;
