@@ -13,6 +13,7 @@ public:
 
 	void saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList);
 	void setPrimary (uint64_t objectId, uint32_t primary);
+	uint32_t getPrimary (uint64_t objectId);
 private:
 	string _collection;
 

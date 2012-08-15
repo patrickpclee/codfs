@@ -16,6 +16,7 @@ public:
 
 	void createFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t fileId, CodingScheme codingScheme);
 	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
+	vector<uint64_t> readObjectList(uint32_t fileId);
 
 	uint32_t generateFileId();
 private:

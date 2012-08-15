@@ -24,7 +24,7 @@ uint32_t MetaDataModule::createFile(uint32_t clientId, string path,
 }
 
 uint32_t MetaDataModule::getPrimary(uint64_t objectId) {
-	return 0;
+	return _objectMetaDataModule->getPrimary(objectId);
 }
 
 uint32_t MetaDataModule::lookupFileId(string path) {
@@ -49,7 +49,8 @@ unsigned char* MetaDataModule::readChecksum(uint32_t fileId) {
 }
 
 vector<uint32_t> MetaDataModule::readNodeList(uint64_t objectId) {
-	return {0};
+	//return _fileMetaDataModule->readNodeList(objectId);
+	return{0};
 }
 
 vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs) {
@@ -66,7 +67,7 @@ uint64_t MetaDataModule::newObjectId() {
 }
 
 vector<uint64_t> MetaDataModule::readObjectList(uint32_t fileId) {
-	return {0};
+	return _fileMetaDataModule->readObjectList(fileId);
 }
 
 vector<uint64_t> MetaDataModule::readOsdObjectList(uint32_t osdId) {

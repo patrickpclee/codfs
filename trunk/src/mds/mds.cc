@@ -258,6 +258,15 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 void Mds::test() {
+	uint32_t fileId = 216;
+	vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);
+	debug("Object List [%" PRIu32 "]\n",fileId);
+	for(const auto object : objectList){
+		uint32_t primaryId = _metaDataModule->getPrimary(object);
+		printf("%" PRIu64 " [%" PRIu32 "]- ", object,primaryId);
+	}
+	printf("\n");
+	/*
 	debug("%s\n", "Test\n");
 	for (int i = 0; i < 10; ++i) {
 		uint32_t temp = _metaDataModule->createFile(1, ".", 1024, RAID1_CODING);
@@ -269,6 +278,7 @@ void Mds::test() {
 			_metaDataModule->setPrimary(objectList[j], 1);
 		}
 	}
+	*/
 }
 
 int main(void) {
@@ -291,7 +301,7 @@ int main(void) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	//mds->test();
+	mds->test();
 
 	garbageCollectionThread.join();
 	receiveThread.join();
