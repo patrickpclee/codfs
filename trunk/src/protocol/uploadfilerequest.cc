@@ -25,14 +25,16 @@ UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator) :
 /**
  * Constructor - Save parameters in private variables
  */
-UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator, uint32_t mdsSockfd, 
-		uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs) :
+UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator,
+		uint32_t mdsSockfd, uint32_t clientId, string path, uint64_t fileSize,
+		uint32_t numOfObjs, CodingScheme codingScheme) :
 		Message(communicator) {
 	_sockfd = mdsSockfd;
 	_clientId = clientId;
 	_path = path;
 	_fileSize = fileSize;
 	_numOfObjs = numOfObjs;
+	_codingScheme = codingScheme;
 }
 
 void UploadFileRequestMsg::prepareProtocolMsg() {
@@ -44,6 +46,8 @@ void UploadFileRequestMsg::prepareProtocolMsg() {
 	uploadFileRequestPro.set_path(_path);
 	uploadFileRequestPro.set_filesize(_fileSize);
 	uploadFileRequestPro.set_numofobjs(_numOfObjs);
+	uploadFileRequestPro.set_codingscheme(
+			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
 
 	if (!uploadFileRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -67,18 +71,21 @@ void UploadFileRequestMsg::parse(char* buf) {
 	_path = uploadFileRequestPro.path();
 	_fileSize = uploadFileRequestPro.filesize();
 	_numOfObjs = uploadFileRequestPro.numofobjs();
+	_codingScheme = (CodingScheme) uploadFileRequestPro.codingscheme();
 
 }
 
 void UploadFileRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->uploadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _path, _fileSize, _numOfObjs);
+	mds->uploadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _path,
+			_fileSize, _numOfObjs, _codingScheme);
 #endif
 }
 
 void UploadFileRequestMsg::printProtocol() {
-	debug("[UPLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", Path = %s\n", _clientId,
-			_path.c_str());
+	debug(
+			"[UPLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", Path = %s, CodingScheme = %d\n",
+			_clientId, _path.c_str(), _codingScheme);
 }
 
 void UploadFileRequestMsg::setObjectList(vector<uint64_t> objectList) {

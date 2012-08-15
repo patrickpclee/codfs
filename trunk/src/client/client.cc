@@ -5,6 +5,7 @@
 #include <thread>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <iomanip>
 #include "client.hh"
 #include "client_storagemodule.hh"
 #include "../common/garbagecollector.hh"
@@ -17,6 +18,7 @@
 
 using namespace std;
 
+// handle ctrl-C for profiler
 void sighandler(int signum) {
 	if (signum == SIGINT)
 		exit(42);
@@ -77,10 +79,11 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
 		//uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
-		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData, codingScheme);
+		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
+				codingScheme);
 	}
 
-	debug("Upload %s Done [%" PRIu32 "]\n",path.c_str(),fileMetaData._id);
+	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);
 
 	return fileMetaData._id;
 }
@@ -115,7 +118,8 @@ uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme) {
 		uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
 		objectData.info.objectId = i;
 
-		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData, codingScheme);
+		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
+				codingScheme);
 	}
 
 	// Time stamp after the computations
@@ -126,12 +130,13 @@ uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme) {
 
 	// Time and Rate calculation (in seconds)
 	double duration = end - start;
-	double filesize = _storageModule->getFilesize(filepath) / 1024.0
-			/ 1024.0;
+	uint64_t filesize = _storageModule->getFilesize(filepath) / 1024.0 / 1024.0;
 	double rate = filesize / duration;
 
-	cout << filesize << " MB transferred in " << duration << " secs, Rate = "
-			<< rate << " MB/s" << endl;
+	cout << fixed;
+	cout << setprecision(2);
+	cout << filesize << " MB transferred in "
+			<< duration << " secs, Rate = " << rate << " MB/s" << endl;
 
 	return 0;
 }
@@ -179,7 +184,6 @@ int main(void) {
 	// connect to MDS
 	//communicator->connectToMds();
 	//communicator->connectToOsd();
-
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);
 

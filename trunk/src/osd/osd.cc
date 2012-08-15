@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+// handle ctrl-C for profiler
 void sighandler(int signum) {
 	if (signum == SIGINT)
 		exit(42);

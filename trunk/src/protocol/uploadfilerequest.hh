@@ -30,7 +30,7 @@ public:
 	 * @param	communicator	Communicator the Message belongs to
 	 */
 
-	UploadFileRequestMsg (Communicator* communicator);
+	UploadFileRequestMsg(Communicator* communicator);
 
 	/**
 	 * Constructor - Save parameters in private variables
@@ -41,16 +41,19 @@ public:
 	 * @param	path	Requested directory path
 	 * @param	fileSize	Size of the File
 	 * @param	numOfObjs	Number of Objects
+	 * @param	codingScheme 	Coding Scheme of the file
 	 */
 
-	UploadFileRequestMsg (Communicator* communicator, uint32_t mdsSockfd, uint32_t clientId, string path, uint64_t fileSize, uint32_t numOfObjs);
+	UploadFileRequestMsg(Communicator* communicator, uint32_t mdsSockfd,
+			uint32_t clientId, string path, uint64_t fileSize,
+			uint32_t numOfObjs, CodingScheme codingScheme);
 
 	/**
 	 * Copy values in private variables to protocol message
 	 * Serialize protocol message and copy to private variable
 	 */
 
-	void prepareProtocolMsg ();
+	void prepareProtocolMsg();
 
 	/**
 	 * Override
@@ -58,40 +61,41 @@ public:
 	 * @param buf Raw buffer storing header + protocol + payload
 	 */
 
-	void parse (char* buf);
+	void parse(char* buf);
 
 	/**
 	 * Override
 	 * Execute the corresponding Processor
 	 */
 
-	void doHandle ();
+	void doHandle();
 
 	/**
 	 * Override
 	 * DEBUG: print protocol message
 	 */
 
-	void printProtocol ();
+	void printProtocol();
 
 	/**
 	 * @brief	Set the Object ID List
 	 *
 	 * @param	objectList	Vector of Object ID
 	 */
-	void setObjectList (vector<uint64_t> objectList);
-	void setPrimaryList (vector<uint32_t> primaryList);
-	void setFileId (uint32_t fileId);
+	void setObjectList(vector<uint64_t> objectList);
+	void setPrimaryList(vector<uint32_t> primaryList);
+	void setFileId(uint32_t fileId);
 
-	vector<uint64_t> getObjectList ();
-	vector<uint32_t> getPrimaryList ();
-	uint32_t getFileId ();
+	vector<uint64_t> getObjectList();
+	vector<uint32_t> getPrimaryList();
+	uint32_t getFileId();
 
 private:
 	uint32_t _clientId;
 	string _path;
 	uint64_t _fileSize;
 	uint32_t _numOfObjs;
+	CodingScheme _codingScheme;
 
 	vector<uint64_t> _objectList;
 	vector<uint32_t> _primaryList;

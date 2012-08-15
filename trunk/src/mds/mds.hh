@@ -33,10 +33,13 @@ public:
 	 * @param	dstPath		Target Path for the file uploaded
 	 * @param	fileSize	Size of the File
 	 * @param	numOfObjs	number of objects to be uploaded
+	 * @param	codingScheme	Coding Scheme for the file
 	 *
 	 * @return	File ID
 	 */
-	uint32_t uploadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath, uint64_t fileSize, uint32_t numOfObjs);
+	uint32_t uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
+			uint32_t clientId, string dstPath, uint64_t fileSize,
+			uint32_t numOfObjs, CodingScheme codingScheme);
 
 	/**
 	 * @brief	Handle Upload Object Acknowledgement from Primary
@@ -46,7 +49,8 @@ public:
 	 * @param	objectId	ID of the object uploaded
 	 * @param	objectNodeList	List of the Osd
 	 */
-	void uploadObjectAckProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t> objectNodeList);
+	void uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId, vector<uint32_t> objectNodeList);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)
@@ -56,7 +60,8 @@ public:
 	 * @param	clientId	ID of the client Requesting
 	 * @param	dstPath		Path of the file
 	 */
-	void downloadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, string dstPath);
+	void downloadFileProcessor(uint32_t requestId, uint32_t connectionId,
+			uint32_t clientId, string dstPath);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with File ID)
@@ -66,7 +71,8 @@ public:
 	 * @param	clientId	ID of the client Requesting
 	 * @param	fileId		ID of the file
 	 */
-	void downloadFileProcessor (uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId);
+	void downloadFileProcessor(uint32_t requestId, uint32_t connectionId,
+			uint32_t clientId, uint32_t fileId);
 
 	/**
 	 * @brief	Handle the Secondary Node List Request from Osd
@@ -75,7 +81,8 @@ public:
 	 * @param	conenctionId	Connection ID
 	 * @param	objectID	ID of the Object
 	 */
-	void secondaryNodeListProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId);
+	void secondaryNodeListProcessor(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId);
 
 	/**
 	 * @brief	Handle List Folder Request from Client
@@ -84,8 +91,9 @@ public:
 	 * @param	conenctionId	Connection ID
 	 * @param	clientId	ID of the Client
 	 * @param	path	Path to the Folder
-	 */ 
-	void listFolderProcessor (uint32_t requestId, uint32_t clientId, uint32_t connectionId, string path);
+	 */
+	void listFolderProcessor(uint32_t requestId, uint32_t clientId,
+			uint32_t connectionId, string path);
 
 	/**
 	 * @brief	Handle Primary Node Failure Report from Client
@@ -96,7 +104,9 @@ public:
 	 * @param	objectId	ID of the Failed Object
 	 * @param	reason		Reason of the Failure (Default to Node Failure)
 	 */
-	void primaryFailureProcessor (uint32_t requestId, uint32_t connectionId, uint32_t osdId, uint64_t objectId, FailureReason reason=UNREACHABLE);
+	void primaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
+			uint32_t osdId, uint64_t objectId, FailureReason reason =
+					UNREACHABLE);
 
 	/**
 	 * @brief	Handle Secondary Node Failure Report from Osd
@@ -107,7 +117,9 @@ public:
 	 * @param	objectId	ID of the Failed Object
 	 * @param	reason		Reason of the Failure (Default to Node Failure)
 	 */
-	void secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId, uint32_t osdId, uint64_t objectId, FailureReason reason=UNREACHABLE);
+	void secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
+			uint32_t osdId, uint64_t objectId, FailureReason reason =
+					UNREACHABLE);
 
 	/**
 	 * @brief	Handle Osd Recovery Initialized by Monitor
@@ -116,7 +128,8 @@ public:
 	 * @param	conenctionId	Connection ID
 	 * @param	osdId		ID of the failed Osd
 	 */
-	void recoveryProcessor(uint32_t requestId, uint32_t connectionId, uint32_t osdId);
+	void recoveryProcessor(uint32_t requestId, uint32_t connectionId,
+			uint32_t osdId);
 
 	/**
 	 * @brief	Handle Object Node List Update from Osd
@@ -126,7 +139,8 @@ public:
 	 * @param	objectId	ID of the Object
 	 * @param	objectNodeList	Node List of the Object
 	 */
-	void nodeListUpdateProcessor (uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t> objectNodeList);
+	void nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId, vector<uint32_t> objectNodeList);
 
 	/**
 	 * @brief	Get the MDS Communicator
@@ -153,7 +167,8 @@ private:
 	 * @param	fileId		ID of the File
 	 * @param	path		Path of the File
 	 */
-	void downloadFileProcess (uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, string path);
+	void downloadFileProcess(uint32_t requestId, uint32_t connectionId,
+			uint32_t clientId, uint32_t fileId, string path);
 
 	/// Handle Communication with other components
 	MdsCommunicator* _mdsCommunicator;

@@ -44,11 +44,9 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 		string path, uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme) {
 
-	// TODO: add codingScheme to UploadFileRequestMsg
-
 	uint32_t mdsSockFd = getMdsSockfd();
 	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg(this,
-			mdsSockFd, clientId, path, fileSize, numOfObjs);
+			mdsSockFd, clientId, path, fileSize, numOfObjs, codingScheme);
 	uploadFileRequestMsg->prepareProtocolMsg();
 
 	addMessage(uploadFileRequestMsg, true);

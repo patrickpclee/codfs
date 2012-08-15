@@ -489,6 +489,13 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_path();
   inline ::std::string* release_path();
   
+  // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 5;
+  inline bool has_codingscheme() const;
+  inline void clear_codingscheme();
+  static const int kCodingSchemeFieldNumber = 5;
+  inline ::ncvfs::PutObjectInitRequestPro_CodingScheme codingscheme() const;
+  inline void set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.UploadFileRequestPro)
  private:
   inline void set_has_clientid();
@@ -499,6 +506,8 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   inline void clear_has_numofobjs();
   inline void set_has_path();
   inline void clear_has_path();
+  inline void set_has_codingscheme();
+  inline void clear_has_codingscheme();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -506,9 +515,10 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 clientid_;
   ::google::protobuf::uint32 numofobjs_;
   ::std::string* path_;
+  int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -2564,6 +2574,29 @@ inline ::std::string* UploadFileRequestPro::release_path() {
     path_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 5;
+inline bool UploadFileRequestPro::has_codingscheme() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void UploadFileRequestPro::set_has_codingscheme() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void UploadFileRequestPro::clear_has_codingscheme() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void UploadFileRequestPro::clear_codingscheme() {
+  codingscheme_ = 1;
+  clear_has_codingscheme();
+}
+inline ::ncvfs::PutObjectInitRequestPro_CodingScheme UploadFileRequestPro::codingscheme() const {
+  return static_cast< ::ncvfs::PutObjectInitRequestPro_CodingScheme >(codingscheme_);
+}
+inline void UploadFileRequestPro::set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value) {
+  GOOGLE_DCHECK(::ncvfs::PutObjectInitRequestPro_CodingScheme_IsValid(value));
+  set_has_codingscheme();
+  codingscheme_ = value;
 }
 
 // -------------------------------------------------------------------
