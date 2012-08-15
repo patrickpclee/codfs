@@ -1,4 +1,5 @@
 #include "getprimarylistreply.hh"
+#include "getprimarylistrequest.hh"
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
@@ -31,7 +32,10 @@ void GetPrimaryListReplyMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::GetPrimaryListReplyPro getPrimaryListReplyPro;
-	getPrimaryListReplyPro.set_primarylist(_primaryList);
+
+	for (uint32_t primary : _primaryList) {
+		getPrimaryListReplyPro.add_primarylist(primary);
+	}
 
 	if (!getPrimaryListReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -39,7 +43,7 @@ void GetPrimaryListReplyMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType (GET_PRIMARY_LIST_REPLY);
+	setProtocolType(GET_PRIMARY_LIST_REPLY);
 	setProtocolMsg(serializedString);
 
 }
@@ -52,18 +56,19 @@ void GetPrimaryListReplyMsg::parse(char* buf) {
 	getPrimaryListReplyPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	for(int i = 0; i < getPrimaryListReplyPro.objectlist_size(); ++i) {
-			_primaryList.push_back(getPrimaryListReplyPro.primarylist(i));
+	for (int i = 0; i < getPrimaryListReplyPro.primarylist_size(); ++i) {
+		_primaryList.push_back(getPrimaryListReplyPro.primarylist(i));
 	}
 	return;
 }
 
 void GetPrimaryListReplyMsg::doHandle() {
 	GetPrimaryListRequestMsg* getPrimaryListRequestMsg =
-			(GetPrimaryListRequestMsg*) _communicator->popWaitReplyMessage(_msgHeader.requestId);
+			(GetPrimaryListRequestMsg*) _communicator->popWaitReplyMessage(
+					_msgHeader.requestId);
 	getPrimaryListRequestMsg->setStatus(READY);
 }
 
 void GetPrimaryListReplyMsg::printProtocol() {
-	debug("[GET_PRIMARY_LIST_REPLY] GOT.\n");
+	debug("%s\n", "[GET_PRIMARY_LIST_REPLY] GOT.");
 }

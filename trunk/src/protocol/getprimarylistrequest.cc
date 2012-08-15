@@ -1,10 +1,10 @@
-#include "getprimarylistrequest.hh"
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
 #include "../osd/osd.hh"
 #include "../monitor/monitor.hh"
+#include "getprimarylistrequest.hh"
 
 #ifdef COMPILE_FOR_OSD
 extern Osd* osd;
