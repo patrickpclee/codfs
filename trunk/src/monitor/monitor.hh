@@ -30,15 +30,11 @@ public:
 //	void osdRecoveryRequest(uint32_t osdId);
 //	void recoveryResultHandler(uint32_t osdId, bool success);
 
-	// Threads
-	void startGarbageCollectionThread();
-	void startSendThread(Communicator* communicator);
-	void startReceiveThread(Communicator* communicator);
-	void startUpdateThread(Communicator* communicator, StatModule* statmodule);
-
 	// get methods
 	MonitorCommunicator* getCommunicator();
 	StatModule* getStatModule();
+	RecoveryModule* getRecoveryModule();
+
 	uint32_t getMonitorId();
 
 	void OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,

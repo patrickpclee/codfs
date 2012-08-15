@@ -1,4 +1,5 @@
 #include "statmodule.hh"
+#include <ctime>
 #include "../protocol/osdstatupdaterequestmsg.hh"
 
 /*  Constructor */
@@ -40,12 +41,14 @@ void StatModule::setStatById (uint32_t osdId, uint32_t sockfd,
 	lock_guard<mutex> lk(osdStatMapMutex);
 	iter = _osdStatMap.find(osdId);
 	if (iter == _osdStatMap.end()) {
-		_osdStatMap[osdId] =OsdStat(osdId, sockfd, capacity, loading, health);
+		_osdStatMap[osdId] =OsdStat(osdId, sockfd, capacity, loading, health,
+		time(NULL));
 	} else {
 		iter->second.osdSockfd = sockfd;
 		iter->second.osdCapacity = capacity;
 		iter->second.osdLoading = loading;
 		iter->second.osdHealth = health;
+		iter->second.timestamp = time(NULL);
 	}
 }
 
@@ -58,7 +61,7 @@ void StatModule::setStatById (uint32_t osdId, uint32_t sockfd,
 	iter = _osdStatMap.find(osdId);
 	if (iter == _osdStatMap.end()) {
 		_osdStatMap[osdId] =OsdStat(osdId, sockfd, capacity, loading, health,
-		ip, port);
+		ip, port, time(NULL));
 	} else {
 		iter->second.osdSockfd = sockfd;
 		iter->second.osdCapacity = capacity;
@@ -66,5 +69,6 @@ void StatModule::setStatById (uint32_t osdId, uint32_t sockfd,
 		iter->second.osdHealth = health;
 		iter->second.osdIp = ip;
 		iter->second.osdPort = port;
+		iter->second.timestamp = NULL;
 	}
 }

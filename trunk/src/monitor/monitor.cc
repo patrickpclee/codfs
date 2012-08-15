@@ -16,7 +16,7 @@ Monitor::Monitor() {
 
 	configLayer = new ConfigLayer("monitorconfig.xml");
 	_selectionModule = new SelectionModule(_osdStatMap);
-	_recoveryModule = new RecoveryModule();
+	_recoveryModule = new RecoveryModule(_osdStatMap);
 	_statModule = new StatModule(_osdStatMap);
 	_monitorCommunicator = new MonitorCommunicator();
 	_monitorId = configLayer->getConfigInt("MonitorId");
@@ -37,6 +37,10 @@ MonitorCommunicator* Monitor::getCommunicator() {
 
 StatModule* Monitor::getStatModule() {
 	return _statModule;
+}
+
+RecoveryModule* Monitor::getRecoveryModule() {
+	return _recoveryModule;
 }
 
 uint32_t Monitor::getMonitorId() {
@@ -83,6 +87,9 @@ void startUpdateThread(Communicator* communicator, StatModule* statmodule) {
 	statmodule->updateOsdStatMap(communicator);
 }
 
+void startRecoveryThread(Communicator* communicator, RecoveryModule* recoverymodule) {
+	recoverymodule->failureDetection(100,10);
+}
 
 int main (void) {
 	
@@ -91,6 +98,7 @@ int main (void) {
 	monitor = new Monitor();
 	MonitorCommunicator* communicator = monitor->getCommunicator();
 	StatModule* statmodule = monitor->getStatModule();
+	RecoveryModule* recoverymodule = monitor->getRecoveryModule();
 
 	// set up communicator
 	communicator->setId(monitor->getMonitorId());
@@ -109,13 +117,16 @@ int main (void) {
 
 	// 4. Update Thread
 	thread updateThread(startUpdateThread, communicator, statmodule);
+	
+	// 5. Recovery Thread
+	thread recoveryThread(startRecoveryThread, communicator, recoverymodule);
 
 	// threads join
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
 	updateThread.join();
-
+	recoveryThread.join();
 	//clean up
 	delete configLayer;
 	delete monitor;
