@@ -286,7 +286,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 
 		// Acknowledge MDS for Object Upload Completed
-		_osdCommunicator->objectUploadAck(objectId, nodeList);
+//		_osdCommunicator->objectUploadAck(objectId, nodeList);
 
 	}
 

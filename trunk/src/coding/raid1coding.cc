@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iostream>
+#include "../common/debug.hh"
 #include "coding.hh"
 #include "raid1coding.hh"
 #include "../common/memorypool.hh"
@@ -17,7 +18,9 @@ vector<struct SegmentData> Raid1Coding::encode(struct ObjectData objectData, str
 	const uint32_t noOfReplications = getNoOfReplications(setting);
 	vector<struct SegmentData> segmentDataList;
 
-	for (uint32_t i = 0; i < _noOfReplications; i++) {
+	debug ("RAID1: Replication No = %" PRIu32 "\n", noOfReplications);
+
+	for (uint32_t i = 0; i < noOfReplications; i++) {
 
 		struct SegmentData segmentData;
 		segmentData.info.objectId = objectData.info.objectId;

@@ -19,7 +19,6 @@ public:
 	}
 
 private:
-	uint32_t _noOfReplications;
 };
 
 #endif

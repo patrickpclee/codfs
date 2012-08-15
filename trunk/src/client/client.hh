@@ -32,7 +32,7 @@ public:
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting);
+//	uint32_t sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting);
 
 	/**
 	 * @brief	Get the Client Communicator
