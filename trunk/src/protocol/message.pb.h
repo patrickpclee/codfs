@@ -498,6 +498,17 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   inline ::ncvfs::PutObjectInitRequestPro_CodingScheme codingscheme() const;
   inline void set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value);
   
+  // optional string codingSetting = 6;
+  inline bool has_codingsetting() const;
+  inline void clear_codingsetting();
+  static const int kCodingSettingFieldNumber = 6;
+  inline const ::std::string& codingsetting() const;
+  inline void set_codingsetting(const ::std::string& value);
+  inline void set_codingsetting(const char* value);
+  inline void set_codingsetting(const char* value, size_t size);
+  inline ::std::string* mutable_codingsetting();
+  inline ::std::string* release_codingsetting();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.UploadFileRequestPro)
  private:
   inline void set_has_clientid();
@@ -510,6 +521,8 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   inline void clear_has_path();
   inline void set_has_codingscheme();
   inline void clear_has_codingscheme();
+  inline void set_has_codingsetting();
+  inline void clear_has_codingsetting();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -517,10 +530,11 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 clientid_;
   ::google::protobuf::uint32 numofobjs_;
   ::std::string* path_;
+  ::std::string* codingsetting_;
   int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -637,6 +651,17 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   inline ::ncvfs::PutObjectInitRequestPro_CodingScheme codingscheme() const;
   inline void set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value);
   
+  // optional string codingSetting = 5;
+  inline bool has_codingsetting() const;
+  inline void clear_codingsetting();
+  static const int kCodingSettingFieldNumber = 5;
+  inline const ::std::string& codingsetting() const;
+  inline void set_codingsetting(const ::std::string& value);
+  inline void set_codingsetting(const char* value);
+  inline void set_codingsetting(const char* value, size_t size);
+  inline ::std::string* mutable_codingsetting();
+  inline ::std::string* release_codingsetting();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.PutObjectInitRequestPro)
  private:
   inline void set_has_objectid();
@@ -647,16 +672,19 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_chunkcount();
   inline void set_has_codingscheme();
   inline void clear_has_codingscheme();
+  inline void set_has_codingsetting();
+  inline void clear_has_codingsetting();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 objectid_;
   ::google::protobuf::uint32 objectsize_;
   ::google::protobuf::uint32 chunkcount_;
+  ::std::string* codingsetting_;
   int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -2768,6 +2796,64 @@ inline void UploadFileRequestPro::set_codingscheme(::ncvfs::PutObjectInitRequest
   codingscheme_ = value;
 }
 
+// optional string codingSetting = 6;
+inline bool UploadFileRequestPro::has_codingsetting() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void UploadFileRequestPro::set_has_codingsetting() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void UploadFileRequestPro::clear_has_codingsetting() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void UploadFileRequestPro::clear_codingsetting() {
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    codingsetting_->clear();
+  }
+  clear_has_codingsetting();
+}
+inline const ::std::string& UploadFileRequestPro::codingsetting() const {
+  return *codingsetting_;
+}
+inline void UploadFileRequestPro::set_codingsetting(const ::std::string& value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void UploadFileRequestPro::set_codingsetting(const char* value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void UploadFileRequestPro::set_codingsetting(const char* value, size_t size) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* UploadFileRequestPro::mutable_codingsetting() {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  return codingsetting_;
+}
+inline ::std::string* UploadFileRequestPro::release_codingsetting() {
+  clear_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = codingsetting_;
+    codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
 // -------------------------------------------------------------------
 
 // PutObjectInitRequestPro
@@ -2859,6 +2945,64 @@ inline void PutObjectInitRequestPro::set_codingscheme(::ncvfs::PutObjectInitRequ
   GOOGLE_DCHECK(::ncvfs::PutObjectInitRequestPro_CodingScheme_IsValid(value));
   set_has_codingscheme();
   codingscheme_ = value;
+}
+
+// optional string codingSetting = 5;
+inline bool PutObjectInitRequestPro::has_codingsetting() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void PutObjectInitRequestPro::set_has_codingsetting() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void PutObjectInitRequestPro::clear_has_codingsetting() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void PutObjectInitRequestPro::clear_codingsetting() {
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    codingsetting_->clear();
+  }
+  clear_has_codingsetting();
+}
+inline const ::std::string& PutObjectInitRequestPro::codingsetting() const {
+  return *codingsetting_;
+}
+inline void PutObjectInitRequestPro::set_codingsetting(const ::std::string& value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void PutObjectInitRequestPro::set_codingsetting(const char* value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void PutObjectInitRequestPro::set_codingsetting(const char* value, size_t size) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* PutObjectInitRequestPro::mutable_codingsetting() {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  return codingsetting_;
+}
+inline ::std::string* PutObjectInitRequestPro::release_codingsetting() {
+  clear_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = codingsetting_;
+    codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------

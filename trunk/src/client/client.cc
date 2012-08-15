@@ -13,6 +13,7 @@
 #include "../config/config.hh"
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
+#include "../coding/raid1coding.hh"
 
 #include <sys/stat.h>
 
@@ -48,7 +49,7 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
-uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
+uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme, string codingSetting) {
 
 	uint32_t objectCount = _storageModule->getObjectCount(path);
 
@@ -60,7 +61,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
 	debug("Object Count of %s: %" PRIu32 "\n", path.c_str(), objectCount);
 
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
-			_clientId, path, fileSize, objectCount, codingScheme);
+			_clientId, path, fileSize, objectCount, codingScheme, codingSetting);
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
@@ -80,7 +81,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
 		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
-				codingScheme);
+				codingScheme, codingSetting);
 	}
 
 	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);
@@ -94,7 +95,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
  * 3. Call uploadObjectRequest()
  */
 
-uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme) {
+uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting) {
 
 	// start timer
 	struct timeval tp;
@@ -119,7 +120,7 @@ uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme) {
 		objectData.info.objectId = i;
 
 		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
-				codingScheme);
+				codingScheme, codingSetting);
 	}
 
 	// Time stamp after the computations
@@ -199,8 +200,12 @@ int main(void) {
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
-	client->sendFileRequest("./testfile", RAID1_CODING);
-	//client->uploadFileRequest("./testfile", RAID1_CODING);
+
+	CodingScheme codingScheme = RAID1_CODING;
+	string codingSetting = Raid1Coding::generateSetting(3);
+
+	//client->sendFileRequest("./testfile", codingScheme, codingSetting);
+	client->uploadFileRequest("./testfile", codingScheme, codingSetting);
 
 	/*
 

@@ -33,7 +33,7 @@ ConfigLayer* configLayer;
 
 mutex pendingObjectChunkMutex;
 mutex pendingSegmentChunkMutex;
-mutex objectCodingSchemeMutex;
+mutex codingSettingMapMutex;
 
 Osd::Osd(string configFilePath) {
 
@@ -140,7 +140,11 @@ void Osd::getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme) {
+		CodingScheme codingScheme, string setting) {
+
+	struct CodingSetting codingSetting;
+	codingSetting.codingScheme = codingScheme;
+	codingSetting.setting = setting;
 
 	// initialize chunkCount value
 	{
@@ -149,8 +153,8 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	{
-		lock_guard<mutex> lk(objectCodingSchemeMutex);
-		_objectCodingScheme[objectId] = codingScheme;
+		lock_guard<mutex> lk(codingSettingMapMutex);
+		_codingSettingMap[objectId] = codingSetting;
 	}
 
 	// create object and cache
@@ -236,18 +240,20 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 				objectCache.length);
 
 		// perform coding
-		CodingScheme codingScheme = DEFAULT_CODING;
+		struct CodingSetting codingSetting;
 		{
-			lock_guard<mutex> lk(objectCodingSchemeMutex);
-			codingScheme = _objectCodingScheme[objectId];
-			_objectCodingScheme.erase(objectId);
+			lock_guard<mutex> lk(codingSettingMapMutex);
+			codingSetting = _codingSettingMap[objectId];
+			_codingSettingMap.erase(objectId);
 		}
 
-		debug ("Coding Scheme = %d\n", (int) codingScheme);
+		debug("Coding Scheme = %d setting = %s\n",
+				(int) codingSetting.codingScheme, codingSetting.setting.c_str());
 
 		vector<struct SegmentData> segmentDataList =
-				_codingModule->encodeObjectToSegment(codingScheme, objectId,
-						objectCache.buf, objectCache.length);
+				_codingModule->encodeObjectToSegment(codingSetting.codingScheme,
+						objectId, objectCache.buf, objectCache.length,
+						codingSetting.setting);
 
 		// request secondary OSD list
 		vector<struct SegmentLocation> segmentLocationList =

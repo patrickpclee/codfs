@@ -16,7 +16,7 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator) :
 
 PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
 		uint32_t osdSockfd, uint64_t objectId, uint32_t objectSize,
-		uint32_t chunkCount, CodingScheme codingScheme) :
+		uint32_t chunkCount, CodingScheme codingScheme, string codingSetting) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -24,6 +24,7 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
 	_objectSize = objectSize;
 	_chunkCount = chunkCount;
 	_codingScheme = codingScheme;
+	_codingSetting = codingSetting;
 }
 
 void PutObjectInitRequestMsg::prepareProtocolMsg() {
@@ -35,6 +36,7 @@ void PutObjectInitRequestMsg::prepareProtocolMsg() {
 	putObjectInitRequestPro.set_chunkcount(_chunkCount);
 	putObjectInitRequestPro.set_codingscheme(
 			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
+	putObjectInitRequestPro.set_codingsetting(_codingSetting);
 
 	if (!putObjectInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -59,18 +61,19 @@ void PutObjectInitRequestMsg::parse(char* buf) {
 	_objectSize = putObjectInitRequestPro.objectsize();
 	_chunkCount = putObjectInitRequestPro.chunkcount();
 	_codingScheme = (CodingScheme) putObjectInitRequestPro.codingscheme();
+	_codingSetting = putObjectInitRequestPro.codingsetting();
 
 }
 
 void PutObjectInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId,
-			_objectSize, _chunkCount, _codingScheme);
+			_objectSize, _chunkCount, _codingScheme, _codingSetting);
 #endif
 }
 
 void PutObjectInitRequestMsg::printProtocol() {
 	debug(
-			"[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 " CodingScheme = %" PRIu32 "\n",
-			_objectId, _objectSize, _chunkCount, _codingScheme);
+			"[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 " CodingScheme = %" PRIu32 " CodingSetting = %s\n",
+			_objectId, _objectSize, _chunkCount, _codingScheme, _codingSetting.c_str());
 }

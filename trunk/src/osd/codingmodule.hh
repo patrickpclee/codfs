@@ -12,6 +12,11 @@
 #include "../common/objectdata.hh"
 #include "../common/enums.hh"
 
+struct CodingSetting {
+	CodingScheme codingScheme;
+	string setting;
+};
+
 class CodingModule {
 public:
 
@@ -20,11 +25,12 @@ public:
 	/**
 	 * Encode an object to a list of segments
 	 * @param objectData ObjectData structure
+	 * @param setting for the coding scheme
 	 * @return A list of SegmentData structure
 	 */
 
 	vector<struct SegmentData> encodeObjectToSegment(CodingScheme codingScheme,
-			struct ObjectData objectData);
+			struct ObjectData objectData, string setting);
 
 	/**
 	 * Encode an object to a list of segments
@@ -35,7 +41,7 @@ public:
 	 */
 
 	vector<struct SegmentData> encodeObjectToSegment(CodingScheme codingScheme,
-			uint64_t objectId, char* buf, uint64_t length);
+			uint64_t objectId, char* buf, uint64_t length, string setting);
 
 	/**
 	 * Decode a list of segments into an object
@@ -45,7 +51,8 @@ public:
 	 */
 
 	struct ObjectData decodeSegmentToObject(CodingScheme codingScheme,
-			uint64_t objectId, vector<struct SegmentData> segmentData);
+			uint64_t objectId, vector<struct SegmentData> segmentData,
+			string setting);
 
 	/**
 	 * Get the Coding object according to the codingScheme specified

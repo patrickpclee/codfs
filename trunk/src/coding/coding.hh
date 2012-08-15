@@ -1,8 +1,7 @@
 #ifndef __CODING_HH__
 #define __CODING_HH__
 
-#include "encodingbehaviour.hh"
-#include "decodingbehaviour.hh"
+#include <vector>
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
 
@@ -12,14 +11,12 @@ public:
 	Coding();
 	virtual ~Coding();
 
-	vector<struct SegmentData> performEncoding(struct ObjectData objectData);
-	struct ObjectData performDecoding(vector<struct SegmentData> segmentData);
-	void setEncodingBehaviour(EncodingBehaviour *cb);
-	void setDecodingBehaviour(DecodingBehaviour *db);
-	virtual void display() = 0; // make class abstract
+	virtual vector<struct SegmentData> encode(struct ObjectData objectData,
+			string setting) = 0;
+	virtual struct ObjectData decode(vector<struct SegmentData> segmentData,
+			string setting) = 0;
 
-	EncodingBehaviour* _encodingBehaviour;
-	DecodingBehaviour* _decodingBehaviour;
+	virtual void display() = 0; // make class abstract
 }
 ;
 

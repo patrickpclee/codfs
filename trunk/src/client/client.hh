@@ -24,7 +24,7 @@ public:
 	 */
 	vector<FileMetaData> listFolderRequest(char* path);
 
-	uint32_t uploadFileRequest (string path, CodingScheme codingScheme);
+	uint32_t uploadFileRequest (string path, CodingScheme codingScheme, string codingSetting);
 	/**
 	 * Upload a file to OSD
 	 * @param filepath Location of the file to upload
@@ -32,7 +32,7 @@ public:
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendFileRequest(string filepath, CodingScheme codingScheme);
+	uint32_t sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting);
 
 	/**
 	 * @brief	Get the Client Communicator

@@ -22,11 +22,12 @@ public:
 	 * @param	path	Path to the File
 	 * @param	fileSize	Size of the File
 	 * @param 	codingScheme	Coding Scheme of the file
+	 * @param	codingSetting	Coding Scheme Setting
 	 *
 	 * @return	File ID
 	 */
 	uint32_t createFile(uint32_t clientId, string path, uint64_t fileSize,
-			CodingScheme codingScheme);
+			CodingScheme codingScheme, string codingSetting);
 
 	/**
 	 * @brief	Open a File

@@ -9,33 +9,31 @@
 
 CodingModule::CodingModule() {
 
-	const uint32_t noOfStrips = 2;
-	_codingWorker[RAID0_CODING] = new Raid0Coding(noOfStrips);
-
-	const uint32_t noOfReplications = 3;
-	_codingWorker[RAID1_CODING] = new Raid1Coding(noOfReplications);
+	_codingWorker[RAID0_CODING] = new Raid0Coding();
+	_codingWorker[RAID1_CODING] = new Raid1Coding();
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(
-		CodingScheme codingScheme, struct ObjectData objectData) {
+		CodingScheme codingScheme, struct ObjectData objectData, string setting) {
 
-	return getCoding(codingScheme)->performEncoding(objectData);
+	return getCoding(codingScheme)->encode(objectData, setting);
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(
 		CodingScheme codingScheme, uint64_t objectId, char* buf,
-		uint64_t length) {
+		uint64_t length, string setting) {
+
 	struct ObjectData objectData;
 	objectData.buf = buf;
 	objectData.info.objectId = objectId;
 	objectData.info.objectSize = length;
-	return getCoding(codingScheme)->performEncoding(objectData);
+	return getCoding(codingScheme)->encode(objectData, setting);
 }
 
 struct ObjectData CodingModule::decodeSegmentToObject(CodingScheme codingScheme,
-		uint64_t objectId, vector<struct SegmentData> segmentData) {
+		uint64_t objectId, vector<struct SegmentData> segmentData, string setting) {
 
-	return getCoding(codingScheme)->performDecoding(segmentData);
+	return getCoding(codingScheme)->decode(segmentData, setting);
 }
 
 Coding* CodingModule::getCoding(CodingScheme codingScheme) {

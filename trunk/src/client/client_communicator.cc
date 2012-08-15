@@ -42,11 +42,13 @@ vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 }
 
 struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
-		string path, uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme) {
+		string path, uint64_t fileSize, uint32_t numOfObjs,
+		CodingScheme codingScheme, string codingSetting) {
 
 	uint32_t mdsSockFd = getMdsSockfd();
 	UploadFileRequestMsg* uploadFileRequestMsg = new UploadFileRequestMsg(this,
-			mdsSockFd, clientId, path, fileSize, numOfObjs, codingScheme);
+			mdsSockFd, clientId, path, fileSize, numOfObjs, codingScheme,
+			codingSetting);
 	uploadFileRequestMsg->prepareProtocolMsg();
 
 	addMessage(uploadFileRequestMsg, true);
@@ -60,14 +62,15 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 		waitAndDelete(uploadFileRequestMsg);
 		return fileMetaData;
 	} else {
-		debug("%s\n", "List Directory Request Failed");
+		debug("%s\n", "Upload File Request Failed");
 		exit(-1);
 	}
 	return {};
 }
 
 void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
-		struct ObjectData objectData, CodingScheme codingScheme) {
+		struct ObjectData objectData, CodingScheme codingScheme,
+		string codingSetting) {
 
 	const uint64_t totalSize = objectData.info.objectSize;
 	const uint64_t objectId = objectData.info.objectId;
@@ -77,7 +80,8 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	// Step 1 : Send Init message (wait for reply)
 
-	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount, codingScheme);
+	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount,
+			codingScheme, codingSetting);
 	debug("%s\n", "Put Object Init ACK-ed");
 
 	// Step 2 : Send data chunk by chunk
@@ -118,13 +122,13 @@ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 
 void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme) {
+		CodingScheme codingScheme, string codingSetting) {
 
 	// Step 1 of the upload process
 
 	PutObjectInitRequestMsg* putObjectInitRequestMsg =
 			new PutObjectInitRequestMsg(this, dstOsdSockfd, objectId, length,
-					chunkCount, codingScheme);
+					chunkCount, codingScheme, codingSetting);
 
 	putObjectInitRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectInitRequestMsg, true);
