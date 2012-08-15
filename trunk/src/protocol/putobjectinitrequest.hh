@@ -18,7 +18,7 @@ public:
 
 	PutObjectInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t objectId, uint32_t objectSize, uint32_t chunkCount,
-			CodingScheme codingScheme);
+			CodingScheme codingScheme, string codingSetting);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -54,6 +54,7 @@ private:
 	uint64_t _objectSize;
 	uint32_t _chunkCount;
 	CodingScheme _codingScheme;
+	string _codingSetting;
 };
 
 #endif

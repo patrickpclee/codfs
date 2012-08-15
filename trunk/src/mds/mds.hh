@@ -34,12 +34,13 @@ public:
 	 * @param	fileSize	Size of the File
 	 * @param	numOfObjs	number of objects to be uploaded
 	 * @param	codingScheme	Coding Scheme for the file
+	 * @param 	codingSetting	Coding Scheme Setting
 	 *
 	 * @return	File ID
 	 */
 	uint32_t uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 			uint32_t clientId, string dstPath, uint64_t fileSize,
-			uint32_t numOfObjs, CodingScheme codingScheme);
+			uint32_t numOfObjs, CodingScheme codingScheme, string codingSetting);
 
 	/**
 	 * @brief	Handle Upload Object Acknowledgement from Primary
@@ -154,7 +155,7 @@ public:
 	 */
 	void run();
 
-	void test();
+//	void test();
 
 private:
 

@@ -2,6 +2,7 @@
 #define __SEGMENTDATA_HH__
 
 #include <string>
+#include <stdint.h>
 #include "../common/enums.hh"
 
 using namespace std;

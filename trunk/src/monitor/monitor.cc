@@ -62,7 +62,7 @@ void Monitor::OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd,
 void Monitor::getPrimaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfObjs){
 	vector<uint32_t> primaryList;
 	primaryList = _selectionModule->ChoosePrimary(numOfObjs);
-	_monitorCommunicator->replyPrimaryList(sockfd, primaryList);
+	_monitorCommunicator->replyPrimaryList(requestId, sockfd, primaryList);
 	return;
 }
 

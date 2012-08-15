@@ -1,13 +1,23 @@
 #ifndef __RAID0CODING_HH__
 #define __RAID0CODING_HH__
 
-class Raid0Coding : public Coding {
+#include "coding.hh"
+
+class Raid0Coding: public Coding {
 public:
-	Raid0Coding(uint32_t noOfStrips);
+	Raid0Coding();
 	~Raid0Coding();
+	vector<struct SegmentData> encode(struct ObjectData objectData,
+			string setting);
+	struct ObjectData decode(vector<struct SegmentData> segmentData,
+			string setting);
+	uint32_t getNoOfStrips(string setting);
+	static string generateSetting(int noOfStrips) {
+		return to_string(noOfStrips);
+	}
+
 	void display();
 private:
-	uint32_t _noOfStrips;
 };
 
 #endif

@@ -30,8 +30,8 @@ MonitorCommunicator::~MonitorCommunicator() {
 
 }
 
-void MonitorCommunicator::replyPrimaryList(uint32_t sockfd, vector<uint32_t> primaryList){
-	GetPrimaryListReplyMsg* getPrimaryListReplyMsg = new GetPrimaryListReplyMsg(this, sockfd, primaryList);
+void MonitorCommunicator::replyPrimaryList(uint32_t requestId, uint32_t sockfd, vector<uint32_t> primaryList){
+	GetPrimaryListReplyMsg* getPrimaryListReplyMsg = new GetPrimaryListReplyMsg(this, requestId, sockfd, primaryList);
 	getPrimaryListReplyMsg->prepareProtocolMsg();
 
 	addMessage(getPrimaryListReplyMsg);
