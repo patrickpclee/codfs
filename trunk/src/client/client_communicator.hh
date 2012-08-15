@@ -23,7 +23,8 @@ public:
 	vector<FileMetaData> listFolderData(uint32_t clientId, string path);
 
 	struct FileMetaData uploadFile(uint32_t clientId, string path,
-			uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme);
+			uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme,
+			string codingSetting);
 
 	/**
 	 * 1. Send an init message
@@ -33,10 +34,12 @@ public:
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
 	 * @param objectData ObjectData Structure
 	 * @param codingScheme Coding Scheme specified
+	 * @param codingSetting Coding Scheme setting
 	 */
 
 	void putObject(uint32_t clientId, uint32_t dstOsdSockfd,
-			struct ObjectData objectData, CodingScheme codingScheme);
+			struct ObjectData objectData, CodingScheme codingScheme,
+			string codingSetting);
 
 	// TODO: CONNECT TO COMPONENT: PRIMITIVE DESIGN
 	void connectToMds();
@@ -51,11 +54,12 @@ private:
 	 * @param length Size of the object
 	 * @param chunkCount Number of chunks that will be sent
 	 * @param codingScheme Coding Scheme used
+	 * @param codingSetting Coding Scheme Setting
 	 */
 
 	void putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
 			uint64_t objectId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme);
+			CodingScheme codingScheme, string codingSetting);
 
 	/**
 	 * Send an object chunk to OSD (Step 2)

@@ -3,9 +3,8 @@
 #include <iostream>
 #include <cstdio>
 #include <thread>
-#include <sys/time.h>
-#include <sys/types.h>
 #include <iomanip>
+#include <chrono>
 #include "client.hh"
 #include "client_storagemodule.hh"
 #include "../common/garbagecollector.hh"
@@ -13,6 +12,7 @@
 #include "../config/config.hh"
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
+#include "../coding/raid1coding.hh"
 
 #include <sys/stat.h>
 
@@ -48,19 +48,23 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
-uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
+uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
+		string codingSetting) {
 
-	uint32_t objectCount = _storageModule->getObjectCount(path);
+	// start timer
+//	double start = getTime();
+	typedef chrono::high_resolution_clock Clock;
+	typedef chrono::milliseconds milliseconds;
+	Clock::time_point t0 = Clock::now();
 
-	struct stat tempFileStat;
-	stat(path.c_str(), &tempFileStat);
-
-	uint64_t fileSize = tempFileStat.st_size;
+	const uint32_t objectCount = _storageModule->getObjectCount(path);
+	const uint64_t fileSize = _storageModule->getFilesize(path);
 
 	debug("Object Count of %s: %" PRIu32 "\n", path.c_str(), objectCount);
 
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
-			_clientId, path, fileSize, objectCount, codingScheme);
+			_clientId, path, fileSize, objectCount, codingScheme,
+			codingSetting);
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
@@ -80,10 +84,22 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
 		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
-				codingScheme);
+				codingScheme, codingSetting);
 	}
 
 	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);
+
+	// Time and Rate calculation (in seconds)
+	Clock::time_point t1 = Clock::now();
+	milliseconds ms = chrono::duration_cast<milliseconds>(t1 - t0);
+	double duration = ms.count() / 1024.0;
+	double fileSizeMb = fileSize / 1048576.0;
+	double rate = fileSizeMb / duration;
+
+	cout << fixed;
+	cout << setprecision(2);
+	cout << fileSizeMb << " MB transferred in " << duration << " secs, Rate = "
+			<< rate << " MB/s" << endl;
 
 	return fileMetaData._id;
 }
@@ -94,54 +110,54 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme) {
  * 3. Call uploadObjectRequest()
  */
 
-uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme) {
-
-	// start timer
-	struct timeval tp;
-	double sec, usec, start, end;
-	gettimeofday(&tp, NULL);
-	sec = static_cast<double>(tp.tv_sec);
-	usec = static_cast<double>(tp.tv_usec) / 1E6;
-	start = sec + usec;
-
-	const uint32_t objectCount = _storageModule->getObjectCount(filepath);
-
-	// TODO: obtain a list of OSD for upload from MDS
-
-	debug("Object Count of %s is %" PRIu32 "\n", filepath.c_str(), objectCount);
-
-	for (uint32_t i = 0; i < objectCount; ++i) {
-		struct ObjectData objectData = _storageModule->readObjectFromFile(
-				filepath, i);
-
-		// TODO: HARDCODE FOR NOW!
-		uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
-		objectData.info.objectId = i;
-
-		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
-				codingScheme);
-	}
-
-	// Time stamp after the computations
-	gettimeofday(&tp, NULL);
-	sec = static_cast<double>(tp.tv_sec);
-	usec = static_cast<double>(tp.tv_usec) / 1E6;
-	end = sec + usec;
-
-	// Time and Rate calculation (in seconds)
-	double duration = end - start;
-	uint64_t filesize = _storageModule->getFilesize(filepath) / 1024.0 / 1024.0;
-	double rate = filesize / duration;
-
-	cout << fixed;
-	cout << setprecision(2);
-	cout << filesize << " MB transferred in "
-			<< duration << " secs, Rate = " << rate << " MB/s" << endl;
-
-	return 0;
-}
-
 /*
+ uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting) {
+
+ // start timer
+ struct timeval tp;
+ double sec, usec, start, end;
+ gettimeofday(&tp, NULL);
+ sec = static_cast<double>(tp.tv_sec);
+ usec = static_cast<double>(tp.tv_usec) / 1E6;
+ start = sec + usec;
+
+ const uint32_t objectCount = _storageModule->getObjectCount(filepath);
+
+ // TODO: obtain a list of OSD for upload from MDS
+
+ debug("Object Count of %s is %" PRIu32 "\n", filepath.c_str(), objectCount);
+
+ for (uint32_t i = 0; i < objectCount; ++i) {
+ struct ObjectData objectData = _storageModule->readObjectFromFile(
+ filepath, i);
+
+ // TODO: HARDCODE FOR NOW!
+ uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
+ objectData.info.objectId = i;
+
+ _clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
+ codingScheme, codingSetting);
+ }
+
+ // Time stamp after the computations
+ gettimeofday(&tp, NULL);
+ sec = static_cast<double>(tp.tv_sec);
+ usec = static_cast<double>(tp.tv_usec) / 1E6;
+ end = sec + usec;
+
+ // Time and Rate calculation (in seconds)
+ double duration = end - start;
+ uint64_t filesize = _storageModule->getFilesize(filepath) / 1024.0 / 1024.0;
+ double rate = filesize / duration;
+
+ cout << fixed;
+ cout << setprecision(2);
+ cout << filesize << " MB transferred in "
+ << duration << " secs, Rate = " << rate << " MB/s" << endl;
+
+ return 0;
+ }
+
  uint32_t Client::downloadFileRequest(string dstPath) {
  return 0;
  }
@@ -199,8 +215,12 @@ int main(void) {
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
-	client->sendFileRequest("./testfile", RAID1_CODING);
-	//client->uploadFileRequest("./testfile", RAID1_CODING);
+
+	CodingScheme codingScheme = RAID1_CODING;
+	string codingSetting = Raid1Coding::generateSetting(3);
+
+	//client->sendFileRequest("./testfile", codingScheme, codingSetting);
+	client->uploadFileRequest("./testfile", codingScheme, codingSetting);
 
 	/*
 

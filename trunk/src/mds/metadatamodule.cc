@@ -15,10 +15,10 @@ string MetaDataModule::lookupFilePath(uint32_t fileId) {
 }
 
 uint32_t MetaDataModule::createFile(uint32_t clientId, string path,
-		uint64_t fileSize, CodingScheme codingScheme) {
+		uint64_t fileSize, CodingScheme codingScheme, string codingSetting) {
 	uint32_t fileId = _fileMetaDataModule->generateFileId();
 
-	_fileMetaDataModule->createFile(clientId, path, fileSize, fileId, codingScheme);
+	_fileMetaDataModule->createFile(clientId, path, fileSize, fileId, codingScheme, codingSetting);
 
 	return fileId;
 }

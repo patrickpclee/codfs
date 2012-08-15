@@ -49,14 +49,14 @@ Mds::~Mds() {
  */
 uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, string dstPath, uint64_t fileSize,
-		uint32_t numOfObjs, CodingScheme codingScheme) {
+		uint32_t numOfObjs, CodingScheme codingScheme, string codingSetting) {
 
 	vector<uint64_t> objectList(numOfObjs);
 	vector<uint32_t> primaryList(numOfObjs);
 	uint32_t fileId = 0;
 
 	_nameSpaceModule->createFile(clientId, dstPath);
-	fileId = _metaDataModule->createFile(clientId, dstPath, fileSize, codingScheme);
+	fileId = _metaDataModule->createFile(clientId, dstPath, fileSize, codingScheme, codingSetting);
 
 	objectList = _metaDataModule->newObjectList(numOfObjs);
 	_metaDataModule->saveObjectList(fileId, objectList);
@@ -257,6 +257,7 @@ void startReceiveThread(Communicator* communicator) {
 
 }
 
+/*
 void Mds::test() {
 	uint32_t fileId = 216;
 	vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);
@@ -280,6 +281,7 @@ void Mds::test() {
 	}
 	*/
 }
+*/
 
 int main(void) {
 	configLayer = new ConfigLayer("mdsconfig.xml");

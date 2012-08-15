@@ -1,6 +1,7 @@
 #ifndef __OBJECTDATA_HH__
 #define __OBJECTDATA_HH__
 
+#include <stdint.h>
 #include <string>
 
 using namespace std;

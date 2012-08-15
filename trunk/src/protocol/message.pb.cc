@@ -151,12 +151,13 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ListDirectoryRequestPro));
   UploadFileRequestPro_descriptor_ = file->message_type(3);
-  static const int UploadFileRequestPro_offsets_[5] = {
+  static const int UploadFileRequestPro_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadFileRequestPro, clientid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadFileRequestPro, filesize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadFileRequestPro, numofobjs_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadFileRequestPro, path_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadFileRequestPro, codingscheme_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadFileRequestPro, codingsetting_),
   };
   UploadFileRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -170,11 +171,12 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(UploadFileRequestPro));
   PutObjectInitRequestPro_descriptor_ = file->message_type(4);
-  static const int PutObjectInitRequestPro_offsets_[4] = {
+  static const int PutObjectInitRequestPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, objectsize_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, chunkcount_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, codingscheme_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutObjectInitRequestPro, codingsetting_),
   };
   PutObjectInitRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -623,45 +625,46 @@ void protobuf_AddDesc_message_2eproto() {
     "mponentType\030\002 \001(\0162(.ncvfs.HandshakeReque"
     "stPro.ComponentType\"\?\n\027ListDirectoryRequ"
     "estPro\022\r\n\005osdId\030\001 \001(\007\022\025\n\rdirectoryPath\030\002"
-    " \001(\t\"\236\001\n\024UploadFileRequestPro\022\020\n\010clientI"
+    " \001(\t\"\265\001\n\024UploadFileRequestPro\022\020\n\010clientI"
     "d\030\001 \001(\007\022\020\n\010fileSize\030\002 \001(\006\022\021\n\tnumOfObjs\030\003"
     " \001(\007\022\014\n\004path\030\004 \001(\t\022A\n\014codingScheme\030\005 \001(\016"
     "2+.ncvfs.PutObjectInitRequestPro.CodingS"
-    "cheme\"\312\001\n\027PutObjectInitRequestPro\022\020\n\010obj"
-    "ectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 \001(\007\022\022\n\nchunk"
-    "Count\030\003 \001(\007\022A\n\014codingScheme\030\004 \001(\0162+.ncvf"
-    "s.PutObjectInitRequestPro.CodingScheme\"2"
-    "\n\014CodingScheme\022\020\n\014RAID0_CODING\020\001\022\020\n\014RAID"
-    "1_CODING\020\002\"A\n\rObjectDataPro\022\020\n\010objectId\030"
-    "\001 \001(\006\022\016\n\006offset\030\002 \001(\006\022\016\n\006length\030\003 \001(\007\"*\n"
-    "\026PutObjectEndRequestPro\022\020\n\010objectId\030\001 \001("
-    "\006\"@\n\025ListDirectoryReplyPro\022\'\n\013fileInfoPr"
-    "o\030\001 \003(\0132\022.ncvfs.FileInfoPro\"A\n\013FileInfoP"
-    "ro\022\016\n\006fileId\030\001 \001(\007\022\020\n\010fileSize\030\002 \001(\006\022\020\n\010"
-    "fileName\030\003 \001(\t\"M\n\022UploadFileReplyPro\022\016\n\006"
-    "fileId\030\001 \001(\007\022\022\n\nobjectList\030\002 \003(\006\022\023\n\013prim"
-    "aryList\030\003 \003(\007\"-\n\030GetPrimaryListRequestPr"
-    "o\022\021\n\tnumOfObjs\030\001 \001(\007\"8\n\022UploadObjectAckP"
-    "ro\022\020\n\010objectId\030\001 \001(\006\022\020\n\010nodeList\030\002 \003(\007\")"
-    "\n\025PutObjectInitReplyPro\022\020\n\010objectId\030\001 \001("
-    "\006\"(\n\024PutObjectEndReplyPro\022\020\n\010objectId\030\001 "
-    "\001(\006\"h\n\030PutSegmentInitRequestPro\022\020\n\010objec"
-    "tId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013segmentS"
-    "ize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"U\n\016Segment"
-    "DataPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002"
-    " \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006length\030\004 \001(\007\">\n\027"
-    "PutSegmentEndRequestPro\022\020\n\010objectId\030\001 \001("
-    "\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026PutSegmentInitRe"
-    "plyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 "
-    "\001(\007\"<\n\025PutSegmentEndReplyPro\022\020\n\010objectId"
-    "\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"G\n\rOsdStartupP"
+    "cheme\022\025\n\rcodingSetting\030\006 \001(\t\"\341\001\n\027PutObje"
+    "ctInitRequestPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nob"
+    "jectSize\030\002 \001(\007\022\022\n\nchunkCount\030\003 \001(\007\022A\n\014co"
+    "dingScheme\030\004 \001(\0162+.ncvfs.PutObjectInitRe"
+    "questPro.CodingScheme\022\025\n\rcodingSetting\030\005"
+    " \001(\t\"2\n\014CodingScheme\022\020\n\014RAID0_CODING\020\001\022\020"
+    "\n\014RAID1_CODING\020\002\"A\n\rObjectDataPro\022\020\n\010obj"
+    "ectId\030\001 \001(\006\022\016\n\006offset\030\002 \001(\006\022\016\n\006length\030\003 "
+    "\001(\007\"*\n\026PutObjectEndRequestPro\022\020\n\010objectI"
+    "d\030\001 \001(\006\"@\n\025ListDirectoryReplyPro\022\'\n\013file"
+    "InfoPro\030\001 \003(\0132\022.ncvfs.FileInfoPro\"A\n\013Fil"
+    "eInfoPro\022\016\n\006fileId\030\001 \001(\007\022\020\n\010fileSize\030\002 \001"
+    "(\006\022\020\n\010fileName\030\003 \001(\t\"M\n\022UploadFileReplyP"
+    "ro\022\016\n\006fileId\030\001 \001(\007\022\022\n\nobjectList\030\002 \003(\006\022\023"
+    "\n\013primaryList\030\003 \003(\007\"-\n\030GetPrimaryListReq"
+    "uestPro\022\021\n\tnumOfObjs\030\001 \001(\007\"8\n\022UploadObje"
+    "ctAckPro\022\020\n\010objectId\030\001 \001(\006\022\020\n\010nodeList\030\002"
+    " \003(\007\")\n\025PutObjectInitReplyPro\022\020\n\010objectI"
+    "d\030\001 \001(\006\"(\n\024PutObjectEndReplyPro\022\020\n\010objec"
+    "tId\030\001 \001(\006\"h\n\030PutSegmentInitRequestPro\022\020\n"
+    "\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013se"
+    "gmentSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"U\n\016S"
+    "egmentDataPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegme"
+    "ntId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006length\030\004 \001"
+    "(\007\">\n\027PutSegmentEndRequestPro\022\020\n\010objectI"
+    "d\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026PutSegment"
+    "InitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmen"
+    "tId\030\002 \001(\007\"<\n\025PutSegmentEndReplyPro\022\020\n\010ob"
+    "jectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"G\n\rOsdSt"
+    "artupPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002"
+    " \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"\037\n\016OsdShutdownP"
+    "ro\022\r\n\005osdId\030\001 \001(\007\"O\n\025OsdStatUpdateReplyP"
     "ro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022"
-    "\n\nosdLoading\030\003 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005"
-    "osdId\030\001 \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005"
-    "osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdL"
-    "oading\030\003 \001(\007\"\031\n\027OsdStatUpdateRequestPro\""
-    "-\n\026GetPrimaryListReplyPro\022\023\n\013primaryList"
-    "\030\001 \003(\007", 1886);
+    "\n\nosdLoading\030\003 \001(\007\"\031\n\027OsdStatUpdateReque"
+    "stPro\"-\n\026GetPrimaryListReplyPro\022\023\n\013prima"
+    "ryList\030\001 \003(\007", 1932);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -1520,6 +1523,7 @@ const int UploadFileRequestPro::kFileSizeFieldNumber;
 const int UploadFileRequestPro::kNumOfObjsFieldNumber;
 const int UploadFileRequestPro::kPathFieldNumber;
 const int UploadFileRequestPro::kCodingSchemeFieldNumber;
+const int UploadFileRequestPro::kCodingSettingFieldNumber;
 #endif  // !_MSC_VER
 
 UploadFileRequestPro::UploadFileRequestPro()
@@ -1543,6 +1547,7 @@ void UploadFileRequestPro::SharedCtor() {
   numofobjs_ = 0u;
   path_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   codingscheme_ = 1;
+  codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1553,6 +1558,9 @@ UploadFileRequestPro::~UploadFileRequestPro() {
 void UploadFileRequestPro::SharedDtor() {
   if (path_ != &::google::protobuf::internal::kEmptyString) {
     delete path_;
+  }
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    delete codingsetting_;
   }
   if (this != default_instance_) {
   }
@@ -1589,6 +1597,11 @@ void UploadFileRequestPro::Clear() {
       }
     }
     codingscheme_ = 1;
+    if (has_codingsetting()) {
+      if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+        codingsetting_->clear();
+      }
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1681,6 +1694,23 @@ bool UploadFileRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(50)) goto parse_codingSetting;
+        break;
+      }
+      
+      // optional string codingSetting = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_codingSetting:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_codingsetting()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->codingsetting().data(), this->codingsetting().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1733,6 +1763,15 @@ void UploadFileRequestPro::SerializeWithCachedSizes(
       5, this->codingscheme(), output);
   }
   
+  // optional string codingSetting = 6;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      6, this->codingsetting(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1772,6 +1811,16 @@ void UploadFileRequestPro::SerializeWithCachedSizes(
       5, this->codingscheme(), target);
   }
   
+  // optional string codingSetting = 6;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        6, this->codingsetting(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -1809,6 +1858,13 @@ int UploadFileRequestPro::ByteSize() const {
     if (has_codingscheme()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->codingscheme());
+    }
+    
+    // optional string codingSetting = 6;
+    if (has_codingsetting()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->codingsetting());
     }
     
   }
@@ -1853,6 +1909,9 @@ void UploadFileRequestPro::MergeFrom(const UploadFileRequestPro& from) {
     if (from.has_codingscheme()) {
       set_codingscheme(from.codingscheme());
     }
+    if (from.has_codingsetting()) {
+      set_codingsetting(from.codingsetting());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1881,6 +1940,7 @@ void UploadFileRequestPro::Swap(UploadFileRequestPro* other) {
     std::swap(numofobjs_, other->numofobjs_);
     std::swap(path_, other->path_);
     std::swap(codingscheme_, other->codingscheme_);
+    std::swap(codingsetting_, other->codingsetting_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -1924,6 +1984,7 @@ const int PutObjectInitRequestPro::kObjectIdFieldNumber;
 const int PutObjectInitRequestPro::kObjectSizeFieldNumber;
 const int PutObjectInitRequestPro::kChunkCountFieldNumber;
 const int PutObjectInitRequestPro::kCodingSchemeFieldNumber;
+const int PutObjectInitRequestPro::kCodingSettingFieldNumber;
 #endif  // !_MSC_VER
 
 PutObjectInitRequestPro::PutObjectInitRequestPro()
@@ -1946,6 +2007,7 @@ void PutObjectInitRequestPro::SharedCtor() {
   objectsize_ = 0u;
   chunkcount_ = 0u;
   codingscheme_ = 1;
+  codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1954,6 +2016,9 @@ PutObjectInitRequestPro::~PutObjectInitRequestPro() {
 }
 
 void PutObjectInitRequestPro::SharedDtor() {
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    delete codingsetting_;
+  }
   if (this != default_instance_) {
   }
 }
@@ -1984,6 +2049,11 @@ void PutObjectInitRequestPro::Clear() {
     objectsize_ = 0u;
     chunkcount_ = 0u;
     codingscheme_ = 1;
+    if (has_codingsetting()) {
+      if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+        codingsetting_->clear();
+      }
+    }
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -2059,6 +2129,23 @@ bool PutObjectInitRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(42)) goto parse_codingSetting;
+        break;
+      }
+      
+      // optional string codingSetting = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_codingSetting:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_codingsetting()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->codingsetting().data(), this->codingsetting().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -2102,6 +2189,15 @@ void PutObjectInitRequestPro::SerializeWithCachedSizes(
       4, this->codingscheme(), output);
   }
   
+  // optional string codingSetting = 5;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      5, this->codingsetting(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -2129,6 +2225,16 @@ void PutObjectInitRequestPro::SerializeWithCachedSizes(
   if (has_codingscheme()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       4, this->codingscheme(), target);
+  }
+  
+  // optional string codingSetting = 5;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        5, this->codingsetting(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -2161,6 +2267,13 @@ int PutObjectInitRequestPro::ByteSize() const {
     if (has_codingscheme()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->codingscheme());
+    }
+    
+    // optional string codingSetting = 5;
+    if (has_codingsetting()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->codingsetting());
     }
     
   }
@@ -2202,6 +2315,9 @@ void PutObjectInitRequestPro::MergeFrom(const PutObjectInitRequestPro& from) {
     if (from.has_codingscheme()) {
       set_codingscheme(from.codingscheme());
     }
+    if (from.has_codingsetting()) {
+      set_codingsetting(from.codingsetting());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -2229,6 +2345,7 @@ void PutObjectInitRequestPro::Swap(PutObjectInitRequestPro* other) {
     std::swap(objectsize_, other->objectsize_);
     std::swap(chunkcount_, other->chunkcount_);
     std::swap(codingscheme_, other->codingscheme_);
+    std::swap(codingsetting_, other->codingsetting_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

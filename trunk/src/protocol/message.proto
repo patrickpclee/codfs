@@ -4,7 +4,6 @@ package ncvfs;
 
 message HandshakeRequestPro {
 	optional fixed32 componentId = 1;
-	 
 	
 	enum ComponentType {
 		CLIENT = 1;
@@ -38,6 +37,7 @@ message UploadFileRequestPro {
 	optional fixed32 numOfObjs = 3;
 	optional string path = 4;
 	optional PutObjectInitRequestPro.CodingScheme codingScheme = 5;	
+	optional string codingSetting = 6;
 }
 
 //
@@ -55,6 +55,7 @@ message PutObjectInitRequestPro {
 	}
 	
 	optional CodingScheme codingScheme = 4;
+	optional string codingSetting = 5;
 }
 
 message ObjectDataPro {

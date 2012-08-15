@@ -101,11 +101,12 @@ public:
 	 * @param length Object size, equals the total length of all the trunks
 	 * @param chunkCount number of chunks that will be received
 	 * @param codingScheme Coding Scheme for the object
+	 * @param setting Coding setting for the object
 	 */
 
 	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t objectId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme);
+			CodingScheme codingScheme, string setting);
 
 	/**
 	 * Action when a put object end is received
@@ -265,7 +266,7 @@ private:
 
 	map<uint64_t, uint32_t> _pendingObjectChunk;
 	map<string, uint32_t> _pendingSegmentChunk;
-	map<uint64_t, CodingScheme> _objectCodingScheme;
+	map<uint64_t, struct CodingSetting> _codingSettingMap;
 
 };
 #endif
