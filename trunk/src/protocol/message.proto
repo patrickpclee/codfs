@@ -89,6 +89,14 @@ message UploadFileReplyPro {
 	repeated fixed32 primaryList = 3;
 }
 
+//
+// MDS -> MONITOR
+//
+
+message GetPrimaryListRequestPro{
+	optional fixed32 numOfObjs = 1;
+}
+
 ///////////////// FROM OSD /////////////////
 
 //
@@ -171,4 +179,12 @@ message OsdStatUpdateReplyPro {
 
 message OsdStatUpdateRequestPro {
 
+}
+
+//
+// MONITOR -> MDS
+//
+
+message GetPrimaryListReplyPro{
+	repeated fixed32 primaryList = 1;
 }
