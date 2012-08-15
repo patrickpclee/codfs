@@ -415,10 +415,12 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutSegmentEndReplyPro));
   OsdStartupPro_descriptor_ = file->message_type(19);
-  static const int OsdStartupPro_offsets_[3] = {
+  static const int OsdStartupPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdcapacity_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdloading_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdip_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdport_),
   };
   OsdStartupPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -654,14 +656,14 @@ void protobuf_AddDesc_message_2eproto() {
     "\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026PutSegmentInitRe"
     "plyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 "
     "\001(\007\"<\n\025PutSegmentEndReplyPro\022\020\n\010objectId"
-    "\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"G\n\rOsdStartupP"
+    "\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"g\n\rOsdStartupP"
     "ro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022"
-    "\n\nosdLoading\030\003 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005"
-    "osdId\030\001 \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005"
-    "osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdL"
-    "oading\030\003 \001(\007\"\031\n\027OsdStatUpdateRequestPro\""
-    "-\n\026GetPrimaryListReplyPro\022\023\n\013primaryList"
-    "\030\001 \003(\007", 1886);
+    "\n\nosdLoading\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osd"
+    "Port\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001 "
+    "\001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005osdId\030\001 "
+    "\001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoading\030\003"
+    " \001(\007\"\031\n\027OsdStatUpdateRequestPro\"-\n\026GetPr"
+    "imaryListReplyPro\022\023\n\013primaryList\030\001 \003(\007", 1918);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -5765,6 +5767,8 @@ void PutSegmentEndReplyPro::Swap(PutSegmentEndReplyPro* other) {
 const int OsdStartupPro::kOsdIdFieldNumber;
 const int OsdStartupPro::kOsdCapacityFieldNumber;
 const int OsdStartupPro::kOsdLoadingFieldNumber;
+const int OsdStartupPro::kOsdIpFieldNumber;
+const int OsdStartupPro::kOsdPortFieldNumber;
 #endif  // !_MSC_VER
 
 OsdStartupPro::OsdStartupPro()
@@ -5786,6 +5790,8 @@ void OsdStartupPro::SharedCtor() {
   osdid_ = 0u;
   osdcapacity_ = 0u;
   osdloading_ = 0u;
+  osdip_ = 0u;
+  osdport_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -5823,6 +5829,8 @@ void OsdStartupPro::Clear() {
     osdid_ = 0u;
     osdcapacity_ = 0u;
     osdloading_ = 0u;
+    osdip_ = 0u;
+    osdport_ = 0u;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -5877,6 +5885,38 @@ bool OsdStartupPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(37)) goto parse_osdIp;
+        break;
+      }
+      
+      // optional fixed32 osdIp = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdIp:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdip_)));
+          set_has_osdip();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(45)) goto parse_osdPort;
+        break;
+      }
+      
+      // optional fixed32 osdPort = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdPort:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdport_)));
+          set_has_osdport();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -5914,6 +5954,16 @@ void OsdStartupPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->osdloading(), output);
   }
   
+  // optional fixed32 osdIp = 4;
+  if (has_osdip()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(4, this->osdip(), output);
+  }
+  
+  // optional fixed32 osdPort = 5;
+  if (has_osdport()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(5, this->osdport(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -5935,6 +5985,16 @@ void OsdStartupPro::SerializeWithCachedSizes(
   // optional fixed32 osdLoading = 3;
   if (has_osdloading()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->osdloading(), target);
+  }
+  
+  // optional fixed32 osdIp = 4;
+  if (has_osdip()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(4, this->osdip(), target);
+  }
+  
+  // optional fixed32 osdPort = 5;
+  if (has_osdport()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(5, this->osdport(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -5960,6 +6020,16 @@ int OsdStartupPro::ByteSize() const {
     
     // optional fixed32 osdLoading = 3;
     if (has_osdloading()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdIp = 4;
+    if (has_osdip()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdPort = 5;
+    if (has_osdport()) {
       total_size += 1 + 4;
     }
     
@@ -5999,6 +6069,12 @@ void OsdStartupPro::MergeFrom(const OsdStartupPro& from) {
     if (from.has_osdloading()) {
       set_osdloading(from.osdloading());
     }
+    if (from.has_osdip()) {
+      set_osdip(from.osdip());
+    }
+    if (from.has_osdport()) {
+      set_osdport(from.osdport());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -6025,6 +6101,8 @@ void OsdStartupPro::Swap(OsdStartupPro* other) {
     std::swap(osdid_, other->osdid_);
     std::swap(osdcapacity_, other->osdcapacity_);
     std::swap(osdloading_, other->osdloading_);
+    std::swap(osdip_, other->osdip_);
+    std::swap(osdport_, other->osdport_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

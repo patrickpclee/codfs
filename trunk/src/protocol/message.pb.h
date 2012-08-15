@@ -2066,6 +2066,20 @@ class OsdStartupPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 osdloading() const;
   inline void set_osdloading(::google::protobuf::uint32 value);
   
+  // optional fixed32 osdIp = 4;
+  inline bool has_osdip() const;
+  inline void clear_osdip();
+  static const int kOsdIpFieldNumber = 4;
+  inline ::google::protobuf::uint32 osdip() const;
+  inline void set_osdip(::google::protobuf::uint32 value);
+  
+  // optional fixed32 osdPort = 5;
+  inline bool has_osdport() const;
+  inline void clear_osdport();
+  static const int kOsdPortFieldNumber = 5;
+  inline ::google::protobuf::uint32 osdport() const;
+  inline void set_osdport(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.OsdStartupPro)
  private:
   inline void set_has_osdid();
@@ -2074,15 +2088,21 @@ class OsdStartupPro : public ::google::protobuf::Message {
   inline void clear_has_osdcapacity();
   inline void set_has_osdloading();
   inline void clear_has_osdloading();
+  inline void set_has_osdip();
+  inline void clear_has_osdip();
+  inline void set_has_osdport();
+  inline void clear_has_osdport();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 osdid_;
   ::google::protobuf::uint32 osdcapacity_;
   ::google::protobuf::uint32 osdloading_;
+  ::google::protobuf::uint32 osdip_;
+  ::google::protobuf::uint32 osdport_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -3693,6 +3713,50 @@ inline ::google::protobuf::uint32 OsdStartupPro::osdloading() const {
 inline void OsdStartupPro::set_osdloading(::google::protobuf::uint32 value) {
   set_has_osdloading();
   osdloading_ = value;
+}
+
+// optional fixed32 osdIp = 4;
+inline bool OsdStartupPro::has_osdip() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void OsdStartupPro::set_has_osdip() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void OsdStartupPro::clear_has_osdip() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void OsdStartupPro::clear_osdip() {
+  osdip_ = 0u;
+  clear_has_osdip();
+}
+inline ::google::protobuf::uint32 OsdStartupPro::osdip() const {
+  return osdip_;
+}
+inline void OsdStartupPro::set_osdip(::google::protobuf::uint32 value) {
+  set_has_osdip();
+  osdip_ = value;
+}
+
+// optional fixed32 osdPort = 5;
+inline bool OsdStartupPro::has_osdport() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void OsdStartupPro::set_has_osdport() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void OsdStartupPro::clear_has_osdport() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void OsdStartupPro::clear_osdport() {
+  osdport_ = 0u;
+  clear_has_osdport();
+}
+inline ::google::protobuf::uint32 OsdStartupPro::osdport() const {
+  return osdport_;
+}
+inline void OsdStartupPro::set_osdport(::google::protobuf::uint32 value) {
+  set_has_osdport();
+  osdport_ = value;
 }
 
 // -------------------------------------------------------------------

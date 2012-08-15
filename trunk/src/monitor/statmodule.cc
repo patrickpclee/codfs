@@ -48,3 +48,23 @@ void StatModule::setStatById (uint32_t osdId, uint32_t sockfd,
 		iter->second.osdHealth = health;
 	}
 }
+
+void StatModule::setStatById (uint32_t osdId, uint32_t sockfd, 
+	uint32_t capacity, uint32_t loading, enum OsdHealthStat health, uint32_t ip,
+	uint16_t port) {
+	map<uint32_t, struct OsdStat>::iterator iter;
+
+	lock_guard<mutex> lk(osdStatMapMutex);
+	iter = _osdStatMap.find(osdId);
+	if (iter == _osdStatMap.end()) {
+		_osdStatMap[osdId] =OsdStat(osdId, sockfd, capacity, loading, health,
+		ip, port);
+	} else {
+		iter->second.osdSockfd = sockfd;
+		iter->second.osdCapacity = capacity;
+		iter->second.osdLoading = loading;
+		iter->second.osdHealth = health;
+		iter->second.osdIp = ip;
+		iter->second.osdPort = port;
+	}
+}
