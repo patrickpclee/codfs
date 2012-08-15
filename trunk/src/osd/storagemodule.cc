@@ -180,7 +180,6 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 
 	uint32_t byteWritten = 0;
 
-
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
 

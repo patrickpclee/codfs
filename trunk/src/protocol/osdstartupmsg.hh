@@ -17,6 +17,9 @@ public:
 
 	OsdStartupMsg(Communicator* communicator, uint32_t dstSockfd,
 			uint32_t osdId, uint32_t capacity, uint32_t loading);
+	OsdStartupMsg(Communicator* communicator, uint32_t dstSockfd,
+			uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip,
+			uint16_t port);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -51,6 +54,8 @@ private:
 	uint32_t _osdId;
 	uint32_t _capacity;
 	uint32_t _loading;
+	uint32_t _osdIp;
+	uint16_t _osdPort;
 };
 
 #endif
