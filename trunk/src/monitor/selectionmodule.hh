@@ -13,6 +13,7 @@ public:
 	SelectionModule(map<uint32_t, struct OsdStat>& mapRef);
 	uint32_t findNextOsd(); // osd to store the next object
 	uint32_t* findSecondaryOsdList(uint32_t splitFactor);
+	uint32_t* findPrimaryOsdList(uint32_t numOfOsd);
 	uint32_t findRecoveryOsd(struct OjbectOwnership objectOwnership);
 
 private:
