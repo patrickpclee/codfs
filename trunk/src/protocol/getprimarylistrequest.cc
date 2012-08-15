@@ -58,7 +58,7 @@ void GetPrimaryListRequestMsg::parse(char* buf) {
 
 void GetPrimaryListRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MONITOR
-	monitor->getPrimaryListProcessor (_msgHeader.requestId, _sockfd, _numOfObjs);
+//	monitor->getPrimaryListProcessor (_msgHeader.requestId, _sockfd, _numOfObjs);
 #endif
 }
 
