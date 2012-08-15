@@ -91,7 +91,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
-	milliseconds ms = chrono::duration_cast<milliseconds>(t1 - t0);
+	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1024.0;
 	double fileSizeMb = fileSize / 1048576.0;
 	double rate = fileSizeMb / duration;
