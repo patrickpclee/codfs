@@ -68,8 +68,8 @@ public:
 
 	void printProtocol ();
 
-	void setSecondaryList(vector<uint32_t> secondaryList);
-	vector<uint32_t> getSecondaryList();
+	void setSecondaryList(vector<struct SegmentLocation> secondaryList);
+	vector<SegmentLocation> getSecondaryList();
 
 
 private:

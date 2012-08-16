@@ -20,6 +20,7 @@ message HandshakeReplyPro {
 	optional HandshakeRequestPro.ComponentType componentType = 2; 
 }
 
+
 ///////////////// FROM CLIENT /////////////////
 
 //
@@ -98,6 +99,11 @@ message FileInfoPro {
 	optional fixed32 fileId = 1;
 	optional fixed64 fileSize = 2;
 	optional string fileName = 3;
+}
+
+message SegmentLocationPro {
+   	optional fixed32 osdId = 1;
+   	optional fixed32 segmentId = 2;
 }
 
 message UploadFileReplyPro {
@@ -242,11 +248,7 @@ message OsdStatUpdateReplyPro {
 
 message GetSecondaryListRequestPro{
 	optional fixed32 numOfSegs = 1;
-	message segmentLocation {
-    	optional fixed32 osdId = 1;
-    	optional fixed32 segmentId = 2;
-  	}
-	repeated segmentLocation secondaryList = 2;
+	repeated SegmentLocationPro secondaryList = 2;
 }
 
 ///////////////// FROM MONITOR /////////////////
@@ -259,7 +261,7 @@ message OsdStatUpdateRequestPro {
 }
 
 message GetSecondaryListReplyPro{
-	repeated GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
+	repeated SegmentLocationPro secondaryList = 1;
 }
 
 //

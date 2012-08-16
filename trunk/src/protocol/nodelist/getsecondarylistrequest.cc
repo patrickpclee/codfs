@@ -30,7 +30,7 @@ GetSecondaryListRequestMsg::GetSecondaryListRequestMsg(Communicator* communicato
 void GetSecondaryListRequestMsg::prepareProtocolMsg() {
 	string serializedString;
 
-/*
+
 	ncvfs::GetSecondaryListRequestPro getSecondaryListRequestPro;
 	getSecondaryListRequestPro.set_numofsegs(_numOfSegs);
 
@@ -42,12 +42,12 @@ void GetSecondaryListRequestMsg::prepareProtocolMsg() {
 	setProtocolSize(serializedString.length());
 	setProtocolType (GET_SECONDARY_LIST_REQUEST);
 	setProtocolMsg(serializedString);
-	*/
+
 
 }
 
 void GetSecondaryListRequestMsg::parse(char* buf) {
-	/*
+
 
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
@@ -56,32 +56,32 @@ void GetSecondaryListRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_numOfSegs = getSecondaryListRequestPro.numofsegs();
-	*/
+
 
 }
 
 void GetSecondaryListRequestMsg::doHandle() {
-	/*
+
 #ifdef COMPILE_FOR_MONITOR
 	monitor->getSecondaryListProcessor (_msgHeader.requestId, _sockfd, _numOfSegs);
 #endif
-*/
+
 }
 
 void GetSecondaryListRequestMsg::printProtocol() {
 	debug("[GET_SECONDARY_LIST_REQUEST] NUMBER OF SEGS = %" PRIu32 "\n",_numOfSegs);
 }
 
-void GetSecondaryListRequestMsg::setSecondaryList(vector<uint32_t> secondaryList) {
-	/*
+void GetSecondaryListRequestMsg::setSecondaryList(vector<struct SegmentLocation> secondaryList) {
+
 	_secondaryList = secondaryList;
 	return;
-	*/
+
 }
-vector<uint32_t> GetSecondaryListRequestMsg::getSecondaryList() {
-/*
+vector<struct SegmentLocation> GetSecondaryListRequestMsg::getSecondaryList() {
+
 
 	return _secondaryList;
-*/
+
 }
 

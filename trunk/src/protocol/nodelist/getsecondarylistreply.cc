@@ -30,13 +30,18 @@ GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator,
 
 void GetSecondaryListReplyMsg::prepareProtocolMsg() {
 	string serializedString;
-	/*
+
 
 	ncvfs::GetSecondaryListReplyPro getSecondaryListReplyPro;
 
-	for (struct SegmentLocation secondary : _secondaryList) {
-		getSecondaryListReplyPro.add_secondarylist(secondary);
-	}
+	vector<SegmentLocation>::iterator it;
+
+		for (it = _secondaryList.begin(); it < _secondaryList.end(); ++it) {
+			ncvfs::SegmentLocationPro* segmentLocationPro =
+					getSecondaryListReplyPro.add_secondarylist();
+			segmentLocationPro->set_osdid((*it).osdId);
+			segmentLocationPro->set_segmentid((*it).segmentId);
+		}
 
 	if (!getSecondaryListReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -47,12 +52,12 @@ void GetSecondaryListReplyMsg::prepareProtocolMsg() {
 	setProtocolType(GET_SECONDARY_LIST_REPLY);
 	setProtocolMsg(serializedString);
 
-*/
+
 }
 
 void GetSecondaryListReplyMsg::parse(char* buf) {
 
-/*
+
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
 	ncvfs::GetSecondaryListReplyPro getSecondaryListReplyPro;
@@ -60,20 +65,25 @@ void GetSecondaryListReplyMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	for (int i = 0; i < getSecondaryListReplyPro.secondarylist_size(); ++i) {
-		_secondaryList.push_back(getSecondaryListReplyPro.secondarylist(i));
+		struct SegmentLocation tempSegmentLocation;
+
+		tempSegmentLocation.osdId = getSecondaryListReplyPro.secondarylist(i).osdid();
+		tempSegmentLocation.segmentId = getSecondaryListReplyPro.secondarylist(i).segmentid();
+
+		_secondaryList.push_back(tempSegmentLocation);
 	}
 	return;
-	*/
+
 }
 
 void GetSecondaryListReplyMsg::doHandle() {
-/*
+
 	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
 			(GetSecondaryListRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	getSecondaryListRequestMsg->setSecondaryList(_secondaryList);
 	getSecondaryListRequestMsg->setStatus(READY);
-	*/
+
 }
 
 void GetSecondaryListReplyMsg::printProtocol() {
