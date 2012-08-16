@@ -8,6 +8,9 @@ extern ConfigLayer *configLayer;
 
 using namespace mongo;
 
+/**
+ * @brief	Default Constructor
+ */
 ObjectMetaDataModule::ObjectMetaDataModule(ConfigMetaDataModule* configMetaDataModule)
 {
 	_configMetaDataModule = configMetaDataModule;
@@ -19,6 +22,9 @@ ObjectMetaDataModule::ObjectMetaDataModule(ConfigMetaDataModule* configMetaDataM
 	_objectMetaDataStorage->setCollection(_collection);
 }
 
+/**
+ * @brief	Save Node List of a Object
+ */
 void ObjectMetaDataModule::saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList)
 {
 	vector<uint32_t>::iterator it;
@@ -34,6 +40,9 @@ void ObjectMetaDataModule::saveNodeList (uint64_t objectId, vector<uint32_t> obj
 	return ;
 }
 
+/**
+ * @brief	Read Node List of a Object
+ */
 vector<uint32_t> ObjectMetaDataModule::readNodeList (uint64_t objectId)
 {
 	vector<uint32_t> nodeList;
@@ -45,6 +54,9 @@ vector<uint32_t> ObjectMetaDataModule::readNodeList (uint64_t objectId)
 	return nodeList;
 }
 
+/**
+ * @brief	Set Primary of a Object
+ */
 void ObjectMetaDataModule::setPrimary (uint64_t objectId, uint32_t primary)
 {
 	BSONObj queryObject = BSON ("id" << (long long int) objectId);
@@ -54,6 +66,9 @@ void ObjectMetaDataModule::setPrimary (uint64_t objectId, uint32_t primary)
 	return ;
 }
 
+/**
+ * @brief	Get Primary of a Object
+ */
 uint32_t ObjectMetaDataModule::getPrimary (uint64_t objectId)
 {
 	BSONObj queryObject = BSON ("id" << (long long int) objectId);

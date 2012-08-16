@@ -38,8 +38,21 @@ public:
 	 */
 	void openFile(uint32_t clientId, uint32_t filieId);
 
-	uint32_t selectActingPrimary(uint64_t objectId, uint32_t exclude);
+	/**
+	 * @brief	Generate List of Object ID
+	 *
+	 * @param	numOfObjs	Number of Objects
+	 *
+	 * @return	List of Object ID
+	 */
+	vector<uint64_t> newObjectList(uint32_t numOfObjs);
 
+	/**
+	 * @brief	Save Object List of a File
+	 *
+	 * @param	fileId	ID of the File
+	 * @param	objectList	List of Object ID
+	 */
 	void saveObjectList(uint32_t fileId, vector<uint64_t> objectList);
 	vector<uint64_t> readObjectList(uint32_t fileId);
 	vector<uint64_t> readOsdObjectList(uint32_t osdId);
@@ -54,16 +67,39 @@ public:
 	unsigned char* readChecksum(uint32_t fileId);
 
 	/**
-	 * @brief	Generate List of Object ID
+	 * @brief	Set Primary of a Object
 	 *
-	 * @param	numOfObjs	Number of Objects
+	 * @param	objectId	ID of the Object
+	 * @param	primaryOsdId	ID of the Primary
 	 */
-	vector<uint64_t> newObjectList(uint32_t numOfObjs);
-
 	void setPrimary(uint64_t objectId, uint32_t primaryOsdId);
+
+	uint32_t selectActingPrimary(uint64_t objectId, uint32_t exclude);
+
+	/**
+	 * @brief	Get Primary of a Object
+	 *
+	 * @param	objectId	ID of the Object
+	 *
+	 * @return	ID of the Primary
+	 */
 	uint32_t getPrimary(uint64_t objectId);
 
+	/**
+	 * @brief	Save Node List of a Object
+	 *
+	 * @param	objectId	ID of the Object
+	 * @param	objectNodeList	List of Node ID
+	 */
 	void saveNodeList(uint64_t objectId, vector<uint32_t> objectNodeList);
+
+	/**
+	 * @brief	Read Node List of a Object
+	 *
+	 * @param	objectId	ID of the Object
+	 *
+	 * @return	List of Node ID
+	 */
 	vector<uint32_t> readNodeList(uint64_t objectId);
 
 	/**
@@ -86,7 +122,7 @@ public:
 
 private:
 	/**
-	 * @brief	Generate a New ObjectId
+	 * @brief	Generate a New Object ID
 	 *
 	 * @return	Object ID
 	 */

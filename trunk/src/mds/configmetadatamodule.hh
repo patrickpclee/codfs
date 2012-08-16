@@ -9,12 +9,23 @@
 
 class ConfigMetaDataModule {
 public:
+	/**
+	 * @brief	Default Constructor
+	 */
 	ConfigMetaDataModule();
 
+	/**
+	 * @brief	Get a Setting and Increment
+	 *
+	 * @param	config	Filed Name of Config
+	 */
 	uint32_t getAndInc (string config);
 private:
+
+	/// Collection
 	string _collection;
 
+	/// Underlying Meta Data Storage
 	MongoDB* _configMetaDataStorage;
 };
 

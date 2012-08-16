@@ -155,6 +155,9 @@ public:
 	 */
 	void run();
 
+	/**
+	 * @brief	Test Case
+	 */
 	void test();
 
 private:

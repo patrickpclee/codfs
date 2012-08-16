@@ -8,6 +8,9 @@ extern ConfigLayer *configLayer;
 
 using namespace mongo;
 
+/**
+ * @brief	Default Constructor
+ */
 FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModule) {
 	_configMetaDataModule = configMetaDataModule;
 
@@ -23,6 +26,9 @@ FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModul
 
 }
 
+/**
+ * @brief	Create a File
+ */
 void FileMetaDataModule::createFile(uint32_t clientId, string path,
 		uint64_t fileSize, uint32_t fileId, CodingScheme codingScheme,
 		string codingSetting) {
@@ -35,6 +41,9 @@ void FileMetaDataModule::createFile(uint32_t clientId, string path,
 	return;
 }
 
+/**
+ * @brief	Save the Object List of a File
+ */
 void FileMetaDataModule::saveObjectList(uint32_t fileId,
 		vector<uint64_t> objectList) {
 	vector<uint64_t>::iterator it;
@@ -51,6 +60,9 @@ void FileMetaDataModule::saveObjectList(uint32_t fileId,
 	return;
 }
 
+/**
+ * @brief	Read the Object List of a File
+ */
 vector<uint64_t> FileMetaDataModule::readObjectList(uint32_t fileId) {
 	vector<uint64_t> objectList;
 	BSONObj queryObject = BSON ("id" << fileId);
@@ -61,11 +73,10 @@ vector<uint64_t> FileMetaDataModule::readObjectList(uint32_t fileId) {
 	return objectList;
 }
 
+/**
+ * @brief	Generate a New File ID
+ */
 uint32_t FileMetaDataModule::generateFileId() {
-	//BSONObj queryObject = BSON ("id" << "config");
-	//BSONObj updateObject = BSON ("$inc" << BSON ("fileId" << 1));
-	//BSONObj result = _configMetaDataStorage->findAndModify(queryObject, updateObject);
-	//fileId = result.getField("fileId").Int();
 
 	return _configMetaDataModule->getAndInc("fileId");
 }

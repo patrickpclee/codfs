@@ -17,7 +17,9 @@ void MdsCommunicator::replyFolderData(uint32_t requestId, uint32_t connectionId,
 	return ;
 }
 
-
+/**
+ * @brief	Ask Monitor for Primary List
+ */
 vector<uint32_t> MdsCommunicator::askPrimaryList(uint32_t numOfObjs)
 {
 	vector<uint32_t> primaryList;
@@ -54,10 +56,12 @@ void MdsCommunicator::replyNodeList(uint32_t requestId, uint32_t connectionId, u
 }
 
 
+/**
+ * @brief	Reply Object and Primary List to Client
+ */
 void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList, unsigned char* checksum)
 {
-	// checksum NULL for upload
-	if(checksum == NULL) {
+	if(checksum == NULL){
 		UploadFileReplyMsg* uploadFileReplyMsg = new UploadFileReplyMsg(this, requestId, connectionId, fileId, objectList, primaryList);
 		uploadFileReplyMsg->prepareProtocolMsg();
 

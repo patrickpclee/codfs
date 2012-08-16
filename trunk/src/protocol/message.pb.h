@@ -44,6 +44,7 @@ class GetObjectReadyPro;
 class ObjectTransferEndRequestPro;
 class ListDirectoryReplyPro;
 class FileInfoPro;
+class SegmentLocationPro;
 class UploadFileReplyPro;
 class DownloadFileReplyPro;
 class GetObjectInfoReplyPro;
@@ -65,7 +66,6 @@ class OsdStartupPro;
 class OsdShutdownPro;
 class OsdStatUpdateReplyPro;
 class GetSecondaryListRequestPro;
-class GetSecondaryListRequestPro_segmentLocation;
 class OsdStatUpdateRequestPro;
 class GetSecondaryListReplyPro;
 class GetPrimaryListReplyPro;
@@ -1336,6 +1336,98 @@ class FileInfoPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static FileInfoPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class SegmentLocationPro : public ::google::protobuf::Message {
+ public:
+  SegmentLocationPro();
+  virtual ~SegmentLocationPro();
+  
+  SegmentLocationPro(const SegmentLocationPro& from);
+  
+  inline SegmentLocationPro& operator=(const SegmentLocationPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SegmentLocationPro& default_instance();
+  
+  void Swap(SegmentLocationPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  SegmentLocationPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SegmentLocationPro& from);
+  void MergeFrom(const SegmentLocationPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 osdId = 1;
+  inline bool has_osdid() const;
+  inline void clear_osdid();
+  static const int kOsdIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 segmentId = 2;
+  inline bool has_segmentid() const;
+  inline void clear_segmentid();
+  static const int kSegmentIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 segmentid() const;
+  inline void set_segmentid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.SegmentLocationPro)
+ private:
+  inline void set_has_osdid();
+  inline void clear_has_osdid();
+  inline void set_has_segmentid();
+  inline void clear_has_segmentid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 osdid_;
+  ::google::protobuf::uint32 segmentid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static SegmentLocationPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -3324,98 +3416,6 @@ class OsdStatUpdateReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class GetSecondaryListRequestPro_segmentLocation : public ::google::protobuf::Message {
- public:
-  GetSecondaryListRequestPro_segmentLocation();
-  virtual ~GetSecondaryListRequestPro_segmentLocation();
-  
-  GetSecondaryListRequestPro_segmentLocation(const GetSecondaryListRequestPro_segmentLocation& from);
-  
-  inline GetSecondaryListRequestPro_segmentLocation& operator=(const GetSecondaryListRequestPro_segmentLocation& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const GetSecondaryListRequestPro_segmentLocation& default_instance();
-  
-  void Swap(GetSecondaryListRequestPro_segmentLocation* other);
-  
-  // implements Message ----------------------------------------------
-  
-  GetSecondaryListRequestPro_segmentLocation* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const GetSecondaryListRequestPro_segmentLocation& from);
-  void MergeFrom(const GetSecondaryListRequestPro_segmentLocation& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed32 osdId = 1;
-  inline bool has_osdid() const;
-  inline void clear_osdid();
-  static const int kOsdIdFieldNumber = 1;
-  inline ::google::protobuf::uint32 osdid() const;
-  inline void set_osdid(::google::protobuf::uint32 value);
-  
-  // optional fixed32 segmentId = 2;
-  inline bool has_segmentid() const;
-  inline void clear_segmentid();
-  static const int kSegmentIdFieldNumber = 2;
-  inline ::google::protobuf::uint32 segmentid() const;
-  inline void set_segmentid(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.GetSecondaryListRequestPro.segmentLocation)
- private:
-  inline void set_has_osdid();
-  inline void clear_has_osdid();
-  inline void set_has_segmentid();
-  inline void clear_has_segmentid();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint32 osdid_;
-  ::google::protobuf::uint32 segmentid_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static GetSecondaryListRequestPro_segmentLocation* default_instance_;
-};
-// -------------------------------------------------------------------
-
 class GetSecondaryListRequestPro : public ::google::protobuf::Message {
  public:
   GetSecondaryListRequestPro();
@@ -3468,8 +3468,6 @@ class GetSecondaryListRequestPro : public ::google::protobuf::Message {
   
   // nested types ----------------------------------------------------
   
-  typedef GetSecondaryListRequestPro_segmentLocation segmentLocation;
-  
   // accessors -------------------------------------------------------
   
   // optional fixed32 numOfSegs = 1;
@@ -3479,16 +3477,16 @@ class GetSecondaryListRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 numofsegs() const;
   inline void set_numofsegs(::google::protobuf::uint32 value);
   
-  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 2;
+  // repeated .ncvfs.SegmentLocationPro secondaryList = 2;
   inline int secondarylist_size() const;
   inline void clear_secondarylist();
   static const int kSecondaryListFieldNumber = 2;
-  inline const ::ncvfs::GetSecondaryListRequestPro_segmentLocation& secondarylist(int index) const;
-  inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* mutable_secondarylist(int index);
-  inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* add_secondarylist();
-  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >&
+  inline const ::ncvfs::SegmentLocationPro& secondarylist(int index) const;
+  inline ::ncvfs::SegmentLocationPro* mutable_secondarylist(int index);
+  inline ::ncvfs::SegmentLocationPro* add_secondarylist();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >&
       secondarylist() const;
-  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >*
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >*
       mutable_secondarylist();
   
   // @@protoc_insertion_point(class_scope:ncvfs.GetSecondaryListRequestPro)
@@ -3498,7 +3496,7 @@ class GetSecondaryListRequestPro : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation > secondarylist_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro > secondarylist_;
   ::google::protobuf::uint32 numofsegs_;
   
   mutable int _cached_size_;
@@ -3639,16 +3637,16 @@ class GetSecondaryListReplyPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
+  // repeated .ncvfs.SegmentLocationPro secondaryList = 1;
   inline int secondarylist_size() const;
   inline void clear_secondarylist();
   static const int kSecondaryListFieldNumber = 1;
-  inline const ::ncvfs::GetSecondaryListRequestPro_segmentLocation& secondarylist(int index) const;
-  inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* mutable_secondarylist(int index);
-  inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* add_secondarylist();
-  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >&
+  inline const ::ncvfs::SegmentLocationPro& secondarylist(int index) const;
+  inline ::ncvfs::SegmentLocationPro* mutable_secondarylist(int index);
+  inline ::ncvfs::SegmentLocationPro* add_secondarylist();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >&
       secondarylist() const;
-  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >*
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >*
       mutable_secondarylist();
   
   // @@protoc_insertion_point(class_scope:ncvfs.GetSecondaryListReplyPro)
@@ -3656,7 +3654,7 @@ class GetSecondaryListReplyPro : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation > secondarylist_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro > secondarylist_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -4627,6 +4625,54 @@ inline ::std::string* FileInfoPro::release_filename() {
     filename_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// -------------------------------------------------------------------
+
+// SegmentLocationPro
+
+// optional fixed32 osdId = 1;
+inline bool SegmentLocationPro::has_osdid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SegmentLocationPro::set_has_osdid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SegmentLocationPro::clear_has_osdid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SegmentLocationPro::clear_osdid() {
+  osdid_ = 0u;
+  clear_has_osdid();
+}
+inline ::google::protobuf::uint32 SegmentLocationPro::osdid() const {
+  return osdid_;
+}
+inline void SegmentLocationPro::set_osdid(::google::protobuf::uint32 value) {
+  set_has_osdid();
+  osdid_ = value;
+}
+
+// optional fixed32 segmentId = 2;
+inline bool SegmentLocationPro::has_segmentid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void SegmentLocationPro::set_has_segmentid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void SegmentLocationPro::clear_has_segmentid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void SegmentLocationPro::clear_segmentid() {
+  segmentid_ = 0u;
+  clear_has_segmentid();
+}
+inline ::google::protobuf::uint32 SegmentLocationPro::segmentid() const {
+  return segmentid_;
+}
+inline void SegmentLocationPro::set_segmentid(::google::protobuf::uint32 value) {
+  set_has_segmentid();
+  segmentid_ = value;
 }
 
 // -------------------------------------------------------------------
@@ -5913,54 +5959,6 @@ inline void OsdStatUpdateReplyPro::set_osdloading(::google::protobuf::uint32 val
 
 // -------------------------------------------------------------------
 
-// GetSecondaryListRequestPro_segmentLocation
-
-// optional fixed32 osdId = 1;
-inline bool GetSecondaryListRequestPro_segmentLocation::has_osdid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::set_has_osdid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::clear_has_osdid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::clear_osdid() {
-  osdid_ = 0u;
-  clear_has_osdid();
-}
-inline ::google::protobuf::uint32 GetSecondaryListRequestPro_segmentLocation::osdid() const {
-  return osdid_;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::set_osdid(::google::protobuf::uint32 value) {
-  set_has_osdid();
-  osdid_ = value;
-}
-
-// optional fixed32 segmentId = 2;
-inline bool GetSecondaryListRequestPro_segmentLocation::has_segmentid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::set_has_segmentid() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::clear_has_segmentid() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::clear_segmentid() {
-  segmentid_ = 0u;
-  clear_has_segmentid();
-}
-inline ::google::protobuf::uint32 GetSecondaryListRequestPro_segmentLocation::segmentid() const {
-  return segmentid_;
-}
-inline void GetSecondaryListRequestPro_segmentLocation::set_segmentid(::google::protobuf::uint32 value) {
-  set_has_segmentid();
-  segmentid_ = value;
-}
-
-// -------------------------------------------------------------------
-
 // GetSecondaryListRequestPro
 
 // optional fixed32 numOfSegs = 1;
@@ -5985,27 +5983,27 @@ inline void GetSecondaryListRequestPro::set_numofsegs(::google::protobuf::uint32
   numofsegs_ = value;
 }
 
-// repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 2;
+// repeated .ncvfs.SegmentLocationPro secondaryList = 2;
 inline int GetSecondaryListRequestPro::secondarylist_size() const {
   return secondarylist_.size();
 }
 inline void GetSecondaryListRequestPro::clear_secondarylist() {
   secondarylist_.Clear();
 }
-inline const ::ncvfs::GetSecondaryListRequestPro_segmentLocation& GetSecondaryListRequestPro::secondarylist(int index) const {
+inline const ::ncvfs::SegmentLocationPro& GetSecondaryListRequestPro::secondarylist(int index) const {
   return secondarylist_.Get(index);
 }
-inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* GetSecondaryListRequestPro::mutable_secondarylist(int index) {
+inline ::ncvfs::SegmentLocationPro* GetSecondaryListRequestPro::mutable_secondarylist(int index) {
   return secondarylist_.Mutable(index);
 }
-inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* GetSecondaryListRequestPro::add_secondarylist() {
+inline ::ncvfs::SegmentLocationPro* GetSecondaryListRequestPro::add_secondarylist() {
   return secondarylist_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >&
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >&
 GetSecondaryListRequestPro::secondarylist() const {
   return secondarylist_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >*
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >*
 GetSecondaryListRequestPro::mutable_secondarylist() {
   return &secondarylist_;
 }
@@ -6018,27 +6016,27 @@ GetSecondaryListRequestPro::mutable_secondarylist() {
 
 // GetSecondaryListReplyPro
 
-// repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
+// repeated .ncvfs.SegmentLocationPro secondaryList = 1;
 inline int GetSecondaryListReplyPro::secondarylist_size() const {
   return secondarylist_.size();
 }
 inline void GetSecondaryListReplyPro::clear_secondarylist() {
   secondarylist_.Clear();
 }
-inline const ::ncvfs::GetSecondaryListRequestPro_segmentLocation& GetSecondaryListReplyPro::secondarylist(int index) const {
+inline const ::ncvfs::SegmentLocationPro& GetSecondaryListReplyPro::secondarylist(int index) const {
   return secondarylist_.Get(index);
 }
-inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* GetSecondaryListReplyPro::mutable_secondarylist(int index) {
+inline ::ncvfs::SegmentLocationPro* GetSecondaryListReplyPro::mutable_secondarylist(int index) {
   return secondarylist_.Mutable(index);
 }
-inline ::ncvfs::GetSecondaryListRequestPro_segmentLocation* GetSecondaryListReplyPro::add_secondarylist() {
+inline ::ncvfs::SegmentLocationPro* GetSecondaryListReplyPro::add_secondarylist() {
   return secondarylist_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >&
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >&
 GetSecondaryListReplyPro::secondarylist() const {
   return secondarylist_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::ncvfs::GetSecondaryListRequestPro_segmentLocation >*
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >*
 GetSecondaryListReplyPro::mutable_secondarylist() {
   return &secondarylist_;
 }

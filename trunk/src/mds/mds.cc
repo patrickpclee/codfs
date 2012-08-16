@@ -258,6 +258,9 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 
+/**
+ * @brief	Test Case
+ */
 void Mds::test() {
 	uint32_t fileId = 216;
 	vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);

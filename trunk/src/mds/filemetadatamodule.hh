@@ -29,11 +29,28 @@ public:
 	 */
 	void createFile(uint32_t clientId, string path, uint64_t fileSize,
 			uint32_t fileId, CodingScheme codingScheme, string codingSetting);
+
+	/**
+	 * @brief	Save the Object List of a File
+	 *
+	 * @param	fileId	ID of the File
+	 * @param	objectList	List of Object ID
+	 */
 	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
+
+	/**
+	 * @brief	Read the Object List of a File
+	 *
+	 * @param	fileId ID of the File
+	 *
+	 * @raturn	List of Object ID
+	 */
 	vector<uint64_t> readObjectList(uint32_t fileId);
 
 	/**
 	 * @brief	Generate a New File ID
+	 *
+	 * @return	File ID
 	 */
 	uint32_t generateFileId();
 private:

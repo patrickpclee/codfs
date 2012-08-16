@@ -24,7 +24,7 @@ public:
 	 * @param	primaryList	Primary List
 	 * @param	checksum	File Checksum
 	 */
-	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList, unsigned char* checksum = NULL);
+	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList, unsigned char* checksum=NULL);
 
 
 	/**
@@ -86,6 +86,7 @@ public:
 	 * @param	numOfObjs	Number of Objects
 	 */
 	vector<uint32_t> askPrimaryList (uint32_t numOfObjs);
+
 	vector<uint32_t> getPrimaryList (uint32_t sockfd, uint32_t numOfObjs);
 
 private:
