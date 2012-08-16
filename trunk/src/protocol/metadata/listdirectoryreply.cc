@@ -7,7 +7,7 @@
 #include "listdirectoryreply.hh"
 #include "listdirectoryrequest.hh"
 
-#include "../protocol/message.pb.h"
+#include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
 

@@ -4,13 +4,13 @@
 
 #include <iostream>
 #include "listdirectoryrequest.hh"
-#include "../protocol/message.pb.h"
+#include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/debug.hh"
 #include "../../common/memorypool.hh"
 
 #ifdef COMPILE_FOR_MDS
-#include "../mds/mds.hh"
+#include "../../mds/mds.hh"
 extern Mds* mds;
 #endif
 

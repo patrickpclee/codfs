@@ -107,8 +107,10 @@ message UploadFileReplyPro {
 }
 
 message DownloadFileReplyPro {
-	repeated fixed64 objectList = 1;
-	repeated fixed32 primaryList = 3;
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	repeated fixed64 objectList = 3;
+	repeated fixed32 primaryList = 4;
 }
 
 //

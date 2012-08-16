@@ -3,7 +3,7 @@
 #include "uploadfilereply.hh"
 #include "uploadfilerequest.hh"
 
-#include "../protocol/message.pb.h"
+#include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
 #include "../../common/debug.hh"

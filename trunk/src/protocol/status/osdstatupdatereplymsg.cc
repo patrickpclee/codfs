@@ -1,6 +1,6 @@
 #include "osdstatupdatereplymsg.hh"
 #include "../../common/debug.hh"
-#include "../protocol/message.pb.h"
+#include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
 #include "../monitor/monitor.hh"

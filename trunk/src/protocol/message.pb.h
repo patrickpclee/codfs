@@ -1498,10 +1498,24 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // repeated fixed64 objectList = 1;
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 fileId = 2;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // repeated fixed64 objectList = 3;
   inline int objectlist_size() const;
   inline void clear_objectlist();
-  static const int kObjectListFieldNumber = 1;
+  static const int kObjectListFieldNumber = 3;
   inline ::google::protobuf::uint64 objectlist(int index) const;
   inline void set_objectlist(int index, ::google::protobuf::uint64 value);
   inline void add_objectlist(::google::protobuf::uint64 value);
@@ -1510,10 +1524,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
       mutable_objectlist();
   
-  // repeated fixed32 primaryList = 3;
+  // repeated fixed32 primaryList = 4;
   inline int primarylist_size() const;
   inline void clear_primarylist();
-  static const int kPrimaryListFieldNumber = 3;
+  static const int kPrimaryListFieldNumber = 4;
   inline ::google::protobuf::uint32 primarylist(int index) const;
   inline void set_primarylist(int index, ::google::protobuf::uint32 value);
   inline void add_primarylist(::google::protobuf::uint32 value);
@@ -1524,14 +1538,20 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   
   // @@protoc_insertion_point(class_scope:ncvfs.DownloadFileReplyPro)
  private:
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
+  ::google::protobuf::uint32 clientid_;
+  ::google::protobuf::uint32 fileid_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectlist_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4399,7 +4419,51 @@ UploadFileReplyPro::mutable_primarylist() {
 
 // DownloadFileReplyPro
 
-// repeated fixed64 objectList = 1;
+// optional fixed32 clientId = 1;
+inline bool DownloadFileReplyPro::has_clientid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DownloadFileReplyPro::set_has_clientid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DownloadFileReplyPro::clear_has_clientid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DownloadFileReplyPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
+}
+inline ::google::protobuf::uint32 DownloadFileReplyPro::clientid() const {
+  return clientid_;
+}
+inline void DownloadFileReplyPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
+}
+
+// optional fixed32 fileId = 2;
+inline bool DownloadFileReplyPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void DownloadFileReplyPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void DownloadFileReplyPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void DownloadFileReplyPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 DownloadFileReplyPro::fileid() const {
+  return fileid_;
+}
+inline void DownloadFileReplyPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// repeated fixed64 objectList = 3;
 inline int DownloadFileReplyPro::objectlist_size() const {
   return objectlist_.size();
 }
@@ -4424,7 +4488,7 @@ DownloadFileReplyPro::mutable_objectlist() {
   return &objectlist_;
 }
 
-// repeated fixed32 primaryList = 3;
+// repeated fixed32 primaryList = 4;
 inline int DownloadFileReplyPro::primarylist_size() const {
   return primarylist_.size();
 }

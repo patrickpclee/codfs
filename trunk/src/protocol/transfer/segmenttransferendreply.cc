@@ -1,10 +1,10 @@
 #include "segmenttransferendreply.hh"
 #include "segmenttransferendrequest.hh"
 #include "../../common/debug.hh"
-#include "../protocol/message.pb.h"
+#include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../osd/osd.hh"
+#include "../../osd/osd.hh"
 
 SegmentTransferEndReplyMsg::SegmentTransferEndReplyMsg(Communicator* communicator) :
 		Message(communicator) {
