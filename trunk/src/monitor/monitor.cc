@@ -1,6 +1,7 @@
 #include <cstdio>
 #include "monitor.hh"
 #include "../config/config.hh"
+#include "../osd/segmentlocation.hh"
 #include "../common/garbagecollector.hh"
 
 ConfigLayer* configLayer;
@@ -67,6 +68,13 @@ void Monitor::getPrimaryListProcessor (uint32_t requestId, uint32_t sockfd, uint
 	vector<uint32_t> primaryList;
 	primaryList = _selectionModule->ChoosePrimary(numOfObjs);
 	_monitorCommunicator->replyPrimaryList(requestId, sockfd, primaryList);
+	return;
+}
+
+void Monitor::getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfSegs){
+	vector<struct SegmentLocation> secondaryList;
+	secondaryList = _selectionModule->ChooseSecondary(numOfSegs);
+	_monitorCommunicator->replySecondaryList(requestId, sockfd, secondaryList);
 	return;
 }
 

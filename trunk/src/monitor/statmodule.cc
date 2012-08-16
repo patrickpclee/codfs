@@ -1,6 +1,5 @@
 #include "statmodule.hh"
 #include <ctime>
-#include "../protocol/osdstatupdaterequestmsg.hh"
 
 
 /*  Constructor */
