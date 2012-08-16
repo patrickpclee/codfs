@@ -7,7 +7,7 @@ MetaDataModule::MetaDataModule() {
 	_objectMetaDataModule = new ObjectMetaDataModule();
 	_osdMetaDataModule = new OsdMetaDataModule();
 
-	srand(0);
+	srand(time(NULL));
 }
 
 string MetaDataModule::lookupFilePath(uint32_t fileId) {
