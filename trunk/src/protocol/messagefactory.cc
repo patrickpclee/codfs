@@ -29,6 +29,8 @@
 #include "metadata/uploadobjectack.hh"
 #include "nodelist/getprimarylistrequest.hh"
 #include "nodelist/getprimarylistreply.hh"
+#include "nodelist/getsecondarylistrequest.hh"
+#include "nodelist/getsecondarylistreply.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -109,6 +111,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_PRIMARY_LIST_REPLY):
 		return new GetPrimaryListReplyMsg(communicator);
+		break;
+	case (GET_SECONDARY_LIST_REQUEST):
+		return new GetSecondaryListRequestMsg(communicator);
+		break;
+	case (GET_SECONDARY_LIST_REPLY):
+		return new GetSecondaryListReplyMsg(communicator);
 		break;
 	default:
 		debug("%s\n", "Invalid message type");

@@ -1,6 +1,5 @@
 #include "statmodule.hh"
 #include <ctime>
-#include "../protocol/osdstatupdaterequestmsg.hh"
 
 /*  Constructor */
 StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
