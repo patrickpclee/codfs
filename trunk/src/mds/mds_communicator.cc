@@ -1,8 +1,8 @@
 #include "mds_communicator.hh"
 
-#include "../protocol/listdirectoryreply.hh"
-#include "../protocol/uploadfilereply.hh"
-#include "../protocol/getprimarylistrequest.hh"
+#include "../protocol/metadata/listdirectoryreply.hh"
+#include "../protocol/metadata/uploadfilereply.hh"
+#include "../protocol/nodelist/getprimarylistrequest.hh"
 
 
 /**

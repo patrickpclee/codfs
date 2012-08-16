@@ -4,11 +4,11 @@
 #include "../common/debug.hh"
 #include "../common/objectdata.hh"
 #include "../common/memorypool.hh"
-#include "../protocol/listdirectoryrequest.hh"
-#include "../protocol/uploadfilerequest.hh"
-#include "../protocol/putobjectinitrequest.hh"
-#include "../protocol/objecttransferendrequest.hh"
-#include "../protocol/objectdatamsg.hh"
+#include "../protocol/metadata/listdirectoryrequest.hh"
+#include "../protocol/metadata/uploadfilerequest.hh"
+#include "../protocol/transfer/putobjectinitrequest.hh"
+#include "../protocol/transfer/objecttransferendrequest.hh"
+#include "../protocol/transfer/objectdatamsg.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)

@@ -11,9 +11,9 @@
 #include "../common/debug.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
-#include "../protocol/osdstartupmsg.hh"
-#include "../protocol/osdshutdownmsg.hh"
-#include "../protocol/osdstatupdatereplymsg.hh"
+#include "../protocol/status/osdstartupmsg.hh"
+#include "../protocol/status/osdshutdownmsg.hh"
+#include "../protocol/status/osdstatupdatereplymsg.hh"
 
 // for random srand() time() rand()
 #include <stdlib.h>

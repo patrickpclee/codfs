@@ -11,15 +11,15 @@
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
 
-#include "../protocol/listdirectoryrequest.hh"
-#include "../protocol/putobjectinitreply.hh"
-#include "../protocol/putsegmentinitrequest.hh"
-#include "../protocol/putsegmentinitreply.hh"
-#include "../protocol/objecttransferendreply.hh"
-#include "../protocol/segmenttransferendrequest.hh"
-#include "../protocol/segmenttransferendreply.hh"
-#include "../protocol/segmentdatamsg.hh"
-#include "../protocol/uploadobjectack.hh"
+#include "../protocol/metadata/uploadobjectack.hh"
+#include "../protocol/metadata/listdirectoryrequest.hh"
+#include "../protocol/transfer/putobjectinitreply.hh"
+#include "../protocol/transfer/putsegmentinitrequest.hh"
+#include "../protocol/transfer/putsegmentinitreply.hh"
+#include "../protocol/transfer/objecttransferendreply.hh"
+#include "../protocol/transfer/segmenttransferendrequest.hh"
+#include "../protocol/transfer/segmenttransferendreply.hh"
+#include "../protocol/transfer/segmentdatamsg.hh"
 
 using namespace std;
 

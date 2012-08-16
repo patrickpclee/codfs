@@ -18,8 +18,8 @@
 #include "../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../protocol/messagefactory.hh"
-#include "../protocol/handshakerequest.hh"
-#include "../protocol/handshakereply.hh"
+#include "../protocol/handshake/handshakerequest.hh"
+#include "../protocol/handshake/handshakereply.hh"
 
 using namespace std;
 

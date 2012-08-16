@@ -1,5 +1,4 @@
 #include <signal.h>
-
 #include <iostream>
 #include <cstdio>
 #include <thread>
@@ -13,8 +12,6 @@
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
 #include "../coding/raid1coding.hh"
-
-#include <sys/stat.h>
 
 using namespace std;
 

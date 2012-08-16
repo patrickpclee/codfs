@@ -10,7 +10,7 @@
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
 #include "../common/debug.hh"
-#include "../protocol/getprimarylistreply.hh"
+#include "../protocol/nodelist/getprimarylistreply.hh"
 
 using namespace std;
 
