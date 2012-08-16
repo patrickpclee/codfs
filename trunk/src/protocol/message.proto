@@ -130,6 +130,7 @@ message GetObjectInfoReplyPro {
 
 message GetPrimaryListRequestPro{
 	optional fixed32 numOfObjs = 1;
+	repeated fixed32 primaryList = 2;
 }
 
 ///////////////// FROM OSD /////////////////
@@ -239,6 +240,14 @@ message OsdStatUpdateReplyPro {
 	optional fixed32 osdLoading = 3;
 }
 
+message GetSecondaryListRequestPro{
+	optional fixed32 numOfSegs = 1;
+	message segmentLocation {
+    	optional fixed32 osdId = 1;
+    	optional fixed32 segmentId = 2;
+  	}
+	repeated segmentLocation secondaryList = 2;
+}
 
 ///////////////// FROM MONITOR /////////////////
 //
@@ -247,6 +256,10 @@ message OsdStatUpdateReplyPro {
 
 message OsdStatUpdateRequestPro {
 
+}
+
+message GetSecondaryListReplyPro{
+	repeated GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
 }
 
 //

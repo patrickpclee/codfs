@@ -20,6 +20,9 @@
 #include "transfer/objecttransferendrequest.hh"
 #include "transfer/objectdatamsg.hh"
 #include "transfer/segmentdatamsg.hh"
+#include "transfer/getobjectreadymsg.hh"
+#include "transfer/getsegmentreadymsg.hh"
+#include "transfer/getobjectreplymsg.hh"
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
 #include "status/osdstartupmsg.hh"
@@ -29,6 +32,8 @@
 #include "metadata/uploadobjectack.hh"
 #include "nodelist/getprimarylistrequest.hh"
 #include "nodelist/getprimarylistreply.hh"
+#include "nodelist/getsecondarylistrequest.hh"
+#include "nodelist/getsecondarylistreply.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -82,8 +87,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (SEGMENT_TRANSFER_END_REPLY):
 		return new SegmentTransferEndReplyMsg(communicator);
-		break;
-	case (OBJECT_DATA):
+		break; case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);
 		break;
 	case (SEGMENT_DATA):
@@ -109,6 +113,20 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_PRIMARY_LIST_REPLY):
 		return new GetPrimaryListReplyMsg(communicator);
+		break;
+	case (GET_OBJECT_READY):
+		return new GetObjectReadyMsg(communicator);
+		break;
+	case (GET_OBJECT_REPLY):
+		return new GetObjectReplyMsg(communicator);
+		break;
+	case (GET_SEGMENT_READY):
+		return new GetSegmentReadyMsg(communicator);
+	case (GET_SECONDARY_LIST_REQUEST):
+		return new GetSecondaryListRequestMsg(communicator);
+		break;
+	case (GET_SECONDARY_LIST_REPLY):
+		return new GetSecondaryListReplyMsg(communicator);
 		break;
 	default:
 		debug("%s\n", "Invalid message type");

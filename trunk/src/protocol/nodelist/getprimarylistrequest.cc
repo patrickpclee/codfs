@@ -6,8 +6,8 @@
 #include "../monitor/monitor.hh"
 #include "getprimarylistrequest.hh"
 
-#ifdef COMPILE_FOR_OSD
-extern Osd* osd;
+#ifdef COMPILE_FOR_MDS
+extern Mds* mds;
 #endif
 
 #ifdef COMPILE_FOR_MONITOR

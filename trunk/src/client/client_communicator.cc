@@ -9,6 +9,9 @@
 #include "../protocol/transfer/putobjectinitrequest.hh"
 #include "../protocol/transfer/objecttransferendrequest.hh"
 #include "../protocol/transfer/objectdatamsg.hh"
+#include "../protocol/transfer/getobjectreadymsg.hh"
+#include "../protocol/transfer/getsegmentreadymsg.hh"
+#include "../protocol/transfer/getobjectreplymsg.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)

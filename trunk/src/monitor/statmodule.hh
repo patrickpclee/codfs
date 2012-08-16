@@ -5,6 +5,7 @@
 #include "../common/osdstat.hh"
 #include "../communicator/communicator.hh"
 #include <map>
+#include "../protocol/status/osdstatupdaterequestmsg.hh"
 
 using namespace std;
 

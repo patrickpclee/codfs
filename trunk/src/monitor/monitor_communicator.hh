@@ -24,8 +24,8 @@ public:
 	MonitorCommunicator();
 	~MonitorCommunicator();
 
-	void replyPrimaryList(uint32_t requestId, uint32_t sockdf, vector<uint32_t> primaryList);
-
+	void replyPrimaryList(uint32_t requestId, uint32_t sockfd, vector<uint32_t> primaryList);
+	void replySecondaryList(uint32_t requestId, uint32_t sockfd, vector<struct SegmentLocation> secondaryList);
 private:
 
 };
