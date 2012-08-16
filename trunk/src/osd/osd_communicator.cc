@@ -20,6 +20,7 @@
 #include "../protocol/transfer/segmenttransferendrequest.hh"
 #include "../protocol/transfer/segmenttransferendreply.hh"
 #include "../protocol/transfer/segmentdatamsg.hh"
+#include "../protocol/nodelist/getsecondarylistrequest.hh"
 
 using namespace std;
 
@@ -207,7 +208,8 @@ vector<struct SegmentLocation> OsdCommunicator::getSecondaryListRequest(
 
 	vector<struct SegmentLocation> secondaryList;
 	if (status == READY) {
-		vector<struct SegmentLocation> secondaryList = getSecondaryListRequestMsg->getSecondaryList();
+		vector<struct SegmentLocation> secondaryList;
+		// = getSecondaryListRequestMsg->getSecondaryList();
 		return secondaryList;
 	}
 	return {};

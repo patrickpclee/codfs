@@ -68,9 +68,9 @@ public:
 
 	void printProtocol ();
 
-	void setSecondaryList(vector<uint32_t> primaryList);
+	void setSecondaryList(vector<uint32_t> secondaryList);
+	vector<uint32_t> getSecondaryList();
 
-	vector<uint32_t> setSecondaryListt();
 
 private:
 	uint32_t _numOfSegs;

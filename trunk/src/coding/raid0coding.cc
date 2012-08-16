@@ -61,7 +61,7 @@ struct ObjectData Raid0Coding::decode(vector<struct SegmentData> segmentData,
 		string setting) {
 
 	const uint32_t segmentCount = (uint32_t) segmentData.size();
-	const uint32_t noOfStrips = getNoOfStrips(setting);
+	//const uint32_t noOfStrips = getNoOfStrips(setting);
 
 	struct ObjectData objectData;
 

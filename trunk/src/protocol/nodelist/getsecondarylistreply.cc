@@ -1,11 +1,11 @@
 #include "getsecondarylistreply.hh"
 #include "getsecondarylistrequest.hh"
 #include "../../common/debug.hh"
-#include "../protocol/message.pb.h"
+#include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../osd/osd.hh"
-#include "../monitor/monitor.hh"
+#include "../../osd/osd.hh"
+#include "../../monitor/monitor.hh"
 
 #ifdef COMPILE_FOR_OSD
 extern Osd* osd;
@@ -30,6 +30,7 @@ GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator,
 
 void GetSecondaryListReplyMsg::prepareProtocolMsg() {
 	string serializedString;
+	/*
 
 	ncvfs::GetSecondaryListReplyPro getSecondaryListReplyPro;
 
@@ -46,10 +47,12 @@ void GetSecondaryListReplyMsg::prepareProtocolMsg() {
 	setProtocolType(GET_SECONDARY_LIST_REPLY);
 	setProtocolMsg(serializedString);
 
+*/
 }
 
 void GetSecondaryListReplyMsg::parse(char* buf) {
 
+/*
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
 	ncvfs::GetSecondaryListReplyPro getSecondaryListReplyPro;
@@ -60,14 +63,17 @@ void GetSecondaryListReplyMsg::parse(char* buf) {
 		_secondaryList.push_back(getSecondaryListReplyPro.secondarylist(i));
 	}
 	return;
+	*/
 }
 
 void GetSecondaryListReplyMsg::doHandle() {
+/*
 	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
 			(GetSecondaryListRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	getSecondaryListRequestMsg->setSecondaryList(_secondaryList);
 	getSecondaryListRequestMsg->setStatus(READY);
+	*/
 }
 
 void GetSecondaryListReplyMsg::printProtocol() {

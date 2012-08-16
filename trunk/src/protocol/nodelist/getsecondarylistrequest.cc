@@ -1,9 +1,9 @@
 #include "../../common/debug.hh"
-#include "../protocol/message.pb.h"
+#include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../osd/osd.hh"
-#include "../monitor/monitor.hh"
+#include "../../osd/osd.hh"
+#include "../../monitor/monitor.hh"
 #include "getsecondarylistrequest.hh"
 
 #ifdef COMPILE_FOR_OSD
@@ -30,6 +30,7 @@ GetSecondaryListRequestMsg::GetSecondaryListRequestMsg(Communicator* communicato
 void GetSecondaryListRequestMsg::prepareProtocolMsg() {
 	string serializedString;
 
+/*
 	ncvfs::GetSecondaryListRequestPro getSecondaryListRequestPro;
 	getSecondaryListRequestPro.set_numofsegs(_numOfSegs);
 
@@ -41,10 +42,12 @@ void GetSecondaryListRequestMsg::prepareProtocolMsg() {
 	setProtocolSize(serializedString.length());
 	setProtocolType (GET_SECONDARY_LIST_REQUEST);
 	setProtocolMsg(serializedString);
+	*/
 
 }
 
 void GetSecondaryListRequestMsg::parse(char* buf) {
+	/*
 
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
@@ -53,13 +56,16 @@ void GetSecondaryListRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_numOfSegs = getSecondaryListRequestPro.numofsegs();
+	*/
 
 }
 
 void GetSecondaryListRequestMsg::doHandle() {
+	/*
 #ifdef COMPILE_FOR_MONITOR
 	monitor->getSecondaryListProcessor (_msgHeader.requestId, _sockfd, _numOfSegs);
 #endif
+*/
 }
 
 void GetSecondaryListRequestMsg::printProtocol() {
@@ -67,10 +73,15 @@ void GetSecondaryListRequestMsg::printProtocol() {
 }
 
 void GetSecondaryListRequestMsg::setSecondaryList(vector<uint32_t> secondaryList) {
+	/*
 	_secondaryList = secondaryList;
 	return;
+	*/
+}
+vector<uint32_t> GetSecondaryListRequestMsg::getSecondaryList() {
+/*
+
+	return _secondaryList;
+*/
 }
 
-vector<uint32_t> GetSecondaryListRequestMsg::getSecondaryList() {
-	return _secondaryList;
-}
