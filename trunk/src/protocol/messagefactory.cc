@@ -20,6 +20,9 @@
 #include "transfer/objecttransferendrequest.hh"
 #include "transfer/objectdatamsg.hh"
 #include "transfer/segmentdatamsg.hh"
+#include "transfer/getobjectreadymsg.hh"
+#include "transfer/getsegmentreadymsg.hh"
+#include "transfer/getobjectreplymsg.hh"
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
 #include "status/osdstartupmsg.hh"
@@ -109,6 +112,15 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_PRIMARY_LIST_REPLY):
 		return new GetPrimaryListReplyMsg(communicator);
+		break;
+	case (GET_OBJECT_READY):
+		return new GetObjectReadyMsg(communicator);
+		break;
+	case (GET_OBJECT_REPLY):
+		return new GetObjectReplyMsg(communicator);
+		break;
+	case (GET_SEGMENT_READY):
+		return new GetSegmentReadyMsg(communicator);
 		break;
 	default:
 		debug("%s\n", "Invalid message type");
