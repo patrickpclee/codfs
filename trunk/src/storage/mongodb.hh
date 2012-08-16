@@ -18,20 +18,27 @@ public:
 
 	MongoDB ();
 
-	MongoDB (string host, string database);
+	MongoDB (string host, uint32_t port, string database);
 
 	/**
 	 * @brief	Connect to the Data Base
 	 */
 	void connect(bool writeConcern = true);
 
-	vector<mongo::BSONObj> read (string collection, mongo::Query queryObject);
-	mongo::BSONObj readOne (string collection, mongo::Query queryObject);
-	void insert (string collection, mongo::BSONObj insertObject);
-	void update (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
-	void push (string collection, mongo::Query queryObject, mongo::BSONObj updateObject);
-	void remove (string collection, mongo::Query queryObject);
-	mongo::BSONObj findAndModify (string collection, mongo::BSONObj queryObject, mongo::BSONObj updateObject);
+	/**
+	 * @brief	Set the Collection
+	 *
+	 * @param	collection	Collection to Use
+	 */
+	void setCollection(string collection);
+
+	vector<mongo::BSONObj> read (mongo::Query queryObject);
+	mongo::BSONObj readOne (mongo::Query queryObject);
+	void insert (mongo::BSONObj insertObject);
+	void update (mongo::Query queryObject, mongo::BSONObj updateObject);
+	void push (mongo::Query queryObject, mongo::BSONObj updateObject);
+	void remove (mongo::Query queryObject);
+	mongo::BSONObj findAndModify (mongo::BSONObj queryObject, mongo::BSONObj updateObject);
 
 private:
 	string _user;
@@ -39,6 +46,7 @@ private:
 	string _host;
 	uint32_t _port;
 	string _database;
+	string _collection;
 
 	mongo::DBClientConnection _connection;
 };

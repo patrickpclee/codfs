@@ -9,9 +9,33 @@
 
 class NameSpaceModule {
 public:
+	/**
+	 * @brief	Default Constructor, Read Setting From Config
+	 */
 	NameSpaceModule ();
+
+	/**
+	 * @brief	Create a File with Client ID and Path
+	 *
+	 * @param	clientId	ID of the Client
+	 * @param	path	Path of the File
+	 */
 	uint32_t createFile (uint32_t clientId, string path);
-//	uint32_t deleteFile (string path, uint32_t clientId);
+
+//	/**
+//	 * @brief	Delete a File with Client ID and Path
+//	 *
+//	 * @param	clientId	ID of the Client
+//	 * @param	path	Path of the File
+//	 */
+//	void deleteFile (string path, uint32_t clientId);
+
+	/**
+	 * @brief	Open a File
+	 *
+	 * @param	clientId	ID of the Client
+	 * @param	path	Path of the File
+	 */
 	uint32_t openFile (uint32_t clientId, string path);
 
 	/**
@@ -22,9 +46,14 @@ public:
 	 */
 	vector<FileMetaData> listFolder (uint32_t clientId, string path);
 private:
-	uint32_t newFileId (string path);
+	/**
+	 * @brief	Covert Path to Real One
+	 *
+	 * @param	path	Path
+	 */
 	string convertPath (string path);
 
+	/// Base Path of the Namespace Tree
 	string _basePath;
 };
 #endif

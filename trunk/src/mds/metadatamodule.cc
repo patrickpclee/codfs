@@ -3,8 +3,9 @@
 #include "../common/debug.hh"
 
 MetaDataModule::MetaDataModule() {
-	_fileMetaDataModule = new FileMetaDataModule();
-	_objectMetaDataModule = new ObjectMetaDataModule();
+	_configMetaDataStorage = new ConfigMetaDataModule();
+	_fileMetaDataModule = new FileMetaDataModule(_configMetaDataStorage);
+	_objectMetaDataModule = new ObjectMetaDataModule(_configMetaDataStorage);
 	_osdMetaDataModule = new OsdMetaDataModule();
 
 	srand(time(NULL));

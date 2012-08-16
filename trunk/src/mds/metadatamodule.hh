@@ -5,6 +5,7 @@
 #include <vector>
 using namespace std;
 
+#include "configmetadatamodule.hh"
 #include "filemetadatamodule.hh"
 #include "objectmetadatamodule.hh"
 #include "osdmetadatamodule.hh"
@@ -91,6 +92,7 @@ private:
 	 */
 	uint64_t newObjectId();
 
+	ConfigMetaDataModule* _configMetaDataStorage;
 	FileMetaDataModule* _fileMetaDataModule;
 	ObjectMetaDataModule* _objectMetaDataModule;
 	OsdMetaDataModule* _osdMetaDataModule;

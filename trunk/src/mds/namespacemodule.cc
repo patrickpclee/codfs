@@ -11,6 +11,9 @@
 
 extern ConfigLayer* configLayer;
 
+/**
+ * @brief	Default Constructor, Read Setting From Config
+ */
 NameSpaceModule::NameSpaceModule () {
 	_basePath = configLayer->getConfigString("MetaData>BasePath");
 
@@ -68,23 +71,26 @@ vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, string path
 }
 
 
+/**
+ * @brief	Create a File with Client ID and Path
+ */
 uint32_t NameSpaceModule::createFile(uint32_t clientId, string path)
 {
 	return 0;
 }
 
 
-uint32_t NameSpaceModule::newFileId(string path)
-{
-	return 0;
-}
-
-
+/**
+ * @brief	Open a File
+ */
 uint32_t NameSpaceModule::openFile(uint32_t clientId, string path)
 {
 	return 0;
 }
 
+/**
+ * @brief	Covert Path to Real One
+ */
 string NameSpaceModule::convertPath (string path)
 {
 	return _basePath + path;

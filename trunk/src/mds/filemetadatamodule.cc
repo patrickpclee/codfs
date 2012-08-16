@@ -8,15 +8,18 @@ extern ConfigLayer *configLayer;
 
 using namespace mongo;
 
-FileMetaDataModule::FileMetaDataModule() {
+FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModule) {
+	_configMetaDataModule = configMetaDataModule;
+
 	_collection = "File Meta Data";
 
 	_fileMetaDataStorage = new MongoDB();
 	_fileMetaDataStorage->connect();
+	_fileMetaDataStorage->setCollection(_collection);
 
 	//BSONObj queryObject = BSON ("id" << "config");
 	//BSONObj updateObject = BSON ("$set" << BSON ("fileId" << 0));
-	//_fileMetaDataStorage->update(_collection, queryObject, updateObject);
+	//_fileMetaDataStorage->update(queryObject, updateObject);
 
 }
 
@@ -27,7 +30,7 @@ void FileMetaDataModule::createFile(uint32_t clientId, string path,
 			BSON ("id" << fileId << "path" << path << "fileSize" << (long long int)fileSize
 					<< "clientId" << clientId << "codingScheme" << (int)codingScheme
 					<< "codingSetting" << codingSetting);
-	_fileMetaDataStorage->insert(_collection, insertObject);
+	_fileMetaDataStorage->insert(insertObject);
 
 	return;
 }
@@ -42,7 +45,7 @@ void FileMetaDataModule::saveObjectList(uint32_t fileId,
 		pushObject =
 				BSON ( "$push" << BSON ("objectList" << (long long int)*it));
 		debug("Push %" PRIu64 "\n", *it);
-		_fileMetaDataStorage->push(_collection, queryObject, pushObject);
+		_fileMetaDataStorage->push(queryObject, pushObject);
 	}
 
 	return;
@@ -51,7 +54,7 @@ void FileMetaDataModule::saveObjectList(uint32_t fileId,
 vector<uint64_t> FileMetaDataModule::readObjectList(uint32_t fileId) {
 	vector<uint64_t> objectList;
 	BSONObj queryObject = BSON ("id" << fileId);
-	BSONObj result = _fileMetaDataStorage->readOne(_collection,queryObject);
+	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
 	BSONForEach(it, result.getObjectField("objectList")) {
 		objectList.push_back((uint64_t)it.numberLong());
 	}
@@ -59,17 +62,10 @@ vector<uint64_t> FileMetaDataModule::readObjectList(uint32_t fileId) {
 }
 
 uint32_t FileMetaDataModule::generateFileId() {
-	uint32_t fileId;
+	//BSONObj queryObject = BSON ("id" << "config");
+	//BSONObj updateObject = BSON ("$inc" << BSON ("fileId" << 1));
+	//BSONObj result = _configMetaDataStorage->findAndModify(queryObject, updateObject);
+	//fileId = result.getField("fileId").Int();
 
-	BSONObj queryObject = BSON ("id" << "config");
-	BSONObj updateObject = BSON ("$inc" << BSON ("fileId" << 1));
-	BSONObj result = _fileMetaDataStorage->findAndModify("Configuration",
-			queryObject, updateObject);
-
-	fileId = result.getField("fileId").Int();
-
-	return fileId;
-}
-
-FileMetaDataModule::~FileMetaDataModule() {
+	return _configMetaDataModule->getAndInc("fileId");
 }

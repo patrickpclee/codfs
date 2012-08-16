@@ -21,8 +21,8 @@ MongoDB::MongoDB ()
 	_password = configLayer->getConfigString("MetaData>MongoDB>Password");
 }
 
-MongoDB::MongoDB (string host, string database) :
-	_host(host), _database(database)
+MongoDB::MongoDB (string host, uint32_t port, string database) :
+	_host(host), _port(port), _database(database)
 {
 }
 
@@ -40,10 +40,20 @@ void MongoDB::connect (bool writeConcern)
 	return ;
 }
 
-vector<BSONObj> MongoDB::read (string collection, Query queryObject)
+/**
+ * @brief	Set the Collection
+ */
+void MongoDB::setCollection(string collection)
+{
+	_collection = collection;
+
+	return ;
+}
+
+vector<BSONObj> MongoDB::read (Query queryObject)
 {
 	unique_ptr<DBClientCursor> cursor =
-		_connection.query(_database +"." + collection, queryObject);
+		_connection.query(_database +"." + _collection, queryObject);
 	vector<BSONObj> result;
 	BSONObj tempObj;
 	while( cursor->more() ) {
@@ -54,46 +64,42 @@ vector<BSONObj> MongoDB::read (string collection, Query queryObject)
 	return result;
 }
 
-BSONObj MongoDB::readOne (string collection, Query queryObject)
+BSONObj MongoDB::readOne (Query queryObject)
 {
-	return read(collection, queryObject).at(0);
+	return read(queryObject).at(0);
 }
 
-void MongoDB::insert (string collection, BSONObj insertObject)
+void MongoDB::insert (BSONObj insertObject)
 {
-	_connection.insert(_database + "." + collection, insertObject);
+	_connection.insert(_database + "." + _collection, insertObject);
 
 	return ;
 }
 
-void MongoDB::update (string collection, Query queryObject, BSONObj updateObject)
+void MongoDB::update (Query queryObject, BSONObj updateObject)
 {
-	_connection.update(_database + "." + collection, queryObject, updateObject, true);
+	_connection.update(_database + "." + _collection, queryObject, updateObject, true);
 
 	return ;
 }
 
-void MongoDB::remove (string collection, Query queryObject)
+void MongoDB::remove (Query queryObject)
 {
-	_connection.remove(_database + "." + collection, queryObject);
+	_connection.remove(_database + "." + _collection, queryObject);
 
 	return ;
 
 }
 
-void MongoDB::push (string collection, Query queryObject, BSONObj pushObject)
+void MongoDB::push (Query queryObject, BSONObj pushObject)
 {
-	_connection.update(_database + "." + collection, queryObject, pushObject, true);
+	_connection.update(_database + "." + _collection, queryObject, pushObject, true);
 }
 
-BSONObj MongoDB::findAndModify (string collection, BSONObj queryObject, BSONObj updateObject)
+BSONObj MongoDB::findAndModify (BSONObj queryObject, BSONObj updateObject)
 {
-	//BSONObj commandObject = BSON ("findandmodify" << collection << modifyObject);
-//	BSONObj commandObject = BSON ("findandmodify" << "File Meta Data" << "query" << BSON ("id" << "config") << "update" << BSON ("$inc" << BSON ("fileId" << 1)));
-//	debug("%s\n",commandObject.jsonString().c_str());
 	BSONObj result;
-	_connection.runCommand(_database, BSON ("findandmodify" << collection << "query" << queryObject << "update" << updateObject), result);
-	//_connection.runCommand(_database,BSON ("findandmodify" << "File Meta Data" << "query" << BSON ("id" << "config") << "update" << BSON ("$inc" << BSON ("fileId" << 1))),result);
+	_connection.runCommand(_database, BSON ("findandmodify" << _collection << "query" << queryObject << "update" << updateObject), result);
 
 	return result.getObjectField("value");
 };

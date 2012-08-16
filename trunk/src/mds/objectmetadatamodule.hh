@@ -4,13 +4,15 @@
 #include <stdint.h>
 #include <vector>
 
+#include "configmetadatamodule.hh"
+
 #include "../storage/mongodb.hh"
 
 #include "../common/metadata.hh"
 
 class ObjectMetaDataModule {
 public:
-	ObjectMetaDataModule();
+	ObjectMetaDataModule(ConfigMetaDataModule* configMetaDataModule);
 
 	void saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList);
 	vector<uint32_t> readNodeList (uint64_t objectId);
@@ -19,6 +21,7 @@ public:
 private:
 	string _collection;
 
+	ConfigMetaDataModule* _configMetaDataModule;
 	MongoDB* _objectMetaDataStorage;
 
 	//ObjectMetaDataCache *_objectMetaDataCache;

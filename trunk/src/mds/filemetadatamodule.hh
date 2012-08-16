@@ -1,8 +1,9 @@
 #ifndef __FILE_METADATA_MODULE_HH__
 #define __FILE_METADATA_MODULE_HH__
 
-#include <atomic>
 #include <stdint.h>
+
+#include "configmetadatamodule.hh"
 
 #include "../storage/mongodb.hh"
 
@@ -10,8 +11,7 @@
 
 class FileMetaDataModule {
 public:
-	FileMetaDataModule();
-	~FileMetaDataModule();
+	FileMetaDataModule(ConfigMetaDataModule* configMetaDataModule);
 
 	void createFile (uint32_t clientId, string path, uint64_t fileSize, uint32_t fileId, CodingScheme codingScheme);
 	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
@@ -23,6 +23,7 @@ public:
 private:
 	string _collection;
 
+	ConfigMetaDataModule* _configMetaDataModule;
 	MongoDB* _fileMetaDataStorage;
 	/// File Meta Data Cache
 	//FileMetaDataCache* _fileMetaDataCache;
