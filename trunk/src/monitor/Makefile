@@ -17,7 +17,8 @@ DEFS     := -DCOMPILE_FOR_MONITOR
 EXTRA_CFLAGS := -O2 -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../coding ../communicator ../config ../protocol ../../lib/tinyxml
+SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml
+OBJ_DIR   = ./obj
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 

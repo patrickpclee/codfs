@@ -115,9 +115,18 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* OsdStatUpdateReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   OsdStatUpdateReplyPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* GetSecondaryListRequestPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  GetSecondaryListRequestPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* GetSecondaryListRequestPro_segmentLocation_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  GetSecondaryListRequestPro_segmentLocation_reflection_ = NULL;
 const ::google::protobuf::Descriptor* OsdStatUpdateRequestPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   OsdStatUpdateRequestPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* GetSecondaryListReplyPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  GetSecondaryListReplyPro_reflection_ = NULL;
 const ::google::protobuf::Descriptor* GetPrimaryListReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   GetPrimaryListReplyPro_reflection_ = NULL;
@@ -384,8 +393,9 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetObjectInfoReplyPro));
   GetPrimaryListRequestPro_descriptor_ = file->message_type(15);
-  static const int GetPrimaryListRequestPro_offsets_[1] = {
+  static const int GetPrimaryListRequestPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListRequestPro, numofobjs_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListRequestPro, primarylist_),
   };
   GetPrimaryListRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -661,7 +671,39 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OsdStatUpdateReplyPro));
-  OsdStatUpdateRequestPro_descriptor_ = file->message_type(32);
+  GetSecondaryListRequestPro_descriptor_ = file->message_type(32);
+  static const int GetSecondaryListRequestPro_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, numofsegs_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, secondarylist_),
+  };
+  GetSecondaryListRequestPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      GetSecondaryListRequestPro_descriptor_,
+      GetSecondaryListRequestPro::default_instance_,
+      GetSecondaryListRequestPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(GetSecondaryListRequestPro));
+  GetSecondaryListRequestPro_segmentLocation_descriptor_ = GetSecondaryListRequestPro_descriptor_->nested_type(0);
+  static const int GetSecondaryListRequestPro_segmentLocation_offsets_[2] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro_segmentLocation, osdid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro_segmentLocation, segmentid_),
+  };
+  GetSecondaryListRequestPro_segmentLocation_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      GetSecondaryListRequestPro_segmentLocation_descriptor_,
+      GetSecondaryListRequestPro_segmentLocation::default_instance_,
+      GetSecondaryListRequestPro_segmentLocation_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro_segmentLocation, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro_segmentLocation, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(GetSecondaryListRequestPro_segmentLocation));
+  OsdStatUpdateRequestPro_descriptor_ = file->message_type(33);
   static const int OsdStatUpdateRequestPro_offsets_[1] = {
   };
   OsdStatUpdateRequestPro_reflection_ =
@@ -675,7 +717,22 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OsdStatUpdateRequestPro));
-  GetPrimaryListReplyPro_descriptor_ = file->message_type(33);
+  GetSecondaryListReplyPro_descriptor_ = file->message_type(34);
+  static const int GetSecondaryListReplyPro_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListReplyPro, secondarylist_),
+  };
+  GetSecondaryListReplyPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      GetSecondaryListReplyPro_descriptor_,
+      GetSecondaryListReplyPro::default_instance_,
+      GetSecondaryListReplyPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListReplyPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListReplyPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(GetSecondaryListReplyPro));
+  GetPrimaryListReplyPro_descriptor_ = file->message_type(35);
   static const int GetPrimaryListReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListReplyPro, primarylist_),
   };
@@ -767,7 +824,13 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     OsdStatUpdateReplyPro_descriptor_, &OsdStatUpdateReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    GetSecondaryListRequestPro_descriptor_, &GetSecondaryListRequestPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    GetSecondaryListRequestPro_segmentLocation_descriptor_, &GetSecondaryListRequestPro_segmentLocation::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     OsdStatUpdateRequestPro_descriptor_, &OsdStatUpdateRequestPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    GetSecondaryListReplyPro_descriptor_, &GetSecondaryListReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     GetPrimaryListReplyPro_descriptor_, &GetPrimaryListReplyPro::default_instance());
 }
@@ -839,8 +902,14 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete OsdShutdownPro_reflection_;
   delete OsdStatUpdateReplyPro::default_instance_;
   delete OsdStatUpdateReplyPro_reflection_;
+  delete GetSecondaryListRequestPro::default_instance_;
+  delete GetSecondaryListRequestPro_reflection_;
+  delete GetSecondaryListRequestPro_segmentLocation::default_instance_;
+  delete GetSecondaryListRequestPro_segmentLocation_reflection_;
   delete OsdStatUpdateRequestPro::default_instance_;
   delete OsdStatUpdateRequestPro_reflection_;
+  delete GetSecondaryListReplyPro::default_instance_;
+  delete GetSecondaryListReplyPro_reflection_;
   delete GetPrimaryListReplyPro::default_instance_;
   delete GetPrimaryListReplyPro_reflection_;
 }
@@ -889,38 +958,45 @@ void protobuf_AddDesc_message_2eproto() {
     "oReplyPro\022\020\n\010objectId\030\001 \001(\006\022\020\n\010nodeList\030"
     "\002 \003(\007\022A\n\014codingScheme\030\003 \001(\0162+.ncvfs.PutO"
     "bjectInitRequestPro.CodingScheme\022\025\n\rcodi"
-    "ngSetting\030\004 \001(\t\"-\n\030GetPrimaryListRequest"
-    "Pro\022\021\n\tnumOfObjs\030\001 \001(\007\"8\n\022UploadObjectAc"
-    "kPro\022\020\n\010objectId\030\001 \001(\006\022\020\n\010nodeList\030\002 \003(\007"
-    "\"+\n\027GetObjectInfoRequestPro\022\020\n\010objectId\030"
-    "\001 \001(\006\")\n\025PutObjectInitReplyPro\022\020\n\010object"
-    "Id\030\001 \001(\006\"-\n\031ObjectTransferEndReplyPro\022\020\n"
-    "\010objectId\030\001 \001(\006\"M\n\021GetObjectReplyPro\022\020\n\010"
-    "objectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 \001(\007\022\022\n\nch"
-    "unkCount\030\003 \001(\007\"h\n\030PutSegmentInitRequestP"
-    "ro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022"
-    "\023\n\013segmentSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007"
-    "\"U\n\016SegmentDataPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\t"
-    "segmentId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006lengt"
-    "h\030\004 \001(\007\"C\n\034SegmentTransferEndRequestPro\022"
-    "\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026"
-    "PutSegmentInitReplyPro\022\020\n\010objectId\030\001 \001(\006"
-    "\022\021\n\tsegmentId\030\002 \001(\007\"A\n\032SegmentTransferEn"
-    "dReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId"
-    "\030\002 \001(\007\"\?\n\030GetSegmentInitRequestPro\022\020\n\010ob"
-    "jectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"f\n\026GetSe"
-    "gmentInitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\ts"
-    "egmentId\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001(\007\022\022\n\nc"
-    "hunkCount\030\004 \001(\007\"9\n\022GetSegmentReadyPro\022\020\n"
-    "\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"g\n\rOs"
-    "dStartupPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacit"
-    "y\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\022\r\n\005osdIp\030\004 \001"
-    "(\007\022\017\n\007osdPort\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n"
-    "\005osdId\030\001 \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n"
-    "\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosd"
-    "Loading\030\003 \001(\007\"\031\n\027OsdStatUpdateRequestPro"
-    "\"-\n\026GetPrimaryListReplyPro\022\023\n\013primaryLis"
-    "t\030\001 \003(\007", 2727);
+    "ngSetting\030\004 \001(\t\"B\n\030GetPrimaryListRequest"
+    "Pro\022\021\n\tnumOfObjs\030\001 \001(\007\022\023\n\013primaryList\030\002 "
+    "\003(\007\"8\n\022UploadObjectAckPro\022\020\n\010objectId\030\001 "
+    "\001(\006\022\020\n\010nodeList\030\002 \003(\007\"+\n\027GetObjectInfoRe"
+    "questPro\022\020\n\010objectId\030\001 \001(\006\")\n\025PutObjectI"
+    "nitReplyPro\022\020\n\010objectId\030\001 \001(\006\"-\n\031ObjectT"
+    "ransferEndReplyPro\022\020\n\010objectId\030\001 \001(\006\"M\n\021"
+    "GetObjectReplyPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\no"
+    "bjectSize\030\002 \001(\007\022\022\n\nchunkCount\030\003 \001(\007\"h\n\030P"
+    "utSegmentInitRequestPro\022\020\n\010objectId\030\001 \001("
+    "\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001("
+    "\007\022\022\n\nchunkCount\030\004 \001(\007\"U\n\016SegmentDataPro\022"
+    "\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\016\n\006"
+    "offset\030\003 \001(\006\022\016\n\006length\030\004 \001(\007\"C\n\034SegmentT"
+    "ransferEndRequestPro\022\020\n\010objectId\030\001 \001(\006\022\021"
+    "\n\tsegmentId\030\002 \001(\007\"=\n\026PutSegmentInitReply"
+    "Pro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007"
+    "\"A\n\032SegmentTransferEndReplyPro\022\020\n\010object"
+    "Id\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"\?\n\030GetSegmen"
+    "tInitRequestPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tseg"
+    "mentId\030\002 \001(\007\"f\n\026GetSegmentInitReplyPro\022\020"
+    "\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013s"
+    "egmentSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"9\n\022"
+    "GetSegmentReadyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\t"
+    "segmentId\030\002 \001(\007\"g\n\rOsdStartupPro\022\r\n\005osdI"
+    "d\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoadi"
+    "ng\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007"
+    "\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025Osd"
+    "StatUpdateReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osd"
+    "Capacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"\256\001\n\032G"
+    "etSecondaryListRequestPro\022\021\n\tnumOfSegs\030\001"
+    " \001(\007\022H\n\rsecondaryList\030\002 \003(\01321.ncvfs.GetS"
+    "econdaryListRequestPro.segmentLocation\0323"
+    "\n\017segmentLocation\022\r\n\005osdId\030\001 \001(\007\022\021\n\tsegm"
+    "entId\030\002 \001(\007\"\031\n\027OsdStatUpdateRequestPro\"d"
+    "\n\030GetSecondaryListReplyPro\022H\n\rsecondaryL"
+    "ist\030\001 \003(\01321.ncvfs.GetSecondaryListReques"
+    "tPro.segmentLocation\"-\n\026GetPrimaryListRe"
+    "plyPro\022\023\n\013primaryList\030\001 \003(\007", 3027);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -955,7 +1031,10 @@ void protobuf_AddDesc_message_2eproto() {
   OsdStartupPro::default_instance_ = new OsdStartupPro();
   OsdShutdownPro::default_instance_ = new OsdShutdownPro();
   OsdStatUpdateReplyPro::default_instance_ = new OsdStatUpdateReplyPro();
+  GetSecondaryListRequestPro::default_instance_ = new GetSecondaryListRequestPro();
+  GetSecondaryListRequestPro_segmentLocation::default_instance_ = new GetSecondaryListRequestPro_segmentLocation();
   OsdStatUpdateRequestPro::default_instance_ = new OsdStatUpdateRequestPro();
+  GetSecondaryListReplyPro::default_instance_ = new GetSecondaryListReplyPro();
   GetPrimaryListReplyPro::default_instance_ = new GetPrimaryListReplyPro();
   HandshakeRequestPro::default_instance_->InitAsDefaultInstance();
   HandshakeReplyPro::default_instance_->InitAsDefaultInstance();
@@ -989,7 +1068,10 @@ void protobuf_AddDesc_message_2eproto() {
   OsdStartupPro::default_instance_->InitAsDefaultInstance();
   OsdShutdownPro::default_instance_->InitAsDefaultInstance();
   OsdStatUpdateReplyPro::default_instance_->InitAsDefaultInstance();
+  GetSecondaryListRequestPro::default_instance_->InitAsDefaultInstance();
+  GetSecondaryListRequestPro_segmentLocation::default_instance_->InitAsDefaultInstance();
   OsdStatUpdateRequestPro::default_instance_->InitAsDefaultInstance();
+  GetSecondaryListReplyPro::default_instance_->InitAsDefaultInstance();
   GetPrimaryListReplyPro::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
 }
@@ -5263,6 +5345,7 @@ void GetObjectInfoReplyPro::Swap(GetObjectInfoReplyPro* other) {
 
 #ifndef _MSC_VER
 const int GetPrimaryListRequestPro::kNumOfObjsFieldNumber;
+const int GetPrimaryListRequestPro::kPrimaryListFieldNumber;
 #endif  // !_MSC_VER
 
 GetPrimaryListRequestPro::GetPrimaryListRequestPro()
@@ -5318,6 +5401,7 @@ void GetPrimaryListRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     numofobjs_ = 0u;
   }
+  primarylist_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -5339,6 +5423,28 @@ bool GetPrimaryListRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(21)) goto parse_primaryList;
+        break;
+      }
+      
+      // repeated fixed32 primaryList = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_primaryList:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 1, 21, input, this->mutable_primarylist())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_LENGTH_DELIMITED) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, this->mutable_primarylist())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_primaryList;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -5366,6 +5472,12 @@ void GetPrimaryListRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->numofobjs(), output);
   }
   
+  // repeated fixed32 primaryList = 2;
+  for (int i = 0; i < this->primarylist_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(
+      2, this->primarylist(i), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -5377,6 +5489,12 @@ void GetPrimaryListRequestPro::SerializeWithCachedSizes(
   // optional fixed32 numOfObjs = 1;
   if (has_numofobjs()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->numofobjs(), target);
+  }
+  
+  // repeated fixed32 primaryList = 2;
+  for (int i = 0; i < this->primarylist_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteFixed32ToArray(2, this->primarylist(i), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -5396,6 +5514,13 @@ int GetPrimaryListRequestPro::ByteSize() const {
     }
     
   }
+  // repeated fixed32 primaryList = 2;
+  {
+    int data_size = 0;
+    data_size = 4 * this->primarylist_size();
+    total_size += 1 * this->primarylist_size() + data_size;
+  }
+  
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -5421,6 +5546,7 @@ void GetPrimaryListRequestPro::MergeFrom(const ::google::protobuf::Message& from
 
 void GetPrimaryListRequestPro::MergeFrom(const GetPrimaryListRequestPro& from) {
   GOOGLE_CHECK_NE(&from, this);
+  primarylist_.MergeFrom(from.primarylist_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_numofobjs()) {
       set_numofobjs(from.numofobjs());
@@ -5449,6 +5575,7 @@ bool GetPrimaryListRequestPro::IsInitialized() const {
 void GetPrimaryListRequestPro::Swap(GetPrimaryListRequestPro* other) {
   if (other != this) {
     std::swap(numofobjs_, other->numofobjs_);
+    primarylist_.Swap(&other->primarylist_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -9628,6 +9755,494 @@ void OsdStatUpdateReplyPro::Swap(OsdStatUpdateReplyPro* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
+const int GetSecondaryListRequestPro_segmentLocation::kOsdIdFieldNumber;
+const int GetSecondaryListRequestPro_segmentLocation::kSegmentIdFieldNumber;
+#endif  // !_MSC_VER
+
+GetSecondaryListRequestPro_segmentLocation::GetSecondaryListRequestPro_segmentLocation()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void GetSecondaryListRequestPro_segmentLocation::InitAsDefaultInstance() {
+}
+
+GetSecondaryListRequestPro_segmentLocation::GetSecondaryListRequestPro_segmentLocation(const GetSecondaryListRequestPro_segmentLocation& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void GetSecondaryListRequestPro_segmentLocation::SharedCtor() {
+  _cached_size_ = 0;
+  osdid_ = 0u;
+  segmentid_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+GetSecondaryListRequestPro_segmentLocation::~GetSecondaryListRequestPro_segmentLocation() {
+  SharedDtor();
+}
+
+void GetSecondaryListRequestPro_segmentLocation::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void GetSecondaryListRequestPro_segmentLocation::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* GetSecondaryListRequestPro_segmentLocation::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return GetSecondaryListRequestPro_segmentLocation_descriptor_;
+}
+
+const GetSecondaryListRequestPro_segmentLocation& GetSecondaryListRequestPro_segmentLocation::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+GetSecondaryListRequestPro_segmentLocation* GetSecondaryListRequestPro_segmentLocation::default_instance_ = NULL;
+
+GetSecondaryListRequestPro_segmentLocation* GetSecondaryListRequestPro_segmentLocation::New() const {
+  return new GetSecondaryListRequestPro_segmentLocation;
+}
+
+void GetSecondaryListRequestPro_segmentLocation::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    osdid_ = 0u;
+    segmentid_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool GetSecondaryListRequestPro_segmentLocation::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed32 osdId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdid_)));
+          set_has_osdid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_segmentId;
+        break;
+      }
+      
+      // optional fixed32 segmentId = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_segmentId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &segmentid_)));
+          set_has_segmentid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void GetSecondaryListRequestPro_segmentLocation::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->osdid(), output);
+  }
+  
+  // optional fixed32 segmentId = 2;
+  if (has_segmentid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->segmentid(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* GetSecondaryListRequestPro_segmentLocation::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->osdid(), target);
+  }
+  
+  // optional fixed32 segmentId = 2;
+  if (has_segmentid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->segmentid(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int GetSecondaryListRequestPro_segmentLocation::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed32 osdId = 1;
+    if (has_osdid()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 segmentId = 2;
+    if (has_segmentid()) {
+      total_size += 1 + 4;
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void GetSecondaryListRequestPro_segmentLocation::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const GetSecondaryListRequestPro_segmentLocation* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const GetSecondaryListRequestPro_segmentLocation*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void GetSecondaryListRequestPro_segmentLocation::MergeFrom(const GetSecondaryListRequestPro_segmentLocation& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_osdid()) {
+      set_osdid(from.osdid());
+    }
+    if (from.has_segmentid()) {
+      set_segmentid(from.segmentid());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void GetSecondaryListRequestPro_segmentLocation::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GetSecondaryListRequestPro_segmentLocation::CopyFrom(const GetSecondaryListRequestPro_segmentLocation& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GetSecondaryListRequestPro_segmentLocation::IsInitialized() const {
+  
+  return true;
+}
+
+void GetSecondaryListRequestPro_segmentLocation::Swap(GetSecondaryListRequestPro_segmentLocation* other) {
+  if (other != this) {
+    std::swap(osdid_, other->osdid_);
+    std::swap(segmentid_, other->segmentid_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata GetSecondaryListRequestPro_segmentLocation::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = GetSecondaryListRequestPro_segmentLocation_descriptor_;
+  metadata.reflection = GetSecondaryListRequestPro_segmentLocation_reflection_;
+  return metadata;
+}
+
+
+// -------------------------------------------------------------------
+
+#ifndef _MSC_VER
+const int GetSecondaryListRequestPro::kNumOfSegsFieldNumber;
+const int GetSecondaryListRequestPro::kSecondaryListFieldNumber;
+#endif  // !_MSC_VER
+
+GetSecondaryListRequestPro::GetSecondaryListRequestPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void GetSecondaryListRequestPro::InitAsDefaultInstance() {
+}
+
+GetSecondaryListRequestPro::GetSecondaryListRequestPro(const GetSecondaryListRequestPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void GetSecondaryListRequestPro::SharedCtor() {
+  _cached_size_ = 0;
+  numofsegs_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+GetSecondaryListRequestPro::~GetSecondaryListRequestPro() {
+  SharedDtor();
+}
+
+void GetSecondaryListRequestPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void GetSecondaryListRequestPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* GetSecondaryListRequestPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return GetSecondaryListRequestPro_descriptor_;
+}
+
+const GetSecondaryListRequestPro& GetSecondaryListRequestPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+GetSecondaryListRequestPro* GetSecondaryListRequestPro::default_instance_ = NULL;
+
+GetSecondaryListRequestPro* GetSecondaryListRequestPro::New() const {
+  return new GetSecondaryListRequestPro;
+}
+
+void GetSecondaryListRequestPro::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    numofsegs_ = 0u;
+  }
+  secondarylist_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool GetSecondaryListRequestPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed32 numOfSegs = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &numofsegs_)));
+          set_has_numofsegs();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_secondaryList;
+        break;
+      }
+      
+      // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_secondaryList:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_secondarylist()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(18)) goto parse_secondaryList;
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void GetSecondaryListRequestPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed32 numOfSegs = 1;
+  if (has_numofsegs()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->numofsegs(), output);
+  }
+  
+  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 2;
+  for (int i = 0; i < this->secondarylist_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, this->secondarylist(i), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* GetSecondaryListRequestPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed32 numOfSegs = 1;
+  if (has_numofsegs()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->numofsegs(), target);
+  }
+  
+  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 2;
+  for (int i = 0; i < this->secondarylist_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        2, this->secondarylist(i), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int GetSecondaryListRequestPro::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed32 numOfSegs = 1;
+    if (has_numofsegs()) {
+      total_size += 1 + 4;
+    }
+    
+  }
+  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 2;
+  total_size += 1 * this->secondarylist_size();
+  for (int i = 0; i < this->secondarylist_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->secondarylist(i));
+  }
+  
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void GetSecondaryListRequestPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const GetSecondaryListRequestPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const GetSecondaryListRequestPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void GetSecondaryListRequestPro::MergeFrom(const GetSecondaryListRequestPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  secondarylist_.MergeFrom(from.secondarylist_);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_numofsegs()) {
+      set_numofsegs(from.numofsegs());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void GetSecondaryListRequestPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GetSecondaryListRequestPro::CopyFrom(const GetSecondaryListRequestPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GetSecondaryListRequestPro::IsInitialized() const {
+  
+  return true;
+}
+
+void GetSecondaryListRequestPro::Swap(GetSecondaryListRequestPro* other) {
+  if (other != this) {
+    std::swap(numofsegs_, other->numofsegs_);
+    secondarylist_.Swap(&other->secondarylist_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata GetSecondaryListRequestPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = GetSecondaryListRequestPro_descriptor_;
+  metadata.reflection = GetSecondaryListRequestPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
 #endif  // !_MSC_VER
 
 OsdStatUpdateRequestPro::OsdStatUpdateRequestPro()
@@ -9776,6 +10391,208 @@ void OsdStatUpdateRequestPro::Swap(OsdStatUpdateRequestPro* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = OsdStatUpdateRequestPro_descriptor_;
   metadata.reflection = OsdStatUpdateRequestPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int GetSecondaryListReplyPro::kSecondaryListFieldNumber;
+#endif  // !_MSC_VER
+
+GetSecondaryListReplyPro::GetSecondaryListReplyPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void GetSecondaryListReplyPro::InitAsDefaultInstance() {
+}
+
+GetSecondaryListReplyPro::GetSecondaryListReplyPro(const GetSecondaryListReplyPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void GetSecondaryListReplyPro::SharedCtor() {
+  _cached_size_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+GetSecondaryListReplyPro::~GetSecondaryListReplyPro() {
+  SharedDtor();
+}
+
+void GetSecondaryListReplyPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void GetSecondaryListReplyPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* GetSecondaryListReplyPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return GetSecondaryListReplyPro_descriptor_;
+}
+
+const GetSecondaryListReplyPro& GetSecondaryListReplyPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+GetSecondaryListReplyPro* GetSecondaryListReplyPro::default_instance_ = NULL;
+
+GetSecondaryListReplyPro* GetSecondaryListReplyPro::New() const {
+  return new GetSecondaryListReplyPro;
+}
+
+void GetSecondaryListReplyPro::Clear() {
+  secondarylist_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool GetSecondaryListReplyPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_secondaryList:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_secondarylist()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(10)) goto parse_secondaryList;
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void GetSecondaryListReplyPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
+  for (int i = 0; i < this->secondarylist_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->secondarylist(i), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* GetSecondaryListReplyPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
+  for (int i = 0; i < this->secondarylist_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        1, this->secondarylist(i), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int GetSecondaryListReplyPro::ByteSize() const {
+  int total_size = 0;
+  
+  // repeated .ncvfs.GetSecondaryListRequestPro.segmentLocation secondaryList = 1;
+  total_size += 1 * this->secondarylist_size();
+  for (int i = 0; i < this->secondarylist_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->secondarylist(i));
+  }
+  
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void GetSecondaryListReplyPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const GetSecondaryListReplyPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const GetSecondaryListReplyPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void GetSecondaryListReplyPro::MergeFrom(const GetSecondaryListReplyPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  secondarylist_.MergeFrom(from.secondarylist_);
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void GetSecondaryListReplyPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GetSecondaryListReplyPro::CopyFrom(const GetSecondaryListReplyPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GetSecondaryListReplyPro::IsInitialized() const {
+  
+  return true;
+}
+
+void GetSecondaryListReplyPro::Swap(GetSecondaryListReplyPro* other) {
+  if (other != this) {
+    secondarylist_.Swap(&other->secondarylist_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata GetSecondaryListReplyPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = GetSecondaryListReplyPro_descriptor_;
+  metadata.reflection = GetSecondaryListReplyPro_reflection_;
   return metadata;
 }
 
