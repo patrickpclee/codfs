@@ -135,9 +135,10 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		primaryList.push_back(primaryId);
 	}
 
+	uint64_t fileSize = _metaDataModule->readFileSize(fileId);
 	string checksum = _metaDataModule->readChecksum(fileId);
 
-	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, checksum, objectList, primaryList);
+	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, fileSize, checksum, objectList, primaryList);
 
 	return;
 }

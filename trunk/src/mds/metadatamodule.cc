@@ -31,6 +31,14 @@ void MetaDataModule::openFile(uint32_t clientId, uint32_t filieId) {
 }
 
 /**
+ * @brief	Read File Size of a File
+ */
+uint64_t MetaDataModule::readFileSize(uint32_t fileId)
+{
+	return _fileMetaDataModule->readFileSize(fileId);
+}
+
+/**
  * @brief	Generate List of Object ID
  */
 vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs) {

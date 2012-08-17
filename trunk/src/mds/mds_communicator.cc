@@ -76,11 +76,11 @@ void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId, uint32_t con
 /**
  * @brief	Reply Download Information to Client
  *
- * Object List, Primary List, Checksum
+ * File Size, Object List, Primary List, Checksum
  */
-void MdsCommunicator::replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList)
+void MdsCommunicator::replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, uint64_t fileSize, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList)
 {
-	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this, requestId, connectionId, fileId, checksum, objectList, primaryList);
+	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this, requestId, connectionId, fileId, fileSize, checksum, objectList, primaryList);
 	downloadFileReplyMsg->prepareProtocolMsg();
 
 	addMessage(downloadFileReplyMsg);

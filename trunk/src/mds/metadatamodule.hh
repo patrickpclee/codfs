@@ -39,6 +39,15 @@ public:
 	void openFile(uint32_t clientId, uint32_t filieId);
 
 	/**
+	 * @brief	Read File Size of a File
+	 *
+	 * @param	fileId	ID of the File
+	 *
+	 * @return	File Size
+	 */
+	uint64_t readFileSize(uint32_t fileId);
+
+	/**
 	 * @brief	Generate List of Object ID
 	 *
 	 * @param	numOfObjs	Number of Objects

@@ -1600,10 +1600,17 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 fileid() const;
   inline void set_fileid(::google::protobuf::uint32 value);
   
-  // optional string checksum = 2;
+  // optional fixed64 fileSize = 2;
+  inline bool has_filesize() const;
+  inline void clear_filesize();
+  static const int kFileSizeFieldNumber = 2;
+  inline ::google::protobuf::uint64 filesize() const;
+  inline void set_filesize(::google::protobuf::uint64 value);
+  
+  // optional string checksum = 3;
   inline bool has_checksum() const;
   inline void clear_checksum();
-  static const int kChecksumFieldNumber = 2;
+  static const int kChecksumFieldNumber = 3;
   inline const ::std::string& checksum() const;
   inline void set_checksum(const ::std::string& value);
   inline void set_checksum(const char* value);
@@ -1611,10 +1618,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_checksum();
   inline ::std::string* release_checksum();
   
-  // repeated fixed64 objectList = 3;
+  // repeated fixed64 objectList = 4;
   inline int objectlist_size() const;
   inline void clear_objectlist();
-  static const int kObjectListFieldNumber = 3;
+  static const int kObjectListFieldNumber = 4;
   inline ::google::protobuf::uint64 objectlist(int index) const;
   inline void set_objectlist(int index, ::google::protobuf::uint64 value);
   inline void add_objectlist(::google::protobuf::uint64 value);
@@ -1623,10 +1630,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
       mutable_objectlist();
   
-  // repeated fixed32 primaryList = 4;
+  // repeated fixed32 primaryList = 5;
   inline int primarylist_size() const;
   inline void clear_primarylist();
-  static const int kPrimaryListFieldNumber = 4;
+  static const int kPrimaryListFieldNumber = 5;
   inline ::google::protobuf::uint32 primarylist(int index) const;
   inline void set_primarylist(int index, ::google::protobuf::uint32 value);
   inline void add_primarylist(::google::protobuf::uint32 value);
@@ -1639,18 +1646,21 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
  private:
   inline void set_has_fileid();
   inline void clear_has_fileid();
+  inline void set_has_filesize();
+  inline void clear_has_filesize();
   inline void set_has_checksum();
   inline void clear_has_checksum();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
+  ::google::protobuf::uint64 filesize_;
   ::std::string* checksum_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectlist_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
   ::google::protobuf::uint32 fileid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4805,15 +4815,37 @@ inline void DownloadFileReplyPro::set_fileid(::google::protobuf::uint32 value) {
   fileid_ = value;
 }
 
-// optional string checksum = 2;
-inline bool DownloadFileReplyPro::has_checksum() const {
+// optional fixed64 fileSize = 2;
+inline bool DownloadFileReplyPro::has_filesize() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void DownloadFileReplyPro::set_has_checksum() {
+inline void DownloadFileReplyPro::set_has_filesize() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void DownloadFileReplyPro::clear_has_checksum() {
+inline void DownloadFileReplyPro::clear_has_filesize() {
   _has_bits_[0] &= ~0x00000002u;
+}
+inline void DownloadFileReplyPro::clear_filesize() {
+  filesize_ = GOOGLE_ULONGLONG(0);
+  clear_has_filesize();
+}
+inline ::google::protobuf::uint64 DownloadFileReplyPro::filesize() const {
+  return filesize_;
+}
+inline void DownloadFileReplyPro::set_filesize(::google::protobuf::uint64 value) {
+  set_has_filesize();
+  filesize_ = value;
+}
+
+// optional string checksum = 3;
+inline bool DownloadFileReplyPro::has_checksum() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void DownloadFileReplyPro::set_has_checksum() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void DownloadFileReplyPro::clear_has_checksum() {
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void DownloadFileReplyPro::clear_checksum() {
   if (checksum_ != &::google::protobuf::internal::kEmptyString) {
@@ -4863,7 +4895,7 @@ inline ::std::string* DownloadFileReplyPro::release_checksum() {
   }
 }
 
-// repeated fixed64 objectList = 3;
+// repeated fixed64 objectList = 4;
 inline int DownloadFileReplyPro::objectlist_size() const {
   return objectlist_.size();
 }
@@ -4888,7 +4920,7 @@ DownloadFileReplyPro::mutable_objectlist() {
   return &objectlist_;
 }
 
-// repeated fixed32 primaryList = 4;
+// repeated fixed32 primaryList = 5;
 inline int DownloadFileReplyPro::primarylist_size() const {
   return primarylist_.size();
 }

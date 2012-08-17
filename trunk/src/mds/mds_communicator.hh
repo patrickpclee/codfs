@@ -31,11 +31,12 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	fileId	ID of the File
+	 * @param	fileSize	Size of the File
 	 * @param	checksum	Checksum of the File
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
 	 */
-	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList);
+	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, uint64_t fileSize, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Object Information to Osd

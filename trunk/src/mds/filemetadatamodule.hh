@@ -31,6 +31,15 @@ public:
 			uint32_t fileId, CodingScheme codingScheme, string codingSetting);
 
 	/**
+	 * @brief	Read File Size of a File
+	 *
+	 * @param	fileId	ID of the File
+	 *
+	 * @return	File Size
+	 */
+	uint64_t readFileSize(uint32_t fileId);
+
+	/**
 	 * @brief	Save the Object List of a File
 	 *
 	 * @param	fileId	ID of the File
