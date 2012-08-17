@@ -67,6 +67,14 @@ public:
 	string readChecksum(uint32_t fileId);
 
 	/**
+	 * @brief	Save Object Info
+	 *
+	 * @param	objectId	ID of the Object
+	 * @param	objectInfo	Info of the Object
+	 */
+	void saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo);
+
+	/**
 	 * @brief	Set Primary of a Object
 	 *
 	 * @param	objectId	ID of the Object

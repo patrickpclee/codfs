@@ -23,6 +23,22 @@ ObjectMetaDataModule::ObjectMetaDataModule(ConfigMetaDataModule* configMetaDataM
 }
 
 /**
+ * @brief	Save Object Info
+ */
+void ObjectMetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo)
+{
+	BSONObj queryObject = BSON ("id" << (long long int)objectId);
+	BSONObj insertObject = BSON ("id" << (long long int)objectId
+							<< "primary" << objectInfo._primary
+							<< "checksum" << objectInfo._checksum
+							<< "codingScheme" << (int)objectInfo._codingScheme
+							<< "codingSetting" << objectInfo._codingSetting);
+	_objectMetaDataStorage->update(queryObject, insertObject);
+	saveNodeList(objectId, objectInfo._nodeList);
+	return ;
+}
+
+/**
  * @brief	Save Node List of a Object
  */
 void ObjectMetaDataModule::saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList)

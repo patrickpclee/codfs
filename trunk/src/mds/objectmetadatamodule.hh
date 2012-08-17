@@ -20,6 +20,14 @@ public:
 	ObjectMetaDataModule(ConfigMetaDataModule* configMetaDataModule);
 
 	/**
+	 * @brief	Save Object Info
+	 *
+	 * @param	objectId	ID of the Object
+	 * @param	objectInfo	Info of the Object
+	 */
+	void saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo);
+
+	/**
 	 * @brief	Save Node List of a Object
 	 *
 	 * @param	objectId	ID of the Object

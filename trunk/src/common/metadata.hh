@@ -33,6 +33,7 @@ struct ObjectMetaData {
 	//uint32_t* _segmentList;
 	//uint32_t _offsetInFile;
 	vector<uint32_t> _nodeList;
+	uint32_t _primary;
 	string _checksum;
 	CodingScheme _codingScheme;
 	string _codingSetting;

@@ -77,8 +77,13 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
  */
 void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
 		uint64_t objectId, vector<uint32_t> objectNodeList) {
-	_metaDataModule->saveNodeList(objectId, objectNodeList);
-	_metaDataModule->setPrimary(objectId, objectNodeList[0]);
+	struct ObjectMetaData objectMetaData;
+	objectMetaData._id = objectId;
+	objectMetaData._nodeList = objectNodeList;
+	objectMetaData._primary = objectNodeList[0];
+	_metaDataModule->saveObjectInfo(objectId, objectMetaData);
+	//_metaDataModule->saveNodeList(objectId, objectNodeList);
+	//_metaDataModule->setPrimary(objectId, objectNodeList[0]);
 
 	return;
 }

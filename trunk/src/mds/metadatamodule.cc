@@ -66,6 +66,16 @@ string MetaDataModule::readChecksum(uint32_t fileId) {
 }
 
 /**
+ * @brief	Save Object Info
+ */
+void MetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo)
+{
+	_objectMetaDataModule->saveObjectInfo(objectId, objectInfo);
+
+	return ;
+}
+
+/**
  * @brief	Set Primary of a Object
  */
 void MetaDataModule::setPrimary(uint64_t objectId, uint32_t primaryOsdId) {
