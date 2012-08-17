@@ -27,14 +27,14 @@ DownloadFileReplyMsg::DownloadFileReplyMsg(Communicator* communicator) :
  * Constructor - Save parameters in private variables
  */
 DownloadFileReplyMsg::DownloadFileReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t sockfd, uint32_t clientId, uint32_t fileId,
-		vector<uint64_t> objectList, vector<uint32_t> primaryList) :
+		uint32_t requestId, uint32_t sockfd, uint32_t fileId, 
+		string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList) :
 		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
 	_sockfd = sockfd;
-	_clientId = clientId;
 	_fileId = fileId;
+	_checksum = checksum;
 	_objectList = objectList;
 	_primaryList = primaryList;
 }
@@ -44,8 +44,8 @@ void DownloadFileReplyMsg::prepareProtocolMsg() {
 
 	ncvfs::DownloadFileReplyPro downloadFileReplyPro;
 
-	downloadFileReplyPro.set_clientid(_clientId);
 	downloadFileReplyPro.set_fileid(_fileId);
+	downloadFileReplyPro.set_checksum(_checksum);
 
 	for (auto objectID : _objectList) {
 		downloadFileReplyPro.add_objectlist(objectID);
@@ -73,8 +73,8 @@ void DownloadFileReplyMsg::parse(char* buf) {
 	downloadFileReplyPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	_clientId = downloadFileReplyPro.clientid();
 	_fileId = downloadFileReplyPro.fileid();
+	_checksum = downloadFileReplyPro.checksum();
 
 	for (int i = 0; i < downloadFileReplyPro.objectlist_size(); i++) {
 		_objectList.push_back(downloadFileReplyPro.objectlist(i));

@@ -3,6 +3,7 @@
 #include "../protocol/metadata/listdirectoryreply.hh"
 #include "../protocol/metadata/uploadfilereply.hh"
 #include "../protocol/nodelist/getprimarylistrequest.hh"
+#include "../protocol/metadata/downloadfilereply.hh"
 
 
 /**
@@ -59,14 +60,26 @@ void MdsCommunicator::replyNodeList(uint32_t requestId, uint32_t connectionId, u
 /**
  * @brief	Reply Object and Primary List to Client
  */
-void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList, unsigned char* checksum)
+void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList)
 {
-	if(checksum == NULL){
-		UploadFileReplyMsg* uploadFileReplyMsg = new UploadFileReplyMsg(this, requestId, connectionId, fileId, objectList, primaryList);
-		uploadFileReplyMsg->prepareProtocolMsg();
+	UploadFileReplyMsg* uploadFileReplyMsg = new UploadFileReplyMsg(this, requestId, connectionId, fileId, objectList, primaryList);
+	uploadFileReplyMsg->prepareProtocolMsg();
 
-		addMessage(uploadFileReplyMsg);
-	}
+	addMessage(uploadFileReplyMsg);
+	return ;
+}
+
+/**
+ * @brief	Reply Download Information to Client
+ *
+ * Object List, Primary List, Checksum
+ */
+void MdsCommunicator::replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList)
+{
+	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this, requestId, connectionId, fileId, checksum, objectList, primaryList);
+	downloadFileReplyMsg->prepareProtocolMsg();
+
+	addMessage(downloadFileReplyMsg);
 	return ;
 }
 

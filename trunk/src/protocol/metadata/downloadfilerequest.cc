@@ -66,7 +66,7 @@ void DownloadFileRequestMsg::parse(char* buf) {
 
 void DownloadFileRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-//	mds->downloadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _fileId);
+	mds->downloadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _fileId);
 #endif
 }
 

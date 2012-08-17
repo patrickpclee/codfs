@@ -22,10 +22,20 @@ public:
 	 * @param	fileId	ID of the File
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
-	 * @param	checksum	File Checksum
 	 */
-	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList, unsigned char* checksum=NULL);
+	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
+	/**
+	 * @brief	Reply Download Information to Client
+	 *
+	 * @param	requestId	Request ID
+	 * @param	connectionId	Connection ID
+	 * @param	fileId	ID of the File
+	 * @param	checksum	Checksum of the File
+	 * @param	objectList	Object List
+	 * @param	primaryList	Primary List
+	 */
+	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Node List to Osd

@@ -64,7 +64,7 @@ public:
 	 *
 	 * @return	Checksum
 	 */
-	unsigned char* readChecksum(uint32_t fileId);
+	string readChecksum(uint32_t fileId);
 
 	/**
 	 * @brief	Set Primary of a Object

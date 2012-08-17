@@ -128,10 +128,9 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		primaryList.push_back(primaryId);
 	}
 
-	unsigned char* checksum = _metaDataModule->readChecksum(fileId);
+	string checksum = _metaDataModule->readChecksum(fileId);
 
-	_mdsCommunicator->replyObjectandPrimaryList(requestId, connectionId, fileId,
-			objectList, primaryList, checksum);
+	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, checksum, objectList, primaryList);
 
 	return;
 }

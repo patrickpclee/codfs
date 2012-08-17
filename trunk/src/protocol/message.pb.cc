@@ -374,8 +374,8 @@ void protobuf_AssignDesc_message_2eproto() {
       sizeof(UploadFileReplyPro));
   DownloadFileReplyPro_descriptor_ = file->message_type(14);
   static const int DownloadFileReplyPro_offsets_[4] = {
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DownloadFileReplyPro, clientid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DownloadFileReplyPro, fileid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DownloadFileReplyPro, checksum_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DownloadFileReplyPro, objectlist_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DownloadFileReplyPro, primarylist_),
   };
@@ -954,7 +954,7 @@ void protobuf_AddDesc_message_2eproto() {
     "(\007\022\021\n\tsegmentId\030\002 \001(\007\"M\n\022UploadFileReply"
     "Pro\022\016\n\006fileId\030\001 \001(\007\022\022\n\nobjectList\030\002 \003(\006\022"
     "\023\n\013primaryList\030\003 \003(\007\"a\n\024DownloadFileRepl"
-    "yPro\022\020\n\010clientId\030\001 \001(\007\022\016\n\006fileId\030\002 \001(\007\022\022"
+    "yPro\022\016\n\006fileId\030\001 \001(\007\022\020\n\010checksum\030\002 \001(\t\022\022"
     "\n\nobjectList\030\003 \003(\006\022\023\n\013primaryList\030\004 \003(\007\""
     "\225\001\n\025GetObjectInfoReplyPro\022\020\n\010objectId\030\001 "
     "\001(\006\022\020\n\010nodeList\030\002 \003(\007\022A\n\014codingScheme\030\003 "
@@ -4900,8 +4900,8 @@ void UploadFileReplyPro::Swap(UploadFileReplyPro* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
-const int DownloadFileReplyPro::kClientIdFieldNumber;
 const int DownloadFileReplyPro::kFileIdFieldNumber;
+const int DownloadFileReplyPro::kChecksumFieldNumber;
 const int DownloadFileReplyPro::kObjectListFieldNumber;
 const int DownloadFileReplyPro::kPrimaryListFieldNumber;
 #endif  // !_MSC_VER
@@ -4922,8 +4922,8 @@ DownloadFileReplyPro::DownloadFileReplyPro(const DownloadFileReplyPro& from)
 
 void DownloadFileReplyPro::SharedCtor() {
   _cached_size_ = 0;
-  clientid_ = 0u;
   fileid_ = 0u;
+  checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -4932,6 +4932,9 @@ DownloadFileReplyPro::~DownloadFileReplyPro() {
 }
 
 void DownloadFileReplyPro::SharedDtor() {
+  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
+    delete checksum_;
+  }
   if (this != default_instance_) {
   }
 }
@@ -4958,8 +4961,12 @@ DownloadFileReplyPro* DownloadFileReplyPro::New() const {
 
 void DownloadFileReplyPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    clientid_ = 0u;
     fileid_ = 0u;
+    if (has_checksum()) {
+      if (checksum_ != &::google::protobuf::internal::kEmptyString) {
+        checksum_->clear();
+      }
+    }
   }
   objectlist_.Clear();
   primarylist_.Clear();
@@ -4973,30 +4980,31 @@ bool DownloadFileReplyPro::MergePartialFromCodedStream(
   ::google::protobuf::uint32 tag;
   while ((tag = input->ReadTag()) != 0) {
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // optional fixed32 clientId = 1;
+      // optional fixed32 fileId = 1;
       case 1: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
-                 input, &clientid_)));
-          set_has_clientid();
+                 input, &fileid_)));
+          set_has_fileid();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(21)) goto parse_fileId;
+        if (input->ExpectTag(18)) goto parse_checksum;
         break;
       }
       
-      // optional fixed32 fileId = 2;
+      // optional string checksum = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
-         parse_fileId:
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
-                 input, &fileid_)));
-          set_has_fileid();
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_checksum:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_checksum()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->checksum().data(), this->checksum().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
         } else {
           goto handle_uninterpreted;
         }
@@ -5066,14 +5074,18 @@ bool DownloadFileReplyPro::MergePartialFromCodedStream(
 
 void DownloadFileReplyPro::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // optional fixed32 clientId = 1;
-  if (has_clientid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->clientid(), output);
+  // optional fixed32 fileId = 1;
+  if (has_fileid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->fileid(), output);
   }
   
-  // optional fixed32 fileId = 2;
-  if (has_fileid()) {
-    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->fileid(), output);
+  // optional string checksum = 2;
+  if (has_checksum()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->checksum().data(), this->checksum().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->checksum(), output);
   }
   
   // repeated fixed64 objectList = 3;
@@ -5096,14 +5108,19 @@ void DownloadFileReplyPro::SerializeWithCachedSizes(
 
 ::google::protobuf::uint8* DownloadFileReplyPro::SerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // optional fixed32 clientId = 1;
-  if (has_clientid()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->clientid(), target);
+  // optional fixed32 fileId = 1;
+  if (has_fileid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->fileid(), target);
   }
   
-  // optional fixed32 fileId = 2;
-  if (has_fileid()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->fileid(), target);
+  // optional string checksum = 2;
+  if (has_checksum()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->checksum().data(), this->checksum().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->checksum(), target);
   }
   
   // repeated fixed64 objectList = 3;
@@ -5129,14 +5146,16 @@ int DownloadFileReplyPro::ByteSize() const {
   int total_size = 0;
   
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    // optional fixed32 clientId = 1;
-    if (has_clientid()) {
+    // optional fixed32 fileId = 1;
+    if (has_fileid()) {
       total_size += 1 + 4;
     }
     
-    // optional fixed32 fileId = 2;
-    if (has_fileid()) {
-      total_size += 1 + 4;
+    // optional string checksum = 2;
+    if (has_checksum()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->checksum());
     }
     
   }
@@ -5182,11 +5201,11 @@ void DownloadFileReplyPro::MergeFrom(const DownloadFileReplyPro& from) {
   objectlist_.MergeFrom(from.objectlist_);
   primarylist_.MergeFrom(from.primarylist_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
-    if (from.has_clientid()) {
-      set_clientid(from.clientid());
-    }
     if (from.has_fileid()) {
       set_fileid(from.fileid());
+    }
+    if (from.has_checksum()) {
+      set_checksum(from.checksum());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -5211,8 +5230,8 @@ bool DownloadFileReplyPro::IsInitialized() const {
 
 void DownloadFileReplyPro::Swap(DownloadFileReplyPro* other) {
   if (other != this) {
-    std::swap(clientid_, other->clientid_);
     std::swap(fileid_, other->fileid_);
+    std::swap(checksum_, other->checksum_);
     objectlist_.Swap(&other->objectlist_);
     primarylist_.Swap(&other->primarylist_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
