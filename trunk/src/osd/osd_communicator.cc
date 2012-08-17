@@ -176,15 +176,7 @@ void OsdCommunicator::getSegmentRequest(uint32_t osdId, uint64_t objectId,
 			new GetSegmentInitRequestMsg(this, dstSockfd, objectId, segmentId);
 	getSegmentInitRequestMsg->prepareProtocolMsg();
 
-	addMessage(getSegmentInitRequestMsg, true);
-
-	MessageStatus status = getSegmentInitRequestMsg->waitForStatusChange();
-	if (status == READY) {
-		waitAndDelete(getSegmentInitRequestMsg);
-	} else {
-		debug("%s\n", "Put Segment Init Failed");
-		exit(-1);
-	}
+	addMessage(getSegmentInitRequestMsg, false);
 
 }
 

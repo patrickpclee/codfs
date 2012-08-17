@@ -108,7 +108,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	vector<struct SegmentData>& segmentDataList = _receivedSegments[objectId];
 	receivedSegmentsMutex.unlock();
 
-	debug("[Download] Reserve %" PRIu32 " segments\n", segmentCount);
+	debug("[Download] Reserve %" PRIu32 " segments, segmentDataList = %zu\n", segmentCount, segmentDataList.size());
 
 	// 3. request segments (either from disk or wait segments to arrive)
 
@@ -129,6 +129,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 		} else {
 			// request segment from other OSD
+			debug ("sending request for segment %" PRIu32 "\n", i);
 			_osdCommunicator->getSegmentRequest(osdId, objectId, i);
 		}
 		i++;
@@ -414,16 +415,13 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// if the segment received is for download process
 	if (isDownload) {
-		debug ("%s\n", "isDownload");
 		receivedSegmentsMutex.lock();
 		struct SegmentData& segmentData = _receivedSegments[objectId].at(
 				segmentId);
 		receivedSegmentsMutex.unlock();
 
-		debug ("%s\n", "before memcpy");
 		segmentData.buf = MemoryPool::getInstance().poolMalloc(length);
-		memcpy(segmentData.buf + offset, buf, length);
-		debug ("%s\n", "after memcpy");
+		memcpy(segmentData.buf, buf + offset, length);
 	} else {
 		byteWritten = _storageModule->writeSegment(objectId, segmentId, buf,
 				offset, length);
@@ -448,6 +446,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 				lock_guard<mutex> lk(pendingSegmentCountMutex);
 				_pendingSegmentCount[objectId]--;
 			}
+			debug ("all chunks for segment %" PRIu32 "is received\n", segmentId);
 		}
 
 		// remove from map
