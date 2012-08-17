@@ -42,17 +42,16 @@ public:
 
 	void printProtocol();
 
+	/*
 	void setSegmentSize(uint32_t segmentSize);
 	uint32_t getSegmentSize();
 	void setChunkCount(uint32_t chunkCount);
 	uint32_t getChunkCount();
+	*/
 
 private:
 	uint64_t _objectId;
 	uint32_t _segmentId;
-
-	uint32_t _segmentSize;
-	uint32_t _chunkCount;
 };
 
 #endif

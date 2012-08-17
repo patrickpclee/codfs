@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <stdint.h>
+#include "../common/metadata.hh"
 #include "segmentlocation.hh"
 #include "../communicator/communicator.hh"
 
@@ -73,14 +74,12 @@ public:
 
 	/**
 	 * Send a segment to another OSD
-	 * @param osdId My OSD ID
 	 * @param sockfd Socket Descriptor of the destination
 	 * @param segmentData SegmentData structure
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendSegment(uint32_t osdId, uint32_t sockfd,
-			struct SegmentData segmentData);
+	uint32_t sendSegment(uint32_t sockfd, struct SegmentData segmentData);
 
 	/**
 	 * Send an object to a client
@@ -96,10 +95,9 @@ public:
 	 * @param connectionId ID of the target component connection
 	 * @param objectId ID of the object that the segment is belonged to
 	 * @param segmentId
-	 * @return SegmentData structure
 	 */
 
-	struct SegmentData getSegmentRequest(uint32_t osdId, uint64_t objectId,
+	void getSegmentRequest(uint32_t osdId, uint64_t objectId,
 			uint32_t segmentId);
 
 	/**
@@ -113,7 +111,8 @@ public:
 	vector<struct SegmentLocation> getOsdListRequest(uint64_t objectId,
 			ComponentType dstComponent, uint32_t segmentCount = 0);
 
-	vector<struct SegmentLocation> getSecondaryListRequest(uint64_t objectId, uint32_t sockfd, uint32_t segmentCount);
+	vector<struct SegmentLocation> getSecondaryListRequest(uint64_t objectId,
+			uint32_t sockfd, uint32_t segmentCount);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored
@@ -125,13 +124,15 @@ public:
 	uint32_t sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 			ComponentType dstComponent);
 
+	// DOWNLOAD
+	ObjectTransferOsdInfo getObjectInfoRequest(uint64_t objectId);
+
 	void objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
 		string codingSetting, vector<uint32_t> nodeList);
 private:
 
 	/**
 	 * Initiate upload process to OSD (Step 1)
-	 * @param osdId OSD ID
 	 * @param sockfd Destination OSD Socket Descriptor
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
@@ -139,12 +140,11 @@ private:
 	 * @param chunkCount Number of chunks that will be sent
 	 */
 
-	void putSegmentInit(uint32_t osdId, uint32_t sockfd, uint64_t objectId,
-			uint32_t segmentId, uint32_t length, uint32_t chunkCount);
+	void putSegmentInit(uint32_t sockfd, uint64_t objectId, uint32_t segmentId,
+			uint32_t length, uint32_t chunkCount);
 
 	/**
 	 * Send an object chunk to OSD (Step 2)
-	 * @param osdId OSD ID
 	 * @param sockfd Destination OSD Socket Descriptor
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
@@ -153,20 +153,17 @@ private:
 	 * @param length Length of the chunk
 	 */
 
-	void putSegmentData(uint32_t osdId, uint32_t sockfd,
-			uint64_t objectId, uint32_t segmentId, char* buf, uint64_t offset,
-			uint32_t length);
+	void putSegmentData(uint32_t sockfd, uint64_t objectId, uint32_t segmentId,
+			char* buf, uint64_t offset, uint32_t length);
 
 	/**
 	 * Finalise upload process to OSD (Step 3)
-	 * @param clientId Client ID
 	 * @param sockfd Destination OSD Socket Descriptor
 	 * @param objectId Object ID
 	 * @param segmentId Segment ID
 	 */
 
-	void putSegmentEnd(uint32_t clientId, uint32_t sockfd, uint64_t objectId,
-			uint32_t segmentId);
+	void putSegmentEnd(uint32_t sockfd, uint64_t objectId, uint32_t segmentId);
 };
 
 #endif

@@ -26,7 +26,7 @@
 #include "transfer/objectdatamsg.hh"
 #include "transfer/segmentdatamsg.hh"
 #include "transfer/getobjectreadymsg.hh"
-#include "transfer/getsegmentreadymsg.hh"
+//#include "transfer/getsegmentreadymsg.hh"
 #include "transfer/getobjectreplymsg.hh"
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
@@ -125,9 +125,11 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_OBJECT_REPLY):
 		return new GetObjectReplyMsg(communicator);
 		break;
+		/*
 	case (GET_SEGMENT_READY):
 		return new GetSegmentReadyMsg(communicator);
 		break;
+		*/
 
 
 	//STATUS

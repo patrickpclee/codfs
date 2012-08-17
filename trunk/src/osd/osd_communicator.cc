@@ -10,10 +10,12 @@
 #include "../common/debug.hh"
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
-
+#include "../common/metadata.hh"
 #include "../protocol/metadata/uploadobjectack.hh"
 #include "../protocol/metadata/listdirectoryrequest.hh"
+#include "../protocol/metadata/getobjectinforequest.hh"
 #include "../protocol/transfer/putobjectinitreply.hh"
+#include "../protocol/transfer/getsegmentinitrequest.hh"
 #include "../protocol/transfer/putsegmentinitrequest.hh"
 #include "../protocol/transfer/putsegmentinitreply.hh"
 #include "../protocol/transfer/objecttransferendreply.hh"
@@ -78,8 +80,9 @@ void OsdCommunicator::replyPutSegmentInit(uint32_t requestId,
 void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId) {
 
-	ObjectTransferEndReplyMsg* putObjectEndReplyMsg = new ObjectTransferEndReplyMsg(this,
-			requestId, connectionId, objectId);
+	ObjectTransferEndReplyMsg* putObjectEndReplyMsg =
+			new ObjectTransferEndReplyMsg(this, requestId, connectionId,
+					objectId);
 	putObjectEndReplyMsg->prepareProtocolMsg();
 
 	addMessage(putObjectEndReplyMsg);
@@ -88,8 +91,9 @@ void OsdCommunicator::replyPutObjectEnd(uint32_t requestId,
 void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId, uint32_t segmentId) {
 
-	SegmentTransferEndReplyMsg* segmentTransferEndReplyMsg = new SegmentTransferEndReplyMsg(
-			this, requestId, connectionId, objectId, segmentId);
+	SegmentTransferEndReplyMsg* segmentTransferEndReplyMsg =
+			new SegmentTransferEndReplyMsg(this, requestId, connectionId,
+					objectId, segmentId);
 	segmentTransferEndReplyMsg->prepareProtocolMsg();
 
 	addMessage(segmentTransferEndReplyMsg);
@@ -101,7 +105,7 @@ uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 	return 0;
 }
 
-uint32_t OsdCommunicator::sendSegment(uint32_t osdId, uint32_t sockfd,
+uint32_t OsdCommunicator::sendSegment(uint32_t sockfd,
 		struct SegmentData segmentData) {
 
 	uint64_t objectId = segmentData.info.objectId;
@@ -112,7 +116,7 @@ uint32_t OsdCommunicator::sendSegment(uint32_t osdId, uint32_t sockfd,
 
 	// step 1: send init message, wait for ack
 	debug("Put Segment Init to FD = %" PRIu32 "\n", sockfd);
-	putSegmentInit(osdId, sockfd, objectId, segmentId, length, chunkCount);
+	putSegmentInit(sockfd, objectId, segmentId, length, chunkCount);
 	debug("Put Segment Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
 
 	// step 2: send data
@@ -129,7 +133,7 @@ uint32_t OsdCommunicator::sendSegment(uint32_t osdId, uint32_t sockfd,
 			byteToSend = byteRemaining;
 		}
 
-		putSegmentData(osdId, sockfd, objectId, segmentId, buf, byteProcessed,
+		putSegmentData(sockfd, objectId, segmentId, buf, byteProcessed,
 				byteToSend);
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
@@ -138,7 +142,7 @@ uint32_t OsdCommunicator::sendSegment(uint32_t osdId, uint32_t sockfd,
 
 	// Step 3: Send End message
 
-	putSegmentEnd(osdId, sockfd, objectId, segmentId);
+	putSegmentEnd(sockfd, objectId, segmentId);
 
 	cout << "Put Segment ID = " << objectId << "." << segmentId << " Finished"
 			<< endl;
@@ -162,10 +166,26 @@ uint32_t OsdCommunicator::sendObject(uint32_t sockfd,
 	return 0;
 }
 
-struct SegmentData OsdCommunicator::getSegmentRequest(uint32_t osdId,
-		uint64_t objectId, uint32_t segmentId) {
+void OsdCommunicator::getSegmentRequest(uint32_t osdId, uint64_t objectId,
+		uint32_t segmentId) {
+
 	struct SegmentData segmentData;
-	return segmentData;
+
+	uint32_t dstSockfd = getSockfdFromId(osdId);
+	GetSegmentInitRequestMsg* getSegmentInitRequestMsg =
+			new GetSegmentInitRequestMsg(this, dstSockfd, objectId, segmentId);
+	getSegmentInitRequestMsg->prepareProtocolMsg();
+
+	addMessage(getSegmentInitRequestMsg, true);
+
+	MessageStatus status = getSegmentInitRequestMsg->waitForStatusChange();
+	if (status == READY) {
+		waitAndDelete(getSegmentInitRequestMsg);
+	} else {
+		debug("%s\n", "Put Segment Init Failed");
+		exit(-1);
+	}
+
 }
 
 vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
@@ -200,7 +220,7 @@ vector<struct SegmentLocation> OsdCommunicator::getSecondaryListRequest(
 		uint64_t objectId, uint32_t sockfd, uint32_t segmentCount) {
 
 	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
-					new GetSecondaryListRequestMsg(this, sockfd, segmentCount);
+			new GetSecondaryListRequestMsg(this, sockfd, segmentCount);
 	getSecondaryListRequestMsg->prepareProtocolMsg();
 
 	addMessage(getSecondaryListRequestMsg, true);
@@ -224,7 +244,7 @@ uint32_t OsdCommunicator::sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 // PRIVATE FUNCTIONS
 //
 
-void OsdCommunicator::putSegmentInit(uint32_t osdId, uint32_t sockfd,
+void OsdCommunicator::putSegmentInit(uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, uint32_t length,
 		uint32_t chunkCount) {
 
@@ -248,7 +268,7 @@ void OsdCommunicator::putSegmentInit(uint32_t osdId, uint32_t sockfd,
 
 }
 
-void OsdCommunicator::putSegmentData(uint32_t osdId, uint32_t sockfd,
+void OsdCommunicator::putSegmentData(uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, char* buf, uint64_t offset,
 		uint32_t length) {
 
@@ -262,7 +282,7 @@ void OsdCommunicator::putSegmentData(uint32_t osdId, uint32_t sockfd,
 	addMessage(segmentDataMsg, false);
 }
 
-void OsdCommunicator::putSegmentEnd(uint32_t osdId, uint32_t sockfd,
+void OsdCommunicator::putSegmentEnd(uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId) {
 
 	// Step 3 of the upload process
@@ -305,4 +325,34 @@ void OsdCommunicator::objectUploadAck(uint64_t objectId, CodingScheme codingSche
 	 exit(-1);
 	 }
 	 */
+}
+
+// DOWNLOAD
+
+struct ObjectTransferOsdInfo OsdCommunicator::getObjectInfoRequest(
+		uint64_t objectId) {
+
+	struct ObjectTransferOsdInfo objectInfo = { };
+	uint32_t mdsSockFd = getMdsSockfd();
+
+	GetObjectInfoRequestMsg* getObjectInfoRequestMsg =
+			new GetObjectInfoRequestMsg(this, mdsSockFd, objectId);
+	getObjectInfoRequestMsg->prepareProtocolMsg();
+	addMessage(getObjectInfoRequestMsg, true);
+
+	MessageStatus status = getObjectInfoRequestMsg->waitForStatusChange();
+	if (status == READY) {
+		objectInfo._id = objectId;
+		objectInfo._size = getObjectInfoRequestMsg->getObjectSize();
+		objectInfo._codingScheme = getObjectInfoRequestMsg->getCodingScheme();
+		objectInfo._codingSetting = getObjectInfoRequestMsg->getCodingSetting();
+		objectInfo._checksum = getObjectInfoRequestMsg->getChecksum();
+		objectInfo._osdList = getObjectInfoRequestMsg->getNodeList();
+		waitAndDelete(getObjectInfoRequestMsg);
+	} else {
+		debug("%s\n", "Get Object Info Request Failed");
+		exit(-1);
+	}
+
+	return objectInfo;
 }

@@ -14,7 +14,6 @@
 #include "../protocol/transfer/objectdatamsg.hh"
 #include "../protocol/transfer/getobjectrequest.hh"
 #include "../protocol/transfer/getobjectreadymsg.hh"
-#include "../protocol/transfer/getsegmentreadymsg.hh"
 #include "../protocol/transfer/getobjectreplymsg.hh"
 
 /**
@@ -78,6 +77,7 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 	return {};
 }
 
+
 struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId, uint32_t fileId){
 	uint32_t mdsSockFd = getMdsSockfd();
 	DownloadFileRequestMsg* downloadFileRequestMsg = new DownloadFileRequestMsg(this, mdsSockFd, clientId, fileId);
@@ -133,8 +133,8 @@ struct ObjectData ClientCommunicator::getObject(uint32_t clientId, uint32_t dstS
 	addMessage(getObjectReadyMsg);
 
 	// to be implemented
-	while(client->getPendingChunkCount(objectId) != 0){}
 
+	while(client->getPendingChunkCount(objectId) != 0){}
 	objectData = client->ObjectManipulation(objectId,objectSize);
 
 	return objectData;

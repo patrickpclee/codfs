@@ -63,6 +63,7 @@ void GetSegmentInitRequestMsg::printProtocol() {
 			_objectId, _segmentId);
 }
 
+/*
 void GetSegmentInitRequestMsg::setSegmentSize(uint32_t segmentSize) {
 	_segmentSize = segmentSize;
 }
@@ -78,3 +79,4 @@ void GetSegmentInitRequestMsg::setChunkCount(uint32_t chunkCount) {
 uint32_t GetSegmentInitRequestMsg::getChunkCount() {
 	return _chunkCount;
 }
+*/

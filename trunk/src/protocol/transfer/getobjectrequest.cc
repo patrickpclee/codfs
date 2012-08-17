@@ -55,7 +55,7 @@ void GetObjectRequestMsg::parse(char* buf) {
 
 void GetObjectRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-//	osd->getObjectRequestProcessor (_sockfd, _objectId);
+	osd->getObjectRequestProcessor (_msgHeader.requestId, _sockfd, _objectId);
 #endif
 }
 

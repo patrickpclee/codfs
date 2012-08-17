@@ -48,19 +48,27 @@ public:
 
 	void printProtocol();
 
+	uint64_t getObjectSize();
+	void setObjectSize(uint64_t objectSize);
 	vector<uint32_t> getNodeList();
 	void setNodeList(vector<uint32_t> nodeList);
 	CodingScheme getCodingScheme();
 	void setCodingScheme(CodingScheme codingScheme);
 	string getCodingSetting();
 	void setCodingSetting(string codingSetting);
+	string getChecksum();
+	void setChecksum(string checksum);
+
 
 private:
 	uint64_t _objectId;
 
+	// reply
+	uint64_t _objectSize;
 	vector<uint32_t> _nodeList;
 	CodingScheme _codingScheme;
 	string _codingSetting;
+	string _checksum;
 };
 
 #endif
