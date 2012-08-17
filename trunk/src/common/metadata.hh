@@ -9,10 +9,21 @@
 
 using namespace std;
 
-struct ObjectTransferInfo {
-	uint32_t _id;
+// use in client
+struct ObjectTransferClientInfo {
+	uint64_t _id;
 	uint64_t _size;
 	uint32_t _chunkCount;
+};
+
+// use in OSD
+struct ObjectTransferOsdInfo {
+	uint64_t _id;
+	uint64_t _size;
+	vector <uint32_t> _osdList;
+	CodingScheme _codingScheme;
+	string _codingSetting;
+	string _checksum;
 };
 
 struct FileMetaData {

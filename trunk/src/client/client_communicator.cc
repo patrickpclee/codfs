@@ -10,7 +10,6 @@
 #include "../protocol/transfer/objecttransferendrequest.hh"
 #include "../protocol/transfer/objectdatamsg.hh"
 #include "../protocol/transfer/getobjectreadymsg.hh"
-#include "../protocol/transfer/getsegmentreadymsg.hh"
 #include "../protocol/transfer/getobjectreplymsg.hh"
 
 /**
@@ -71,10 +70,16 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 	return {};
 }
 
+struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId, uint32_t fileId) {
+
+	return {};
+}
+
 struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
 		uint32_t dstSockfd, uint64_t objectId) {
 
 	// to be implemented
+	return {};
 
 }
 

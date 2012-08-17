@@ -34,7 +34,7 @@ void GetObjectInfoRequestMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType (GET_OBJECT_INFO_REQUEST);
+	setProtocolType(GET_OBJECT_INFO_REQUEST);
 	setProtocolMsg(serializedString);
 
 }
@@ -83,4 +83,20 @@ string GetObjectInfoRequestMsg::getCodingSetting() {
 
 void GetObjectInfoRequestMsg::setCodingSetting(string codingSetting) {
 	_codingSetting = codingSetting;
+}
+
+uint64_t GetObjectInfoRequestMsg::getObjectSize() {
+	return _objectSize;
+}
+
+void GetObjectInfoRequestMsg::setObjectSize(uint64_t objectSize) {
+	_objectSize = objectSize;
+}
+
+string GetObjectInfoRequestMsg::getChecksum() {
+	return _checksum;
+}
+
+void GetObjectInfoRequestMsg::setChecksum(string checksum) {
+	_checksum = checksum;
 }

@@ -71,6 +71,8 @@ public:
 	uint32_t osdListProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t objectId, vector<struct SegmentLocation> osdList);
 
+	// DOWNLOAD
+
 	/**
 	 * Action when a getObjectRequest is received
 	 * @param requestId Request ID
@@ -78,7 +80,7 @@ public:
 	 * @param objectId 	ID of the object to send
 	 */
 
-	void getObjectProcessor(uint32_t requestId, uint32_t sockfd,
+	void getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t objectId);
 
 	/**
@@ -89,7 +91,7 @@ public:
 	 * @param segmentId ID of the segment to send
 	 */
 
-	void getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
+	void getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t objectId, uint32_t segmentId);
 
 	/**
@@ -266,6 +268,8 @@ private:
 
 	map<uint64_t, uint32_t> _pendingObjectChunk;
 	map<string, uint32_t> _pendingSegmentChunk;
+	map<uint64_t, vector<struct SegmentData>> _receivedSegments;
+	map<uint64_t, uint32_t> _pendingSegmentCount;
 	map<uint64_t, struct CodingSetting> _codingSettingMap;
 
 };

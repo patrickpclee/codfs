@@ -9,6 +9,7 @@
 #include "osd.hh"
 #include "segmentlocation.hh"
 #include "../common/debug.hh"
+#include "../common/metadata.hh"
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
 #include "../protocol/status/osdstartupmsg.hh"
@@ -33,6 +34,9 @@ ConfigLayer* configLayer;
 
 mutex pendingObjectChunkMutex;
 mutex pendingSegmentChunkMutex;
+mutex pendingSegmentCountMutex;
+mutex receivedSegmentsMutex;
+;
 mutex codingSettingMapMutex;
 
 Osd::Osd(string configFilePath) {
@@ -75,67 +79,97 @@ uint32_t Osd::osdListProcessor(uint32_t requestId, uint32_t sockfd,
  * Send the object to the target
  */
 
-void Osd::getObjectProcessor(uint32_t requestId, uint32_t sockfd,
+void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId) {
 
-	/*
+	struct ObjectData objectData = { };
 
-	 vector<struct SegmentData> segmentDataList;
-	 vector<struct SegmentLocation> osdIdList;
-	 struct ObjectData objectData;
+	// TODO: check if OSD has object
+	// TODO: check if osd list exists in cache
 
-	 if (_storageModule->isObjectExist(objectId)) {
-	 // if object exists in cache
-	 objectData = _storageModule->readObject(objectId, 0);
-	 } else {
-	 // get osdIDList from cache, if failed update it from MDS
-	 try {
-	 osdIdList = _segmentLocationCache->readSegmentLocation(objectId);
-	 } catch (CacheMissException &e) {
-	 osdIdList = _osdCommunicator->getOsdListRequest(objectId, MDS);
-	 _segmentLocationCache->writeSegmentLocation(objectId, osdIdList);
-	 }
+	// 1. ask MDS to get object information
 
-	 // get segments from the OSD one by one
-	 vector<struct SegmentLocation>::const_iterator p;
+	ObjectTransferOsdInfo objectInfo = _osdCommunicator->getObjectInfoRequest(
+			objectId);
 
-	 for (p = osdIdList.begin(); p != osdIdList.end(); ++p) {
-	 // memory of SegmentData is allocated in getSegmentRequest
-	 struct SegmentData segmentData;
-	 uint32_t osdId = (*p).osdId;
-	 uint32_t segmentId = (*p).segmentId;
+	// 2. initialize list and count
 
-	 if (_osdId == osdId) {
-	 // case 1: local segment
-	 segmentData = _storageModule->readSegment(objectId, segmentId);
-	 } else {
-	 // case 2: foreign segment
-	 segmentData = _osdCommunicator->getSegmentRequest(osdId,
-	 objectId, segmentId);
-	 }
-	 segmentDataList.push_back(segmentData);
-	 }
+	receivedSegmentsMutex.lock();
+	vector<struct SegmentData>& segmentDataList = _receivedSegments[objectId];
+	receivedSegmentsMutex.unlock();
 
-	 // memory of objectData is allocated in decodeSegmentToObject
-	 // TODO: decodeSegmentToObject should free memory in segmentDataList
-	 objectData = _codingModule->decodeSegmentToObject(objectId,
-	 segmentDataList);
-	 }
+	const uint32_t segmentCount = objectInfo._osdList.size();
+	{
+		lock_guard<mutex> lk(pendingSegmentCountMutex);
+		_pendingSegmentCount[objectId] = segmentCount;
+	}
+	segmentDataList.reserve(segmentCount);
 
-	 _osdCommunicator->sendObject(sockfd, objectData);
-	 */
+	// 3. request segments (either from disk or wait segments to arrive)
 
-	return;
+	uint32_t i = 0;
+	for (uint32_t osdId : objectInfo._osdList) {
+
+		if (osdId == _osdId) {
+			// read segment from disk
+			struct SegmentData segmentData = _storageModule->readSegment(
+					objectId, i, 0);
+			segmentDataList[i] = segmentData;
+
+			{
+				lock_guard<mutex> lk(pendingSegmentCountMutex);
+				_pendingSegmentCount[objectId]--;
+			}
+
+		} else {
+			// request segment from other OSD
+			_osdCommunicator->getSegmentRequest(osdId, objectId, i);
+		}
+		i++;
+	}
+
+	// 4. wait until all segments have arrived
+
+	while (1) {
+		uint32_t segmentLeft = 0;
+		{
+			lock_guard<mutex> lk(pendingSegmentCountMutex);
+			segmentLeft = _pendingSegmentCount[objectId];
+		}
+
+		if (segmentLeft == 0) {
+			// 5. decode segments
+			const CodingScheme codingScheme = objectInfo._codingScheme;
+			const string codingSetting = objectInfo._codingSetting;
+
+			objectData = _codingModule->decodeSegmentToObject(codingScheme,
+					objectId, segmentDataList, codingSetting);
+			break;
+		} else {
+			usleep(100000); // 0.1s
+		}
+	}
+
+	// remove segmentList from map
+	{
+		lock_guard<mutex> lk(receivedSegmentsMutex);
+		_receivedSegments.erase(objectId);
+	}
+
+	{
+		lock_guard<mutex> lk(pendingSegmentCountMutex);
+		_pendingSegmentCount.erase(objectId);
+	}
+
+	// 4. send object
+	_osdCommunicator->sendObject(sockfd, objectData);
 }
 
-void Osd::getSegmentProcessor(uint32_t requestId, uint32_t sockfd,
+void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId) {
-
-	struct SegmentData segmentData;
-	segmentData = _storageModule->readSegment(objectId, segmentId);
-	_osdCommunicator->sendSegment(_osdId, sockfd, segmentData);
-
-	return;
+	struct SegmentData segmentData = _storageModule->readSegment(objectId,
+			segmentId, 0);
+	_osdCommunicator->sendSegment(sockfd, segmentData);
 }
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
@@ -277,7 +311,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 			} else {
 				uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 						segmentLocationList[i].osdId);
-				_osdCommunicator->sendSegment(_osdId, dstSockfd, segmentData);
+				_osdCommunicator->sendSegment(dstSockfd, segmentData);
 			}
 
 			nodeList.push_back(segmentLocationList[i].osdId);
@@ -309,10 +343,16 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t segmentId, uint32_t length,
 		uint32_t chunkCount) {
 
+	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
+	bool isDownload = false;
+	{
+		lock_guard<mutex> lk(pendingSegmentCountMutex);
+		isDownload = _pendingSegmentCount.count(objectId);
+	}
+
 	debug(
 			"[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
 			objectId, segmentId, length, chunkCount);
-	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 
 	// initialize chunkCount value
 	{
@@ -320,8 +360,19 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		_pendingSegmentChunk[segmentKey] = chunkCount;
 	}
 
-	// create object and cache
-	_storageModule->createSegment(objectId, segmentId, length);
+	if (isDownload) {
+		receivedSegmentsMutex.lock();
+		struct SegmentData& segmentData = _receivedSegments[objectId].at(segmentId);
+		receivedSegmentsMutex.unlock();
+
+		segmentData.info.objectId = objectId;
+		segmentData.info.segmentId = segmentId;
+		segmentData.info.segmentSize = length;
+	} else {
+		// create file
+		_storageModule->createSegment(objectId, segmentId, length);
+	}
+
 	_osdCommunicator->replyPutSegmentInit(requestId, sockfd, objectId,
 			segmentId);
 
@@ -333,8 +384,25 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 
-	uint32_t byteWritten = _storageModule->writeSegment(objectId, segmentId,
-			buf, offset, length);
+	uint32_t byteWritten = 0;
+	bool isDownload = false;
+
+	{
+		lock_guard<mutex> lk(pendingSegmentCountMutex);
+		isDownload = _pendingSegmentCount.count(objectId);
+	}
+
+	// if the segment received is for download process
+	if (isDownload) {
+		receivedSegmentsMutex.lock();
+		struct SegmentData& segmentData = _receivedSegments[objectId].at(segmentId);
+		receivedSegmentsMutex.unlock();
+
+		memcpy (segmentData.buf + offset, buf, length);
+	} else {
+		byteWritten = _storageModule->writeSegment(objectId, segmentId, buf,
+				offset, length);
+	}
 
 	uint32_t chunkLeft = 0;
 	{
@@ -347,12 +415,14 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	// if all chunks have arrived
 	if (chunkLeft == 0) {
 
-		// close file and free cache
-		_storageModule->closeSegment(objectId, segmentId);
+		if (!isDownload) {
+			// close file and free cache
+			_storageModule->closeSegment(objectId, segmentId);
+		}
 
 		// remove from map
 		{
-			lock_guard<mutex> lk(pendingObjectChunkMutex);
+			lock_guard<mutex> lk(pendingSegmentChunkMutex);
 			_pendingSegmentChunk.erase(segmentKey);
 		}
 
