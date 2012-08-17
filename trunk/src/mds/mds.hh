@@ -76,14 +76,13 @@ public:
 			uint32_t clientId, uint32_t fileId);
 
 	/**
-	 * @brief	Handle the Secondary Node List Request from Osd
+	 * @brief	Handle the Object Info Request from Osd
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	objectID	ID of the Object
 	 */
-	void secondaryNodeListProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId);
+	void getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId, uint64_t objectId);
 
 	/**
 	 * @brief	Handle List Folder Request from Client

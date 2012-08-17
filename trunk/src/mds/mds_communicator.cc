@@ -51,7 +51,7 @@ void MdsCommunicator::display()
 }
 
 
-void MdsCommunicator::replyNodeList(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList)
+void MdsCommunicator::replyObjectInfo(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList, CodingScheme codingScheme, string codingSetting)
 {
 	return ;
 }

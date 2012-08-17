@@ -136,15 +136,15 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 }
 
 /**
- * @brief	Handle the Secondary Node List Request from Osd
+ * @brief	Handle the Object Info Request from Osd
  */
-void Mds::secondaryNodeListProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId) {
-	vector<uint32_t> nodeList;
+void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId, uint64_t objectId)
+{
+	//vector<uint32_t> nodeList;
 
-	nodeList = _metaDataModule->readNodeList(objectId);
-	_mdsCommunicator->replyNodeList(requestId, connectionId, objectId,
-			nodeList);
+	//nodeList = _metaDataModule->readNodeList(objectId);
+	//_mdsCommunicator->replyNodeList(requestId, connectionId, objectId,
+	//		nodeList);
 
 	return;
 }

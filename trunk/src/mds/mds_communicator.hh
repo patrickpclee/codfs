@@ -38,14 +38,16 @@ public:
 	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
-	 * @brief	Reply Node List to Osd
+	 * @brief	Reply Object Information to Osd
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	objectId	ID of the Object
 	 * @param	nodeList	Node List
+	 * @param	codingScheme	Coding Scheme for the file
+	 * @param 	codingSetting	Coding Scheme Setting
 	 */
-	void replyNodeList(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList);
+	void replyObjectInfo(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList, CodingScheme codingScheme, string codingSetting);
 	
 	/**
 	 * @brief	Reply With Folder Data
