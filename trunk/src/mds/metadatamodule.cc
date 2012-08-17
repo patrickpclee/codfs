@@ -76,6 +76,18 @@ void MetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaData obj
 }
 
 /**
+ * @brief	Read Object Info
+ *
+ * @param	objectId	ID of the Object
+ *
+ * @return	Info of the Object
+ */
+struct ObjectMetaData MetaDataModule::readObjectInfo(uint64_t objectId)
+{
+	return _objectMetaDataModule->readObjectInfo(objectId);
+}
+
+/**
  * @brief	Set Primary of a Object
  */
 void MetaDataModule::setPrimary(uint64_t objectId, uint32_t primaryOsdId) {

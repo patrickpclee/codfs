@@ -147,11 +147,8 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
  */
 void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId, uint64_t objectId)
 {
-	//vector<uint32_t> nodeList;
-
-	//nodeList = _metaDataModule->readNodeList(objectId);
-	//_mdsCommunicator->replyNodeList(requestId, connectionId, objectId,
-	//		nodeList);
+	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(objectId);
+	_mdsCommunicator->replyObjectInfo(requestId, connectionId, objectId, objectMetaData._nodeList, objectMetaData._codingScheme, objectMetaData._codingSetting);
 
 	return;
 }
@@ -268,6 +265,16 @@ void startReceiveThread(Communicator* communicator) {
  * @brief	Test Case
  */
 void Mds::test() {
+	/*
+	uint64_t objectId = 976172415;
+	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(objectId);
+
+	debug("Object %" PRIu64 "- Coding %d:%s\n",objectId, (int)objectMetaData._codingScheme, objectMetaData._codingSetting.c_str());
+	for(const auto node : objectMetaData._nodeList) {
+		debug("%" PRIu32 "\n",node);
+	}
+	*/
+	/*
 	uint32_t fileId = 216;
 	vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);
 	debug("Object List [%" PRIu32 "]\n",fileId);
@@ -276,6 +283,7 @@ void Mds::test() {
 		printf("%" PRIu64 " [%" PRIu32 "]- ", object,primaryId);
 	}
 	printf("\n");
+	*/
 	/*
 	debug("%s\n", "Test\n");
 	for (int i = 0; i < 10; ++i) {

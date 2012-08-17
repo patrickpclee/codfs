@@ -73,6 +73,15 @@ public:
 	 * @param	objectInfo	Info of the Object
 	 */
 	void saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo);
+	
+	/**
+	 * @brief	Read Object Info
+	 *
+	 * @param	objectId	ID of the Object
+	 *
+	 * @return	Info of the Object
+	 */
+	struct ObjectMetaData readObjectInfo(uint64_t objectId);
 
 	/**
 	 * @brief	Set Primary of a Object

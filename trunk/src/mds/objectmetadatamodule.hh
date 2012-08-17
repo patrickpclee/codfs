@@ -28,6 +28,15 @@ public:
 	void saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo);
 
 	/**
+	 * @brief	Read Object Info
+	 *
+	 * @param	objectId	ID of the Object
+	 *
+	 * @return	Info of the Object
+	 */
+	struct ObjectMetaData readObjectInfo(uint64_t objectId);
+
+	/**
 	 * @brief	Save Node List of a Object
 	 *
 	 * @param	objectId	ID of the Object

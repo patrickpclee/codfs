@@ -39,6 +39,31 @@ void ObjectMetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaDa
 }
 
 /**
+ * @brief	Read Object Info
+ *
+ * @param	objectId	ID of the Object
+ *
+ * @return	Info of the Object
+ */
+struct ObjectMetaData ObjectMetaDataModule::readObjectInfo(uint64_t objectId)
+{
+	BSONObj	queryObject = BSON ("id" << (long long int)objectId);
+	BSONObj result = _objectMetaDataStorage->readOne(queryObject);
+	struct ObjectMetaData objectMetaData;
+	objectMetaData._id = objectId;
+	BSONForEach(it, result.getObjectField("nodeList")) {
+		objectMetaData._nodeList.push_back((uint32_t)it.numberInt());
+	}
+	objectMetaData._primary = (uint32_t)result.getField("primary").numberInt();
+	objectMetaData._checksum = result.getField("checksum").str();
+	objectMetaData._codingScheme = (CodingScheme)result.getField("codingScheme").numberInt();
+	objectMetaData._codingSetting = result.getField("codingSetting").str();
+
+	return objectMetaData;
+}
+
+
+/**
  * @brief	Save Node List of a Object
  */
 void ObjectMetaDataModule::saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList)
