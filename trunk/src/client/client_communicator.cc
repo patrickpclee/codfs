@@ -71,6 +71,13 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 	return {};
 }
 
+struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
+		uint32_t dstSockfd, uint64_t objectId) {
+
+	// to be implemented
+
+}
+
 void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
 		struct ObjectData objectData, CodingScheme codingScheme,
 		string codingSetting) {
@@ -165,8 +172,8 @@ void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
 
 	// Step 3 of the upload process
 
-	ObjectTransferEndRequestMsg* putObjectEndRequestMsg = new ObjectTransferEndRequestMsg(
-			this, dstOsdSockfd, objectId);
+	ObjectTransferEndRequestMsg* putObjectEndRequestMsg =
+			new ObjectTransferEndRequestMsg(this, dstOsdSockfd, objectId);
 
 	putObjectEndRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectEndRequestMsg, true);

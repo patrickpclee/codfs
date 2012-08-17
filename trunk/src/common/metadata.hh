@@ -9,6 +9,12 @@
 
 using namespace std;
 
+struct ObjectTransferInfo {
+	uint32_t _id;
+	uint64_t _size;
+	uint32_t _chunkCount;
+};
+
 struct FileMetaData {
 	string _path;
 	uint32_t _id;

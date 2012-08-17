@@ -14,6 +14,7 @@ public:
 	uint64_t getFilesize (string filepath);
 	uint32_t getObjectCount (string filepath);
 	struct ObjectData readObjectFromFile (string filepath, uint32_t objectIndex);
+	void writeObjectToFile (string dstPath, struct ObjectData objectData, uint32_t objectIndex);
 private:
 	uint64_t _objectSize;
 };

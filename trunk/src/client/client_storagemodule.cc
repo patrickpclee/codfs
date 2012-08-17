@@ -21,7 +21,7 @@ ClientStorageModule::ClientStorageModule() {
 	debug("Config Object Size = %" PRIu64 " Bytes\n", _objectSize);
 }
 
-uint64_t ClientStorageModule::getFilesize (string filepath) {
+uint64_t ClientStorageModule::getFilesize(string filepath) {
 
 	ifstream in(filepath, ifstream::in | ifstream::binary);
 
@@ -42,7 +42,7 @@ uint64_t ClientStorageModule::getFilesize (string filepath) {
 
 uint32_t ClientStorageModule::getObjectCount(string filepath) {
 
-	const uint64_t filesize = getFilesize (filepath);
+	const uint64_t filesize = getFilesize(filepath);
 
 	if (filesize == 0) {
 		return 0;
@@ -56,6 +56,7 @@ uint32_t ClientStorageModule::getObjectCount(string filepath) {
 struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 		uint32_t objectIndex) {
 
+	// TODO: now assume that client only do one I/O function at a time
 	// lock file access function
 	lock_guard<mutex> lk(fileMutex);
 
@@ -116,5 +117,46 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 	objectData.info.objectSize = byteToRead;
 
 	return objectData;
+
+}
+
+void ClientStorageModule::writeObjectToFile(string dstPath,
+		struct ObjectData objectData, uint32_t objectIndex) {
+
+	// TODO: now assume that client only do one I/O function at a time
+	// lock file access function
+	lock_guard<mutex> lk(fileMutex);
+
+	const uint32_t byteToWrite = objectData.info.objectSize;
+	const uint64_t offset = objectIndex * _objectSize;
+
+	FILE* file = fopen(dstPath.c_str(), "wb");
+
+	if (file == NULL) { // cannot open file
+		debug("%s\n", "Cannot open");
+		exit(-1);
+	}
+
+	// Write Lock
+	if (flock(fileno(file), LOCK_EX) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_SH");
+		exit(-1);
+	}
+
+	uint32_t byteWritten = pwrite (fileno(file), objectData.buf, byteToWrite, offset);
+
+	// Release lock
+	if (flock(fileno(file), LOCK_UN) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_UN");
+		exit(-1);
+	}
+
+	if (byteWritten != byteToWrite) {
+		debug("ERROR: Length = %" PRIu32 ", byteWritten = %" PRIu32 "\n",
+				byteToWrite, byteWritten);
+		exit(-1);
+	}
+
+	fclose(file);
 
 }

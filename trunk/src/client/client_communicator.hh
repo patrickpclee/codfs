@@ -22,9 +22,40 @@ public:
 	 */
 	vector<FileMetaData> listFolderData(uint32_t clientId, string path);
 
+	/**
+	 * Upload a file to OSD
+	 * @param clientId Client ID
+	 * @param path Destination Path
+	 * @param fileSize Size of file
+	 * @param numOfObjs Number of objects
+	 * @param codingScheme Coding Scheme
+	 * @param codingSetting Coding Setting
+	 * @return FileMetaData structure
+	 */
+
 	struct FileMetaData uploadFile(uint32_t clientId, string path,
 			uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme,
 			string codingSetting);
+
+	/**
+	 * Download a file from OSD
+	 * @param clientId Client ID
+	 * @param fileId File ID
+	 * @return FileMetaData structure
+	 */
+
+	struct FileMetaData downloadFile(uint32_t clientId, uint32_t fileId);
+
+	/**
+	 * Get an object from the primary OSD
+	 * @param clientId Client ID
+	 * @param dstSockfd Destination Socket Descriptor
+	 * @param objectId Object ID
+	 * @return ObjectData structure
+	 */
+
+	struct ObjectData getObject(uint32_t clientId, uint32_t dstSockfd,
+			uint64_t objectId);
 
 	/**
 	 * 1. Send an init message

@@ -49,7 +49,6 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		string codingSetting) {
 
 	// start timer
-//	double start = getTime();
 	typedef chrono::high_resolution_clock Clock;
 	typedef chrono::milliseconds milliseconds;
 	Clock::time_point t0 = Clock::now();
@@ -101,67 +100,41 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	return fileMetaData._id;
 }
 
-/**
- * 1. Divide the file into fixed size objects
- * 2. For each object, contact MDS to obtain objectId and dstOsdID
- * 3. Call uploadObjectRequest()
- */
-
-/*
- uint32_t Client::sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting) {
-
- // start timer
- struct timeval tp;
- double sec, usec, start, end;
- gettimeofday(&tp, NULL);
- sec = static_cast<double>(tp.tv_sec);
- usec = static_cast<double>(tp.tv_usec) / 1E6;
- start = sec + usec;
-
- const uint32_t objectCount = _storageModule->getObjectCount(filepath);
-
- // TODO: obtain a list of OSD for upload from MDS
-
- debug("Object Count of %s is %" PRIu32 "\n", filepath.c_str(), objectCount);
-
- for (uint32_t i = 0; i < objectCount; ++i) {
- struct ObjectData objectData = _storageModule->readObjectFromFile(
- filepath, i);
-
- // TODO: HARDCODE FOR NOW!
- uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
- objectData.info.objectId = i;
-
- _clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
- codingScheme, codingSetting);
- }
-
- // Time stamp after the computations
- gettimeofday(&tp, NULL);
- sec = static_cast<double>(tp.tv_sec);
- usec = static_cast<double>(tp.tv_usec) / 1E6;
- end = sec + usec;
-
- // Time and Rate calculation (in seconds)
- double duration = end - start;
- uint64_t filesize = _storageModule->getFilesize(filepath) / 1024.0 / 1024.0;
- double rate = filesize / duration;
-
- cout << fixed;
- cout << setprecision(2);
- cout << filesize << " MB transferred in "
- << duration << " secs, Rate = " << rate << " MB/s" << endl;
-
- return 0;
- }
-
- uint32_t Client::downloadFileRequest(string dstPath) {
- return 0;
- }
- */
-
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
-	// to be implemented
+
+	// start timer
+	typedef chrono::high_resolution_clock Clock;
+	typedef chrono::milliseconds milliseconds;
+	Clock::time_point t0 = Clock::now();
+
+	// 1. Get file infomation from MDS
+	struct FileMetaData fileMetaData = _clientCommunicator->downloadFile(
+			_clientId, fileId);
+	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n",
+			fileMetaData._id, fileMetaData._size);
+
+	// 2. Download file from OSD
+	uint32_t i = 0;
+	for (uint64_t objectId : fileMetaData._objectList) {
+		uint32_t dstComponentId = fileMetaData._primaryList[i];
+		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
+				dstComponentId);
+		struct ObjectData objectData = _clientCommunicator->getObject(_clientId,
+				dstSockfd, objectId);
+		_storageModule->writeObjectToFile(dstPath, objectData, i);
+	}
+
+	// Time and Rate calculation (in seconds)
+	Clock::time_point t1 = Clock::now();
+	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
+	double duration = ms.count() / 1024.0;
+	double fileSizeMb = fileMetaData._size / 1048576.0;
+	double rate = fileSizeMb / duration;
+
+	cout << fixed;
+	cout << setprecision(2);
+	cout << fileSizeMb << " MB transferred in " << duration << " secs, Rate = "
+			<< rate << " MB/s" << endl;
 }
 
 void startGarbageCollectionThread() {
