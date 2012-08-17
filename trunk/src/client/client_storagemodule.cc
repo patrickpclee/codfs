@@ -19,6 +19,10 @@ mutex openedFileMutex;
 
 ClientStorageModule::ClientStorageModule() {
 	// read config value
+
+	_objectCache = {};
+	_openedFile = {};
+	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
 	_objectSize = configLayer->getConfigLong("Storage>ObjectSize") * 1024;
 	debug("Config Object Size = %" PRIu64 " Bytes\n", _objectSize);
 }

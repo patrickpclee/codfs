@@ -128,7 +128,7 @@ struct ObjectData ClientCommunicator::getObject(uint32_t clientId, uint32_t dstS
 
 
 	// step 2. CLIENT -> OSD : GetObjectReady.
-	GetObjectReadyMsg* getObjectReadyMsg = new GetObjectReadyMsg(this, requestId, dstSockfd,objectId);
+	GetObjectReadyMsg* getObjectReadyMsg = new GetObjectReadyMsg(this, requestId, dstSockfd, objectId);
 	getObjectReadyMsg->prepareProtocolMsg();
 	addMessage(getObjectReadyMsg);
 
