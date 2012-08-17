@@ -76,9 +76,16 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
  * 2. Set the Primary for the object
  */
 void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, vector<uint32_t> objectNodeList) {
-	_metaDataModule->saveNodeList(objectId, objectNodeList);
-	_metaDataModule->setPrimary(objectId, objectNodeList[0]);
+		uint64_t objectId, CodingScheme codingScheme, string codingSetting, vector<uint32_t> objectNodeList) {
+	struct ObjectMetaData objectMetaData;
+	objectMetaData._id = objectId;
+	objectMetaData._nodeList = objectNodeList;
+	objectMetaData._primary = objectNodeList[0];
+	objectMetaData._codingScheme = codingScheme;
+	objectMetaData._codingSetting = codingSetting;
+	_metaDataModule->saveObjectInfo(objectId, objectMetaData);
+	//_metaDataModule->saveNodeList(objectId, objectNodeList);
+	//_metaDataModule->setPrimary(objectId, objectNodeList[0]);
 
 	return;
 }
@@ -128,24 +135,21 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		primaryList.push_back(primaryId);
 	}
 
-	unsigned char* checksum = _metaDataModule->readChecksum(fileId);
+	uint64_t fileSize = _metaDataModule->readFileSize(fileId);
+	string checksum = _metaDataModule->readChecksum(fileId);
 
-	_mdsCommunicator->replyObjectandPrimaryList(requestId, connectionId, fileId,
-			objectList, primaryList, checksum);
+	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, fileSize, checksum, objectList, primaryList);
 
 	return;
 }
 
 /**
- * @brief	Handle the Secondary Node List Request from Osd
+ * @brief	Handle the Object Info Request from Osd
  */
-void Mds::secondaryNodeListProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId) {
-	vector<uint32_t> nodeList;
-
-	nodeList = _metaDataModule->readNodeList(objectId);
-	_mdsCommunicator->replyNodeList(requestId, connectionId, objectId,
-			nodeList);
+void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId, uint64_t objectId)
+{
+	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(objectId);
+	_mdsCommunicator->replyObjectInfo(requestId, connectionId, objectId, objectMetaData._nodeList, objectMetaData._codingScheme, objectMetaData._codingSetting);
 
 	return;
 }
@@ -262,6 +266,16 @@ void startReceiveThread(Communicator* communicator) {
  * @brief	Test Case
  */
 void Mds::test() {
+	/*
+	uint64_t objectId = 976172415;
+	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(objectId);
+
+	debug("Object %" PRIu64 "- Coding %d:%s\n",objectId, (int)objectMetaData._codingScheme, objectMetaData._codingSetting.c_str());
+	for(const auto node : objectMetaData._nodeList) {
+		debug("%" PRIu32 "\n",node);
+	}
+	*/
+	/*
 	uint32_t fileId = 216;
 	vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);
 	debug("Object List [%" PRIu32 "]\n",fileId);
@@ -270,6 +284,7 @@ void Mds::test() {
 		printf("%" PRIu64 " [%" PRIu32 "]- ", object,primaryId);
 	}
 	printf("\n");
+	*/
 	/*
 	debug("%s\n", "Test\n");
 	for (int i = 0; i < 10; ++i) {

@@ -113,10 +113,12 @@ message UploadFileReplyPro {
 }
 
 message DownloadFileReplyPro {
-	optional fixed32 clientId = 1;
-	optional fixed32 fileId = 2;
-	repeated fixed64 objectList = 3;
-	repeated fixed32 primaryList = 4;
+//	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 1;
+	optional fixed64 fileSize = 2;
+	optional string checksum = 3;
+	repeated fixed64 objectList = 4;
+	repeated fixed32 primaryList = 5;
 }
 
 //
@@ -147,7 +149,9 @@ message GetPrimaryListRequestPro{
 
 message UploadObjectAckPro {
 	optional fixed64 objectId = 1;
-	repeated fixed32 nodeList = 2;
+	optional PutObjectInitRequestPro.CodingScheme codingScheme = 2;	
+	optional string codingSetting = 3;
+	repeated fixed32 nodeList = 4;
 }
 
 message GetObjectInfoRequestPro {

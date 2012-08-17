@@ -39,6 +39,15 @@ public:
 	void openFile(uint32_t clientId, uint32_t filieId);
 
 	/**
+	 * @brief	Read File Size of a File
+	 *
+	 * @param	fileId	ID of the File
+	 *
+	 * @return	File Size
+	 */
+	uint64_t readFileSize(uint32_t fileId);
+
+	/**
 	 * @brief	Generate List of Object ID
 	 *
 	 * @param	numOfObjs	Number of Objects
@@ -64,7 +73,24 @@ public:
 	 *
 	 * @return	Checksum
 	 */
-	unsigned char* readChecksum(uint32_t fileId);
+	string readChecksum(uint32_t fileId);
+
+	/**
+	 * @brief	Save Object Info
+	 *
+	 * @param	objectId	ID of the Object
+	 * @param	objectInfo	Info of the Object
+	 */
+	void saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo);
+	
+	/**
+	 * @brief	Read Object Info
+	 *
+	 * @param	objectId	ID of the Object
+	 *
+	 * @return	Info of the Object
+	 */
+	struct ObjectMetaData readObjectInfo(uint64_t objectId);
 
 	/**
 	 * @brief	Set Primary of a Object

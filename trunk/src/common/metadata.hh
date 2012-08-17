@@ -40,10 +40,14 @@ struct FileMetaData {
 
 struct ObjectMetaData {
 	uint64_t _id;
-	uint32_t _segmentCount;
-	uint32_t* _segmentList;
-	uint32_t _offsetInFile;
-	unsigned char* _checksum;
+	//uint32_t _segmentCount;
+	//uint32_t* _segmentList;
+	//uint32_t _offsetInFile;
+	vector<uint32_t> _nodeList;
+	uint32_t _primary;
+	string _checksum;
+	CodingScheme _codingScheme;
+	string _codingSetting;
 };
 
 struct SegmentMetaData {

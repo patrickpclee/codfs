@@ -31,6 +31,14 @@ void MetaDataModule::openFile(uint32_t clientId, uint32_t filieId) {
 }
 
 /**
+ * @brief	Read File Size of a File
+ */
+uint64_t MetaDataModule::readFileSize(uint32_t fileId)
+{
+	return _fileMetaDataModule->readFileSize(fileId);
+}
+
+/**
  * @brief	Generate List of Object ID
  */
 vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs) {
@@ -61,8 +69,30 @@ vector<uint64_t> MetaDataModule::readOsdObjectList(uint32_t osdId) {
 	return {0};
 }
 
-unsigned char* MetaDataModule::readChecksum(uint32_t fileId) {
-	return 0; // null
+string MetaDataModule::readChecksum(uint32_t fileId) {
+	return ""; // null
+}
+
+/**
+ * @brief	Save Object Info
+ */
+void MetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo)
+{
+	_objectMetaDataModule->saveObjectInfo(objectId, objectInfo);
+
+	return ;
+}
+
+/**
+ * @brief	Read Object Info
+ *
+ * @param	objectId	ID of the Object
+ *
+ * @return	Info of the Object
+ */
+struct ObjectMetaData MetaDataModule::readObjectInfo(uint64_t objectId)
+{
+	return _objectMetaDataModule->readObjectInfo(objectId);
 }
 
 /**

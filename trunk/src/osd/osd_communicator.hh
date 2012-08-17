@@ -124,11 +124,11 @@ public:
 	uint32_t sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 			ComponentType dstComponent);
 
-	void objectUploadAck(uint64_t objectId, vector<uint32_t> nodeList);
-
 	// DOWNLOAD
 	ObjectTransferOsdInfo getObjectInfoRequest(uint64_t objectId);
 
+	void objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
+		string codingSetting, vector<uint32_t> nodeList);
 private:
 
 	/**

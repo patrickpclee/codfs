@@ -22,20 +22,33 @@ public:
 	 * @param	fileId	ID of the File
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
-	 * @param	checksum	File Checksum
 	 */
-	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList, unsigned char* checksum=NULL);
-
+	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
-	 * @brief	Reply Node List to Osd
+	 * @brief	Reply Download Information to Client
+	 *
+	 * @param	requestId	Request ID
+	 * @param	connectionId	Connection ID
+	 * @param	fileId	ID of the File
+	 * @param	fileSize	Size of the File
+	 * @param	checksum	Checksum of the File
+	 * @param	objectList	Object List
+	 * @param	primaryList	Primary List
+	 */
+	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, uint64_t fileSize, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList);
+
+	/**
+	 * @brief	Reply Object Information to Osd
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	objectId	ID of the Object
 	 * @param	nodeList	Node List
+	 * @param	codingScheme	Coding Scheme for the file
+	 * @param 	codingSetting	Coding Scheme Setting
 	 */
-	void replyNodeList(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList);
+	void replyObjectInfo(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList, CodingScheme codingScheme, string codingSetting);
 	
 	/**
 	 * @brief	Reply With Folder Data

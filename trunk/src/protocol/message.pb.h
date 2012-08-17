@@ -1593,24 +1593,35 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional fixed32 clientId = 1;
-  inline bool has_clientid() const;
-  inline void clear_clientid();
-  static const int kClientIdFieldNumber = 1;
-  inline ::google::protobuf::uint32 clientid() const;
-  inline void set_clientid(::google::protobuf::uint32 value);
-  
-  // optional fixed32 fileId = 2;
+  // optional fixed32 fileId = 1;
   inline bool has_fileid() const;
   inline void clear_fileid();
-  static const int kFileIdFieldNumber = 2;
+  static const int kFileIdFieldNumber = 1;
   inline ::google::protobuf::uint32 fileid() const;
   inline void set_fileid(::google::protobuf::uint32 value);
   
-  // repeated fixed64 objectList = 3;
+  // optional fixed64 fileSize = 2;
+  inline bool has_filesize() const;
+  inline void clear_filesize();
+  static const int kFileSizeFieldNumber = 2;
+  inline ::google::protobuf::uint64 filesize() const;
+  inline void set_filesize(::google::protobuf::uint64 value);
+  
+  // optional string checksum = 3;
+  inline bool has_checksum() const;
+  inline void clear_checksum();
+  static const int kChecksumFieldNumber = 3;
+  inline const ::std::string& checksum() const;
+  inline void set_checksum(const ::std::string& value);
+  inline void set_checksum(const char* value);
+  inline void set_checksum(const char* value, size_t size);
+  inline ::std::string* mutable_checksum();
+  inline ::std::string* release_checksum();
+  
+  // repeated fixed64 objectList = 4;
   inline int objectlist_size() const;
   inline void clear_objectlist();
-  static const int kObjectListFieldNumber = 3;
+  static const int kObjectListFieldNumber = 4;
   inline ::google::protobuf::uint64 objectlist(int index) const;
   inline void set_objectlist(int index, ::google::protobuf::uint64 value);
   inline void add_objectlist(::google::protobuf::uint64 value);
@@ -1619,10 +1630,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
       mutable_objectlist();
   
-  // repeated fixed32 primaryList = 4;
+  // repeated fixed32 primaryList = 5;
   inline int primarylist_size() const;
   inline void clear_primarylist();
-  static const int kPrimaryListFieldNumber = 4;
+  static const int kPrimaryListFieldNumber = 5;
   inline ::google::protobuf::uint32 primarylist(int index) const;
   inline void set_primarylist(int index, ::google::protobuf::uint32 value);
   inline void add_primarylist(::google::protobuf::uint32 value);
@@ -1633,20 +1644,23 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   
   // @@protoc_insertion_point(class_scope:ncvfs.DownloadFileReplyPro)
  private:
-  inline void set_has_clientid();
-  inline void clear_has_clientid();
   inline void set_has_fileid();
   inline void clear_has_fileid();
+  inline void set_has_filesize();
+  inline void clear_has_filesize();
+  inline void set_has_checksum();
+  inline void clear_has_checksum();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
-  ::google::protobuf::uint32 clientid_;
-  ::google::protobuf::uint32 fileid_;
+  ::google::protobuf::uint64 filesize_;
+  ::std::string* checksum_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectlist_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
+  ::google::protobuf::uint32 fileid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -1932,10 +1946,28 @@ class UploadObjectAckPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 objectid() const;
   inline void set_objectid(::google::protobuf::uint64 value);
   
-  // repeated fixed32 nodeList = 2;
+  // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 2;
+  inline bool has_codingscheme() const;
+  inline void clear_codingscheme();
+  static const int kCodingSchemeFieldNumber = 2;
+  inline ::ncvfs::PutObjectInitRequestPro_CodingScheme codingscheme() const;
+  inline void set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value);
+  
+  // optional string codingSetting = 3;
+  inline bool has_codingsetting() const;
+  inline void clear_codingsetting();
+  static const int kCodingSettingFieldNumber = 3;
+  inline const ::std::string& codingsetting() const;
+  inline void set_codingsetting(const ::std::string& value);
+  inline void set_codingsetting(const char* value);
+  inline void set_codingsetting(const char* value, size_t size);
+  inline ::std::string* mutable_codingsetting();
+  inline ::std::string* release_codingsetting();
+  
+  // repeated fixed32 nodeList = 4;
   inline int nodelist_size() const;
   inline void clear_nodelist();
-  static const int kNodeListFieldNumber = 2;
+  static const int kNodeListFieldNumber = 4;
   inline ::google::protobuf::uint32 nodelist(int index) const;
   inline void set_nodelist(int index, ::google::protobuf::uint32 value);
   inline void add_nodelist(::google::protobuf::uint32 value);
@@ -1948,14 +1980,20 @@ class UploadObjectAckPro : public ::google::protobuf::Message {
  private:
   inline void set_has_objectid();
   inline void clear_has_objectid();
+  inline void set_has_codingscheme();
+  inline void clear_has_codingscheme();
+  inline void set_has_codingsetting();
+  inline void clear_has_codingsetting();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 objectid_;
+  ::std::string* codingsetting_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > nodelist_;
+  int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4755,37 +4793,15 @@ UploadFileReplyPro::mutable_primarylist() {
 
 // DownloadFileReplyPro
 
-// optional fixed32 clientId = 1;
-inline bool DownloadFileReplyPro::has_clientid() const {
+// optional fixed32 fileId = 1;
+inline bool DownloadFileReplyPro::has_fileid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void DownloadFileReplyPro::set_has_clientid() {
+inline void DownloadFileReplyPro::set_has_fileid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void DownloadFileReplyPro::clear_has_clientid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void DownloadFileReplyPro::clear_clientid() {
-  clientid_ = 0u;
-  clear_has_clientid();
-}
-inline ::google::protobuf::uint32 DownloadFileReplyPro::clientid() const {
-  return clientid_;
-}
-inline void DownloadFileReplyPro::set_clientid(::google::protobuf::uint32 value) {
-  set_has_clientid();
-  clientid_ = value;
-}
-
-// optional fixed32 fileId = 2;
-inline bool DownloadFileReplyPro::has_fileid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void DownloadFileReplyPro::set_has_fileid() {
-  _has_bits_[0] |= 0x00000002u;
-}
 inline void DownloadFileReplyPro::clear_has_fileid() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline void DownloadFileReplyPro::clear_fileid() {
   fileid_ = 0u;
@@ -4799,7 +4815,87 @@ inline void DownloadFileReplyPro::set_fileid(::google::protobuf::uint32 value) {
   fileid_ = value;
 }
 
-// repeated fixed64 objectList = 3;
+// optional fixed64 fileSize = 2;
+inline bool DownloadFileReplyPro::has_filesize() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void DownloadFileReplyPro::set_has_filesize() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void DownloadFileReplyPro::clear_has_filesize() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void DownloadFileReplyPro::clear_filesize() {
+  filesize_ = GOOGLE_ULONGLONG(0);
+  clear_has_filesize();
+}
+inline ::google::protobuf::uint64 DownloadFileReplyPro::filesize() const {
+  return filesize_;
+}
+inline void DownloadFileReplyPro::set_filesize(::google::protobuf::uint64 value) {
+  set_has_filesize();
+  filesize_ = value;
+}
+
+// optional string checksum = 3;
+inline bool DownloadFileReplyPro::has_checksum() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void DownloadFileReplyPro::set_has_checksum() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void DownloadFileReplyPro::clear_has_checksum() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void DownloadFileReplyPro::clear_checksum() {
+  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
+    checksum_->clear();
+  }
+  clear_has_checksum();
+}
+inline const ::std::string& DownloadFileReplyPro::checksum() const {
+  return *checksum_;
+}
+inline void DownloadFileReplyPro::set_checksum(const ::std::string& value) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(value);
+}
+inline void DownloadFileReplyPro::set_checksum(const char* value) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(value);
+}
+inline void DownloadFileReplyPro::set_checksum(const char* value, size_t size) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* DownloadFileReplyPro::mutable_checksum() {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  return checksum_;
+}
+inline ::std::string* DownloadFileReplyPro::release_checksum() {
+  clear_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = checksum_;
+    checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// repeated fixed64 objectList = 4;
 inline int DownloadFileReplyPro::objectlist_size() const {
   return objectlist_.size();
 }
@@ -4824,7 +4920,7 @@ DownloadFileReplyPro::mutable_objectlist() {
   return &objectlist_;
 }
 
-// repeated fixed32 primaryList = 4;
+// repeated fixed32 primaryList = 5;
 inline int DownloadFileReplyPro::primarylist_size() const {
   return primarylist_.size();
 }
@@ -5058,7 +5154,88 @@ inline void UploadObjectAckPro::set_objectid(::google::protobuf::uint64 value) {
   objectid_ = value;
 }
 
-// repeated fixed32 nodeList = 2;
+// optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 2;
+inline bool UploadObjectAckPro::has_codingscheme() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void UploadObjectAckPro::set_has_codingscheme() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void UploadObjectAckPro::clear_has_codingscheme() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void UploadObjectAckPro::clear_codingscheme() {
+  codingscheme_ = 1;
+  clear_has_codingscheme();
+}
+inline ::ncvfs::PutObjectInitRequestPro_CodingScheme UploadObjectAckPro::codingscheme() const {
+  return static_cast< ::ncvfs::PutObjectInitRequestPro_CodingScheme >(codingscheme_);
+}
+inline void UploadObjectAckPro::set_codingscheme(::ncvfs::PutObjectInitRequestPro_CodingScheme value) {
+  GOOGLE_DCHECK(::ncvfs::PutObjectInitRequestPro_CodingScheme_IsValid(value));
+  set_has_codingscheme();
+  codingscheme_ = value;
+}
+
+// optional string codingSetting = 3;
+inline bool UploadObjectAckPro::has_codingsetting() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void UploadObjectAckPro::set_has_codingsetting() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void UploadObjectAckPro::clear_has_codingsetting() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void UploadObjectAckPro::clear_codingsetting() {
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    codingsetting_->clear();
+  }
+  clear_has_codingsetting();
+}
+inline const ::std::string& UploadObjectAckPro::codingsetting() const {
+  return *codingsetting_;
+}
+inline void UploadObjectAckPro::set_codingsetting(const ::std::string& value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void UploadObjectAckPro::set_codingsetting(const char* value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void UploadObjectAckPro::set_codingsetting(const char* value, size_t size) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* UploadObjectAckPro::mutable_codingsetting() {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  return codingsetting_;
+}
+inline ::std::string* UploadObjectAckPro::release_codingsetting() {
+  clear_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = codingsetting_;
+    codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// repeated fixed32 nodeList = 4;
 inline int UploadObjectAckPro::nodelist_size() const {
   return nodelist_.size();
 }

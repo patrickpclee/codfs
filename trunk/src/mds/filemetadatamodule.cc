@@ -42,6 +42,20 @@ void FileMetaDataModule::createFile(uint32_t clientId, string path,
 }
 
 /**
+ * @brief	Read File Size of a File
+ *
+ * @param	fileId	ID of the File
+ *
+ * @return	File Size
+ */
+uint64_t FileMetaDataModule::readFileSize(uint32_t fileId)
+{
+	BSONObj queryObject = BSON ("id" << fileId);
+	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
+	return (uint64_t)result.getField("FileSize").numberLong();
+}
+
+/**
  * @brief	Save the Object List of a File
  */
 void FileMetaDataModule::saveObjectList(uint32_t fileId,
