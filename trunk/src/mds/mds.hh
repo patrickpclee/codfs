@@ -48,10 +48,13 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	objectId	ID of the object uploaded
+	 * @param	codingScheme	Coding Scheme
+	 * @param 	codingSetting	Coding Scheme Setting
 	 * @param	objectNodeList	List of the Osd
 	 */
 	void uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, vector<uint32_t> objectNodeList);
+			uint64_t objectId, CodingScheme codingScheme, string codingSetting, 
+			vector<uint32_t> objectNodeList);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)

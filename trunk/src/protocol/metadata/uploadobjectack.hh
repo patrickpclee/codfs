@@ -32,7 +32,7 @@ public:
 	 *
 	 * @param	communicator	Communicator the Message belongs to
 	 */
-	UploadObjectAckMsg (Communicator* communicator, uint32_t sockfd, uint64_t objectId, vector<uint32_t> nodeList);
+	UploadObjectAckMsg (Communicator* communicator, uint32_t sockfd, uint64_t objectId, CodingScheme codingScheme, string codingSetting, vector<uint32_t> nodeList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -65,6 +65,8 @@ public:
 
 private:
 	uint64_t _objectId;
+	CodingScheme _codingScheme;
+	string _codingSetting;
 	vector<uint32_t> _nodeList;
 };
 

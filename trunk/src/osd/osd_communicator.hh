@@ -125,8 +125,8 @@ public:
 	uint32_t sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 			ComponentType dstComponent);
 
-	void objectUploadAck(uint64_t objectId, vector<uint32_t> nodeList);
-
+	void objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
+		string codingSetting, vector<uint32_t> nodeList);
 private:
 
 	/**

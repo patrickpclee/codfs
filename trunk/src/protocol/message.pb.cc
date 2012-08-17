@@ -425,8 +425,10 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrimaryListRequestPro));
   UploadObjectAckPro_descriptor_ = file->message_type(17);
-  static const int UploadObjectAckPro_offsets_[2] = {
+  static const int UploadObjectAckPro_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, objectid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, codingscheme_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, codingsetting_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, nodelist_),
   };
   UploadObjectAckPro_reflection_ =
@@ -961,41 +963,43 @@ void protobuf_AddDesc_message_2eproto() {
     "\001(\0162+.ncvfs.PutObjectInitRequestPro.Codi"
     "ngScheme\022\025\n\rcodingSetting\030\004 \001(\t\"B\n\030GetPr"
     "imaryListRequestPro\022\021\n\tnumOfObjs\030\001 \001(\007\022\023"
-    "\n\013primaryList\030\002 \003(\007\"8\n\022UploadObjectAckPr"
-    "o\022\020\n\010objectId\030\001 \001(\006\022\020\n\010nodeList\030\002 \003(\007\"+\n"
-    "\027GetObjectInfoRequestPro\022\020\n\010objectId\030\001 \001"
-    "(\006\")\n\025PutObjectInitReplyPro\022\020\n\010objectId\030"
-    "\001 \001(\006\"-\n\031ObjectTransferEndReplyPro\022\020\n\010ob"
-    "jectId\030\001 \001(\006\"M\n\021GetObjectReplyPro\022\020\n\010obj"
-    "ectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 \001(\007\022\022\n\nchunk"
-    "Count\030\003 \001(\007\"h\n\030PutSegmentInitRequestPro\022"
-    "\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013"
-    "segmentSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"U\n"
-    "\016SegmentDataPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tseg"
-    "mentId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006length\030\004"
-    " \001(\007\"C\n\034SegmentTransferEndRequestPro\022\020\n\010"
-    "objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026Put"
-    "SegmentInitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n"
-    "\tsegmentId\030\002 \001(\007\"A\n\032SegmentTransferEndRe"
-    "plyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 "
-    "\001(\007\"\?\n\030GetSegmentInitRequestPro\022\020\n\010objec"
-    "tId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"f\n\026GetSegme"
-    "ntInitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegm"
-    "entId\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001(\007\022\022\n\nchun"
-    "kCount\030\004 \001(\007\"9\n\022GetSegmentReadyPro\022\020\n\010ob"
-    "jectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"g\n\rOsdSt"
-    "artupPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002"
-    " \001(\007\022\022\n\nosdLoading\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022"
-    "\017\n\007osdPort\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005os"
-    "dId\030\001 \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005os"
-    "dId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoa"
-    "ding\030\003 \001(\007\"a\n\032GetSecondaryListRequestPro"
-    "\022\021\n\tnumOfSegs\030\001 \001(\007\0220\n\rsecondaryList\030\002 \003"
-    "(\0132\031.ncvfs.SegmentLocationPro\"\031\n\027OsdStat"
-    "UpdateRequestPro\"L\n\030GetSecondaryListRepl"
-    "yPro\0220\n\rsecondaryList\030\001 \003(\0132\031.ncvfs.Segm"
-    "entLocationPro\"-\n\026GetPrimaryListReplyPro"
-    "\022\023\n\013primaryList\030\001 \003(\007", 2981);
+    "\n\013primaryList\030\002 \003(\007\"\222\001\n\022UploadObjectAckP"
+    "ro\022\020\n\010objectId\030\001 \001(\006\022A\n\014codingScheme\030\002 \001"
+    "(\0162+.ncvfs.PutObjectInitRequestPro.Codin"
+    "gScheme\022\025\n\rcodingSetting\030\003 \001(\t\022\020\n\010nodeLi"
+    "st\030\004 \003(\007\"+\n\027GetObjectInfoRequestPro\022\020\n\010o"
+    "bjectId\030\001 \001(\006\")\n\025PutObjectInitReplyPro\022\020"
+    "\n\010objectId\030\001 \001(\006\"-\n\031ObjectTransferEndRep"
+    "lyPro\022\020\n\010objectId\030\001 \001(\006\"M\n\021GetObjectRepl"
+    "yPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 \001"
+    "(\007\022\022\n\nchunkCount\030\003 \001(\007\"h\n\030PutSegmentInit"
+    "RequestPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentI"
+    "d\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001(\007\022\022\n\nchunkCou"
+    "nt\030\004 \001(\007\"U\n\016SegmentDataPro\022\020\n\010objectId\030\001"
+    " \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022"
+    "\016\n\006length\030\004 \001(\007\"C\n\034SegmentTransferEndReq"
+    "uestPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002"
+    " \001(\007\"=\n\026PutSegmentInitReplyPro\022\020\n\010object"
+    "Id\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"A\n\032SegmentTr"
+    "ansferEndReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\ts"
+    "egmentId\030\002 \001(\007\"\?\n\030GetSegmentInitRequestP"
+    "ro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\""
+    "f\n\026GetSegmentInitReplyPro\022\020\n\010objectId\030\001 "
+    "\001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013segmentSize\030\003 "
+    "\001(\007\022\022\n\nchunkCount\030\004 \001(\007\"9\n\022GetSegmentRea"
+    "dyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001"
+    "(\007\"g\n\rOsdStartupPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013os"
+    "dCapacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\022\r\n\005o"
+    "sdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007\"\037\n\016OsdShutdo"
+    "wnPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025OsdStatUpdateRep"
+    "lyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001("
+    "\007\022\022\n\nosdLoading\030\003 \001(\007\"a\n\032GetSecondaryLis"
+    "tRequestPro\022\021\n\tnumOfSegs\030\001 \001(\007\0220\n\rsecond"
+    "aryList\030\002 \003(\0132\031.ncvfs.SegmentLocationPro"
+    "\"\031\n\027OsdStatUpdateRequestPro\"L\n\030GetSecond"
+    "aryListReplyPro\0220\n\rsecondaryList\030\001 \003(\0132\031"
+    ".ncvfs.SegmentLocationPro\"-\n\026GetPrimaryL"
+    "istReplyPro\022\023\n\013primaryList\030\001 \003(\007", 3072);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -5856,6 +5860,8 @@ void GetPrimaryListRequestPro::Swap(GetPrimaryListRequestPro* other) {
 
 #ifndef _MSC_VER
 const int UploadObjectAckPro::kObjectIdFieldNumber;
+const int UploadObjectAckPro::kCodingSchemeFieldNumber;
+const int UploadObjectAckPro::kCodingSettingFieldNumber;
 const int UploadObjectAckPro::kNodeListFieldNumber;
 #endif  // !_MSC_VER
 
@@ -5876,6 +5882,8 @@ UploadObjectAckPro::UploadObjectAckPro(const UploadObjectAckPro& from)
 void UploadObjectAckPro::SharedCtor() {
   _cached_size_ = 0;
   objectid_ = GOOGLE_ULONGLONG(0);
+  codingscheme_ = 1;
+  codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -5884,6 +5892,9 @@ UploadObjectAckPro::~UploadObjectAckPro() {
 }
 
 void UploadObjectAckPro::SharedDtor() {
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    delete codingsetting_;
+  }
   if (this != default_instance_) {
   }
 }
@@ -5911,6 +5922,12 @@ UploadObjectAckPro* UploadObjectAckPro::New() const {
 void UploadObjectAckPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     objectid_ = GOOGLE_ULONGLONG(0);
+    codingscheme_ = 1;
+    if (has_codingsetting()) {
+      if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+        codingsetting_->clear();
+      }
+    }
   }
   nodelist_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -5934,18 +5951,56 @@ bool UploadObjectAckPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(21)) goto parse_nodeList;
+        if (input->ExpectTag(16)) goto parse_codingScheme;
         break;
       }
       
-      // repeated fixed32 nodeList = 2;
+      // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 2;
       case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_codingScheme:
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::ncvfs::PutObjectInitRequestPro_CodingScheme_IsValid(value)) {
+            set_codingscheme(static_cast< ::ncvfs::PutObjectInitRequestPro_CodingScheme >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(2, value);
+          }
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(26)) goto parse_codingSetting;
+        break;
+      }
+      
+      // optional string codingSetting = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_codingSetting:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_codingsetting()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->codingsetting().data(), this->codingsetting().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(37)) goto parse_nodeList;
+        break;
+      }
+      
+      // repeated fixed32 nodeList = 4;
+      case 4: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
             ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
          parse_nodeList:
           DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
-                 1, 21, input, this->mutable_nodelist())));
+                 1, 37, input, this->mutable_nodelist())));
         } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
                    == ::google::protobuf::internal::WireFormatLite::
                       WIRETYPE_LENGTH_DELIMITED) {
@@ -5955,7 +6010,7 @@ bool UploadObjectAckPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(21)) goto parse_nodeList;
+        if (input->ExpectTag(37)) goto parse_nodeList;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -5983,10 +6038,25 @@ void UploadObjectAckPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed64(1, this->objectid(), output);
   }
   
-  // repeated fixed32 nodeList = 2;
+  // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 2;
+  if (has_codingscheme()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      2, this->codingscheme(), output);
+  }
+  
+  // optional string codingSetting = 3;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      3, this->codingsetting(), output);
+  }
+  
+  // repeated fixed32 nodeList = 4;
   for (int i = 0; i < this->nodelist_size(); i++) {
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(
-      2, this->nodelist(i), output);
+      4, this->nodelist(i), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -6002,10 +6072,26 @@ void UploadObjectAckPro::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(1, this->objectid(), target);
   }
   
-  // repeated fixed32 nodeList = 2;
+  // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 2;
+  if (has_codingscheme()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      2, this->codingscheme(), target);
+  }
+  
+  // optional string codingSetting = 3;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->codingsetting(), target);
+  }
+  
+  // repeated fixed32 nodeList = 4;
   for (int i = 0; i < this->nodelist_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      WriteFixed32ToArray(2, this->nodelist(i), target);
+      WriteFixed32ToArray(4, this->nodelist(i), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -6024,8 +6110,21 @@ int UploadObjectAckPro::ByteSize() const {
       total_size += 1 + 8;
     }
     
+    // optional .ncvfs.PutObjectInitRequestPro.CodingScheme codingScheme = 2;
+    if (has_codingscheme()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->codingscheme());
+    }
+    
+    // optional string codingSetting = 3;
+    if (has_codingsetting()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->codingsetting());
+    }
+    
   }
-  // repeated fixed32 nodeList = 2;
+  // repeated fixed32 nodeList = 4;
   {
     int data_size = 0;
     data_size = 4 * this->nodelist_size();
@@ -6062,6 +6161,12 @@ void UploadObjectAckPro::MergeFrom(const UploadObjectAckPro& from) {
     if (from.has_objectid()) {
       set_objectid(from.objectid());
     }
+    if (from.has_codingscheme()) {
+      set_codingscheme(from.codingscheme());
+    }
+    if (from.has_codingsetting()) {
+      set_codingsetting(from.codingsetting());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -6086,6 +6191,8 @@ bool UploadObjectAckPro::IsInitialized() const {
 void UploadObjectAckPro::Swap(UploadObjectAckPro* other) {
   if (other != this) {
     std::swap(objectid_, other->objectid_);
+    std::swap(codingscheme_, other->codingscheme_);
+    std::swap(codingsetting_, other->codingsetting_);
     nodelist_.Swap(&other->nodelist_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
