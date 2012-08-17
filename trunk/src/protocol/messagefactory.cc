@@ -10,6 +10,11 @@
 #include "metadata/listdirectoryreply.hh"
 #include "metadata/uploadfilerequest.hh"
 #include "metadata/uploadfilereply.hh"
+#include "metadata/uploadobjectack.hh"
+#include "metadata/downloadfilerequest.hh"
+#include "metadata/downloadfilereply.hh"
+#include "metadata/getobjectinforequest.hh"
+#include "metadata/getobjectinforeply.hh"
 #include "transfer/putobjectinitrequest.hh"
 #include "transfer/putobjectinitreply.hh"
 #include "transfer/segmenttransferendrequest.hh"
@@ -29,7 +34,6 @@
 #include "status/osdshutdownmsg.hh"
 #include "status/osdstatupdaterequestmsg.hh"
 #include "status/osdstatupdatereplymsg.hh"
-#include "metadata/uploadobjectack.hh"
 #include "nodelist/getprimarylistrequest.hh"
 #include "nodelist/getprimarylistreply.hh"
 #include "nodelist/getsecondarylistrequest.hh"
@@ -46,12 +50,16 @@ MessageFactory::~MessageFactory() {
 Message* MessageFactory::createMessage(Communicator* communicator,
 		MsgType messageType) {
 	switch (messageType) {
+	//HAND SHAKE
 	case (HANDSHAKE_REQUEST):
 		return new HandshakeRequestMsg(communicator);
 		break;
 	case (HANDSHAKE_REPLY):
 		return new HandshakeReplyMsg(communicator);
 		break;
+
+
+	//METADATA
 	case (LIST_DIRECTORY_REQUEST):
 		return new ListDirectoryRequestMsg(communicator);
 		break;
@@ -64,6 +72,23 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (UPLOAD_FILE_REPLY):
 		return new UploadFileReplyMsg(communicator);
 		break;
+	case (UPLOAD_OBJECT_ACK):
+		return new UploadObjectAckMsg(communicator);
+		break;
+	case (DOWNLOAD_FILE_REQUEST):
+		return new DownloadFileRequestMsg(communicator);
+		break;
+	case (DOWNLOAD_FILE_REPLY):
+		return new DownloadFileReplyMsg(communicator);
+		break;
+	case (GET_OBJECT_INFO_REQUEST):
+		return new GetObjectInfoRequestMsg(communicator);
+		break;
+	case (GET_OBJECT_INFO_REPLY):
+		return new GetObjectInfoReplyMsg(communicator);
+		break;
+
+	//TRANSFER
 	case (PUT_OBJECT_INIT_REQUEST):
 		return new PutObjectInitRequestMsg(communicator);
 		break;
@@ -87,15 +112,25 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (SEGMENT_TRANSFER_END_REPLY):
 		return new SegmentTransferEndReplyMsg(communicator);
-		break; case (OBJECT_DATA):
+		break;
+	case (OBJECT_DATA):
 		return new ObjectDataMsg(communicator);
 		break;
 	case (SEGMENT_DATA):
 		return new SegmentDataMsg(communicator);
 		break;
-	case (UPLOAD_OBJECT_ACK):
-		return new UploadObjectAckMsg(communicator);
+	case (GET_OBJECT_READY):
+		return new GetObjectReadyMsg(communicator);
 		break;
+	case (GET_OBJECT_REPLY):
+		return new GetObjectReplyMsg(communicator);
+		break;
+	case (GET_SEGMENT_READY):
+		return new GetSegmentReadyMsg(communicator);
+		break;
+
+
+	//STATUS
 	case (OSD_STARTUP):
 		return new OsdStartupMsg(communicator);
 		break;
@@ -108,20 +143,15 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (OSDSTAT_UPDATE_REPLY):
 		return new OsdStatUpdateReplyMsg(communicator);
 		break;
+
+
+	//NODELIST
 	case (GET_PRIMARY_LIST_REQUEST):
 		return new GetPrimaryListRequestMsg(communicator);
 		break;
 	case (GET_PRIMARY_LIST_REPLY):
 		return new GetPrimaryListReplyMsg(communicator);
 		break;
-	case (GET_OBJECT_READY):
-		return new GetObjectReadyMsg(communicator);
-		break;
-	case (GET_OBJECT_REPLY):
-		return new GetObjectReplyMsg(communicator);
-		break;
-	case (GET_SEGMENT_READY):
-		return new GetSegmentReadyMsg(communicator);
 	case (GET_SECONDARY_LIST_REQUEST):
 		return new GetSecondaryListRequestMsg(communicator);
 		break;
