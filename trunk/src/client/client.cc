@@ -15,6 +15,9 @@
 
 using namespace std;
 
+mutex pendingObjectChunkMutex;
+
+
 // handle ctrl-C for profiler
 void sighandler(int signum) {
 	if (signum == SIGINT)
@@ -121,6 +124,8 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 				dstComponentId);
 		struct ObjectData objectData = _clientCommunicator->getObject(_clientId,
 				dstSockfd, objectId);
+
+
 		_storageModule->writeObjectToFile(dstPath, objectData, i);
 	}
 
@@ -137,6 +142,59 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 			<< rate << " MB/s" << endl;
 }
 
+uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
+
+	uint32_t byteWritten;
+	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset, length);
+	{
+		lock_guard<mutex> lk(pendingObjectChunkMutex);
+		// update pendingObjectChunk value
+		_pendingObjectChunk[objectId]--;
+	}
+
+	/*
+	// if all chunks have arrived
+	if (chunkLeft == 0) {
+		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+		// write cache to disk
+		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0, objectCache.length);
+		// close file and free cache
+		_storageModule->closeObject(objectId);
+		// Acknowledge MDS for Object Upload Completed
+		// TODO
+	}
+	*/
+	return byteWritten;
+}
+
+struct ObjectData Client::ObjectManipulation(uint64_t objectId, uint32_t objectSize){
+	struct ObjectData objectData {};
+	objectData.info.objectId = objectId;
+	objectData.info.objectSize = objectSize;
+
+	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+	// write cache to disk
+	objectData.info.objectPath =  _storageModule->writeObject(objectId, objectCache.buf, 0, objectCache.length);
+	objectData.buf = objectCache.buf;
+	// close file and free cache
+	_storageModule->closeObject(objectId);
+	return objectData;
+}
+
+void Client::removePendingObjectFromMap(uint64_t objectId){
+	lock_guard<mutex> lk(pendingObjectChunkMutex);
+	_pendingObjectChunk.erase(objectId);
+}
+
+void Client::updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount){
+	_pendingObjectChunk[objectId] = chunkCount;
+}
+
+uint32_t Client::getPendingChunkCount(uint64_t objectId){
+	return _pendingObjectChunk[objectId];
+}
+
+
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
 }
@@ -150,6 +208,7 @@ void startReceiveThread(Communicator* communicator) {
 	communicator->waitForMessage();
 
 }
+
 
 int main(void) {
 
@@ -212,4 +271,6 @@ int main(void) {
 
 	return 0;
 }
+
+
 

@@ -263,8 +263,10 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ObjectDataPro));
   GetObjectRequestPro_descriptor_ = file->message_type(7);
-  static const int GetObjectRequestPro_offsets_[1] = {
+  static const int GetObjectRequestPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectRequestPro, objectid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectRequestPro, objectsize_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectRequestPro, chunkcount_),
   };
   GetObjectRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -946,8 +948,9 @@ void protobuf_AddDesc_message_2eproto() {
     "e\022\025\n\rcodingSetting\030\005 \001(\t\"2\n\014CodingScheme"
     "\022\020\n\014RAID0_CODING\020\001\022\020\n\014RAID1_CODING\020\002\"A\n\r"
     "ObjectDataPro\022\020\n\010objectId\030\001 \001(\006\022\016\n\006offse"
-    "t\030\002 \001(\006\022\016\n\006length\030\003 \001(\007\"\'\n\023GetObjectRequ"
-    "estPro\022\020\n\010objectId\030\001 \001(\006\"%\n\021GetObjectRea"
+    "t\030\002 \001(\006\022\016\n\006length\030\003 \001(\007\"O\n\023GetObjectRequ"
+    "estPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobjectSize\030\002"
+    " \001(\007\022\022\n\nchunkCount\030\003 \001(\007\"%\n\021GetObjectRea"
     "dyPro\022\020\n\010objectId\030\001 \001(\006\"/\n\033ObjectTransfe"
     "rEndRequestPro\022\020\n\010objectId\030\001 \001(\006\"@\n\025List"
     "DirectoryReplyPro\022\'\n\013fileInfoPro\030\001 \003(\0132\022"
@@ -1001,7 +1004,7 @@ void protobuf_AddDesc_message_2eproto() {
     "stPro\"L\n\030GetSecondaryListReplyPro\0220\n\rsec"
     "ondaryList\030\001 \003(\0132\031.ncvfs.SegmentLocation"
     "Pro\"-\n\026GetPrimaryListReplyPro\022\023\n\013primary"
-    "List\030\001 \003(\007", 3090);
+    "List\030\001 \003(\007", 3130);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -3252,6 +3255,8 @@ void ObjectDataPro::Swap(ObjectDataPro* other) {
 
 #ifndef _MSC_VER
 const int GetObjectRequestPro::kObjectIdFieldNumber;
+const int GetObjectRequestPro::kObjectSizeFieldNumber;
+const int GetObjectRequestPro::kChunkCountFieldNumber;
 #endif  // !_MSC_VER
 
 GetObjectRequestPro::GetObjectRequestPro()
@@ -3271,6 +3276,8 @@ GetObjectRequestPro::GetObjectRequestPro(const GetObjectRequestPro& from)
 void GetObjectRequestPro::SharedCtor() {
   _cached_size_ = 0;
   objectid_ = GOOGLE_ULONGLONG(0);
+  objectsize_ = 0u;
+  chunkcount_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -3306,6 +3313,8 @@ GetObjectRequestPro* GetObjectRequestPro::New() const {
 void GetObjectRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     objectid_ = GOOGLE_ULONGLONG(0);
+    objectsize_ = 0u;
+    chunkcount_ = 0u;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -3325,6 +3334,38 @@ bool GetObjectRequestPro::MergePartialFromCodedStream(
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
                  input, &objectid_)));
           set_has_objectid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_objectSize;
+        break;
+      }
+      
+      // optional fixed32 objectSize = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_objectSize:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &objectsize_)));
+          set_has_objectsize();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(29)) goto parse_chunkCount;
+        break;
+      }
+      
+      // optional fixed32 chunkCount = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_chunkCount:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &chunkcount_)));
+          set_has_chunkcount();
         } else {
           goto handle_uninterpreted;
         }
@@ -3355,6 +3396,16 @@ void GetObjectRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed64(1, this->objectid(), output);
   }
   
+  // optional fixed32 objectSize = 2;
+  if (has_objectsize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->objectsize(), output);
+  }
+  
+  // optional fixed32 chunkCount = 3;
+  if (has_chunkcount()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->chunkcount(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -3366,6 +3417,16 @@ void GetObjectRequestPro::SerializeWithCachedSizes(
   // optional fixed64 objectId = 1;
   if (has_objectid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(1, this->objectid(), target);
+  }
+  
+  // optional fixed32 objectSize = 2;
+  if (has_objectsize()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->objectsize(), target);
+  }
+  
+  // optional fixed32 chunkCount = 3;
+  if (has_chunkcount()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->chunkcount(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -3382,6 +3443,16 @@ int GetObjectRequestPro::ByteSize() const {
     // optional fixed64 objectId = 1;
     if (has_objectid()) {
       total_size += 1 + 8;
+    }
+    
+    // optional fixed32 objectSize = 2;
+    if (has_objectsize()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 chunkCount = 3;
+    if (has_chunkcount()) {
+      total_size += 1 + 4;
     }
     
   }
@@ -3414,6 +3485,12 @@ void GetObjectRequestPro::MergeFrom(const GetObjectRequestPro& from) {
     if (from.has_objectid()) {
       set_objectid(from.objectid());
     }
+    if (from.has_objectsize()) {
+      set_objectsize(from.objectsize());
+    }
+    if (from.has_chunkcount()) {
+      set_chunkcount(from.chunkcount());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -3438,6 +3515,8 @@ bool GetObjectRequestPro::IsInitialized() const {
 void GetObjectRequestPro::Swap(GetObjectRequestPro* other) {
   if (other != this) {
     std::swap(objectid_, other->objectid_);
+    std::swap(objectsize_, other->objectsize_);
+    std::swap(chunkcount_, other->chunkcount_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

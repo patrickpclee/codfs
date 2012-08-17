@@ -963,17 +963,37 @@ class GetObjectRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 objectid() const;
   inline void set_objectid(::google::protobuf::uint64 value);
   
+  // optional fixed32 objectSize = 2;
+  inline bool has_objectsize() const;
+  inline void clear_objectsize();
+  static const int kObjectSizeFieldNumber = 2;
+  inline ::google::protobuf::uint32 objectsize() const;
+  inline void set_objectsize(::google::protobuf::uint32 value);
+  
+  // optional fixed32 chunkCount = 3;
+  inline bool has_chunkcount() const;
+  inline void clear_chunkcount();
+  static const int kChunkCountFieldNumber = 3;
+  inline ::google::protobuf::uint32 chunkcount() const;
+  inline void set_chunkcount(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetObjectRequestPro)
  private:
   inline void set_has_objectid();
   inline void clear_has_objectid();
+  inline void set_has_objectsize();
+  inline void clear_has_objectsize();
+  inline void set_has_chunkcount();
+  inline void clear_has_chunkcount();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::uint32 objectsize_;
+  ::google::protobuf::uint32 chunkcount_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4476,6 +4496,50 @@ inline ::google::protobuf::uint64 GetObjectRequestPro::objectid() const {
 inline void GetObjectRequestPro::set_objectid(::google::protobuf::uint64 value) {
   set_has_objectid();
   objectid_ = value;
+}
+
+// optional fixed32 objectSize = 2;
+inline bool GetObjectRequestPro::has_objectsize() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void GetObjectRequestPro::set_has_objectsize() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void GetObjectRequestPro::clear_has_objectsize() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void GetObjectRequestPro::clear_objectsize() {
+  objectsize_ = 0u;
+  clear_has_objectsize();
+}
+inline ::google::protobuf::uint32 GetObjectRequestPro::objectsize() const {
+  return objectsize_;
+}
+inline void GetObjectRequestPro::set_objectsize(::google::protobuf::uint32 value) {
+  set_has_objectsize();
+  objectsize_ = value;
+}
+
+// optional fixed32 chunkCount = 3;
+inline bool GetObjectRequestPro::has_chunkcount() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void GetObjectRequestPro::set_has_chunkcount() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void GetObjectRequestPro::clear_has_chunkcount() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void GetObjectRequestPro::clear_chunkcount() {
+  chunkcount_ = 0u;
+  clear_has_chunkcount();
+}
+inline ::google::protobuf::uint32 GetObjectRequestPro::chunkcount() const {
+  return chunkcount_;
+}
+inline void GetObjectRequestPro::set_chunkcount(::google::protobuf::uint32 value) {
+  set_has_chunkcount();
+  chunkcount_ = value;
 }
 
 // -------------------------------------------------------------------

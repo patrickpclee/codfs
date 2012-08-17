@@ -76,7 +76,6 @@ public:
 	void connectToMds();
 	void connectToOsd();
 private:
-
 	/**
 	 * Initiate upload process to OSD (Step 1)
 	 * @param clientId Client ID
@@ -105,6 +104,9 @@ private:
 	void putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
 			uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
 
+	void getObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
+			uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
+
 	/**
 	 * Finalise upload process to OSD (Step 3)
 	 * @param clientId Client ID
@@ -114,6 +116,8 @@ private:
 
 	void putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
 			uint64_t objectId);
+
+
 
 };
 #endif

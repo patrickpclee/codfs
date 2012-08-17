@@ -72,6 +72,8 @@ message ObjectDataPro {
 
 message GetObjectRequestPro {
 	optional fixed64 objectId = 1;
+	optional fixed32 objectSize = 2;
+	optional fixed32 chunkCount = 3;
 }
 
 message GetObjectReadyPro {

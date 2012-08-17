@@ -66,6 +66,9 @@ void ObjectDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _offset, _length, _payload);
 #endif
+#ifdef COMPILE_FOR_CLIENT
+	client->ObjectDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _offset, _length, _payload);
+#endif
 }
 
 void ObjectDataMsg::printProtocol() {

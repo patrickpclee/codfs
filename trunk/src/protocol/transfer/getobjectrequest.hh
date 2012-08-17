@@ -46,9 +46,16 @@ public:
 	 */
 
 	void printProtocol();
+	void setObjectSize(uint32_t objectSize);
+	void setChunkCount(uint32_t chunkCount);
+	uint32_t getObjectSize();
+	uint32_t getChunkCount();
+	uint32_t getRequestId();
 
 private:
 	uint64_t _objectId;
+	uint32_t _objectSize;
+	uint32_t _chunkCount;
 };
 
 #endif

@@ -48,6 +48,8 @@ void GetObjectRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_objectId = getObjectRequestPro.objectid();
+	_objectSize = getObjectRequestPro.objectsize();
+	_chunkCount = getObjectRequestPro.chunkcount();
 
 }
 
@@ -55,6 +57,26 @@ void GetObjectRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 //	osd->getObjectRequestProcessor (_sockfd, _objectId);
 #endif
+}
+
+void GetObjectRequestMsg::setObjectSize(uint32_t objectSize){
+	_objectSize = objectSize;
+}
+
+void GetObjectRequestMsg::setChunkCount(uint32_t chunkCount){
+	_chunkCount = chunkCount;
+}
+
+uint32_t GetObjectRequestMsg::getObjectSize(){
+	return _objectSize;
+}
+
+uint32_t GetObjectRequestMsg::getChunkCount(){
+	return _chunkCount;
+}
+
+uint32_t GetObjectRequestMsg::getRequestId(){
+	return _msgHeader.requestId;
 }
 
 void GetObjectRequestMsg::printProtocol() {

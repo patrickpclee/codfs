@@ -14,6 +14,8 @@ extern ConfigLayer* configLayer;
 
 // Global Mutex for locking file during read / write
 mutex fileMutex;
+mutex cacheMutex;
+mutex openedFileMutex;
 
 ClientStorageModule::ClientStorageModule() {
 	// read config value
@@ -120,8 +122,7 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 
 }
 
-void ClientStorageModule::writeObjectToFile(string dstPath,
-		struct ObjectData objectData, uint32_t objectIndex) {
+void ClientStorageModule::writeObjectToFile(string dstPath, struct ObjectData objectData, uint32_t objectIndex) {
 
 	// TODO: now assume that client only do one I/O function at a time
 	// lock file access function
@@ -159,4 +160,166 @@ void ClientStorageModule::writeObjectToFile(string dstPath,
 
 	fclose(file);
 
+}
+
+uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length) {
+
+	char* recvCache;
+
+	{
+		lock_guard<mutex> lk(cacheMutex);
+		if (!_objectCache.count(objectId)) {
+			debug("%s\n", "cannot find cache for object");
+			exit(-1);
+		}
+		recvCache = _objectCache[objectId].buf;
+	}
+
+	memcpy(recvCache + offsetInObject, buf, length);
+
+	return length;
+}
+
+struct ObjectCache ClientStorageModule::getObjectCache(uint64_t objectId) {
+	lock_guard<mutex> lk(cacheMutex);
+	if (!_objectCache.count(objectId)) {
+		debug("%s\n", "object cache not found");
+		exit(-1);
+	}
+	return _objectCache[objectId];
+}
+
+string ClientStorageModule::writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length) {
+
+	uint32_t byteWritten;
+
+	string filepath = generateObjectPath(objectId, _objectFolder);
+	byteWritten = writeFile(filepath, buf, offsetInObject, length);
+
+	debug(
+			"Object ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
+			objectId, byteWritten, offsetInObject);
+
+	return filepath;
+}
+
+void ClientStorageModule::closeObject(uint64_t objectId) {
+	string filepath = generateObjectPath(objectId, _objectFolder);
+	closeFile(filepath);
+
+	// close cache
+	struct ObjectCache objectCache = getObjectCache(objectId);
+	MemoryPool::getInstance().poolFree(objectCache.buf);
+
+	{
+		lock_guard<mutex> lk(cacheMutex);
+		_objectCache.erase(objectId);
+	}
+
+	debug("Object ID = %" PRIu64 " closed\n", objectId);
+}
+
+string ClientStorageModule::generateObjectPath(uint64_t objectId, string objectFolder) {
+
+	// append a '/' if not present
+	if (objectFolder[objectFolder.length() - 1] != '/') {
+		objectFolder.append("/");
+	}
+
+	return objectFolder + to_string(objectId);
+}
+
+uint32_t ClientStorageModule::writeFile(string filepath, char* buf, uint64_t offset, uint32_t length) {
+
+
+	// lock file access function
+	lock_guard<mutex> lk(fileMutex);
+
+	FILE* file = openFile(filepath);
+
+	if (file == NULL) { // cannot open file
+		debug("%s\n", "Cannot write");
+		exit(-1);
+	}
+
+	/*
+
+	// Write Lock
+	if (flock(fileno(file), LOCK_EX) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_EX");
+		exit(-1);
+	}
+
+	*/
+
+	// Write file contents from buffer
+
+	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
+
+	/*
+	fseek (file, offset, SEEK_SET);
+	uint32_t byteWritten = fwrite (buf, 1, length, file);
+	fflush (file);
+	*/
+
+	/*
+
+	// Release lock
+	if (flock(fileno(file), LOCK_UN) == -1) {
+		debug("%s\n", "ERROR: Cannot LOCK_UN");
+		exit(-1);
+	}
+
+	*/
+
+	if (byteWritten != length) {
+		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
+		exit(-1);
+	}
+
+	return byteWritten;
+}
+
+void ClientStorageModule::closeFile(string filepath) {
+
+	FILE* filePtr = openFile(filepath);
+
+	openedFileMutex.lock();
+	_openedFile.erase(filepath);
+	openedFileMutex.unlock();
+
+	fclose(filePtr);
+}
+
+FILE* ClientStorageModule::openFile(string filepath) {
+
+	openedFileMutex.lock();
+
+	// find file in map
+	if (_openedFile.count(filepath)) {
+		FILE* openedFile = _openedFile[filepath];
+		openedFileMutex.unlock();
+		return openedFile;
+	}
+
+	openedFileMutex.unlock();
+
+	FILE* filePtr;
+	filePtr = fopen(filepath.c_str(), "rb+");
+
+	// set buffer to zero to avoid memory leak
+	setvbuf (filePtr, NULL , _IONBF , 0);
+
+	if (filePtr == NULL) {
+		debug("Unable to open file at %s\n", filepath.c_str());
+		return NULL;
+	}
+
+	// add file pointer to map
+
+	openedFileMutex.lock();
+	_openedFile[filepath] = filePtr;
+	openedFileMutex.unlock();
+
+	return filePtr;
 }

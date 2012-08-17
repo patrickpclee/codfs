@@ -1,14 +1,18 @@
 #include <iostream>
+#include <thread>
 #include "client_communicator.hh"
+#include "client.hh"
 
 #include "../common/debug.hh"
 #include "../common/objectdata.hh"
 #include "../common/memorypool.hh"
 #include "../protocol/metadata/listdirectoryrequest.hh"
 #include "../protocol/metadata/uploadfilerequest.hh"
+#include "../protocol/metadata/downloadfilerequest.hh"
 #include "../protocol/transfer/putobjectinitrequest.hh"
 #include "../protocol/transfer/objecttransferendrequest.hh"
 #include "../protocol/transfer/objectdatamsg.hh"
+#include "../protocol/transfer/getobjectrequest.hh"
 #include "../protocol/transfer/getobjectreadymsg.hh"
 #include "../protocol/transfer/getsegmentreadymsg.hh"
 #include "../protocol/transfer/getobjectreplymsg.hh"
@@ -19,6 +23,9 @@
  * 1. Create List Directory Request Message \n
  * 2. Use Future to Wait until Reply is Back
  */
+extern Client* client;
+
+
 vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 		string path) {
 	uint32_t mdsSockFd = getMdsSockfd();
@@ -71,11 +78,66 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 	return {};
 }
 
-struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
-		uint32_t dstSockfd, uint64_t objectId) {
+struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId, uint32_t fileId){
+	uint32_t mdsSockFd = getMdsSockfd();
+	DownloadFileRequestMsg* downloadFileRequestMsg = new DownloadFileRequestMsg(this, mdsSockFd, clientId, fileId);
+	downloadFileRequestMsg->prepareProtocolMsg();
+
+	addMessage(downloadFileRequestMsg, true);
+	MessageStatus status = downloadFileRequestMsg->waitForStatusChange();
+
+	if(status == READY) {
+		struct FileMetaData fileMetaData { };
+		fileMetaData._objectList = downloadFileRequestMsg->getObjectList();
+		fileMetaData._primaryList = downloadFileRequestMsg->getPrimaryList();
+		waitAndDelete(downloadFileRequestMsg);
+		return fileMetaData;
+	}else{
+		debug("%s\n", "Download File Request Failed");
+		exit(-1);
+	}
+	return {};
+}
+
+struct ObjectData ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId) {
+	uint32_t objectSize = 0;
+	uint32_t chunkCount = 0;
+	uint32_t requestId = 0;
+	struct ObjectData objectData {};
+
+	// step 1. CLIENT -> OSD : GetObjectRequest.
+	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,dstSockfd,objectId);
+
+	getObjectRequestMsg->prepareProtocolMsg();
+	addMessage(getObjectRequestMsg,true);
+
+	MessageStatus status = getObjectRequestMsg->waitForStatusChange();
+
+	if(status == READY){
+		objectSize = getObjectRequestMsg->getObjectSize();
+		chunkCount = getObjectRequestMsg->getChunkCount();
+		requestId = getObjectRequestMsg->getRequestId();
+		waitAndDelete(getObjectRequestMsg);
+	} else {
+		debug("%s\n", "Get Object Request Failed");
+		exit(-1);
+	}
+	debug("%s\n", "Get Object Request ACK-ed");
+
+	client->updatePendingObjectChunkMap(objectId,chunkCount);
+
+
+	// step 2. CLIENT -> OSD : GetObjectReady.
+	GetObjectReadyMsg* getObjectReadyMsg = new GetObjectReadyMsg(this, requestId, dstSockfd,objectId);
+	getObjectReadyMsg->prepareProtocolMsg();
+	addMessage(getObjectReadyMsg);
 
 	// to be implemented
+	while(client->getPendingChunkCount(objectId) != 0){}
 
+	objectData = client->ObjectManipulation(objectId,objectSize);
+
+	return objectData;
 }
 
 void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
@@ -154,6 +216,7 @@ void ClientCommunicator::putObjectInit(uint32_t clientId, uint32_t dstOsdSockfd,
 
 }
 
+
 void ClientCommunicator::putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
 		uint64_t objectId, char* buf, uint64_t offset, uint32_t length) {
 
@@ -166,6 +229,7 @@ void ClientCommunicator::putObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
 
 	addMessage(objectDataMsg, false);
 }
+
 
 void ClientCommunicator::putObjectEnd(uint32_t clientId, uint32_t dstOsdSockfd,
 		uint64_t objectId) {

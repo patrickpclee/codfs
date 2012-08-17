@@ -1,4 +1,5 @@
 #include "getobjectreplymsg.hh"
+#include "getobjectrequest.hh"
 #include "../../common/debug.hh"
 #include "../protocol/message.pb.h"
 #include "../../common/enums.hh"
@@ -56,6 +57,12 @@ void GetObjectReplyMsg::parse(char* buf) {
 }
 
 void GetObjectReplyMsg::doHandle() {
+	GetObjectRequestMsg* getObjectRequestMsg =
+			(GetObjectRequestMsg*) _communicator->popWaitReplyMessage(
+					_msgHeader.requestId);
+	getObjectRequestMsg->setObjectSize(_objectSize);
+	getObjectRequestMsg->setChunkCount(_chunkCount);
+	getObjectRequestMsg->setStatus(READY);
 }
 
 void GetObjectReplyMsg::printProtocol() {
