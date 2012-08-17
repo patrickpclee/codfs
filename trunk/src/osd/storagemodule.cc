@@ -2,6 +2,7 @@
  * storagemodule.cc
  */
 
+#include <fstream>
 #include <sstream>
 #include <stdlib.h>
 #include <thread>
@@ -26,6 +27,25 @@ StorageModule::StorageModule() {
 }
 
 StorageModule::~StorageModule() {
+
+}
+
+uint64_t StorageModule::getFilesize(string filepath) {
+
+	ifstream in(filepath, ifstream::in | ifstream::binary);
+
+	if (!in) {
+		debug("%s\n", "ERROR: Cannot open file");
+		exit(-1);
+	}
+
+	// check filesize
+	in.seekg(0, std::ifstream::end);
+	uint64_t filesize = in.tellg();
+
+	in.close();
+
+	return filesize;
 
 }
 
@@ -116,23 +136,29 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 		uint32_t segmentId, uint64_t offsetInSegment, uint32_t length) {
 
 	struct SegmentData segmentData;
-	segmentData.info = readSegmentInfo(objectId, segmentId);
+	string segmentPath = generateSegmentPath(objectId, segmentId,
+			_segmentFolder);
+	segmentData.info.objectId = objectId;
+	segmentData.info.segmentId = segmentId;
+	segmentData.info.segmentPath = segmentPath;
 
 	// check num of bytes to read
 	// if length = 0, read whole segment
 	uint32_t byteToRead;
 	if (length == 0) {
-		byteToRead = segmentData.info.segmentSize;
+		const uint32_t filesize = getFilesize(segmentPath);
+		byteToRead = filesize;
 	} else {
 		byteToRead = length;
 	}
+
+	segmentData.info.segmentSize = byteToRead;
 
 	// TODO: check maximum malloc size
 	// poolFree in osd_communicator::sendSegment
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
-	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,
-			byteToRead);
+	readFile(segmentPath, segmentData.buf, offsetInSegment, byteToRead);
 
 	debug(
 			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
@@ -276,15 +302,20 @@ void StorageModule::writeSegmentInfo(uint64_t objectId, uint32_t segmentId,
 
 }
 
-struct SegmentInfo StorageModule::readSegmentInfo(uint64_t objectId,
-		uint32_t segmentId) {
-	// TODO: Database to be implemented
-	struct SegmentInfo segmentInfo;
-	return segmentInfo;
-}
+/*
+ struct SegmentInfo StorageModule::readSegmentInfo(uint64_t objectId,
+ uint32_t segmentId) {
+ // TODO: Database to be implemented
+ struct SegmentInfo segmentInfo;
+
+ return segmentInfo;
+ }
+ */
 
 uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length) {
+
+	debug("Read File :%s\n", filepath.c_str());
 
 	// lock file access function
 	lock_guard<mutex> lk(fileMutex);
@@ -298,23 +329,23 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 
 	/*
 
-	// Read Lock
-	if (flock(fileno(file), LOCK_SH) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_SH");
-		exit(-1);
-	}
-	*/
+	 // Read Lock
+	 if (flock(fileno(file), LOCK_SH) == -1) {
+	 debug("%s\n", "ERROR: Cannot LOCK_SH");
+	 exit(-1);
+	 }
+	 */
 
 	// Read file contents into buffer
 	uint32_t byteRead = pread(fileno(file), buf, length, offset);
 
 	/*
-	// Release lock
-	if (flock(fileno(file), LOCK_UN) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_UN");
-		exit(-1);
-	}
-	*/
+	 // Release lock
+	 if (flock(fileno(file), LOCK_UN) == -1) {
+	 debug("%s\n", "ERROR: Cannot LOCK_UN");
+	 exit(-1);
+	 }
+	 */
 
 	if (byteRead != length) {
 		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
@@ -328,7 +359,6 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length) {
 
-
 	// lock file access function
 	lock_guard<mutex> lk(fileMutex);
 
@@ -341,33 +371,32 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 
 	/*
 
-	// Write Lock
-	if (flock(fileno(file), LOCK_EX) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_EX");
-		exit(-1);
-	}
+	 // Write Lock
+	 if (flock(fileno(file), LOCK_EX) == -1) {
+	 debug("%s\n", "ERROR: Cannot LOCK_EX");
+	 exit(-1);
+	 }
 
-	*/
+	 */
 
 	// Write file contents from buffer
-
 	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
 
 	/*
-	fseek (file, offset, SEEK_SET);
-	uint32_t byteWritten = fwrite (buf, 1, length, file);
-	fflush (file);
-	*/
+	 fseek (file, offset, SEEK_SET);
+	 uint32_t byteWritten = fwrite (buf, 1, length, file);
+	 fflush (file);
+	 */
 
 	/*
 
-	// Release lock
-	if (flock(fileno(file), LOCK_UN) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_UN");
-		exit(-1);
-	}
+	 // Release lock
+	 if (flock(fileno(file), LOCK_UN) == -1) {
+	 debug("%s\n", "ERROR: Cannot LOCK_UN");
+	 exit(-1);
+	 }
 
-	*/
+	 */
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
@@ -411,7 +440,7 @@ FILE* StorageModule::createFile(string filepath) {
 	filePtr = fopen(filepath.c_str(), "wb+");
 
 	// set buffer to zero to avoid memory leak
-	setvbuf (filePtr, NULL , _IONBF , 0);
+	setvbuf(filePtr, NULL, _IONBF, 0);
 
 	debug("fileptr = %p\n", filePtr);
 
@@ -449,7 +478,7 @@ FILE* StorageModule::openFile(string filepath) {
 	filePtr = fopen(filepath.c_str(), "rb+");
 
 	// set buffer to zero to avoid memory leak
-	setvbuf (filePtr, NULL , _IONBF , 0);
+	setvbuf(filePtr, NULL, _IONBF, 0);
 
 	if (filePtr == NULL) {
 		debug("Unable to open file at %s\n", filepath.c_str());

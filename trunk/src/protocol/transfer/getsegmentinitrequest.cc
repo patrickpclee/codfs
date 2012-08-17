@@ -53,7 +53,7 @@ void GetSegmentInitRequestMsg::parse(char* buf) {
 
 void GetSegmentInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-//	osd->getSegmentInitProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId);
+	osd->getSegmentRequestProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId);
 #endif
 }
 

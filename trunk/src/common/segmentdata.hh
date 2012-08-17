@@ -12,7 +12,7 @@ struct SegmentInfo {
 	uint32_t segmentId;
 	uint32_t segmentSize;
 	string segmentPath;
-	CodingScheme codingScheme;
+//	CodingScheme codingScheme;
 //	uint32_t offsetInObject;
 };
 

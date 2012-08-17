@@ -53,7 +53,7 @@ void GetObjectInfoRequestMsg::parse(char* buf) {
 
 void GetObjectInfoRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-//	mds->getObjectInfoRequestProcessor (_sockfd, _objectId);
+	mds->getObjectInfoProcessor (_msgHeader.requestId, _sockfd, _objectId);
 #endif
 }
 

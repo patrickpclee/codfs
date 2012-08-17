@@ -92,18 +92,23 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	ObjectTransferOsdInfo objectInfo = _osdCommunicator->getObjectInfoRequest(
 			objectId);
 
-	// 2. initialize list and count
+	debug("[Download] ObjectSize = %" PRIu64 "\n", objectInfo._size);
 
-	receivedSegmentsMutex.lock();
-	vector<struct SegmentData>& segmentDataList = _receivedSegments[objectId];
-	receivedSegmentsMutex.unlock();
+	// 2. initialize list and count
 
 	const uint32_t segmentCount = objectInfo._osdList.size();
 	{
 		lock_guard<mutex> lk(pendingSegmentCountMutex);
 		_pendingSegmentCount[objectId] = segmentCount;
+		debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
 	}
-	segmentDataList.reserve(segmentCount);
+
+	receivedSegmentsMutex.lock();
+	_receivedSegments[objectId] = vector<struct SegmentData> (segmentCount);
+	vector<struct SegmentData>& segmentDataList = _receivedSegments[objectId];
+	receivedSegmentsMutex.unlock();
+
+	debug("[Download] Reserve %" PRIu32 " segments\n", segmentCount);
 
 	// 3. request segments (either from disk or wait segments to arrive)
 
@@ -119,6 +124,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			{
 				lock_guard<mutex> lk(pendingSegmentCountMutex);
 				_pendingSegmentCount[objectId]--;
+				debug("%s\n", "Read from local segment");
 			}
 
 		} else {
@@ -142,6 +148,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			const CodingScheme codingScheme = objectInfo._codingScheme;
 			const string codingSetting = objectInfo._codingSetting;
 
+			debug(
+					"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
+					(int)codingScheme, codingSetting.c_str());
 			objectData = _codingModule->decodeSegmentToObject(codingScheme,
 					objectId, segmentDataList, codingSetting);
 			break;
@@ -150,7 +159,17 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 	}
 
-	// remove segmentList from map
+	debug("%s\n", "[DOWNLOAD] Send Object");
+
+	// 5. send object (to be implemented)
+	_osdCommunicator->sendObject(sockfd, objectData);
+
+	// clean up
+
+	for (auto segment : segmentDataList) {
+		MemoryPool::getInstance().poolFree(segment.buf);
+	}
+
 	{
 		lock_guard<mutex> lk(receivedSegmentsMutex);
 		_receivedSegments.erase(objectId);
@@ -161,8 +180,8 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		_pendingSegmentCount.erase(objectId);
 	}
 
-	// 4. send object
-	_osdCommunicator->sendObject(sockfd, objectData);
+	debug("%s\n", "[DOWNLOAD] Cleanup completed");
+
 }
 
 void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
@@ -333,7 +352,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 		// Acknowledge MDS for Object Upload Completed
 		_osdCommunicator->objectUploadAck(objectId, codingSetting.codingScheme,
-		codingSetting.setting, nodeList);
+				codingSetting.setting, nodeList);
 
 	}
 
@@ -348,12 +367,12 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	bool isDownload = false;
 	{
 		lock_guard<mutex> lk(pendingSegmentCountMutex);
-		isDownload = _pendingSegmentCount.count(objectId);
+		isDownload = (bool) _pendingSegmentCount.count(objectId);
 	}
 
 	debug(
-			"[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
-			objectId, segmentId, length, chunkCount);
+			"[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "isDownload = %d\n",
+			objectId, segmentId, length, chunkCount, isDownload);
 
 	// initialize chunkCount value
 	{
@@ -363,7 +382,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 	if (isDownload) {
 		receivedSegmentsMutex.lock();
-		struct SegmentData& segmentData = _receivedSegments[objectId].at(segmentId);
+		struct SegmentData& segmentData = _receivedSegments[objectId][segmentId];
 		receivedSegmentsMutex.unlock();
 
 		segmentData.info.objectId = objectId;
@@ -390,16 +409,21 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 	{
 		lock_guard<mutex> lk(pendingSegmentCountMutex);
-		isDownload = _pendingSegmentCount.count(objectId);
+		isDownload = (bool)_pendingSegmentCount.count(objectId);
 	}
 
 	// if the segment received is for download process
 	if (isDownload) {
+		debug ("%s\n", "isDownload");
 		receivedSegmentsMutex.lock();
-		struct SegmentData& segmentData = _receivedSegments[objectId].at(segmentId);
+		struct SegmentData& segmentData = _receivedSegments[objectId].at(
+				segmentId);
 		receivedSegmentsMutex.unlock();
 
-		memcpy (segmentData.buf + offset, buf, length);
+		debug ("%s\n", "before memcpy");
+		segmentData.buf = MemoryPool::getInstance().poolMalloc(length);
+		memcpy(segmentData.buf + offset, buf, length);
+		debug ("%s\n", "after memcpy");
 	} else {
 		byteWritten = _storageModule->writeSegment(objectId, segmentId, buf,
 				offset, length);
@@ -419,6 +443,11 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 		if (!isDownload) {
 			// close file and free cache
 			_storageModule->closeSegment(objectId, segmentId);
+		} else {
+			{
+				lock_guard<mutex> lk(pendingSegmentCountMutex);
+				_pendingSegmentCount[objectId]--;
+			}
 		}
 
 		// remove from map
@@ -472,20 +501,24 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 void startTestThread(Communicator* communicator) {
-	printf("HEHE\n");
-	OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-			communicator->getMonitorSockfd(), osd->getOsdId(), rand() % 10,
-			rand() % 10);
-	printf("Prepared msg\n");
-	testmsg->prepareProtocolMsg();
-	communicator->addMessage(testmsg);
-	printf("Prepared add \n");
-	sleep(120);
-	OsdShutdownMsg* msg = new OsdShutdownMsg(communicator,
-			communicator->getMonitorSockfd(), osd->getOsdId());
-	msg->prepareProtocolMsg();
-	communicator->addMessage(msg);
-	printf("DONE\n");
+
+	/*
+	 printf("HEHE\n");
+	 OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
+	 communicator->getMonitorSockfd(), osd->getOsdId(), rand() % 10,
+	 rand() % 10);
+	 printf("Prepared msg\n");
+	 testmsg->prepareProtocolMsg();
+	 communicator->addMessage(testmsg);
+	 printf("Prepared add \n");
+	 sleep(120);
+	 OsdShutdownMsg* msg = new OsdShutdownMsg(communicator,
+	 communicator->getMonitorSockfd(), osd->getOsdId());
+	 msg->prepareProtocolMsg();
+	 communicator->addMessage(msg);
+	 printf("DONE\n");
+	 */
+
 }
 
 /**
@@ -529,6 +562,13 @@ int main(int argc, char* argv[]) {
 	thread sendThread(startSendThread);
 
 	communicator->connectAllComponents();
+
+	debug("%s\n", "starting test thread");
+	sleep(5);
+
+	if (osd->getOsdId() == 52000) {
+		osd->getObjectRequestProcessor(0, 0, 624278560);
+	}
 
 	thread testThread(startTestThread, communicator);
 	// TODO: pause before connect for now

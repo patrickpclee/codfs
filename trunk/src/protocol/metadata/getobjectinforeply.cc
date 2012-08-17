@@ -14,7 +14,8 @@ GetObjectInfoReplyMsg::GetObjectInfoReplyMsg(Communicator* communicator) :
 GetObjectInfoReplyMsg::GetObjectInfoReplyMsg(Communicator* communicator,
 		uint32_t requestId, uint32_t dstSockfd, uint64_t objectId,
 		vector<uint32_t> nodeList, CodingScheme codingScheme,
-		string codingSetting) {
+		string codingSetting) :
+		Message(communicator){
 
 	_msgHeader.requestId = requestId;
 	_sockfd = dstSockfd;

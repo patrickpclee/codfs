@@ -27,6 +27,7 @@
 #include "transfer/segmentdatamsg.hh"
 #include "transfer/getobjectreadymsg.hh"
 //#include "transfer/getsegmentreadymsg.hh"
+#include "transfer/getsegmentinitrequest.hh"
 #include "transfer/getobjectreplymsg.hh"
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
@@ -58,8 +59,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new HandshakeReplyMsg(communicator);
 		break;
 
-
-	//METADATA
+		//METADATA
 	case (LIST_DIRECTORY_REQUEST):
 		return new ListDirectoryRequestMsg(communicator);
 		break;
@@ -88,7 +88,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new GetObjectInfoReplyMsg(communicator);
 		break;
 
-	//TRANSFER
+		//TRANSFER
 	case (PUT_OBJECT_INIT_REQUEST):
 		return new PutObjectInitRequestMsg(communicator);
 		break;
@@ -126,13 +126,15 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new GetObjectReplyMsg(communicator);
 		break;
 		/*
-	case (GET_SEGMENT_READY):
-		return new GetSegmentReadyMsg(communicator);
+		 case (GET_SEGMENT_READY):
+		 return new GetSegmentReadyMsg(communicator);
+		 break;
+		 */
+	case (GET_SEGMENT_INIT_REQUEST):
+		return new GetSegmentInitRequestMsg(communicator);
 		break;
-		*/
 
-
-	//STATUS
+		//STATUS
 	case (OSD_STARTUP):
 		return new OsdStartupMsg(communicator);
 		break;
@@ -146,8 +148,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new OsdStatUpdateReplyMsg(communicator);
 		break;
 
-
-	//NODELIST
+		//NODELIST
 	case (GET_PRIMARY_LIST_REQUEST):
 		return new GetPrimaryListRequestMsg(communicator);
 		break;
@@ -161,7 +162,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new GetSecondaryListReplyMsg(communicator);
 		break;
 	default:
-		debug("%s\n", "Invalid message type");
+		debug("Invalid message type : %d\n", messageType);
 		break;
 	}
 	return NULL;

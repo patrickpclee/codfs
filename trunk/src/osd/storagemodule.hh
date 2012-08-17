@@ -39,8 +39,8 @@ public:
 
 	bool isObjectExist(uint64_t objectId);
 
-	void createObject (uint64_t objectId, uint32_t length);
-	void createSegment (uint64_t objectId, uint32_t segmentId, uint32_t length);
+	void createObject(uint64_t objectId, uint32_t length);
+	void createSegment(uint64_t objectId, uint32_t segmentId, uint32_t length);
 
 	/**
 	 * Read a part of an object from the storage
@@ -50,8 +50,8 @@ public:
 	 * @return ObjectData structure
 	 */
 
-	struct ObjectData readObject(uint64_t objectId,
-			uint64_t offsetInObject = 0, uint32_t length = 0);
+	struct ObjectData readObject(uint64_t objectId, uint64_t offsetInObject = 0,
+			uint32_t length = 0);
 
 	/**
 	 * Read a part of a segment from the storage
@@ -74,8 +74,8 @@ public:
 	 * @return Number of bytes written
 	 */
 
-	uint32_t writeObject(uint64_t objectId, char* buf,
-			uint64_t offsetInObject, uint32_t length);
+	uint32_t writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject,
+			uint32_t length);
 
 	uint32_t writeObjectCache(uint64_t objectId, char* buf,
 			uint64_t offsetInObject, uint32_t length);
@@ -108,7 +108,8 @@ public:
 	 * @param length Number of bytes the segment will take
 	 */
 
-	FILE* createAndOpenSegment(uint64_t objectId, uint32_t segmentId, uint32_t length);
+	FILE* createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
+			uint32_t length);
 
 	/**
 	 * Close the object after the transfer is finished
@@ -168,8 +169,7 @@ private:
 	 * @return SegmentInfo structure
 	 */
 
-	struct SegmentInfo readSegmentInfo(uint64_t objectId, uint32_t segmentId);
-
+//	struct SegmentInfo readSegmentInfo(uint64_t objectId, uint32_t segmentId);
 	/**
 	 * Open a file and read data to buffer
 	 * @param filepath Path of the file in the storage
@@ -214,16 +214,18 @@ private:
 	string generateSegmentPath(uint64_t objectId, uint32_t segmentId,
 			string segmentFolder);
 
-	FILE* createFile (string filepath);
+	FILE* createFile(string filepath);
 
-	FILE* openFile (string filepath);
+	FILE* openFile(string filepath);
 
-	void closeFile (string filepath);
+	void closeFile(string filepath);
+
+	uint64_t getFilesize(string filepath);
 
 	uint32_t _capacity; // total capacity of the node
 	uint32_t _freespace; // remaining capacity of the node
-	map <string, FILE*> _openedFile;
-	map <uint64_t, struct ObjectCache> _objectCache;
+	map<string, FILE*> _openedFile;
+	map<uint64_t, struct ObjectCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
 };
