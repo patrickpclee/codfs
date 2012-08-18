@@ -154,6 +154,11 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 					(int)codingScheme, codingSetting.c_str());
 			objectData = _codingModule->decodeSegmentToObject(codingScheme,
 					objectId, segmentDataList, codingSetting);
+
+			// debug
+//			_storageModule->writeObject (12345, objectData.buf, 0, objectData.info.objectSize);
+
+
 			break;
 		} else {
 			usleep(100000); // 0.1s
@@ -389,6 +394,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		segmentData.info.objectId = objectId;
 		segmentData.info.segmentId = segmentId;
 		segmentData.info.segmentSize = length;
+		segmentData.buf = MemoryPool::getInstance().poolMalloc(length);
 	} else {
 		// create file
 		_storageModule->createSegment(objectId, segmentId, length);
@@ -416,12 +422,11 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	// if the segment received is for download process
 	if (isDownload) {
 		receivedSegmentsMutex.lock();
-		struct SegmentData& segmentData = _receivedSegments[objectId].at(
-				segmentId);
+		struct SegmentData& segmentData = _receivedSegments[objectId][segmentId];
 		receivedSegmentsMutex.unlock();
 
-		segmentData.buf = MemoryPool::getInstance().poolMalloc(length);
-		memcpy(segmentData.buf, buf + offset, length);
+		debug ("offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
+		memcpy(segmentData.buf + offset, buf, length);
 	} else {
 		byteWritten = _storageModule->writeSegment(objectId, segmentId, buf,
 				offset, length);
