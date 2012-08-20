@@ -51,8 +51,11 @@ public:
 
 	void downloadFileRequest(uint32_t fileId, string dstPath);
 
+	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint32_t length, uint32_t chunkCount); // new version
 
 	uint32_t ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
+
+	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
 
 	void updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount);
 	void removePendingObjectFromMap(uint64_t objectId);

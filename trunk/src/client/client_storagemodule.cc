@@ -166,6 +166,72 @@ void ClientStorageModule::writeObjectToFile(string dstPath, struct ObjectData ob
 
 }
 
+void ClientStorageModule::createObject(uint64_t objectId, uint32_t length) {
+
+	// create cache
+	struct ObjectCache objectCache;
+	objectCache.length = length;
+	objectCache.buf = MemoryPool::getInstance().poolMalloc(length);
+
+	// save cache to map
+	{
+		lock_guard<mutex> lk(cacheMutex);
+		_objectCache[objectId] = objectCache;
+	}
+
+	// create object
+	createAndOpenObject(objectId, length);
+
+	// write info
+	string filepath = generateObjectPath(objectId, _objectFolder);
+	writeObjectInfo(objectId, length, filepath);
+
+	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 " Path = %s\n",
+			objectId, length, filepath.c_str());
+}
+
+FILE* ClientStorageModule::createAndOpenObject(uint64_t objectId, uint32_t length) {
+
+	string filepath = generateObjectPath(objectId, _objectFolder);
+	writeObjectInfo(objectId, length, filepath);
+
+	debug("Object ID = %" PRIu64 " created\n", objectId);
+
+	return createFile(filepath);
+}
+
+void ClientStorageModule::writeObjectInfo(uint64_t objectId, uint32_t objectSize,
+		string filepath) {
+
+	// TODO: Database to be implemented
+
+}
+
+FILE* ClientStorageModule::createFile(string filepath) {
+
+	// open file for read/write
+	// create new if not exist
+	FILE* filePtr;
+	filePtr = fopen(filepath.c_str(), "wb+");
+
+	// set buffer to zero to avoid memory leak
+	setvbuf(filePtr, NULL, _IONBF, 0);
+
+	debug("fileptr = %p\n", filePtr);
+
+	if (filePtr == NULL) {
+		debug("%s\n", "Unable to create file!");
+		return NULL;
+	}
+
+	// add file pointer to map
+	openedFileMutex.lock();
+	_openedFile[filepath] = filePtr;
+	openedFileMutex.unlock();
+
+	return filePtr;
+}
+
 uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length) {
 
 	char* recvCache;

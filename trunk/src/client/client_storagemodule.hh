@@ -19,11 +19,17 @@ public:
 	void writeObjectToFile (string dstPath, struct ObjectData objectData, uint32_t objectIndex);
 
 	struct ObjectCache getObjectCache(uint64_t objectId);
+
+	FILE* createAndOpenObject(uint64_t objectId, uint32_t length);
+	void createObject(uint64_t objectId, uint32_t length);
 	string writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length);
+	void writeObjectInfo(uint64_t objectId, uint32_t objectSize, string filepath);
 	uint32_t writeObjectCache (uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length);
 	void closeObject(uint64_t objectId);
 
 	string generateObjectPath(uint64_t objectId, string objectFolder);
+
+	FILE* createFile(string filepath);
 	uint32_t writeFile(string filepath, char* buf, uint64_t offset, uint32_t length);
 	void closeFile (string filepath);
 	FILE* openFile(string filepath);

@@ -72,6 +72,9 @@ public:
 			struct ObjectData objectData, CodingScheme codingScheme,
 			string codingSetting);
 
+	void replyPutObjectInit(uint32_t requestId, uint32_t connectionId, uint64_t objectId); // new version
+	void replyPutObjectEnd(uint32_t requestId, uint32_t connectionId, uint64_t objectId); //new version
+
 	// TODO: CONNECT TO COMPONENT: PRIMITIVE DESIGN
 	void connectToMds();
 	void connectToOsd();

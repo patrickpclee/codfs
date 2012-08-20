@@ -4,9 +4,14 @@
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
 #include "../../osd/osd.hh"
+#include "../../client/client.hh"
 
 #ifdef COMPILE_FOR_OSD
 extern Osd* osd;
+#endif
+
+#ifdef COMPILE_FOR_CLIENT
+extern Client* client;
 #endif
 
 PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator) :
@@ -69,6 +74,11 @@ void PutObjectInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId,
 			_objectSize, _chunkCount, _codingScheme, _codingSetting);
+#endif
+
+#ifdef COMPILE_FOR_CLIENT
+	client->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId,
+			_objectSize, _chunkCount);
 #endif
 }
 

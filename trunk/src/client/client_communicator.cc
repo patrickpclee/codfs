@@ -10,11 +10,14 @@
 #include "../protocol/metadata/uploadfilerequest.hh"
 #include "../protocol/metadata/downloadfilerequest.hh"
 #include "../protocol/transfer/putobjectinitrequest.hh"
+#include "../protocol/transfer/putobjectinitreply.hh"
 #include "../protocol/transfer/objecttransferendrequest.hh"
+#include "../protocol/transfer/objecttransferendreply.hh"
 #include "../protocol/transfer/objectdatamsg.hh"
 #include "../protocol/transfer/getobjectrequest.hh"
-#include "../protocol/transfer/getobjectreadymsg.hh"
-#include "../protocol/transfer/getobjectreplymsg.hh"
+
+//#include "../protocol/transfer/getobjectreadymsg.hh"
+//#include "../protocol/transfer/getobjectreplymsg.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
@@ -99,42 +102,58 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId, uint32_t
 	return {};
 }
 
+void ClientCommunicator::replyPutObjectInit(uint32_t requestId, uint32_t connectionId, uint64_t objectId) {
+
+	PutObjectInitReplyMsg* putObjectInitReplyMsg = new PutObjectInitReplyMsg(this, requestId, connectionId, objectId);
+	putObjectInitReplyMsg->prepareProtocolMsg();
+
+	addMessage(putObjectInitReplyMsg);
+}
+
+void ClientCommunicator::replyPutObjectEnd(uint32_t requestId, uint32_t connectionId, uint64_t objectId) {
+
+	ObjectTransferEndReplyMsg* putObjectEndReplyMsg = new ObjectTransferEndReplyMsg(this, requestId, connectionId, objectId);
+	putObjectEndReplyMsg->prepareProtocolMsg();
+
+	addMessage(putObjectEndReplyMsg);
+}
+
 struct ObjectData ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId) {
 	uint32_t objectSize = 0;
-	uint32_t chunkCount = 0;
-	uint32_t requestId = 0;
+//	uint32_t chunkCount = 0;
+//	uint32_t requestId = 0;
 	struct ObjectData objectData {};
 
 	// step 1. CLIENT -> OSD : GetObjectRequest.
 	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,dstSockfd,objectId);
 
 	getObjectRequestMsg->prepareProtocolMsg();
-	addMessage(getObjectRequestMsg,true);
+	addMessage(getObjectRequestMsg);
 
-	MessageStatus status = getObjectRequestMsg->waitForStatusChange();
+//	MessageStatus status = getObjectRequestMsg->waitForStatusChange();
 
-	if(status == READY){
-		objectSize = getObjectRequestMsg->getObjectSize();
-		chunkCount = getObjectRequestMsg->getChunkCount();
-		requestId = getObjectRequestMsg->getRequestId();
-		waitAndDelete(getObjectRequestMsg);
-	} else {
-		debug("%s\n", "Get Object Request Failed");
-		exit(-1);
-	}
-	debug("%s\n", "Get Object Request ACK-ed");
+//	if(status == READY){
+//		objectSize = getObjectRequestMsg->getObjectSize();
+//		chunkCount = getObjectRequestMsg->getChunkCount();
+//		requestId = getObjectRequestMsg->getRequestId();
+//		waitAndDelete(getObjectRequestMsg);
+//	} else {
+//		debug("%s\n", "Get Object Request Failed");
+//		exit(-1);
+//	}
+//	debug("%s\n", "Get Object Request ACK-ed");
 
-	client->updatePendingObjectChunkMap(objectId,chunkCount);
+//	client->updatePendingObjectChunkMap(objectId,chunkCount);
 
 
 	// step 2. CLIENT -> OSD : GetObjectReady.
-	GetObjectReadyMsg* getObjectReadyMsg = new GetObjectReadyMsg(this, requestId, dstSockfd, objectId);
-	getObjectReadyMsg->prepareProtocolMsg();
-	addMessage(getObjectReadyMsg);
+//	GetObjectReadyMsg* getObjectReadyMsg = new GetObjectReadyMsg(this, requestId, dstSockfd, objectId);
+//	getObjectReadyMsg->prepareProtocolMsg();
+//	addMessage(getObjectReadyMsg);
 
 	// to be implemented
 
-	while(client->getPendingChunkCount(objectId) != 0){}
+	while(client->getPendingChunkCount(objectId) != 0){usleep(100000);}
 	objectData = client->ObjectManipulation(objectId,objectSize);
 
 	return objectData;

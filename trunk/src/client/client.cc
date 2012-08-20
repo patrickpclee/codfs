@@ -142,6 +142,46 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 			<< rate << " MB/s" << endl;
 }
 
+void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
+
+	// initialize chunkCount value
+	{
+		lock_guard<mutex> lk(pendingObjectChunkMutex);
+		_pendingObjectChunk[objectId] = chunkCount;
+	}
+
+	// create object and cache
+	updatePendingObjectChunkMap(objectId,chunkCount);
+	_storageModule->createObject(objectId, length);
+	_clientCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
+
+}
+
+void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId) {
+
+	// TODO: check integrity of object received
+	bool chunkRemaining = false;
+
+	while (1) {
+
+		{
+			lock_guard<mutex> lk(pendingObjectChunkMutex);
+			chunkRemaining = (bool) _pendingObjectChunk.count(objectId);
+		}
+
+		if (!chunkRemaining) {
+			// if all chunks have arrived, send ack
+			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
+			break;
+		} else {
+			usleep(100000); // sleep 0.1s
+		}
+
+	}
+
+}
+
 uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;

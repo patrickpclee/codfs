@@ -4,11 +4,15 @@
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
 #include "../../osd/osd.hh"
+#include "../../client/client.hh"
 
 #ifdef COMPILE_FOR_OSD
 extern Osd* osd;
 #endif
 
+#ifdef COMPILE_FOR_CLIENT
+extern Client* client;
+#endif
 ObjectTransferEndRequestMsg::ObjectTransferEndRequestMsg(Communicator* communicator) :
 		Message(communicator) {
 
@@ -54,6 +58,10 @@ void ObjectTransferEndRequestMsg::parse(char* buf) {
 void ObjectTransferEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectEndProcessor (_msgHeader.requestId, _sockfd, _objectId);
+#endif
+
+#ifdef COMPILE_FOR_CLIENT
+	client->putObjectEndProcessor (_msgHeader.requestId, _sockfd, _objectId);
 #endif
 }
 
