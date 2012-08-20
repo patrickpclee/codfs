@@ -76,10 +76,15 @@ public:
 	void setPrimaryList(vector<uint32_t> primaryList);
 	vector<uint64_t> getObjectList();
 	vector<uint32_t> getPrimaryList();
+	void setFileId (uint32_t fileId);
+	uint32_t getFileId ();
+	void setSize (uint64_t size);
+	uint32_t getSize();
 
 private:
 	uint32_t _clientId;
 	uint32_t _fileId;
+	uint64_t _size;
 	vector<uint64_t> _objectList;
 	vector<uint32_t> _primaryList;
 };

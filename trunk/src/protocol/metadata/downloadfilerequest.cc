@@ -47,7 +47,7 @@ void DownloadFileRequestMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType (DOWNLOAD_FILE_REQUEST);
+	setProtocolType(DOWNLOAD_FILE_REQUEST);
 	setProtocolMsg(serializedString);
 
 }
@@ -90,4 +90,21 @@ vector<uint64_t> DownloadFileRequestMsg::getObjectList() {
 
 vector<uint32_t> DownloadFileRequestMsg::getPrimaryList() {
 	return _primaryList;
+}
+
+void DownloadFileRequestMsg::setFileId(uint32_t fileId) {
+	_fileId = fileId;
+
+}
+
+uint32_t DownloadFileRequestMsg::getFileId() {
+	return _fileId;
+}
+
+void DownloadFileRequestMsg::setSize (uint64_t size) {
+	_size = size;
+}
+
+uint32_t DownloadFileRequestMsg::getSize() {
+	return _size;
 }

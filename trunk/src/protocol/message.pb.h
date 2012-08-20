@@ -93,11 +93,12 @@ inline bool HandshakeRequestPro_ComponentType_Parse(
 }
 enum PutObjectInitRequestPro_CodingScheme {
   PutObjectInitRequestPro_CodingScheme_RAID0_CODING = 1,
-  PutObjectInitRequestPro_CodingScheme_RAID1_CODING = 2
+  PutObjectInitRequestPro_CodingScheme_RAID1_CODING = 2,
+  PutObjectInitRequestPro_CodingScheme_DEFAULT_CODING = 100
 };
 bool PutObjectInitRequestPro_CodingScheme_IsValid(int value);
 const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro_CodingScheme_CodingScheme_MIN = PutObjectInitRequestPro_CodingScheme_RAID0_CODING;
-const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro_CodingScheme_CodingScheme_MAX = PutObjectInitRequestPro_CodingScheme_RAID1_CODING;
+const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro_CodingScheme_CodingScheme_MAX = PutObjectInitRequestPro_CodingScheme_DEFAULT_CODING;
 const int PutObjectInitRequestPro_CodingScheme_CodingScheme_ARRAYSIZE = PutObjectInitRequestPro_CodingScheme_CodingScheme_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* PutObjectInitRequestPro_CodingScheme_descriptor();
@@ -705,6 +706,7 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   typedef PutObjectInitRequestPro_CodingScheme CodingScheme;
   static const CodingScheme RAID0_CODING = PutObjectInitRequestPro_CodingScheme_RAID0_CODING;
   static const CodingScheme RAID1_CODING = PutObjectInitRequestPro_CodingScheme_RAID1_CODING;
+  static const CodingScheme DEFAULT_CODING = PutObjectInitRequestPro_CodingScheme_DEFAULT_CODING;
   static inline bool CodingScheme_IsValid(int value) {
     return PutObjectInitRequestPro_CodingScheme_IsValid(value);
   }

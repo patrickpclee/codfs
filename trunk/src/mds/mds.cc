@@ -138,6 +138,7 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	uint64_t fileSize = _metaDataModule->readFileSize(fileId);
 	string checksum = _metaDataModule->readChecksum(fileId);
 
+	debug ("FILESIZE = %" PRIu64 "\n", fileSize);
 	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, fileSize, checksum, objectList, primaryList);
 
 	return;

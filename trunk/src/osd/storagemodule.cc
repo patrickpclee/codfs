@@ -35,7 +35,7 @@ uint64_t StorageModule::getFilesize(string filepath) {
 	ifstream in(filepath, ifstream::in | ifstream::binary);
 
 	if (!in) {
-		debug("%s\n", "ERROR: Cannot open file");
+		debug("ERROR: Cannot open file: %s\n", filepath.c_str());
 		exit(-1);
 	}
 

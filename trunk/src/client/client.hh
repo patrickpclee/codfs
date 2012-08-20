@@ -24,7 +24,8 @@ public:
 	 */
 	vector<FileMetaData> listFolderRequest(char* path);
 
-	uint32_t uploadFileRequest (string path, CodingScheme codingScheme, string codingSetting);
+	uint32_t uploadFileRequest(string path, CodingScheme codingScheme,
+			string codingSetting);
 	/**
 	 * Upload a file to OSD
 	 * @param filepath Location of the file to upload
@@ -33,7 +34,6 @@ public:
 	 */
 
 //	uint32_t sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting);
-
 	/**
 	 * @brief	Get the Client Communicator
 	 *
@@ -51,15 +51,19 @@ public:
 
 	void downloadFileRequest(uint32_t fileId, string dstPath);
 
-	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint32_t length, uint32_t chunkCount); // new version
+	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint32_t length, uint32_t chunkCount); // new version
 
-	uint32_t ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
+	uint32_t ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
 
-	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
+	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId);
 
 	void updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount);
 	void removePendingObjectFromMap(uint64_t objectId);
 	uint32_t getPendingChunkCount(uint64_t objectId);
+	void setPendingChunkCount(uint64_t objectId, int32_t chunkCount);
 	ObjectData ObjectManipulation(uint64_t objectId, uint32_t objectSize);
 private:
 
@@ -90,7 +94,7 @@ private:
 	// config
 	uint64_t _objectSize;
 
-	map<uint64_t, uint32_t> _pendingObjectChunk;
-	map <uint64_t, struct ObjectCache> _objectCache;
+	map<uint64_t, int32_t> _pendingObjectChunk;
+	map<uint64_t, struct ObjectCache> _objectCache;
 };
 #endif

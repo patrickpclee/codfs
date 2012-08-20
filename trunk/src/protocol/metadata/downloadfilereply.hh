@@ -81,7 +81,7 @@ public:
 	void printProtocol();
 
 private:
-	uint32_t _clientId;
+//	uint32_t _clientId;
 	uint32_t _fileId;
 	uint64_t _fileSize;
 	string _checksum;

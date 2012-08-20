@@ -1,5 +1,7 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
+	<Clientid>51000</Clientid>
+
 	<Coding><SegmentNumber>1</SegmentNumber></Coding>
     <Communication>
     

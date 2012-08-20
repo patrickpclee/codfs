@@ -34,8 +34,7 @@ Client::Client() {
 	_clientCommunicator = new ClientCommunicator();
 	_storageModule = new ClientStorageModule();
 
-	// TODO: HARDCODE CLIENT ID
-	_clientId = 1;
+	_clientId = configLayer->getConfigInt("Clientid");
 
 }
 
@@ -228,10 +227,17 @@ void Client::removePendingObjectFromMap(uint64_t objectId){
 }
 
 void Client::updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount){
+	lock_guard<mutex> lk(pendingObjectChunkMutex);
+	_pendingObjectChunk[objectId] = chunkCount;
+}
+
+void Client::setPendingChunkCount(uint64_t objectId, int32_t chunkCount){
+	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	_pendingObjectChunk[objectId] = chunkCount;
 }
 
 uint32_t Client::getPendingChunkCount(uint64_t objectId){
+	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	return _pendingObjectChunk[objectId];
 }
 
@@ -289,8 +295,11 @@ int main(void) {
 	CodingScheme codingScheme = RAID1_CODING;
 	string codingSetting = Raid1Coding::generateSetting(3);
 
-	//client->sendFileRequest("./testfile", codingScheme, codingSetting);
-	client->uploadFileRequest("./testfile", codingScheme, codingSetting);
+//	client->uploadFileRequest("./testfile", codingScheme, codingSetting);
+
+	// TEST DOWNLOAD
+
+	client->downloadFileRequest(259, "./abc");
 
 	/*
 

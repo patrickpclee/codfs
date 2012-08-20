@@ -27,7 +27,6 @@
  */
 extern Client* client;
 
-
 vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
 		string path) {
 	uint32_t mdsSockFd = getMdsSockfd();
@@ -80,52 +79,64 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 	return {};
 }
 
-
-struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId, uint32_t fileId){
+struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
+		uint32_t fileId) {
 	uint32_t mdsSockFd = getMdsSockfd();
-	DownloadFileRequestMsg* downloadFileRequestMsg = new DownloadFileRequestMsg(this, mdsSockFd, clientId, fileId);
+	DownloadFileRequestMsg* downloadFileRequestMsg = new DownloadFileRequestMsg(
+			this, mdsSockFd, clientId, fileId);
 	downloadFileRequestMsg->prepareProtocolMsg();
 
 	addMessage(downloadFileRequestMsg, true);
 	MessageStatus status = downloadFileRequestMsg->waitForStatusChange();
 
-	if(status == READY) {
+	if (status == READY) {
 		struct FileMetaData fileMetaData { };
+		fileMetaData._id = downloadFileRequestMsg->getFileId();
+		fileMetaData._size = downloadFileRequestMsg->getSize();
 		fileMetaData._objectList = downloadFileRequestMsg->getObjectList();
 		fileMetaData._primaryList = downloadFileRequestMsg->getPrimaryList();
 		waitAndDelete(downloadFileRequestMsg);
 		return fileMetaData;
-	}else{
+	} else {
 		debug("%s\n", "Download File Request Failed");
 		exit(-1);
 	}
 	return {};
 }
 
-void ClientCommunicator::replyPutObjectInit(uint32_t requestId, uint32_t connectionId, uint64_t objectId) {
+void ClientCommunicator::replyPutObjectInit(uint32_t requestId,
+		uint32_t connectionId, uint64_t objectId) {
 
-	PutObjectInitReplyMsg* putObjectInitReplyMsg = new PutObjectInitReplyMsg(this, requestId, connectionId, objectId);
+	PutObjectInitReplyMsg* putObjectInitReplyMsg = new PutObjectInitReplyMsg(
+			this, requestId, connectionId, objectId);
 	putObjectInitReplyMsg->prepareProtocolMsg();
 
 	addMessage(putObjectInitReplyMsg);
 }
 
-void ClientCommunicator::replyPutObjectEnd(uint32_t requestId, uint32_t connectionId, uint64_t objectId) {
+void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
+		uint32_t connectionId, uint64_t objectId) {
 
-	ObjectTransferEndReplyMsg* putObjectEndReplyMsg = new ObjectTransferEndReplyMsg(this, requestId, connectionId, objectId);
+	ObjectTransferEndReplyMsg* putObjectEndReplyMsg =
+			new ObjectTransferEndReplyMsg(this, requestId, connectionId,
+					objectId);
 	putObjectEndReplyMsg->prepareProtocolMsg();
 
 	addMessage(putObjectEndReplyMsg);
 }
 
-struct ObjectData ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId) {
+struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
+		uint32_t dstSockfd, uint64_t objectId) {
 	uint32_t objectSize = 0;
 //	uint32_t chunkCount = 0;
 //	uint32_t requestId = 0;
-	struct ObjectData objectData {};
+	struct ObjectData objectData { };
+
+	client->setPendingChunkCount(objectId, -1);
 
 	// step 1. CLIENT -> OSD : GetObjectRequest.
-	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,dstSockfd,objectId);
+	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,
+			dstSockfd, objectId);
 
 	getObjectRequestMsg->prepareProtocolMsg();
 	addMessage(getObjectRequestMsg);
@@ -145,77 +156,77 @@ struct ObjectData ClientCommunicator::getObject(uint32_t clientId, uint32_t dstS
 
 //	client->updatePendingObjectChunkMap(objectId,chunkCount);
 
-
-	// step 2. CLIENT -> OSD : GetObjectReady.
+// step 2. CLIENT -> OSD : GetObjectReady.
 //	GetObjectReadyMsg* getObjectReadyMsg = new GetObjectReadyMsg(this, requestId, dstSockfd, objectId);
 //	getObjectReadyMsg->prepareProtocolMsg();
 //	addMessage(getObjectReadyMsg);
 
-	// to be implemented
+// to be implemented
 
-	while(client->getPendingChunkCount(objectId) != 0){usleep(100000);}
-	objectData = client->ObjectManipulation(objectId,objectSize);
+
+	while (client->getPendingChunkCount(objectId) != 0) {
+		usleep(100000);
+	}
+	objectData = client->ObjectManipulation(objectId, objectSize);
 
 	return objectData;
 }
 
 /*
-(replaced by Communicator::sendObject)
+ (replaced by Communicator::sendObject)
 
-void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
-		struct ObjectData objectData, CodingScheme codingScheme,
-		string codingSetting) {
+ void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
+ struct ObjectData objectData, CodingScheme codingScheme,
+ string codingSetting) {
 
-	const uint64_t totalSize = objectData.info.objectSize;
-	const uint64_t objectId = objectData.info.objectId;
-	char* buf = objectData.buf;
+ const uint64_t totalSize = objectData.info.objectSize;
+ const uint64_t objectId = objectData.info.objectId;
+ char* buf = objectData.buf;
 
-	const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
+ const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
 
-	// Step 1 : Send Init message (wait for reply)
+ // Step 1 : Send Init message (wait for reply)
 
-	putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount,
-			codingScheme, codingSetting);
-	debug("%s\n", "Put Object Init ACK-ed");
+ putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount,
+ codingScheme, codingSetting);
+ debug("%s\n", "Put Object Init ACK-ed");
 
-	// Step 2 : Send data chunk by chunk
+ // Step 2 : Send data chunk by chunk
 
-	uint64_t byteToSend = 0;
-	uint64_t byteProcessed = 0;
-	uint64_t byteRemaining = totalSize;
+ uint64_t byteToSend = 0;
+ uint64_t byteProcessed = 0;
+ uint64_t byteRemaining = totalSize;
 
-	while (byteProcessed < totalSize) {
+ while (byteProcessed < totalSize) {
 
-		if (byteRemaining > _chunkSize) {
-			byteToSend = _chunkSize;
-		} else {
-			byteToSend = byteRemaining;
-		}
+ if (byteRemaining > _chunkSize) {
+ byteToSend = _chunkSize;
+ } else {
+ byteToSend = byteRemaining;
+ }
 
-		putObjectData(clientId, dstOsdSockfd, objectId, buf, byteProcessed,
-				byteToSend);
-		byteProcessed += byteToSend;
-		byteRemaining -= byteToSend;
+ putObjectData(clientId, dstOsdSockfd, objectId, buf, byteProcessed,
+ byteToSend);
+ byteProcessed += byteToSend;
+ byteRemaining -= byteToSend;
 
-	}
+ }
 
-	// Step 3: Send End message
+ // Step 3: Send End message
 
-	putObjectEnd(clientId, dstOsdSockfd, objectId);
+ putObjectEnd(clientId, dstOsdSockfd, objectId);
 
-	// free buf
-	MemoryPool::getInstance().poolFree(objectData.buf);
+ // free buf
+ MemoryPool::getInstance().poolFree(objectData.buf);
 
-	cout << "Put Object ID = " << objectId << " Finished" << endl;
+ cout << "Put Object ID = " << objectId << " Finished" << endl;
 
-}
-*/
-
+ }
+ */
 
 //
 // TODO: DUMMY CONNECTION FOR NOW
 //
-
 void ClientCommunicator::connectToMds() {
 	uint16_t port = 50000;
 	string ip = "127.0.0.1";

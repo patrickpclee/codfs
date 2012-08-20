@@ -25,10 +25,11 @@
 #include "transfer/objecttransferendrequest.hh"
 #include "transfer/objectdatamsg.hh"
 #include "transfer/segmentdatamsg.hh"
-#include "transfer/getobjectreadymsg.hh"
+//#include "transfer/getobjectreadymsg.hh"
 //#include "transfer/getsegmentreadymsg.hh"
 #include "transfer/getsegmentinitrequest.hh"
-#include "transfer/getobjectreplymsg.hh"
+#include "transfer/getobjectrequest.hh"
+//#include "transfer/getobjectreplymsg.hh"
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
 #include "status/osdstartupmsg.hh"
@@ -119,13 +120,16 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (SEGMENT_DATA):
 		return new SegmentDataMsg(communicator);
 		break;
+	case (GET_OBJECT_REQUEST):
+		return new GetObjectRequestMsg(communicator);
+		break;
+		/*
 	case (GET_OBJECT_READY):
 		return new GetObjectReadyMsg(communicator);
 		break;
 	case (GET_OBJECT_REPLY):
 		return new GetObjectReplyMsg(communicator);
 		break;
-		/*
 		 case (GET_SEGMENT_READY):
 		 return new GetSegmentReadyMsg(communicator);
 		 break;

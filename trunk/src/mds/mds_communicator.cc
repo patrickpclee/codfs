@@ -1,6 +1,7 @@
 #include <iostream>
 #include "mds_communicator.hh"
 
+#include "../common/debug.hh"
 #include "../protocol/metadata/listdirectoryreply.hh"
 #include "../protocol/metadata/uploadfilereply.hh"
 #include "../protocol/nodelist/getprimarylistrequest.hh"
@@ -94,6 +95,9 @@ void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
 	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this,
 			requestId, connectionId, fileId, fileSize, checksum, objectList,
 			primaryList);
+
+	debug ("FILESIZE = %" PRIu64 "\n", fileSize);
+
 	downloadFileReplyMsg->prepareProtocolMsg();
 
 	addMessage(downloadFileReplyMsg);

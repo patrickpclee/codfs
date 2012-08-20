@@ -52,7 +52,7 @@ uint64_t FileMetaDataModule::readFileSize(uint32_t fileId)
 {
 	BSONObj queryObject = BSON ("id" << fileId);
 	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
-	return (uint64_t)result.getField("FileSize").numberLong();
+	return (uint64_t)result.getField("fileSize").numberLong();
 }
 
 /**

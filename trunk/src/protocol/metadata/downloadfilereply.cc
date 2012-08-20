@@ -93,6 +93,8 @@ void DownloadFileReplyMsg::doHandle() {
 	DownloadFileRequestMsg* downloadFileRequestMsg =
 			(DownloadFileRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
+	downloadFileRequestMsg->setFileId(_fileId);
+	downloadFileRequestMsg->setSize(_fileSize);
 	downloadFileRequestMsg->setObjectList(_objectList);
 	downloadFileRequestMsg->setPrimaryList(_primaryList);
 	downloadFileRequestMsg->setStatus(READY);
@@ -100,6 +102,5 @@ void DownloadFileReplyMsg::doHandle() {
 
 void DownloadFileReplyMsg::printProtocol() {
 	debug(
-			"[UPLOAD_FILE_REPLY] Client ID = %" PRIu32 ", File ID = %" PRIu32 "\n",
-			_clientId, _fileId);
+			"[DOWNLOAD_FILE_REPLY] File ID = %" PRIu32 " Size = %" PRIu64 "\n", _fileId, _fileSize);
 }
