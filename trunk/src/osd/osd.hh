@@ -15,6 +15,7 @@
 #include "storagemodule.hh"
 #include "codingmodule.hh"
 
+
 /**
  * Central class of OSD
  * All functions of OSD are invoked here
@@ -192,6 +193,20 @@ public:
 	void OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd);
 
 	// getters
+
+	/** 
+	 * To get the current cpu load average in last 15 mins. If error, return
+	 * infinity INF = (1<<29)
+	 * @param idx 0 to get last one minute, 1 to get last 5 mins, 2 to get last 15 mins
+	 * @return loading*100 to cast into integer
+	 */
+	uint32_t getCpuLoadavg(int idx);
+
+	/**
+     * To get the free space of the current disk in MB
+	 * @return free space in MB, if error, return 0
+	 */
+	uint32_t getFreespace();
 
 	/**
 	 * Get a reference of OSDCommunicator
