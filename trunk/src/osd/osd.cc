@@ -16,9 +16,14 @@
 #include "../protocol/status/osdshutdownmsg.hh"
 #include "../protocol/status/osdstatupdatereplymsg.hh"
 
-// for random srand() time() rand()
+// for random srand() time() rand() getloadavg()
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <sys/statvfs.h>
+
+#define INF (1<<29)
+#define DISK_PATH "/"
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
@@ -471,9 +476,34 @@ void Osd::recoveryProcessor(uint32_t requestId, uint32_t sockfd) {
 
 void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
 	OsdStatUpdateReplyMsg* replyMsg = new OsdStatUpdateReplyMsg(
-			_osdCommunicator, sockfd, _osdId, rand() % 100, rand() % 200);
+			_osdCommunicator, sockfd, _osdId, getFreespace(), getCpuLoadavg(2));
 	replyMsg->prepareProtocolMsg();
 	_osdCommunicator->addMessage(replyMsg);
+}
+
+
+uint32_t Osd::getCpuLoadavg(int idx) {
+	double load[3];
+	int ret = getloadavg(load, 3);
+	if (ret < idx) {
+		return (INF);
+	} else {
+		return ((uint32_t) (load[idx]*100));
+	}
+}
+
+uint32_t Osd::getFreespace() {
+	struct statvfs64 fiData;
+	if((statvfs64(DISK_PATH,&fiData)) < 0 ) {
+		printf("Failed to stat %s:\n", DISK_PATH);
+		return 0;
+	} else {
+//		printf("Disk %s: \n", DISK_PATH);
+//		printf("\tblock size: %u\n", fiData.f_bsize);
+//		printf("\ttotal no blocks: %i\n", fiData.f_blocks);
+//		printf("\tfree blocks: %i\n", fiData.f_bfree);
+		return ((uint32_t) (fiData.f_bsize * fiData.f_bfree / 1024 / 1024));
+	}
 }
 
 OsdCommunicator* Osd::getCommunicator() {
@@ -505,24 +535,20 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 void startTestThread(Communicator* communicator) {
-
-	/*
+	/* 
 	 printf("HEHE\n");
 	 OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-	 communicator->getMonitorSockfd(), osd->getOsdId(), rand() % 10,
-	 rand() % 10);
-	 printf("Prepared msg\n");
+	 	communicator->getMonitorSockfd(), osd->getOsdId(), osd->getFreespace(),
+	 	osd->getCpuLoadavg(0));
 	 testmsg->prepareProtocolMsg();
 	 communicator->addMessage(testmsg);
-	 printf("Prepared add \n");
-	 sleep(120);
+	 sleep(1200);
 	 OsdShutdownMsg* msg = new OsdShutdownMsg(communicator,
 	 communicator->getMonitorSockfd(), osd->getOsdId());
 	 msg->prepareProtocolMsg();
 	 communicator->addMessage(msg);
 	 printf("DONE\n");
-	 */
-
+	*/
 }
 
 /**
@@ -566,22 +592,22 @@ int main(int argc, char* argv[]) {
 	thread sendThread(startSendThread);
 
 	communicator->connectAllComponents();
-
 	debug("%s\n", "starting test thread");
 	sleep(5);
+
 
 	if (osd->getOsdId() == 52000) {
 		osd->getObjectRequestProcessor(0, 0, 624278560);
 	}
 
-	thread testThread(startTestThread, communicator);
+	//thread testThread(startTestThread, communicator);
 	// TODO: pause before connect for now
 	//getchar();
 
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
-//	testThread.join();
+	//testThread.join();
 
 	// cleanup
 	delete configLayer;
