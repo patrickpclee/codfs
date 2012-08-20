@@ -206,19 +206,6 @@ uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64
 		_pendingObjectChunk[objectId]--;
 		debug ("Data Chunkcount = %" PRIu32 "\n", _pendingObjectChunk[objectId]);
 	}
-
-	/*
-	// if all chunks have arrived
-	if (chunkLeft == 0) {
-		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
-		// write cache to disk
-		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0, objectCache.length);
-		// close file and free cache
-		_storageModule->closeObject(objectId);
-		// Acknowledge MDS for Object Upload Completed
-		// TODO
-	}
-	*/
 	return byteWritten;
 }
 

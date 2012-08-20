@@ -48,23 +48,43 @@ public:
 	 * @param	fileId	File ID
 	 * @param	dstPath	Location to save the file
 	 */
-
 	void downloadFileRequest(uint32_t fileId, string dstPath);
 
-	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t length, uint32_t chunkCount); // new version
+	/**
+	 * @brief	putObjectInitRequestMsg Handler: update chunkCount in pendingChunkMap
+	 * @param	requestId	Request ID
+	 * @param   sockfd 		Socket file descriptor
+	 * @param	objectId	Object ID
+	 * @param	length		Data Length
+	 * @param 	chunkCount	Number of Chunks
+	 */
+	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint32_t length, uint32_t chunkCount);
 
-	uint32_t ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
+	/**
+	 * @brief	ObjectDataMsg Handler: receive Object Data
+	 * @param	requestId	Request ID
+	 * @param   sockfd 		Socket file descriptor
+	 * @param	objectId	Object ID
+	 * @param	offset		Offset in the file
+	 * @param	length		Data Length
+	 * @param 	buf			The Buffer contains the data
+	 */
+	uint32_t ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
 
-	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId);
+	/**
+	 * @brief	putObjectEndRequestMsg Handler: counting chunkCount in pendingChunkMap
+	 * @param	requestId	Request ID
+	 * @param   sockfd 		Socket file descriptor
+	 * @param	objectId	Object ID
+	 */
+	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
 
 	void updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount);
 	void removePendingObjectFromMap(uint64_t objectId);
+
 	uint32_t getPendingChunkCount(uint64_t objectId);
 	void setPendingChunkCount(uint64_t objectId, int32_t chunkCount);
-//	ObjectData ObjectManipulation(uint64_t objectId, uint32_t objectSize);
+
 private:
 
 	/**

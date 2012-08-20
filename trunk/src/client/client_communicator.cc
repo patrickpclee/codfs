@@ -16,9 +16,6 @@
 #include "../protocol/transfer/objectdatamsg.hh"
 #include "../protocol/transfer/getobjectrequest.hh"
 
-//#include "../protocol/transfer/getobjectreadymsg.hh"
-//#include "../protocol/transfer/getobjectreplymsg.hh"
-
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
  *
@@ -131,50 +128,20 @@ struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
 	debug ("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n", objectId, dstSockfd);
 
 	uint32_t objectSize = 0;
-//	uint32_t chunkCount = 0;
-//	uint32_t requestId = 0;
+
 	struct ObjectData objectData { };
 
 	client->setPendingChunkCount(objectId, -1);
 
-	// step 1. CLIENT -> OSD : GetObjectRequest.
 	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,
 			dstSockfd, objectId);
 
 	getObjectRequestMsg->prepareProtocolMsg();
 	addMessage(getObjectRequestMsg);
 
-//	MessageStatus status = getObjectRequestMsg->waitForStatusChange();
-
-//	if(status == READY){
-//		objectSize = getObjectRequestMsg->getObjectSize();
-//		chunkCount = getObjectRequestMsg->getChunkCount();
-//		requestId = getObjectRequestMsg->getRequestId();
-//		waitAndDelete(getObjectRequestMsg);
-//	} else {
-//		debug("%s\n", "Get Object Request Failed");
-//		exit(-1);
-//	}
-//	debug("%s\n", "Get Object Request ACK-ed");
-
-//	client->updatePendingObjectChunkMap(objectId,chunkCount);
-
-// step 2. CLIENT -> OSD : GetObjectReady.
-//	GetObjectReadyMsg* getObjectReadyMsg = new GetObjectReadyMsg(this, requestId, dstSockfd, objectId);
-//	getObjectReadyMsg->prepareProtocolMsg();
-//	addMessage(getObjectReadyMsg);
-
-// to be implemented
-
-
 	while (client->getPendingChunkCount(objectId) != 0) {
 		usleep(100000);
 	}
-
-	/*
-	objectData = client->ObjectManipulation(objectId, objectSize);
-	return objectData;
-	*/
 }
 
 /*
