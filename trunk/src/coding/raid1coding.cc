@@ -65,6 +65,11 @@ string Raid1Coding::generateSetting (int noOfReplications) {
 }
 */
 
+vector<uint32_t> Raid1Coding::getRequiredSegmentIds (string setting) {
+	// for Raid1 Coding, only require the first segment
+	return {0};
+}
+
 void Raid1Coding::display() {
 
 }

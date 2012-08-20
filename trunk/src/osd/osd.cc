@@ -91,12 +91,18 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 	ObjectTransferOsdInfo objectInfo = _osdCommunicator->getObjectInfoRequest(
 			objectId);
+	const CodingScheme codingScheme = objectInfo._codingScheme;
+	const string codingSetting = objectInfo._codingSetting;
+
+	// check which segments are needed to request
+	vector<uint32_t> requiredSegments = _codingModule->getRequiredSegmentIds(
+			codingScheme, codingSetting);
 
 	debug("[Download] ObjectSize = %" PRIu64 "\n", objectInfo._size);
 
 	// 2. initialize list and count
 
-	const uint32_t segmentCount = objectInfo._osdList.size();
+	const uint32_t segmentCount = requiredSegments.size();
 	{
 		lock_guard<mutex> lk(pendingSegmentCountMutex);
 		_pendingSegmentCount[objectId] = segmentCount;
@@ -104,22 +110,24 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	receivedSegmentsMutex.lock();
-	_receivedSegments[objectId] = vector<struct SegmentData> (segmentCount);
+	_receivedSegments[objectId] = vector<struct SegmentData>(segmentCount);
 	vector<struct SegmentData>& segmentDataList = _receivedSegments[objectId];
 	receivedSegmentsMutex.unlock();
 
-	debug("[Download] Reserve %" PRIu32 " segments, segmentDataList = %zu\n", segmentCount, segmentDataList.size());
+	debug("[Download] Reserve %" PRIu32 " segments, segmentDataList = %zu\n",
+			segmentCount, segmentDataList.size());
 
 	// 3. request segments (either from disk or wait segments to arrive)
 
-	uint32_t i = 0;
-	for (uint32_t osdId : objectInfo._osdList) {
+	for (uint32_t requiredSegmentIndex : requiredSegments) {
+
+		uint32_t osdId = objectInfo._osdList[requiredSegmentIndex];
 
 		if (osdId == _osdId) {
 			// read segment from disk
 			struct SegmentData segmentData = _storageModule->readSegment(
-					objectId, i, 0);
-			segmentDataList[i] = segmentData;
+					objectId, requiredSegmentIndex, 0);
+			segmentDataList[requiredSegmentIndex] = segmentData;
 
 			{
 				lock_guard<mutex> lk(pendingSegmentCountMutex);
@@ -129,10 +137,11 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 		} else {
 			// request segment from other OSD
-			debug ("sending request for segment %" PRIu32 "\n", i);
-			_osdCommunicator->getSegmentRequest(osdId, objectId, i);
+			debug("sending request for segment %" PRIu32 "\n",
+					requiredSegmentIndex);
+			_osdCommunicator->getSegmentRequest(osdId, objectId,
+					requiredSegmentIndex);
 		}
-		i++;
 	}
 
 	// 4. wait until all segments have arrived
@@ -146,8 +155,6 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (segmentLeft == 0) {
 			// 5. decode segments
-			const CodingScheme codingScheme = objectInfo._codingScheme;
-			const string codingSetting = objectInfo._codingSetting;
 
 			debug(
 					"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
@@ -157,7 +164,6 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 			// debug
 //			_storageModule->writeObject (12345, objectData.buf, 0, objectData.info.objectSize);
-
 
 			break;
 		} else {
@@ -169,6 +175,13 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// 5. send object (to be implemented)
 	_osdCommunicator->sendObject(sockfd, objectData);
+
+	// DEBUG, write to disk
+	/*
+	_storageModule->createAndOpenObject(123456, objectData.info.objectSize);
+	_storageModule->writeObject(123456, objectData.buf, 0,
+			objectData.info.objectSize);
+	*/
 
 	// clean up
 
@@ -416,7 +429,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 	{
 		lock_guard<mutex> lk(pendingSegmentCountMutex);
-		isDownload = (bool)_pendingSegmentCount.count(objectId);
+		isDownload = (bool) _pendingSegmentCount.count(objectId);
 	}
 
 	// if the segment received is for download process
@@ -425,7 +438,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 		struct SegmentData& segmentData = _receivedSegments[objectId][segmentId];
 		receivedSegmentsMutex.unlock();
 
-		debug ("offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
+		debug("offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
 		memcpy(segmentData.buf + offset, buf, length);
 	} else {
 		byteWritten = _storageModule->writeSegment(objectId, segmentId, buf,
@@ -451,7 +464,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 				lock_guard<mutex> lk(pendingSegmentCountMutex);
 				_pendingSegmentCount[objectId]--;
 			}
-			debug ("all chunks for segment %" PRIu32 "is received\n", segmentId);
+			debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
 		}
 
 		// remove from map
@@ -571,7 +584,7 @@ int main(int argc, char* argv[]) {
 	sleep(5);
 
 	if (osd->getOsdId() == 52000) {
-		osd->getObjectRequestProcessor(0, 0, 624278560);
+//		osd->getObjectRequestProcessor(0, 0, 83937998);
 	}
 
 	thread testThread(startTestThread, communicator);

@@ -45,6 +45,10 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 	return _codingWorker[codingScheme];
 }
 
+vector<uint32_t> CodingModule::getRequiredSegmentIds (CodingScheme codingScheme, string setting) {
+	return getCoding(codingScheme)->getRequiredSegmentIds(setting);
+}
+
 /*
  Coding* CodingModule::codingWorkerFactory (CodingScheme codingScheme) {
 
