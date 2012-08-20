@@ -9,6 +9,11 @@
 #include "../cache/cache.hh"
 #include "../common/metadata.hh"
 
+struct ClientObjectCache {
+	string dstPath;
+	uint64_t offset;
+};
+
 class Client {
 public:
 //	uint32_t uploadFileRequest(char* srcPath, char* dstPath);
@@ -85,6 +90,11 @@ public:
 	uint32_t getPendingChunkCount(uint64_t objectId);
 	void setPendingChunkCount(uint64_t objectId, int32_t chunkCount);
 
+	void setCOCdstpath(uint64_t objectId, string dstPath);
+	void setCOCoffset(uint64_t objectId, uint64_t offset);
+
+	ClientObjectCache getCOC(uint64_t objectId);
+
 private:
 
 	/**
@@ -112,6 +122,6 @@ private:
 	ClientStorageModule* _storageModule;
 
 	map<uint64_t, int32_t> _pendingObjectChunk;
-	map<uint64_t, struct ObjectCache> _objectCache;
+	map<uint64_t, struct ClientObjectCache> _coc;
 };
 #endif

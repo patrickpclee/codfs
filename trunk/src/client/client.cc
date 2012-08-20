@@ -16,7 +16,7 @@
 using namespace std;
 
 mutex pendingObjectChunkMutex;
-
+mutex cocMutex;
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
@@ -125,15 +125,17 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		uint32_t dstComponentId = fileMetaData._primaryList[i];
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
-
+		_coc[objectId] = {};
+		_coc[objectId].dstPath = dstPath;
+		_coc[objectId].offset = i * objectSize;
 		//TODO: get object in parallel
 		_clientCommunicator->getObject(_clientId, dstSockfd, objectId);
 
 		// write to file
-		const uint64_t offset = objectSize * i;
-		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
-		_storageModule->writeFile(dstPath, objectCache.buf, offset, objectCache.length);
-		debug ("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n", objectId, offset, objectCache.length, dstPath.c_str());
+//		const uint64_t offset = objectSize * i;
+//		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+//		_storageModule->writeFile(dstPath, objectCache.buf, offset, objectCache.length);
+//		debug ("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n", objectId, offset, objectCache.length, dstPath.c_str());
 
 		i++;
 	}
@@ -184,6 +186,12 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t
 
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
+
+			struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+			_storageModule->writeFile(_coc[objectId].dstPath, objectCache.buf, _coc[objectId].offset, objectCache.length);
+			debug ("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n", objectId, _coc[objectId].offset, objectCache.length, _coc[objectId].dstPath.c_str());
+			_coc.erase(objectId);
+
 			_storageModule->closeObject(objectId);
 			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
@@ -226,6 +234,21 @@ void Client::setPendingChunkCount(uint64_t objectId, int32_t chunkCount){
 uint32_t Client::getPendingChunkCount(uint64_t objectId){
 	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	return _pendingObjectChunk[objectId];
+}
+
+void Client::setCOCdstpath(uint64_t objectId, string dstPath){
+	lock_guard<mutex> lk(cocMutex);
+	_coc[objectId].dstPath = dstPath;
+}
+
+void Client::setCOCoffset(uint64_t objectId, uint64_t offset){
+	lock_guard<mutex> lk(cocMutex);
+	_coc[objectId].offset = offset;
+}
+
+ClientObjectCache Client::getCOC(uint64_t objectId){
+	lock_guard<mutex> lk(cocMutex);
+	return _coc[objectId];
 }
 
 
