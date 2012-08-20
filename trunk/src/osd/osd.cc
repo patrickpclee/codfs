@@ -167,9 +167,6 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			objectData = _codingModule->decodeSegmentToObject(codingScheme,
 					objectId, segmentDataList, codingSetting);
 
-			// debug
-//			_storageModule->writeObject (12345, objectData.buf, 0, objectData.info.objectSize);
-
 			break;
 		} else {
 			usleep(100000); // 0.1s
@@ -178,17 +175,12 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 	debug("%s\n", "[DOWNLOAD] Send Object");
 
-	// 5. send object (to be implemented)
-	_osdCommunicator->sendObject(sockfd, objectData);
-
-	// DEBUG, write to disk
-	/*
-	_storageModule->createAndOpenObject(123456, objectData.info.objectSize);
-	_storageModule->writeObject(123456, objectData.buf, 0,
-			objectData.info.objectSize);
-	*/
+	// 5. send object
+	_osdCommunicator->sendObject(_osdId, sockfd, objectData);
 
 	// clean up
+
+	MemoryPool::getInstance().poolFree(objectData.buf);
 
 	for (auto segment : segmentDataList) {
 		MemoryPool::getInstance().poolFree(segment.buf);
