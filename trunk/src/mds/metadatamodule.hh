@@ -147,12 +147,6 @@ public:
 	uint32_t lookupFileId(string path);
 
 private:
-	/**
-	 * @brief	Generate a New Object ID
-	 *
-	 * @return	Object ID
-	 */
-	uint64_t newObjectId();
 
 	ConfigMetaDataModule* _configMetaDataStorage;
 	FileMetaDataModule* _fileMetaDataModule;

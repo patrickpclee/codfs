@@ -69,6 +69,13 @@ public:
 	 * @return	ID of the Primary
 	 */
 	uint32_t getPrimary (uint64_t objectId);
+
+	/**
+	 * @brief	Generate a New Object ID
+	 *
+	 * @return	File ID
+	 */
+	uint64_t generateObjectId();
 private:
 	/// Collection
 	string _collection;
