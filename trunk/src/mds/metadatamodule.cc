@@ -45,7 +45,7 @@ vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs) {
 	vector<uint64_t> objectList(numOfObjs);
 	for (uint32_t i = 0; i < numOfObjs; ++i) {
 		//objectList.push_back(newObjectId());
-		objectList[i] = newObjectId();
+		objectList[i] = _objectMetaDataModule->generateObjectId();
 	}
 	return objectList;
 }
@@ -138,13 +138,3 @@ uint32_t MetaDataModule::lookupFileId(string path) {
 string MetaDataModule::lookupFilePath(uint32_t fileId) {
 	return "";
 }
-
-/**
- * @brief	Generate a New Object ID
- *
- * @todo	Currently is rand()
- */
-uint64_t MetaDataModule::newObjectId() {
-	return rand();
-}
-

@@ -116,3 +116,11 @@ uint32_t ObjectMetaDataModule::getPrimary (uint64_t objectId)
 	BSONObj temp = _objectMetaDataStorage->readOne (queryObject);
 	return (uint32_t)temp.getField("primary").Int();
 }
+
+/**
+ * @brief	Generate a New Object ID
+ */
+uint64_t ObjectMetaDataModule::generateObjectId() {
+
+	return _configMetaDataModule->getAndInc("objectId");
+}
