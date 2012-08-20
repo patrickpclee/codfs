@@ -157,6 +157,7 @@ uint32_t OsdCommunicator::sendObject(uint32_t sockfd,
 	debug("Send object ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
 			objectData.info.objectId, sockfd);
 
+
 	// step 1: send init message, wait for ack
 
 	// step 2: send data

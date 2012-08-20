@@ -16,6 +16,8 @@ public:
 		return to_string(noOfStrips);
 	}
 
+	vector<uint32_t> getRequiredSegmentIds (string setting);
+
 	void display();
 private:
 };

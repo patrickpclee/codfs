@@ -14,6 +14,8 @@ public:
 			string setting);
 	uint32_t getNoOfReplications(string setting);
 
+	vector<uint32_t> getRequiredSegmentIds (string setting);
+
 	static string generateSetting(int noOfReplications) {
 		return to_string(noOfReplications);
 	}

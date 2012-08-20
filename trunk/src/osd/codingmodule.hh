@@ -54,6 +54,8 @@ public:
 			uint64_t objectId, vector<struct SegmentData> segmentData,
 			string setting);
 
+	vector<uint32_t> getRequiredSegmentIds (CodingScheme codingScheme, string setting);
+
 	/**
 	 * Get the Coding object according to the codingScheme specified
 	 * @param codingScheme Type of coding scheme
