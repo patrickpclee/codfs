@@ -54,8 +54,7 @@ public:
 	 * @return ObjectData structure
 	 */
 
-	struct ObjectData getObject(uint32_t clientId, uint32_t dstSockfd,
-			uint64_t objectId);
+	void getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId);
 
 	/**
 	 * 1. Send an init message

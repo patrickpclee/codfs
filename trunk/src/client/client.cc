@@ -127,8 +127,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 				dstComponentId);
 
 		//TODO: get object in parallel
-		struct ObjectData objectData = _clientCommunicator->getObject(_clientId,
-				dstSockfd, objectId);
+		_clientCommunicator->getObject(_clientId, dstSockfd, objectId);
 
 		// write to file
 		const uint64_t offset = objectSize * i;

@@ -122,7 +122,7 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 	addMessage(putObjectEndReplyMsg);
 }
 
-struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
+void ClientCommunicator::getObject(uint32_t clientId,
 		uint32_t dstSockfd, uint64_t objectId) {
 
 	debug ("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n", objectId, dstSockfd);
