@@ -18,6 +18,7 @@
     
     <Storage>
     	<!-- KB -->
+    	<ObjectLocation>./client_object/</ObjectLocation>
     	<ObjectSize>10240</ObjectSize>
     </Storage>
 </NcvfsConfig>
