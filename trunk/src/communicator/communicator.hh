@@ -102,21 +102,21 @@ public:
 	 * @return list of MDS Component
 	 */
 
-	vector <Component> getMdsList ();
+	vector<Component> getMdsList();
 
 	/**
 	 * Obtain a list of OSD retrieved from config file
 	 * @return list of OSD Component
 	 */
 
-	vector <Component> getOsdList ();
+	vector<Component> getOsdList();
 
 	/**
 	 * Obtain a list of Monitor retrieved from config file
 	 * @return list of Monitor Component
 	 */
 
-	vector <Component> getMonitorList ();
+	vector<Component> getMonitorList();
 
 	/**
 	 * Generate a monotonically increasing requestID
@@ -178,9 +178,59 @@ public:
 	 * @return Socket descriptor of the component
 	 */
 
-	uint32_t getSockfdFromId (uint32_t componentId);
+	uint32_t getSockfdFromId(uint32_t componentId);
+
+	/**
+	 * Send an object to a socket descriptor
+	 * @param componentId My Component ID
+	 * @param sockfd Destination Socket Descriptor
+	 * @param objectData ObjectData structure
+	 * @param codingScheme (Optional) Coding Scheme
+	 * @param codingSetting (Optional) Coding Setting
+	 * @return Number of bytes sent
+	 */
+
+	uint32_t sendObject(uint32_t componentId, uint32_t sockfd,
+			struct ObjectData objectData, CodingScheme codingScheme =
+					DEFAULT_CODING, string codingSetting = "");
 
 protected:
+
+	/**
+	 * Initiate upload process to OSD (Step 1)
+	 * @param componentId My Component ID
+	 * @param dstOsdSockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 * @param length Size of the object
+	 * @param chunkCount Number of chunks that will be sent
+	 */
+
+	void putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
+			uint64_t objectId, uint32_t length, uint32_t chunkCount,
+			CodingScheme codingScheme, string codingSetting);
+
+	/**
+	 * Send an object chunk to OSD (Step 2)
+	 * @param componentId Component ID
+	 * @param dstOsdSockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 * @param buf Buffer containing the object
+	 * @param offset Offset of the chunk inside the buffer
+	 * @param length Length of the chunk
+	 */
+
+	void putObjectData(uint32_t componentID, uint32_t dstOsdSockfd,
+			uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
+
+	/**
+	 * Finalise upload process to OSD (Step 3)
+	 * @param componentId Component ID
+	 * @param dstOsdSockfd Destination OSD Socket Descriptor
+	 * @param objectId Object ID
+	 */
+
+	void putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
+			uint64_t objectId);
 
 	/**
 	 * Runs in a separate detached thread
@@ -237,7 +287,6 @@ protected:
 
 	void requestHandshake(uint32_t sockfd, uint32_t componentId,
 			ComponentType componentType);
-
 
 	/**
 	 * DEBUG: Print the component information saved in the list

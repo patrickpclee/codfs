@@ -82,8 +82,9 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		//uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
-		_clientCommunicator->putObject(_clientId, dstOsdSockfd, objectData,
+		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData,
 				codingScheme, codingSetting);
+		MemoryPool::getInstance().poolFree(objectData.buf);
 	}
 
 	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);

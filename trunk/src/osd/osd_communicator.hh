@@ -82,15 +82,6 @@ public:
 	uint32_t sendSegment(uint32_t sockfd, struct SegmentData segmentData);
 
 	/**
-	 * Send an object to a client
-	 * @param sockfd Socket Descriptor of the destination
-	 * @param objectData OjectData structure
-	 * @return 0 if success, -1 if failure
-	 */
-
-	uint32_t sendObject(uint32_t sockfd, struct ObjectData objectData);
-
-	/**
 	 * Send a request to get a segment to other OSD
 	 * @param connectionId ID of the target component connection
 	 * @param objectId ID of the object that the segment is belonged to

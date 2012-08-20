@@ -16,10 +16,14 @@
 #include "../common/garbagecollector.hh"
 #include "../common/enums.hh"
 #include "../common/debug.hh"
+#include "../common/objectdata.hh"
 #include "../protocol/message.pb.h"
 #include "../protocol/messagefactory.hh"
 #include "../protocol/handshake/handshakerequest.hh"
 #include "../protocol/handshake/handshakereply.hh"
+#include "../protocol/transfer/putobjectinitrequest.hh"
+#include "../protocol/transfer/objecttransferendrequest.hh"
+#include "../protocol/transfer/objectdatamsg.hh"
 
 using namespace std;
 
@@ -175,7 +179,8 @@ void Communicator::waitForMessage() {
 					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 					if (nbytes == 0) {
 						// disconnect and remove from _connectionMap
-						debug("SOCKFD = %" PRIu32 " connection lost\n", p->first);
+						debug("SOCKFD = %" PRIu32 " connection lost\n",
+								p->first);
 						_connectionMap.erase(p->first);
 						continue;
 					}
@@ -509,8 +514,8 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 			componentId, sockfd);
 
 	// prepare reply message
-	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this, requestId, sockfd,
-			_componentId, _componentType);
+	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this,
+			requestId, sockfd, _componentId, _componentType);
 	handshakeReplyMsg->prepareProtocolMsg();
 	addMessage(handshakeReplyMsg, false);
 }
@@ -611,10 +616,130 @@ void Communicator::connectAllComponents() {
 }
 
 uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
-	lock_guard <mutex> lk (componentIdMapMutex);
+	lock_guard<mutex> lk(componentIdMapMutex);
 	if (!_componentIdMap.count(componentId)) {
-		debug ("SOCKFD for Component ID = %" PRIu32 " not found!\n", componentId);
-		exit (-1);
+		debug("SOCKFD for Component ID = %" PRIu32 " not found!\n",
+				componentId);
+		exit(-1);
 	}
 	return _componentIdMap[componentId];
+}
+
+uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
+		struct ObjectData objectData, CodingScheme codingScheme,
+		string codingSetting) {
+
+	debug("Send object ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
+			objectData.info.objectId, sockfd);
+
+	const uint64_t totalSize = objectData.info.objectSize;
+	const uint64_t objectId = objectData.info.objectId;
+	char* buf = objectData.buf;
+
+	const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
+
+	// Step 1 : Send Init message (wait for reply)
+
+	putObjectInit(componentId, sockfd, objectId, totalSize, chunkCount,
+			codingScheme, codingSetting);
+	debug("%s\n", "Put Object Init ACK-ed");
+
+	// Step 2 : Send data chunk by chunk
+
+	uint64_t byteToSend = 0;
+	uint64_t byteProcessed = 0;
+	uint64_t byteRemaining = totalSize;
+
+	while (byteProcessed < totalSize) {
+
+		if (byteRemaining > _chunkSize) {
+			byteToSend = _chunkSize;
+		} else {
+			byteToSend = byteRemaining;
+		}
+
+		putObjectData(componentId, sockfd, objectId, buf, byteProcessed,
+				byteToSend);
+		byteProcessed += byteToSend;
+		byteRemaining -= byteToSend;
+
+	}
+
+	// Step 3: Send End message
+
+	putObjectEnd(componentId, sockfd, objectId);
+
+	// free buf
+	// MemoryPool::getInstance().poolFree(objectData.buf);
+
+	cout << "Put Object ID = " << objectId << " Finished" << endl;
+
+	return byteProcessed;
+
+}
+
+//
+// PRIVATE FUNCTIONS
+//
+
+// codingScheme (DEFAULT_CODING) and codingSetting ("") are optional
+void Communicator::putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
+		uint64_t objectId, uint32_t length, uint32_t chunkCount,
+		CodingScheme codingScheme, string codingSetting) {
+
+	// Step 1 of the upload process
+
+	PutObjectInitRequestMsg* putObjectInitRequestMsg =
+			new PutObjectInitRequestMsg(this, dstOsdSockfd, objectId, length,
+					chunkCount, codingScheme, codingSetting);
+
+	putObjectInitRequestMsg->prepareProtocolMsg();
+	addMessage(putObjectInitRequestMsg, true);
+
+	MessageStatus status = putObjectInitRequestMsg->waitForStatusChange();
+	if (status == READY) {
+		waitAndDelete(putObjectInitRequestMsg);
+		return;
+	} else {
+		debug("%s\n", "Put Object Init Failed");
+		exit(-1);
+	}
+
+}
+
+void Communicator::putObjectData(uint32_t componentID, uint32_t dstOsdSockfd,
+		uint64_t objectId, char* buf, uint64_t offset, uint32_t length) {
+
+	// Step 2 of the upload process
+	ObjectDataMsg* objectDataMsg = new ObjectDataMsg(this, dstOsdSockfd,
+			objectId, offset, length);
+
+	objectDataMsg->prepareProtocolMsg();
+	objectDataMsg->preparePayload(buf + offset, length);
+
+	addMessage(objectDataMsg, false);
+}
+
+void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
+		uint64_t objectId) {
+
+	// Step 3 of the upload process
+
+	ObjectTransferEndRequestMsg* putObjectEndRequestMsg =
+			new ObjectTransferEndRequestMsg(this, dstOsdSockfd, objectId);
+
+	putObjectEndRequestMsg->prepareProtocolMsg();
+	addMessage(putObjectEndRequestMsg, true);
+
+	debug("%s\n", "before waitForStatusChange");
+	MessageStatus status = putObjectEndRequestMsg->waitForStatusChange();
+	if (status == READY) {
+		debug("%s\n", "status == READY");
+		waitAndDelete(putObjectEndRequestMsg);
+		debug("%s\n", "msg deleted");
+		return;
+	} else {
+		debug("%s\n", "Put Object Init Failed");
+		exit(-1);
+	}
 }
