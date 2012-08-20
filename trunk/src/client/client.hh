@@ -64,7 +64,7 @@ public:
 	void removePendingObjectFromMap(uint64_t objectId);
 	uint32_t getPendingChunkCount(uint64_t objectId);
 	void setPendingChunkCount(uint64_t objectId, int32_t chunkCount);
-	ObjectData ObjectManipulation(uint64_t objectId, uint32_t objectSize);
+//	ObjectData ObjectManipulation(uint64_t objectId, uint32_t objectSize);
 private:
 
 	/**
@@ -90,9 +90,6 @@ private:
 
 	ClientCommunicator* _clientCommunicator;
 	ClientStorageModule* _storageModule;
-
-	// config
-	uint64_t _objectSize;
 
 	map<uint64_t, int32_t> _pendingObjectChunk;
 	map<uint64_t, struct ObjectCache> _objectCache;

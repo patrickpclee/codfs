@@ -126,46 +126,6 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 
 }
 
-void ClientStorageModule::writeObjectToFile(string dstPath, struct ObjectData objectData, uint32_t objectIndex) {
-
-	// TODO: now assume that client only do one I/O function at a time
-	// lock file access function
-	lock_guard<mutex> lk(fileMutex);
-
-	const uint32_t byteToWrite = objectData.info.objectSize;
-	const uint64_t offset = objectIndex * _objectSize;
-
-	FILE* file = fopen(dstPath.c_str(), "wb");
-
-	if (file == NULL) { // cannot open file
-		debug("%s\n", "Cannot open");
-		exit(-1);
-	}
-
-	// Write Lock
-	if (flock(fileno(file), LOCK_EX) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_SH");
-		exit(-1);
-	}
-
-	uint32_t byteWritten = pwrite (fileno(file), objectData.buf, byteToWrite, offset);
-
-	// Release lock
-	if (flock(fileno(file), LOCK_UN) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_UN");
-		exit(-1);
-	}
-
-	if (byteWritten != byteToWrite) {
-		debug("ERROR: Length = %" PRIu32 ", byteWritten = %" PRIu32 "\n",
-				byteToWrite, byteWritten);
-		exit(-1);
-	}
-
-	fclose(file);
-
-}
-
 void ClientStorageModule::createObject(uint64_t objectId, uint32_t length) {
 
 	// create cache
@@ -190,7 +150,8 @@ void ClientStorageModule::createObject(uint64_t objectId, uint32_t length) {
 			objectId, length, filepath.c_str());
 }
 
-FILE* ClientStorageModule::createAndOpenObject(uint64_t objectId, uint32_t length) {
+FILE* ClientStorageModule::createAndOpenObject(uint64_t objectId,
+		uint32_t length) {
 
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
@@ -200,8 +161,8 @@ FILE* ClientStorageModule::createAndOpenObject(uint64_t objectId, uint32_t lengt
 	return createFile(filepath);
 }
 
-void ClientStorageModule::writeObjectInfo(uint64_t objectId, uint32_t objectSize,
-		string filepath) {
+void ClientStorageModule::writeObjectInfo(uint64_t objectId,
+		uint32_t objectSize, string filepath) {
 
 	// TODO: Database to be implemented
 
@@ -232,7 +193,8 @@ FILE* ClientStorageModule::createFile(string filepath) {
 	return filePtr;
 }
 
-uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length) {
+uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf,
+		uint64_t offsetInObject, uint32_t length) {
 
 	char* recvCache;
 
@@ -259,7 +221,8 @@ struct ObjectCache ClientStorageModule::getObjectCache(uint64_t objectId) {
 	return _objectCache[objectId];
 }
 
-string ClientStorageModule::writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length) {
+string ClientStorageModule::writeObject(uint64_t objectId, char* buf,
+		uint64_t offsetInObject, uint32_t length) {
 
 	uint32_t byteWritten;
 
@@ -289,7 +252,8 @@ void ClientStorageModule::closeObject(uint64_t objectId) {
 	debug("Object ID = %" PRIu64 " closed\n", objectId);
 }
 
-string ClientStorageModule::generateObjectPath(uint64_t objectId, string objectFolder) {
+string ClientStorageModule::generateObjectPath(uint64_t objectId,
+		string objectFolder) {
 
 	// append a '/' if not present
 	if (objectFolder[objectFolder.length() - 1] != '/') {
@@ -299,8 +263,8 @@ string ClientStorageModule::generateObjectPath(uint64_t objectId, string objectF
 	return objectFolder + to_string(objectId);
 }
 
-uint32_t ClientStorageModule::writeFile(string filepath, char* buf, uint64_t offset, uint32_t length) {
-
+uint32_t ClientStorageModule::writeFile(string filepath, char* buf,
+		uint64_t offset, uint32_t length) {
 
 	// lock file access function
 	lock_guard<mutex> lk(fileMutex);
@@ -314,33 +278,32 @@ uint32_t ClientStorageModule::writeFile(string filepath, char* buf, uint64_t off
 
 	/*
 
-	// Write Lock
-	if (flock(fileno(file), LOCK_EX) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_EX");
-		exit(-1);
-	}
+	 // Write Lock
+	 if (flock(fileno(file), LOCK_EX) == -1) {
+	 debug("%s\n", "ERROR: Cannot LOCK_EX");
+	 exit(-1);
+	 }
 
-	*/
+	 */
 
 	// Write file contents from buffer
-
 	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
 
 	/*
-	fseek (file, offset, SEEK_SET);
-	uint32_t byteWritten = fwrite (buf, 1, length, file);
-	fflush (file);
-	*/
+	 fseek (file, offset, SEEK_SET);
+	 uint32_t byteWritten = fwrite (buf, 1, length, file);
+	 fflush (file);
+	 */
 
 	/*
 
-	// Release lock
-	if (flock(fileno(file), LOCK_UN) == -1) {
-		debug("%s\n", "ERROR: Cannot LOCK_UN");
-		exit(-1);
-	}
+	 // Release lock
+	 if (flock(fileno(file), LOCK_UN) == -1) {
+	 debug("%s\n", "ERROR: Cannot LOCK_UN");
+	 exit(-1);
+	 }
 
-	*/
+	 */
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
@@ -378,7 +341,7 @@ FILE* ClientStorageModule::openFile(string filepath) {
 	filePtr = fopen(filepath.c_str(), "rb+");
 
 	// set buffer to zero to avoid memory leak
-	setvbuf (filePtr, NULL , _IONBF , 0);
+	setvbuf(filePtr, NULL, _IONBF, 0);
 
 	if (filePtr == NULL) {
 		debug("Unable to open file at %s\n", filepath.c_str());
@@ -392,4 +355,8 @@ FILE* ClientStorageModule::openFile(string filepath) {
 	openedFileMutex.unlock();
 
 	return filePtr;
+}
+
+uint64_t ClientStorageModule::getObjectSize () {
+	return _objectSize;
 }

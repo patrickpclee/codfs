@@ -105,6 +105,8 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
+	const uint64_t objectSize = _storageModule->getObjectSize();
+
 	// start timer
 	typedef chrono::high_resolution_clock Clock;
 	typedef chrono::milliseconds milliseconds;
@@ -115,6 +117,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 			_clientId, fileId);
 	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n",
 			fileMetaData._id, fileMetaData._size);
+	_storageModule->createFile(dstPath);
 
 	// 2. Download file from OSD
 	uint32_t i = 0;
@@ -122,12 +125,21 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		uint32_t dstComponentId = fileMetaData._primaryList[i];
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
+
+		//TODO: get object in parallel
 		struct ObjectData objectData = _clientCommunicator->getObject(_clientId,
 				dstSockfd, objectId);
 
+		// write to file
+		const uint64_t offset = objectSize * i;
+		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+		_storageModule->writeFile(dstPath, objectCache.buf, offset, objectCache.length);
+		debug ("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu32 " to %s\n", objectId, offset, objectCache.length, dstPath.c_str());
 
-		_storageModule->writeObjectToFile(dstPath, objectData, i);
+		i++;
 	}
+
+	_storageModule->closeFile(dstPath);
 
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
@@ -149,6 +161,7 @@ void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	{
 		lock_guard<mutex> lk(pendingObjectChunkMutex);
 		_pendingObjectChunk[objectId] = chunkCount;
+		debug ("Init Chunkcount = %" PRIu32 "\n", chunkCount);
 	}
 
 	// create object and cache
@@ -172,6 +185,7 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t
 
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
+			_storageModule->closeObject(objectId);
 			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
 		} else {
@@ -190,6 +204,7 @@ uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64
 		lock_guard<mutex> lk(pendingObjectChunkMutex);
 		// update pendingObjectChunk value
 		_pendingObjectChunk[objectId]--;
+		debug ("Data Chunkcount = %" PRIu32 "\n", _pendingObjectChunk[objectId]);
 	}
 
 	/*
@@ -205,20 +220,6 @@ uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64
 	}
 	*/
 	return byteWritten;
-}
-
-struct ObjectData Client::ObjectManipulation(uint64_t objectId, uint32_t objectSize){
-	struct ObjectData objectData {};
-	objectData.info.objectId = objectId;
-	objectData.info.objectSize = objectSize;
-
-	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
-	// write cache to disk
-	objectData.info.objectPath =  _storageModule->writeObject(objectId, objectCache.buf, 0, objectCache.length);
-	objectData.buf = objectCache.buf;
-	// close file and free cache
-	_storageModule->closeObject(objectId);
-	return objectData;
 }
 
 void Client::removePendingObjectFromMap(uint64_t objectId){
@@ -299,7 +300,7 @@ int main(void) {
 
 	// TEST DOWNLOAD
 
-	client->downloadFileRequest(259, "./abc");
+	client->downloadFileRequest(260, "./abc");
 
 	/*
 

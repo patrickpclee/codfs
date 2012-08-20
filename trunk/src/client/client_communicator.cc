@@ -127,6 +127,9 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 
 struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
 		uint32_t dstSockfd, uint64_t objectId) {
+
+	debug ("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n", objectId, dstSockfd);
+
 	uint32_t objectSize = 0;
 //	uint32_t chunkCount = 0;
 //	uint32_t requestId = 0;
@@ -167,9 +170,11 @@ struct ObjectData ClientCommunicator::getObject(uint32_t clientId,
 	while (client->getPendingChunkCount(objectId) != 0) {
 		usleep(100000);
 	}
-	objectData = client->ObjectManipulation(objectId, objectSize);
 
+	/*
+	objectData = client->ObjectManipulation(objectId, objectSize);
 	return objectData;
+	*/
 }
 
 /*

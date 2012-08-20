@@ -16,9 +16,10 @@ public:
 	uint64_t getFilesize (string filepath);
 	uint32_t getObjectCount (string filepath);
 	struct ObjectData readObjectFromFile (string filepath, uint32_t objectIndex);
-	void writeObjectToFile (string dstPath, struct ObjectData objectData, uint32_t objectIndex);
+//	void writeObjectToFile (string dstPath, struct ObjectData objectData, uint32_t objectIndex);
 
 	struct ObjectCache getObjectCache(uint64_t objectId);
+	uint64_t getObjectSize ();
 
 	FILE* createAndOpenObject(uint64_t objectId, uint32_t length);
 	void createObject(uint64_t objectId, uint32_t length);
