@@ -122,5 +122,6 @@ uint32_t ObjectMetaDataModule::getPrimary (uint64_t objectId)
  */
 uint64_t ObjectMetaDataModule::generateObjectId() {
 
-	return _configMetaDataModule->getAndInc("objectId");
+	//return _configMetaDataModule->getAndInc("objectId");
+	return rand();
 }

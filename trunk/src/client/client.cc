@@ -134,7 +134,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		const uint64_t offset = objectSize * i;
 		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
 		_storageModule->writeFile(dstPath, objectCache.buf, offset, objectCache.length);
-		debug ("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu32 " to %s\n", objectId, offset, objectCache.length, dstPath.c_str());
+		debug ("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n", objectId, offset, objectCache.length, dstPath.c_str());
 
 		i++;
 	}
@@ -258,7 +258,13 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 
-int main(void) {
+int main(int argc, char *argv[]) {
+
+	if (argc < 3 || argc > 4) {
+		cout << "Upload: ./CLIENT upload [SRC]" << endl;
+		cout << "Download: ./CLIENT download [FILEID] [DST]" << endl;
+		exit (-1);
+	}
 
 	signal(SIGINT, sighandler);
 
@@ -296,11 +302,11 @@ int main(void) {
 	CodingScheme codingScheme = RAID1_CODING;
 	string codingSetting = Raid1Coding::generateSetting(3);
 
-//	client->uploadFileRequest("./testfile", codingScheme, codingSetting);
-
-	// TEST DOWNLOAD
-
-	client->downloadFileRequest(260, "./abc");
+	if (strcmp (argv[1], "upload") == 0) {
+		client->uploadFileRequest(argv[2], codingScheme, codingSetting);
+	} else {
+		client->downloadFileRequest(atoi(argv[2]), argv[3]);
+	}
 
 	/*
 
