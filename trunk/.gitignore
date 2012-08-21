@@ -3,6 +3,7 @@ OSD
 MDS
 MONITOR
 testfile
+CLIENT_FUSE
 *.d
 *.o
 *.log
