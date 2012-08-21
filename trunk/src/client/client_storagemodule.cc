@@ -21,7 +21,6 @@ ClientStorageModule::ClientStorageModule() {
 	// read config value
 
 	_objectCache = {};
-	_openedFile = {};
 	_objectSize = configLayer->getConfigLong("Storage>ObjectSize") * 1024;
 	debug("Config Object Size = %" PRIu64 " Bytes\n", _objectSize);
 }
@@ -100,7 +99,6 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 	}
 
 	// Read file contents into buffer
-	// poolFree in ClientCommunicator::putObject
 	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 	uint32_t byteRead = pread(fileno(file), objectData.buf, byteToRead, offset);
 
@@ -125,7 +123,8 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 
 }
 
-void ClientStorageModule::createObject(uint64_t objectId, uint32_t length) {
+void ClientStorageModule::createObjectCache(uint64_t objectId,
+		uint32_t length) {
 
 	// create cache
 	struct ObjectCache objectCache;
@@ -138,56 +137,8 @@ void ClientStorageModule::createObject(uint64_t objectId, uint32_t length) {
 		_objectCache[objectId] = objectCache;
 	}
 
-	// create object
-	createAndOpenObject(objectId, length);
-
-	// write info
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	writeObjectInfo(objectId, length, filepath);
-
-	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 " Path = %s\n",
-			objectId, length, filepath.c_str());
-}
-
-FILE* ClientStorageModule::createAndOpenObject(uint64_t objectId,
-		uint32_t length) {
-
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	writeObjectInfo(objectId, length, filepath);
-
-	debug("Object ID = %" PRIu64 " created\n", objectId);
-
-	return createFile(filepath);
-}
-
-void ClientStorageModule::writeObjectInfo(uint64_t objectId,
-		uint32_t objectSize, string filepath) {
-
-	// TODO: Database to be implemented
-
-}
-
-FILE* ClientStorageModule::createFile(string filepath) {
-
-	// open file for read/write
-	// create new if not exist
-	FILE* filePtr;
-	filePtr = fopen(filepath.c_str(), "wb+");
-
-	if (filePtr == NULL) {
-		debug("%s\n", "Unable to create file!");
-		return NULL;
-	}
-
-	// set buffer to zero to avoid memory leak
-	setvbuf(filePtr, NULL, _IONBF, 0);
-
-	// add file pointer to map
-	openedFileMutex.lock();
-	_openedFile[filepath] = filePtr;
-	openedFileMutex.unlock();
-
-	return filePtr;
+	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 "\n",
+			objectId, length);
 }
 
 uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf,
@@ -218,24 +169,7 @@ struct ObjectCache ClientStorageModule::getObjectCache(uint64_t objectId) {
 	return _objectCache[objectId];
 }
 
-string ClientStorageModule::writeObject(uint64_t objectId, char* buf,
-		uint64_t offsetInObject, uint32_t length) {
-
-	uint32_t byteWritten;
-
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	byteWritten = writeFile(filepath, buf, offsetInObject, length);
-
-	debug(
-			"Object ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
-			objectId, byteWritten, offsetInObject);
-
-	return filepath;
-}
-
 void ClientStorageModule::closeObject(uint64_t objectId) {
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	closeFile(filepath);
 
 	// close cache
 	struct ObjectCache objectCache = getObjectCache(objectId);
@@ -249,58 +183,37 @@ void ClientStorageModule::closeObject(uint64_t objectId) {
 	debug("Object ID = %" PRIu64 " closed\n", objectId);
 }
 
-string ClientStorageModule::generateObjectPath(uint64_t objectId,
-		string objectFolder) {
+FILE* ClientStorageModule::createAndOpenFile(string filepath) {
+	// open file for read/write
+	// create new if not exist
+	FILE* filePtr;
+	filePtr = fopen(filepath.c_str(), "wb+");
 
-	// append a '/' if not present
-	if (objectFolder[objectFolder.length() - 1] != '/') {
-		objectFolder.append("/");
+	if (filePtr == NULL) {
+		debug("%s\n", "Unable to create file!");
+		return NULL;
 	}
 
-	return objectFolder + to_string(objectId);
+	// set buffer to zero to avoid memory leak
+	setvbuf(filePtr, NULL, _IONBF, 0);
+
+	return filePtr;
+
 }
 
-uint32_t ClientStorageModule::writeFile(string filepath, char* buf,
+uint32_t ClientStorageModule::writeFile(FILE* file, string filepath, char* buf,
 		uint64_t offset, uint32_t length) {
 
 	// lock file access function
 	lock_guard<mutex> lk(fileMutex);
-
-	FILE* file = openFile(filepath);
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot write");
 		exit(-1);
 	}
 
-	/*
-
-	 // Write Lock
-	 if (flock(fileno(file), LOCK_EX) == -1) {
-	 debug("%s\n", "ERROR: Cannot LOCK_EX");
-	 exit(-1);
-	 }
-
-	 */
-
 	// Write file contents from buffer
 	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
-
-	/*
-	 fseek (file, offset, SEEK_SET);
-	 uint32_t byteWritten = fwrite (buf, 1, length, file);
-	 fflush (file);
-	 */
-
-	/*
-
-	 // Release lock
-	 if (flock(fileno(file), LOCK_UN) == -1) {
-	 debug("%s\n", "ERROR: Cannot LOCK_UN");
-	 exit(-1);
-	 }
-
-	 */
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
@@ -310,50 +223,10 @@ uint32_t ClientStorageModule::writeFile(string filepath, char* buf,
 	return byteWritten;
 }
 
-void ClientStorageModule::closeFile(string filepath) {
-
-	FILE* filePtr = openFile(filepath);
-
-	openedFileMutex.lock();
-	_openedFile.erase(filepath);
-	openedFileMutex.unlock();
-
-	fclose(filePtr);
+void ClientStorageModule::closeFile (FILE* filePtr) {
+	fclose (filePtr);
 }
 
-FILE* ClientStorageModule::openFile(string filepath) {
-
-	openedFileMutex.lock();
-
-	// find file in map
-	if (_openedFile.count(filepath)) {
-		FILE* openedFile = _openedFile[filepath];
-		openedFileMutex.unlock();
-		return openedFile;
-	}
-
-	openedFileMutex.unlock();
-
-	FILE* filePtr;
-	filePtr = fopen(filepath.c_str(), "rb+");
-
-	// set buffer to zero to avoid memory leak
-	setvbuf(filePtr, NULL, _IONBF, 0);
-
-	if (filePtr == NULL) {
-		debug("Unable to open file at %s\n", filepath.c_str());
-		return NULL;
-	}
-
-	// add file pointer to map
-
-	openedFileMutex.lock();
-	_openedFile[filepath] = filePtr;
-	openedFileMutex.unlock();
-
-	return filePtr;
-}
-
-uint64_t ClientStorageModule::getObjectSize () {
+uint64_t ClientStorageModule::getObjectSize() {
 	return _objectSize;
 }

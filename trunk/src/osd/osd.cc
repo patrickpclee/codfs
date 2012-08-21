@@ -180,8 +180,10 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// clean up
 
 	MemoryPool::getInstance().poolFree(objectData.buf);
+	debug ("object %" PRIu64 "free-d\n", objectId);
 
 	for (auto segment : segmentDataList) {
+		debug ("segment %" PRIu32 " free-d\n", segment.info.segmentId);
 		MemoryPool::getInstance().poolFree(segment.buf);
 	}
 
@@ -204,6 +206,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	struct SegmentData segmentData = _storageModule->readSegment(objectId,
 			segmentId, 0);
 	_osdCommunicator->sendSegment(sockfd, segmentData);
+	MemoryPool::getInstance().poolFree(segmentData.buf);
 }
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,

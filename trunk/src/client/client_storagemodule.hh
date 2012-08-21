@@ -16,29 +16,20 @@ public:
 	uint64_t getFilesize (string filepath);
 	uint32_t getObjectCount (string filepath);
 	struct ObjectData readObjectFromFile (string filepath, uint32_t objectIndex);
-//	void writeObjectToFile (string dstPath, struct ObjectData objectData, uint32_t objectIndex);
-
-	struct ObjectCache getObjectCache(uint64_t objectId);
 	uint64_t getObjectSize ();
 
-	FILE* createAndOpenObject(uint64_t objectId, uint32_t length);
-	void createObject(uint64_t objectId, uint32_t length);
-	string writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length);
-	void writeObjectInfo(uint64_t objectId, uint32_t objectSize, string filepath);
+	void createObjectCache(uint64_t objectId, uint32_t length);
 	uint32_t writeObjectCache (uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length);
 	void closeObject(uint64_t objectId);
+	struct ObjectCache getObjectCache(uint64_t objectId);
 
-	string generateObjectPath(uint64_t objectId, string objectFolder);
-
-	FILE* createFile(string filepath);
-	uint32_t writeFile(string filepath, char* buf, uint64_t offset, uint32_t length);
-	void closeFile (string filepath);
-	FILE* openFile(string filepath);
+	FILE* createAndOpenFile(string filepath);
+	uint32_t writeFile(FILE* file, string filepath, char* buf, uint64_t offset, uint32_t length);
+	void closeFile (FILE* filePtr);
 
 private:
 	uint64_t _objectSize;
 	map <uint64_t, struct ObjectCache> _objectCache;
-	map <string, FILE*> _openedFile;
 	string _objectFolder;
 };
 

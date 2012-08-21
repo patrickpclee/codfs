@@ -131,6 +131,7 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 					objectId);
 	putObjectEndReplyMsg->prepareProtocolMsg();
 
+	debug ("Reply put object end for ID: %" PRIu64 "\n", objectId);
 	addMessage(putObjectEndReplyMsg);
 }
 
@@ -152,57 +153,6 @@ void ClientCommunicator::getObject(uint32_t clientId,
 	}
 }
 
-/*
- (replaced by Communicator::sendObject)
-
- void ClientCommunicator::putObject(uint32_t clientId, uint32_t dstOsdSockfd,
- struct ObjectData objectData, CodingScheme codingScheme,
- string codingSetting) {
-
- const uint64_t totalSize = objectData.info.objectSize;
- const uint64_t objectId = objectData.info.objectId;
- char* buf = objectData.buf;
-
- const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
-
- // Step 1 : Send Init message (wait for reply)
-
- putObjectInit(clientId, dstOsdSockfd, objectId, totalSize, chunkCount,
- codingScheme, codingSetting);
- debug("%s\n", "Put Object Init ACK-ed");
-
- // Step 2 : Send data chunk by chunk
-
- uint64_t byteToSend = 0;
- uint64_t byteProcessed = 0;
- uint64_t byteRemaining = totalSize;
-
- while (byteProcessed < totalSize) {
-
- if (byteRemaining > _chunkSize) {
- byteToSend = _chunkSize;
- } else {
- byteToSend = byteRemaining;
- }
-
- putObjectData(clientId, dstOsdSockfd, objectId, buf, byteProcessed,
- byteToSend);
- byteProcessed += byteToSend;
- byteRemaining -= byteToSend;
-
- }
-
- // Step 3: Send End message
-
- putObjectEnd(clientId, dstOsdSockfd, objectId);
-
- // free buf
- MemoryPool::getInstance().poolFree(objectData.buf);
-
- cout << "Put Object ID = " << objectId << " Finished" << endl;
-
- }
- */
 
 //
 // TODO: DUMMY CONNECTION FOR NOW

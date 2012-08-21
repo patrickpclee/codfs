@@ -746,7 +746,7 @@ void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
 		waitAndDelete(putObjectEndRequestMsg);
 		return;
 	} else {
-		debug("%s\n", "Put Object Init Failed");
+		debug("%s\n", "Put Object End Failed");
 		exit(-1);
 	}
 }

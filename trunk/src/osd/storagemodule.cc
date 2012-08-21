@@ -154,8 +154,6 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 
 	segmentData.info.segmentSize = byteToRead;
 
-	// TODO: check maximum malloc size
-	// poolFree in osd_communicator::sendSegment
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
 	readFile(segmentPath, segmentData.buf, offsetInSegment, byteToRead);

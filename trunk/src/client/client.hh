@@ -79,8 +79,10 @@ public:
 	 */
 	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
 
+	/*
 	void updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount);
 	void removePendingObjectFromMap(uint64_t objectId);
+	*/
 
 	uint32_t getPendingChunkCount(uint64_t objectId);
 	void setPendingChunkCount(uint64_t objectId, int32_t chunkCount);

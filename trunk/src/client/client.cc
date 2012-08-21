@@ -137,7 +137,9 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 			_clientId, fileId);
 	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n",
 			fileMetaData._id, fileMetaData._size);
-	_storageModule->createFile(dstPath);
+
+	// open file
+	FILE* filePtr = _storageModule->createAndOpenFile(dstPath);
 
 	// 2. Download file from OSD
 
@@ -175,7 +177,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		const uint64_t offset = objectSize * i;
 		struct ObjectCache objectCache = _storageModule->getObjectCache(
 				objectId);
-		_storageModule->writeFile(dstPath, objectCache.buf, offset,
+		_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
 				objectCache.length);
 		debug(
 				"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
@@ -183,7 +185,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		i++;
 	}
 
-	_storageModule->closeFile(dstPath);
+	_storageModule->closeFile(filePtr);
 
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
@@ -209,8 +211,7 @@ void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	// create object and cache
-	updatePendingObjectChunkMap(objectId, chunkCount);
-	_storageModule->createObject(objectId, length);
+	_storageModule->createObjectCache(objectId, length);
 	_clientCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
 }
@@ -225,11 +226,12 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 		{
 			lock_guard<mutex> lk(pendingObjectChunkMutex);
-			chunkRemaining = (bool) _pendingObjectChunk.count(objectId);
+			chunkRemaining = (bool) _pendingObjectChunk[objectId];
 		}
 
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
+			_pendingObjectChunk.erase(objectId);
 			_storageModule->closeObject(objectId);
 			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
@@ -238,7 +240,6 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 
 	}
-
 }
 
 uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
@@ -251,20 +252,8 @@ uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		lock_guard<mutex> lk(pendingObjectChunkMutex);
 		// update pendingObjectChunk value
 		_pendingObjectChunk[objectId]--;
-		debug("Data Chunkcount = %" PRIu32 "\n", _pendingObjectChunk[objectId]);
 	}
 	return byteWritten;
-}
-
-void Client::removePendingObjectFromMap(uint64_t objectId) {
-	lock_guard<mutex> lk(pendingObjectChunkMutex);
-	_pendingObjectChunk.erase(objectId);
-}
-
-void Client::updatePendingObjectChunkMap(uint64_t objectId,
-		uint32_t chunkCount) {
-	lock_guard<mutex> lk(pendingObjectChunkMutex);
-	_pendingObjectChunk[objectId] = chunkCount;
 }
 
 void Client::setPendingChunkCount(uint64_t objectId, int32_t chunkCount) {
