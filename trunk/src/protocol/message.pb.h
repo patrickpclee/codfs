@@ -37,6 +37,7 @@ class HandshakeReplyPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
 class DownloadFileRequestPro;
+class SaveObjectListRequestPro;
 class PutObjectInitRequestPro;
 class ObjectDataPro;
 class GetObjectRequestPro;
@@ -648,6 +649,111 @@ class DownloadFileRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static DownloadFileRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class SaveObjectListRequestPro : public ::google::protobuf::Message {
+ public:
+  SaveObjectListRequestPro();
+  virtual ~SaveObjectListRequestPro();
+  
+  SaveObjectListRequestPro(const SaveObjectListRequestPro& from);
+  
+  inline SaveObjectListRequestPro& operator=(const SaveObjectListRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SaveObjectListRequestPro& default_instance();
+  
+  void Swap(SaveObjectListRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  SaveObjectListRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SaveObjectListRequestPro& from);
+  void MergeFrom(const SaveObjectListRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 fileId = 2;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // repeated fixed64 objectList = 3;
+  inline int objectlist_size() const;
+  inline void clear_objectlist();
+  static const int kObjectListFieldNumber = 3;
+  inline ::google::protobuf::uint64 objectlist(int index) const;
+  inline void set_objectlist(int index, ::google::protobuf::uint64 value);
+  inline void add_objectlist(::google::protobuf::uint64 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
+      objectlist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
+      mutable_objectlist();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.SaveObjectListRequestPro)
+ private:
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 clientid_;
+  ::google::protobuf::uint32 fileid_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectlist_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static SaveObjectListRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -4251,6 +4357,79 @@ inline ::google::protobuf::uint32 DownloadFileRequestPro::fileid() const {
 inline void DownloadFileRequestPro::set_fileid(::google::protobuf::uint32 value) {
   set_has_fileid();
   fileid_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// SaveObjectListRequestPro
+
+// optional fixed32 clientId = 1;
+inline bool SaveObjectListRequestPro::has_clientid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SaveObjectListRequestPro::set_has_clientid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SaveObjectListRequestPro::clear_has_clientid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SaveObjectListRequestPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
+}
+inline ::google::protobuf::uint32 SaveObjectListRequestPro::clientid() const {
+  return clientid_;
+}
+inline void SaveObjectListRequestPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
+}
+
+// optional fixed32 fileId = 2;
+inline bool SaveObjectListRequestPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void SaveObjectListRequestPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void SaveObjectListRequestPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void SaveObjectListRequestPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 SaveObjectListRequestPro::fileid() const {
+  return fileid_;
+}
+inline void SaveObjectListRequestPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// repeated fixed64 objectList = 3;
+inline int SaveObjectListRequestPro::objectlist_size() const {
+  return objectlist_.size();
+}
+inline void SaveObjectListRequestPro::clear_objectlist() {
+  objectlist_.Clear();
+}
+inline ::google::protobuf::uint64 SaveObjectListRequestPro::objectlist(int index) const {
+  return objectlist_.Get(index);
+}
+inline void SaveObjectListRequestPro::set_objectlist(int index, ::google::protobuf::uint64 value) {
+  objectlist_.Set(index, value);
+}
+inline void SaveObjectListRequestPro::add_objectlist(::google::protobuf::uint64 value) {
+  objectlist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
+SaveObjectListRequestPro::objectlist() const {
+  return objectlist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
+SaveObjectListRequestPro::mutable_objectlist() {
+  return &objectlist_;
 }
 
 // -------------------------------------------------------------------

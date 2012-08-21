@@ -47,6 +47,15 @@ public:
 	struct FileMetaData downloadFile(uint32_t clientId, uint32_t fileId);
 
 	/**
+	 * @brief	Save ObjectList of a File
+	 *
+	 * @param	clientId	Client ID
+	 * @param	fileId	ID of the File
+	 * @param	objectList	Object List of the File
+	 */
+	void saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
+
+	/**
 	 * Get an object from the primary OSD
 	 * @param clientId Client ID
 	 * @param dstSockfd Destination Socket Descriptor
