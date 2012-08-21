@@ -142,6 +142,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 		//TODO: get object in parallel
 		downloadThread[i] = thread (startDownloadThread, _clientId, dstSockfd, objectId);
+		i++;
 	}
 
 	for (uint32_t i = 0; i < objectCount; i++) {
