@@ -41,7 +41,6 @@ mutex pendingObjectChunkMutex;
 mutex pendingSegmentChunkMutex;
 mutex pendingSegmentCountMutex;
 mutex receivedSegmentsMutex;
-;
 mutex codingSettingMapMutex;
 
 Osd::Osd(string configFilePath) {
@@ -169,7 +168,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 			break;
 		} else {
-			usleep(100000); // 0.1s
+			usleep(10000); // 0.01s
 		}
 	}
 
@@ -250,7 +249,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
 		} else {
-			usleep(100000); // sleep 0.1s
+			usleep(10000); // sleep 0.01s
 		}
 
 	}
@@ -277,7 +276,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 					segmentId);
 			break;
 		} else {
-			usleep(100000); // sleep 0.1s
+			usleep(10000); // sleep 0.01s
 		}
 
 	}
@@ -486,20 +485,19 @@ void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
 	_osdCommunicator->addMessage(replyMsg);
 }
 
-
 uint32_t Osd::getCpuLoadavg(int idx) {
 	double load[3];
 	int ret = getloadavg(load, 3);
 	if (ret < idx) {
 		return (INF);
 	} else {
-		return ((uint32_t) (load[idx]*100));
+		return ((uint32_t) (load[idx] * 100));
 	}
 }
 
 uint32_t Osd::getFreespace() {
 	struct statvfs64 fiData;
-	if((statvfs64(DISK_PATH,&fiData)) < 0 ) {
+	if ((statvfs64(DISK_PATH, &fiData)) < 0) {
 		printf("Failed to stat %s:\n", DISK_PATH);
 		return 0;
 	} else {
@@ -543,8 +541,8 @@ void startTestThread(Communicator* communicator) {
 	/* 
 	 printf("HEHE\n");
 	 OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-	 	communicator->getMonitorSockfd(), osd->getOsdId(), osd->getFreespace(),
-	 	osd->getCpuLoadavg(0));
+	 communicator->getMonitorSockfd(), osd->getOsdId(), osd->getFreespace(),
+	 osd->getCpuLoadavg(0));
 	 testmsg->prepareProtocolMsg();
 	 communicator->addMessage(testmsg);
 	 sleep(1200);
@@ -553,7 +551,7 @@ void startTestThread(Communicator* communicator) {
 	 msg->prepareProtocolMsg();
 	 communicator->addMessage(msg);
 	 printf("DONE\n");
-	*/
+	 */
 }
 
 /**
@@ -599,7 +597,6 @@ int main(int argc, char* argv[]) {
 	communicator->connectAllComponents();
 	debug("%s\n", "starting test thread");
 	sleep(5);
-
 
 	if (osd->getOsdId() == 52000) {
 //		osd->getObjectRequestProcessor(0, 0, 83937998);

@@ -259,6 +259,10 @@ ClientObjectCache Client::getCOC(uint64_t objectId){
 	return _coc[objectId];
 }
 
+uint32_t Client::getClientId () {
+	return _clientId;
+}
+
 
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
@@ -283,6 +287,7 @@ int main(int argc, char *argv[]) {
 		exit (-1);
 	}
 
+	// handle signal for profiler
 	signal(SIGINT, sighandler);
 
 	configLayer = new ConfigLayer("clientconfig.xml");
@@ -292,14 +297,6 @@ int main(int argc, char *argv[]) {
 	// start server
 	communicator->createServerSocket();
 
-	/*
-	 const int segmentNumber = configLayer->getConfigInt("Coding>SegmentNumber");
-	 debug("Segment Number = %d\n", segmentNumber);
-	 */
-
-	// connect to MDS
-	//communicator->connectToMds();
-	//communicator->connectToOsd();
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);
 
@@ -309,17 +306,18 @@ int main(int argc, char *argv[]) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	communicator->setId(51000);
+	communicator->setId(client->getClientId());
 	communicator->setComponentType(CLIENT);
 	communicator->connectAllComponents();
+
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST PUT OBJECT
 
-	CodingScheme codingScheme = RAID1_CODING;
-	string codingSetting = Raid1Coding::generateSetting(3);
 
 	if (strcmp (argv[1], "upload") == 0) {
+		CodingScheme codingScheme = RAID1_CODING;
+		string codingSetting = Raid1Coding::generateSetting(3);
 		client->uploadFileRequest(argv[2], codingScheme, codingSetting);
 	} else {
 		client->downloadFileRequest(atoi(argv[2]), argv[3]);
@@ -345,6 +343,3 @@ int main(int argc, char *argv[]) {
 
 	return 0;
 }
-
-
-

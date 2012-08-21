@@ -95,6 +95,8 @@ public:
 
 	ClientObjectCache getCOC(uint64_t objectId);
 
+	uint32_t getClientId ();
+
 private:
 
 	/**
