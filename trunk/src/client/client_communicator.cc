@@ -136,7 +136,7 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 }
 
 void ClientCommunicator::getObject(uint32_t clientId,
-		uint32_t dstSockfd, uint64_t objectId) {
+		uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
 
 	debug ("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n", objectId, dstSockfd);
 
@@ -151,6 +151,13 @@ void ClientCommunicator::getObject(uint32_t clientId,
 	while (client->getPendingChunkCount(objectId) != 0) {
 		usleep(100000);
 	}
+
+	ClientStorageModule* _storageModule = client->getStorageModule();
+	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset, objectCache.length);
+			debug("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
+					objectId, offset, objectCache.length, dstPath.c_str());
+	_storageModule->closeObject(objectId);
 }
 
 

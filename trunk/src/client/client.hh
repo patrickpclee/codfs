@@ -40,6 +40,7 @@ public:
 	 * @return	Pointer to the Client Communicator Module
 	 */
 	ClientCommunicator* getCommunicator();
+	ClientStorageModule* getStorageModule();
 
 //	void downloadFileRequest(char* srcPath, char* dstPath);
 

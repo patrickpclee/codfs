@@ -63,7 +63,7 @@ public:
 	 * @return ObjectData structure
 	 */
 
-	void getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId);
+	void getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath);
 
 	/**
 	 * 1. Send an init message

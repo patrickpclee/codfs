@@ -36,6 +36,10 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
+ClientStorageModule* Client::getStorageModule() {
+	return _storageModule;
+}
+
 #ifdef PARALLEL_TRANSFER
 
 void startUploadThread(uint32_t clientId, uint32_t sockfd,
@@ -47,8 +51,8 @@ void startUploadThread(uint32_t clientId, uint32_t sockfd,
 }
 
 void startDownloadThread(uint32_t clientId, uint32_t sockfd,
-		uint64_t objectId) {
-	client->getCommunicator()->getObject(clientId, sockfd, objectId);
+		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
+	client->getCommunicator()->getObject(clientId, sockfd, objectId, offset, filePtr, dstPath);
 }
 
 #endif
@@ -153,12 +157,12 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		uint32_t dstComponentId = fileMetaData._primaryList[i];
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
-
+		const uint64_t offset = objectSize * i;
 #ifdef PARALLEL_TRANSFER
 		downloadThread[i] = thread(startDownloadThread, _clientId, dstSockfd,
-				objectId);
+				objectId, offset, filePtr, dstPath);
 #else
-		_clientCommunicator->getObject(_clientId, dstSockfd, objectId);
+		_clientCommunicator->getObject(_clientId, dstSockfd, objectId, offset,filePtr, dstPath);
 #endif
 
 		i++;
@@ -172,19 +176,18 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 	// write to file
 
-	i = 0;
-	for (uint64_t objectId : fileMetaData._objectList) {
-		const uint64_t offset = objectSize * i;
-		struct ObjectCache objectCache = _storageModule->getObjectCache(
-				objectId);
-		_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
-				objectCache.length);
-		debug(
-				"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
-				objectId, offset, objectCache.length, dstPath.c_str());
-		_storageModule->closeObject(objectId);
-		i++;
-	}
+//	i = 0;
+//	for (uint64_t objectId : fileMetaData._objectList) {
+//		struct ObjectCache objectCache = _storageModule->getObjectCache(
+//				objectId);
+//		_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
+//				objectCache.length);
+//		debug(
+//				"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
+//				objectId, offset, objectCache.length, dstPath.c_str());
+//		_storageModule->closeObject(objectId);
+//		i++;
+//	}
 
 	_storageModule->closeFile(filePtr);
 
