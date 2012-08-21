@@ -3,14 +3,16 @@ SRC=				${CURRENT}/src
 OSD_DIR=			${SRC}/osd
 MONITOR_DIR=		${SRC}/monitor
 CLIENT_DIR=			${SRC}/client
+FUSE_DIR=			${SRC}/fuse
 MDS_DIR=			${SRC}/mds
 
 
 all:
 	make mds;
 	make client;
+	make fuse;
 	make osd;
-	cp ./OSD ../osd_test
+	#cp ./OSD ../osd_test
 	make monitor;
 
 mds:
@@ -24,6 +26,9 @@ osd:
 
 monitor:
 	cd ${MONITOR_DIR}; make -j3
+
+fuse:
+	cd ${FUSE_DIR}; make -j3
 
 clean:
 	cd ${OSD_DIR}; make clean
