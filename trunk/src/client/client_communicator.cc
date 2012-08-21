@@ -137,9 +137,9 @@ void ClientCommunicator::getObject(uint32_t clientId,
 	getObjectRequestMsg->prepareProtocolMsg();
 	addMessage(getObjectRequestMsg);
 
-//	while (client->getPendingChunkCount(objectId) != 0) {
-//		usleep(100000);
-//	}
+	while (client->getPendingChunkCount(objectId) != 0) {
+		usleep(100000);
+	}
 }
 
 /*
