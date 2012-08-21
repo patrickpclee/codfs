@@ -22,7 +22,6 @@ ClientStorageModule::ClientStorageModule() {
 
 	_objectCache = {};
 	_openedFile = {};
-	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
 	_objectSize = configLayer->getConfigLong("Storage>ObjectSize") * 1024;
 	debug("Config Object Size = %" PRIu64 " Bytes\n", _objectSize);
 }
@@ -175,15 +174,13 @@ FILE* ClientStorageModule::createFile(string filepath) {
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "wb+");
 
-	// set buffer to zero to avoid memory leak
-	setvbuf(filePtr, NULL, _IONBF, 0);
-
-	debug("fileptr = %p\n", filePtr);
-
 	if (filePtr == NULL) {
 		debug("%s\n", "Unable to create file!");
 		return NULL;
 	}
+
+	// set buffer to zero to avoid memory leak
+	setvbuf(filePtr, NULL, _IONBF, 0);
 
 	// add file pointer to map
 	openedFileMutex.lock();

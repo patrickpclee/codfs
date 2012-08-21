@@ -30,11 +30,11 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 		throw SocketException("Could not create client socket.");
 	}
 
-	if (!_socket.connect(ip, (int)port)) {
+	if (!_socket.connect(ip, (int) port)) {
 		throw SocketException("Could not bind to port.");
 	}
 
-	debug ("Connected to sockfd = %" PRIu32 "\n", _socket.getSockfd());
+	debug("Connected to sockfd = %" PRIu32 "\n", _socket.getSockfd());
 
 	// save connection info in private variables
 	_connectionType = connectionType;
@@ -58,10 +58,11 @@ uint32_t Connection::sendMessage(Message* message) {
 		cerr << "Error in sending MsgHeader" << endl;
 	}
 
-	debug ("Header sent %" PRIu32 " bytes\n", byteSent);
+	debug("ID: %" PRIu32 " Header sent %" PRIu32 " bytes\n",
+			message->getMsgHeader().requestId, byteSent);
 
 	// send protocol message
-	
+
 	byteSent = 0;
 
 	string protocolMessage = message->getProtocolMsg();
@@ -74,10 +75,11 @@ uint32_t Connection::sendMessage(Message* message) {
 		cerr << "Error in sending Protocol Message" << endl;
 	}
 
-	debug ("Protocol sent %" PRIu32 " bytes\n", byteSent);
+	debug("ID: %" PRIu32 " Protocol sent %" PRIu32 " bytes\n",
+			message->getMsgHeader().requestId, byteSent);
 
 	// send payload if there is one
-	
+
 	byteSent = 0;
 
 	if (msgHeader.payloadSize > 0) {
@@ -92,8 +94,8 @@ uint32_t Connection::sendMessage(Message* message) {
 
 	}
 
-	debug ("Payload sent %" PRIu32 " bytes\n", byteSent);
-
+	debug("ID: %" PRIu32 " Payload sent %" PRIu32 " bytes\n",
+			message->getMsgHeader().requestId, byteSent);
 
 	return totalByteSent;
 }
@@ -115,7 +117,7 @@ char* Connection::recvMessage() {
 		cerr << "Error in receiving MsgHeader" << endl;
 	}
 
-	debug ("Header received %" PRIu32 " bytes\n", byteReceived);
+	debug("Header received %" PRIu32 " bytes\n", byteReceived);
 
 	// allocate buffer
 
@@ -128,8 +130,8 @@ char* Connection::recvMessage() {
 	// copy header to buffer
 	memcpy(buf, &msgHeader, headerLength);
 
-	debug ("Type %d\n", (int)msgHeader.protocolMsgType);
-	debug ("Buffer Size %" PRIu32 "\n",bufferSize);
+	debug("Type %d\n", (int)msgHeader.protocolMsgType);
+	debug("Buffer Size %" PRIu32 "\n", bufferSize);
 	// receive protocol message
 
 	const uint32_t protocolLength = msgHeader.protocolMsgSize;
@@ -142,7 +144,7 @@ char* Connection::recvMessage() {
 		cerr << "Error in receiving protocol message" << endl;
 	}
 
-	debug ("Protocol received %" PRIu32 " bytes\n", byteReceived);
+	debug("Protocol received %" PRIu32 " bytes\n", byteReceived);
 
 	// receive payload if needed
 
@@ -159,7 +161,7 @@ char* Connection::recvMessage() {
 
 	}
 
-	debug ("Payload received %" PRIu32 " bytes\n", byteReceived);
+	debug("Payload received %" PRIu32 " bytes\n", byteReceived);
 
 	return buf;
 

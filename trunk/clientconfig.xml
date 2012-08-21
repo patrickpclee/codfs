@@ -2,7 +2,6 @@
 <NcvfsConfig>
 	<Clientid>51000</Clientid>
 
-	<Coding><SegmentNumber>1</SegmentNumber></Coding>
     <Communication>
     
         <!-- polling interval in terms of ms -->
@@ -20,7 +19,6 @@
     
     <Storage>
     	<!-- KB -->
-    	<ObjectLocation>./client_object/</ObjectLocation>
     	<ObjectSize>10240</ObjectSize>
     </Storage>
 </NcvfsConfig>

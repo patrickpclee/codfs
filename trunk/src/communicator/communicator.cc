@@ -216,8 +216,8 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 			lock_guard<mutex> lk(waitReplyMessageMapMutex);
 			_waitReplyMessageMap[requestId] = message;
 			debug(
-					"Message (ID: %" PRIu32 " FD = %" PRIu32 ") added to waitReplyMessageMap\n",
-					requestId, message->getSockfd());
+					"Message (ID: %" PRIu32 " Type = %d FD = %" PRIu32 ") added to waitReplyMessageMap\n",
+					requestId, (int) message->getMsgHeader().protocolMsgType, message->getSockfd());
 		}
 	}
 
@@ -733,12 +733,9 @@ void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
 	putObjectEndRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectEndRequestMsg, true);
 
-	debug("%s\n", "before waitForStatusChange");
 	MessageStatus status = putObjectEndRequestMsg->waitForStatusChange();
 	if (status == READY) {
-		debug("%s\n", "status == READY");
 		waitAndDelete(putObjectEndRequestMsg);
-		debug("%s\n", "msg deleted");
 		return;
 	} else {
 		debug("%s\n", "Put Object Init Failed");

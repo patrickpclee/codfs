@@ -35,16 +35,16 @@ void startReceiveThread(Communicator* communicator) {
 
 int main(int argc, char *argv[]) {
 
-	if (argc < 3 || argc > 4) {
-		cout << "Upload: ./CLIENT upload [SRC]" << endl;
-		cout << "Download: ./CLIENT download [FILEID] [DST]" << endl;
+	if (argc < 4 || argc > 5) {
+		cout << "Upload: ./CLIENT [CONFIG] upload [SRC]" << endl;
+		cout << "Download: ./CLIENT [CONFIG] download [FILEID] [DST]" << endl;
 		exit(-1);
 	}
 
 	// handle signal for profiler
 	signal(SIGINT, sighandler);
 
-	configLayer = new ConfigLayer("clientconfig.xml");
+	configLayer = new ConfigLayer(argv[1]);
 	client = new Client();
 	ClientCommunicator* communicator = client->getCommunicator();
 
@@ -68,12 +68,12 @@ int main(int argc, char *argv[]) {
 
 	// TEST PUT OBJECT
 
-	if (strcmp(argv[1], "upload") == 0) {
+	if (strncmp(argv[2], "upload", 6) == 0) {
 		CodingScheme codingScheme = RAID1_CODING;
 		string codingSetting = Raid1Coding::generateSetting(3);
-		client->uploadFileRequest(argv[2], codingScheme, codingSetting);
+		client->uploadFileRequest(argv[3], codingScheme, codingSetting);
 	} else {
-		client->downloadFileRequest(atoi(argv[2]), argv[3]);
+		client->downloadFileRequest(atoi(argv[3]), argv[4]);
 	}
 
 	/*
