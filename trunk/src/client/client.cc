@@ -47,6 +47,11 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
+void startUploadThread (uint32_t clientId, uint32_t sockfd, struct ObjectData objectData, CodingScheme codingScheme, string codingSetting) {
+	client->getCommunicator()->sendObject(clientId, sockfd, objectData, codingScheme, codingSetting);
+	MemoryPool::getInstance().poolFree(objectData.buf);
+}
+
 uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		string codingSetting) {
 
@@ -66,24 +71,27 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
-	debug("%s\n", "====================");
 	for (uint32_t i = 0; i < fileMetaData._primaryList.size(); ++i) {
 		debug("%" PRIu64 "[%" PRIu32 "]\n",
 				fileMetaData._objectList[i], fileMetaData._primaryList[i]);
 	}
+
+	thread uploadThread [objectCount];
 
 	for (uint32_t i = 0; i < objectCount; ++i) {
 		struct ObjectData objectData = _storageModule->readObjectFromFile(path,
 				i);
 		uint32_t primary = fileMetaData._primaryList[i];
 		debug("Send to Primary [%" PRIu32 "]\n", primary);
-		// TODO: HARDCODE FOR NOW!
-		//uint32_t dstOsdSockfd = _clientCommunicator->getOsdSockfd();
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
-		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData,
-				codingScheme, codingSetting);
-		MemoryPool::getInstance().poolFree(objectData.buf);
+
+		uploadThread[i] = thread (startUploadThread, _clientId, dstOsdSockfd, objectData, codingScheme, codingSetting);
+	}
+
+	// wait for every thread to finish
+	for (uint32_t i = 0; i < objectCount; i++) {
+		uploadThread[i].join();
 	}
 
 	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);
