@@ -139,8 +139,6 @@ void ClientCommunicator::getObject(uint32_t clientId,
 
 	debug ("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n", objectId, dstSockfd);
 
-	//uint32_t objectSize = 0;
-
 	client->setPendingChunkCount(objectId, -1);
 
 	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,

@@ -278,10 +278,8 @@ void Communicator::sendMessage() {
 
 			// debug
 
-			debug ("%s\n", "[SEND DEBUG START]");
 			message->printProtocol();
 			message->printHeader();
-			debug ("%s\n", "[SEND DEBUG END]");
 
 			debug(
 					"Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
