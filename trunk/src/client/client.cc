@@ -182,6 +182,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		debug(
 				"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
 				objectId, offset, objectCache.length, dstPath.c_str());
+		_storageModule->closeObject(objectId);
 		i++;
 	}
 
@@ -232,7 +233,7 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
 			_pendingObjectChunk.erase(objectId);
-			_storageModule->closeObject(objectId);
+			//_storageModule->closeObject(objectId); // cannot close here
 			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
 		} else {

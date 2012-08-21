@@ -163,7 +163,7 @@ uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf,
 struct ObjectCache ClientStorageModule::getObjectCache(uint64_t objectId) {
 	lock_guard<mutex> lk(cacheMutex);
 	if (!_objectCache.count(objectId)) {
-		debug("%s\n", "object cache not found");
+		debug("object cache not found for %" PRIu64 "\n", objectId);
 		exit(-1);
 	}
 	return _objectCache[objectId];
