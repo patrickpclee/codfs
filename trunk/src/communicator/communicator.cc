@@ -170,6 +170,7 @@ void Communicator::waitForMessage() {
 		// if there is data in existing connections
 		{ // start critical session
 			lock_guard<mutex> lk(connectionMapMutex);
+			p = _connectionMap.begin();
 			while (p != _connectionMap.end()) {
 
 				uint32_t sockfd = p->second->getSockfd();
