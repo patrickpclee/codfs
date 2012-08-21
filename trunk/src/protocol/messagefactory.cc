@@ -15,6 +15,7 @@
 #include "metadata/downloadfilereply.hh"
 #include "metadata/getobjectinforequest.hh"
 #include "metadata/getobjectinforeply.hh"
+#include "metadata/saveobjectlistrequest.hh"
 #include "transfer/putobjectinitrequest.hh"
 #include "transfer/putobjectinitreply.hh"
 #include "transfer/segmenttransferendrequest.hh"
@@ -87,6 +88,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_OBJECT_INFO_REPLY):
 		return new GetObjectInfoReplyMsg(communicator);
+		break;
+	case (SAVE_OBJECT_LIST_REQUEST):
+		return new SaveObjectListRequestMsg(communicator);
 		break;
 
 		//TRANSFER

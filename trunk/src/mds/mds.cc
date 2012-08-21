@@ -234,10 +234,6 @@ void Mds::recoveryProcessor(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
-MdsCommunicator* Mds::getCommunicator() {
-	return _mdsCommunicator;
-}
-
 /**
  * @brief	Handle Object Node List Update from Osd
  */
@@ -246,6 +242,19 @@ void Mds::nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
 	_metaDataModule->saveNodeList(objectId, objectNodeList);
 	_metaDataModule->setPrimary(objectId, objectNodeList[0]);
 	return;
+}
+
+/**
+ * @brief	Handle Object List Save Request
+ */
+void Mds::saveObjectListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList)
+{
+	_metaDataModule->saveObjectList(fileId, objectList);
+	return ;
+}
+
+MdsCommunicator* Mds::getCommunicator() {
+	return _mdsCommunicator;
 }
 
 void startGarbageCollectionThread() {

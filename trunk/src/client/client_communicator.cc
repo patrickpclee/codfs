@@ -9,6 +9,7 @@
 #include "../protocol/metadata/listdirectoryrequest.hh"
 #include "../protocol/metadata/uploadfilerequest.hh"
 #include "../protocol/metadata/downloadfilerequest.hh"
+#include "../protocol/metadata/saveobjectlistrequest.hh"
 #include "../protocol/transfer/putobjectinitrequest.hh"
 #include "../protocol/transfer/putobjectinitreply.hh"
 #include "../protocol/transfer/objecttransferendrequest.hh"
@@ -99,6 +100,17 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 		exit(-1);
 	}
 	return {};
+}
+
+void ClientCommunicator::saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList)
+{
+	uint32_t mdsSockfd = getMdsSockfd();
+	SaveObjectListRequestMsg* saveObjectListRequestMsg = new SaveObjectListRequestMsg(this, mdsSockfd, clientId, fileId, objectList);
+	saveObjectListRequestMsg->prepareProtocolMsg();
+
+	addMessage(saveObjectListRequestMsg);
+
+	return ;
 }
 
 void ClientCommunicator::replyPutObjectInit(uint32_t requestId,

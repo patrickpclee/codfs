@@ -146,6 +146,17 @@ public:
 			uint64_t objectId, vector<uint32_t> objectNodeList);
 
 	/**
+	 * @brief	Handle Object List Save Request
+	 *
+	 * @param	requestId	Request ID
+	 * @param	conenctionId	Connection ID
+	 * @param	clientId	ID of the client Requesting
+	 * @param	fileId	ID of the File
+	 * @param	objectList	Object List of the File
+	 */
+	void saveObjectListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
+
+	/**
 	 * @brief	Get the MDS Communicator
 	 *
 	 * @return	Pointer to the MDS Communicator Module

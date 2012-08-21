@@ -46,6 +46,12 @@ message DownloadFileRequestPro {
 	optional fixed32 fileId = 2;
 }
 
+message SaveObjectListRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	repeated fixed64 objectList = 3;
+}
+
 //
 // CLIENT -> OSD
 //
