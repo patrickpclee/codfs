@@ -102,7 +102,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	vector<uint32_t> requiredSegments = _codingModule->getRequiredSegmentIds(
 			codingScheme, codingSetting);
 
-	debug("[Download] ObjectSize = %" PRIu64 "\n", objectInfo._size);
+//	debug("[Download] ObjectSize = %" PRIu64 "\n", objectInfo._size);
 
 	// 2. initialize list and count
 

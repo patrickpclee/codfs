@@ -170,9 +170,12 @@ void Communicator::waitForMessage() {
 		// if there is data in existing connections
 		{ // start critical session
 			lock_guard<mutex> lk(connectionMapMutex);
-			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+			while (p != _connectionMap.end()) {
+
+				uint32_t sockfd = p->second->getSockfd();
+
 				// if socket has data available
-				if (FD_ISSET(p->second->getSockfd(), &sockfdSet)) {
+				if (FD_ISSET(sockfd, &sockfdSet)) {
 
 					// check if connection is lost
 					int nbytes = 0;
@@ -181,16 +184,20 @@ void Communicator::waitForMessage() {
 						// disconnect and remove from _connectionMap
 						debug("SOCKFD = %" PRIu32 " connection lost\n",
 								p->first);
-						_connectionMap.erase(p->first);
-						continue;
-					}
 
-					// receive message into buffer, memory allocated in recvMessage
-					buf = p->second->recvMessage();
-					dispatch(buf, p->first);
+						// hack: post-increment adjusts iterator even erase is called
+						_connectionMap.erase(p++);
+						continue;
+					} else {
+						// receive message into buffer, memory allocated in recvMessage
+						buf = p->second->recvMessage();
+						dispatch(buf, p->first);
+					}
 				}
+
+				p++;
 			}
-		} // end critical session
+		} // end critical section
 
 	} // end while (1)
 }
