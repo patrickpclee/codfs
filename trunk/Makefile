@@ -14,16 +14,16 @@ all:
 	make monitor;
 
 mds:
-	cd ${MDS_DIR}; make -j6
+	cd ${MDS_DIR}; make -j3
 
 client:
-	cd ${CLIENT_DIR}; make -j6
+	cd ${CLIENT_DIR}; make -j3
 
 osd:
-	cd ${OSD_DIR}; make -j6
+	cd ${OSD_DIR}; make -j3
 
 monitor:
-	cd ${MONITOR_DIR}; make -j6
+	cd ${MONITOR_DIR}; make -j3
 
 clean:
 	cd ${OSD_DIR}; make clean

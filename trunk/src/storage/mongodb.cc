@@ -22,7 +22,7 @@ class DbAuthHook : public DBConnectionHook
         string err;
         try
         {
-            if(conn->auth(_database, _user, _password, err) == false)
+            if(conn->auth(_database, _user, _password, err, false) == false)
             {
                 cout << "[TERM]Unable to authenticate to db" << endl;
                 exit(-1);

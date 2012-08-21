@@ -48,6 +48,8 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
+#ifdef PARALLEL_TRANSFER
+
 void startUploadThread(uint32_t clientId, uint32_t sockfd,
 		struct ObjectData objectData, CodingScheme codingScheme,
 		string codingSetting) {
@@ -55,6 +57,13 @@ void startUploadThread(uint32_t clientId, uint32_t sockfd,
 			codingScheme, codingSetting);
 	MemoryPool::getInstance().poolFree(objectData.buf);
 }
+
+void startDownloadThread(uint32_t clientId, uint32_t sockfd,
+		uint64_t objectId) {
+	client->getCommunicator()->getObject(clientId, sockfd, objectId);
+}
+
+#endif
 
 uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		string codingSetting) {
@@ -125,10 +134,6 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	return fileMetaData._id;
 }
 
-void startDownloadThread(uint32_t clientId, uint32_t sockfd,
-		uint64_t objectId) {
-	client->getCommunicator()->getObject(clientId, sockfd, objectId);
-}
 
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
