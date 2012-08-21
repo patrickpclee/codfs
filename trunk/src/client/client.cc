@@ -15,6 +15,8 @@
 
 using namespace std;
 
+//#define PARALLEL_TRANSFER
+
 mutex pendingObjectChunkMutex;
 
 // handle ctrl-C for profiler
@@ -46,13 +48,12 @@ ClientCommunicator* Client::getCommunicator() {
 	return _clientCommunicator;
 }
 
-void startUploadThread (uint32_t clientId, uint32_t sockfd, struct ObjectData objectData, CodingScheme codingScheme, string codingSetting) {
-	client->getCommunicator()->sendObject(clientId, sockfd, objectData, codingScheme, codingSetting);
+void startUploadThread(uint32_t clientId, uint32_t sockfd,
+		struct ObjectData objectData, CodingScheme codingScheme,
+		string codingSetting) {
+	client->getCommunicator()->sendObject(clientId, sockfd, objectData,
+			codingScheme, codingSetting);
 	MemoryPool::getInstance().poolFree(objectData.buf);
-}
-
-void startDownloadThread (uint32_t clientId, uint32_t sockfd, uint64_t objectId) {
-	client->getCommunicator()->getObject(clientId, sockfd, objectId);
 }
 
 uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
@@ -79,7 +80,9 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 				fileMetaData._objectList[i], fileMetaData._primaryList[i]);
 	}
 
-	thread uploadThread [objectCount];
+#ifdef PARALLEL_TRANSFER
+	thread uploadThread[objectCount];
+#endif
 
 	for (uint32_t i = 0; i < objectCount; ++i) {
 		struct ObjectData objectData = _storageModule->readObjectFromFile(path,
@@ -89,13 +92,21 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
 
-		uploadThread[i] = thread (startUploadThread, _clientId, dstOsdSockfd, objectData, codingScheme, codingSetting);
+#ifdef PARALLEL_TRANSFER
+		uploadThread[i] = thread(startUploadThread, _clientId, dstOsdSockfd,
+				objectData, codingScheme, codingSetting);
+#else
+		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData, codingScheme, codingSetting);
+		MemoryPool::getInstance().poolFree(objectData.buf);
+#endif
 	}
 
+#ifdef PARALLEL_TRANSFER
 	// wait for every thread to finish
 	for (uint32_t i = 0; i < objectCount; i++) {
 		uploadThread[i].join();
 	}
+#endif
 
 	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);
 
@@ -112,6 +123,11 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 			<< rate << " MB/s" << endl;
 
 	return fileMetaData._id;
+}
+
+void startDownloadThread(uint32_t clientId, uint32_t sockfd,
+		uint64_t objectId) {
+	client->getCommunicator()->getObject(clientId, sockfd, objectId);
 }
 
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
@@ -131,8 +147,11 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	_storageModule->createFile(dstPath);
 
 	// 2. Download file from OSD
+
+#ifdef PARALLEL_TRANSFER
 	const uint32_t objectCount = fileMetaData._objectList.size();
-	thread downloadThread [objectCount];
+	thread downloadThread[objectCount];
+#endif
 
 	uint32_t i = 0;
 	for (uint64_t objectId : fileMetaData._objectList) {
@@ -140,23 +159,34 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
 
-		//TODO: get object in parallel
-		downloadThread[i] = thread (startDownloadThread, _clientId, dstSockfd, objectId);
+#ifdef PARALLEL_TRANSFER
+		downloadThread[i] = thread(startDownloadThread, _clientId, dstSockfd,
+				objectId);
+#else
+		_clientCommunicator->getObject(_clientId, dstSockfd, objectId);
+#endif
+
 		i++;
 	}
 
+#ifdef PARALLEL_TRANSFER
 	for (uint32_t i = 0; i < objectCount; i++) {
-			downloadThread[i].join();
+		downloadThread[i].join();
 	}
+#endif
+
+	// write to file
 
 	i = 0;
 	for (uint64_t objectId : fileMetaData._objectList) {
-		// write to file
 		const uint64_t offset = objectSize * i;
-		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
-		_storageModule->writeFile(dstPath, objectCache.buf, offset, objectCache.length);
-		debug ("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n", objectId, offset, objectCache.length, dstPath.c_str());
-
+		struct ObjectCache objectCache = _storageModule->getObjectCache(
+				objectId);
+		_storageModule->writeFile(dstPath, objectCache.buf, offset,
+				objectCache.length);
+		debug(
+				"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
+				objectId, offset, objectCache.length, dstPath.c_str());
 		i++;
 	}
 
@@ -182,17 +212,18 @@ void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	{
 		lock_guard<mutex> lk(pendingObjectChunkMutex);
 		_pendingObjectChunk[objectId] = chunkCount;
-		debug ("Init Chunkcount = %" PRIu32 "\n", chunkCount);
+		debug("Init Chunkcount = %" PRIu32 "\n", chunkCount);
 	}
 
 	// create object and cache
-	updatePendingObjectChunkMap(objectId,chunkCount);
+	updatePendingObjectChunkMap(objectId, chunkCount);
 	_storageModule->createObject(objectId, length);
 	_clientCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
 }
 
-void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId) {
+void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId) {
 
 	// TODO: check integrity of object received
 	bool chunkRemaining = false;
@@ -217,40 +248,43 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t
 
 }
 
-uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
+uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset, length);
+	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
+			length);
 	{
 		lock_guard<mutex> lk(pendingObjectChunkMutex);
 		// update pendingObjectChunk value
 		_pendingObjectChunk[objectId]--;
-		debug ("Data Chunkcount = %" PRIu32 "\n", _pendingObjectChunk[objectId]);
+		debug("Data Chunkcount = %" PRIu32 "\n", _pendingObjectChunk[objectId]);
 	}
 	return byteWritten;
 }
 
-void Client::removePendingObjectFromMap(uint64_t objectId){
+void Client::removePendingObjectFromMap(uint64_t objectId) {
 	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	_pendingObjectChunk.erase(objectId);
 }
 
-void Client::updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount){
+void Client::updatePendingObjectChunkMap(uint64_t objectId,
+		uint32_t chunkCount) {
 	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	_pendingObjectChunk[objectId] = chunkCount;
 }
 
-void Client::setPendingChunkCount(uint64_t objectId, int32_t chunkCount){
+void Client::setPendingChunkCount(uint64_t objectId, int32_t chunkCount) {
 	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	_pendingObjectChunk[objectId] = chunkCount;
 }
 
-uint32_t Client::getPendingChunkCount(uint64_t objectId){
+uint32_t Client::getPendingChunkCount(uint64_t objectId) {
 	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	return _pendingObjectChunk[objectId];
 }
 
-uint32_t Client::getClientId () {
+uint32_t Client::getClientId() {
 	return _clientId;
 }
 
@@ -268,13 +302,12 @@ void startReceiveThread(Communicator* communicator) {
 
 }
 
-
 int main(int argc, char *argv[]) {
 
 	if (argc < 3 || argc > 4) {
 		cout << "Upload: ./CLIENT upload [SRC]" << endl;
 		cout << "Download: ./CLIENT download [FILEID] [DST]" << endl;
-		exit (-1);
+		exit(-1);
 	}
 
 	// handle signal for profiler
@@ -304,8 +337,7 @@ int main(int argc, char *argv[]) {
 
 	// TEST PUT OBJECT
 
-
-	if (strcmp (argv[1], "upload") == 0) {
+	if (strcmp(argv[1], "upload") == 0) {
 		CodingScheme codingScheme = RAID1_CODING;
 		string codingSetting = Raid1Coding::generateSetting(3);
 		client->uploadFileRequest(argv[2], codingScheme, codingSetting);
