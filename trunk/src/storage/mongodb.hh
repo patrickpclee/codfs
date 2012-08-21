@@ -120,7 +120,8 @@ private:
 	string _collection;
 
 	/// Connection to the MongoDB
-	mongo::DBClientConnection _connection;
+	//mongo::DBClientConnection _connection;
+	//mongo::ScopedDbConnection _connection;
 };
 
 #endif
