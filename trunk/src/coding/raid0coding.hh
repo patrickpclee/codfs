@@ -17,6 +17,7 @@ public:
 	}
 
 	vector<uint32_t> getRequiredSegmentIds (string setting);
+	uint32_t getNumberOfSegments(string setting);
 
 	void display();
 private:

@@ -70,6 +70,10 @@ vector<uint32_t> Raid1Coding::getRequiredSegmentIds (string setting) {
 	return {0};
 }
 
+uint32_t Raid1Coding::getNumberOfSegments(string setting) {
+	return getNoOfReplications(setting);
+}
+
 void Raid1Coding::display() {
 
 }

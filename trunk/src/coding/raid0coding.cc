@@ -93,19 +93,23 @@ uint32_t Raid0Coding::getNoOfStrips(string setting) {
 }
 
 /*
-string Raid0Coding::generateSetting(int noOfStrips) {
-	return to_string(noOfStrips);
-}
-*/
+ string Raid0Coding::generateSetting(int noOfStrips) {
+ return to_string(noOfStrips);
+ }
+ */
 
-vector<uint32_t> Raid0Coding::getRequiredSegmentIds (string setting) {
+vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting) {
 	// for Raid0 Coding, require all segments for decode
 	const uint32_t noOfStrips = getNoOfStrips(setting);
-	vector <uint32_t> requiredSegments (noOfStrips);
+	vector<uint32_t> requiredSegments(noOfStrips);
 	for (uint32_t i = 0; i < noOfStrips; i++) {
 		requiredSegments[i] = i;
 	}
 	return requiredSegments;
+}
+
+uint32_t Raid0Coding::getNumberOfSegments(string setting) {
+	return getNoOfStrips(setting);
 }
 
 void Raid0Coding::display() {

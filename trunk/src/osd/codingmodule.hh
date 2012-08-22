@@ -54,7 +54,23 @@ public:
 			uint64_t objectId, vector<struct SegmentData> segmentData,
 			string setting);
 
+	/**
+	 * Get the list of segments required to do decode
+	 * @param codingScheme Coding Scheme
+	 * @param setting Coding Setting
+	 * @return list of segment ID
+	 */
+
 	vector<uint32_t> getRequiredSegmentIds (CodingScheme codingScheme, string setting);
+
+	/**
+	 * Get the number of segments that the scheme uses
+	 * @param codingScheme Coding Scheme
+	 * @param setting Coding Setting
+	 * @return number of segments
+	 */
+
+	uint32_t getNumberOfSegments(CodingScheme codingScheme, string setting);
 
 	/**
 	 * Get the Coding object according to the codingScheme specified

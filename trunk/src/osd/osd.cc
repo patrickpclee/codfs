@@ -102,8 +102,8 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// check which segments are needed to request
 	vector<uint32_t> requiredSegments = _codingModule->getRequiredSegmentIds(
 			codingScheme, codingSetting);
-
-//	debug("[Download] ObjectSize = %" PRIu64 "\n", objectInfo._size);
+	uint32_t totalNumOfSegments = _codingModule->getNumberOfSegments(codingScheme,
+			codingSetting);
 
 	// 2. initialize list and count
 
@@ -122,19 +122,16 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 		{
 			lock_guard<mutex> lk(receivedSegmentDataMutex);
-			_receivedSegmentData[objectId] = vector<struct SegmentData>(
-					segmentCount);
+			_receivedSegmentData[objectId] = vector<struct SegmentData> (totalNumOfSegments);
 		}
 	} else {
 		_objectRequestCount[objectId]++;
 	}
 	vector<struct SegmentData>& segmentDataList = _receivedSegmentData[objectId];
-	debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
 
 	segmentTransferMutex.unlock(); // ----- end lock -----
 
-	debug("[Download] Reserve %" PRIu32 " segments, segmentDataList = %zu\n",
-			segmentCount, segmentDataList.size());
+	debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
 
 	// 3. request segments
 	// case 1: load from disk
@@ -151,6 +148,8 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// read segment from disk
 				struct SegmentData segmentData = _storageModule->readSegment(
 						objectId, requiredSegmentIndex, 0);
+
+				// segmentDataList only reserved space for the requiredSegments
 				segmentDataList[requiredSegmentIndex] = segmentData;
 
 				{
@@ -166,7 +165,6 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				_osdCommunicator->getSegmentRequest(osdId, objectId,
 						requiredSegmentIndex);
 			}
-
 		}
 	}
 
@@ -239,23 +237,6 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	debug("%s\n", "[DOWNLOAD] Cleanup completed");
-
-	{
-		lock_guard<mutex> lk(segmentTransferMutex);
-		cout << "========" << endl;
-		debug("_objectRequestCount = %zu\n", _objectRequestCount.size());
-		debug("_pendingSegmentCount = %zu\n", _pendingSegmentCount.size());
-		debug("_pendingSegmentChunk = %zu\n", _pendingSegmentChunk.size());
-		{
-			lock_guard<mutex> lk(requestedSegmentsMutex);
-			debug("_requestedSegments = %zu\n", _requestedSegments.size());
-		}
-		{
-			lock_guard<mutex> lk(receivedSegmentDataMutex);
-			debug("_receivedSegmentData = %zu\n", _receivedSegmentData.size());
-		}
-		cout << "========" << endl;
-	}
 
 }
 
