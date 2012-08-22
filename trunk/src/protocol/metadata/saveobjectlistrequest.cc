@@ -72,5 +72,5 @@ void SaveObjectListRequestMsg::doHandle() {
 }
 
 void SaveObjectListRequestMsg::printProtocol() {
-	debug("[SAVE_OBJECT_LIST_REQUEST] File ID = %" PRIu32 ", Number of Object %d\n", _fileId,_objectList.size());
+	debug("[SAVE_OBJECT_LIST_REQUEST] File ID = %" PRIu32 ", Number of Object %zu\n", _fileId,_objectList.size());
 }

@@ -35,6 +35,7 @@ mutex outMessageQueueMutex;
 mutex waitReplyMessageMapMutex;
 mutex connectionMapMutex;
 mutex componentIdMapMutex;
+mutex requestIdMutex;;
 
 Communicator::Communicator() {
 
@@ -42,7 +43,13 @@ Communicator::Communicator() {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 	// initialize variables
-	_requestId.store(0);
+//	_requestId.store(0);
+
+	{
+		lock_guard <mutex> lk(requestIdMutex);
+		_requestId = 0;
+	}
+
 	_connectionMap = {};
 	_componentIdMap = {};
 	_outMessageQueue = {};
@@ -447,8 +454,13 @@ uint32_t Communicator::generateRequestId() {
 
 	// increment _requestId
 
+	/*
 	_requestId.store(_requestId.load() + 1);
 	return _requestId.load();
+	*/
+
+	lock_guard <mutex> lk(requestIdMutex);
+	return ++_requestId;
 
 }
 
