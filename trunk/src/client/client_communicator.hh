@@ -69,10 +69,10 @@ public:
 	 * @param clientId Client ID
 	 * @param dstSockfd Destination Socket Descriptor
 	 * @param objectId Object ID
-	 * @return ObjectData structure
+	 * @return ObjectCache structure
 	 */
 
-	//struct objectCache getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath);
+	struct ObjectCache getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId);
 
 	/**
 	 * 1. Send an init message

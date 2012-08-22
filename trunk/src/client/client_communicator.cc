@@ -137,8 +137,7 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 	addMessage(putObjectEndReplyMsg);
 }
 
-void ClientCommunicator::getObjectAndWriteFile(uint32_t clientId, uint32_t dstSockfd,
-		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
+struct ObjectCache ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId) {
 
 	debug("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n",
 			objectId, dstSockfd);
@@ -159,6 +158,16 @@ void ClientCommunicator::getObjectAndWriteFile(uint32_t clientId, uint32_t dstSo
 
 	ClientStorageModule* _storageModule = client->getStorageModule();
 	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+	return objectCache;
+}
+
+void ClientCommunicator::getObjectAndWriteFile(uint32_t clientId, uint32_t dstSockfd,
+		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
+//	ClientStorageModule* _storageModule = client->getStorageModule();
+//	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+	struct ObjectCache objectCache = getObject(clientId, dstSockfd, objectId);
+
+	ClientStorageModule* _storageModule = client->getStorageModule();
 	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
 			objectCache.length);
 	debug(
