@@ -85,8 +85,8 @@ public:
 	void removePendingObjectFromMap(uint64_t objectId);
 	*/
 
-	uint32_t getPendingChunkCount(uint64_t objectId);
-	void setPendingChunkCount(uint64_t objectId, int32_t chunkCount);
+	int getPendingChunkCount(uint64_t objectId);
+	void setPendingChunkCount(uint64_t objectId, int chunkCount);
 
 	uint32_t getClientId ();
 private:
@@ -115,6 +115,6 @@ private:
 	ClientCommunicator* _clientCommunicator;
 	ClientStorageModule* _storageModule;
 
-	map<uint64_t, int32_t> _pendingObjectChunk;
+	map<uint64_t, int> _pendingObjectChunk;
 };
 #endif

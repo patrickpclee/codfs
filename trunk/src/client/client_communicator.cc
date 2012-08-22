@@ -102,15 +102,17 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 	return {};
 }
 
-void ClientCommunicator::saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList)
-{
+void ClientCommunicator::saveObjectList(uint32_t clientId, uint32_t fileId,
+		vector<uint64_t> objectList) {
 	uint32_t mdsSockfd = getMdsSockfd();
-	SaveObjectListRequestMsg* saveObjectListRequestMsg = new SaveObjectListRequestMsg(this, mdsSockfd, clientId, fileId, objectList);
+	SaveObjectListRequestMsg* saveObjectListRequestMsg =
+			new SaveObjectListRequestMsg(this, mdsSockfd, clientId, fileId,
+					objectList);
 	saveObjectListRequestMsg->prepareProtocolMsg();
 
 	addMessage(saveObjectListRequestMsg);
 
-	return ;
+	return;
 }
 
 void ClientCommunicator::replyPutObjectInit(uint32_t requestId,
@@ -131,14 +133,15 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 					objectId);
 	putObjectEndReplyMsg->prepareProtocolMsg();
 
-	debug ("Reply put object end for ID: %" PRIu64 "\n", objectId);
+	debug("Reply put object end for ID: %" PRIu64 "\n", objectId);
 	addMessage(putObjectEndReplyMsg);
 }
 
-void ClientCommunicator::getObject(uint32_t clientId,
-		uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
+void ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd,
+		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
 
-	debug ("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n", objectId, dstSockfd);
+	debug("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n",
+			objectId, dstSockfd);
 
 	client->setPendingChunkCount(objectId, -1);
 
@@ -149,17 +152,20 @@ void ClientCommunicator::getObject(uint32_t clientId,
 	addMessage(getObjectRequestMsg);
 
 	while (client->getPendingChunkCount(objectId) != 0) {
+		debug("Pending chunk count = %d\n",
+				client->getPendingChunkCount(objectId));
 		usleep(100000);
 	}
 
 	ClientStorageModule* _storageModule = client->getStorageModule();
 	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
-	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset, objectCache.length);
-			debug("Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
-					objectId, offset, objectCache.length, dstPath.c_str());
+	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
+			objectCache.length);
+	debug(
+			"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
+			objectId, offset, objectCache.length, dstPath.c_str());
 	_storageModule->closeObject(objectId);
 }
-
 
 //
 // TODO: DUMMY CONNECTION FOR NOW

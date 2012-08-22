@@ -72,7 +72,7 @@ void DownloadFileRequestMsg::doHandle() {
 
 void DownloadFileRequestMsg::printProtocol() {
 	debug(
-			"[UPLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", File ID = %" PRIu32 "\n",
+			"[DOWNLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", File ID = %" PRIu32 "\n",
 			_clientId, _fileId);
 }
 

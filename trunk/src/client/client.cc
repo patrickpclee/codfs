@@ -53,6 +53,7 @@ void startUploadThread(uint32_t clientId, uint32_t sockfd,
 void startDownloadThread(uint32_t clientId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
 	client->getCommunicator()->getObject(clientId, sockfd, objectId, offset, filePtr, dstPath);
+	debug ("Object ID = %" PRIu64 " finished download\n", objectId);
 }
 
 #endif
@@ -260,12 +261,12 @@ uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 	return byteWritten;
 }
 
-void Client::setPendingChunkCount(uint64_t objectId, int32_t chunkCount) {
+void Client::setPendingChunkCount(uint64_t objectId, int chunkCount) {
 	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	_pendingObjectChunk[objectId] = chunkCount;
 }
 
-uint32_t Client::getPendingChunkCount(uint64_t objectId) {
+int Client::getPendingChunkCount(uint64_t objectId) {
 	lock_guard<mutex> lk(pendingObjectChunkMutex);
 	return _pendingObjectChunk[objectId];
 }

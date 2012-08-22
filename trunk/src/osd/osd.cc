@@ -182,7 +182,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	MemoryPool::getInstance().poolFree(objectData.buf);
 	debug ("object %" PRIu64 "free-d\n", objectId);
 
-	for (auto segment : segmentDataList) {
+	for (struct SegmentData segment : segmentDataList) {
 		debug ("segment %" PRIu32 " free-d\n", segment.info.segmentId);
 		MemoryPool::getInstance().poolFree(segment.buf);
 	}
