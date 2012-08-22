@@ -11,6 +11,10 @@
 #include "../common/objectdata.hh"
 using namespace std;
 
+/**
+ * For caching an object in memory during upload/download
+ */
+
 struct ObjectCache {
 	uint64_t length;
 	char* buf;
@@ -39,7 +43,22 @@ public:
 
 	bool isObjectExist(uint64_t objectId);
 
+	/**
+	 * Create and open the file for storing the object on disk
+	 * Also creates an ObjectCache for downloading the object
+	 * @param objectId Object ID
+	 * @param length Length of object
+	 */
+
 	void createObject(uint64_t objectId, uint32_t length);
+
+	/**
+	 * Create and open the file for storing the segment on disk
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 * @param length Length of segment
+	 */
+
 	void createSegment(uint64_t objectId, uint32_t segmentId, uint32_t length);
 
 	/**
@@ -76,6 +95,15 @@ public:
 
 	uint32_t writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject,
 			uint32_t length);
+
+	/**
+	 * Write a buffer to the ObjectCache of the object
+	 * @param objectId Object ID
+	 * @param buf Pointer to buffer
+	 * @param offsetInObject No of bytes to skip in the cache
+	 * @param length No of bytes to write to the cache
+	 * @return No of bytes written
+	 */
 
 	uint32_t writeObjectCache(uint64_t objectId, char* buf,
 			uint64_t offsetInObject, uint32_t length);
@@ -170,6 +198,7 @@ private:
 	 */
 
 //	struct SegmentInfo readSegmentInfo(uint64_t objectId, uint32_t segmentId);
+
 	/**
 	 * Open a file and read data to buffer
 	 * @param filepath Path of the file in the storage
@@ -214,12 +243,35 @@ private:
 	string generateSegmentPath(uint64_t objectId, uint32_t segmentId,
 			string segmentFolder);
 
+	/**
+	 * Create a file on disk and open it
+	 * @param filepath Path of the file on storage
+	 * @return Pointer to the opened file
+	 */
+
 	FILE* createFile(string filepath);
+
+	/**
+	 * Retrieve the opened file pointer if file is already open
+	 * Open the file on disk if file is not already open
+	 * @param filepath Path to the file on disk
+	 * @return Pointer to the opened file
+	 */
 
 	FILE* openFile(string filepath);
 
+	/**
+	 * Close the file and remove it from _openedFile map
+	 * @param filepath Path to the file on disk
+	 */
+
 	void closeFile(string filepath);
 
+	/**
+	 * Open the file and finds the size of it
+	 * @param filepath Path to the file on disk
+	 * @return Size of the file
+	 */
 	uint64_t getFilesize(string filepath);
 
 	uint32_t _capacity; // total capacity of the node
