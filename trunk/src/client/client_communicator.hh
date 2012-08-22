@@ -56,6 +56,15 @@ public:
 	void saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
 
 	/**
+	 * Get an object from the primary OSD and Write to File
+	 * @param clientId Client ID
+	 * @param dstSockfd Destination Socket Descriptor
+	 * @param objectId Object ID
+	 */
+
+	void getObjectAndWriteFile(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath);
+
+	/**
 	 * Get an object from the primary OSD
 	 * @param clientId Client ID
 	 * @param dstSockfd Destination Socket Descriptor
@@ -63,7 +72,7 @@ public:
 	 * @return ObjectData structure
 	 */
 
-	void getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath);
+	//struct objectCache getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath);
 
 	/**
 	 * 1. Send an init message

@@ -137,7 +137,7 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 	addMessage(putObjectEndReplyMsg);
 }
 
-void ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd,
+void ClientCommunicator::getObjectAndWriteFile(uint32_t clientId, uint32_t dstSockfd,
 		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
 
 	debug("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n",

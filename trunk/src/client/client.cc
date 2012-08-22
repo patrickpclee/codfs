@@ -52,7 +52,7 @@ void startUploadThread(uint32_t clientId, uint32_t sockfd,
 
 void startDownloadThread(uint32_t clientId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
-	client->getCommunicator()->getObject(clientId, sockfd, objectId, offset, filePtr, dstPath);
+	client->getCommunicator()->getObjectAndWriteFile(clientId, sockfd, objectId, offset, filePtr, dstPath);
 	debug ("Object ID = %" PRIu64 " finished download\n", objectId);
 }
 
@@ -163,7 +163,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		downloadThread[i] = thread(startDownloadThread, _clientId, dstSockfd,
 				objectId, offset, filePtr, dstPath);
 #else
-		_clientCommunicator->getObject(_clientId, dstSockfd, objectId, offset,filePtr, dstPath);
+		_clientCommunicator->getObjectAndWriteFile(_clientId, dstSockfd, objectId, offset,filePtr, dstPath);
 #endif
 
 		i++;
