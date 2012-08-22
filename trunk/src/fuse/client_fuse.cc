@@ -17,6 +17,9 @@ ConfigLayer* configLayer;
 
 ClientCommunicator* communicator;
 
+mutex fileInfoCacheMutex;
+map <uint32_t, struct FileMetaData> _fileInfoCache;
+
 thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
@@ -80,8 +83,12 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi)
 	//if(strcmp(path, "/") != 0)
 	//	return -ENOENT;
 
-	struct FileMetaData fileMetaData = communicator->getFileInfo(51000, 423);
-	fi->fh = fileMetaData._id;
+	{
+		lock_guard<mutex> lk(fileInfoCacheMutex);
+		struct FileMetaData fileMetaData = communicator->getFileInfo(51000, 423);
+		fi->fh = fileMetaData._id;
+		_fileInfoCache[fileMetaData._id] = fileMetaData;
+	}
 	return 0;
 }
 
@@ -95,7 +102,11 @@ static int ncvfs_read(const char *path, char *buf, size_t size,
 //	if(strcmp(path, "/") != 0)
 //		return -ENOENT;
 
-	struct FileMetaData fileMetaData = communicator->getFileInfo(51000, fi->fh);
+	struct FileMetaData fileMetaData;
+	{
+		fileMetaData = _fileInfoCache[fi->fh];
+		//fileMetaData = communicator->getFileInfo(51000, fi->fh);
+	}
 
 	if((offset + size) > fileMetaData._size)
 		return 0;
