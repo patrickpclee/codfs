@@ -2,19 +2,26 @@
  * codingmodule.cc
  */
 
+#include <thread>
 #include "codingmodule.hh"
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
 #include "../common/debug.hh"
 
+mutex codingMutex;
+
 CodingModule::CodingModule() {
 
-	_codingWorker[RAID0_CODING] = new Raid0Coding();
-	_codingWorker[RAID1_CODING] = new Raid1Coding();
+	{
+		lock_guard<mutex> lk(codingMutex);
+		_codingWorker[RAID0_CODING] = new Raid0Coding();
+		_codingWorker[RAID1_CODING] = new Raid1Coding();
+	}
 }
 
 vector<struct SegmentData> CodingModule::encodeObjectToSegment(
-		CodingScheme codingScheme, struct ObjectData objectData, string setting) {
+		CodingScheme codingScheme, struct ObjectData objectData,
+		string setting) {
 
 	return getCoding(codingScheme)->encode(objectData, setting);
 }
@@ -31,12 +38,19 @@ vector<struct SegmentData> CodingModule::encodeObjectToSegment(
 }
 
 struct ObjectData CodingModule::decodeSegmentToObject(CodingScheme codingScheme,
-		uint64_t objectId, vector<struct SegmentData> segmentData, string setting) {
+		uint64_t objectId, vector<struct SegmentData> segmentData,
+		string setting) {
 
-	return getCoding(codingScheme)->decode(segmentData, setting);
+	Coding* coding = getCoding(codingScheme);
+	struct ObjectData objectData = coding->decode(segmentData, setting);
+
+	return objectData;
 }
 
 Coding* CodingModule::getCoding(CodingScheme codingScheme) {
+
+	lock_guard<mutex> lk(codingMutex);
+
 	if (!_codingWorker.count(codingScheme)) {
 		debug("%s\n", "Wrong coding scheme!");
 		exit(-1);
@@ -45,7 +59,8 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 	return _codingWorker[codingScheme];
 }
 
-vector<uint32_t> CodingModule::getRequiredSegmentIds (CodingScheme codingScheme, string setting) {
+vector<uint32_t> CodingModule::getRequiredSegmentIds(CodingScheme codingScheme,
+		string setting) {
 	return getCoding(codingScheme)->getRequiredSegmentIds(setting);
 }
 

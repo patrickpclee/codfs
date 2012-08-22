@@ -41,7 +41,7 @@ mutex pendingObjectChunkMutex;
 mutex pendingSegmentChunkMutex;
 mutex segmentTransferMutex;
 mutex receivedSegmentDataMutex;
-mutex receivedSegmentsMutex;
+mutex requestedSegmentsMutex;
 mutex codingSettingMapMutex;
 
 Osd::Osd(string configFilePath) {
@@ -116,7 +116,10 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		// initialize segmentCount
 		_pendingSegmentCount[objectId] = segmentCount;
 		_objectRequestCount[objectId] = 1;
-		_receivedSegments[objectId] = vector<bool>(segmentCount, false);
+		{
+			lock_guard<mutex> lk(requestedSegmentsMutex);
+			_requestedSegments[objectId] = vector<bool>(segmentCount, false);
+		}
 		{
 			lock_guard<mutex> lk(receivedSegmentDataMutex);
 			_receivedSegmentData[objectId] = vector<struct SegmentData>(
@@ -140,7 +143,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 	for (uint32_t requiredSegmentIndex : requiredSegments) {
 
-		if (!isSegmentReceived(objectId, requiredSegmentIndex)) {
+		if (!checkAndUpdateRequestStatus(objectId, requiredSegmentIndex)) {
 
 			uint32_t osdId = objectInfo._osdList[requiredSegmentIndex];
 
@@ -153,7 +156,6 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				{
 					lock_guard<mutex> lk(segmentTransferMutex);
 					_pendingSegmentCount[objectId]--;
-					_receivedSegments[objectId][requiredSegmentIndex] = true;
 					debug("%s\n", "Read from local segment");
 				}
 
@@ -209,7 +211,11 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			freeSegmentData = true;
 			_objectRequestCount.erase(objectId);
 			_pendingSegmentCount.erase(objectId);
-			_receivedSegments.erase(objectId);
+
+			{
+				lock_guard<mutex> lk(requestedSegmentsMutex);
+				_requestedSegments.erase(objectId);
+			}
 		}
 	}
 
@@ -240,7 +246,10 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		debug("_objectRequestCount = %zu\n", _objectRequestCount.size());
 		debug("_pendingSegmentCount = %zu\n", _pendingSegmentCount.size());
 		debug("_pendingSegmentChunk = %zu\n", _pendingSegmentChunk.size());
-		debug("_receivedSegments = %zu\n", _receivedSegments.size());
+		{
+			lock_guard<mutex> lk(requestedSegmentsMutex);
+			debug("_requestedSegments = %zu\n", _requestedSegments.size());
+		}
 		{
 			lock_guard<mutex> lk(receivedSegmentDataMutex);
 			debug("_receivedSegmentData = %zu\n", _receivedSegmentData.size());
@@ -513,7 +522,6 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 			{
 				lock_guard<mutex> lk(segmentTransferMutex);
 				_pendingSegmentCount[objectId]--;
-				_receivedSegments[objectId][segmentId] = true;
 			}
 			debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
 		}
@@ -578,9 +586,13 @@ uint32_t Osd::getOsdId() {
 	return _osdId;
 }
 
-bool Osd::isSegmentReceived(uint64_t objectId, uint32_t segmentId) {
-	lock_guard<mutex> lk(receivedSegmentsMutex);
-	return _receivedSegments[objectId][segmentId];
+bool Osd::checkAndUpdateRequestStatus(uint64_t objectId, uint32_t segmentId) {
+	lock_guard<mutex> lk(requestedSegmentsMutex);
+	if (_requestedSegments[objectId][segmentId] == true) {
+		return true;
+	}
+	_requestedSegments[objectId][segmentId] = true;
+	return false;
 }
 
 void startGarbageCollectionThread() {

@@ -226,7 +226,15 @@ public:
 
 	uint32_t getOsdId();
 
-	bool isSegmentReceived(uint64_t objectId, uint32_t segmentId);
+	/**
+	 * If segment is not requested, return false and set status to true
+	 * If segment is requested, return true
+	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 * @return is segment requested
+	 */
+
+	bool checkAndUpdateRequestStatus (uint64_t objectId, uint32_t segmentId);
 
 private:
 
@@ -290,7 +298,7 @@ private:
 	map<uint64_t, uint32_t> _objectRequestCount;
 	map<uint64_t, vector<struct SegmentData>> _receivedSegmentData;
 	map<uint64_t, uint32_t> _pendingSegmentCount;
-	map<uint64_t, vector<bool>> _receivedSegments;
+	map<uint64_t, vector<bool>> _requestedSegments;
 
 	// upload / download
 	map<string, uint32_t> _pendingSegmentChunk;
