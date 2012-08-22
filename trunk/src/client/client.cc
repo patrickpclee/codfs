@@ -216,7 +216,8 @@ void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	// create object and cache
-	_storageModule->createObjectCache(objectId, length);
+	if(!_storageModule->locateObjectCache(objectId))
+		_storageModule->createObjectCache(objectId, length);
 	_clientCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
 }

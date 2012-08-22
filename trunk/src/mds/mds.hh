@@ -79,6 +79,16 @@ public:
 			uint32_t clientId, uint32_t fileId);
 
 	/**
+	 * @brief	Handle Get File Info Request
+	 *
+	 * @param	requestId	Request ID
+	 * @param	connectonId	Connection ID
+	 * @param	clientId	ID of the Client
+	 * @param	path	Path of the File
+	 */
+	void getFileInfoProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, string path);
+
+	/**
 	 * @brief	Handle the Object Info Request from Osd
 	 *
 	 * @param	requestId	Request ID

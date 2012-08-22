@@ -144,8 +144,16 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
+void Mds::getFileInfoProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, string path)
+{
+	downloadFileProcessor(requestId, connectionId, clientId, path);	
+
+	return ;
+}
+
 /**
  * @brief	Handle the Object Info Request from Osd
+ * TODO: Currently Only Supplying Info Same as Download
  */
 void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId, uint64_t objectId)
 {
