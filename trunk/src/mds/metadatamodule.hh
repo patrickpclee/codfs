@@ -39,6 +39,14 @@ public:
 	void openFile(uint32_t clientId, uint32_t filieId);
 
 	/**
+	 *	@brief	Set File Size of a File
+	 *
+	 *	@param	fileId	ID of the File
+	 *	@param	fileSize	Size of the File
+	 */
+	void setFileSize(uint32_t fileId, uint64_t fileSize);
+
+	/**
 	 * @brief	Read File Size of a File
 	 *
 	 * @param	fileId	ID of the File

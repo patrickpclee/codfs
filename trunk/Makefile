@@ -10,7 +10,6 @@ MDS_DIR=			${SRC}/mds
 all:
 	make mds;
 	make client;
-	make fuse;
 	make osd;
 	#cp ./OSD ../osd_test
 	make monitor;

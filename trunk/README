@@ -25,3 +25,6 @@ In Ubuntu, the following changes are needed
 3. Install Apache Runtime
 
 > apt-get install libaprutil1-dev libapr1-dev
+
+4. Install FUSE
+> apt-get install libfuse-dev

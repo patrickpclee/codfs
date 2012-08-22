@@ -6,6 +6,7 @@
 #include "messagefactory.hh"
 #include "../common/debug.hh"
 #include "../common/enums.hh"
+
 #include "metadata/listdirectoryrequest.hh"
 #include "metadata/listdirectoryreply.hh"
 #include "metadata/uploadfilerequest.hh"
@@ -16,6 +17,8 @@
 #include "metadata/getobjectinforequest.hh"
 #include "metadata/getobjectinforeply.hh"
 #include "metadata/saveobjectlistrequest.hh"
+#include "metadata/setfilesizerequest.hh"
+
 #include "transfer/putobjectinitrequest.hh"
 #include "transfer/putobjectinitreply.hh"
 #include "transfer/segmenttransferendrequest.hh"
@@ -31,12 +34,15 @@
 #include "transfer/getsegmentinitrequest.hh"
 #include "transfer/getobjectrequest.hh"
 //#include "transfer/getobjectreplymsg.hh"
+
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
+
 #include "status/osdstartupmsg.hh"
 #include "status/osdshutdownmsg.hh"
 #include "status/osdstatupdaterequestmsg.hh"
 #include "status/osdstatupdatereplymsg.hh"
+
 #include "nodelist/getprimarylistrequest.hh"
 #include "nodelist/getprimarylistreply.hh"
 #include "nodelist/getsecondarylistrequest.hh"
@@ -91,6 +97,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (SAVE_OBJECT_LIST_REQUEST):
 		return new SaveObjectListRequestMsg(communicator);
+		break;
+	case (SET_FILE_SIZE_REQUEST):
+		return new SetFileSizeRequestMsg(communicator);
 		break;
 
 		//TRANSFER

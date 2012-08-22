@@ -268,9 +268,17 @@ void startSendThread() {
 void startReceiveThread(Communicator* communicator) {
 	// wait for message
 	communicator->waitForMessage();
-
 }
 
+/**
+ * @brief	Handle Set File Size Request
+ */
+void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, uint64_t fileSize)
+{
+	_metaDataModule->setFileSize(fileId, fileSize);	
+
+	return ;
+}
 
 /**
  * @brief	Test Case

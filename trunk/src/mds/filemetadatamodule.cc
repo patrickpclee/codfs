@@ -42,6 +42,21 @@ void FileMetaDataModule::createFile(uint32_t clientId, string path,
 }
 
 /**
+ *	@brief	Set File Size of a File
+ *
+ *	@param	fileId	ID of the File
+ *	@param	fileSize	Size of the File
+ */
+void FileMetaDataModule::setFileSize(uint32_t fileId, uint64_t fileSize)
+{
+	BSONObj queryObject = BSON ("id" << fileId);
+	BSONObj updateObject = BSON ("$set" << BSON ("fileSize" << (long long int)fileSize));
+	_fileMetaDataStorage->update(queryObject, updateObject);
+
+	return ;
+}
+
+/**
  * @brief	Read File Size of a File
  *
  * @param	fileId	ID of the File

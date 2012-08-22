@@ -157,6 +157,17 @@ public:
 	void saveObjectListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
 
 	/**
+	 * @brief	Handle Set File Size Request
+	 *
+	 * @param	requestId	Request ID
+	 * @param	conenctionId	Connection ID
+	 * @param	clientId	ID of the client Requesting
+	 * @param	fileId	ID of the File
+	 * @param	fileSize	Size of the File
+	 */
+	void setFileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, uint64_t fileSize);
+
+	/**
 	 * @brief	Get the MDS Communicator
 	 *
 	 * @return	Pointer to the MDS Communicator Module

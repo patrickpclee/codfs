@@ -38,6 +38,7 @@ class ListDirectoryRequestPro;
 class UploadFileRequestPro;
 class DownloadFileRequestPro;
 class SaveObjectListRequestPro;
+class SetFileSizeRequestPro;
 class PutObjectInitRequestPro;
 class ObjectDataPro;
 class GetObjectRequestPro;
@@ -754,6 +755,108 @@ class SaveObjectListRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static SaveObjectListRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class SetFileSizeRequestPro : public ::google::protobuf::Message {
+ public:
+  SetFileSizeRequestPro();
+  virtual ~SetFileSizeRequestPro();
+  
+  SetFileSizeRequestPro(const SetFileSizeRequestPro& from);
+  
+  inline SetFileSizeRequestPro& operator=(const SetFileSizeRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SetFileSizeRequestPro& default_instance();
+  
+  void Swap(SetFileSizeRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  SetFileSizeRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SetFileSizeRequestPro& from);
+  void MergeFrom(const SetFileSizeRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 fileId = 2;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // optional fixed64 fileSize = 3;
+  inline bool has_filesize() const;
+  inline void clear_filesize();
+  static const int kFileSizeFieldNumber = 3;
+  inline ::google::protobuf::uint64 filesize() const;
+  inline void set_filesize(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.SetFileSizeRequestPro)
+ private:
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  inline void set_has_filesize();
+  inline void clear_has_filesize();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 clientid_;
+  ::google::protobuf::uint32 fileid_;
+  ::google::protobuf::uint64 filesize_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static SetFileSizeRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -4430,6 +4533,76 @@ SaveObjectListRequestPro::objectlist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
 SaveObjectListRequestPro::mutable_objectlist() {
   return &objectlist_;
+}
+
+// -------------------------------------------------------------------
+
+// SetFileSizeRequestPro
+
+// optional fixed32 clientId = 1;
+inline bool SetFileSizeRequestPro::has_clientid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SetFileSizeRequestPro::set_has_clientid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SetFileSizeRequestPro::clear_has_clientid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SetFileSizeRequestPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
+}
+inline ::google::protobuf::uint32 SetFileSizeRequestPro::clientid() const {
+  return clientid_;
+}
+inline void SetFileSizeRequestPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
+}
+
+// optional fixed32 fileId = 2;
+inline bool SetFileSizeRequestPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void SetFileSizeRequestPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void SetFileSizeRequestPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void SetFileSizeRequestPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 SetFileSizeRequestPro::fileid() const {
+  return fileid_;
+}
+inline void SetFileSizeRequestPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// optional fixed64 fileSize = 3;
+inline bool SetFileSizeRequestPro::has_filesize() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void SetFileSizeRequestPro::set_has_filesize() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void SetFileSizeRequestPro::clear_has_filesize() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void SetFileSizeRequestPro::clear_filesize() {
+  filesize_ = GOOGLE_ULONGLONG(0);
+  clear_has_filesize();
+}
+inline ::google::protobuf::uint64 SetFileSizeRequestPro::filesize() const {
+  return filesize_;
+}
+inline void SetFileSizeRequestPro::set_filesize(::google::protobuf::uint64 value) {
+  set_has_filesize();
+  filesize_ = value;
 }
 
 // -------------------------------------------------------------------

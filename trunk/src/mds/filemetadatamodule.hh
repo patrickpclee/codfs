@@ -31,6 +31,14 @@ public:
 			uint32_t fileId, CodingScheme codingScheme, string codingSetting);
 
 	/**
+	 *	@brief	Set File Size of a File
+	 *
+	 *	@param	fileId	ID of the File
+	 *	@param	fileSize	Size of the File
+	 */
+	void setFileSize(uint32_t fileId, uint64_t fileSize);
+
+	/**
 	 * @brief	Read File Size of a File
 	 *
 	 * @param	fileId	ID of the File

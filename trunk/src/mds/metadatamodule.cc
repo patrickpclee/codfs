@@ -31,6 +31,15 @@ void MetaDataModule::openFile(uint32_t clientId, uint32_t filieId) {
 }
 
 /**
+ *	@brief	Set File Size of a File
+ */
+void MetaDataModule::setFileSize(uint32_t fileId, uint64_t fileSize)
+{
+	_fileMetaDataModule->setFileSize(fileId, fileSize);
+	return ;
+}
+
+/**
  * @brief	Read File Size of a File
  */
 uint64_t MetaDataModule::readFileSize(uint32_t fileId)

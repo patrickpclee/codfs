@@ -21,4 +21,8 @@
     	<!-- KB -->
     	<ObjectSize>10240</ObjectSize>
     </Storage>
+
+	<Fuse>
+		<TempStorage>/tmp/</TempStorage>
+	</Fuse>
 </NcvfsConfig>

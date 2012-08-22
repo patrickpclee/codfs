@@ -52,6 +52,12 @@ message SaveObjectListRequestPro {
 	repeated fixed64 objectList = 3;
 }
 
+message SetFileSizeRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	optional fixed64 fileSize = 3;
+}
+
 //
 // CLIENT -> OSD
 //
