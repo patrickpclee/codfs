@@ -102,6 +102,15 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 	return {};
 }
 
+/**
+ * @brief	Get File Info
+ * TODO: Currently Doing Same as Download
+ */
+struct FileMetaData ClientCommunicator::getFileInfo(uint32_t clientId, uint32_t fileId)
+{
+	return downloadFile(clientId, fileId);
+}
+
 void ClientCommunicator::saveObjectList(uint32_t clientId, uint32_t fileId,
 		vector<uint64_t> objectList) {
 	uint32_t mdsSockfd = getMdsSockfd();
@@ -142,6 +151,11 @@ struct ObjectCache ClientCommunicator::getObject(uint32_t clientId, uint32_t dst
 	debug("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n",
 			objectId, dstSockfd);
 
+	ClientStorageModule* _storageModule = client->getStorageModule();
+	if(_storageModule->locateObjectCache(objectId)){
+		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+		return objectCache;
+	}
 	client->setPendingChunkCount(objectId, -1);
 
 	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,
@@ -156,7 +170,6 @@ struct ObjectCache ClientCommunicator::getObject(uint32_t clientId, uint32_t dst
 		usleep(100000);
 	}
 
-	ClientStorageModule* _storageModule = client->getStorageModule();
 	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
 	return objectCache;
 }

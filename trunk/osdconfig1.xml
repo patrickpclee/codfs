@@ -18,8 +18,8 @@
     </Communication>
     
     <Storage>
-    	<ObjectLocation>./osd_object2/</ObjectLocation>
-    	<SegmentLocation>./osd_segment2/</SegmentLocation>
+    	<ObjectLocation>./osd_object/</ObjectLocation>
+    	<SegmentLocation>./osd_segment/</SegmentLocation>
     </Storage>
     
 </NcvfsConfig>

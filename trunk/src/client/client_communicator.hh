@@ -47,6 +47,16 @@ public:
 	struct FileMetaData downloadFile(uint32_t clientId, uint32_t fileId);
 
 	/**
+	 * @brief	Get File Info
+	 *
+	 * @param	clientId	Client ID
+	 * @param	fileId	ID of the file
+	 *
+	 * @return	File Meta Data
+	 */
+	struct FileMetaData getFileInfo(uint32_t clientId, uint32_t fileId);
+
+	/**
 	 * @brief	Save ObjectList of a File
 	 *
 	 * @param	clientId	Client ID

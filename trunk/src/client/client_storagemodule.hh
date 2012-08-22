@@ -20,6 +20,7 @@ public:
 
 	void createObjectCache(uint64_t objectId, uint32_t length);
 	uint32_t writeObjectCache (uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length);
+	bool locateObjectCache(uint64_t objectId);
 	void closeObject(uint64_t objectId);
 	struct ObjectCache getObjectCache(uint64_t objectId);
 

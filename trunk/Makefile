@@ -33,4 +33,5 @@ clean:
 	cd ${OSD_DIR}; make clean
 	cd ${MONITOR_DIR}; make clean
 	cd ${CLIENT_DIR}; make clean
+	cd $(FUSE_DIR); make clean
 	cd ${MDS_DIR}; make clean
