@@ -39,7 +39,8 @@ ConfigLayer* configLayer;
 
 mutex pendingObjectChunkMutex;
 mutex pendingSegmentChunkMutex;
-mutex pendingSegmentCountMutex;
+mutex segmentTransferMutex;
+mutex receivedSegmentDataMutex;
 mutex receivedSegmentsMutex;
 mutex codingSettingMapMutex;
 
@@ -107,44 +108,63 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// 2. initialize list and count
 
 	const uint32_t segmentCount = requiredSegments.size();
-	{
-		lock_guard<mutex> lk(pendingSegmentCountMutex);
-		_pendingSegmentCount[objectId] = segmentCount;
-		debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
-	}
 
-	receivedSegmentsMutex.lock();
-	_receivedSegments[objectId] = vector<struct SegmentData>(segmentCount);
-	vector<struct SegmentData>& segmentDataList = _receivedSegments[objectId];
-	receivedSegmentsMutex.unlock();
+	segmentTransferMutex.lock(); // ----- start lock -----
+
+	// if no one is downloading the object
+	if (!_objectRequestCount.count(objectId)) {
+		// initialize segmentCount
+		_pendingSegmentCount[objectId] = segmentCount;
+		_objectRequestCount[objectId] = 1;
+		_receivedSegments[objectId] = vector<bool>(segmentCount, false);
+		{
+			lock_guard<mutex> lk(receivedSegmentDataMutex);
+			_receivedSegmentData[objectId] = vector<struct SegmentData>(
+					segmentCount);
+		}
+	} else {
+		_objectRequestCount[objectId]++;
+	}
+	vector<struct SegmentData>& segmentDataList = _receivedSegmentData[objectId];
+	debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
+
+	segmentTransferMutex.unlock(); // ----- end lock -----
 
 	debug("[Download] Reserve %" PRIu32 " segments, segmentDataList = %zu\n",
 			segmentCount, segmentDataList.size());
 
-	// 3. request segments (either from disk or wait segments to arrive)
+	// 3. request segments
+	// case 1: load from disk
+	// case 2: request from OSD
+	// case 3: already requested
 
 	for (uint32_t requiredSegmentIndex : requiredSegments) {
 
-		uint32_t osdId = objectInfo._osdList[requiredSegmentIndex];
+		if (!isSegmentReceived(objectId, requiredSegmentIndex)) {
 
-		if (osdId == _osdId) {
-			// read segment from disk
-			struct SegmentData segmentData = _storageModule->readSegment(
-					objectId, requiredSegmentIndex, 0);
-			segmentDataList[requiredSegmentIndex] = segmentData;
+			uint32_t osdId = objectInfo._osdList[requiredSegmentIndex];
 
-			{
-				lock_guard<mutex> lk(pendingSegmentCountMutex);
-				_pendingSegmentCount[objectId]--;
-				debug("%s\n", "Read from local segment");
+			if (osdId == _osdId) {
+				// read segment from disk
+				struct SegmentData segmentData = _storageModule->readSegment(
+						objectId, requiredSegmentIndex, 0);
+				segmentDataList[requiredSegmentIndex] = segmentData;
+
+				{
+					lock_guard<mutex> lk(segmentTransferMutex);
+					_pendingSegmentCount[objectId]--;
+					_receivedSegments[objectId][requiredSegmentIndex] = true;
+					debug("%s\n", "Read from local segment");
+				}
+
+			} else {
+				// request segment from other OSD
+				debug("sending request for segment %" PRIu32 "\n",
+						requiredSegmentIndex);
+				_osdCommunicator->getSegmentRequest(osdId, objectId,
+						requiredSegmentIndex);
 			}
 
-		} else {
-			// request segment from other OSD
-			debug("sending request for segment %" PRIu32 "\n",
-					requiredSegmentIndex);
-			_osdCommunicator->getSegmentRequest(osdId, objectId,
-					requiredSegmentIndex);
 		}
 	}
 
@@ -153,7 +173,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	while (1) {
 		uint32_t segmentLeft = 0;
 		{
-			lock_guard<mutex> lk(pendingSegmentCountMutex);
+			lock_guard<mutex> lk(segmentTransferMutex);
 			segmentLeft = _pendingSegmentCount[objectId];
 		}
 
@@ -179,25 +199,54 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// clean up
 
+	bool freeSegmentData = false;
+	{
+		lock_guard<mutex> lk(segmentTransferMutex);
+
+		// decrease _objectRequestCount and erase if 0
+		if ((--_objectRequestCount[objectId]) == 0) {
+			// if this request is the only request left
+			freeSegmentData = true;
+			_objectRequestCount.erase(objectId);
+			_pendingSegmentCount.erase(objectId);
+			_receivedSegments.erase(objectId);
+		}
+	}
+
+	// free objectData
+	debug("free object %" PRIu64 "\n", objectId);
 	MemoryPool::getInstance().poolFree(objectData.buf);
-	debug ("object %" PRIu64 "free-d\n", objectId);
+	debug("object %" PRIu64 "free-d\n", objectId);
 
-	for (struct SegmentData segment : segmentDataList) {
-		debug ("segment %" PRIu32 " free-d\n", segment.info.segmentId);
-		MemoryPool::getInstance().poolFree(segment.buf);
-	}
-
-	{
-		lock_guard<mutex> lk(receivedSegmentsMutex);
-		_receivedSegments.erase(objectId);
-	}
-
-	{
-		lock_guard<mutex> lk(pendingSegmentCountMutex);
-		_pendingSegmentCount.erase(objectId);
+	// free segmentData if no one else uses
+	if (freeSegmentData) {
+		debug("free segmentdata for object %" PRIu64 "\n", objectId);
+		for (struct SegmentData segment : segmentDataList) {
+			debug("free segment %" PRIu32 "\n", segment.info.segmentId);
+			MemoryPool::getInstance().poolFree(segment.buf);
+			debug("segment %" PRIu32 " free-d\n", segment.info.segmentId);
+		}
+		{
+			lock_guard<mutex> lk(receivedSegmentDataMutex);
+			_receivedSegmentData.erase(objectId);
+		}
 	}
 
 	debug("%s\n", "[DOWNLOAD] Cleanup completed");
+
+	{
+		lock_guard<mutex> lk(segmentTransferMutex);
+		cout << "========" << endl;
+		debug("_objectRequestCount = %zu\n", _objectRequestCount.size());
+		debug("_pendingSegmentCount = %zu\n", _pendingSegmentCount.size());
+		debug("_pendingSegmentChunk = %zu\n", _pendingSegmentChunk.size());
+		debug("_receivedSegments = %zu\n", _receivedSegments.size());
+		{
+			lock_guard<mutex> lk(receivedSegmentDataMutex);
+			debug("_receivedSegmentData = %zu\n", _receivedSegmentData.size());
+		}
+		cout << "========" << endl;
+	}
 
 }
 
@@ -384,7 +433,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 	bool isDownload = false;
 	{
-		lock_guard<mutex> lk(pendingSegmentCountMutex);
+		lock_guard<mutex> lk(segmentTransferMutex);
 		isDownload = (bool) _pendingSegmentCount.count(objectId);
 	}
 
@@ -399,9 +448,10 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	if (isDownload) {
-		receivedSegmentsMutex.lock();
-		struct SegmentData& segmentData = _receivedSegments[objectId][segmentId];
-		receivedSegmentsMutex.unlock();
+		receivedSegmentDataMutex.lock();
+		struct SegmentData& segmentData =
+				_receivedSegmentData[objectId][segmentId];
+		receivedSegmentDataMutex.unlock();
 
 		segmentData.info.objectId = objectId;
 		segmentData.info.segmentId = segmentId;
@@ -427,15 +477,16 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	bool isDownload = false;
 
 	{
-		lock_guard<mutex> lk(pendingSegmentCountMutex);
+		lock_guard<mutex> lk(segmentTransferMutex);
 		isDownload = (bool) _pendingSegmentCount.count(objectId);
 	}
 
 	// if the segment received is for download process
 	if (isDownload) {
-		receivedSegmentsMutex.lock();
-		struct SegmentData& segmentData = _receivedSegments[objectId][segmentId];
-		receivedSegmentsMutex.unlock();
+		receivedSegmentDataMutex.lock();
+		struct SegmentData& segmentData =
+				_receivedSegmentData[objectId][segmentId];
+		receivedSegmentDataMutex.unlock();
 
 		debug("offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
 		memcpy(segmentData.buf + offset, buf, length);
@@ -460,8 +511,9 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 			_storageModule->closeSegment(objectId, segmentId);
 		} else {
 			{
-				lock_guard<mutex> lk(pendingSegmentCountMutex);
+				lock_guard<mutex> lk(segmentTransferMutex);
 				_pendingSegmentCount[objectId]--;
+				_receivedSegments[objectId][segmentId] = true;
 			}
 			debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
 		}
@@ -524,6 +576,11 @@ OsdCommunicator* Osd::getCommunicator() {
 
 uint32_t Osd::getOsdId() {
 	return _osdId;
+}
+
+bool Osd::isSegmentReceived(uint64_t objectId, uint32_t segmentId) {
+	lock_guard<mutex> lk(receivedSegmentsMutex);
+	return _receivedSegments[objectId][segmentId];
 }
 
 void startGarbageCollectionThread() {

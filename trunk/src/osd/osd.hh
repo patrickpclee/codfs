@@ -15,7 +15,6 @@
 #include "storagemodule.hh"
 #include "codingmodule.hh"
 
-
 /**
  * Central class of OSD
  * All functions of OSD are invoked here
@@ -203,7 +202,7 @@ public:
 	uint32_t getCpuLoadavg(int idx);
 
 	/**
-     * To get the free space of the current disk in MB
+	 * To get the free space of the current disk in MB
 	 * @return free space in MB, if error, return 0
 	 */
 	uint32_t getFreespace();
@@ -226,6 +225,8 @@ public:
 	 */
 
 	uint32_t getOsdId();
+
+	bool isSegmentReceived(uint64_t objectId, uint32_t segmentId);
 
 private:
 
@@ -281,11 +282,17 @@ private:
 //	Coding _cunit; // encode & decode done here
 	uint32_t _osdId;
 
+	// upload
 	map<uint64_t, uint32_t> _pendingObjectChunk;
-	map<string, uint32_t> _pendingSegmentChunk;
-	map<uint64_t, vector<struct SegmentData>> _receivedSegments;
-	map<uint64_t, uint32_t> _pendingSegmentCount;
 	map<uint64_t, struct CodingSetting> _codingSettingMap;
 
+	// download
+	map<uint64_t, uint32_t> _objectRequestCount;
+	map<uint64_t, vector<struct SegmentData>> _receivedSegmentData;
+	map<uint64_t, uint32_t> _pendingSegmentCount;
+	map<uint64_t, vector<bool>> _receivedSegments;
+
+	// upload / download
+	map<string, uint32_t> _pendingSegmentChunk;
 };
 #endif

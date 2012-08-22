@@ -152,8 +152,8 @@ void ClientCommunicator::getObjectAndWriteFile(uint32_t clientId, uint32_t dstSo
 	addMessage(getObjectRequestMsg);
 
 	while (client->getPendingChunkCount(objectId) != 0) {
-		debug("Pending chunk count = %d\n",
-				client->getPendingChunkCount(objectId));
+//		debug("Pending chunk count = %d\n",
+	//			client->getPendingChunkCount(objectId));
 		usleep(100000);
 	}
 

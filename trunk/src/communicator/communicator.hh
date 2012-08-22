@@ -296,7 +296,8 @@ protected:
 
 	void printComponents(string componentType, vector<Component> componentList);
 
-	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
+	uint32_t _requestId;
+//	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
 
 	uint16_t _serverPort; // listening port for incoming connections
 	Socket _serverSocket; // socket for accepting incoming connections
