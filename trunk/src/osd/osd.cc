@@ -293,8 +293,10 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 				objectId);
 
 		// write cache to disk
+		/*
 		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
 				objectCache.length);
+				*/
 
 		// perform coding
 		struct CodingSetting codingSetting = _codingSettingMap.get(objectId);
