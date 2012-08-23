@@ -14,6 +14,7 @@
 #include "segmentlocation.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
+#include "../datastructure/concurrentmap.hh"
 
 /**
  * Central class of OSD
@@ -234,7 +235,7 @@ public:
 	 * @return is segment requested
 	 */
 
-	bool checkAndUpdateRequestStatus (uint64_t objectId, uint32_t segmentId);
+	bool isSegmentRequested (uint64_t objectId, uint32_t segmentId);
 
 private:
 
@@ -291,16 +292,16 @@ private:
 	uint32_t _osdId;
 
 	// upload
-	map<uint64_t, uint32_t> _pendingObjectChunk;
-	map<uint64_t, struct CodingSetting> _codingSettingMap;
+	ConcurrentMap<uint64_t, uint32_t> _pendingObjectChunk;
+	ConcurrentMap<uint64_t, struct CodingSetting> _codingSettingMap;
 
 	// download
-	map<uint64_t, uint32_t> _objectRequestCount;
-	map<uint64_t, vector<struct SegmentData>> _receivedSegmentData;
-	map<uint64_t, uint32_t> _pendingSegmentCount;
-	map<uint64_t, vector<bool>> _requestedSegments;
+	ConcurrentMap<uint64_t, uint32_t> _objectRequestCount;
+	ConcurrentMap<uint64_t, vector<struct SegmentData>> _receivedSegmentData;
+	ConcurrentMap<uint64_t, uint32_t> _downloadSegmentRemaining;
+	ConcurrentMap<uint64_t, vector<bool>> _requestedSegments;
 
 	// upload / download
-	map<string, uint32_t> _pendingSegmentChunk;
+	ConcurrentMap<string, uint32_t> _pendingSegmentChunk;
 };
 #endif

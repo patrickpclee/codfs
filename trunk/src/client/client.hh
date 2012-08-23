@@ -8,6 +8,7 @@
 
 #include "../cache/cache.hh"
 #include "../common/metadata.hh"
+#include "../datastructure/concurrentmap.hh"
 
 class Client {
 public:
@@ -131,6 +132,6 @@ private:
 	ClientCommunicator* _clientCommunicator;
 	ClientStorageModule* _storageModule;
 
-	map<uint64_t, int> _pendingObjectChunk;
+	ConcurrentMap<uint64_t, int> _pendingObjectChunk;
 };
 #endif

@@ -49,6 +49,16 @@ public:
 		return value;
 	}
 
+	void increment (K key) {
+		std::lock_guard<std::mutex> lk(this->_m);
+		_map[key]++;
+	}
+
+	void decrement (K key) {
+		std::lock_guard<std::mutex> lk(this->_m);
+		_map[key]--;
+	}
+
 };
 
 #endif /* CONCURRENTMAP_HH_ */
