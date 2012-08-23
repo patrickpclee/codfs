@@ -629,20 +629,34 @@ class DownloadFileRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 fileid() const;
   inline void set_fileid(::google::protobuf::uint32 value);
   
+  // optional string filePath = 3;
+  inline bool has_filepath() const;
+  inline void clear_filepath();
+  static const int kFilePathFieldNumber = 3;
+  inline const ::std::string& filepath() const;
+  inline void set_filepath(const ::std::string& value);
+  inline void set_filepath(const char* value);
+  inline void set_filepath(const char* value, size_t size);
+  inline ::std::string* mutable_filepath();
+  inline ::std::string* release_filepath();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.DownloadFileRequestPro)
  private:
   inline void set_has_clientid();
   inline void clear_has_clientid();
   inline void set_has_fileid();
   inline void clear_has_fileid();
+  inline void set_has_filepath();
+  inline void clear_has_filepath();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 clientid_;
   ::google::protobuf::uint32 fileid_;
+  ::std::string* filepath_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -1824,24 +1838,35 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional fixed32 fileId = 1;
+  // optional fixed32 fileId = 2;
   inline bool has_fileid() const;
   inline void clear_fileid();
-  static const int kFileIdFieldNumber = 1;
+  static const int kFileIdFieldNumber = 2;
   inline ::google::protobuf::uint32 fileid() const;
   inline void set_fileid(::google::protobuf::uint32 value);
   
-  // optional fixed64 fileSize = 2;
+  // optional string filePath = 3;
+  inline bool has_filepath() const;
+  inline void clear_filepath();
+  static const int kFilePathFieldNumber = 3;
+  inline const ::std::string& filepath() const;
+  inline void set_filepath(const ::std::string& value);
+  inline void set_filepath(const char* value);
+  inline void set_filepath(const char* value, size_t size);
+  inline ::std::string* mutable_filepath();
+  inline ::std::string* release_filepath();
+  
+  // optional fixed64 fileSize = 4;
   inline bool has_filesize() const;
   inline void clear_filesize();
-  static const int kFileSizeFieldNumber = 2;
+  static const int kFileSizeFieldNumber = 4;
   inline ::google::protobuf::uint64 filesize() const;
   inline void set_filesize(::google::protobuf::uint64 value);
   
-  // optional string checksum = 3;
+  // optional string checksum = 5;
   inline bool has_checksum() const;
   inline void clear_checksum();
-  static const int kChecksumFieldNumber = 3;
+  static const int kChecksumFieldNumber = 5;
   inline const ::std::string& checksum() const;
   inline void set_checksum(const ::std::string& value);
   inline void set_checksum(const char* value);
@@ -1849,10 +1874,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_checksum();
   inline ::std::string* release_checksum();
   
-  // repeated fixed64 objectList = 4;
+  // repeated fixed64 objectList = 6;
   inline int objectlist_size() const;
   inline void clear_objectlist();
-  static const int kObjectListFieldNumber = 4;
+  static const int kObjectListFieldNumber = 6;
   inline ::google::protobuf::uint64 objectlist(int index) const;
   inline void set_objectlist(int index, ::google::protobuf::uint64 value);
   inline void add_objectlist(::google::protobuf::uint64 value);
@@ -1861,10 +1886,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
       mutable_objectlist();
   
-  // repeated fixed32 primaryList = 5;
+  // repeated fixed32 primaryList = 7;
   inline int primarylist_size() const;
   inline void clear_primarylist();
-  static const int kPrimaryListFieldNumber = 5;
+  static const int kPrimaryListFieldNumber = 7;
   inline ::google::protobuf::uint32 primarylist(int index) const;
   inline void set_primarylist(int index, ::google::protobuf::uint32 value);
   inline void add_primarylist(::google::protobuf::uint32 value);
@@ -1877,6 +1902,8 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
  private:
   inline void set_has_fileid();
   inline void clear_has_fileid();
+  inline void set_has_filepath();
+  inline void clear_has_filepath();
   inline void set_has_filesize();
   inline void clear_has_filesize();
   inline void set_has_checksum();
@@ -1884,6 +1911,7 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
+  ::std::string* filepath_;
   ::google::protobuf::uint64 filesize_;
   ::std::string* checksum_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectlist_;
@@ -1891,7 +1919,7 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 fileid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4462,6 +4490,64 @@ inline void DownloadFileRequestPro::set_fileid(::google::protobuf::uint32 value)
   fileid_ = value;
 }
 
+// optional string filePath = 3;
+inline bool DownloadFileRequestPro::has_filepath() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void DownloadFileRequestPro::set_has_filepath() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void DownloadFileRequestPro::clear_has_filepath() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void DownloadFileRequestPro::clear_filepath() {
+  if (filepath_ != &::google::protobuf::internal::kEmptyString) {
+    filepath_->clear();
+  }
+  clear_has_filepath();
+}
+inline const ::std::string& DownloadFileRequestPro::filepath() const {
+  return *filepath_;
+}
+inline void DownloadFileRequestPro::set_filepath(const ::std::string& value) {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  filepath_->assign(value);
+}
+inline void DownloadFileRequestPro::set_filepath(const char* value) {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  filepath_->assign(value);
+}
+inline void DownloadFileRequestPro::set_filepath(const char* value, size_t size) {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  filepath_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* DownloadFileRequestPro::mutable_filepath() {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  return filepath_;
+}
+inline ::std::string* DownloadFileRequestPro::release_filepath() {
+  clear_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = filepath_;
+    filepath_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
 // -------------------------------------------------------------------
 
 // SaveObjectListRequestPro
@@ -5211,7 +5297,7 @@ UploadFileReplyPro::mutable_primarylist() {
 
 // DownloadFileReplyPro
 
-// optional fixed32 fileId = 1;
+// optional fixed32 fileId = 2;
 inline bool DownloadFileReplyPro::has_fileid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
@@ -5233,15 +5319,73 @@ inline void DownloadFileReplyPro::set_fileid(::google::protobuf::uint32 value) {
   fileid_ = value;
 }
 
-// optional fixed64 fileSize = 2;
-inline bool DownloadFileReplyPro::has_filesize() const {
+// optional string filePath = 3;
+inline bool DownloadFileReplyPro::has_filepath() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void DownloadFileReplyPro::set_has_filesize() {
+inline void DownloadFileReplyPro::set_has_filepath() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void DownloadFileReplyPro::clear_has_filesize() {
+inline void DownloadFileReplyPro::clear_has_filepath() {
   _has_bits_[0] &= ~0x00000002u;
+}
+inline void DownloadFileReplyPro::clear_filepath() {
+  if (filepath_ != &::google::protobuf::internal::kEmptyString) {
+    filepath_->clear();
+  }
+  clear_has_filepath();
+}
+inline const ::std::string& DownloadFileReplyPro::filepath() const {
+  return *filepath_;
+}
+inline void DownloadFileReplyPro::set_filepath(const ::std::string& value) {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  filepath_->assign(value);
+}
+inline void DownloadFileReplyPro::set_filepath(const char* value) {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  filepath_->assign(value);
+}
+inline void DownloadFileReplyPro::set_filepath(const char* value, size_t size) {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  filepath_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* DownloadFileReplyPro::mutable_filepath() {
+  set_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    filepath_ = new ::std::string;
+  }
+  return filepath_;
+}
+inline ::std::string* DownloadFileReplyPro::release_filepath() {
+  clear_has_filepath();
+  if (filepath_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = filepath_;
+    filepath_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional fixed64 fileSize = 4;
+inline bool DownloadFileReplyPro::has_filesize() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void DownloadFileReplyPro::set_has_filesize() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void DownloadFileReplyPro::clear_has_filesize() {
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void DownloadFileReplyPro::clear_filesize() {
   filesize_ = GOOGLE_ULONGLONG(0);
@@ -5255,15 +5399,15 @@ inline void DownloadFileReplyPro::set_filesize(::google::protobuf::uint64 value)
   filesize_ = value;
 }
 
-// optional string checksum = 3;
+// optional string checksum = 5;
 inline bool DownloadFileReplyPro::has_checksum() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void DownloadFileReplyPro::set_has_checksum() {
-  _has_bits_[0] |= 0x00000004u;
+  _has_bits_[0] |= 0x00000008u;
 }
 inline void DownloadFileReplyPro::clear_has_checksum() {
-  _has_bits_[0] &= ~0x00000004u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void DownloadFileReplyPro::clear_checksum() {
   if (checksum_ != &::google::protobuf::internal::kEmptyString) {
@@ -5313,7 +5457,7 @@ inline ::std::string* DownloadFileReplyPro::release_checksum() {
   }
 }
 
-// repeated fixed64 objectList = 4;
+// repeated fixed64 objectList = 6;
 inline int DownloadFileReplyPro::objectlist_size() const {
   return objectlist_.size();
 }
@@ -5338,7 +5482,7 @@ DownloadFileReplyPro::mutable_objectlist() {
   return &objectlist_;
 }
 
-// repeated fixed32 primaryList = 5;
+// repeated fixed32 primaryList = 7;
 inline int DownloadFileReplyPro::primarylist_size() const {
   return primarylist_.size();
 }

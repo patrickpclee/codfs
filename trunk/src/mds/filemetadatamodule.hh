@@ -31,6 +31,15 @@ public:
 			uint32_t fileId, CodingScheme codingScheme, string codingSetting);
 
 	/**
+	 * @brief	Lookup the File ID with file Path
+	 *
+	 * @param	path	Path to the File
+	 *
+	 * @return	ID of the File
+	 */
+	uint32_t lookupFileId(string path);
+
+	/**
 	 *	@brief	Set File Size of a File
 	 *
 	 *	@param	fileId	ID of the File

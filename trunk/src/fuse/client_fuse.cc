@@ -2,6 +2,7 @@
 
 #include <fuse.h>
 #include <errno.h>
+#include <unordered_map>
 
 #include "client.hh"
 #include "client_communicator.hh"
@@ -17,12 +18,47 @@ ConfigLayer* configLayer;
 
 ClientCommunicator* communicator;
 
+uint32_t clientId = 51000;
+
 mutex fileInfoCacheMutex;
+mutex _objectProcessingMutex;
+unordered_map <uint64_t, unique_lock<mutex> > _objectProcessing;
 map <uint32_t, struct FileMetaData> _fileInfoCache;
+unordered_map <string, uint32_t> _fileIdCache;
 
 thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
+
+struct FileMetaData getAndCacheFileInfo (string filePath)
+{
+	struct FileMetaData fileMetaData;
+	uint32_t fileId;
+	lock_guard<mutex> lk(fileInfoCacheMutex);
+	if(_fileIdCache.count(filePath) == 0) {
+		fileMetaData = communicator->getFileInfo(clientId, filePath);
+		_fileIdCache[filePath] = fileMetaData._id;
+		_fileInfoCache[fileMetaData._id] = fileMetaData;
+		fileId = fileMetaData._id;
+	}
+	else {
+		fileId = _fileIdCache[filePath];
+	}
+	return _fileInfoCache[fileId];
+}
+
+struct FileMetaData getAndCacheFileInfo (uint32_t fileId)
+{
+	struct FileMetaData fileMetaData;
+	lock_guard<mutex> lk(fileInfoCacheMutex);
+	if(_fileInfoCache.count(fileId) == 0) {
+		fileMetaData = communicator->getFileInfo(clientId, fileId);
+		_fileIdCache[fileMetaData._path] = fileId;
+		_fileInfoCache[fileId] = fileMetaData;
+	}
+	return _fileInfoCache[fileId];
+
+}
 
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
@@ -60,7 +96,7 @@ void* ncvfs_init(struct fuse_conn_info *conn)
 
 static int ncvfs_getattr(const char *path, struct stat *stbuf)
 {
-	struct FileMetaData fileMetaData = communicator->getFileInfo(51000, 423);
+	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 	//if(strcmp(path, "/") != 0)
 	//	return -ENOENT;
 
@@ -83,12 +119,8 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi)
 	//if(strcmp(path, "/") != 0)
 	//	return -ENOENT;
 
-	{
-		lock_guard<mutex> lk(fileInfoCacheMutex);
-		struct FileMetaData fileMetaData = communicator->getFileInfo(51000, 423);
-		fi->fh = fileMetaData._id;
-		_fileInfoCache[fileMetaData._id] = fileMetaData;
-	}
+	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
+	fi->fh = fileMetaData._id;
 	return 0;
 }
 
@@ -102,11 +134,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size,
 //	if(strcmp(path, "/") != 0)
 //		return -ENOENT;
 
-	struct FileMetaData fileMetaData;
-	{
-		fileMetaData = _fileInfoCache[fi->fh];
-		//fileMetaData = communicator->getFileInfo(51000, fi->fh);
-	}
+	struct FileMetaData fileMetaData = getAndCacheFileInfo(fi->fh);
 
 	if((offset + size) > fileMetaData._size)
 		return 0;
@@ -125,7 +153,14 @@ static int ncvfs_read(const char *path, char *buf, size_t size,
 		uint32_t sockfd = communicator->getSockfdFromId(componentId);
 
 		struct ObjectCache objectCache;
-		objectCache = communicator->getObject(51000, sockfd, objectId); 
+		{
+			lock_guard<mutex> lk(_objectProcessingMutex);
+			objectCache = communicator->getObject(clientId, sockfd, objectId); 
+			//static unique_lock<mutex> tempLock;
+			//_objectProcessing[objectId] = move(tempLock);
+		}
+		//_objectProcessing[objectId].lock();
+		//_objectProcessing[objectId].unlock();
 		uint64_t copySize = min(objectSize,size - byteWritten);
 		copySize = min(copySize, (i+1) * objectSize - (offset + byteWritten));
 		uint64_t objectOffset = (offset + byteWritten) - i * objectSize;

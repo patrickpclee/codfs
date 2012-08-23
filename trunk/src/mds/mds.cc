@@ -96,6 +96,7 @@ void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
 void Mds::downloadFileProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, string dstPath) {
 	uint32_t fileId = _metaDataModule->lookupFileId(dstPath);
+	debug("Path = %s [%" PRIu32 "]\n",dstPath.c_str(), fileId);
 	return downloadFileProcess(requestId, connectionId, clientId, fileId,
 			dstPath);
 }
@@ -139,7 +140,7 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	string checksum = _metaDataModule->readChecksum(fileId);
 
 	debug ("FILESIZE = %" PRIu64 "\n", fileSize);
-	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, fileSize, checksum, objectList, primaryList);
+	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path, fileSize, checksum, objectList, primaryList);
 
 	return;
 }
