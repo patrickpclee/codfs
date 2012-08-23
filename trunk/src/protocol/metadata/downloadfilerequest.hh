@@ -44,6 +44,17 @@ public:
 			uint32_t clientId, uint32_t fileId);
 
 	/**
+	 * Constructor - Save parameters in private variables
+	 *
+	 * @param	communicator	Communicator the Message belongs to
+	 * @param	clientId	Client ID
+	 * @param	filePath	File Path
+	 */
+
+	DownloadFileRequestMsg(Communicator* communicator, uint32_t mdsSockfd,
+			uint32_t clientId, string filePath);
+
+	/**
 	 * Copy values in private variables to protocol message
 	 * Serialize protocol message and copy to private variable
 	 */
@@ -78,6 +89,8 @@ public:
 	vector<uint32_t> getPrimaryList();
 	void setFileId (uint32_t fileId);
 	uint32_t getFileId ();
+	void setFilePath (string filePath);
+	string getFilePath ();
 	void setSize (uint64_t size);
 	uint32_t getSize();
 
@@ -85,6 +98,7 @@ private:
 	uint32_t _clientId;
 	uint32_t _fileId;
 	uint64_t _size;
+	string _filePath;
 	vector<uint64_t> _objectList;
 	vector<uint32_t> _primaryList;
 };

@@ -141,7 +141,7 @@ vector<uint32_t> MetaDataModule::readNodeList(uint64_t objectId) {
 }
 
 uint32_t MetaDataModule::lookupFileId(string path) {
-	return 0;
+	return _fileMetaDataModule->lookupFileId(path);
 }
 
 string MetaDataModule::lookupFilePath(uint32_t fileId) {

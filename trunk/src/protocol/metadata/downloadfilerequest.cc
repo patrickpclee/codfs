@@ -31,6 +31,19 @@ DownloadFileRequestMsg::DownloadFileRequestMsg(Communicator* communicator,
 	_sockfd = mdsSockfd;
 	_clientId = clientId;
 	_fileId = fileId;
+	_filePath = "";
+}
+
+/**
+ * Constructor - Save parameters in private variables
+ */
+DownloadFileRequestMsg::DownloadFileRequestMsg(Communicator* communicator,
+		uint32_t mdsSockfd, uint32_t clientId, string filePath) :
+		Message(communicator) {
+	_sockfd = mdsSockfd;
+	_clientId = clientId;
+	_fileId = 0;
+	_filePath = filePath;
 }
 
 void DownloadFileRequestMsg::prepareProtocolMsg() {
@@ -39,7 +52,10 @@ void DownloadFileRequestMsg::prepareProtocolMsg() {
 	ncvfs::DownloadFileRequestPro downloadFileRequestPro;
 
 	downloadFileRequestPro.set_clientid(_clientId);
-	downloadFileRequestPro.set_fileid(_fileId);
+	if(_fileId == 0)
+		downloadFileRequestPro.set_filepath(_filePath);
+	else
+		downloadFileRequestPro.set_fileid(_fileId);
 
 	if (!downloadFileRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -60,20 +76,29 @@ void DownloadFileRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_clientId = downloadFileRequestPro.clientid();
-	_fileId = downloadFileRequestPro.fileid();
+	if(downloadFileRequestPro.has_fileid()){
+		_fileId = downloadFileRequestPro.fileid();
+		_filePath = "";
+	} else {
+		_fileId = 0;
+		_filePath = downloadFileRequestPro.filepath();
+	}
 
 }
 
 void DownloadFileRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->downloadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _fileId);
+	if(_fileId == 0)
+		mds->downloadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _filePath);
+	else
+		mds->downloadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _fileId);
 #endif
 }
 
 void DownloadFileRequestMsg::printProtocol() {
 	debug(
-			"[DOWNLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", File ID = %" PRIu32 "\n",
-			_clientId, _fileId);
+			"[DOWNLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", File ID = %" PRIu32 "File Path = %s\n",
+			_clientId, _fileId, _filePath.c_str());
 }
 
 void DownloadFileRequestMsg::setObjectList(vector<uint64_t> objectList) {
@@ -94,11 +119,18 @@ vector<uint32_t> DownloadFileRequestMsg::getPrimaryList() {
 
 void DownloadFileRequestMsg::setFileId(uint32_t fileId) {
 	_fileId = fileId;
-
 }
 
 uint32_t DownloadFileRequestMsg::getFileId() {
 	return _fileId;
+}
+
+void DownloadFileRequestMsg::setFilePath (string filePath) {
+	_filePath = filePath;
+}
+
+string DownloadFileRequestMsg::getFilePath () {
+	return _filePath;
 }
 
 void DownloadFileRequestMsg::setSize (uint64_t size) {
