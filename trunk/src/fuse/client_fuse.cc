@@ -79,7 +79,6 @@ void* ncvfs_init(struct fuse_conn_info *conn)
 	communicator->createServerSocket();
 
 	// 1. Garbage Collection Thread
-	//thread garbageCollectionThread(startGarbageCollectionThread);
 	garbageCollectionThread = thread(startGarbageCollectionThread);
 
 	// 2. Receive Thread
@@ -97,14 +96,11 @@ void* ncvfs_init(struct fuse_conn_info *conn)
 static int ncvfs_getattr(const char *path, struct stat *stbuf)
 {
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
-	//if(strcmp(path, "/") != 0)
-	//	return -ENOENT;
 
 	stbuf->st_mode = S_IFREG | 0644;
 	stbuf->st_nlink = 1;
 	stbuf->st_uid = getuid();
 	stbuf->st_gid = getgid();
-	//stbuf->st_size = (1ULL << 32); /* 4G */
 	stbuf->st_size = fileMetaData._size;
 	stbuf->st_blocks = 0;
 	stbuf->st_atime = stbuf->st_mtime = stbuf->st_ctime = time(NULL);
@@ -114,11 +110,6 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf)
 
 static int ncvfs_open(const char *path, struct fuse_file_info *fi)
 {
-	//(void) fi;
-
-	//if(strcmp(path, "/") != 0)
-	//	return -ENOENT;
-
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 	fi->fh = fileMetaData._id;
 	return 0;
@@ -127,13 +118,6 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi)
 static int ncvfs_read(const char *path, char *buf, size_t size,
 		     off_t offset, struct fuse_file_info *fi)
 {
-	(void) buf;
-	(void) offset;
-	(void) fi;
-
-//	if(strcmp(path, "/") != 0)
-//		return -ENOENT;
-
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(fi->fh);
 
 	if((offset + size) > fileMetaData._size)
@@ -156,11 +140,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size,
 		{
 			lock_guard<mutex> lk(_objectProcessingMutex);
 			objectCache = communicator->getObject(clientId, sockfd, objectId); 
-			//static unique_lock<mutex> tempLock;
-			//_objectProcessing[objectId] = move(tempLock);
 		}
-		//_objectProcessing[objectId].lock();
-		//_objectProcessing[objectId].unlock();
 		uint64_t copySize = min(objectSize,size - byteWritten);
 		copySize = min(copySize, (i+1) * objectSize - (offset + byteWritten));
 		uint64_t objectOffset = (offset + byteWritten) - i * objectSize;
@@ -168,8 +148,6 @@ static int ncvfs_read(const char *path, char *buf, size_t size,
 		byteWritten += copySize;
 		//storageModule->closeObject(objectId);
 	}
-	//if (offset >= (1ULL << 32))
-	//	return 0;
 
 	return byteWritten;
 }
