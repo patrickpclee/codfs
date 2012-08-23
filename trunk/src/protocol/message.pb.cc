@@ -1001,7 +1001,7 @@ void protobuf_AddDesc_message_2eproto() {
     "gScheme\030\004 \001(\0162+.ncvfs.PutObjectInitReque"
     "stPro.CodingScheme\022\025\n\rcodingSetting\030\005 \001("
     "\t\"F\n\014CodingScheme\022\020\n\014RAID0_CODING\020\001\022\020\n\014R"
-    "AID1_CODING\020\002\022\022\n\016DEFAULT_CODING\020d\"A\n\rObj"
+    "AID1_CODING\020\002\022\022\n\016DEFAULT_CODING\020\017\"A\n\rObj"
     "ectDataPro\022\020\n\010objectId\030\001 \001(\006\022\016\n\006offset\030\002"
     " \001(\006\022\016\n\006length\030\003 \001(\007\"O\n\023GetObjectRequest"
     "Pro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 \001("
@@ -1059,7 +1059,7 @@ void protobuf_AddDesc_message_2eproto() {
     "dStatUpdateRequestPro\"L\n\030GetSecondaryLis"
     "tReplyPro\0220\n\rsecondaryList\030\001 \003(\0132\031.ncvfs"
     ".SegmentLocationPro\"-\n\026GetPrimaryListRep"
-    "lyPro\022\023\n\013primaryList\030\001 \003(\007", 3346);
+    "lyPro\022\023\n\013primaryList\030\001 \003(\007B\002H\001", 3350);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -3260,7 +3260,7 @@ bool PutObjectInitRequestPro_CodingScheme_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
-    case 100:
+    case 15:
       return true;
     default:
       return false;

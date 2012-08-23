@@ -1,4 +1,5 @@
 package ncvfs;
+option optimize_for = SPEED;
 
 ///////////////// UNIVERSAL /////////////////
 
@@ -71,7 +72,7 @@ message PutObjectInitRequestPro {
 	enum CodingScheme {
 		RAID0_CODING = 1;
 		RAID1_CODING = 2;
-		DEFAULT_CODING = 100;
+		DEFAULT_CODING = 15;
 	}
 	
 	optional CodingScheme codingScheme = 4;
