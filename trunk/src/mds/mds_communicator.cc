@@ -60,10 +60,10 @@ void MdsCommunicator::replyObjectInfo(uint32_t requestId, uint32_t connectionId,
 			codingSetting);
 	getObjectInfoReplyMsg->prepareProtocolMsg();
 
-	cout << "======================"<< endl;
+	debug ("%s\n" , "======================");
 	getObjectInfoReplyMsg->printHeader();
 	getObjectInfoReplyMsg->printProtocol();
-	cout << "======================"<< endl;
+	debug ("%s\n" , "======================");
 
 	addMessage(getObjectInfoReplyMsg);
 	return;

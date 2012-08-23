@@ -28,12 +28,9 @@ extern Osd* osd;
 /// Config Object
 extern ConfigLayer* configLayer;
 
-mutex pendingObjectChunkMutex;
-mutex pendingSegmentChunkMutex;
-mutex segmentTransferMutex;
-mutex receivedSegmentDataMutex;
 mutex requestedSegmentsMutex;
-mutex codingSettingMapMutex;
+mutex initializationMutex;
+mutex cleanupMutex;
 
 Osd::Osd(string configFilePath) {
 
@@ -93,34 +90,30 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// check which segments are needed to request
 	vector<uint32_t> requiredSegments = _codingModule->getRequiredSegmentIds(
 			codingScheme, codingSetting);
-	uint32_t totalNumOfSegments = _codingModule->getNumberOfSegments(codingScheme,
-			codingSetting);
+	uint32_t totalNumOfSegments = _codingModule->getNumberOfSegments(
+			codingScheme, codingSetting);
 
 	// 2. initialize list and count
 
 	const uint32_t segmentCount = requiredSegments.size();
-
-	segmentTransferMutex.lock(); // ----- start lock -----
+	
+	initializationMutex.lock();
 
 	// if no one is downloading the object
 	if (!_objectRequestCount.count(objectId)) {
 		// initialize segmentCount
-		_pendingSegmentCount[objectId] = segmentCount;
-		_objectRequestCount[objectId] = 1;
-		{
-			lock_guard<mutex> lk(requestedSegmentsMutex);
-			_requestedSegments[objectId] = vector<bool>(segmentCount, false);
-		}
-		{
-			lock_guard<mutex> lk(receivedSegmentDataMutex);
-			_receivedSegmentData[objectId] = vector<struct SegmentData> (totalNumOfSegments);
-		}
+		_downloadSegmentRemaining.set(objectId, segmentCount);
+		_objectRequestCount.set(objectId, 1);
+		_requestedSegments.set(objectId, vector<bool>(segmentCount, false));
+		_receivedSegmentData.set(objectId,
+				vector<struct SegmentData>(totalNumOfSegments));
 	} else {
-		_objectRequestCount[objectId]++;
+		_objectRequestCount.increment(objectId);
 	}
-	vector<struct SegmentData>& segmentDataList = _receivedSegmentData[objectId];
+	vector<struct SegmentData>& segmentDataList = _receivedSegmentData.get(
+			objectId);
 
-	segmentTransferMutex.unlock(); // ----- end lock -----
+	initializationMutex.unlock();
 
 	debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
 
@@ -131,7 +124,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 	for (uint32_t requiredSegmentIndex : requiredSegments) {
 
-		if (!checkAndUpdateRequestStatus(objectId, requiredSegmentIndex)) {
+		if (!isSegmentRequested(objectId, requiredSegmentIndex)) {
 
 			uint32_t osdId = objectInfo._osdList[requiredSegmentIndex];
 
@@ -143,11 +136,8 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// segmentDataList only reserved space for the requiredSegments
 				segmentDataList[requiredSegmentIndex] = segmentData;
 
-				{
-					lock_guard<mutex> lk(segmentTransferMutex);
-					_pendingSegmentCount[objectId]--;
-					debug("%s\n", "Read from local segment");
-				}
+				_downloadSegmentRemaining.decrement(objectId);
+				debug("%s\n", "Read from local segment");
 
 			} else {
 				// request segment from other OSD
@@ -162,13 +152,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// 4. wait until all segments have arrived
 
 	while (1) {
-		uint32_t segmentLeft = 0;
-		{
-			lock_guard<mutex> lk(segmentTransferMutex);
-			segmentLeft = _pendingSegmentCount[objectId];
-		}
-
-		if (segmentLeft == 0) {
+		if (_downloadSegmentRemaining.get(objectId) == 0) {
 			// 5. decode segments
 
 			debug(
@@ -191,22 +175,21 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// clean up
 
 	bool freeSegmentData = false;
-	{
-		lock_guard<mutex> lk(segmentTransferMutex);
 
-		// decrease _objectRequestCount and erase if 0
-		if ((--_objectRequestCount[objectId]) == 0) {
-			// if this request is the only request left
-			freeSegmentData = true;
-			_objectRequestCount.erase(objectId);
-			_pendingSegmentCount.erase(objectId);
-
-			{
-				lock_guard<mutex> lk(requestedSegmentsMutex);
-				_requestedSegments.erase(objectId);
-			}
-		}
+	// decrease _objectRequestCount and erase if 0
+	
+	cleanupMutex.lock();
+	
+	_objectRequestCount.decrement(objectId);
+	if (_objectRequestCount.get(objectId) == 0) {
+		// if this request is the only request left
+		freeSegmentData = true;
+		_objectRequestCount.erase(objectId);
+		_downloadSegmentRemaining.erase(objectId);
+		_requestedSegments.erase(objectId);
 	}
+	
+	cleanupMutex.unlock();
 
 	// free objectData
 	debug("free object %" PRIu64 "\n", objectId);
@@ -221,10 +204,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			MemoryPool::getInstance().poolFree(segment.buf);
 			debug("segment %" PRIu32 " free-d\n", segment.info.segmentId);
 		}
-		{
-			lock_guard<mutex> lk(receivedSegmentDataMutex);
-			_receivedSegmentData.erase(objectId);
-		}
+		_receivedSegmentData.erase(objectId);
 	}
 
 	debug("%s\n", "[DOWNLOAD] Cleanup completed");
@@ -248,15 +228,10 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	codingSetting.setting = setting;
 
 	// initialize chunkCount value
-	{
-		lock_guard<mutex> lk(pendingObjectChunkMutex);
-		_pendingObjectChunk[objectId] = chunkCount;
-	}
+	_pendingObjectChunk.set(objectId, chunkCount);
 
-	{
-		lock_guard<mutex> lk(codingSettingMapMutex);
-		_codingSettingMap[objectId] = codingSetting;
-	}
+	// save coding setting
+	_codingSettingMap.set(objectId, codingSetting);
 
 	// create object and cache
 	_storageModule->createObject(objectId, length);
@@ -268,16 +243,9 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId) {
 
 	// TODO: check integrity of object received
-	bool chunkRemaining = false;
-
 	while (1) {
 
-		{
-			lock_guard<mutex> lk(pendingObjectChunkMutex);
-			chunkRemaining = (bool) _pendingObjectChunk.count(objectId);
-		}
-
-		if (!chunkRemaining) {
+		if (!_pendingObjectChunk.count(objectId)) {
 			// if all chunks have arrived, send ack
 			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
@@ -294,17 +262,11 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// TODO: check integrity of segment received
 	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
-	bool chunkRemaining = false;
 
 	while (1) {
 
-		{
-			lock_guard<mutex> lk(pendingObjectChunkMutex);
-			chunkRemaining = (bool) _pendingSegmentChunk.count(segmentKey);
-		}
-
-		if (!chunkRemaining) {
-			// if all chunks have arrived, send ack
+		// if all chunks have arrived, send ack
+		if (!_pendingSegmentChunk.count(segmentKey)) {
 			_osdCommunicator->replyPutSegmentEnd(requestId, sockfd, objectId,
 					segmentId);
 			break;
@@ -323,16 +285,10 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
 			length);
 
-	uint32_t chunkLeft = 0;
-	{
-		lock_guard<mutex> lk(pendingObjectChunkMutex);
-		// update pendingObjectChunk value
-		_pendingObjectChunk[objectId]--;
-		chunkLeft = _pendingObjectChunk[objectId];
-	}
+	_pendingObjectChunk.decrement(objectId);
 
 	// if all chunks have arrived
-	if (chunkLeft == 0) {
+	if (_pendingObjectChunk.get(objectId) == 0) {
 		struct ObjectCache objectCache = _storageModule->getObjectCache(
 				objectId);
 
@@ -341,12 +297,8 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 				objectCache.length);
 
 		// perform coding
-		struct CodingSetting codingSetting;
-		{
-			lock_guard<mutex> lk(codingSettingMapMutex);
-			codingSetting = _codingSettingMap[objectId];
-			_codingSettingMap.erase(objectId);
-		}
+		struct CodingSetting codingSetting = _codingSettingMap.get(objectId);
+		_codingSettingMap.erase(objectId);
 
 		debug("Coding Scheme = %d setting = %s\n",
 				(int) codingSetting.codingScheme, codingSetting.setting.c_str());
@@ -392,11 +344,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		// close file and free cache
 		_storageModule->closeObject(objectId);
 
-		// remove from map
-		{
-			lock_guard<mutex> lk(pendingObjectChunkMutex);
-			_pendingObjectChunk.erase(objectId);
-		}
+		_pendingObjectChunk.erase(objectId);
 
 		// Acknowledge MDS for Object Upload Completed
 		_osdCommunicator->objectUploadAck(objectId, codingSetting.codingScheme,
@@ -412,27 +360,17 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint32_t chunkCount) {
 
 	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
-	bool isDownload = false;
-	{
-		lock_guard<mutex> lk(segmentTransferMutex);
-		isDownload = (bool) _pendingSegmentCount.count(objectId);
-	}
+	bool isDownload = _downloadSegmentRemaining.count(objectId);
 
 	debug(
 			"[PUT_SEGMENT_INIT] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "isDownload = %d\n",
 			objectId, segmentId, length, chunkCount, isDownload);
 
-	// initialize chunkCount value
-	{
-		lock_guard<mutex> lk(pendingSegmentChunkMutex);
-		_pendingSegmentChunk[segmentKey] = chunkCount;
-	}
+	_pendingSegmentChunk.set(segmentKey, chunkCount);
 
 	if (isDownload) {
-		receivedSegmentDataMutex.lock();
 		struct SegmentData& segmentData =
-				_receivedSegmentData[objectId][segmentId];
-		receivedSegmentDataMutex.unlock();
+				_receivedSegmentData.get(objectId)[segmentId];
 
 		segmentData.info.objectId = objectId;
 		segmentData.info.segmentId = segmentId;
@@ -455,19 +393,12 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 
 	uint32_t byteWritten = 0;
-	bool isDownload = false;
-
-	{
-		lock_guard<mutex> lk(segmentTransferMutex);
-		isDownload = (bool) _pendingSegmentCount.count(objectId);
-	}
+	bool isDownload = _downloadSegmentRemaining.count(objectId);
 
 	// if the segment received is for download process
 	if (isDownload) {
-		receivedSegmentDataMutex.lock();
 		struct SegmentData& segmentData =
-				_receivedSegmentData[objectId][segmentId];
-		receivedSegmentDataMutex.unlock();
+				_receivedSegmentData.get(objectId)[segmentId];
 
 		debug("offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
 		memcpy(segmentData.buf + offset, buf, length);
@@ -476,33 +407,21 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 				offset, length);
 	}
 
-	uint32_t chunkLeft = 0;
-	{
-		lock_guard<mutex> lk(pendingSegmentChunkMutex);
-		// update pendingSegmentChunk value
-		_pendingSegmentChunk[segmentKey]--;
-		chunkLeft = _pendingSegmentChunk[segmentKey];
-	}
+	_pendingSegmentChunk.decrement(segmentKey);
 
 	// if all chunks have arrived
-	if (chunkLeft == 0) {
+	if (_pendingSegmentChunk.get(segmentKey) == 0) {
 
 		if (!isDownload) {
 			// close file and free cache
 			_storageModule->closeSegment(objectId, segmentId);
 		} else {
-			{
-				lock_guard<mutex> lk(segmentTransferMutex);
-				_pendingSegmentCount[objectId]--;
-			}
+			_downloadSegmentRemaining.decrement(objectId);
 			debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
 		}
 
 		// remove from map
-		{
-			lock_guard<mutex> lk(pendingSegmentChunkMutex);
-			_pendingSegmentChunk.erase(segmentKey);
-		}
+		_pendingSegmentChunk.erase(segmentKey);
 
 	}
 
@@ -558,12 +477,17 @@ uint32_t Osd::getOsdId() {
 	return _osdId;
 }
 
-bool Osd::checkAndUpdateRequestStatus(uint64_t objectId, uint32_t segmentId) {
+bool Osd::isSegmentRequested (uint64_t objectId, uint32_t segmentId) {
 	lock_guard<mutex> lk(requestedSegmentsMutex);
-	if (_requestedSegments[objectId][segmentId] == true) {
+	bool requested = _requestedSegments.get(objectId)[segmentId];
+
+	// if segment is already requested, return true
+	if (requested) {
 		return true;
 	}
-	_requestedSegments[objectId][segmentId] = true;
+
+	// else, ask this thread to send request and set it to true
+	_requestedSegments.get(objectId)[segmentId] = true;
 	return false;
 }
 
