@@ -39,6 +39,7 @@ public:
 	 * @param	requestId	Request ID
 	 * @param 	sockfd		Source Socket Descriptor
 	 * @param	fileId		File ID
+	 * @param	filePath	File Path
 	 * @param	fileSize	Size of the File
 	 * @param	checksum	Checksum of the File
 	 * @param 	objectList	List of objects of the file
@@ -46,7 +47,7 @@ public:
 	 */
 
 	DownloadFileReplyMsg(Communicator* communicator, 
-			uint32_t requestId, uint32_t sockfd, uint32_t fileId, 
+			uint32_t requestId, uint32_t sockfd, uint32_t fileId, string filePath,
 			uint64_t fileSize, string checksum, 
 			vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
@@ -83,6 +84,7 @@ public:
 private:
 //	uint32_t _clientId;
 	uint32_t _fileId;
+	string _filePath;
 	uint64_t _fileSize;
 	string _checksum;
 	vector<uint64_t> _objectList;

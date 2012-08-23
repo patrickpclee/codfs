@@ -89,11 +89,11 @@ void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId,
  * File Size, Object List, Primary List, Checksum
  */
 void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
-		uint32_t connectionId, uint32_t fileId, uint64_t fileSize,
+		uint32_t connectionId, uint32_t fileId, string filePath, uint64_t fileSize,
 		string checksum, vector<uint64_t> objectList,
 		vector<uint32_t> primaryList) {
 	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this,
-			requestId, connectionId, fileId, fileSize, checksum, objectList,
+			requestId, connectionId, fileId, filePath, fileSize, checksum, objectList,
 			primaryList);
 
 	debug ("FILESIZE = %" PRIu64 "\n", fileSize);

@@ -42,6 +42,16 @@ void FileMetaDataModule::createFile(uint32_t clientId, string path,
 }
 
 /**
+ * @brief	Lookup the File ID with file Path
+ */
+uint32_t FileMetaDataModule::lookupFileId(string path)
+{
+	BSONObj queryObject = BSON ("path" << path.erase(0,1));
+	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
+	return (uint32_t)result.getField("id").numberInt();
+}
+
+/**
  *	@brief	Set File Size of a File
  *
  *	@param	fileId	ID of the File

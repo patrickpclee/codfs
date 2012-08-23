@@ -38,13 +38,23 @@ public:
 			string codingSetting);
 
 	/**
-	 * Download a file from OSD
+	 * @brief	Get Download Info
 	 * @param clientId Client ID
 	 * @param fileId File ID
 	 * @return FileMetaData structure
 	 */
 
 	struct FileMetaData downloadFile(uint32_t clientId, uint32_t fileId);
+
+	/**
+	 * @brief	Get Download Info
+	 *
+	 * @param	clientId	Client ID
+	 * @param	filePath	File Path
+	 *
+	 * @return	File Meta Data
+	 */
+	struct FileMetaData downloadFile(uint32_t clientId, string filePath);
 
 	/**
 	 * @brief	Get File Info
@@ -55,6 +65,16 @@ public:
 	 * @return	File Meta Data
 	 */
 	struct FileMetaData getFileInfo(uint32_t clientId, uint32_t fileId);
+
+	/**
+	 * @brief	Get File Info
+	 *
+	 * @param	clientId	Client ID
+	 * @param	filePath	File Path
+	 *
+	 * @return	File Meta Data
+	 */
+	struct FileMetaData getFileInfo(uint32_t clientId, string filePath);
 
 	/**
 	 * @brief	Save ObjectList of a File

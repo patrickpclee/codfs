@@ -44,6 +44,7 @@ message UploadFileRequestPro {
 message DownloadFileRequestPro {
 	optional fixed32 clientId = 1;
 	optional fixed32 fileId = 2;
+	optional string filePath = 3;
 }
 
 message SaveObjectListRequestPro {
@@ -129,11 +130,12 @@ message UploadFileReplyPro {
 
 message DownloadFileReplyPro {
 //	optional fixed32 clientId = 1;
-	optional fixed32 fileId = 1;
-	optional fixed64 fileSize = 2;
-	optional string checksum = 3;
-	repeated fixed64 objectList = 4;
-	repeated fixed32 primaryList = 5;
+	optional fixed32 fileId = 2;
+	optional string filePath = 3;
+	optional fixed64 fileSize = 4;
+	optional string checksum = 5;
+	repeated fixed64 objectList = 6;
+	repeated fixed32 primaryList = 7;
 }
 
 //
