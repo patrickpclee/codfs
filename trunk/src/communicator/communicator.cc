@@ -31,10 +31,7 @@ using namespace std;
 extern ConfigLayer* configLayer;
 
 // mutex
-mutex waitReplyMessageMapMutex;
 mutex connectionMapMutex;
-mutex componentIdMapMutex;
-mutex requestIdMutex;
 
 Communicator::Communicator() {
 
@@ -43,11 +40,8 @@ Communicator::Communicator() {
 
 	// initialize variables
 	_requestId = 0;
-
-	_connectionMap = {};
-	_componentIdMap = {};
-	_waitReplyMessageMap = {};
 	_maxFd = 0;
+	_connectionMap = {};
 
 	// select timeout
 	_timeoutSec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
@@ -221,8 +215,8 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 		message->setExpectReply(true);
 		{
 			const uint32_t requestId = message->getMsgHeader().requestId;
-			lock_guard<mutex> lk(waitReplyMessageMapMutex);
-			_waitReplyMessageMap[requestId] = message;
+			_waitReplyMessageMap.set(requestId, message);
+//			_waitReplyMessageMap[requestId] = message;
 			debug(
 					"Message (ID: %" PRIu32 " Type = %d FD = %" PRIu32 ") added to waitReplyMessageMap\n",
 					requestId, (int) message->getMsgHeader().protocolMsgType, message->getSockfd());
@@ -240,16 +234,11 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 
 Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 
-	lock_guard<mutex> lk(waitReplyMessageMapMutex);
-
 	// check if message is in map
 	if (_waitReplyMessageMap.count(requestId)) {
 
-		// find message
-		Message* message = _waitReplyMessageMap[requestId];
-
-		// remove message from map
-		_waitReplyMessageMap.erase(requestId);
+		// find message (and erase from map)
+		Message* message = _waitReplyMessageMap.pop(requestId);
 
 		return message;
 	}
@@ -500,10 +489,7 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		waitAndDelete(requestHandshakeMsg);
 
 		// add ID -> sockfd mapping to map
-		{
-			lock_guard<mutex> lk(componentIdMapMutex);
-			_componentIdMap[targetComponentId] = sockfd;
-		}
+		_componentIdMap.set(targetComponentId, sockfd);
 		debug(
 				"[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
 				targetComponentId, sockfd);
@@ -518,10 +504,7 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 		uint32_t sockfd, uint32_t componentId, ComponentType componentType) {
 
 	// add ID -> sockfd mapping to map
-	{
-		lock_guard<mutex> lk(componentIdMapMutex);
-		_componentIdMap[componentId] = sockfd;
-	}
+	_componentIdMap.set(componentId, sockfd);
 
 	debug(
 			"[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
@@ -630,13 +613,12 @@ void Communicator::connectAllComponents() {
 }
 
 uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
-	lock_guard<mutex> lk(componentIdMapMutex);
 	if (!_componentIdMap.count(componentId)) {
 		debug("SOCKFD for Component ID = %" PRIu32 " not found!\n",
 				componentId);
 		exit(-1);
 	}
-	return _componentIdMap[componentId];
+	return _componentIdMap.get(componentId);
 }
 
 uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,

@@ -17,6 +17,7 @@
 #include "connection.hh"
 #include "../common/enums.hh"
 #include "component.hh"
+#include "../datastructure/concurrentmap.hh"
 
 //#define USE_LOWLOCK_QUEUE
 
@@ -304,21 +305,19 @@ protected:
 
 	void printComponents(string componentType, vector<Component> componentList);
 
-	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
-
-	uint16_t _serverPort; // listening port for incoming connections
-	Socket _serverSocket; // socket for accepting incoming connections
-	map<uint32_t, Connection*> _connectionMap; // a map of all connections
-	map<uint32_t, uint32_t> _componentIdMap; // a map from component ID to sockfd
-
-
 #ifdef USE_LOWLOCK_QUEUE
 	struct LowLockQueue <Message *> _outMessageQueue;
 #else
 	ConcurrentQueue<Message *> _outMessageQueue;
 #endif
 
-	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
+	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
+
+	uint16_t _serverPort; // listening port for incoming connections
+	Socket _serverSocket; // socket for accepting incoming connections
+	map<uint32_t, Connection*> _connectionMap; // a map of all connections
+	ConcurrentMap<uint32_t, uint32_t> _componentIdMap; // a map from component ID to sockfd
+	ConcurrentMap <uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
 	uint32_t _maxFd; // maximum number of socket descriptors among connections
 
 	// self identity
