@@ -3,8 +3,8 @@
  * http://www.drdobbs.com/parallel/writing-a-generalized-concurrent-queue/211601363
  */
 
-#ifndef CONCURRENTQUEUE_HH_
-#define CONCURRENTQUEUE_HH_
+#ifndef LOWLOCKQUEUE_HH_
+#define LOWLOCKQUEUE_HH_
 
 #include <thread>
 

@@ -30,13 +30,13 @@ using namespace std;
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
-
 // mutex
 mutex outMessageQueueMutex;
 mutex waitReplyMessageMapMutex;
 mutex connectionMapMutex;
 mutex componentIdMapMutex;
-mutex requestIdMutex;;
+mutex requestIdMutex;
+;
 
 Communicator::Communicator() {
 
@@ -47,7 +47,7 @@ Communicator::Communicator() {
 //	_requestId.store(0);
 
 	{
-		lock_guard <mutex> lk(requestIdMutex);
+		lock_guard<mutex> lk(requestIdMutex);
 		_requestId = 0;
 	}
 
@@ -55,10 +55,6 @@ Communicator::Communicator() {
 	_componentIdMap = {};
 	_waitReplyMessageMap = {};
 	_maxFd = 0;
-
-#ifndef USE_CONCURRENT_QUEUE
-	_outMessageQueue = {};
-#endif
 
 	// select timeout
 	_timeoutSec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
@@ -241,13 +237,10 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	}
 
 	// add message to outMessageQueue
-#ifdef USE_CONCURRENT_QUEUE
+#ifdef USE_LOWLOCK_QUEUE
 	_outMessageQueue.push(message); // must be at the end of function
 #else
-	{
-		lock_guard<mutex> lk(outMessageQueueMutex);
-		_outMessageQueue.push(message); // must be at the end of function
-	}
+	_outMessageQueue.push(message); // must be at the end of function
 #endif
 
 }
@@ -317,7 +310,9 @@ void Communicator::sendMessage() {
 		}
 
 		// in terms of 10^-6 seconds
+#ifdef USE_LOWLOCK_QUEUE
 		usleep(_pollingInterval);
+#endif
 	}
 }
 
@@ -463,11 +458,11 @@ uint32_t Communicator::generateRequestId() {
 	// increment _requestId
 
 	/*
-	_requestId.store(_requestId.load() + 1);
-	return _requestId.load();
-	*/
+	 _requestId.store(_requestId.load() + 1);
+	 return _requestId.load();
+	 */
 
-	lock_guard <mutex> lk(requestIdMutex);
+	lock_guard<mutex> lk(requestIdMutex);
 	return ++_requestId;
 
 }
@@ -475,17 +470,13 @@ uint32_t Communicator::generateRequestId() {
 Message* Communicator::popMessage() {
 	Message* message = NULL;
 
-#ifdef USE_CONCURRENT_QUEUE
+#ifdef USE_LOWLOCK_QUEUE
 	if (_outMessageQueue.pop(message) != false) {
 		return message;
 	}
 	return NULL;
 #else
-	lock_guard<mutex> lk(outMessageQueueMutex);
-	if (!_outMessageQueue.empty()) {
-		message = _outMessageQueue.front();
-		_outMessageQueue.pop();
-	}
+	_outMessageQueue.wait_and_pop(message);
 	return message;
 #endif
 

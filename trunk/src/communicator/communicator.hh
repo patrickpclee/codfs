@@ -17,9 +17,14 @@
 #include "connection.hh"
 #include "../common/enums.hh"
 #include "component.hh"
-#include "../datastructure/lowlockqueue.hh"
 
-//#define USE_CONCURRENT_QUEUE
+//#define USE_LOWLOCK_QUEUE
+
+#ifdef USE_LOWLOCK_QUEUE
+#include "../datastructure/lowlockqueue.hh"
+#else
+#include "../datastructure/concurrentqueue.hh"
+#endif
 
 using namespace std;
 
@@ -308,10 +313,10 @@ protected:
 	map<uint32_t, uint32_t> _componentIdMap; // a map from component ID to sockfd
 
 
-#ifdef USE_CONCURRENT_QUEUE
+#ifdef USE_LOWLOCK_QUEUE
 	struct LowLockQueue <Message *> _outMessageQueue;
 #else
-	queue<Message *> _outMessageQueue; // queue of message to be sent
+	ConcurrentQueue<Message *> _outMessageQueue;
 #endif
 
 	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
