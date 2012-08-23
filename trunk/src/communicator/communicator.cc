@@ -435,7 +435,7 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	t.detach();
 }
 
-uint32_t Communicator::generateRequestId() {
+inline uint32_t Communicator::generateRequestId() {
 	// increment _requestId
 	return ++_requestId;
 }

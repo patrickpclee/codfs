@@ -96,7 +96,7 @@ inline bool HandshakeRequestPro_ComponentType_Parse(
 enum PutObjectInitRequestPro_CodingScheme {
   PutObjectInitRequestPro_CodingScheme_RAID0_CODING = 1,
   PutObjectInitRequestPro_CodingScheme_RAID1_CODING = 2,
-  PutObjectInitRequestPro_CodingScheme_DEFAULT_CODING = 100
+  PutObjectInitRequestPro_CodingScheme_DEFAULT_CODING = 15
 };
 bool PutObjectInitRequestPro_CodingScheme_IsValid(int value);
 const PutObjectInitRequestPro_CodingScheme PutObjectInitRequestPro_CodingScheme_CodingScheme_MIN = PutObjectInitRequestPro_CodingScheme_RAID0_CODING;
