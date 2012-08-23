@@ -11,7 +11,6 @@
 
 class Client {
 public:
-//	uint32_t uploadFileRequest(char* srcPath, char* dstPath);
 
 	Client();
 
@@ -24,8 +23,6 @@ public:
 	 */
 	vector<FileMetaData> listFolderRequest(char* path);
 
-	uint32_t uploadFileRequest(string path, CodingScheme codingScheme,
-			string codingSetting);
 	/**
 	 * Upload a file to OSD
 	 * @param filepath Location of the file to upload
@@ -33,16 +30,23 @@ public:
 	 * @return 0 if success, -1 if failure
 	 */
 
+	uint32_t uploadFileRequest(string path, CodingScheme codingScheme, string codingSetting);
+//	uint32_t uploadFileRequest(char* srcPath, char* dstPath);
 //	uint32_t sendFileRequest(string filepath, CodingScheme codingScheme, string codingSetting);
+
 	/**
 	 * @brief	Get the Client Communicator
 	 *
 	 * @return	Pointer to the Client Communicator Module
 	 */
 	ClientCommunicator* getCommunicator();
-	ClientStorageModule* getStorageModule();
 
-//	void downloadFileRequest(char* srcPath, char* dstPath);
+	/**
+	 * @brief	Get the Client StorageModule
+	 *
+	 * @return	Pointer to the Client Storage Module
+	 */
+	ClientStorageModule* getStorageModule();
 
 	/**
 	 * @brief	Download a file from OSDs
@@ -50,6 +54,7 @@ public:
 	 * @param	dstPath	Location to save the file
 	 */
 	void downloadFileRequest(uint32_t fileId, string dstPath);
+//	void downloadFileRequest(char* srcPath, char* dstPath);
 
 	/**
 	 * @brief	putObjectInitRequestMsg Handler: update chunkCount in pendingChunkMap
@@ -80,14 +85,26 @@ public:
 	 */
 	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId);
 
-	/*
-	void updatePendingObjectChunkMap(uint64_t objectId, uint32_t chunkCount);
-	void removePendingObjectFromMap(uint64_t objectId);
-	*/
-
+	/**
+	 * @brief	get the chunkCount in pendingChunkMap
+	 * @param	objectId	Object ID
+	 *
+	 * @return	int chunkCount
+	 */
 	int getPendingChunkCount(uint64_t objectId);
+
+	/**
+	 * @brief	set the chunkCount in pendingChunkMap
+	 * @param	objectId	Object ID
+	 * @param	chunkCount	Number of chunks
+	 */
 	void setPendingChunkCount(uint64_t objectId, int chunkCount);
 
+	/**
+	 * @brief	get the client ID
+	 *
+	 * @return	uint32_t 	client ID
+	 */
 	uint32_t getClientId ();
 private:
 
@@ -97,7 +114,7 @@ private:
 	 * @param objectData ObjectData structure
 	 */
 
-	void uploadObjectRequest(uint32_t dstOsdID, struct ObjectData objectData);
+//	void uploadObjectRequest(uint32_t dstOsdID, struct ObjectData objectData);
 
 //	void reportPrimaryFailure(OsdInfo down_osd_info, uint64_t timestamp);
 
@@ -110,7 +127,6 @@ private:
 	uint32_t _clientId;
 	uint32_t _ip;
 	uint16_t _port;
-//	Cache _cache;
 
 	ClientCommunicator* _clientCommunicator;
 	ClientStorageModule* _storageModule;
