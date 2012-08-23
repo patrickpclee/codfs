@@ -14,9 +14,6 @@ using namespace std;
 
 //#define PARALLEL_TRANSFER
 
-mutex pendingObjectChunkMutex;
-
-extern Client* client;
 extern ConfigLayer* configLayer;
 
 Client::Client() {
@@ -98,7 +95,8 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		uploadThread[i] = thread(startUploadThread, _clientId, dstOsdSockfd,
 				objectData, codingScheme, codingSetting);
 #else
-		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData, codingScheme, codingSetting);
+		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData,
+				codingScheme, codingSetting);
 		MemoryPool::getInstance().poolFree(objectData.buf);
 #endif
 	}
@@ -126,7 +124,6 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 
 	return fileMetaData._id;
 }
-
 
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
@@ -163,7 +160,8 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		downloadThread[i] = thread(startDownloadThread, _clientId, dstSockfd,
 				objectId, offset, filePtr, dstPath);
 #else
-		_clientCommunicator->getObjectAndWriteFile(_clientId, dstSockfd, objectId, offset,filePtr, dstPath);
+		_clientCommunicator->getObjectAndWriteFile(_clientId, dstSockfd,
+				objectId, offset, filePtr, dstPath);
 #endif
 
 		i++;
@@ -209,14 +207,11 @@ void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
 
 	// initialize chunkCount value
-	{
-		lock_guard<mutex> lk(pendingObjectChunkMutex);
-		_pendingObjectChunk[objectId] = chunkCount;
-		debug("Init Chunkcount = %" PRIu32 "\n", chunkCount);
-	}
+	_pendingObjectChunk.set(objectId, chunkCount);
+	debug("Init Chunkcount = %" PRIu32 "\n", chunkCount);
 
 	// create object and cache
-	if(!_storageModule->locateObjectCache(objectId))
+	if (!_storageModule->locateObjectCache(objectId))
 		_storageModule->createObjectCache(objectId, length);
 	_clientCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
@@ -230,10 +225,7 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 	while (1) {
 
-		{
-			lock_guard<mutex> lk(pendingObjectChunkMutex);
-			chunkRemaining = (bool) _pendingObjectChunk[objectId];
-		}
+		chunkRemaining = _pendingObjectChunk.count(objectId);
 
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
@@ -242,7 +234,7 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
 		} else {
-			usleep(100000); // sleep 0.1s
+			usleep(10000); // sleep 0.1s
 		}
 
 	}
@@ -254,22 +246,16 @@ uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
 			length);
-	{
-		lock_guard<mutex> lk(pendingObjectChunkMutex);
-		// update pendingObjectChunk value
-		_pendingObjectChunk[objectId]--;
-	}
+		_pendingObjectChunk.decrement(objectId);
 	return byteWritten;
 }
 
 void Client::setPendingChunkCount(uint64_t objectId, int chunkCount) {
-	lock_guard<mutex> lk(pendingObjectChunkMutex);
-	_pendingObjectChunk[objectId] = chunkCount;
+	_pendingObjectChunk.set(objectId, chunkCount);
 }
 
 int Client::getPendingChunkCount(uint64_t objectId) {
-	lock_guard<mutex> lk(pendingObjectChunkMutex);
-	return _pendingObjectChunk[objectId];
+	return _pendingObjectChunk.get(objectId);
 }
 
 uint32_t Client::getClientId() {
