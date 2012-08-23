@@ -42,12 +42,7 @@ Communicator::Communicator() {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 	// initialize variables
-//	_requestId.store(0);
-
-	{
-		lock_guard<mutex> lk(requestIdMutex);
-		_requestId = 0;
-	}
+	_requestId = 0;
 
 	_connectionMap = {};
 	_componentIdMap = {};
@@ -452,17 +447,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 }
 
 uint32_t Communicator::generateRequestId() {
-
 	// increment _requestId
-
-	/*
-	 _requestId.store(_requestId.load() + 1);
-	 return _requestId.load();
-	 */
-
-	lock_guard<mutex> lk(requestIdMutex);
 	return ++_requestId;
-
 }
 
 Message* Communicator::popMessage() {
