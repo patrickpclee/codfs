@@ -12,8 +12,9 @@
 
 using namespace std;
 
-//#define PARALLEL_TRANSFER
+#define PARALLEL_TRANSFER
 
+extern Client* client;
 extern ConfigLayer* configLayer;
 
 Client::Client() {
