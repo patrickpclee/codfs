@@ -99,7 +99,20 @@ public:
 			struct ObjectData objectData, CodingScheme codingScheme,
 			string codingSetting);
 
+	/**
+	 * Send an initiate message of a object data transfer.
+	 * @param requestId 	Request ID
+	 * @param connectionId 	connection ID
+	 * @param objectId 		object ID
+	 */
 	void replyPutObjectInit(uint32_t requestId, uint32_t connectionId, uint64_t objectId); // new version
+
+	/**
+	 * Send an end message of an object data transfer.
+	 * @param requestId 	Request ID
+	 * @param connectionId 	connection ID
+	 * @param objectId 		object ID
+	 */
 	void replyPutObjectEnd(uint32_t requestId, uint32_t connectionId, uint64_t objectId); //new version
 
 	// TODO: CONNECT TO COMPONENT: PRIMITIVE DESIGN
@@ -107,8 +120,13 @@ public:
 	void connectToOsd();
 private:
 
-	void getObjectData(uint32_t clientID, uint32_t dstOsdSockfd,
-			uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
+	/**
+	 * object data transfer message handler.
+	 * @param
+	 * @param
+	 * @param
+	 */
+//	void getObjectData(uint32_t clientID, uint32_t dstOsdSockfd, uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
 
 };
 #endif
