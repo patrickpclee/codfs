@@ -1,7 +1,7 @@
 /*
  * concurrentqueue.hh
  * http://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html
- * Modified to use c++0x std::thread instead of thread
+ * Modified to use c++0x std::thread instead of boost::thread
  */
 
 #ifndef CONCURRENTQUEUE_HH_
