@@ -31,12 +31,10 @@ using namespace std;
 extern ConfigLayer* configLayer;
 
 // mutex
-mutex outMessageQueueMutex;
 mutex waitReplyMessageMapMutex;
 mutex connectionMapMutex;
 mutex componentIdMapMutex;
 mutex requestIdMutex;
-;
 
 Communicator::Communicator() {
 
