@@ -68,9 +68,11 @@ int main(int argc, char *argv[]) {
 
 	// TEST PUT OBJECT
 
+	const uint32_t replicationFactor = 1;
+
 	if (strncmp(argv[2], "upload", 6) == 0) {
 		CodingScheme codingScheme = RAID1_CODING;
-		string codingSetting = Raid1Coding::generateSetting(3);
+		string codingSetting = Raid1Coding::generateSetting(replicationFactor);
 		client->uploadFileRequest(argv[3], codingScheme, codingSetting);
 	} else {
 		client->downloadFileRequest(atoi(argv[3]), argv[4]);

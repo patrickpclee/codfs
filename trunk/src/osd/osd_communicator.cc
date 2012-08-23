@@ -175,12 +175,20 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 	for (uint32_t i = 0; i < segmentCount; i++) {
 		struct SegmentLocation segmentLocation;
 
+		// DEBUG 1: random assignment
 		//segmentLocation.osdId = rand() % 2 + 52000;
 
-		 if (_componentId == 52000)
-		 segmentLocation.osdId = 52001;
-		 else
-		 segmentLocation.osdId = 52000;
+		// DEBUG 2: must be local
+		segmentLocation.osdId = _componentId;
+
+		// DEBUG 3: must be foreign
+		/*
+		if (_componentId == 52000) {
+			segmentLocation.osdId = 52001;
+		} else {
+			segmentLocation.osdId = 52000;
+		}
+		*/
 
 		segmentLocation.segmentId = 0;
 		osdList.push_back(segmentLocation);
@@ -198,9 +206,8 @@ uint32_t OsdCommunicator::sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 // PRIVATE FUNCTIONS
 //
 
-void OsdCommunicator::putSegmentInit(uint32_t sockfd,
-		uint64_t objectId, uint32_t segmentId, uint32_t length,
-		uint32_t chunkCount) {
+void OsdCommunicator::putSegmentInit(uint32_t sockfd, uint64_t objectId,
+		uint32_t segmentId, uint32_t length, uint32_t chunkCount) {
 
 	// Step 1 of the upload process
 
@@ -222,9 +229,8 @@ void OsdCommunicator::putSegmentInit(uint32_t sockfd,
 
 }
 
-void OsdCommunicator::putSegmentData(uint32_t sockfd,
-		uint64_t objectId, uint32_t segmentId, char* buf, uint64_t offset,
-		uint32_t length) {
+void OsdCommunicator::putSegmentData(uint32_t sockfd, uint64_t objectId,
+		uint32_t segmentId, char* buf, uint64_t offset, uint32_t length) {
 
 	// Step 2 of the upload process
 	SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, sockfd, objectId,
@@ -236,8 +242,8 @@ void OsdCommunicator::putSegmentData(uint32_t sockfd,
 	addMessage(segmentDataMsg, false);
 }
 
-void OsdCommunicator::putSegmentEnd(uint32_t sockfd,
-		uint64_t objectId, uint32_t segmentId) {
+void OsdCommunicator::putSegmentEnd(uint32_t sockfd, uint64_t objectId,
+		uint32_t segmentId) {
 
 	// Step 3 of the upload process
 
@@ -257,8 +263,9 @@ void OsdCommunicator::putSegmentEnd(uint32_t sockfd,
 	}
 }
 
-void OsdCommunicator::objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
-		string codingSetting, vector<uint32_t> nodeList) {
+void OsdCommunicator::objectUploadAck(uint64_t objectId,
+		CodingScheme codingScheme, string codingSetting,
+		vector<uint32_t> nodeList) {
 	uint32_t mdsSockFd = getMdsSockfd();
 
 	UploadObjectAckMsg* uploadObjectAckMsg = new UploadObjectAckMsg(this,
