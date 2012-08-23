@@ -14,10 +14,11 @@ CROSS_COMPILE =
 OPTIMIZE := 
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_CLIENT
-EXTRA_CFLAGS := -O2 -pg -fno-inline -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
+#EXTRA_CFLAGS := -O2 -pg -fno-inline -g -std=c++0x
+EXTRA_CFLAGS := -O2 -g -std=c++0x
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml
+SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 
@@ -103,7 +104,7 @@ $(TARGET): $(all_objs)
 else
 $(TARGET): LD = $(if $(strip $(src-cpp) $(src-cc) $(src-cxx)),$(G++),$(GCC))
 $(TARGET): $(all_objs)
-	$(LD) $(LDFLAGS)  $(all_objs) -pg -fno-inline -o $@ `pkg-config --cflags --libs protobuf` -lpthread -lapr-1 -laprutil-1
+	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf` -lpthread -lapr-1 -laprutil-1
 endif
 
 .mkdir:

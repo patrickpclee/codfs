@@ -189,25 +189,6 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 	return osdList;
 }
 
-vector<struct SegmentLocation> OsdCommunicator::getSecondaryListRequest(
-		uint64_t objectId, uint32_t sockfd, uint32_t segmentCount) {
-
-	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
-			new GetSecondaryListRequestMsg(this, sockfd, segmentCount);
-	getSecondaryListRequestMsg->prepareProtocolMsg();
-
-	addMessage(getSecondaryListRequestMsg, true);
-	MessageStatus status = getSecondaryListRequestMsg->waitForStatusChange();
-
-	vector<struct SegmentLocation> secondaryList;
-	if (status == READY) {
-		vector<struct SegmentLocation> secondaryList;
-		// = getSecondaryListRequestMsg->getSecondaryList();
-		return secondaryList;
-	}
-	return {};
-}
-
 uint32_t OsdCommunicator::sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 		ComponentType dstComponent) {
 	return 0;

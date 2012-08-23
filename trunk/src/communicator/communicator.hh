@@ -17,6 +17,9 @@
 #include "connection.hh"
 #include "../common/enums.hh"
 #include "component.hh"
+#include "../datastructure/lowlockqueue.hh"
+
+//#define USE_CONCURRENT_QUEUE
 
 using namespace std;
 
@@ -303,7 +306,14 @@ protected:
 	Socket _serverSocket; // socket for accepting incoming connections
 	map<uint32_t, Connection*> _connectionMap; // a map of all connections
 	map<uint32_t, uint32_t> _componentIdMap; // a map from component ID to sockfd
+
+
+#ifdef USE_CONCURRENT_QUEUE
+	struct LowLockQueue <Message *> _outMessageQueue;
+#else
 	queue<Message *> _outMessageQueue; // queue of message to be sent
+#endif
+
 	map<uint32_t, Message *> _waitReplyMessageMap; // map of message waiting for reply
 	uint32_t _maxFd; // maximum number of socket descriptors among connections
 

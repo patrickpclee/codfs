@@ -20,9 +20,18 @@ using namespace std;
 
 class OsdCommunicator: public Communicator {
 public:
+
+	/**
+	 * Constructor
+	 */
+
 	OsdCommunicator();
+
+	/**
+	 * Destructor
+	 */
+
 	~OsdCommunicator();
-//	void listDirectoryRequest(uint32_t osdId, string directoryPath);
 
 	/**
 	 * Initiate a connection to the MDS
@@ -70,6 +79,13 @@ public:
 	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId,
 			uint64_t objectId, uint32_t segmentId);
 
+	/**
+	 * (to be implemented)
+	 * Report a failure of OSD to monitor / MDS
+	 * @param osdId Failed OSD ID
+	 * @return 0 if success, -1 if failure
+	 */
+
 	uint32_t reportOsdFailure(uint32_t osdId);
 
 	/**
@@ -102,9 +118,6 @@ public:
 	vector<struct SegmentLocation> getOsdListRequest(uint64_t objectId,
 			ComponentType dstComponent, uint32_t segmentCount = 0);
 
-	vector<struct SegmentLocation> getSecondaryListRequest(uint64_t objectId,
-			uint32_t sockfd, uint32_t segmentCount);
-
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored
 	 * @param objectId ID of the object that the segment is belonged to
@@ -112,14 +125,29 @@ public:
 	 * @param dstComponent Type of the component to ACK
 	 * @return 0 if success, -1 if failure
 	 */
+
 	uint32_t sendSegmentAck(uint64_t objectId, uint32_t segmentId,
 			ComponentType dstComponent);
 
-	// DOWNLOAD
+	/**
+	 * Obtain the information about an object from the MDS
+	 * @param objectId Object ID
+	 * @return ObjectTransferOsdInfo struct
+	 */
+
 	ObjectTransferOsdInfo getObjectInfoRequest(uint64_t objectId);
+
+	/**
+	 * Send acknowledgement to MDS when upload is complete
+	 * @param objectId Object ID
+	 * @param codingScheme Coding Scheme
+	 * @param codingSetting Coding Setting
+	 * @param nodeList List of OSD that saved segments for the object
+	 */
 
 	void objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
 		string codingSetting, vector<uint32_t> nodeList);
+
 private:
 
 	/**
