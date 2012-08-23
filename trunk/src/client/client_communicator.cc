@@ -90,6 +90,33 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 	if (status == READY) {
 		struct FileMetaData fileMetaData { };
 		fileMetaData._id = downloadFileRequestMsg->getFileId();
+		fileMetaData._path = downloadFileRequestMsg->getFilePath();
+		fileMetaData._size = downloadFileRequestMsg->getSize();
+		fileMetaData._objectList = downloadFileRequestMsg->getObjectList();
+		fileMetaData._primaryList = downloadFileRequestMsg->getPrimaryList();
+		waitAndDelete(downloadFileRequestMsg);
+		return fileMetaData;
+	} else {
+		debug("%s\n", "Download File Request Failed");
+		exit(-1);
+	}
+	return {};
+}
+
+struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
+		string filePath) {
+	uint32_t mdsSockFd = getMdsSockfd();
+	DownloadFileRequestMsg* downloadFileRequestMsg = new DownloadFileRequestMsg(
+			this, mdsSockFd, clientId, filePath);
+	downloadFileRequestMsg->prepareProtocolMsg();
+
+	addMessage(downloadFileRequestMsg, true);
+	MessageStatus status = downloadFileRequestMsg->waitForStatusChange();
+
+	if (status == READY) {
+		struct FileMetaData fileMetaData { };
+		fileMetaData._id = downloadFileRequestMsg->getFileId();
+		fileMetaData._path = downloadFileRequestMsg->getFilePath();
 		fileMetaData._size = downloadFileRequestMsg->getSize();
 		fileMetaData._objectList = downloadFileRequestMsg->getObjectList();
 		fileMetaData._primaryList = downloadFileRequestMsg->getPrimaryList();
@@ -109,6 +136,16 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 struct FileMetaData ClientCommunicator::getFileInfo(uint32_t clientId, uint32_t fileId)
 {
 	return downloadFile(clientId, fileId);
+}
+
+/**
+ *
+ * @brief	Get File Info
+ * TODO: Currently Doing Same as Download
+ */
+struct FileMetaData ClientCommunicator::getFileInfo(uint32_t clientId, string filePath)
+{
+	return downloadFile(clientId, filePath);
 }
 
 void ClientCommunicator::saveObjectList(uint32_t clientId, uint32_t fileId,
