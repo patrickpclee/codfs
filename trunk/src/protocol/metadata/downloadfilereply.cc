@@ -9,9 +9,9 @@
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
 #include "../../common/debug.hh"
-#include "../../mds/mds.hh"
 
 #ifdef COMPILE_FOR_MDS
+#include "../../mds/mds.hh"
 extern Mds* mds;
 #endif
 

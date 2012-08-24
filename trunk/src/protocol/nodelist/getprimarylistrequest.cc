@@ -2,16 +2,15 @@
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../../monitor/monitor.hh"
-#include "../../mds/mds.hh"
-#include "../../monitor/monitor.hh"
 #include "getprimarylistrequest.hh"
 
 #ifdef COMPILE_FOR_MDS
+#include "../../mds/mds.hh"
 extern Mds* mds;
 #endif
 
 #ifdef COMPILE_FOR_MONITOR
+#include "../../monitor/monitor.hh"
 extern Monitor* monitor;
 #endif
 
