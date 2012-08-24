@@ -1,7 +1,10 @@
+#include <iostream>
+using namespace std;
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
+#include "../../osd/segmentlocation.hh"
 #include "getsecondarylistrequest.hh"
 
 #ifdef COMPILE_FOR_OSD
