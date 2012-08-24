@@ -46,6 +46,11 @@ namespace mm
 
 using std::size_t;
 
+// Add declarator in order to compile on my arch linux
+// Add by DQ
+template <class T>
+inline void hash_combine( size_t& seed, const T& v );
+
 ///////////////////////////////////////////////////////////////////////
 // Scalar integers
 ///////////////////////////////////////////////////////////////////////

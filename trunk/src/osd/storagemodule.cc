@@ -6,6 +6,8 @@
 #include <sstream>
 #include <stdlib.h>
 #include <thread>
+#include <mutex>
+#include <unistd.h>
 #include <sys/file.h>
 #include "storagemodule.hh"
 #include "../common/debug.hh"

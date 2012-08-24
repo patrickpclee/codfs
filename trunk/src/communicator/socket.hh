@@ -81,7 +81,7 @@ public:
 	 * @return Number of bytes sent
 	 */
 
-	uint32_t sendn(const char* buf, uint32_t buf_len);
+	int32_t sendn(const char* buf, int32_t buf_len);
 
 	/**
 	 * Receive a certain number of bytes form a socket to buffer
@@ -90,7 +90,7 @@ public:
 	 * @return Number of bytes received
 	 */
 
-	uint32_t recvn(char* buf, uint32_t buf_len);
+	int32_t recvn(char* buf, int32_t buf_len);
 
 	void set_non_blocking(const bool);
 

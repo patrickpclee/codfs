@@ -43,7 +43,7 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 }
 
 uint32_t Connection::sendMessage(Message* message) {
-	uint32_t byteSent = 0;
+	int32_t byteSent = 0;
 	uint32_t totalByteSent = 0;
 
 	// send header
@@ -102,8 +102,8 @@ uint32_t Connection::sendMessage(Message* message) {
 
 char* Connection::recvMessage() {
 	char* buf;
-	uint32_t byteReceived = 0;
-	uint32_t totalByteReceived = 0;
+	int32_t byteReceived = 0;
+	int32_t totalByteReceived = 0;
 
 	// receive header
 

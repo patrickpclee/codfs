@@ -1,7 +1,8 @@
 #include "recoverymodule.hh"
 #include <ctime>
 #include <stdio.h>
-
+#include <mutex>
+#include <unistd.h>
 using namespace std;
 
 RecoveryModule::RecoveryModule(map<uint32_t, struct OsdStat>& mapRef):
