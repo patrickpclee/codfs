@@ -1,11 +1,13 @@
+#include <iostream>
+using namespace std;
 #include "getobjectinforequest.hh"
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../../mds/mds.hh"
 
 #ifdef COMPILE_FOR_MDS
+#include "../../mds/mds.hh"
 extern Mds* mds;
 #endif
 

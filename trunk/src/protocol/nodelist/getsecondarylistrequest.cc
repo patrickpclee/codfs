@@ -2,15 +2,15 @@
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../../osd/osd.hh"
-#include "../../monitor/monitor.hh"
 #include "getsecondarylistrequest.hh"
 
 #ifdef COMPILE_FOR_OSD
+#include "../../osd/osd.hh"
 extern Osd* osd;
 #endif
 
 #ifdef COMPILE_FOR_MONITOR
+#include "../../monitor/monitor.hh"
 extern Monitor* monitor;
 #endif
 
