@@ -4,7 +4,6 @@
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../../osd/osd.hh"
 
 PutObjectInitReplyMsg::PutObjectInitReplyMsg(Communicator* communicator) :
 		Message(communicator) {

@@ -2,9 +2,9 @@
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
-#include "../../osd/osd.hh"
 
 #ifdef COMPILE_FOR_OSD
+#include "../../osd/osd.hh"
 extern Osd* osd;
 #endif
 
