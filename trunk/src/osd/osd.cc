@@ -352,6 +352,8 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		_osdCommunicator->objectUploadAck(objectId, codingSetting.codingScheme,
 				codingSetting.setting, nodeList);
 
+		cout << "Object " << objectId << " uploaded" << endl;
+
 	}
 
 	return byteWritten;
