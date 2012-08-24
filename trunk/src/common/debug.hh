@@ -1,7 +1,7 @@
 #ifndef __DEBUG_HH__
 #define __DEBUG_HH__
 
-#define DEBUG 1
+#define DEBUG 0
 
 // for PRIu64, PRIu32, etc
 #define __STDC_FORMAT_MACROS
