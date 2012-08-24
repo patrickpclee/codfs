@@ -9,9 +9,8 @@ All the stable codes are here.
 > cd lib/protobuf;  ./configure; make; make install
 
 In Ubuntu, the following changes are needed
-> cd /usr/lib
-> sudo ln -s /usr/local/lib/libprotobuf.so.7 libprotobuf.so.7
-> sudo ln -s /usr/local/lib/libprotoc.so.7 libprotoc.so.7
+> sudo ln -s /usr/local/lib/libprotobuf.so.7 /usr/lib/libprotobuf.so.7
+> sudo ln -s /usr/local/lib/libprotoc.so.7 /usr/lib/libprotoc.so.7
 
 -------------------------------
 

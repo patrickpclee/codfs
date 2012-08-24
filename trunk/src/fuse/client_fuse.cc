@@ -95,6 +95,13 @@ void* ncvfs_init(struct fuse_conn_info *conn)
 
 static int ncvfs_getattr(const char *path, struct stat *stbuf)
 {
+
+	if(strcmp(path,"/") == 0) {
+		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_uid = getuid();
+		stbuf->st_gid = getgid();
+		return 0;
+	}
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 
 	stbuf->st_mode = S_IFREG | 0644;
