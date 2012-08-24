@@ -3,9 +3,9 @@
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../monitor/monitor.hh"
 
 #ifdef COMPILE_FOR_MONITOR
+#include "../monitor/monitor.hh"
 extern Monitor* monitor;
 #endif
 

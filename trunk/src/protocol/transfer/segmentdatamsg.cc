@@ -2,14 +2,14 @@
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
-#include "../../osd/osd.hh"
-#include "../client/client.hh"
 
 #ifdef COMPILE_FOR_OSD
+#include "../../osd/osd.hh"
 extern Osd* osd;
 #endif
 
 #ifdef COMPILE_FOR_CLIENT
+#include "../client/client.hh"
 extern Client* client;
 #endif
 
