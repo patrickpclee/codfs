@@ -6,7 +6,7 @@ All the stable codes are here.
 
 1. Install Protobuf
 
-> cd lib/protobuf;  ./configure; make; make install
+> cd lib/protobuf;  ./configure; make clean; make; make install
 
 In Ubuntu, the following changes are needed
 > sudo ln -s /usr/local/lib/libprotobuf.so.7 /usr/lib/libprotobuf.so.7
