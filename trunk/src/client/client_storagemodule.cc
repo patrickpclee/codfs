@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <sys/file.h>
 #include <thread>
+#include <mutex>	// added for gcc 4.7.1
+#include <unistd.h>	// added for gcc 4.7.1
 #include "../common/debug.hh"
 #include "../common/memorypool.hh"
 #include "client_storagemodule.hh"

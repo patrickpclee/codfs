@@ -3,6 +3,7 @@
  */
 
 #include <thread>
+#include <mutex>
 #include "codingmodule.hh"
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"

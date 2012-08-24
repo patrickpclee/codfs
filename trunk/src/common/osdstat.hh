@@ -2,6 +2,7 @@
 #define __OSDSTAT_HH__
 
 #include <thread>
+#include <mutex>
 using namespace std;
 
 extern mutex osdStatMapMutex;

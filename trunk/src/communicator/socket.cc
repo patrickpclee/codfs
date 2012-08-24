@@ -85,10 +85,10 @@ bool Socket::accept(Socket* new_socket) const {
 		return true;
 }
 
-uint32_t Socket::sendn(const char* buf, uint32_t buf_len) {
+int32_t Socket::sendn(const char* buf, int32_t buf_len) {
 	const uint32_t sd = m_sock;
-	uint32_t n_left = buf_len; // actual data bytes sent
-	uint32_t n;
+	int32_t n_left = buf_len; // actual data bytes sent
+	int32_t n;
 	while (n_left > 0) {
 		if ((n = send(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
 			return -1;
@@ -100,10 +100,10 @@ uint32_t Socket::sendn(const char* buf, uint32_t buf_len) {
 	return buf_len;
 }
 
-uint32_t Socket::recvn(char* buf, uint32_t buf_len) {
+int32_t Socket::recvn(char* buf, int32_t buf_len) {
 	const uint32_t sd = m_sock;
-	uint32_t n_left = buf_len;
-	uint32_t n = 0;
+	int32_t n_left = buf_len;
+	int32_t n = 0;
 	while (n_left > 0) {
 		if ((n = recv(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
 			return -1;
