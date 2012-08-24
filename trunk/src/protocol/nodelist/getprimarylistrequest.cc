@@ -1,3 +1,5 @@
+#include <iostream>
+using namespace std;
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"

@@ -1,3 +1,5 @@
+#include <iostream>
+using namespace std;
 #include "osdstartupmsg.hh"
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
