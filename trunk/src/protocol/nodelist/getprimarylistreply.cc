@@ -1,3 +1,5 @@
+#include <iostream>
+using namespace std;
 #include "getprimarylistreply.hh"
 #include "getprimarylistrequest.hh"
 #include "../../common/debug.hh"

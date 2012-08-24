@@ -1,3 +1,5 @@
+#include <iostream>
+using namespace std;
 #include "getsecondarylistreply.hh"
 #include "getsecondarylistrequest.hh"
 #include "../../common/debug.hh"

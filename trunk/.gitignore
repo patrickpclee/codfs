@@ -5,6 +5,7 @@ MONITOR
 testfile
 CLIENT_FUSE
 *.d
+*.la
 *.o
 *.log
 *.swp
