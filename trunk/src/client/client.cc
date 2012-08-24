@@ -109,7 +109,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	}
 #endif
 
-	debug("Upload %s Done [%" PRIu32 "]\n", path.c_str(), fileMetaData._id);
+	cout << "Upload " << path << " Done [" << fileMetaData._id << "]" << endl;
 
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
