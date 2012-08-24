@@ -3,9 +3,9 @@
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../../osd/osd.hh"
 
 #ifdef COMPILE_FOR_OSD
+#include "../../osd/osd.hh"
 extern Osd* osd;
 #endif
 
