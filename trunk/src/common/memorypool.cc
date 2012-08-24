@@ -38,7 +38,9 @@ char* MemoryPool::poolMalloc(uint32_t length) {
 #ifdef USE_MEMORY_POOL
 	{
 		std::lock_guard<std::mutex> lk(memoryPoolMutex);
-		return (char *)apr_bucket_alloc((apr_size_t)length, balloc);
+		char* buf = (char *)apr_bucket_alloc((apr_size_t)length, balloc);
+		memset (buf, 0, length);
+		return buf;
 	}
 #else
 	return (char*) calloc(length, 1);
