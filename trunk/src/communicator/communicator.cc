@@ -170,8 +170,12 @@ void Communicator::waitForMessage() {
 
 				uint32_t sockfd = p->second->getSockfd();
 
+				debug ("Checking FD_ISSET FD = %" PRIu32 "\n", sockfd);
+
 				// if socket has data available
 				if (FD_ISSET(sockfd, &sockfdSet)) {
+
+					debug ("FD_ISSET FD = %" PRIu32 "\n", sockfd);
 
 					// check if connection is lost
 					int nbytes = 0;
@@ -186,8 +190,11 @@ void Communicator::waitForMessage() {
 						continue;
 					} else {
 						// receive message into buffer, memory allocated in recvMessage
+						debug ("Call recv on FD = %" PRIu32 "\n", p->first);
 						buf = p->second->recvMessage();
+						debug ("End recv on FD = %" PRIu32 "\n", p->first);
 						dispatch(buf, p->first);
+						debug ("End dispatch on FD = %" PRIu32 "\n", p->first);
 					}
 				}
 
