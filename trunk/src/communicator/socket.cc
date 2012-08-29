@@ -91,7 +91,8 @@ int32_t Socket::sendn(const char* buf, int32_t buf_len) {
 	int32_t n;
 	while (n_left > 0) {
 		if ((n = send(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
-			return -1;
+			perror ("sendn");
+			exit (-1);
 		} else if (n == 0) {
 			return 0;
 		}
@@ -106,7 +107,8 @@ int32_t Socket::recvn(char* buf, int32_t buf_len) {
 	int32_t n = 0;
 	while (n_left > 0) {
 		if ((n = recv(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
-			return -1;
+			perror ("recvn");
+			exit (-1);
 		} else if (n == 0) {
 			return 0;
 		}

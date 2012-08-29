@@ -31,7 +31,7 @@ Message::Message(Communicator* communicator) {
 }
 
 Message::~Message() {
-	debug ("%s\n", "message destructor");
+	//debug ("%s\n", "message destructor");
 }
 
 void Message::setProtocolType(MsgType protocolType) {
