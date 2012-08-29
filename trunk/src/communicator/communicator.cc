@@ -8,6 +8,7 @@
 #include <unistd.h>		// required by select()
 #include <sys/select.h>	// required by select()
 #include <sys/ioctl.h>
+#include <boost/thread/thread.hpp>
 #include "connection.hh"
 #include "communicator.hh"
 #include "component.hh"
@@ -31,7 +32,7 @@ using namespace std;
 extern ConfigLayer* configLayer;
 
 // mutex
-mutex connectionMapMutex;
+boost::shared_mutex connectionMapMutex;
 
 Communicator::Communicator() {
 
@@ -122,14 +123,14 @@ void Communicator::waitForMessage() {
 
 		// add all socket descriptors into sockfdSet
 		{
-			lock_guard<mutex> lk(connectionMapMutex);
+			boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 				FD_SET(p->second->getSockfd(), &sockfdSet);
 			}
 		}
 
 		// invoke select
-		debug ("%s\n", "invoke select");
+		debug("%s\n", "invoke select");
 		result = select(_maxFd + 1, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
@@ -150,7 +151,8 @@ void Communicator::waitForMessage() {
 
 			// add connection to _connectionMap
 			{
-				lock_guard<mutex> lk(connectionMapMutex);
+				boost::unique_lock<boost::shared_mutex> lock(
+						connectionMapMutex);
 				_connectionMap[conn->getSockfd()] = conn;
 			}
 
@@ -164,23 +166,28 @@ void Communicator::waitForMessage() {
 
 		// if there is data in existing connections
 		{ // start critical session
-			lock_guard<mutex> lk(connectionMapMutex);
+			boost::upgrade_lock<boost::shared_mutex> lock(connectionMapMutex);
 			p = _connectionMap.begin();
 			while (p != _connectionMap.end()) {
 
 				uint32_t sockfd = p->second->getSockfd();
 
-				debug ("Checking FD_ISSET FD = %" PRIu32 "\n", sockfd);
+				debug("Checking FD_ISSET FD = %" PRIu32 "\n", sockfd);
 
 				// if socket has data available
 				if (FD_ISSET(sockfd, &sockfdSet)) {
 
-					debug ("FD_ISSET FD = %" PRIu32 "\n", sockfd);
+					debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
 
 					// check if connection is lost
 					int nbytes = 0;
 					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 					if (nbytes == 0) {
+
+						//boost::upgrade_lock lock(connectionMapMutex);
+						boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
+								lock);
+
 						// disconnect and remove from _connectionMap
 						debug("SOCKFD = %" PRIu32 " connection lost\n",
 								p->first);
@@ -190,11 +197,11 @@ void Communicator::waitForMessage() {
 						continue;
 					} else {
 						// receive message into buffer, memory allocated in recvMessage
-						debug ("Call recv on FD = %" PRIu32 "\n", p->first);
+						debug("Call recv on FD = %" PRIu32 "\n", p->first);
 						buf = p->second->recvMessage();
-						debug ("End recv on FD = %" PRIu32 "\n", p->first);
+						debug("End recv on FD = %" PRIu32 "\n", p->first);
 						dispatch(buf, p->first);
-						debug ("End dispatch on FD = %" PRIu32 "\n", p->first);
+						debug("End dispatch on FD = %" PRIu32 "\n", p->first);
 					}
 				}
 
@@ -273,7 +280,8 @@ void Communicator::sendMessage() {
 			}
 
 			{
-				lock_guard<mutex> lk(connectionMapMutex);
+				boost::shared_lock<boost::shared_mutex> lock(
+						connectionMapMutex);
 				if (!(_connectionMap.count(sockfd))) {
 					debug("Connection SOCKFD = %" PRIu32 " not found!\n",
 							sockfd);
@@ -320,7 +328,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 
 	// Save the connection into corresponding list
 	{
-		lock_guard<mutex> lk(connectionMapMutex);
+		boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 		_connectionMap[sockfd] = conn;
 	}
 
@@ -339,7 +347,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
  */
 
 void Communicator::disconnectAndRemove(uint32_t sockfd) {
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	if (_connectionMap.count(sockfd)) {
 		Connection* conn = _connectionMap[sockfd];
@@ -356,7 +364,7 @@ uint32_t Communicator::getMdsSockfd() {
 	// TODO: assume return first MDS
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MDS) {
@@ -371,7 +379,7 @@ uint32_t Communicator::getMonitorSockfd() {
 	// TODO: assume return first Monitor
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MONITOR) {
@@ -386,7 +394,7 @@ uint32_t Communicator::getOsdSockfd() {
 	// TODO: assume return first Osd
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == OSD) {

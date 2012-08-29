@@ -32,6 +32,6 @@ char* getTime() {
 	milliseconds = tv.tv_usec / 1000;
 	/* Print the formatted time, in seconds, followed by a decimal point
 	 and the milliseconds. */
-	sprintf (time_string, "%s.%03ld\n", time_string, milliseconds);
+	sprintf (time_string, "%s.%03ld", time_string, milliseconds);
 	return time_string;
 }
