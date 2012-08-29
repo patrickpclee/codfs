@@ -130,7 +130,7 @@ void Communicator::waitForMessage() {
 		}
 
 		// invoke select
-		debug("%s\n", "invoke select");
+//		debug("%s\n", "invoke select");
 		result = select(_maxFd + 1, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
@@ -139,7 +139,7 @@ void Communicator::waitForMessage() {
 		} else if (result == 0) {
 //			debug("%s\n", "select timeout");
 		} else {
-			debug("%s\n", "select returns");
+//			debug("%s\n", "select returns");
 		}
 
 		// if there is a new connection
@@ -172,12 +172,12 @@ void Communicator::waitForMessage() {
 
 				uint32_t sockfd = p->second->getSockfd();
 
-				debug("Checking FD_ISSET FD = %" PRIu32 "\n", sockfd);
+//				debug("Checking FD_ISSET FD = %" PRIu32 "\n", sockfd);
 
 				// if socket has data available
 				if (FD_ISSET(sockfd, &sockfdSet)) {
 
-					debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
+//					debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
 
 					// check if connection is lost
 					int nbytes = 0;
