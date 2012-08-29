@@ -6,6 +6,15 @@
 	</Coding>
 	
 	<Communication>
+
+        <!-- polling interval in terms of ms -->
+        <SendPollingInterval>100</SendPollingInterval>
+        
+        <!-- timeout for select -->
+        <SelectTimeout>
+            <sec>1</sec>
+            <usec>0</usec>
+        </SelectTimeout>
 	
 		<!-- Chunk Size used in transfer in Byte-->
 		<ChunkSize>524288</ChunkSize> <!-- 512KB -->
