@@ -129,6 +129,7 @@ void Communicator::waitForMessage() {
 		}
 
 		// invoke select
+		debug ("%s\n", "invoke select");
 		result = select(_maxFd + 1, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {

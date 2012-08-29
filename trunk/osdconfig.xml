@@ -3,15 +3,6 @@
     <Osdid>52000</Osdid>
     
     <Communication>
-    
-        <!-- polling interval in terms of ms -->
-        <SendPollingInterval>100</SendPollingInterval>
-        
-        <!-- timeout for select -->
-        <SelectTimeout>
-            <sec>1</sec>
-            <usec>0</usec>
-        </SelectTimeout>
         
         <ServerPort>52000</ServerPort>
         
