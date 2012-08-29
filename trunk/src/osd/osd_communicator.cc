@@ -179,16 +179,14 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 		//segmentLocation.osdId = rand() % 2 + 52000;
 
 		// DEBUG 2: must be local
-		segmentLocation.osdId = _componentId;
+		//segmentLocation.osdId = _componentId;
 
 		// DEBUG 3: must be foreign
-		/*
 		if (_componentId == 52000) {
 			segmentLocation.osdId = 52001;
 		} else {
 			segmentLocation.osdId = 52000;
 		}
-		*/
 
 		segmentLocation.segmentId = 0;
 		osdList.push_back(segmentLocation);
