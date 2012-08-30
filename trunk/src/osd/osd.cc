@@ -181,6 +181,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	cleanupMutex.lock();
 
 	_objectRequestCount.decrement(objectId);
+
+	debug ("objectRequestCount = %" PRIu32 "\n", _objectRequestCount.get(objectId));
+
 	if (_objectRequestCount.get(objectId) == 0) {
 		// if this request is the only request left
 		freeSegmentData = true;
@@ -199,10 +202,10 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// free segmentData if no one else uses
 	if (freeSegmentData) {
 		debug("free segmentdata for object %" PRIu64 "\n", objectId);
-		for (struct SegmentData segment : segmentDataList) {
-			debug("free segment %" PRIu32 "\n", segment.info.segmentId);
-			MemoryPool::getInstance().poolFree(segment.buf);
-			debug("segment %" PRIu32 " free-d\n", segment.info.segmentId);
+		for (uint32_t i : requiredSegments) {
+			debug("%" PRIu32 " free segment %" PRIu32 " addr = %p\n", i, segmentDataList[i].info.segmentId, segmentDataList[i].buf);
+			MemoryPool::getInstance().poolFree(segmentDataList[i].buf);
+			debug("%" PRIu32 " segment %" PRIu32 " free-d\n", i, segmentDataList[i].info.segmentId);
 		}
 		_receivedSegmentData.erase(objectId);
 	}
@@ -217,6 +220,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			segmentId, 0);
 	_osdCommunicator->sendSegment(sockfd, segmentData);
 	MemoryPool::getInstance().poolFree(segmentData.buf);
+	debug ("Segment ID = %" PRIu32 " free-d\n", segmentId);
 }
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
