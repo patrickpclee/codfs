@@ -11,13 +11,13 @@
 #include <queue>
 #include <map>
 #include <atomic>
-#include "socket.hh"
 #include "../protocol/messagefactory.hh"
 #include "../protocol/message.hh"
-#include "connection.hh"
 #include "../common/enums.hh"
-#include "component.hh"
 #include "../datastructure/concurrentmap.hh"
+#include "socket.hh"
+#include "component.hh"
+#include "connection.hh"
 
 //#define USE_LOWLOCK_QUEUE
 
@@ -328,6 +328,8 @@ protected:
 	uint32_t _timeoutSec, _timeoutUsec;
 	uint32_t _chunkSize;
 	uint32_t _pollingInterval;
+	uint32_t _numDispatchThread;
+	uint32_t _numSpecialDispatchThread;
 
 	// component list
 	vector<Component> mdsList;
