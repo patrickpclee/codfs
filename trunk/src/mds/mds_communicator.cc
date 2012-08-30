@@ -109,6 +109,14 @@ void MdsCommunicator::replyPrimary(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
+/**
+ * @brief	Reply Object ID List
+ */
+void MdsCommunicator::replyObjectIdList(uint32_t requestId, uint32_t connectionId, vector<uint64_t> objectList)
+{
+	return ;
+}
+
 void MdsCommunicator::replyRecoveryInfo(uint32_t requestId,
 		uint32_t connectionId, uint32_t osdId, vector<uint64_t> objectList,
 		vector<uint32_t> primaryList,

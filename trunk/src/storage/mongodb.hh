@@ -93,6 +93,8 @@ public:
 	 */
 	mongo::BSONObj findAndModify (mongo::BSONObj queryObject, mongo::BSONObj updateObject);
 
+	void removeField (mongo::Query queryObject, string field);
+
 	/**
 	 * @brief	Remove a Record
 	 *
