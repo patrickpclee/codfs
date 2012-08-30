@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
 
 	// TEST PUT OBJECT
 
-	const uint32_t replicationFactor = 1;
+	const uint32_t replicationFactor = 2;
 
 	if (strncmp(argv[2], "upload", 6) == 0) {
 		CodingScheme codingScheme = RAID1_CODING;
