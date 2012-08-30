@@ -229,19 +229,21 @@ void Communicator::waitForMessage() {
 
 						// use thread pool implementation
 #ifdef USE_THREAD_POOL
+						/*
 						struct MsgHeader msgHeader;
 						memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
-						MsgType msgType = msgHeader.protocolMsgType;
+						*/
+						MsgType msgType = ((struct MsgHeader*)buf)->protocolMsgType;
 
-						debug(
-								"Before schedule dispatch for %" PRIu32 " Type = %" PRIu32 "\n",
-								msgHeader.requestId, msgType);
 						// if message is for secondary OSD, handle it with a special thread pool to avoid blocking
 						if (msgType == PUT_SEGMENT_INIT_REQUEST
 								|| msgType == PUT_SEGMENT_INIT_REPLY
 								|| msgType == SEGMENT_DATA
 								|| msgType == SEGMENT_TRANSFER_END_REQUEST
-								|| msgType == SEGMENT_TRANSFER_END_REPLY) {
+								|| msgType == SEGMENT_TRANSFER_END_REPLY
+								|| msgType == GET_SEGMENT_INIT_REQUEST
+								|| msgType == GET_SEGMENT_INIT_REPLY) {
+
 							tpSpecial.schedule(
 									boost::bind(&Communicator::dispatch, this,
 											buf, p->first));
@@ -250,9 +252,6 @@ void Communicator::waitForMessage() {
 									boost::bind(&Communicator::dispatch, this,
 											buf, p->first));
 						}
-						debug(
-								"After schedule dispatch for %" PRIu32 " Type = %" PRIu32 "\n",
-								msgHeader.requestId, msgType);
 #else
 						dispatch(buf, p->first);
 #endif
@@ -487,8 +486,10 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
 
+	/*
 	debug("Running dispatch ID = %" PRIu32 " Type = %d\n",
 			msgHeader.requestId, msgHeader.protocolMsgType);
+	*/
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
@@ -515,8 +516,10 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	t.detach();
 #endif
 
+	/*
 	debug("dispatch finished for %" PRIu32 " Type = %d\n",
 			msgHeader.requestId, msgHeader.protocolMsgType);
+	*/
 }
 
 inline uint32_t Communicator::generateRequestId() {
