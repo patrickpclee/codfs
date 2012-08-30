@@ -296,10 +296,16 @@ private:
 	ConcurrentMap<uint64_t, struct CodingSetting> _codingSettingMap;
 
 	// download
-	ConcurrentMap<uint64_t, uint32_t> _objectRequestCount;
+	/*
+	ConcurrentMap<uint64_t, vector<bool>> _requestedSegments;
+	*/
+
 	ConcurrentMap<uint64_t, vector<struct SegmentData>> _receivedSegmentData;
 	ConcurrentMap<uint64_t, uint32_t> _downloadSegmentRemaining;
-	ConcurrentMap<uint64_t, vector<bool>> _requestedSegments;
+	ConcurrentMap<uint64_t, uint32_t> _objectRequestCount;
+	ConcurrentMap<uint64_t, mutex*> _objectDownloadMutex;
+	ConcurrentMap<uint64_t, ObjectData> _objectDataMap;
+	ConcurrentMap<uint64_t, bool> _needGetObjectMap;
 
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingSegmentChunk;
