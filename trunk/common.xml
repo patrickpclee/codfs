@@ -20,7 +20,8 @@
 		<ChunkSize>524288</ChunkSize> <!-- 512KB -->
 
 		<!-- No of dispatch thread created for thread pool -->
-		<NumDispatchThread>10</NumDispatchThread>
+		<NumDispatchThread>20</NumDispatchThread>
+		<NumSpecialDispatchThread>3</NumSpecialDispatchThread>
 
 	</Communication>
 	

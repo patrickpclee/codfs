@@ -69,8 +69,13 @@ Communicator::Communicator() {
 
 #ifdef USE_THREAD_POOL
 	// thread pool
-	_numDispatchThread = configLayer->getConfigInt ("Communication>NumDispatchThread");
-	debug ("Number of dispatch thread = %" PRIu32 "\n", _numDispatchThread);
+	_numDispatchThread = configLayer->getConfigInt(
+			"Communication>NumDispatchThread");
+	_numSpecialDispatchThread = configLayer->getConfigInt(
+			"Communication>NumSpecialDispatchThread");
+	debug(
+			"Dispatch thread = %" PRIu32 " Special Dispatch Thread = %" PRIu32 "\n",
+			_numDispatchThread, _numSpecialDispatchThread);
 #endif
 
 	debug("%s\n", "Communicator constructed");
@@ -129,7 +134,8 @@ void Communicator::waitForMessage() {
 
 #ifdef USE_THREAD_POOL
 	// initialize thread pool
-	pool tp (_numDispatchThread);
+	pool tp(_numDispatchThread);
+	pool tpSpecial(_numSpecialDispatchThread);
 #endif
 
 	while (1) {
@@ -225,9 +231,28 @@ void Communicator::waitForMessage() {
 #ifdef USE_THREAD_POOL
 						struct MsgHeader msgHeader;
 						memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
-						debug ("Before schedule dispatch for %" PRIu32 "\n", msgHeader.requestId);
-						tp.schedule (boost::bind(&Communicator::dispatch, this, buf, p->first));
-						debug ("After schedule dispatch for %" PRIu32 "\n", msgHeader.requestId);
+						MsgType msgType = msgHeader.protocolMsgType;
+
+						debug(
+								"Before schedule dispatch for %" PRIu32 " Type = %" PRIu32 "\n",
+								msgHeader.requestId, msgType);
+						// if message is for secondary OSD, handle it with a special thread pool to avoid blocking
+						if (msgType == PUT_SEGMENT_INIT_REQUEST
+								|| msgType == PUT_SEGMENT_INIT_REPLY
+								|| msgType == SEGMENT_DATA
+								|| msgType == SEGMENT_TRANSFER_END_REQUEST
+								|| msgType == SEGMENT_TRANSFER_END_REPLY) {
+							tpSpecial.schedule(
+									boost::bind(&Communicator::dispatch, this,
+											buf, p->first));
+						} else {
+							tp.schedule(
+									boost::bind(&Communicator::dispatch, this,
+											buf, p->first));
+						}
+						debug(
+								"After schedule dispatch for %" PRIu32 " Type = %" PRIu32 "\n",
+								msgHeader.requestId, msgType);
 #else
 						dispatch(buf, p->first);
 #endif
@@ -462,7 +487,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
 
-	debug ("Running dispatch FD = %" PRIu32 "\n", msgHeader.requestId);
+	debug("Running dispatch ID = %" PRIu32 " Type = %d\n",
+			msgHeader.requestId, msgHeader.protocolMsgType);
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
@@ -489,7 +515,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	t.detach();
 #endif
 
-	debug ("dispatch finished for %" PRIu32 "\n", msgHeader.requestId);
+	debug("dispatch finished for %" PRIu32 " Type = %d\n",
+			msgHeader.requestId, msgHeader.protocolMsgType);
 }
 
 inline uint32_t Communicator::generateRequestId() {
