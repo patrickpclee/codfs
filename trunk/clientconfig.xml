@@ -5,6 +5,7 @@
     <Communication>
     
         <ServerPort>51000</ServerPort>
+		<NumClientThreads>10</NumClientThreads>
         
     </Communication>
     
