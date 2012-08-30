@@ -25,7 +25,8 @@ Client::Client() {
 
 	_clientId = configLayer->getConfigInt("Clientid");
 
-	_numClientThreads = configLayer->getConfigInt ("Communication>NumClientThreads");
+	_numClientThreads = configLayer->getConfigInt(
+			"Communication>NumClientThreads");
 	_tp.size_controller().resize(_numClientThreads);
 }
 
@@ -52,10 +53,11 @@ void startUploadThread(uint32_t clientId, uint32_t sockfd,
 	MemoryPool::getInstance().poolFree(objectData.buf);
 }
 
-void startDownloadThread(uint32_t clientId, uint32_t sockfd,
-		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
-	client->getCommunicator()->getObjectAndWriteFile(clientId, sockfd, objectId, offset, filePtr, dstPath);
-	debug ("Object ID = %" PRIu64 " finished download\n", objectId);
+void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId,
+		uint64_t offset, FILE* filePtr, string dstPath) {
+	client->getCommunicator()->getObjectAndWriteFile(clientId, sockfd, objectId,
+			offset, filePtr, dstPath);
+	debug("Object ID = %" PRIu64 " finished download\n", objectId);
 }
 
 #endif
@@ -84,11 +86,11 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 				fileMetaData._objectList[i], fileMetaData._primaryList[i]);
 	}
 
-/*
-#ifdef PARALLEL_TRANSFER
-	thread uploadThread[objectCount];
-#endif
-*/
+	/*
+	 #ifdef PARALLEL_TRANSFER
+	 thread uploadThread[objectCount];
+	 #endif
+	 */
 
 	for (uint32_t i = 0; i < objectCount; ++i) {
 		struct ObjectData objectData = _storageModule->readObjectFromFile(path,
@@ -100,11 +102,12 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 
 #ifdef PARALLEL_TRANSFER
 		/*
-		uploadThread[i] = thread(startUploadThread, _clientId, dstOsdSockfd,
-				objectData, codingScheme, codingSetting);
-		*/
-		_tp.schedule(boost::bind(startUploadThread, _clientId, dstOsdSockfd,
-				objectData, codingScheme, codingSetting));
+		 uploadThread[i] = thread(startUploadThread, _clientId, dstOsdSockfd,
+		 objectData, codingScheme, codingSetting);
+		 */
+		_tp.schedule(
+				boost::bind(startUploadThread, _clientId, dstOsdSockfd,
+						objectData, codingScheme, codingSetting));
 #else
 		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData,
 				codingScheme, codingSetting);
@@ -115,10 +118,10 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 #ifdef PARALLEL_TRANSFER
 	// wait for every thread to finish
 	/*
-	for (uint32_t i = 0; i < objectCount; i++) {
-		uploadThread[i].join();
-	}
-	*/
+	 for (uint32_t i = 0; i < objectCount; i++) {
+	 uploadThread[i].join();
+	 }
+	 */
 	_tp.wait();
 #endif
 
@@ -159,12 +162,12 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 	// 2. Download file from OSD
 
-/*
-#ifdef PARALLEL_TRANSFER
-	const uint32_t objectCount = fileMetaData._objectList.size();
-	thread downloadThread[objectCount];
-#endif
-*/
+	/*
+	 #ifdef PARALLEL_TRANSFER
+	 const uint32_t objectCount = fileMetaData._objectList.size();
+	 thread downloadThread[objectCount];
+	 #endif
+	 */
 
 	uint32_t i = 0;
 	for (uint64_t objectId : fileMetaData._objectList) {
@@ -173,12 +176,13 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 				dstComponentId);
 		const uint64_t offset = objectSize * i;
 #ifdef PARALLEL_TRANSFER
-/*
-		downloadThread[i] = thread(startDownloadThread, _clientId, dstSockfd,
-				objectId, offset, filePtr, dstPath);
-*/
-		_tp.schedule(boost::bind(startDownloadThread, _clientId, dstSockfd,
-				objectId, offset, filePtr, dstPath));
+		/*
+		 downloadThread[i] = thread(startDownloadThread, _clientId, dstSockfd,
+		 objectId, offset, filePtr, dstPath);
+		 */
+		_tp.schedule(
+				boost::bind(startDownloadThread, _clientId, dstSockfd, objectId,
+						offset, filePtr, dstPath));
 #else
 		_clientCommunicator->getObjectAndWriteFile(_clientId, dstSockfd,
 				objectId, offset, filePtr, dstPath);
@@ -188,11 +192,11 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	}
 
 #ifdef PARALLEL_TRANSFER
-/*
-	for (uint32_t i = 0; i < objectCount; i++) {
-		downloadThread[i].join();
-	}
-*/
+	/*
+	 for (uint32_t i = 0; i < objectCount; i++) {
+	 downloadThread[i].join();
+	 }
+	 */
 	_tp.wait();
 #endif
 
@@ -252,7 +256,7 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
-			_pendingObjectChunk.erase(objectId);
+
 			//_storageModule->closeObject(objectId); // cannot close here
 			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
@@ -269,7 +273,11 @@ uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
 			length);
-		_pendingObjectChunk.decrement(objectId);
+	_pendingObjectChunk.decrement(objectId);
+
+	if (_pendingObjectChunk.get(objectId) == 0) {
+		_pendingObjectChunk.erase(objectId);
+	}
 	return byteWritten;
 }
 

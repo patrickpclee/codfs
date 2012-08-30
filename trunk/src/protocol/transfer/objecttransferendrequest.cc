@@ -61,7 +61,9 @@ void ObjectTransferEndRequestMsg::doHandle() {
 #endif
 
 #ifdef COMPILE_FOR_CLIENT
+	debug ("Start Processor for object ID = %" PRIu64 "\n", _objectId);
 	client->putObjectEndProcessor (_msgHeader.requestId, _sockfd, _objectId);
+	debug ("End Processor for object ID = %" PRIu64 "\n", _objectId);
 #endif
 }
 
