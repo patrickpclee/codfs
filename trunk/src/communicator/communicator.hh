@@ -329,6 +329,7 @@ protected:
 	uint32_t _chunkSize;
 	uint32_t _pollingInterval;
 	uint32_t _numDispatchThread;
+	uint32_t _numSpecialDispatchThread;
 
 	// component list
 	vector<Component> mdsList;
