@@ -28,6 +28,16 @@
 
 using namespace std;
 
+#define USE_THREAD_POOL
+
+#ifdef USE_THREAD_POOL
+
+#include <boost/bind.hpp>
+#include "../../lib/threadpool/threadpool.hpp"
+using namespace boost::threadpool;
+
+#endif
+
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
@@ -57,7 +67,14 @@ Communicator::Communicator() {
 	_pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
 
+#ifdef USE_THREAD_POOL
+	// thread pool
+	_numDispatchThread = configLayer->getConfigInt ("Communication>NumDispatchThread");
+	debug ("Number of dispatch thread = %" PRIu32 "\n", _numDispatchThread);
+#endif
+
 	debug("%s\n", "Communicator constructed");
+
 }
 
 Communicator::~Communicator() {
@@ -109,6 +126,11 @@ void Communicator::waitForMessage() {
 	if (serverSockfd > _maxFd) {
 		_maxFd = serverSockfd;
 	}
+
+#ifdef USE_THREAD_POOL
+	// initialize thread pool
+	pool tp (_numDispatchThread);
+#endif
 
 	while (1) {
 
@@ -197,11 +219,18 @@ void Communicator::waitForMessage() {
 						continue;
 					} else {
 						// receive message into buffer, memory allocated in recvMessage
-						debug("Call recv on FD = %" PRIu32 "\n", p->first);
 						buf = p->second->recvMessage();
-						debug("End recv on FD = %" PRIu32 "\n", p->first);
+
+						// use thread pool implementation
+#ifdef USE_THREAD_POOL
+						struct MsgHeader msgHeader;
+						memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+						debug ("Before schedule dispatch for %" PRIu32 "\n", msgHeader.requestId);
+						tp.schedule (boost::bind(&Communicator::dispatch, this, buf, p->first));
+						debug ("After schedule dispatch for %" PRIu32 "\n", msgHeader.requestId);
+#else
 						dispatch(buf, p->first);
-						debug("End dispatch on FD = %" PRIu32 "\n", p->first);
+#endif
 					}
 				}
 
@@ -210,6 +239,10 @@ void Communicator::waitForMessage() {
 		} // end critical section
 
 	} // end while (1)
+
+#ifdef USE_THREAD_POOL
+	tp.wait();
+#endif
 }
 
 /**
@@ -425,8 +458,11 @@ void Communicator::sendThread(Communicator* communicator) {
  */
 
 void Communicator::dispatch(char* buf, uint32_t sockfd) {
+
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+
+	debug ("Running dispatch FD = %" PRIu32 "\n", msgHeader.requestId);
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
@@ -442,13 +478,18 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
 
 	// debug
-	debug("%s\n", "running dispatch");
 	message->printHeader();
 	message->printProtocol();
 	//message->printPayloadHex();
 
+#ifdef USE_THREAD_POOL
+	message->handle();
+#else
 	thread t(handleThread, message);
 	t.detach();
+#endif
+
+	debug ("dispatch finished for %" PRIu32 "\n", msgHeader.requestId);
 }
 
 inline uint32_t Communicator::generateRequestId() {
