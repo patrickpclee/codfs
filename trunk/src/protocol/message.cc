@@ -21,7 +21,7 @@ Message::Message() {
 
 Message::Message(Communicator* communicator) {
 	_sockfd = 0;
-	memset (&_msgHeader, 0, sizeof (struct MsgHeader));
+	memset(&_msgHeader, 0, sizeof(struct MsgHeader));
 	_protocolMsg = "";
 	_payload = NULL;
 	_recvBuf = NULL;
@@ -31,7 +31,7 @@ Message::Message(Communicator* communicator) {
 }
 
 Message::~Message() {
-	debug ("%s\n", "message destructor");
+	//debug ("%s\n", "message destructor");
 }
 
 void Message::setProtocolType(MsgType protocolType) {
@@ -67,8 +67,9 @@ void Message::setRecvBuf(char* recvBuf) {
 }
 
 void Message::printHeader() {
-	debug("[MsgHeader] Type = %d Size = %" PRIu32 ", PayloadSize = %" PRIu32 "\n",
-			(int)_msgHeader.protocolMsgType, _msgHeader.protocolMsgSize, _msgHeader.payloadSize);
+	debug(
+			"[MsgHeader] ID = %" PRIu32 " Type = %d Size = %" PRIu32 ", PayloadSize = %" PRIu32 "\n",
+			_msgHeader.requestId, (int)_msgHeader.protocolMsgType, _msgHeader.protocolMsgSize, _msgHeader.payloadSize);
 }
 
 void Message::printPayloadHex() {
@@ -104,7 +105,7 @@ bool Message::isExpectReply() {
 }
 
 MessageStatus Message::waitForStatusChange() {
-	debug ("%s\n", "waitforstatuschange");
+	debug("%s\n", "waitforstatuschange");
 	return _status.get_future().get();
 }
 
@@ -117,7 +118,7 @@ void Message::setStatus(MessageStatus status) {
 	return;
 }
 
-void Message::setExpectReply (bool expectReply) {
+void Message::setExpectReply(bool expectReply) {
 	_expectReply = expectReply;
 }
 
