@@ -40,6 +40,15 @@ public:
 	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, string filePath, uint64_t fileSize, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
+	 * @brief	Reply Object ID List
+	 *
+	 * @param	requestId	Request ID
+	 * @param	connectionId	Connection ID
+	 * @param	objectList	Object ID List
+	 */
+	void replyObjectIdList(uint32_t requestId, uint32_t connectionId, vector<uint64_t> objectList);
+
+	/**
 	 * @brief	Reply Object Information to Osd
 	 *
 	 * @param	requestId	Request ID

@@ -79,6 +79,15 @@ public:
 			uint32_t clientId, uint32_t fileId);
 
 	/**
+	 * @brief	Handle Get Object ID Lsit
+	 *
+	 * @param	requestId	Request ID
+	 * @param	conenctionId	Connection ID
+	 * @param	numOfObjs	Number of Objects
+	 */
+	void getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t numOfObjs);
+
+	/**
 	 * @brief	Handle Get File Info Request
 	 *
 	 * @param	requestId	Request ID
