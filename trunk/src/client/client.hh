@@ -2,6 +2,7 @@
 #define __CLIENT_HH__
 
 #include <stdint.h>
+#include <boost/thread/thread.hpp>
 
 #include "client_communicator.hh"
 #include "client_storagemodule.hh"
@@ -9,6 +10,7 @@
 #include "../cache/cache.hh"
 #include "../common/metadata.hh"
 #include "../datastructure/concurrentmap.hh"
+#include "../../lib/threadpool/threadpool.hpp"
 
 class Client {
 public:
@@ -133,5 +135,9 @@ private:
 	ClientStorageModule* _storageModule;
 
 	ConcurrentMap<uint64_t, int> _pendingObjectChunk;
+
+	// thread pool for upload
+	uint32_t _numClientThreads;
+	boost::threadpool::pool _tp;
 };
 #endif

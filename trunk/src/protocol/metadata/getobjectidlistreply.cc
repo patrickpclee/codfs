@@ -62,7 +62,7 @@ void GetObjectIdListReplyMsg::doHandle() {
 
 void GetObjectIdListReplyMsg::printProtocol() {
 	debug(
-			"[GET_OBJECT_ID_LIST_REPLY] Number of Objects= %" PRIu32 "\n",
+			"[GET_OBJECT_ID_LIST_REPLY] Number of Objects= %zu\n",
 			_objectIdList.size());
 }
 
