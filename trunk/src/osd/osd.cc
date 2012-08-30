@@ -96,7 +96,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// 2. initialize list and count
 
 	const uint32_t segmentCount = requiredSegments.size();
-	
+
 	initializationMutex.lock();
 
 	// if no one is downloading the object
@@ -177,9 +177,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	bool freeSegmentData = false;
 
 	// decrease _objectRequestCount and erase if 0
-	
+
 	cleanupMutex.lock();
-	
+
 	_objectRequestCount.decrement(objectId);
 	if (_objectRequestCount.get(objectId) == 0) {
 		// if this request is the only request left
@@ -188,7 +188,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		_downloadSegmentRemaining.erase(objectId);
 		_requestedSegments.erase(objectId);
 	}
-	
+
 	cleanupMutex.unlock();
 
 	// free objectData
@@ -245,7 +245,76 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 	// TODO: check integrity of object received
 	while (1) {
 
-		if (!_pendingObjectChunk.count(objectId)) {
+		if (_pendingObjectChunk.get(objectId) == 0) {
+			// if all chunks have arrived
+			struct ObjectCache objectCache = _storageModule->getObjectCache(
+					objectId);
+
+			// write cache to disk
+			/*
+			 byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
+			 objectCache.length);
+			 */
+
+			// perform coding
+			struct CodingSetting codingSetting = _codingSettingMap.get(
+					objectId);
+			_codingSettingMap.erase(objectId);
+
+			debug("Coding Scheme = %d setting = %s\n",
+					(int) codingSetting.codingScheme, codingSetting.setting.c_str());
+
+			vector<struct SegmentData> segmentDataList =
+					_codingModule->encodeObjectToSegment(
+							codingSetting.codingScheme, objectId,
+							objectCache.buf, objectCache.length,
+							codingSetting.setting);
+
+			// request secondary OSD list
+			vector<struct SegmentLocation> segmentLocationList =
+					_osdCommunicator->getOsdListRequest(objectId, MONITOR,
+							segmentDataList.size());
+
+			vector<uint32_t> nodeList;
+			uint32_t i = 0;
+			for (const auto segmentData : segmentDataList) {
+
+				// if destination is myself
+				if (segmentLocationList[i].osdId == _osdId) {
+					_storageModule->createSegment(objectId,
+							segmentData.info.segmentId,
+							segmentData.info.segmentSize);
+					_storageModule->writeSegment(objectId,
+							segmentData.info.segmentId, segmentData.buf, 0,
+							segmentData.info.segmentSize);
+					_storageModule->closeSegment(objectId,
+							segmentData.info.segmentId);
+				} else {
+					uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
+							segmentLocationList[i].osdId);
+					_osdCommunicator->sendSegment(dstSockfd, segmentData);
+				}
+
+				nodeList.push_back(segmentLocationList[i].osdId);
+
+				// free memory
+				MemoryPool::getInstance().poolFree(segmentData.buf);
+
+				i++;
+			}
+
+			// close file and free cache
+			_storageModule->closeObject(objectId);
+
+			_pendingObjectChunk.erase(objectId);
+
+			// Acknowledge MDS for Object Upload Completed
+			_osdCommunicator->objectUploadAck(objectId,
+					codingSetting.codingScheme, codingSetting.setting,
+					nodeList);
+
+			cout << "Object " << objectId << " uploaded" << endl;
+
 			// if all chunks have arrived, send ack
 			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 			break;
@@ -286,75 +355,6 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 			length);
 
 	_pendingObjectChunk.decrement(objectId);
-
-	// if all chunks have arrived
-	if (_pendingObjectChunk.get(objectId) == 0) {
-		struct ObjectCache objectCache = _storageModule->getObjectCache(
-				objectId);
-
-		// write cache to disk
-		/*
-		byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
-				objectCache.length);
-				*/
-
-		// perform coding
-		struct CodingSetting codingSetting = _codingSettingMap.get(objectId);
-		_codingSettingMap.erase(objectId);
-
-		debug("Coding Scheme = %d setting = %s\n",
-				(int) codingSetting.codingScheme, codingSetting.setting.c_str());
-
-		vector<struct SegmentData> segmentDataList =
-				_codingModule->encodeObjectToSegment(codingSetting.codingScheme,
-						objectId, objectCache.buf, objectCache.length,
-						codingSetting.setting);
-
-		// request secondary OSD list
-		vector<struct SegmentLocation> segmentLocationList =
-				_osdCommunicator->getOsdListRequest(objectId, MONITOR,
-						segmentDataList.size());
-
-		vector<uint32_t> nodeList;
-		uint32_t i = 0;
-		for (const auto segmentData : segmentDataList) {
-
-			// if destination is myself
-			if (segmentLocationList[i].osdId == _osdId) {
-				_storageModule->createSegment(objectId,
-						segmentData.info.segmentId,
-						segmentData.info.segmentSize);
-				_storageModule->writeSegment(objectId,
-						segmentData.info.segmentId, segmentData.buf, 0,
-						segmentData.info.segmentSize);
-				_storageModule->closeSegment(objectId,
-						segmentData.info.segmentId);
-			} else {
-				uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
-						segmentLocationList[i].osdId);
-				_osdCommunicator->sendSegment(dstSockfd, segmentData);
-			}
-
-			nodeList.push_back(segmentLocationList[i].osdId);
-
-			// free memory
-			MemoryPool::getInstance().poolFree(segmentData.buf);
-
-			i++;
-		}
-
-		// close file and free cache
-		_storageModule->closeObject(objectId);
-
-		_pendingObjectChunk.erase(objectId);
-
-		// Acknowledge MDS for Object Upload Completed
-		_osdCommunicator->objectUploadAck(objectId, codingSetting.codingScheme,
-				codingSetting.setting, nodeList);
-
-		cout << "Object " << objectId << " uploaded" << endl;
-
-	}
 
 	return byteWritten;
 }
@@ -481,7 +481,7 @@ uint32_t Osd::getOsdId() {
 	return _osdId;
 }
 
-bool Osd::isSegmentRequested (uint64_t objectId, uint32_t segmentId) {
+bool Osd::isSegmentRequested(uint64_t objectId, uint32_t segmentId) {
 	lock_guard<mutex> lk(requestedSegmentsMutex);
 	bool requested = _requestedSegments.get(objectId)[segmentId];
 

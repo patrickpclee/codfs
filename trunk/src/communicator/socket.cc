@@ -6,6 +6,7 @@
 #include <iostream>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/ioctl.h>
 #include "../common/debug.hh"
 
 using namespace std;
@@ -20,12 +21,12 @@ Socket::Socket() :
 Socket::~Socket() {
 	if (is_valid())
 		::close(m_sock);
-	debug ("Socket %d closed\n", m_sock);
+	debug("Socket %d closed\n", m_sock);
 }
 
 bool Socket::create() {
 	m_sock = socket(AF_INET, SOCK_STREAM, 0);
-	debug ("Socket %d created\n", m_sock);
+	debug("Socket %d created\n", m_sock);
 
 	if (!is_valid())
 		return false;
@@ -35,7 +36,6 @@ bool Socket::create() {
 	if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (const char*) &on,
 			sizeof(on)) == -1)
 		return false;
-
 	return true;
 
 }
@@ -90,8 +90,34 @@ int32_t Socket::sendn(const char* buf, int32_t buf_len) {
 	int32_t n_left = buf_len; // actual data bytes sent
 	int32_t n;
 	while (n_left > 0) {
+
+		// -----------
+		// check if tcp socket is writable
+		// -----------
+
+		fd_set wfds;
+		struct timeval tv = { 0, 0 };
+		int retval;
+
+		FD_ZERO(&wfds);
+		FD_SET(m_sock, &wfds);
+
+		retval = select(m_sock + 1, NULL, &wfds, NULL, &tv);
+
+		if (retval == -1)
+			perror("select()\n");
+		else if (retval)
+			debug ("FD = %" PRIu32 " Writable\n", sd);
+		else
+			debug ("FD = %" PRIu32 " Not Writable\n", sd);
+
+		fflush(stdout);
+
+		// -----------
+
 		if ((n = send(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
-			return -1;
+			perror("sendn");
+			exit(-1);
 		} else if (n == 0) {
 			return 0;
 		}
@@ -106,7 +132,8 @@ int32_t Socket::recvn(char* buf, int32_t buf_len) {
 	int32_t n = 0;
 	while (n_left > 0) {
 		if ((n = recv(sd, buf + (buf_len - n_left), n_left, 0)) < 0) {
-			return -1;
+			perror("recvn");
+			exit(-1);
 		} else if (n == 0) {
 			return 0;
 		}
@@ -155,5 +182,5 @@ void Socket::set_non_blocking(const bool b) {
 }
 
 uint32_t Socket::getSockfd() {
-	return (uint32_t)m_sock;
+	return (uint32_t) m_sock;
 }

@@ -8,6 +8,7 @@
 #include <unistd.h>		// required by select()
 #include <sys/select.h>	// required by select()
 #include <sys/ioctl.h>
+#include <boost/thread/thread.hpp>
 #include "connection.hh"
 #include "communicator.hh"
 #include "component.hh"
@@ -27,11 +28,21 @@
 
 using namespace std;
 
+#define USE_THREAD_POOL
+
+#ifdef USE_THREAD_POOL
+
+#include <boost/bind.hpp>
+#include "../../lib/threadpool/threadpool.hpp"
+using namespace boost::threadpool;
+
+#endif
+
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
 // mutex
-mutex connectionMapMutex;
+boost::shared_mutex connectionMapMutex;
 
 Communicator::Communicator() {
 
@@ -56,7 +67,19 @@ Communicator::Communicator() {
 	_pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
 
+#ifdef USE_THREAD_POOL
+	// thread pool
+	_numDispatchThread = configLayer->getConfigInt(
+			"Communication>NumDispatchThread");
+	_numSpecialDispatchThread = configLayer->getConfigInt(
+			"Communication>NumSpecialDispatchThread");
+	debug(
+			"Dispatch thread = %" PRIu32 " Special Dispatch Thread = %" PRIu32 "\n",
+			_numDispatchThread, _numSpecialDispatchThread);
+#endif
+
 	debug("%s\n", "Communicator constructed");
+
 }
 
 Communicator::~Communicator() {
@@ -109,6 +132,12 @@ void Communicator::waitForMessage() {
 		_maxFd = serverSockfd;
 	}
 
+#ifdef USE_THREAD_POOL
+	// initialize thread pool
+	pool tp(_numDispatchThread);
+	pool tpSpecial(_numSpecialDispatchThread);
+#endif
+
 	while (1) {
 
 		// reset timeout
@@ -122,13 +151,14 @@ void Communicator::waitForMessage() {
 
 		// add all socket descriptors into sockfdSet
 		{
-			lock_guard<mutex> lk(connectionMapMutex);
+			boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 				FD_SET(p->second->getSockfd(), &sockfdSet);
 			}
 		}
 
 		// invoke select
+//		debug("%s\n", "invoke select");
 		result = select(_maxFd + 1, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
@@ -137,7 +167,7 @@ void Communicator::waitForMessage() {
 		} else if (result == 0) {
 //			debug("%s\n", "select timeout");
 		} else {
-			debug("%s\n", "select returns");
+//			debug("%s\n", "select returns");
 		}
 
 		// if there is a new connection
@@ -149,7 +179,8 @@ void Communicator::waitForMessage() {
 
 			// add connection to _connectionMap
 			{
-				lock_guard<mutex> lk(connectionMapMutex);
+				boost::unique_lock<boost::shared_mutex> lock(
+						connectionMapMutex);
 				_connectionMap[conn->getSockfd()] = conn;
 			}
 
@@ -163,19 +194,28 @@ void Communicator::waitForMessage() {
 
 		// if there is data in existing connections
 		{ // start critical session
-			lock_guard<mutex> lk(connectionMapMutex);
+			boost::upgrade_lock<boost::shared_mutex> lock(connectionMapMutex);
 			p = _connectionMap.begin();
 			while (p != _connectionMap.end()) {
 
 				uint32_t sockfd = p->second->getSockfd();
 
+//				debug("Checking FD_ISSET FD = %" PRIu32 "\n", sockfd);
+
 				// if socket has data available
 				if (FD_ISSET(sockfd, &sockfdSet)) {
+
+//					debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
 
 					// check if connection is lost
 					int nbytes = 0;
 					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 					if (nbytes == 0) {
+
+						//boost::upgrade_lock lock(connectionMapMutex);
+						boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
+								lock);
+
 						// disconnect and remove from _connectionMap
 						debug("SOCKFD = %" PRIu32 " connection lost\n",
 								p->first);
@@ -186,7 +226,36 @@ void Communicator::waitForMessage() {
 					} else {
 						// receive message into buffer, memory allocated in recvMessage
 						buf = p->second->recvMessage();
+
+						// use thread pool implementation
+#ifdef USE_THREAD_POOL
+						struct MsgHeader msgHeader;
+						memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+						MsgType msgType = msgHeader.protocolMsgType;
+
+						debug(
+								"Before schedule dispatch for %" PRIu32 " Type = %" PRIu32 "\n",
+								msgHeader.requestId, msgType);
+						// if message is for secondary OSD, handle it with a special thread pool to avoid blocking
+						if (msgType == PUT_SEGMENT_INIT_REQUEST
+								|| msgType == PUT_SEGMENT_INIT_REPLY
+								|| msgType == SEGMENT_DATA
+								|| msgType == SEGMENT_TRANSFER_END_REQUEST
+								|| msgType == SEGMENT_TRANSFER_END_REPLY) {
+							tpSpecial.schedule(
+									boost::bind(&Communicator::dispatch, this,
+											buf, p->first));
+						} else {
+							tp.schedule(
+									boost::bind(&Communicator::dispatch, this,
+											buf, p->first));
+						}
+						debug(
+								"After schedule dispatch for %" PRIu32 " Type = %" PRIu32 "\n",
+								msgHeader.requestId, msgType);
+#else
 						dispatch(buf, p->first);
+#endif
 					}
 				}
 
@@ -195,6 +264,10 @@ void Communicator::waitForMessage() {
 		} // end critical section
 
 	} // end while (1)
+
+#ifdef USE_THREAD_POOL
+	tp.wait();
+#endif
 }
 
 /**
@@ -265,7 +338,8 @@ void Communicator::sendMessage() {
 			}
 
 			{
-				lock_guard<mutex> lk(connectionMapMutex);
+				boost::shared_lock<boost::shared_mutex> lock(
+						connectionMapMutex);
 				if (!(_connectionMap.count(sockfd))) {
 					debug("Connection SOCKFD = %" PRIu32 " not found!\n",
 							sockfd);
@@ -312,7 +386,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 
 	// Save the connection into corresponding list
 	{
-		lock_guard<mutex> lk(connectionMapMutex);
+		boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 		_connectionMap[sockfd] = conn;
 	}
 
@@ -331,7 +405,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
  */
 
 void Communicator::disconnectAndRemove(uint32_t sockfd) {
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	if (_connectionMap.count(sockfd)) {
 		Connection* conn = _connectionMap[sockfd];
@@ -348,7 +422,7 @@ uint32_t Communicator::getMdsSockfd() {
 	// TODO: assume return first MDS
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MDS) {
@@ -363,7 +437,7 @@ uint32_t Communicator::getMonitorSockfd() {
 	// TODO: assume return first Monitor
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MONITOR) {
@@ -378,7 +452,7 @@ uint32_t Communicator::getOsdSockfd() {
 	// TODO: assume return first Osd
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == OSD) {
@@ -409,8 +483,12 @@ void Communicator::sendThread(Communicator* communicator) {
  */
 
 void Communicator::dispatch(char* buf, uint32_t sockfd) {
+
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+
+	debug("Running dispatch ID = %" PRIu32 " Type = %d\n",
+			msgHeader.requestId, msgHeader.protocolMsgType);
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
@@ -426,13 +504,19 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
 
 	// debug
-	debug("%s\n", "running dispatch");
 	message->printHeader();
 	message->printProtocol();
 	//message->printPayloadHex();
 
+#ifdef USE_THREAD_POOL
+	message->handle();
+#else
 	thread t(handleThread, message);
 	t.detach();
+#endif
+
+	debug("dispatch finished for %" PRIu32 " Type = %d\n",
+			msgHeader.requestId, msgHeader.protocolMsgType);
 }
 
 inline uint32_t Communicator::generateRequestId() {
