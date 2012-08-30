@@ -145,6 +145,19 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
+/**
+ * @brief	Handle Get Object ID Lsit
+ */
+void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t numOfObjs)
+{
+	vector<uint64_t> objectList = _metaDataModule->newObjectList(numOfObjs);
+	_mdsCommunicator->replyObjectIdList(requestId, connectionId, objectList);
+	return ;
+}
+
+/**
+ * @brief	Handle Get File Info Request
+ */
 void Mds::getFileInfoProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, string path)
 {
 	downloadFileProcessor(requestId, connectionId, clientId, path);	

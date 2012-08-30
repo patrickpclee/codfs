@@ -12,6 +12,8 @@
 #include "metadata/uploadfilerequest.hh"
 #include "metadata/uploadfilereply.hh"
 #include "metadata/uploadobjectack.hh"
+#include "metadata/getobjectidlistrequest.hh"
+//#include "metedata/getobjectidlistreply.hh"
 #include "metadata/downloadfilerequest.hh"
 #include "metadata/downloadfilereply.hh"
 #include "metadata/getobjectinforequest.hh"
@@ -83,6 +85,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (UPLOAD_OBJECT_ACK):
 		return new UploadObjectAckMsg(communicator);
 		break;
+	case (GET_OBJECT_ID_LIST_REQUEST):
+		return new GetObjectIdListRequestMsg(communicator);
+		break;
+//	case (GET_OBJECT_ID_LIST_REPLY):
+//		return new GetObjectIdListReplyMsg(communicator);
+//		break;
 	case (DOWNLOAD_FILE_REQUEST):
 		return new DownloadFileRequestMsg(communicator);
 		break;

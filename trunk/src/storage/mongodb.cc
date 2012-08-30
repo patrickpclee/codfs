@@ -180,6 +180,15 @@ BSONObj MongoDB::findAndModify (BSONObj queryObject, BSONObj updateObject)
 	return result.getObjectField("value");
 };
 
+void MongoDB::removeField (Query queryObject, string field)
+{
+	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
+	DBClientBase* _connection = _conn->get();
+	BSONObj unsetObject = BSON ("$unset" << BSON (field << "1"));
+	_connection->update(_database + "." + _collection, queryObject, unsetObject, true);
+	_conn->done();
+}
+
 void MongoDB::remove (Query queryObject)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
