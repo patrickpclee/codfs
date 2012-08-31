@@ -102,7 +102,7 @@ public:
 	 * @return ObjectCache structure
 	 */
 
-	struct ObjectCache getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId);
+	struct ObjectTransferCache getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId);
 
 	/**
 	 * 1. Send an init message
