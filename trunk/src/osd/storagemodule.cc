@@ -95,15 +95,15 @@ void StorageModule::initializeStorageStatus() {
 		struct ObjectDiskCache objectDiskCache;
 		uint64_t objectId = boost::lexical_cast<uint64_t>(dent->d_name);
 		objectDiskCache.length = st.st_size;
-		objectDiskCache.lastModifiedTime = st.st_mtim;
+		objectDiskCache.lastAccessedTime = st.st_atim;
 		objectDiskCache.filepath = _objectFolder + dent->d_name;
-		_objectDiskCacheMap.set (objectId, objectDiskCache);
+		_objectDiskCacheMap.set(objectId, objectDiskCache);
 
 		_freeObjectSpace -= st.st_size;
 		_currentObjectUsage += st.st_size;
 
 		cout << "ID: " << objectId << "\tLength: " << objectDiskCache.length
-				<< "\t Modified: " << objectDiskCache.lastModifiedTime.tv_sec
+				<< "\t Modified: " << objectDiskCache.lastAccessedTime.tv_sec
 				<< endl;
 
 	}
@@ -203,17 +203,9 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 			objectId, segmentId, length, filepath.c_str());
 }
 
-bool StorageModule::isObjectExist(uint64_t objectId) {
+bool StorageModule::isObjectCached(uint64_t objectId) {
 
-	// TEST OBJECT READ
-	/*
-	 ObjectInfo objectInfo = readObjectInfo(objectId);
-	 if (objectInfo.objectSize == 0) {
-	 return false;
-	 }
-	 */
-
-	return true;
+	return _objectDiskCacheMap.count(objectId);
 }
 
 /**
@@ -691,6 +683,11 @@ uint32_t StorageModule::getFreeObjectSpace() {
 
 int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 	//TODO delete old objects and make room for new one.
+
+	// lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
+	// remove (filepath);
+	// _objectDiskCacheMap.erase (objectId);
+	// _objectDiskCacheMutex.erase(objectId);
 	return 0;
 }
 
@@ -711,8 +708,8 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 			objectCache.length);
 
 	if (byteWritten != objectCache.length) {
-		perror ("Cannot saveObjectToDisk");
-		exit (-1);
+		perror("Cannot saveObjectToDisk");
+		exit(-1);
 	}
 	closeObjectFile(objectId);
 
@@ -720,6 +717,15 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	struct ObjectDiskCache objectDiskCache;
 	objectDiskCache.filepath = generateObjectPath(objectId, _objectFolder);
 	objectDiskCache.length = objectCache.length;
-	objectDiskCache.lastModifiedTime = {time(NULL), 0}; // set to current time
+	objectDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
 	_objectDiskCacheMap.set(objectId, objectDiskCache);
+}
+
+struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
+	struct ObjectData objectData;
+
+	struct ObjectDiskCache objectDiskCache = _objectDiskCacheMap.get(objectId);
+
+	objectData = readObject(objectId, 0, objectDiskCache.length);
+	return objectData;
 }
