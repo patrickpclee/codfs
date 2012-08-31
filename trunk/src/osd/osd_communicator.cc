@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include "osd.hh"
 #include "osd_communicator.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
@@ -23,8 +24,11 @@
 #include "../protocol/transfer/segmenttransferendreply.hh"
 #include "../protocol/transfer/segmentdatamsg.hh"
 #include "../protocol/nodelist/getsecondarylistrequest.hh"
+#include "../protocol/status/osdstartupmsg.hh"
 
 using namespace std;
+
+extern Osd* osd;
 
 /**
  * Constructor
@@ -167,7 +171,21 @@ void OsdCommunicator::getSegmentRequest(uint32_t osdId, uint64_t objectId,
 vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 		uint64_t objectId, ComponentType dstComponent, uint32_t segmentCount) {
 
-	vector<struct SegmentLocation> osdList;
+	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
+			new GetSecondaryListRequestMsg(this, getMonitorSockfd(), segmentCount);
+	getSecondaryListRequestMsg->prepareProtocolMsg();
+
+	addMessage(getSecondaryListRequestMsg, true);
+	MessageStatus status = getSecondaryListRequestMsg->waitForStatusChange();
+
+	if (status == READY) {
+		vector<struct SegmentLocation> osdList = 
+				getSecondaryListRequestMsg->getSecondaryList();
+		return osdList;
+	}
+
+	return {};
+	/* 
 	srand(time(NULL));
 
 	// TODO: request to MONITOR (HARDCODE FOR NOW)
@@ -182,19 +200,19 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 		//segmentLocation.osdId = _componentId;
 
 		// DEBUG 3: must be foreign
-		/*
 		if (_componentId == 52000) {
 			segmentLocation.osdId = 52001;
 		} else {
 			segmentLocation.osdId = 52000;
 		}
-		*/
 
 		segmentLocation.segmentId = 0;
 		osdList.push_back(segmentLocation);
 	}
 
 	return osdList;
+	*/
+
 }
 
 uint32_t OsdCommunicator::sendSegmentAck(uint64_t objectId, uint32_t segmentId,
@@ -316,4 +334,11 @@ struct ObjectTransferOsdInfo OsdCommunicator::getObjectInfoRequest(
 	}
 
 	return objectInfo;
+}
+
+void OsdCommunicator::registerToMonitor() {
+	OsdStartupMsg* startupMsg = new OsdStartupMsg(this, getMonitorSockfd(), 
+		osd->getOsdId(), osd->getFreespace(), osd->getCpuLoadavg(0));
+	startupMsg->prepareProtocolMsg();
+	addMessage(startupMsg);
 }

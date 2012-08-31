@@ -486,10 +486,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
 
-	/*
 	debug("Running dispatch ID = %" PRIu32 " Type = %d\n",
 			msgHeader.requestId, msgHeader.protocolMsgType);
-	*/
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
@@ -673,11 +671,27 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 			// send HandshakeRequest
 			requestHandshake(sockfd, _componentId, _componentType);
 
+		} else 
+		if ((_componentType == MDS || _componentType == OSD) && component.type == MONITOR) {
+			debug("Connecting to %s:%" PRIu16 "\n",
+					component.ip.c_str(), component.port);
+			uint32_t sockfd = connectAndAdd(component.ip, component.port,
+					component.type);
+
+			// send HandshakeRequest
+			requestHandshake(sockfd, _componentId, _componentType);
+
 		} else {
 			debug("Skipping %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
 		}
 	}
+}
+
+void Communicator::connectToMonitor() {
+	vector<Component> monitorList = parseConfigFile("MONITOR");
+	printComponents("MONITOR", monitorList);
+	connectToComponents(monitorList);
 }
 
 void Communicator::connectAllComponents() {
