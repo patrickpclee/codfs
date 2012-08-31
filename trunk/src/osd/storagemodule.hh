@@ -25,10 +25,9 @@ struct ObjectTransferCache {
  * For retrieving an object cache file from the disk
  */
 struct ObjectDiskCache {
-	struct timespec lastModifiedTime;
-	uint64_t objectId;
 	uint64_t length;
 	string filepath;
+	struct timespec lastModifiedTime;
 };
 
 class StorageModule {
@@ -322,7 +321,7 @@ private:
 	uint64_t getFilesize(string filepath);
 
 	// TODO: use more efficient data structure for LRU delete
-	ConcurrentMap <uint64_t, struct ObjectDiskCache> _objectCacheFileMap;
+	ConcurrentMap <uint64_t, struct ObjectDiskCache> _objectDiskCacheMap;
 
 	map<string, FILE*> _openedFile;
 	map<uint64_t, struct ObjectTransferCache> _objectCache;
