@@ -580,14 +580,9 @@ void StorageModule::updateSegmentFreespace(uint32_t new_segment_size) {
 
 }
 
-void StorageModule::updateObjectFreespace(uint32_t new_object_size) {
-	uint32_t update_space = new_object_size;
-	if (verifyObjectSpace(update_space)) {
-		_currentObject += update_space;
-		_freeObjectSpace -= update_space;
-	} else {
-		perror("object free space not enough.\n");
-	}
+void StorageModule::updateObjectFreespace(int32_t new_object_size) {
+	_currentObject += new_object_size;
+	_freeObjectSpace -= new_object_size;
 }
 
 uint32_t StorageModule::getCurrentSegmentCapacity() {
@@ -606,5 +601,19 @@ uint32_t StorageModule::getFreeObjectSpace() {
 	return _freeObjectSpace;
 }
 
+int32_t StorageModule::spareObjectSpace(uint32_t new_object_size){
+	//TODO delete old objects and make room for new one.
+	return 0;
+}
+
 void StorageModule::saveObjectToDisk(ObjectCache objectCache) {
+	//TODO write object to disk.
+
+
+	uint32_t update_size = objectCache.length;
+	if(verifyObjectSpace(update_size)){
+		updateObjectFreespace(update_size);
+	}else{
+		updateObjectFreespace(spareObjectSpace(update_size));
+	}
 }
