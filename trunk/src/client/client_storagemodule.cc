@@ -129,7 +129,7 @@ void ClientStorageModule::createObjectCache(uint64_t objectId,
 		uint32_t length) {
 
 	// create cache
-	struct ObjectCache objectCache;
+	struct ObjectTransferCache objectCache;
 	objectCache.length = length;
 	objectCache.buf = MemoryPool::getInstance().poolMalloc(length);
 
@@ -166,7 +166,7 @@ bool ClientStorageModule::locateObjectCache(uint64_t objectId){
 	return (_objectCache.count(objectId) > 0);
 }
 
-struct ObjectCache ClientStorageModule::getObjectCache(uint64_t objectId) {
+struct ObjectTransferCache ClientStorageModule::getObjectCache(uint64_t objectId) {
 	lock_guard<mutex> lk(cacheMutex);
 	if (!_objectCache.count(objectId)) {
 		debug("object cache not found for %" PRIu64 "\n", objectId);
@@ -178,7 +178,7 @@ struct ObjectCache ClientStorageModule::getObjectCache(uint64_t objectId) {
 void ClientStorageModule::closeObject(uint64_t objectId) {
 
 	// close cache
-	struct ObjectCache objectCache = getObjectCache(objectId);
+	struct ObjectTransferCache objectCache = getObjectCache(objectId);
 	MemoryPool::getInstance().poolFree(objectCache.buf);
 
 	{

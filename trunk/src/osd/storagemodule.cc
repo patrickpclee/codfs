@@ -166,7 +166,7 @@ uint64_t StorageModule::getFilesize(string filepath) {
 void StorageModule::createObjectCache(uint64_t objectId, uint32_t length) {
 
 	// create cache
-	struct ObjectCache objectCache;
+	struct ObjectTransferCache objectCache;
 	objectCache.length = length;
 	objectCache.buf = MemoryPool::getInstance().poolMalloc(length);
 
@@ -356,7 +356,7 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 
 void StorageModule::closeObjectCache(uint64_t objectId) {
 	// close cache
-	struct ObjectCache objectCache = getObjectCache(objectId);
+	struct ObjectTransferCache objectCache = getObjectCache(objectId);
 	MemoryPool::getInstance().poolFree(objectCache.buf);
 
 	{
@@ -620,7 +620,7 @@ void StorageModule::closeFile(string filepath) {
 	fclose(filePtr);
 }
 
-struct ObjectCache StorageModule::getObjectCache(uint64_t objectId) {
+struct ObjectTransferCache StorageModule::getObjectCache(uint64_t objectId) {
 	lock_guard<mutex> lk(cacheMutex);
 	if (!_objectCache.count(objectId)) {
 		debug("%s\n", "object cache not found");
@@ -695,7 +695,7 @@ int32_t StorageModule::spareObjectSpace(uint32_t new_object_size){
 	return 0;
 }
 
-void StorageModule::saveObjectToDisk(ObjectCache objectCache) {
+void StorageModule::saveObjectToDisk(ObjectTransferCache objectCache) {
 	//TODO write object to disk.
 
 

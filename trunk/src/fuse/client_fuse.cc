@@ -143,7 +143,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size,
 		uint32_t componentId = fileMetaData._primaryList[i];
 		uint32_t sockfd = communicator->getSockfdFromId(componentId);
 
-		struct ObjectCache objectCache;
+		struct ObjectTransferCache objectCache;
 		{
 			lock_guard<mutex> lk(_objectProcessingMutex);
 			objectCache = communicator->getObject(clientId, sockfd, objectId); 
