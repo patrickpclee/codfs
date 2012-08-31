@@ -86,13 +86,16 @@ void StorageModule::createObjectCache(uint64_t objectId, uint32_t length) {
 			objectId, length);
 }
 
-void StorageModule::createObjectFile (uint64_t objectId, uint32_t length) {
+void StorageModule::createObjectFile(uint64_t objectId, uint32_t length) {
 	// create object
 	createAndOpenObjectFile(objectId, length);
 
 	// write info
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
+
+	//TODO save object to the QUEUE
+	updateObjectFreespace(objectCache.length);
 }
 
 void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
@@ -233,10 +236,13 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteWritten, offsetInSegment);
 
+	updateSegmentFreespace(length);
+
 	return byteWritten;
 }
 
-FILE* StorageModule::createAndOpenObjectFile(uint64_t objectId, uint32_t length) {
+FILE* StorageModule::createAndOpenObjectFile(uint64_t objectId,
+		uint32_t length) {
 
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	return createFile(filepath);
@@ -267,7 +273,7 @@ void StorageModule::closeObjectCache(uint64_t objectId) {
 	debug("Object Cache ID = %" PRIu64 " closed\n", objectId);
 }
 
-void StorageModule::closeObjectFile (uint64_t objectId) {
+void StorageModule::closeObjectFile(uint64_t objectId) {
 	// close file
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	closeFile(filepath);
@@ -563,9 +569,8 @@ bool StorageModule::verifyObjectSpace(uint32_t size) {
 	return size <= _freeObjectSpace ? true : false;
 }
 
-void StorageModule::updateCurrentSegmentCapacity(uint32_t new_segment_size,
-		uint32_t count) {
-	uint32_t update_space = new_segment_size * count;
+void StorageModule::updateSegmentFreespace(uint32_t new_segment_size) {
+	uint32_t update_space = new_segment_size;
 	if (verifySegmentSpace(update_space)) {
 		_currentSegment += update_space;
 		_freeSegmentSpace -= update_space;
@@ -575,9 +580,8 @@ void StorageModule::updateCurrentSegmentCapacity(uint32_t new_segment_size,
 
 }
 
-void StorageModule::updateCurrentObjectCache(uint32_t new_object_size,
-		uint32_t count) {
-	uint32_t update_space = new_object_size * count;
+void StorageModule::updateObjectFreespace(uint32_t new_object_size) {
+	uint32_t update_space = new_object_size;
 	if (verifyObjectSpace(update_space)) {
 		_currentObject += update_space;
 		_freeObjectSpace -= update_space;
@@ -600,4 +604,7 @@ uint32_t StorageModule::getFreeSegmentSpace() {
 
 uint32_t StorageModule::getFreeObjectSpace() {
 	return _freeObjectSpace;
+}
+
+void StorageModule::saveObjectToDisk(ObjectCache objectCache) {
 }
