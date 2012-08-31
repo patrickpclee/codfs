@@ -14,9 +14,6 @@ static const string sizes[] = { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
 static const uint64_t exbibytes = 1024ULL * 1024ULL * 1024ULL * 1024ULL
 		* 1024ULL * 1024ULL;
 
-
-char time_string[40];
-
 void printhex(char* buf, int n) {
 	int i;
 	for (i = 0; i < n; i++) {
@@ -28,10 +25,11 @@ void printhex(char* buf, int n) {
 
 }
 
-char* getTime() {
+string getTime() {
 	struct timeval tv;
 	struct tm* ptm;
 	long milliseconds;
+	char time_string[40];
 
 	/* Obtain the time of day, and convert it to a tm struct. */
 	gettimeofday(&tv, NULL);
@@ -43,7 +41,7 @@ char* getTime() {
 	/* Print the formatted time, in seconds, followed by a decimal point
 	 and the milliseconds. */
 	sprintf(time_string, "%s.%03ld", time_string, milliseconds);
-	return time_string;
+	return string(time_string);
 }
 
 string formatSize(uint64_t size) {
@@ -51,15 +49,14 @@ string formatSize(uint64_t size) {
 	uint64_t multiplier = exbibytes;
 	int i;
 
-	for (i = 0; i < (int)DIM(sizes); i++, multiplier /= 1024) {
+	for (i = 0; i < (int) DIM(sizes); i++, multiplier /= 1024) {
 		if (size < multiplier) {
 			continue;
 		}
 		if (size % multiplier == 0) {
 			result = to_string(size / multiplier) + sizes[i];
 //			sprintf(result, "%" PRIu64 " %s", size / multiplier, sizes[i]);
-		}
-		else {
+		} else {
 			stringstream ss;
 			ss.precision(2);
 			ss << fixed << (float) size / multiplier << sizes[i];
