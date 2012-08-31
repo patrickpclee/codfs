@@ -16,7 +16,7 @@ using namespace std;
  * For caching an object in memory during upload/download
  */
 
-struct ObjectCache {
+struct ObjectTransferCache {
 	uint64_t length;
 	char* buf;
 };
@@ -180,7 +180,7 @@ public:
 	void closeSegment(uint64_t objectId, uint32_t segmentId);
 
 	// getters
-	struct ObjectCache getObjectCache(uint64_t objectId);
+	struct ObjectTransferCache getObjectCache(uint64_t objectId);
 
 	void setMaxSegmentCapacity(uint32_t max_segment);
 	void setMaxObjectCache(uint32_t max_object);
@@ -197,7 +197,7 @@ public:
 	bool verifySegmentSpace(uint32_t size);
 	bool verifyObjectSpace(uint32_t size);
 
-	void saveObjectToDisk(ObjectCache objectCache);
+	void saveObjectToDisk(ObjectTransferCache objectCache);
 
 
 private:
@@ -325,7 +325,7 @@ private:
 	ConcurrentMap <uint64_t, struct ObjectCacheFile> _objectCacheFileMap;
 
 	map<string, FILE*> _openedFile;
-	map<uint64_t, struct ObjectCache> _objectCache;
+	map<uint64_t, struct ObjectTransferCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
 	uint64_t _maxSegmentCapacity;

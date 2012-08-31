@@ -255,7 +255,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (_pendingObjectChunk.get(objectId) == 0) {
 			// if all chunks have arrived
-			struct ObjectCache objectCache = _storageModule->getObjectCache(
+			struct ObjectTransferCache objectCache = _storageModule->getObjectCache(
 					objectId);
 
 			// write cache to disk
