@@ -204,8 +204,12 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 }
 
 bool StorageModule::isObjectCached(uint64_t objectId) {
-
-	return _objectDiskCacheMap.count(objectId);
+	if (_objectDiskCacheMap.count(objectId)) {
+		// update access time
+		_objectDiskCacheMap.get(objectId).lastAccessedTime = {time(NULL), 0};
+		return true;
+	}
+	return false;
 }
 
 /**
