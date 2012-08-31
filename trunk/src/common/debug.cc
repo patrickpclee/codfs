@@ -1,17 +1,19 @@
+#include <iostream>
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
-#include <string.h>
+#include <string>
 #include <stdlib.h>
+#include <sstream>
 #include "debug.hh"
+using namespace std;
 
 #define DIM(x) (sizeof(x)/sizeof(*(x)))
 
-static const char *sizes[] = { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
+static const string sizes[] = { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
 static const uint64_t exbibytes = 1024ULL * 1024ULL * 1024ULL * 1024ULL
 		* 1024ULL * 1024ULL;
 
-using namespace std;
 
 char time_string[40];
 
@@ -44,20 +46,28 @@ char* getTime() {
 	return time_string;
 }
 
-char* formatSize(uint64_t size) {
-	char *result = (char *) malloc(sizeof(char) * 20);
+string formatSize(uint64_t size) {
+	string result;
 	uint64_t multiplier = exbibytes;
 	int i;
 
 	for (i = 0; i < (int)DIM(sizes); i++, multiplier /= 1024) {
-		if (size < multiplier)
+		if (size < multiplier) {
 			continue;
-		if (size % multiplier == 0)
-			sprintf(result, "%" PRIu64 " %s", size / multiplier, sizes[i]);
-		else
-			sprintf(result, "%.1f %s", (float) size / multiplier, sizes[i]);
+		}
+		if (size % multiplier == 0) {
+			result = to_string(size / multiplier) + sizes[i];
+//			sprintf(result, "%" PRIu64 " %s", size / multiplier, sizes[i]);
+		}
+		else {
+			stringstream ss;
+			ss.precision(2);
+			ss << fixed << (float) size / multiplier << sizes[i];
+			result = ss.str();
+//			sprintf(result, "%.1f %s", (float) size / multiplier, sizes[i]);
+		}
 		return result;
 	}
-	strcpy(result, "0");
+	result = "0";
 	return result;
 }
