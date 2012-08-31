@@ -258,12 +258,6 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			struct ObjectTransferCache objectCache = _storageModule->getObjectCache(
 					objectId);
 
-			// write cache to disk
-			/*
-			 byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
-			 objectCache.length);
-			 */
-
 			// perform coding
 			struct CodingSetting codingSetting = _codingSettingMap.get(
 					objectId);
@@ -324,7 +318,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
 			// after ack, write object cache to disk
-			_storageModule->saveObjectToDisk(objectCache);
+			_storageModule->saveObjectToDisk(objectId, objectCache);
 
 			// close file and free cache
 			_storageModule->closeObjectCache(objectId);

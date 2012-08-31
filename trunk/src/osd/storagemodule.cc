@@ -97,14 +97,14 @@ void StorageModule::initializeStorageStatus() {
 		objectDiskCache.length = st.st_size;
 		objectDiskCache.lastModifiedTime = st.st_mtim;
 		objectDiskCache.filepath = _objectFolder + dent->d_name;
-		_objectDiskCacheMap[objectId] = objectDiskCache;
+		_objectDiskCacheMap.set (objectId, objectDiskCache);
 
 		_freeObjectSpace -= st.st_size;
 		_currentObjectUsage += st.st_size;
 
-		cout << "ID: " << objectId << "\tLength: "
-				<< objectDiskCache.length << "\t Modified: "
-				<< objectDiskCache.lastModifiedTime.tv_sec << endl;
+		cout << "ID: " << objectId << "\tLength: " << objectDiskCache.length
+				<< "\t Modified: " << objectDiskCache.lastModifiedTime.tv_sec
+				<< endl;
 
 	}
 	closedir(srcdir);
@@ -189,9 +189,6 @@ void StorageModule::createObjectFile(uint64_t objectId, uint32_t length) {
 	// write info
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
-
-	//TODO save object to the QUEUE
-	updateObjectFreespace(length);
 }
 
 void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
@@ -692,19 +689,37 @@ uint32_t StorageModule::getFreeObjectSpace() {
 	return _freeObjectSpace;
 }
 
-int32_t StorageModule::spareObjectSpace(uint32_t new_object_size){
+int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 	//TODO delete old objects and make room for new one.
 	return 0;
 }
 
-void StorageModule::saveObjectToDisk(ObjectTransferCache objectCache) {
-	//TODO write object to disk.
-
+void StorageModule::saveObjectToDisk(uint64_t objectId,
+		ObjectTransferCache objectCache) {
 
 	uint32_t update_size = objectCache.length;
-	if(verifyObjectSpace(update_size)){
+	if (verifyObjectSpace(update_size)) {
 		updateObjectFreespace(update_size);
-	}else{
+	} else {
+		// clear cache if space is not available
 		updateObjectFreespace(spareObjectSpace(update_size));
 	}
+
+	// write cache to disk
+	createAndOpenObjectFile(objectId, objectCache.length);
+	uint64_t byteWritten = writeObjectFile(objectId, objectCache.buf, 0,
+			objectCache.length);
+
+	if (byteWritten != objectCache.length) {
+		perror ("Cannot saveObjectToDisk");
+		exit (-1);
+	}
+	closeObjectFile(objectId);
+
+	// save cache to map
+	struct ObjectDiskCache objectDiskCache;
+	objectDiskCache.filepath = generateObjectPath(objectId, _objectFolder);
+	objectDiskCache.length = objectCache.length;
+	objectDiskCache.lastModifiedTime = {time(NULL), 0}; // set to current time
+	_objectDiskCacheMap.set(objectId, objectDiskCache);
 }
