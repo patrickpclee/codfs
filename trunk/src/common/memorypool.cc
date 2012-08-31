@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <thread>
+#include <mutex>
 
 #include "memorypool.hh"
 
