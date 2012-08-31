@@ -280,6 +280,8 @@ private:
 	map<uint64_t, struct ObjectCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
+	uint64_t _segmentCapacity;
+	uint64_t _objectCapacity;
 };
 
 #endif

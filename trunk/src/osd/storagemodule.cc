@@ -24,8 +24,20 @@ StorageModule::StorageModule() {
 	_freespace = 0;
 	_openedFile = {};
 	_objectCache = {};
-	_objectFolder = configLayer->getConfigString("Storage>ObjectLocation");
+	_objectFolder = configLayer->getConfigString("Storage>ObjectCacheLocation");
 	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
+
+	// Unit in XML: GB
+	// Unit in StorageModule: Bytes
+	_objectCapacity = configLayer->getConfigInt("Storage>ObjectCacheCapacity")
+			* 1073741824ULL;
+	_segmentCapacity = configLayer->getConfigInt("Storage>SegmentCapacity")
+			* 1073741824ULL;
+
+	debug("Object Cache Location = %s Size = %s\n",
+			_objectFolder.c_str(), formatSize(_objectCapacity));
+	debug("Segment Cache Location = %s Size = %s\n",
+			_segmentFolder.c_str(), formatSize(_segmentCapacity));
 }
 
 StorageModule::~StorageModule() {

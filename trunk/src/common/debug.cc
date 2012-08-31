@@ -1,7 +1,15 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+#include <string.h>
+#include <stdlib.h>
 #include "debug.hh"
+
+#define DIM(x) (sizeof(x)/sizeof(*(x)))
+
+static const char *sizes[] = { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
+static const uint64_t exbibytes = 1024ULL * 1024ULL * 1024ULL * 1024ULL
+		* 1024ULL * 1024ULL;
 
 using namespace std;
 
@@ -32,6 +40,24 @@ char* getTime() {
 	milliseconds = tv.tv_usec / 1000;
 	/* Print the formatted time, in seconds, followed by a decimal point
 	 and the milliseconds. */
-	sprintf (time_string, "%s.%03ld", time_string, milliseconds);
+	sprintf(time_string, "%s.%03ld", time_string, milliseconds);
 	return time_string;
+}
+
+char* formatSize(uint64_t size) {
+	char *result = (char *) malloc(sizeof(char) * 20);
+	uint64_t multiplier = exbibytes;
+	int i;
+
+	for (i = 0; i < (int)DIM(sizes); i++, multiplier /= 1024) {
+		if (size < multiplier)
+			continue;
+		if (size % multiplier == 0)
+			sprintf(result, "%" PRIu64 " %s", size / multiplier, sizes[i]);
+		else
+			sprintf(result, "%.1f %s", (float) size / multiplier, sizes[i]);
+		return result;
+	}
+	strcpy(result, "0");
+	return result;
 }
