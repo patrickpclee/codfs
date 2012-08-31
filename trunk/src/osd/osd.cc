@@ -242,7 +242,7 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_codingSettingMap.set(objectId, codingSetting);
 
 	// create object and cache
-	_storageModule->createObject(objectId, length);
+	_storageModule->createObjectCache(objectId, length);
 	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
 }
@@ -255,14 +255,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (_pendingObjectChunk.get(objectId) == 0) {
 			// if all chunks have arrived
-			struct ObjectCache objectCache = _storageModule->getObjectCache(
+			struct ObjectTransferCache objectCache = _storageModule->getObjectCache(
 					objectId);
-
-			// write cache to disk
-			/*
-			 byteWritten = _storageModule->writeObject(objectId, objectCache.buf, 0,
-			 objectCache.length);
-			 */
 
 			// perform coding
 			struct CodingSetting codingSetting = _codingSettingMap.get(
@@ -311,9 +305,6 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 				i++;
 			}
 
-			// close file and free cache
-			_storageModule->closeObject(objectId);
-
 			_pendingObjectChunk.erase(objectId);
 
 			// Acknowledge MDS for Object Upload Completed
@@ -325,6 +316,13 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			// if all chunks have arrived, send ack
 			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
+
+			// after ack, write object cache to disk
+			_storageModule->saveObjectToDisk(objectId, objectCache);
+
+			// close file and free cache
+			_storageModule->closeObjectCache(objectId);
+
 			break;
 		} else {
 			usleep(10000); // sleep 0.01s
