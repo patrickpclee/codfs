@@ -9,6 +9,7 @@
 #include "../common/memorypool.hh"
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
+#include "../datastructure/concurrentmap.hh"
 using namespace std;
 
 /**
@@ -18,6 +19,16 @@ using namespace std;
 struct ObjectCache {
 	uint64_t length;
 	char* buf;
+};
+
+/**
+ * For retrieving an object cache file from the disk
+ */
+struct ObjectCacheFile {
+	struct timespec lastModifiedTime;
+	uint64_t objectId;
+	uint64_t length;
+	string filepath;
 };
 
 class StorageModule {
@@ -169,8 +180,6 @@ public:
 	void closeSegment(uint64_t objectId, uint32_t segmentId);
 
 	// getters
-	uint32_t getCapacity();
-	uint32_t getFreespace();
 	struct ObjectCache getObjectCache(uint64_t objectId);
 
 	void setMaxSegmentCapacity(uint32_t max_segment);
@@ -192,6 +201,8 @@ public:
 
 
 private:
+
+	void initializeStorageStatus();
 
 	void updateSegmentFreespace(uint32_t new_segment_size);
 	void updateObjectFreespace(uint32_t new_object_size);
@@ -309,18 +320,19 @@ private:
 	 */
 	uint64_t getFilesize(string filepath);
 
-	uint32_t _capacity; // total capacity of the node
-	uint32_t _freespace; // remaining capacity of the node
+	// TODO: use more efficient data structure for LRU delete
+	ConcurrentMap <uint64_t, struct ObjectCacheFile> _objectCacheFileMap;
+
 	map<string, FILE*> _openedFile;
 	map<uint64_t, struct ObjectCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
 	uint64_t _maxSegmentCapacity;
 	uint64_t _maxObjectCache;
-	uint32_t _currentSegment;
-	uint32_t _currentObject;
-	uint32_t _freeSegmentSpace;
-	uint32_t _freeObjectSpace;
+	uint64_t _freeSegmentSpace;
+	uint64_t _freeObjectSpace;
+	uint32_t _currentSegmentUsage;
+	uint32_t _currentObjectUsage;
 };
 
 #endif
