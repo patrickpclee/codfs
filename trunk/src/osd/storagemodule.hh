@@ -206,6 +206,7 @@ private:
 
 	void updateSegmentFreespace(uint32_t new_segment_size);
 	void updateObjectFreespace(uint32_t new_object_size);
+	int32_t spareObjectSpace(uint32_t new_object_size);
 
 	/**
 	 * Write the information about an object to the database
