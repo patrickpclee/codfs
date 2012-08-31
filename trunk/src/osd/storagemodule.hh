@@ -179,9 +179,6 @@ public:
 	uint32_t getMaxSegmentCapacity();
 	uint32_t getMaxObjectCache();
 
-	void updateCurrentSegmentCapacity(uint32_t new_segment_size, uint32_t count);
-	void updateCurrentObjectCache(uint32_t new_object_size, uint32_t count);
-
 	uint32_t getCurrentSegmentCapacity();
 	uint32_t getCurrentObjectCache();
 
@@ -191,8 +188,13 @@ public:
 	bool verifySegmentSpace(uint32_t size);
 	bool verifyObjectSpace(uint32_t size);
 
+	void saveObjectToDisk(ObjectCache objectCache);
+
 
 private:
+
+	void updateSegmentFreespace(uint32_t new_segment_size);
+	void updateObjectFreespace(uint32_t new_object_size);
 
 	/**
 	 * Write the information about an object to the database
