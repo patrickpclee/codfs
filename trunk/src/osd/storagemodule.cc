@@ -92,17 +92,19 @@ void StorageModule::initializeStorageStatus() {
 		}
 
 		// save file info
-		struct ObjectDiskCache objectCacheFile;
-		objectCacheFile.objectId = boost::lexical_cast<uint64_t>(dent->d_name);
-		objectCacheFile.length = st.st_size;
-		objectCacheFile.lastModifiedTime = st.st_mtim;
-		objectCacheFile.filepath = _objectFolder + dent->d_name;
+		struct ObjectDiskCache objectDiskCache;
+		uint64_t objectId = boost::lexical_cast<uint64_t>(dent->d_name);
+		objectDiskCache.length = st.st_size;
+		objectDiskCache.lastModifiedTime = st.st_mtim;
+		objectDiskCache.filepath = _objectFolder + dent->d_name;
+		_objectDiskCacheMap[objectId] = objectDiskCache;
+
 		_freeObjectSpace -= st.st_size;
 		_currentObjectUsage += st.st_size;
 
-		cout << "ID: " << objectCacheFile.objectId << "\tLength: "
-				<< objectCacheFile.length << "\t Modified: "
-				<< objectCacheFile.lastModifiedTime.tv_sec << endl;
+		cout << "ID: " << objectId << "\tLength: "
+				<< objectDiskCache.length << "\t Modified: "
+				<< objectDiskCache.lastModifiedTime.tv_sec << endl;
 
 	}
 	closedir(srcdir);
