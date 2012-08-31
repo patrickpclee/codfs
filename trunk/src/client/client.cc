@@ -131,13 +131,11 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	Clock::time_point t1 = Clock::now();
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1024.0;
-	double fileSizeMb = fileSize / 1048576.0;
-	double rate = fileSizeMb / duration;
 
 	cout << fixed;
 	cout << setprecision(2);
-	cout << fileSizeMb << " MB transferred in " << duration << " secs, Rate = "
-			<< rate << " MB/s" << endl;
+	cout << formatSize(fileSize) << " transferred in " << duration << " secs, Rate = "
+			<< formatSize(fileSize / duration) << "/s" << endl;
 
 	return fileMetaData._id;
 }
@@ -221,13 +219,11 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	Clock::time_point t1 = Clock::now();
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1024.0;
-	double fileSizeMb = fileMetaData._size / 1048576.0;
-	double rate = fileSizeMb / duration;
 
 	cout << fixed;
 	cout << setprecision(2);
-	cout << fileSizeMb << " MB transferred in " << duration << " secs, Rate = "
-			<< rate << " MB/s" << endl;
+	cout << formatSize(fileMetaData._size) << " transferred in " << duration << " secs, Rate = "
+			<< formatSize(fileMetaData._size / duration) << "/s" << endl;
 }
 
 void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
