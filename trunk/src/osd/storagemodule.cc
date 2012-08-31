@@ -33,6 +33,10 @@ StorageModule::StorageModule() {
 			* 1073741824ULL;
 	_maxSegmentCapacity = configLayer->getConfigInt("Storage>SegmentCapacity")
 			* 1073741824ULL;
+	_freeSegmentSpace = _maxSegmentCapacity;
+	_freeObjectSpace = _maxObjectCache;
+	_currentSegment = 0;
+	_currentObject = 0;
 
 	debug("Object Cache Location = %s Size = %s\n",
 			_objectFolder.c_str(), formatSize(_maxObjectCache));

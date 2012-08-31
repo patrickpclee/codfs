@@ -295,6 +295,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 					_storageModule->writeSegment(objectId,
 							segmentData.info.segmentId, segmentData.buf, 0,
 							segmentData.info.segmentSize);
+					_storageModule->updateCurrentSegmentCapacity(segmentData.info.segmentSize,1);
+
 					_storageModule->closeSegment(objectId,
 							segmentData.info.segmentId);
 				} else {
@@ -310,6 +312,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 				i++;
 			}
+			//TODO save object to the QUEUE
+			_storageModule->updateCurrentObjectCache(objectCache.length,1);
 
 			// close file and free cache
 			_storageModule->closeObject(objectId);
@@ -417,6 +421,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	} else {
 		byteWritten = _storageModule->writeSegment(objectId, segmentId, buf,
 				offset, length);
+		_storageModule->updateCurrentSegmentCapacity(length,1);
 	}
 
 	_pendingSegmentChunk.decrement(segmentKey);
