@@ -92,7 +92,7 @@ void StorageModule::initializeStorageStatus() {
 		}
 
 		// save file info
-		struct ObjectCacheFile objectCacheFile;
+		struct ObjectDiskCache objectCacheFile;
 		objectCacheFile.objectId = boost::lexical_cast<uint64_t>(dent->d_name);
 		objectCacheFile.length = st.st_size;
 		objectCacheFile.lastModifiedTime = st.st_mtim;
