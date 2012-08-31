@@ -1,4 +1,7 @@
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include "monitor.hh"
 #include "../config/config.hh"
 #include "../osd/segmentlocation.hh"
@@ -13,6 +16,8 @@ mutex osdStatMapMutex;
 /*  Monitor default constructor
  */
 Monitor::Monitor() {
+	srand(time(NULL));
+
 	_osdStatMap = {};
 
 	configLayer = new ConfigLayer("monitorconfig.xml");
