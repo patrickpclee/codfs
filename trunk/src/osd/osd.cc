@@ -84,7 +84,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		mutex* tempMutex = new mutex();
 		_objectDownloadMutex.set(objectId, tempMutex);
 		_objectDataMap.set(objectId, { });
-		_needGetObjectMap.set(objectId, true);
+		_isObjectDownloaded.set(objectId, false);
 	} else {
 		_objectRequestCount.increment(objectId);
 	}
@@ -97,107 +97,117 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
 		debug("Inside Lock for objectId = %" PRIu64 "\n", objectId);
 
-		if (_needGetObjectMap.get(objectId)) {
+		if (!_isObjectDownloaded.get(objectId)) {
 
-			// TODO: check if OSD has object
-			// TODO: check if osd list exists in cache
+			if (_storageModule->isObjectCached(objectId)) {
+				// case 1: if object exists in cache
+				debug ("Object ID = %" PRIu64 " exists in cache", objectId);
+				objectData = _storageModule->getObjectFromDiskCache(objectId);
+			} else {
+				// case 2: if object does not exist in cache
 
-			// 1. ask MDS to get object information
+				// TODO: check if osd list exists in cache
 
-			ObjectTransferOsdInfo objectInfo =
-					_osdCommunicator->getObjectInfoRequest(objectId);
-			const CodingScheme codingScheme = objectInfo._codingScheme;
-			const string codingSetting = objectInfo._codingSetting;
+				// 1. ask MDS to get object information
 
-			// check which segments are needed to request
-			vector<uint32_t> requiredSegments =
-					_codingModule->getRequiredSegmentIds(codingScheme,
-							codingSetting);
-			uint32_t totalNumOfSegments = _codingModule->getNumberOfSegments(
-					codingScheme, codingSetting);
+				ObjectTransferOsdInfo objectInfo =
+						_osdCommunicator->getObjectInfoRequest(objectId);
+				const CodingScheme codingScheme = objectInfo._codingScheme;
+				const string codingSetting = objectInfo._codingSetting;
 
-			// 2. initialize list and count
+				// check which segments are needed to request
+				vector<uint32_t> requiredSegments =
+						_codingModule->getRequiredSegmentIds(codingScheme,
+								codingSetting);
+				uint32_t totalNumOfSegments =
+						_codingModule->getNumberOfSegments(codingScheme,
+								codingSetting);
 
-			const uint32_t segmentCount = requiredSegments.size();
+				// 2. initialize list and count
 
-			_downloadSegmentRemaining.set(objectId, segmentCount);
-			_receivedSegmentData.set(objectId,
-					vector<struct SegmentData>(totalNumOfSegments));
-			vector<struct SegmentData>& segmentDataList =
-					_receivedSegmentData.get(objectId);
+				const uint32_t segmentCount = requiredSegments.size();
 
-			debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
+				_downloadSegmentRemaining.set(objectId, segmentCount);
+				_receivedSegmentData.set(objectId,
+						vector<struct SegmentData>(totalNumOfSegments));
+				vector<struct SegmentData>& segmentDataList =
+						_receivedSegmentData.get(objectId);
 
-			// 3. request segments
-			// case 1: load from disk
-			// case 2: request from OSD
-			// case 3: already requested
+				debug("PendingSegmentCount = %" PRIu32 "\n", segmentCount);
 
-			for (uint32_t i : requiredSegments) {
+				// 3. request segments
+				// case 1: load from disk
+				// case 2: request from OSD
+				// case 3: already requested
 
-				uint32_t osdId = objectInfo._osdList[i];
+				for (uint32_t i : requiredSegments) {
 
-				if (osdId == _osdId) {
-					// read segment from disk
-					struct SegmentData segmentData =
-							_storageModule->readSegment(objectId, i, 0);
+					uint32_t osdId = objectInfo._osdList[i];
 
-					// segmentDataList only reserved space for the requiredSegments
-					segmentDataList[i] = segmentData;
+					if (osdId == _osdId) {
+						// read segment from disk
+						struct SegmentData segmentData =
+								_storageModule->readSegment(objectId, i, 0);
 
-					_downloadSegmentRemaining.decrement(objectId);
-					debug(
-							"Read from local segment for Object ID = %" PRIu64 " Segment ID = %" PRIu32 "\n",
-							objectId, i);
+						// segmentDataList only reserved space for the requiredSegments
+						segmentDataList[i] = segmentData;
 
-				} else {
-					// request segment from other OSD
-					debug("sending request for segment %" PRIu32 "\n", i);
-					_osdCommunicator->getSegmentRequest(osdId, objectId, i);
-				}
-			}
-
-			// 4. wait until all segments have arrived
-
-			while (1) {
-				if (_downloadSegmentRemaining.get(objectId) == 0) {
-					// 5. decode segments
-
-					debug(
-							"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
-							(int)codingScheme, codingSetting.c_str());
-					objectData = _codingModule->decodeSegmentToObject(
-							codingScheme, objectId, segmentDataList,
-							codingSetting);
-
-					// clean up segment data
-					_downloadSegmentRemaining.erase(objectId);
-
-					for (uint32_t i : requiredSegments) {
+						_downloadSegmentRemaining.decrement(objectId);
 						debug(
-								"%" PRIu32 " free segment %" PRIu32 " addr = %p\n",
-								i, segmentDataList[i].info.segmentId, segmentDataList[i].buf);
-						MemoryPool::getInstance().poolFree(
-								segmentDataList[i].buf);
-						debug("%" PRIu32 " segment %" PRIu32 " free-d\n",
-								i, segmentDataList[i].info.segmentId);
-					}
-					_receivedSegmentData.erase(objectId);
+								"Read from local segment for Object ID = %" PRIu64 " Segment ID = %" PRIu32 "\n",
+								objectId, i);
 
-					break;
-				} else {
-					usleep(50000); // 0.01s
+					} else {
+						// request segment from other OSD
+						debug("sending request for segment %" PRIu32 "\n", i);
+						_osdCommunicator->getSegmentRequest(osdId, objectId, i);
+					}
+				}
+
+				// 4. wait until all segments have arrived
+
+				while (1) {
+					if (_downloadSegmentRemaining.get(objectId) == 0) {
+						// 5. decode segments
+
+						debug(
+								"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
+								(int)codingScheme, codingSetting.c_str());
+						objectData = _codingModule->decodeSegmentToObject(
+								codingScheme, objectId, segmentDataList,
+								codingSetting);
+
+						// clean up segment data
+						_downloadSegmentRemaining.erase(objectId);
+
+						for (uint32_t i : requiredSegments) {
+							debug(
+									"%" PRIu32 " free segment %" PRIu32 " addr = %p\n",
+									i, segmentDataList[i].info.segmentId, segmentDataList[i].buf);
+							MemoryPool::getInstance().poolFree(
+									segmentDataList[i].buf);
+							debug("%" PRIu32 " segment %" PRIu32 " free-d\n",
+									i, segmentDataList[i].info.segmentId);
+						}
+						_receivedSegmentData.erase(objectId);
+
+						break;
+					} else {
+						usleep(50000); // 0.01s
+					}
 				}
 			}
 
 			debug("%s\n", "[DOWNLOAD] Send Object");
 
-			_needGetObjectMap.set(objectId, false);
+			_isObjectDownloaded.set(objectId, true);
 		}
 	}
 
 	// 5. send object
 	_osdCommunicator->sendObject(_osdId, sockfd, objectData);
+
+	//TODO: free objectDiskCache
 
 	{
 		lock_guard<mutex> lk(objectRequestCountMutex);
@@ -255,8 +265,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (_pendingObjectChunk.get(objectId) == 0) {
 			// if all chunks have arrived
-			struct ObjectTransferCache objectCache = _storageModule->getObjectCache(
-					objectId);
+			struct ObjectTransferCache objectCache =
+					_storageModule->getObjectCache(objectId);
 
 			// perform coding
 			struct CodingSetting codingSetting = _codingSettingMap.get(

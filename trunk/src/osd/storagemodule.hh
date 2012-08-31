@@ -28,7 +28,7 @@ struct ObjectTransferCache {
 struct ObjectDiskCache {
 	uint64_t length;
 	string filepath;
-	struct timespec lastModifiedTime;
+	struct timespec lastAccessedTime;
 };
 
 class StorageModule {
@@ -52,7 +52,7 @@ public:
 	 * @return true if object exists, false otherwise
 	 */
 
-	bool isObjectExist(uint64_t objectId);
+	bool isObjectCached(uint64_t objectId);
 
 	/**
 	 * Creates an ObjectCache for downloading the object
@@ -111,8 +111,8 @@ public:
 	 * @return Number of bytes written
 	 */
 
-	uint32_t writeObjectFile(uint64_t objectId, char* buf, uint64_t offsetInObject,
-			uint32_t length);
+	uint32_t writeObjectFile(uint64_t objectId, char* buf,
+			uint64_t offsetInObject, uint32_t length);
 
 	/**
 	 * Write a buffer to the ObjectCache of the object
@@ -194,11 +194,12 @@ public:
 	uint32_t getFreeSegmentSpace();
 	uint32_t getFreeObjectSpace();
 
-	bool verifySegmentSpace(uint32_t size);
-	bool verifyObjectSpace(uint32_t size);
+	bool verifySegmentSpace(uint32_t size);bool verifyObjectSpace(
+			uint32_t size);
 
 	void saveObjectToDisk(uint64_t objectId, ObjectTransferCache objectCache);
 
+	struct ObjectData getObjectFromDiskCache(uint64_t objectId);
 
 private:
 
@@ -245,7 +246,6 @@ private:
 	 */
 
 //	struct SegmentInfo readSegmentInfo(uint64_t objectId, uint32_t segmentId);
-
 	/**
 	 * Open a file and read data to buffer
 	 * @param filepath Path of the file in the storage
@@ -322,7 +322,7 @@ private:
 	uint64_t getFilesize(string filepath);
 
 	// TODO: use more efficient data structure for LRU delete
-	ConcurrentMap <uint64_t, struct ObjectDiskCache> _objectDiskCacheMap;
+	ConcurrentMap<uint64_t, struct ObjectDiskCache> _objectDiskCacheMap;
 
 	map<string, FILE*> _openedFile;
 	map<uint64_t, struct ObjectTransferCache> _objectCache;

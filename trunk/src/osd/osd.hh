@@ -305,7 +305,7 @@ private:
 	ConcurrentMap<uint64_t, uint32_t> _objectRequestCount;
 	ConcurrentMap<uint64_t, mutex*> _objectDownloadMutex;
 	ConcurrentMap<uint64_t, ObjectData> _objectDataMap;
-	ConcurrentMap<uint64_t, bool> _needGetObjectMap;
+	ConcurrentMap<uint64_t, bool> _isObjectDownloaded;
 
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingSegmentChunk;
