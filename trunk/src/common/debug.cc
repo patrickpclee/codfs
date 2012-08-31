@@ -10,7 +10,7 @@ using namespace std;
 
 #define DIM(x) (sizeof(x)/sizeof(*(x)))
 
-static const string sizes[] = { "EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B" };
+static const string sizes[] = { "EB", "PB", "TB", "GB", "MB", "KB", "B" };
 static const uint64_t exbibytes = 1024ULL * 1024ULL * 1024ULL * 1024ULL
 		* 1024ULL * 1024ULL;
 
