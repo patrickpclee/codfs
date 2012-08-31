@@ -44,13 +44,20 @@ public:
 	bool isObjectExist(uint64_t objectId);
 
 	/**
-	 * Create and open the file for storing the object on disk
-	 * Also creates an ObjectCache for downloading the object
+	 * Creates an ObjectCache for downloading the object
 	 * @param objectId Object ID
 	 * @param length Length of object
 	 */
 
-	void createObject(uint64_t objectId, uint32_t length);
+	void createObjectCache(uint64_t objectId, uint32_t length);
+
+	/**
+	 * Create and open the file for storing the object on disk
+	 * @param objectId Object ID
+	 * @param length Length of object
+	 */
+
+	void createObjectFile(uint64_t objectId, uint32_t length);
 
 	/**
 	 * Create and open the file for storing the segment on disk
@@ -93,7 +100,7 @@ public:
 	 * @return Number of bytes written
 	 */
 
-	uint32_t writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject,
+	uint32_t writeObjectFile(uint64_t objectId, char* buf, uint64_t offsetInObject,
 			uint32_t length);
 
 	/**
@@ -127,7 +134,7 @@ public:
 	 * @param length Number of bytes the object will take
 	 */
 
-	FILE* createAndOpenObject(uint64_t objectId, uint32_t length);
+	FILE* createAndOpenObjectFile(uint64_t objectId, uint32_t length);
 
 	/**
 	 * Create an prepare a segment in the storage before writing
@@ -140,11 +147,18 @@ public:
 			uint32_t length);
 
 	/**
-	 * Close the object after the transfer is finished
+	 * Close and remove the object cache after the transfer is finished
 	 * @param objectId Object ID
 	 */
 
-	void closeObject(uint64_t objectId);
+	void closeObjectCache(uint64_t objectId);
+
+	/**
+	 * Close the object file
+	 * @param objectId Object ID
+	 */
+
+	void closeObjectFile(uint64_t objectId);
 
 	/**
 	 * Close the segment after the transfer is finished
