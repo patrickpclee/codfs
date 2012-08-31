@@ -690,5 +690,19 @@ uint32_t StorageModule::getFreeObjectSpace() {
 	return _freeObjectSpace;
 }
 
+int32_t StorageModule::spareObjectSpace(uint32_t new_object_size){
+	//TODO delete old objects and make room for new one.
+	return 0;
+}
+
 void StorageModule::saveObjectToDisk(ObjectCache objectCache) {
+	//TODO write object to disk.
+
+
+	uint32_t update_size = objectCache.length;
+	if(verifyObjectSpace(update_size)){
+		updateObjectFreespace(update_size);
+	}else{
+		updateObjectFreespace(spareObjectSpace(update_size));
+	}
 }
