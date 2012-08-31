@@ -29,15 +29,15 @@ StorageModule::StorageModule() {
 
 	// Unit in XML: GB
 	// Unit in StorageModule: Bytes
-	_objectCapacity = configLayer->getConfigInt("Storage>ObjectCacheCapacity")
+	_maxObjectCache = configLayer->getConfigInt("Storage>ObjectCacheCapacity")
 			* 1073741824ULL;
-	_segmentCapacity = configLayer->getConfigInt("Storage>SegmentCapacity")
+	_maxSegmentCapacity = configLayer->getConfigInt("Storage>SegmentCapacity")
 			* 1073741824ULL;
 
 	debug("Object Cache Location = %s Size = %s\n",
-			_objectFolder.c_str(), formatSize(_objectCapacity));
+			_objectFolder.c_str(), formatSize(_maxObjectCache));
 	debug("Segment Cache Location = %s Size = %s\n",
-			_segmentFolder.c_str(), formatSize(_segmentCapacity));
+			_segmentFolder.c_str(), formatSize(_maxSegmentCapacity));
 }
 
 StorageModule::~StorageModule() {
@@ -528,4 +528,65 @@ struct ObjectCache StorageModule::getObjectCache(uint64_t objectId) {
 		exit(-1);
 	}
 	return _objectCache[objectId];
+}
+
+void StorageModule::setMaxSegmentCapacity(uint32_t max_segment){
+	_maxSegmentCapacity = max_segment;
+}
+
+void StorageModule::setMaxObjectCache(uint32_t max_object){
+	_maxObjectCache = max_object;
+}
+
+uint32_t StorageModule::getMaxSegmentCapacity(){
+	return _maxSegmentCapacity;
+}
+
+uint32_t StorageModule::getMaxObjectCache(){
+	return _maxObjectCache;
+}
+
+bool StorageModule::verifySegmentSpace(uint32_t size){
+	return size<=_freeSegmentSpace?true:false;
+}
+
+bool StorageModule::verifyObjectSpace(uint32_t size){
+	return size<=_freeObjectSpace?true:false;
+}
+
+void StorageModule::updateCurrentSegmentCapacity(uint32_t new_segment_size, uint32_t count){
+	uint32_t update_space = new_segment_size * count;
+	if (verifySegmentSpace(update_space)){
+		_currentSegment += update_space;
+		_freeSegmentSpace -= update_space;
+	}else{
+		perror("segment free space not enough.\n");
+	}
+
+}
+
+void StorageModule::updateCurrentObjectCache(uint32_t new_object_size, uint32_t count){
+	uint32_t update_space = new_object_size * count;
+	if (verifyObjectSpace(update_space)){
+		_currentObject += update_space;
+		_freeObjectSpace -= update_space;
+	}else{
+		perror("object free space not enough.\n");
+	}
+}
+
+uint32_t StorageModule::getCurrentSegmentCapacity(){
+	return _currentSegment;
+}
+
+uint32_t StorageModule::getCurrentObjectCache(){
+	return _currentObject;
+}
+
+uint32_t StorageModule::getFreeSegmentSpace(){
+	return _freeSegmentSpace;
+}
+
+uint32_t StorageModule::getFreeObjectSpace(){
+	return _freeObjectSpace;
 }
