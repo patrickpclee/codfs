@@ -25,7 +25,7 @@ GetPrimaryListReplyMsg::GetPrimaryListReplyMsg(Communicator* communicator) :
 GetPrimaryListReplyMsg::GetPrimaryListReplyMsg(Communicator* communicator,
 		uint32_t requestId, uint32_t mdsSockfd, vector<uint32_t> primaryList) :
 		Message(communicator) {
-
+	_msgHeader.requestId = requestId;
 	_sockfd = mdsSockfd;
 	_primaryList = primaryList;
 }
