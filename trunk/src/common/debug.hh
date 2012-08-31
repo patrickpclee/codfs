@@ -13,5 +13,6 @@
 
 void printhex(char* buf, int n);
 char* getTime();
+char* formatSize(uint64_t size);
 
 #endif

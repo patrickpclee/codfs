@@ -3,23 +3,17 @@
     <Osdid>52001</Osdid>
     
     <Communication>
-    
-        <!-- polling interval in terms of ms -->
-        <SendPollingInterval>100</SendPollingInterval>
-        
-        <!-- timeout for select -->
-        <SelectTimeout>
-            <sec>1</sec>
-            <usec>0</usec>
-        </SelectTimeout>
         
         <ServerPort>52001</ServerPort>
         
     </Communication>
     
     <Storage>
-    	<ObjectLocation>./osd_object2/</ObjectLocation>
-    	<SegmentLocation>./osd_segment2/</SegmentLocation>
+    	<ObjectCacheLocation>./osd_object/</ObjectCacheLocation>
+    	<SegmentLocation>./osd_segment/</SegmentLocation>
+    	
+    	<SegmentCapacity>1</SegmentCapacity> <!-- GB -->
+    	<ObjectCacheCapacity>5</ObjectCacheCapacity> <!-- GB -->
     </Storage>
     
 </NcvfsConfig>
