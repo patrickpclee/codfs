@@ -2,8 +2,8 @@
  * storagemodule.cc
  */
 
+#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <stdlib.h>
 #include <thread>
 #include <mutex>
@@ -38,10 +38,12 @@ StorageModule::StorageModule() {
 	_currentSegment = 0;
 	_currentObject = 0;
 
-	debug("Object Cache Location = %s Size = %s\n",
-			_objectFolder.c_str(), formatSize(_maxObjectCache));
-	debug("Segment Cache Location = %s Size = %s\n",
-			_segmentFolder.c_str(), formatSize(_maxSegmentCapacity));
+	cout << "=== STORAGE ===" << endl;
+	cout << "Object Cache Location = " << _objectFolder << " Size = "
+			<< formatSize(_maxObjectCache) << endl;
+	cout << "Segment Storage Location = " << _segmentFolder << " Size = "
+			<< formatSize(_maxSegmentCapacity) << endl;
+	cout << "===============" << endl;
 }
 
 StorageModule::~StorageModule() {
@@ -534,63 +536,65 @@ struct ObjectCache StorageModule::getObjectCache(uint64_t objectId) {
 	return _objectCache[objectId];
 }
 
-void StorageModule::setMaxSegmentCapacity(uint32_t max_segment){
+void StorageModule::setMaxSegmentCapacity(uint32_t max_segment) {
 	_maxSegmentCapacity = max_segment;
 }
 
-void StorageModule::setMaxObjectCache(uint32_t max_object){
+void StorageModule::setMaxObjectCache(uint32_t max_object) {
 	_maxObjectCache = max_object;
 }
 
-uint32_t StorageModule::getMaxSegmentCapacity(){
+uint32_t StorageModule::getMaxSegmentCapacity() {
 	return _maxSegmentCapacity;
 }
 
-uint32_t StorageModule::getMaxObjectCache(){
+uint32_t StorageModule::getMaxObjectCache() {
 	return _maxObjectCache;
 }
 
-bool StorageModule::verifySegmentSpace(uint32_t size){
-	return size<=_freeSegmentSpace?true:false;
+bool StorageModule::verifySegmentSpace(uint32_t size) {
+	return size <= _freeSegmentSpace ? true : false;
 }
 
-bool StorageModule::verifyObjectSpace(uint32_t size){
-	return size<=_freeObjectSpace?true:false;
+bool StorageModule::verifyObjectSpace(uint32_t size) {
+	return size <= _freeObjectSpace ? true : false;
 }
 
-void StorageModule::updateCurrentSegmentCapacity(uint32_t new_segment_size, uint32_t count){
+void StorageModule::updateCurrentSegmentCapacity(uint32_t new_segment_size,
+		uint32_t count) {
 	uint32_t update_space = new_segment_size * count;
-	if (verifySegmentSpace(update_space)){
+	if (verifySegmentSpace(update_space)) {
 		_currentSegment += update_space;
 		_freeSegmentSpace -= update_space;
-	}else{
+	} else {
 		perror("segment free space not enough.\n");
 	}
 
 }
 
-void StorageModule::updateCurrentObjectCache(uint32_t new_object_size, uint32_t count){
+void StorageModule::updateCurrentObjectCache(uint32_t new_object_size,
+		uint32_t count) {
 	uint32_t update_space = new_object_size * count;
-	if (verifyObjectSpace(update_space)){
+	if (verifyObjectSpace(update_space)) {
 		_currentObject += update_space;
 		_freeObjectSpace -= update_space;
-	}else{
+	} else {
 		perror("object free space not enough.\n");
 	}
 }
 
-uint32_t StorageModule::getCurrentSegmentCapacity(){
+uint32_t StorageModule::getCurrentSegmentCapacity() {
 	return _currentSegment;
 }
 
-uint32_t StorageModule::getCurrentObjectCache(){
+uint32_t StorageModule::getCurrentObjectCache() {
 	return _currentObject;
 }
 
-uint32_t StorageModule::getFreeSegmentSpace(){
+uint32_t StorageModule::getFreeSegmentSpace() {
 	return _freeSegmentSpace;
 }
 
-uint32_t StorageModule::getFreeObjectSpace(){
+uint32_t StorageModule::getFreeObjectSpace() {
 	return _freeObjectSpace;
 }
