@@ -242,7 +242,7 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_codingSettingMap.set(objectId, codingSetting);
 
 	// create object and cache
-	_storageModule->createObject(objectId, length);
+	_storageModule->createObjectCache(objectId, length);
 	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
 }
@@ -316,7 +316,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_storageModule->updateCurrentObjectCache(objectCache.length,1);
 
 			// close file and free cache
-			_storageModule->closeObject(objectId);
+			_storageModule->closeObjectCache(objectId);
 
 			_pendingObjectChunk.erase(objectId);
 

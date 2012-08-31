@@ -69,7 +69,7 @@ uint64_t StorageModule::getFilesize(string filepath) {
 
 }
 
-void StorageModule::createObject(uint64_t objectId, uint32_t length) {
+void StorageModule::createObjectCache(uint64_t objectId, uint32_t length) {
 
 	// create cache
 	struct ObjectCache objectCache;
@@ -82,15 +82,17 @@ void StorageModule::createObject(uint64_t objectId, uint32_t length) {
 		_objectCache[objectId] = objectCache;
 	}
 
+	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 "\n",
+			objectId, length);
+}
+
+void StorageModule::createObjectFile (uint64_t objectId, uint32_t length) {
 	// create object
-	createAndOpenObject(objectId, length);
+	createAndOpenObjectFile(objectId, length);
 
 	// write info
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
-
-	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 " Path = %s\n",
-			objectId, length, filepath.c_str());
 }
 
 void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
@@ -204,7 +206,7 @@ uint32_t StorageModule::writeObjectCache(uint64_t objectId, char* buf,
 	return length;
 }
 
-uint32_t StorageModule::writeObject(uint64_t objectId, char* buf,
+uint32_t StorageModule::writeObjectFile(uint64_t objectId, char* buf,
 		uint64_t offsetInObject, uint32_t length) {
 
 	uint32_t byteWritten;
@@ -234,13 +236,9 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 	return byteWritten;
 }
 
-FILE* StorageModule::createAndOpenObject(uint64_t objectId, uint32_t length) {
+FILE* StorageModule::createAndOpenObjectFile(uint64_t objectId, uint32_t length) {
 
 	string filepath = generateObjectPath(objectId, _objectFolder);
-	writeObjectInfo(objectId, length, filepath);
-
-	debug("Object ID = %" PRIu64 " created\n", objectId);
-
 	return createFile(filepath);
 }
 
@@ -256,10 +254,7 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 	return createFile(filepath);
 }
 
-void StorageModule::closeObject(uint64_t objectId) {
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	closeFile(filepath);
-
+void StorageModule::closeObjectCache(uint64_t objectId) {
 	// close cache
 	struct ObjectCache objectCache = getObjectCache(objectId);
 	MemoryPool::getInstance().poolFree(objectCache.buf);
@@ -268,6 +263,14 @@ void StorageModule::closeObject(uint64_t objectId) {
 		lock_guard<mutex> lk(cacheMutex);
 		_objectCache.erase(objectId);
 	}
+
+	debug("Object Cache ID = %" PRIu64 " closed\n", objectId);
+}
+
+void StorageModule::closeObjectFile (uint64_t objectId) {
+	// close file
+	string filepath = generateObjectPath(objectId, _objectFolder);
+	closeFile(filepath);
 
 	debug("Object ID = %" PRIu64 " closed\n", objectId);
 }
