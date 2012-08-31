@@ -299,8 +299,8 @@ private:
 	map<uint64_t, struct ObjectCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
-	uint32_t _maxSegmentCapacity;
-	uint32_t _maxObjectCache;
+	uint64_t _maxSegmentCapacity;
+	uint64_t _maxObjectCache;
 	uint32_t _currentSegment;
 	uint32_t _currentObject;
 	uint32_t _freeSegmentSpace;
