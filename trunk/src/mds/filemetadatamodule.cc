@@ -109,6 +109,7 @@ vector<uint64_t> FileMetaDataModule::readObjectList(uint32_t fileId) {
 	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
 	BSONForEach(it, result.getObjectField("objectList")) {
 		objectList.push_back((uint64_t)it.numberLong());
+		debug("ObjectList %lld\n",it.numberLong());
 	}
 	return objectList;
 }
