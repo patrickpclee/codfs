@@ -61,7 +61,12 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 	objectList = _metaDataModule->newObjectList(numOfObjs);
 	_metaDataModule->saveObjectList(fileId, objectList);
 
-	primaryList = _mdsCommunicator->askPrimaryList(numOfObjs);
+	
+//	primaryList = _mdsCommunicator->askPrimaryList(numOfObjs);
+	primaryList = _mdsCommunicator->getPrimaryList(_mdsCommunicator->getMonitorSockfd(), numOfObjs);
+	for (int i = 0; i < primaryList.size(); i++) {
+		debug("Get primary list index %" PRIu32 " = %" PRIu32 "\n", i, primaryList[i]);
+	}
 
 	_mdsCommunicator->replyObjectandPrimaryList(requestId, connectionId, fileId,
 			objectList, primaryList);
@@ -126,12 +131,13 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 
 	_nameSpaceModule->openFile(clientId, path);
 	_metaDataModule->openFile(clientId, fileId);
+	debug("Read object List %" PRIu32 "\n", fileId);
 	objectList = _metaDataModule->readObjectList(fileId);
 
 	vector<uint64_t>::iterator it;
 	uint32_t primaryId;
-
 	for (it = objectList.begin(); it < objectList.end(); ++it) {
+		debug("Read primary list %" PRIu64 "\n", *it);
 		primaryId = _metaDataModule->getPrimary(*it);
 		primaryList.push_back(primaryId);
 	}
@@ -351,6 +357,7 @@ int main(void) {
 	communicator->setId(50000);
 	communicator->setComponentType(MDS);
 
+
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);
 
@@ -359,6 +366,8 @@ int main(void) {
 
 	// 3. Send Thread
 	thread sendThread(startSendThread);
+
+	communicator->connectToMonitor();
 
 	mds->test();
 

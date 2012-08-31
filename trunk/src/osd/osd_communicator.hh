@@ -148,6 +148,7 @@ public:
 	void objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
 		string codingSetting, vector<uint32_t> nodeList);
 
+	void registerToMonitor();
 private:
 
 	/**

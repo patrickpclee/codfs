@@ -203,6 +203,11 @@ public:
 			struct ObjectData objectData, CodingScheme codingScheme =
 					DEFAULT_CODING, string codingSetting = "");
 
+	/**
+	 * Connect to monitor (test)
+	 */
+	void connectToMonitor();
+
 protected:
 
 	/**
@@ -278,6 +283,7 @@ protected:
 	 */
 
 	void connectToComponents(vector<Component> componentList);
+
 
 	/**
 	 * Parse the config file and extract information about components

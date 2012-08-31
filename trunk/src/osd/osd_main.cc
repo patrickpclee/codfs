@@ -94,6 +94,9 @@ int main(int argc, char* argv[]) {
 	thread sendThread(startSendThread);
 
 	communicator->connectAllComponents();
+	communicator->connectToMonitor();
+	communicator->registerToMonitor();
+
 	debug("%s\n", "starting test thread");
 	sleep(5);
 
