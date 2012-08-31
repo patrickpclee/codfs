@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <map>
 #include <stdio.h>
+#include <atomic>
 #include "../config/config.hh"
 #include "../common/memorypool.hh"
 #include "../common/segmentdata.hh"
@@ -196,7 +197,7 @@ public:
 	bool verifySegmentSpace(uint32_t size);
 	bool verifyObjectSpace(uint32_t size);
 
-	void saveObjectToDisk(ObjectTransferCache objectCache);
+	void saveObjectToDisk(uint64_t objectId, ObjectTransferCache objectCache);
 
 
 private:
@@ -329,10 +330,10 @@ private:
 	string _segmentFolder;
 	uint64_t _maxSegmentCapacity;
 	uint64_t _maxObjectCache;
-	uint64_t _freeSegmentSpace;
-	uint64_t _freeObjectSpace;
-	uint32_t _currentSegmentUsage;
-	uint32_t _currentObjectUsage;
+	atomic<uint64_t> _freeSegmentSpace;
+	atomic<uint64_t> _freeObjectSpace;
+	atomic<uint32_t> _currentSegmentUsage;
+	atomic<uint32_t> _currentObjectUsage;
 };
 
 #endif
