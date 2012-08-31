@@ -159,6 +159,25 @@ public:
 	uint32_t getFreespace();
 	struct ObjectCache getObjectCache(uint64_t objectId);
 
+	void setMaxSegmentCapacity(uint32_t max_segment);
+	void setMaxObjectCache(uint32_t max_object);
+
+	uint32_t getMaxSegmentCapacity();
+	uint32_t getMaxObjectCache();
+
+	void updateCurrentSegmentCapacity(uint32_t new_segment_size, uint32_t count);
+	void updateCurrentObjectCache(uint32_t new_object_size, uint32_t count);
+
+	uint32_t getCurrentSegmentCapacity();
+	uint32_t getCurrentObjectCache();
+
+	uint32_t getFreeSegmentSpace();
+	uint32_t getFreeObjectSpace();
+
+	bool verifySegmentSpace(uint32_t size);
+	bool verifyObjectSpace(uint32_t size);
+
+
 private:
 
 	/**
@@ -280,8 +299,12 @@ private:
 	map<uint64_t, struct ObjectCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
-	uint64_t _segmentCapacity;
-	uint64_t _objectCapacity;
+	uint32_t _maxSegmentCapacity;
+	uint32_t _maxObjectCache;
+	uint32_t _currentSegment;
+	uint32_t _currentObject;
+	uint32_t _freeSegmentSpace;
+	uint32_t _freeObjectSpace;
 };
 
 #endif
