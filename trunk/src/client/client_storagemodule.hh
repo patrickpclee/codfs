@@ -87,7 +87,7 @@ public:
 	 *
 	 * @return struct ObjectCache contains the object info.
 	 */
-	struct ObjectCache getObjectCache(uint64_t objectId);
+	struct ObjectTransferCache getObjectCache(uint64_t objectId);
 
 
 	/**
@@ -116,7 +116,7 @@ public:
 
 private:
 	uint64_t _objectSize;
-	map <uint64_t, struct ObjectCache> _objectCache;
+	map <uint64_t, struct ObjectTransferCache> _objectCache;
 	string _objectFolder;
 };
 
