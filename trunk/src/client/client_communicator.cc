@@ -183,14 +183,14 @@ void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
 	addMessage(putObjectEndReplyMsg);
 }
 
-struct ObjectCache ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId) {
+struct ObjectTransferCache ClientCommunicator::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId) {
 
 	debug("Getting object ID: %" PRIu64 " from Sockfd %" PRIu32 "\n",
 			objectId, dstSockfd);
 
 	ClientStorageModule* _storageModule = client->getStorageModule();
 	if(_storageModule->locateObjectCache(objectId)){
-		struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+		struct ObjectTransferCache objectCache = _storageModule->getObjectCache(objectId);
 		return objectCache;
 	}
 	client->setPendingChunkCount(objectId, -1);
@@ -207,7 +207,7 @@ struct ObjectCache ClientCommunicator::getObject(uint32_t clientId, uint32_t dst
 		usleep(100000);
 	}
 
-	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
+	struct ObjectTransferCache objectCache = _storageModule->getObjectCache(objectId);
 	return objectCache;
 }
 
@@ -215,7 +215,7 @@ void ClientCommunicator::getObjectAndWriteFile(uint32_t clientId, uint32_t dstSo
 		uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath) {
 //	ClientStorageModule* _storageModule = client->getStorageModule();
 //	struct ObjectCache objectCache = _storageModule->getObjectCache(objectId);
-	struct ObjectCache objectCache = getObject(clientId, dstSockfd, objectId);
+	struct ObjectTransferCache objectCache = getObject(clientId, dstSockfd, objectId);
 
 	ClientStorageModule* _storageModule = client->getStorageModule();
 	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,

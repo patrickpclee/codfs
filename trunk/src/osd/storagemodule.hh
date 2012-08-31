@@ -5,19 +5,30 @@
 #include <stdint.h>
 #include <map>
 #include <stdio.h>
+#include <atomic>
 #include "../config/config.hh"
 #include "../common/memorypool.hh"
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
+#include "../datastructure/concurrentmap.hh"
 using namespace std;
 
 /**
  * For caching an object in memory during upload/download
  */
 
-struct ObjectCache {
+struct ObjectTransferCache {
 	uint64_t length;
 	char* buf;
+};
+
+/**
+ * For retrieving an object cache file from the disk
+ */
+struct ObjectDiskCache {
+	uint64_t length;
+	string filepath;
+	struct timespec lastModifiedTime;
 };
 
 class StorageModule {
@@ -44,13 +55,20 @@ public:
 	bool isObjectExist(uint64_t objectId);
 
 	/**
-	 * Create and open the file for storing the object on disk
-	 * Also creates an ObjectCache for downloading the object
+	 * Creates an ObjectCache for downloading the object
 	 * @param objectId Object ID
 	 * @param length Length of object
 	 */
 
-	void createObject(uint64_t objectId, uint32_t length);
+	void createObjectCache(uint64_t objectId, uint32_t length);
+
+	/**
+	 * Create and open the file for storing the object on disk
+	 * @param objectId Object ID
+	 * @param length Length of object
+	 */
+
+	void createObjectFile(uint64_t objectId, uint32_t length);
 
 	/**
 	 * Create and open the file for storing the segment on disk
@@ -93,7 +111,7 @@ public:
 	 * @return Number of bytes written
 	 */
 
-	uint32_t writeObject(uint64_t objectId, char* buf, uint64_t offsetInObject,
+	uint32_t writeObjectFile(uint64_t objectId, char* buf, uint64_t offsetInObject,
 			uint32_t length);
 
 	/**
@@ -127,7 +145,7 @@ public:
 	 * @param length Number of bytes the object will take
 	 */
 
-	FILE* createAndOpenObject(uint64_t objectId, uint32_t length);
+	FILE* createAndOpenObjectFile(uint64_t objectId, uint32_t length);
 
 	/**
 	 * Create an prepare a segment in the storage before writing
@@ -140,11 +158,18 @@ public:
 			uint32_t length);
 
 	/**
-	 * Close the object after the transfer is finished
+	 * Close and remove the object cache after the transfer is finished
 	 * @param objectId Object ID
 	 */
 
-	void closeObject(uint64_t objectId);
+	void closeObjectCache(uint64_t objectId);
+
+	/**
+	 * Close the object file
+	 * @param objectId Object ID
+	 */
+
+	void closeObjectFile(uint64_t objectId);
 
 	/**
 	 * Close the segment after the transfer is finished
@@ -155,18 +180,13 @@ public:
 	void closeSegment(uint64_t objectId, uint32_t segmentId);
 
 	// getters
-	uint32_t getCapacity();
-	uint32_t getFreespace();
-	struct ObjectCache getObjectCache(uint64_t objectId);
+	struct ObjectTransferCache getObjectCache(uint64_t objectId);
 
 	void setMaxSegmentCapacity(uint32_t max_segment);
 	void setMaxObjectCache(uint32_t max_object);
 
 	uint32_t getMaxSegmentCapacity();
 	uint32_t getMaxObjectCache();
-
-	void updateCurrentSegmentCapacity(uint32_t new_segment_size, uint32_t count);
-	void updateCurrentObjectCache(uint32_t new_object_size, uint32_t count);
 
 	uint32_t getCurrentSegmentCapacity();
 	uint32_t getCurrentObjectCache();
@@ -177,8 +197,16 @@ public:
 	bool verifySegmentSpace(uint32_t size);
 	bool verifyObjectSpace(uint32_t size);
 
+	void saveObjectToDisk(uint64_t objectId, ObjectTransferCache objectCache);
+
 
 private:
+
+	void initializeStorageStatus();
+
+	void updateSegmentFreespace(uint32_t new_segment_size);
+	void updateObjectFreespace(uint32_t new_object_size);
+	int32_t spareObjectSpace(uint32_t new_object_size);
 
 	/**
 	 * Write the information about an object to the database
@@ -293,19 +321,19 @@ private:
 	 */
 	uint64_t getFilesize(string filepath);
 
-	uint32_t _capacity; // total capacity of the node
-	uint32_t _freespace; // remaining capacity of the node
+	// TODO: use more efficient data structure for LRU delete
+	ConcurrentMap <uint64_t, struct ObjectDiskCache> _objectDiskCacheMap;
+
 	map<string, FILE*> _openedFile;
-	map<uint64_t, struct ObjectCache> _objectCache;
+	map<uint64_t, struct ObjectTransferCache> _objectCache;
 	string _objectFolder;
 	string _segmentFolder;
-
-	uint32_t _maxSegmentCapacity;
-	uint32_t _maxObjectCache;
-	uint32_t _currentSegment;
-	uint32_t _currentObject;
-	uint32_t _freeSegmentSpace;
-	uint32_t _freeObjectSpace;
+	uint64_t _maxSegmentCapacity;
+	uint64_t _maxObjectCache;
+	atomic<uint64_t> _freeSegmentSpace;
+	atomic<uint64_t> _freeObjectSpace;
+	atomic<uint32_t> _currentSegmentUsage;
+	atomic<uint32_t> _currentObjectUsage;
 };
 
 #endif
