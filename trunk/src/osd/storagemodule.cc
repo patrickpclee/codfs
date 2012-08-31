@@ -395,9 +395,7 @@ struct ObjectInfo StorageModule::readObjectInfo(uint64_t objectId) {
 
 	objectInfo.objectId = objectId;
 	objectInfo.objectPath = generateObjectPath(objectId, _objectFolder);
-
-	// TEST OBJECT READ
-	objectInfo.objectSize = 26; // HARDCODE;
+	objectInfo.objectSize = getFilesize(objectInfo.objectPath);
 
 	return objectInfo;
 }
@@ -727,9 +725,7 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 
 struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
 	struct ObjectData objectData;
-
 	struct ObjectDiskCache objectDiskCache = _objectDiskCacheMap.get(objectId);
-
 	objectData = readObject(objectId, 0, objectDiskCache.length);
 	return objectData;
 }
