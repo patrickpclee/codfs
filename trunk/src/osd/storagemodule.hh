@@ -4,7 +4,7 @@
 #include <string>
 #include <stdint.h>
 #include <map>
-#include <queue>
+#include <list>
 #include <stdio.h>
 #include <atomic>
 #include "../config/config.hh"
@@ -324,7 +324,7 @@ private:
 
 	// TODO: use more efficient data structure for LRU delete
 	ConcurrentMap<uint64_t, struct ObjectDiskCache> _objectDiskCacheMap;
-	queue<uint64_t> _objectCacheQueue;
+	list<uint64_t> _objectCacheQueue;
 
 	map<string, FILE*> _openedFile;
 	map<uint64_t, struct ObjectTransferCache> _objectCache;
