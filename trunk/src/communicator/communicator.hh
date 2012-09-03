@@ -261,7 +261,7 @@ protected:
 	 * @param sockfd Socket Descriptor of incoming connection
 	 */
 
-	void dispatch(char* buf, uint32_t sockfd);
+	void dispatch(char* buf, uint32_t sockfd, bool isSpecial);
 
 	/**
 	 * Get the first message in the queue
@@ -311,6 +311,9 @@ protected:
 
 	void printComponents(string componentType, vector<Component> componentList);
 
+	// DEBUG
+	void listThreadPool();
+
 #ifdef USE_LOWLOCK_QUEUE
 	struct LowLockQueue <Message *> _outMessageQueue;
 #else
@@ -341,5 +344,10 @@ protected:
 	vector<Component> mdsList;
 	vector<Component> osdList;
 	vector<Component> monitorList;
+
+	// debug
+	ConcurrentMap <uint32_t, MsgType> _tpMsgTypeMap;
+	ConcurrentMap <uint32_t, MsgType> _tpSpecialMsgTypeMap;
+
 };
 #endif
