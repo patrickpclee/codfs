@@ -706,11 +706,11 @@ int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 				oldestPath = it->second.filepath;
 				oldestLength = it->second.length;
 			}
-
-			remove(oldestPath.c_str());
-			new_space += oldestLength;
-			_objectDiskCacheMap.erase(oldestId);
 		}
+
+		remove(oldestPath.c_str());
+		new_space += oldestLength;
+		_objectDiskCacheMap.erase(oldestId);
 	}
 
 	return 0;
