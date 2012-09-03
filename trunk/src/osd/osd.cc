@@ -207,13 +207,17 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// 5. send object
 	_osdCommunicator->sendObject(_osdId, sockfd, objectData);
 
-	//TODO: free objectDiskCache
-
 	{
 		lock_guard<mutex> lk(objectRequestCountMutex);
 		_objectRequestCount.decrement(objectId);
 		if (_objectRequestCount.get(objectId) == 0) {
 			_objectRequestCount.erase(objectId);
+
+			// cache objectData
+			struct ObjectTransferCache objectTransferCache;
+			objectTransferCache.buf = objectData.buf;
+			objectTransferCache.length = objectData.info.objectSize;
+			_storageModule->saveObjectToDisk(objectId, objectTransferCache);
 
 			// free objectData
 			debug("free object %" PRIu64 "\n", objectId);
