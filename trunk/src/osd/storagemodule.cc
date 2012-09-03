@@ -686,10 +686,33 @@ uint32_t StorageModule::getFreeObjectSpace() {
 int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 	//TODO delete old objects and make room for new one.
 
-	// lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
-	// remove (filepath);
-	// _objectDiskCacheMap.erase (objectId);
-	// _objectDiskCacheMutex.erase(objectId);
+//	 lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
+//	 remove (filepath);
+//	 _objectDiskCacheMap.erase (objectId);
+//	 _objectDiskCacheMutex.erase(objectId);
+
+	uint32_t new_space = 0;
+	struct timespec oldestTime;
+	uint64_t oldestId;
+	string oldestPath;
+	uint32_t oldestLength;
+	typedef std::map<uint64_t, struct ObjectDiskCache>::iterator map_it;
+	while(new_space < new_object_size){
+		oldestTime = {time(NULL), 0};
+		for(map_it it = _objectDiskCacheMap._map.begin(); it != _objectDiskCacheMap._map.end(); it++){
+			if (oldestTime.tv_sec > it->second.lastAccessedTime.tv_sec){
+				oldestId = it->first;
+				oldestTime = it->second.lastAccessedTime;
+				oldestPath = it->second.filepath;
+				oldestLength = it->second.length;
+			}
+
+			remove(oldestPath.c_str());
+			new_space += oldestLength;
+			_objectDiskCacheMap.erase(oldestId);
+		}
+	}
+
 	return 0;
 }
 
