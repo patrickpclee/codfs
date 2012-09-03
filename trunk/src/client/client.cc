@@ -218,14 +218,22 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
+	debug ("objectDataProcessor for objectID = %" PRIu64 "\n", objectId);
+
 	uint32_t byteWritten;
+	debug ("before objectCache written for objectID = %" PRIu64 "\n", objectId);
 	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
 			length);
+	debug ("after objectCache written for objectID = %" PRIu64 "\n", objectId);
 	_pendingObjectChunk.decrement(objectId);
+	debug ("after decrement objectID = %" PRIu64 "\n", objectId);
 
 	if (_pendingObjectChunk.get(objectId) == 0) {
+	debug ("before erase objectID = %" PRIu64 "\n", objectId);
 		_pendingObjectChunk.erase(objectId);
+	debug ("after erase objectID = %" PRIu64 "\n", objectId);
 	}
+	debug ("before return objectID = %" PRIu64 "\n", objectId);
 	return byteWritten;
 }
 
@@ -234,6 +242,9 @@ void Client::setPendingChunkCount(uint64_t objectId, int chunkCount) {
 }
 
 int Client::getPendingChunkCount(uint64_t objectId) {
+	if (!_pendingObjectChunk.count(objectId)) {
+		return 0;
+	}
 	return _pendingObjectChunk.get(objectId);
 }
 
