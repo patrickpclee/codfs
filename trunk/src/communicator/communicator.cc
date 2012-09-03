@@ -16,6 +16,7 @@
 #include "../config/config.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/enums.hh"
+#include "../common/enumtostring.hh"
 #include "../common/debug.hh"
 #include "../common/objectdata.hh"
 #include "../protocol/message.pb.h"
@@ -43,6 +44,7 @@ extern ConfigLayer* configLayer;
 
 // mutex
 boost::shared_mutex connectionMapMutex;
+boost::shared_mutex threadPoolMapMutex;
 
 Communicator::Communicator() {
 
@@ -236,27 +238,35 @@ void Communicator::waitForMessage() {
 						MsgType msgType =
 								((struct MsgHeader*) buf)->protocolMsgType;
 
-						// if message is for secondary OSD, handle it with a special thread pool to avoid blocking
+						// blocking threads are put into tp
+						// threads which are needed to unblock the blocking threads are put in tpSpecial
 						if (msgType == PUT_SEGMENT_INIT_REQUEST
 								|| msgType == PUT_SEGMENT_INIT_REPLY
 								|| msgType == SEGMENT_DATA
 								|| msgType == SEGMENT_TRANSFER_END_REQUEST
 								|| msgType == SEGMENT_TRANSFER_END_REPLY
 								|| msgType == GET_SEGMENT_INIT_REQUEST
-								|| msgType == GET_SEGMENT_INIT_REPLY) {
+								|| msgType == GET_SEGMENT_INIT_REPLY
+								|| msgType == GET_PRIMARY_LIST_REQUEST
+								|| msgType == GET_PRIMARY_LIST_REPLY
+								|| msgType == GET_SECONDARY_LIST_REQUEST
+								|| msgType == GET_SECONDARY_LIST_REPLY) {
 
 							tpSpecial.schedule(
 									boost::bind(&Communicator::dispatch, this,
-											buf, p->first));
+											buf, p->first, true));
 						} else {
 							tp.schedule(
 									boost::bind(&Communicator::dispatch, this,
-											buf, p->first));
+											buf, p->first, false));
 						}
 
+						// debug: list the threads in thread pool
 						debug_yellow(
 								"[tp] Active: %zu, Pending: %zu [tpSpecial] Active: %zu, Pending: %zu\n",
 								tp.active(), tp.pending(), tpSpecial.active(), tpSpecial.pending());
+
+						listThreadPool();
 
 #else
 						dispatch(buf, p->first);
@@ -487,10 +497,21 @@ void Communicator::sendThread(Communicator* communicator) {
  * 6. start new thread for message->handle()
  */
 
-void Communicator::dispatch(char* buf, uint32_t sockfd) {
+void Communicator::dispatch(char* buf, uint32_t sockfd, bool isSpecial) {
 
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+
+	// debug
+	{
+		boost::unique_lock<boost::shared_mutex> lock(threadPoolMapMutex);
+		if (isSpecial) {
+			_tpSpecialMsgTypeMap.set(msgHeader.requestId,
+					msgHeader.protocolMsgType);
+		} else {
+			_tpMsgTypeMap.set(msgHeader.requestId, msgHeader.protocolMsgType);
+		}
+	}
 
 	debug("Running dispatch ID = %" PRIu32 " Type = %d\n",
 			msgHeader.requestId, msgHeader.protocolMsgType);
@@ -524,6 +545,16 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 	 debug("dispatch finished for %" PRIu32 " Type = %d\n",
 	 msgHeader.requestId, msgHeader.protocolMsgType);
 	 */
+
+	// debug
+	{
+		boost::unique_lock<boost::shared_mutex> lock(threadPoolMapMutex);
+		if (isSpecial) {
+			_tpSpecialMsgTypeMap.erase(msgHeader.requestId);
+		} else {
+			_tpMsgTypeMap.erase(msgHeader.requestId);
+		}
+	}
 }
 
 inline uint32_t Communicator::generateRequestId() {
@@ -842,4 +873,25 @@ void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
 		debug("%s\n", "Put Object End Failed");
 		exit(-1);
 	}
+}
+
+void Communicator::listThreadPool() {
+	map<uint32_t, MsgType>::iterator p;
+
+	boost::shared_lock<boost::shared_mutex> lock(threadPoolMapMutex);
+
+	cout << "--- TP ---" << endl;
+	for (p = _tpMsgTypeMap._map.begin(); p != _tpMsgTypeMap._map.end(); p++) {
+		cout << "Request ID = " << p->first << " Type = "
+				<< EnumToString::toString(p->second) << endl;
+	}
+	cout << "----------" << endl;
+
+	cout << "--- TP Special ---" << endl;
+	for (p = _tpSpecialMsgTypeMap._map.begin();
+			p != _tpSpecialMsgTypeMap._map.end(); p++) {
+		cout << "Request ID = " << p->first << " Type = "
+				<< EnumToString::toString(p->second) << endl;
+	}
+	cout << "------------------" << endl;
 }

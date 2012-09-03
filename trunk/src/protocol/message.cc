@@ -10,6 +10,7 @@
 #include "../communicator/communicator.hh"
 #include "../common/debug.hh"
 #include "../common/enums.hh"
+#include "../common/enumtostring.hh"
 #include "../common/memorypool.hh"
 #include "../common/debug.hh"
 #include "message.hh"
@@ -68,8 +69,8 @@ void Message::setRecvBuf(char* recvBuf) {
 
 void Message::printHeader() {
 	debug(
-			"[MsgHeader] ID = %" PRIu32 " Type = %d Size = %" PRIu32 ", PayloadSize = %" PRIu32 "\n",
-			_msgHeader.requestId, (int)_msgHeader.protocolMsgType, _msgHeader.protocolMsgSize, _msgHeader.payloadSize);
+			"[MsgHeader] ID = %" PRIu32 " Type = %s Size = %" PRIu32 ", PayloadSize = %" PRIu32 "\n",
+			_msgHeader.requestId, EnumToString::toString(_msgHeader.protocolMsgType), _msgHeader.protocolMsgSize, _msgHeader.payloadSize);
 }
 
 void Message::printPayloadHex() {
