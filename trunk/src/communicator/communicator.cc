@@ -230,10 +230,11 @@ void Communicator::waitForMessage() {
 						// use thread pool implementation
 #ifdef USE_THREAD_POOL
 						/*
-						struct MsgHeader msgHeader;
-						memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
-						*/
-						MsgType msgType = ((struct MsgHeader*)buf)->protocolMsgType;
+						 struct MsgHeader msgHeader;
+						 memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+						 */
+						MsgType msgType =
+								((struct MsgHeader*) buf)->protocolMsgType;
 
 						// if message is for secondary OSD, handle it with a special thread pool to avoid blocking
 						if (msgType == PUT_SEGMENT_INIT_REQUEST
@@ -252,6 +253,11 @@ void Communicator::waitForMessage() {
 									boost::bind(&Communicator::dispatch, this,
 											buf, p->first));
 						}
+
+						debug_yellow(
+								"[tp] Active: %zu, Pending: %zu [tpSpecial] Active: %zu, Pending: %zu\n",
+								tp.active(), tp.pending(), tpSpecial.active(), tpSpecial.pending());
+
 #else
 						dispatch(buf, p->first);
 #endif
@@ -515,9 +521,9 @@ void Communicator::dispatch(char* buf, uint32_t sockfd) {
 #endif
 
 	/*
-	debug("dispatch finished for %" PRIu32 " Type = %d\n",
-			msgHeader.requestId, msgHeader.protocolMsgType);
-	*/
+	 debug("dispatch finished for %" PRIu32 " Type = %d\n",
+	 msgHeader.requestId, msgHeader.protocolMsgType);
+	 */
 }
 
 inline uint32_t Communicator::generateRequestId() {
@@ -671,8 +677,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 			// send HandshakeRequest
 			requestHandshake(sockfd, _componentId, _componentType);
 
-		} else 
-		if ((_componentType == MDS || _componentType == OSD) && component.type == MONITOR) {
+		} else if ((_componentType == MDS || _componentType == OSD)
+				&& component.type == MONITOR) {
 			debug("Connecting to %s:%" PRIu16 "\n",
 					component.ip.c_str(), component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port,
