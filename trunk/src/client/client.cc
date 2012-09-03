@@ -122,6 +122,8 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	cout << formatSize(fileSize) << " transferred in " << duration << " secs, Rate = "
 			<< formatSize(fileSize / duration) << "/s" << endl;
 
+	system("./mid.sh");
+	exit(42);
 	return fileMetaData._id;
 }
 
@@ -178,6 +180,9 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	cout << setprecision(2);
 	cout << formatSize(fileMetaData._size) << " transferred in " << duration << " secs, Rate = "
 			<< formatSize(fileMetaData._size / duration) << "/s" << endl;
+
+	system("./mid.sh");
+	exit(42);
 }
 
 void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
