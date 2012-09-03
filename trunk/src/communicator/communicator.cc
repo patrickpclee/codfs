@@ -252,10 +252,11 @@ void Communicator::waitForMessage() {
 								|| msgType == GET_SECONDARY_LIST_REQUEST
 								|| msgType == GET_SECONDARY_LIST_REPLY
 //								|| msgType == OBJECT_TRANSFER_END_REQUEST
-								|| msgType == OBJECT_DATA
+//								|| msgType == OBJECT_DATA
 								|| msgType == OBJECT_TRANSFER_END_REPLY
 								|| msgType == PUT_OBJECT_INIT_REQUEST
-								|| msgType == PUT_OBJECT_INIT_REPLY) {
+								|| msgType == PUT_OBJECT_INIT_REPLY
+								|| msgType == GET_OBJECT_INFO_REPLY) {
 
 							tpSpecial.schedule(
 									boost::bind(&Communicator::dispatch, this,
