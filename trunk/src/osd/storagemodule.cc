@@ -23,6 +23,7 @@ extern ConfigLayer* configLayer;
 mutex fileMutex;
 mutex openedFileMutex;
 mutex cacheMutex;
+mutex queueMutex;
 
 StorageModule::StorageModule() {
 	_openedFile = {};
@@ -205,8 +206,13 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 
 bool StorageModule::isObjectCached(uint64_t objectId) {
 	if (_objectDiskCacheMap.count(objectId)) {
-		// update access time
+
+
 		_objectDiskCacheMap.get(objectId).lastAccessedTime = {time(NULL), 0};
+
+		lock_guard<mutex> lk(queueMutex);
+		_objectCacheQueue.remove(objectId);
+		_objectCacheQueue.insert(_objectCacheQueue.end(),objectId);
 		return true;
 	}
 	return false;
@@ -692,15 +698,21 @@ int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 //	 _objectDiskCacheMutex.erase(objectId);
 
 	uint32_t new_space = 0;
-
+	uint64_t objectId;
 	while(new_space < new_object_size){
-		uint64_t objectId = _objectCacheQueue.front();
+		{
+			lock_guard<mutex> lk(queueMutex);
+			objectId = *(_objectCacheQueue.begin());
+		}
+
 		struct ObjectDiskCache objectCache = _objectDiskCacheMap.get(objectId);
 
 		remove(objectCache.filepath.c_str());
 		new_space += objectCache.length;
 		_objectDiskCacheMap.erase(objectId);
-		_objectCacheQueue.pop();
+
+		lock_guard<mutex> lk(queueMutex);
+		_objectCacheQueue.remove(objectId);
 	}
 
 	return new_object_size - new_space;
@@ -733,8 +745,11 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	objectDiskCache.filepath = generateObjectPath(objectId, _objectFolder);
 	objectDiskCache.length = objectCache.length;
 	objectDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
-	_objectCacheQueue.push(objectId);
+
 	_objectDiskCacheMap.set(objectId, objectDiskCache);
+
+	lock_guard<mutex> lk(queueMutex);
+	_objectCacheQueue.insert(_objectCacheQueue.end(),objectId);
 }
 
 struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
