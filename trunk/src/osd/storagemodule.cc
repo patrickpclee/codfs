@@ -692,28 +692,18 @@ int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 //	 _objectDiskCacheMutex.erase(objectId);
 
 	uint32_t new_space = 0;
-	struct timespec oldestTime;
-	uint64_t oldestId;
-	string oldestPath;
-	uint32_t oldestLength;
-	typedef std::map<uint64_t, struct ObjectDiskCache>::iterator map_it;
-	while(new_space < new_object_size){
-		oldestTime = {time(NULL), 0};
-		for(map_it it = _objectDiskCacheMap._map.begin(); it != _objectDiskCacheMap._map.end(); it++){
-			if (oldestTime.tv_sec > it->second.lastAccessedTime.tv_sec){
-				oldestId = it->first;
-				oldestTime = it->second.lastAccessedTime;
-				oldestPath = it->second.filepath;
-				oldestLength = it->second.length;
-			}
-		}
 
-		remove(oldestPath.c_str());
-		new_space += oldestLength;
-		_objectDiskCacheMap.erase(oldestId);
+	while(new_space < new_object_size){
+		uint64_t objectId = _objectCacheQueue.front();
+		struct ObjectDiskCache objectCache = _objectDiskCacheMap.get(objectId);
+
+		remove(objectCache.filepath.c_str());
+		new_space += objectCache.length;
+		_objectDiskCacheMap.erase(objectId);
+		_objectCacheQueue.pop();
 	}
 
-	return 0;
+	return new_object_size - new_space;
 }
 
 void StorageModule::saveObjectToDisk(uint64_t objectId,
@@ -743,6 +733,7 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	objectDiskCache.filepath = generateObjectPath(objectId, _objectFolder);
 	objectDiskCache.length = objectCache.length;
 	objectDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
+	_objectCacheQueue.push(objectId);
 	_objectDiskCacheMap.set(objectId, objectDiskCache);
 }
 
