@@ -51,6 +51,7 @@ void ListDirectoryReplyMsg::prepareProtocolMsg() {
 		fileInfoPro->set_fileid((*it)._id);
 		fileInfoPro->set_filesize((*it)._size);
 		fileInfoPro->set_filename((*it)._path);
+		//TODO: Send File Type
 	}
 
 	if (!listDirectoryReplyPro.SerializeToString(&serializedString)) {
