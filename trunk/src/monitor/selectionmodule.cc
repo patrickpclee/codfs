@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include "../config/config.hh"
 #include "selectionmodule.hh"
 
 extern ConfigLayer* configLayer;
