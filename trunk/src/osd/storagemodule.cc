@@ -207,7 +207,6 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 bool StorageModule::isObjectCached(uint64_t objectId) {
 	if (_objectDiskCacheMap.count(objectId)) {
 
-
 		_objectDiskCacheMap.get(objectId).lastAccessedTime = {time(NULL), 0};
 
 		lock_guard<mutex> lk(queueMutex);
@@ -699,7 +698,7 @@ int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 
 	uint32_t new_space = 0;
 	uint64_t objectId;
-	while(new_space < new_object_size){
+	while (new_space < new_object_size) {
 		{
 			lock_guard<mutex> lk(queueMutex);
 			objectId = *(_objectCacheQueue.begin());
@@ -749,7 +748,7 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	_objectDiskCacheMap.set(objectId, objectDiskCache);
 
 	lock_guard<mutex> lk(queueMutex);
-	_objectCacheQueue.insert(_objectCacheQueue.end(),objectId);
+	_objectCacheQueue.insert(_objectCacheQueue.end(), objectId);
 }
 
 struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
@@ -757,4 +756,22 @@ struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
 	struct ObjectDiskCache objectDiskCache = _objectDiskCacheMap.get(objectId);
 	objectData = readObject(objectId, 0, objectDiskCache.length);
 	return objectData;
+}
+
+void StorageModule::clearObjectDiskCache() {
+	lock_guard<mutex> lk(queueMutex);
+	_objectCacheQueue.empty();
+	_objectDiskCacheMap.empty();
+
+	struct dirent *file;
+	DIR *dir;
+
+	char filepath[256];
+	dir = opendir(_objectFolder.c_str());
+
+	while ((file = readdir(dir)) != NULL) {
+		// build the full path for each file in the folder
+		sprintf(filepath, "%s/%s", _objectFolder.c_str(), file->d_name);
+		remove(filepath);
+	}
 }

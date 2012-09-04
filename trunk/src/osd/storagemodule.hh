@@ -202,6 +202,8 @@ public:
 
 	struct ObjectData getObjectFromDiskCache(uint64_t objectId);
 
+	void clearObjectDiskCache();
+
 private:
 
 	void initializeStorageStatus();

@@ -491,6 +491,10 @@ OsdCommunicator* Osd::getCommunicator() {
 	return _osdCommunicator;
 }
 
+StorageModule* Osd::getStorageModule() {
+	return _storageModule;
+}
+
 /*
  SegmentLocationCache* Osd::getSegmentLocationCache() {
  return _segmentLocationCache;
