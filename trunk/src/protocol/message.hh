@@ -27,6 +27,7 @@ struct MsgHeader {
 	MsgType protocolMsgType;
 	uint32_t protocolMsgSize;
 	uint32_t payloadSize;
+	uint32_t threadPoolLevel;
 };
 #pragma pack(0)
 
@@ -166,7 +167,6 @@ protected:
 	char* _recvBuf;		// buffer created to store header + protocol + payload in recvMessage
 	bool _expectReply;
 	Communicator* _communicator;
-	int _threadPoolLevel;
 	
 	promise <MessageStatus> _status;
 	bool _deletable;

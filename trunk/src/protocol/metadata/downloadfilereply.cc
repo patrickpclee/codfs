@@ -39,7 +39,7 @@ DownloadFileReplyMsg::DownloadFileReplyMsg(Communicator* communicator,
 	_checksum = checksum;
 	_objectList = objectList;
 	_primaryList = primaryList;
-	_threadPoolLevel = 1;
+	_msgHeader.threadPoolLevel = 1;
 }
 
 void DownloadFileReplyMsg::prepareProtocolMsg() {

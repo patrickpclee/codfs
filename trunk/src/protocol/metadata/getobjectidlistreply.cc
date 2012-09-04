@@ -22,7 +22,7 @@ GetObjectIdListReplyMsg::GetObjectIdListReplyMsg(Communicator* communicator,
 		Message(communicator) {
 	_sockfd = mdsSockfd;
 	_objectIdList = objectIdList;
-	_threadPoolLevel = 1;
+	_msgHeader.threadPoolLevel = 1;
 }
 
 void GetObjectIdListReplyMsg::prepareProtocolMsg() {

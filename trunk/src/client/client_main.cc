@@ -75,11 +75,12 @@ int main(int argc, char *argv[]) {
 	*/
 
 	// RAID 0
-	const uint32_t stripFactor = 3;
+	const uint32_t stripFactor = 2;
 	CodingScheme codingScheme = RAID0_CODING;
 
 	if (strncmp(argv[2], "upload", 6) == 0) {
 		string codingSetting = Raid1Coding::generateSetting(stripFactor);
+		//string codingSetting = Raid1Coding::generateSetting(replicationFactor);
 		client->uploadFileRequest(argv[3], codingScheme, codingSetting);
 	} else {
 		client->downloadFileRequest(atoi(argv[3]), argv[4]);
