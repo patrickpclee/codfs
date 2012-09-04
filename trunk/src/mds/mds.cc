@@ -64,7 +64,7 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 	
 //	primaryList = _mdsCommunicator->askPrimaryList(numOfObjs);
 	primaryList = _mdsCommunicator->getPrimaryList(_mdsCommunicator->getMonitorSockfd(), numOfObjs);
-	for (int i = 0; i < primaryList.size(); i++) {
+	for (uint32_t i = 0; i < primaryList.size(); i++) {
 		debug("Get primary list index %" PRIu32 " = %" PRIu32 "\n", i, primaryList[i]);
 	}
 

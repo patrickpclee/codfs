@@ -71,15 +71,8 @@ Communicator::Communicator() {
 
 #ifdef USE_THREAD_POOL
 	// thread pool
-	_numDispatchThread_lv0 = configLayer->getConfigInt(
-			"Communication>NumDispatchThread_lv0");
-	_numDispatchThread_lv1 = configLayer->getConfigInt(
-			"Communication>NumDispatchThread_lv1");
-	_numDispatchThread_lv2 = configLayer->getConfigInt(
-			"Communication>NumDispatchThread_lv2");
-	debug(
-			"Dispatch thread lv0 = %" PRIu32 " Dispatch thread lv1 = %" PRIu32 " Dispatch Thread lv2 = %" PRIu32 "\n",
-			_numDispatchThread_lv0, _numDispatchThread_lv1, _numDispatchThread_lv2);
+	_numThreadPerPool = configLayer->getConfigInt(
+			"Communication>NumThreadPerPool");
 #endif
 
 	debug("%s\n", "Communicator constructed");
@@ -138,9 +131,11 @@ void Communicator::waitForMessage() {
 
 #ifdef USE_THREAD_POOL
 	// initialize thread pool
-	pool tpLevel_0(_numDispatchThread_lv0);
-	pool tpLevel_1(_numDispatchThread_lv1);
-	pool tpLevel_2(_numDispatchThread_lv2);
+	pool threadPools [MSGTYPE_END];
+	for (int i = 0; i < MSGTYPE_END; i++) {
+		threadPools[i].size_controller().resize(_numThreadPerPool);
+	}
+
 #endif
 
 	while (1) {
@@ -238,46 +233,20 @@ void Communicator::waitForMessage() {
 						 struct MsgHeader msgHeader;
 						 memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
 						 */
+						uint32_t requestId =
+								((struct MsgHeader*) buf)->requestId;
 						MsgType msgType =
 								((struct MsgHeader*) buf)->protocolMsgType;
 
 						// blocking threads are put into tp
 						// threads which are needed to unblock the blocking threads are put in tpSpecial
-						if (msgType == PUT_SEGMENT_INIT_REQUEST
-								|| msgType == PUT_SEGMENT_INIT_REPLY
-								|| msgType == SEGMENT_DATA
-								|| msgType == SEGMENT_TRANSFER_END_REQUEST
-								|| msgType == SEGMENT_TRANSFER_END_REPLY
-								/*
-								|| msgType == GET_SEGMENT_INIT_REQUEST
-								|| msgType == GET_SEGMENT_INIT_REPLY
-								*/
-								|| msgType == GET_PRIMARY_LIST_REQUEST
-								|| msgType == GET_PRIMARY_LIST_REPLY
-								|| msgType == GET_SECONDARY_LIST_REQUEST
-								|| msgType == GET_SECONDARY_LIST_REPLY
-//								|| msgType == OBJECT_TRANSFER_END_REQUEST
-//								|| msgType == OBJECT_DATA
-								|| msgType == OBJECT_TRANSFER_END_REPLY
-								|| msgType == PUT_OBJECT_INIT_REQUEST
-								|| msgType == PUT_OBJECT_INIT_REPLY
-								|| msgType == GET_OBJECT_INFO_REPLY) {
 
-							tpLevel_1.schedule(
-									boost::bind(&Communicator::dispatch, this,
-											buf, p->first, true));
-						} else {
-							tpLevel_0.schedule(
-									boost::bind(&Communicator::dispatch, this,
-											buf, p->first, false));
-						}
+						debug_cyan(
+								"schedule request ID = %" PRIu32 "to tp %d Type = %s\n",
+								requestId, (int)msgType, EnumToString::toString(msgType));
 
-						// debug: list the threads in thread pool
-						debug_yellow(
-								"[tp] Active: %zu, Pending: %zu [tpSpecial] Active: %zu, Pending: %zu\n",
-								tpLevel_0.active(), tpLevel_0.pending(), tpLevel_1.active(), tpLevel_1.pending());
-
-						listThreadPool();
+						threadPools[msgType].schedule (boost::bind(&Communicator::dispatch, this,
+											buf, p->first, 0));
 
 #else
 						dispatch(buf, p->first);
@@ -292,7 +261,7 @@ void Communicator::waitForMessage() {
 	} // end while (1)
 
 #ifdef USE_THREAD_POOL
-	tpLevel_0.wait();
+	// wait()
 #endif
 }
 
@@ -508,24 +477,14 @@ void Communicator::sendThread(Communicator* communicator) {
  * 6. start new thread for message->handle()
  */
 
-void Communicator::dispatch(char* buf, uint32_t sockfd, bool isSpecial) {
+void Communicator::dispatch(char* buf, uint32_t sockfd,
+		uint32_t threadPoolLevel) {
 
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
 
-	// debug
-	{
-		boost::unique_lock<boost::shared_mutex> lock(threadPoolMapMutex);
-		if (isSpecial) {
-			_tpLevel_1.set(msgHeader.requestId,
-					msgHeader.protocolMsgType);
-		} else {
-			_tpLevel_0.set(msgHeader.requestId, msgHeader.protocolMsgType);
-		}
-	}
-
-	debug("Running dispatch ID = %" PRIu32 " Type = %d\n",
-			msgHeader.requestId, msgHeader.protocolMsgType);
+	debug("Running dispatch ID = %" PRIu32 " Type = %s\n",
+			msgHeader.requestId, EnumToString::toString(msgHeader.protocolMsgType));
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
@@ -552,20 +511,6 @@ void Communicator::dispatch(char* buf, uint32_t sockfd, bool isSpecial) {
 	t.detach();
 #endif
 
-	/*
-	 debug("dispatch finished for %" PRIu32 " Type = %d\n",
-	 msgHeader.requestId, msgHeader.protocolMsgType);
-	 */
-
-	// debug
-	{
-		boost::unique_lock<boost::shared_mutex> lock(threadPoolMapMutex);
-		if (isSpecial) {
-			_tpLevel_1.erase(msgHeader.requestId);
-		} else {
-			_tpLevel_0.erase(msgHeader.requestId);
-		}
-	}
 }
 
 inline uint32_t Communicator::generateRequestId() {
@@ -814,9 +759,6 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 
 	putObjectEnd(componentId, sockfd, objectId);
 
-	// free buf
-	// MemoryPool::getInstance().poolFree(objectData.buf);
-
 	cout << "Put Object ID = " << objectId << " Finished" << endl;
 
 	return byteProcessed;
@@ -884,25 +826,4 @@ void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
 		debug("%s\n", "Put Object End Failed");
 		exit(-1);
 	}
-}
-
-void Communicator::listThreadPool() {
-	map<uint32_t, MsgType>::iterator p;
-
-	boost::shared_lock<boost::shared_mutex> lock(threadPoolMapMutex);
-
-	cout << "--- TP ---" << endl;
-	for (p = _tpLevel_0._map.begin(); p != _tpLevel_0._map.end(); p++) {
-		cout << "Request ID = " << p->first << " Type = "
-				<< EnumToString::toString(p->second) << endl;
-	}
-	cout << "----------" << endl;
-
-	cout << "--- TP Special ---" << endl;
-	for (p = _tpLevel_1._map.begin();
-			p != _tpLevel_1._map.end(); p++) {
-		cout << "Request ID = " << p->first << " Type = "
-				<< EnumToString::toString(p->second) << endl;
-	}
-	cout << "------------------" << endl;
 }

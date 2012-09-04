@@ -22,7 +22,7 @@ OsdStatUpdateReplyMsg::OsdStatUpdateReplyMsg(Communicator* communicator, uint32_
 	_osdId = osdId;
 	_capacity = capacity;
 	_loading = loading;
-	_threadPoolLevel = 1;
+	_msgHeader.threadPoolLevel = 1;
 }
 
 void OsdStatUpdateReplyMsg::prepareProtocolMsg() {

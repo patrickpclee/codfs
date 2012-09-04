@@ -20,7 +20,7 @@ GetSegmentInitRequestMsg::GetSegmentInitRequestMsg(Communicator* communicator,
 	_sockfd = osdSockfd;
 	_objectId = objectId;
 	_segmentId = segmentId;
-	_threadPoolLevel = 1;
+	_msgHeader.threadPoolLevel = 1;
 }
 
 void GetSegmentInitRequestMsg::prepareProtocolMsg() {

@@ -29,7 +29,8 @@ Message::Message(Communicator* communicator) {
 	_expectReply = false;
 	_deletable = false;
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
-	_threadPoolLevel = 0;
+
+	_msgHeader.threadPoolLevel = 0;
 }
 
 Message::~Message() {
@@ -136,3 +137,4 @@ void Message::handle() {
 bool Message::isDeletable() {
 	return _deletable;
 }
+

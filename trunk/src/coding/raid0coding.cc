@@ -2,6 +2,7 @@
 #include <iostream>
 #include "coding.hh"
 #include "raid0coding.hh"
+#include "../common/debug.hh"
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
 #include "../common/memorypool.hh"
@@ -73,14 +74,16 @@ struct ObjectData Raid0Coding::decode(vector<struct SegmentData> segmentData,
 	} else {
 		// objectsize = first segment * (segmentCount - 1) + last segment
 		objectData.info.objectSize = segmentData[0].info.segmentSize
-				* (segmentCount - 1) + segmentData.end()->info.segmentSize;
+				* (segmentCount - 1) + (segmentData.end()-1)->info.segmentSize;
 	}
 
 	objectData.buf = MemoryPool::getInstance().poolMalloc(
 			objectData.info.objectSize);
 
+	uint64_t offset = 0;
 	for (struct SegmentData segment : segmentData) {
-		memcpy(objectData.buf, segment.buf, segment.info.segmentSize);
+		memcpy(objectData.buf + offset, segment.buf, segment.info.segmentSize);
+		offset += segment.info.segmentSize;
 	}
 
 	return objectData;
