@@ -216,6 +216,13 @@ public:
 	OsdCommunicator* getCommunicator();
 
 	/**
+	 * Get a reference of StorageModule
+	 * @return Pointer to OSD storage module
+	 */
+
+	StorageModule* getStorageModule();
+
+	/**
 	 * Get a reference of OSD Cache
 	 * @return Pointer to OSD segment location cache
 	 */
