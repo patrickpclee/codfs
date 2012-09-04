@@ -338,7 +338,6 @@ protected:
 	uint32_t _timeoutSec, _timeoutUsec;
 	uint32_t _chunkSize;
 	uint32_t _pollingInterval;
-	uint32_t _numThreadPerPool;
 
 	// component list
 	vector<Component> mdsList;

@@ -6,6 +6,7 @@
 #include "messagefactory.hh"
 #include "../common/debug.hh"
 #include "../common/enums.hh"
+#include "../common/enumtostring.hh"
 
 #include "metadata/listdirectoryrequest.hh"
 #include "metadata/listdirectoryreply.hh"
@@ -13,7 +14,7 @@
 #include "metadata/uploadfilereply.hh"
 #include "metadata/uploadobjectack.hh"
 #include "metadata/getobjectidlistrequest.hh"
-//#include "metedata/getobjectidlistreply.hh"
+#include "metadata/getobjectidlistreply.hh"
 #include "metadata/downloadfilerequest.hh"
 #include "metadata/downloadfilereply.hh"
 #include "metadata/getobjectinforequest.hh"
@@ -88,9 +89,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_OBJECT_ID_LIST_REQUEST):
 		return new GetObjectIdListRequestMsg(communicator);
 		break;
-//	case (GET_OBJECT_ID_LIST_REPLY):
-//		return new GetObjectIdListReplyMsg(communicator);
-//		break;
+	case (GET_OBJECT_ID_LIST_REPLY):
+		return new GetObjectIdListReplyMsg(communicator);
+		break;
 	case (DOWNLOAD_FILE_REQUEST):
 		return new DownloadFileRequestMsg(communicator);
 		break;
@@ -187,7 +188,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new GetSecondaryListReplyMsg(communicator);
 		break;
 	default:
-		debug("Invalid message type : %d\n", messageType);
+		debug("Invalid message type : %s\n", EnumToString::toString(messageType));
 		break;
 	}
 	return NULL;

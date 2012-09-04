@@ -28,7 +28,7 @@ GetSecondaryListRequestMsg::GetSecondaryListRequestMsg(Communicator* communicato
 
 	_sockfd = mdsSockfd;
 	_numOfSegs = numOfSegs;
-	_msgHeader.threadPoolLevel = 1;
+	
 }
 
 void GetSecondaryListRequestMsg::prepareProtocolMsg() {
