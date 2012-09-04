@@ -34,6 +34,10 @@
         do { if (DEBUG) fprintf(stderr, YELLOW "[%s] %s:%d:%s(): " fmt RESET,  getTime().c_str(), __FILE__, \
                                 __LINE__, __func__, __VA_ARGS__); } while (0)
 
+#define debug_cyan(fmt, ...) \
+        do { if (DEBUG) fprintf(stderr, CYAN "[%s] %s:%d:%s(): " fmt RESET,  getTime().c_str(), __FILE__, \
+                                __LINE__, __func__, __VA_ARGS__); } while (0)
+
 void printhex(char* buf, int n);
 std::string getTime();
 std::string formatSize(uint64_t size);
