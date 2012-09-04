@@ -9,8 +9,8 @@
     </Communication>
     
     <Storage>
-    	<ObjectCacheLocation>./osd_object/</ObjectCacheLocation>
-    	<SegmentLocation>./osd_segment/</SegmentLocation>
+    	<ObjectCacheLocation>./osd_object2/</ObjectCacheLocation>
+    	<SegmentLocation>./osd_segment2/</SegmentLocation>
     	
     	<SegmentCapacity>10</SegmentCapacity> <!-- GB -->
     	<ObjectCacheCapacity>5</ObjectCacheCapacity> <!-- GB -->

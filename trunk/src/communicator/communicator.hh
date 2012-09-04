@@ -337,8 +337,9 @@ protected:
 	uint32_t _timeoutSec, _timeoutUsec;
 	uint32_t _chunkSize;
 	uint32_t _pollingInterval;
-	uint32_t _numDispatchThread;
-	uint32_t _numSpecialDispatchThread;
+	uint32_t _numDispatchThread_lv0;
+	uint32_t _numDispatchThread_lv1;
+	uint32_t _numDispatchThread_lv2;
 
 	// component list
 	vector<Component> mdsList;
@@ -346,8 +347,9 @@ protected:
 	vector<Component> monitorList;
 
 	// debug
-	ConcurrentMap <uint32_t, MsgType> _tpMsgTypeMap;
-	ConcurrentMap <uint32_t, MsgType> _tpSpecialMsgTypeMap;
+	ConcurrentMap <uint32_t, MsgType> _tpLevel_0;
+	ConcurrentMap <uint32_t, MsgType> _tpLevel_1;
+	ConcurrentMap <uint32_t, MsgType> _tpLevel_2;
 
 };
 #endif
