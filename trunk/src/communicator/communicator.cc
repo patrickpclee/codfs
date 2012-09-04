@@ -70,9 +70,11 @@ Communicator::Communicator() {
 			"Communication>SendPollingInterval");
 
 #ifdef USE_THREAD_POOL
-	// thread pool
-	_numThreadPerPool = configLayer->getConfigInt(
-			"Communication>NumThreadPerPool");
+	/*
+	 // thread pool
+	 _numThreadPerPool = configLayer->getConfigInt(
+	 "Communication>NumThreadPerPool");
+	 */
 #endif
 
 	debug("%s\n", "Communicator constructed");
@@ -131,9 +133,16 @@ void Communicator::waitForMessage() {
 
 #ifdef USE_THREAD_POOL
 	// initialize thread pool
-	pool threadPools [MSGTYPE_END];
-	for (int i = 0; i < MSGTYPE_END; i++) {
-		threadPools[i].size_controller().resize(_numThreadPerPool);
+	pool threadPools[MSGTYPE_END];
+	for (int i = 1; i < MSGTYPE_END; i++) { // skip DEFAULT
+		Message* tempMessage = MessageFactory::createMessage(this, (MsgType) i);
+		uint32_t threadPoolSize = tempMessage->getThreadPoolSize();
+		threadPools[i].size_controller().resize(threadPoolSize);
+		/*
+		debug_cyan("Size of thread pool for message type %s = %" PRIu32 "\n",
+				EnumToString::toString((MsgType)i), threadPoolSize);
+		*/
+		delete tempMessage;
 	}
 
 #endif
@@ -245,8 +254,9 @@ void Communicator::waitForMessage() {
 								"schedule request ID = %" PRIu32 "to tp %d Type = %s\n",
 								requestId, (int)msgType, EnumToString::toString(msgType));
 
-						threadPools[msgType].schedule (boost::bind(&Communicator::dispatch, this,
-											buf, p->first, 0));
+						threadPools[msgType].schedule(
+								boost::bind(&Communicator::dispatch, this, buf,
+										p->first, 0));
 
 #else
 						dispatch(buf, p->first);

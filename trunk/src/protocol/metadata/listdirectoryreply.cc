@@ -30,7 +30,7 @@ void ListDirectoryReplyMsg::setVariables(uint32_t requestId, uint32_t sockfd,
 	_msgHeader.requestId = requestId;
 	_path = path;
 	_folderData = folderData;
-	_msgHeader.threadPoolLevel = 1;
+	
 
 	return;
 }

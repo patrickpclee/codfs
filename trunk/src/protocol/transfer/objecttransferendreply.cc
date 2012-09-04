@@ -17,7 +17,7 @@ ObjectTransferEndReplyMsg::ObjectTransferEndReplyMsg(Communicator* communicator,
 	_msgHeader.requestId = requestId;
 	_sockfd = dstSockfd;
 	_objectId = objectId;
-	_msgHeader.threadPoolLevel = 2;
+	
 }
 
 void ObjectTransferEndReplyMsg::prepareProtocolMsg() {

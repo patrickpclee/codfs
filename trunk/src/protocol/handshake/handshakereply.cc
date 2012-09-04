@@ -19,7 +19,7 @@ HandshakeReplyMsg::HandshakeReplyMsg(Communicator* communicator, uint32_t reques
 	_sockfd = srcSockfd;
 	_componentId = componentId;
 	_componentType = componentType;
-	_msgHeader.threadPoolLevel = 1;
+	
 }
 
 void HandshakeReplyMsg::prepareProtocolMsg() {
