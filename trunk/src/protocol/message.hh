@@ -166,6 +166,7 @@ protected:
 	char* _recvBuf;		// buffer created to store header + protocol + payload in recvMessage
 	bool _expectReply;
 	Communicator* _communicator;
+	int _threadPoolLevel;
 	
 	promise <MessageStatus> _status;
 	bool _deletable;

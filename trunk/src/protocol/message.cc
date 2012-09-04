@@ -29,6 +29,7 @@ Message::Message(Communicator* communicator) {
 	_expectReply = false;
 	_deletable = false;
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
+	_threadPoolLevel = 0;
 }
 
 Message::~Message() {

@@ -24,6 +24,7 @@ ObjectTransferEndRequestMsg::ObjectTransferEndRequestMsg(Communicator* communica
 
 	_sockfd = osdSockfd;
 	_objectId = objectId;
+	_threadPoolLevel = 1;
 }
 
 void ObjectTransferEndRequestMsg::prepareProtocolMsg() {

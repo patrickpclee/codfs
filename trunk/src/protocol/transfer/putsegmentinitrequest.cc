@@ -22,6 +22,7 @@ PutSegmentInitRequestMsg::PutSegmentInitRequestMsg(Communicator* communicator,
 	_segmentId = segmentId;
 	_segmentSize = segmentSize;
 	_chunkCount = chunkCount;
+	_threadPoolLevel = 1;
 }
 
 void PutSegmentInitRequestMsg::prepareProtocolMsg() {

@@ -18,6 +18,7 @@ PutSegmentInitReplyMsg::PutSegmentInitReplyMsg(Communicator* communicator,
 	_sockfd = osdSockfd;
 	_objectId = objectId;
 	_segmentId = segmentId;
+	_threadPoolLevel = 2;
 }
 
 void PutSegmentInitReplyMsg::prepareProtocolMsg() {
