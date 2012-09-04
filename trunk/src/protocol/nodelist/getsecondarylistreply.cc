@@ -28,6 +28,7 @@ GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator,
 	_msgHeader.requestId = requestId;
 	_sockfd = sockfd;
 	_secondaryList = secondaryList;
+	_threadPoolLevel = 1;
 }
 
 void GetSecondaryListReplyMsg::prepareProtocolMsg() {

@@ -17,6 +17,7 @@ PutObjectInitReplyMsg::PutObjectInitReplyMsg(Communicator* communicator,
 	_msgHeader.requestId = requestId;
 	_sockfd = osdSockfd;
 	_objectId = objectId;
+	_threadPoolLevel = 2;
 }
 
 void PutObjectInitReplyMsg::prepareProtocolMsg() {

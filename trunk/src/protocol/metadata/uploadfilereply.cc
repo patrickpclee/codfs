@@ -19,6 +19,7 @@ UploadFileReplyMsg::UploadFileReplyMsg (Communicator* communicator, uint32_t req
 	_fileId = fileId;
 	_objectList = objectList;
 	_primaryList = primaryList;
+	_threadPoolLevel = 1;
 }
 
 void UploadFileReplyMsg::prepareProtocolMsg()
