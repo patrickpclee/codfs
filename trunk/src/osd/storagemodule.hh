@@ -180,25 +180,103 @@ public:
 
 	void closeSegment(uint64_t objectId, uint32_t segmentId);
 
-	// getters
+	/**
+	 * Get back the ObjectCache from objectId
+	 * @param objectId 				Object ID
+	 *
+	 * @return ObjectTransferCache  Object Cache
+	 */
+
 	struct ObjectTransferCache getObjectCache(uint64_t objectId);
 
+	/**
+	 * Set the Capacity of OSD
+	 * @param max_segment capacity of OSD
+	 */
+
 	void setMaxSegmentCapacity(uint32_t max_segment);
+
+	/**
+	 * Set the object cache space of OSD
+	 * @param max_object capacity of object cache
+	 */
+
 	void setMaxObjectCache(uint32_t max_object);
 
+	/**
+	 * Get the Capacity of OSD
+	 * @return uint32_t Max capacity of OSD
+	 */
+
 	uint32_t getMaxSegmentCapacity();
+
+	/**
+	 * Get the Space of Object Cache
+	 * @return uint32_t Max space of object cache
+	 */
+
 	uint32_t getMaxObjectCache();
 
+	/**
+	 * Get the current Capacity of OSD
+	 * @return uint32_t current capacity of OSD
+	 */
+
 	uint32_t getCurrentSegmentCapacity();
+
+	/**
+	 * Get the current usage of object cache
+	 * @return uint32_t current usage of object cache
+	 */
+
 	uint32_t getCurrentObjectCache();
 
+	/**
+	 * Get the free space of OSD
+	 * @return uint32_t current free space of OSD
+	 */
+
 	uint32_t getFreeSegmentSpace();
+
+	/**
+	 * Get the free space of object cache
+	 * @return uint32_t current free space of object cache
+	 */
+
 	uint32_t getFreeObjectSpace();
 
-	bool verifySegmentSpace(uint32_t size);bool verifyObjectSpace(
-			uint32_t size);
+	/**
+	 * Verify whether OSD has enough space
+	 * @param size 		the required space size
+	 *
+	 * @return boolean 	TRUE/FALSE
+	 */
+
+	bool verifySegmentSpace(uint32_t size);
+
+	/**
+	 * Verify whether object cache has enough space
+	 * @param size 		the required space size
+	 *
+	 * @return boolean 	TRUE/FALSE
+	 */
+
+	bool verifyObjectSpace(uint32_t size);
+
+	/**
+	 * Save object to object cache on the disk
+	 * @param objectId 		object ID
+	 * @param objectCache 	the object cache to be saved
+	 */
 
 	void saveObjectToDisk(uint64_t objectId, ObjectTransferCache objectCache);
+
+	/**
+	 * Read object cache from the disk
+	 * @param objectId 		object ID
+	 *
+	 * @return objectData 	the object data from the cache
+	 */
 
 	struct ObjectData getObjectFromDiskCache(uint64_t objectId);
 
@@ -206,10 +284,29 @@ public:
 
 private:
 
+	/**
+	 * Calculate and update the free space and usage while set up
+	 */
 	void initializeStorageStatus();
 
+	/**
+	 * Calculate and update the free space and usage of OSD
+	 * @param new_segment_size	the size of the segment to be saved
+	 */
 	void updateSegmentFreespace(uint32_t new_segment_size);
+
+	/**
+	 * Calculate and update the free space and usage of object cache
+	 * @param new_object_size	the size of the object cache to be saved
+	 */
 	void updateObjectFreespace(uint32_t new_object_size);
+
+	/**
+	 * Delete old entry in the object cache to make room for new one
+	 * @param new_object_size	the size of the object cache to be saved
+	 *
+	 * @return int32_t 			the updated size of object cache after deletion
+	 */
 	int32_t spareObjectSpace(uint32_t new_object_size);
 
 	/**
