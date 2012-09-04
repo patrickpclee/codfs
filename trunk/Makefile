@@ -5,6 +5,8 @@ MONITOR_DIR=		${SRC}/monitor
 CLIENT_DIR=			${SRC}/client
 FUSE_DIR=			${SRC}/fuse
 MDS_DIR=			${SRC}/mds
+COMMON_DIR=			${SRC}/common
+PROTOCOL_DIR=		${SRC}/protocol
 
 
 all:
@@ -28,6 +30,12 @@ monitor:
 
 fuse:
 	cd ${FUSE_DIR}; make -j3
+
+enum:
+	cd ${COMMON_DIR}; make
+
+protocol:
+	cd ${PROTOCOL_DIR}; make
 
 clean:
 	cd ${OSD_DIR}; make clean
