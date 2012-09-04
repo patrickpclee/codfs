@@ -27,7 +27,7 @@ SegmentDataMsg::SegmentDataMsg(Communicator* communicator, uint32_t osdSockfd,
 	_segmentId = segmentId;
 	_offset = offset;
 	_length = length;
-	_msgHeader.threadPoolLevel = 2;
+	
 }
 
 void SegmentDataMsg::prepareProtocolMsg() {

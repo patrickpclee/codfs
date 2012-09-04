@@ -29,8 +29,7 @@ Message::Message(Communicator* communicator) {
 	_expectReply = false;
 	_deletable = false;
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
-
-	_msgHeader.threadPoolLevel = 0;
+	_threadPoolSize = 1; // default thread pool size
 }
 
 Message::~Message() {
@@ -123,6 +122,10 @@ void Message::setStatus(MessageStatus status) {
 
 void Message::setExpectReply(bool expectReply) {
 	_expectReply = expectReply;
+}
+
+uint32_t Message::getThreadPoolSize() {
+	return _threadPoolSize;
 }
 
 void Message::handle() {

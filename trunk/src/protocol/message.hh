@@ -27,7 +27,6 @@ struct MsgHeader {
 	MsgType protocolMsgType;
 	uint32_t protocolMsgSize;
 	uint32_t payloadSize;
-	uint32_t threadPoolLevel;
 };
 #pragma pack(0)
 
@@ -142,6 +141,13 @@ public:
 	void setExpectReply (bool expectReply);
 
 	/**
+	 * Get the thread pool size of this type of message
+	 * @return Size of thread pool for this type of message
+	 */
+
+	uint32_t getThreadPoolSize();
+
+	/**
 	 * DEBUG: Print the MsgHeader
 	 */
 
@@ -159,7 +165,9 @@ public:
 
 	void printPayloadHex();
 
+
 protected:
+	uint32_t _threadPoolSize;
 	uint32_t _sockfd;		// destination
 	struct MsgHeader _msgHeader;
 	string _protocolMsg;

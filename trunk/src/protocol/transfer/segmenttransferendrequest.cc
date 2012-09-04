@@ -21,7 +21,7 @@ SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(Communicator* communi
 	_sockfd = osdSockfd;
 	_objectId = objectId;
 	_segmentId = segmentId;
-	_msgHeader.threadPoolLevel = 2;
+	
 }
 
 void SegmentTransferEndRequestMsg::prepareProtocolMsg() {
