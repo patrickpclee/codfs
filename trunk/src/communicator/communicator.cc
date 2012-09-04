@@ -245,8 +245,10 @@ void Communicator::waitForMessage() {
 								|| msgType == SEGMENT_DATA
 								|| msgType == SEGMENT_TRANSFER_END_REQUEST
 								|| msgType == SEGMENT_TRANSFER_END_REPLY
+								/*
 								|| msgType == GET_SEGMENT_INIT_REQUEST
 								|| msgType == GET_SEGMENT_INIT_REPLY
+								*/
 								|| msgType == GET_PRIMARY_LIST_REQUEST
 								|| msgType == GET_PRIMARY_LIST_REPLY
 								|| msgType == GET_SECONDARY_LIST_REQUEST
