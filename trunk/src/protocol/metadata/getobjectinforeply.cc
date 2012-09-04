@@ -24,6 +24,7 @@ GetObjectInfoReplyMsg::GetObjectInfoReplyMsg(Communicator* communicator,
 	_nodeList = nodeList;
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
+	_threadPoolLevel = 1;
 }
 
 void GetObjectInfoReplyMsg::prepareProtocolMsg() {

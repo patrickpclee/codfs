@@ -18,6 +18,7 @@ SegmentTransferEndReplyMsg::SegmentTransferEndReplyMsg(Communicator* communicato
 	_sockfd = dstSockfd;
 	_objectId = objectId;
 	_segmentId = segmentId;
+	_threadPoolLevel = 2;
 }
 
 void SegmentTransferEndReplyMsg::prepareProtocolMsg() {

@@ -27,6 +27,7 @@ ObjectDataMsg::ObjectDataMsg(Communicator* communicator, uint32_t osdSockfd,
 	_objectId = objectId;
 	_offset = offset;
 	_length = length;
+	_threadPoolLevel = 2;
 }
 
 void ObjectDataMsg::prepareProtocolMsg() {

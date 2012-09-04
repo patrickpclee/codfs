@@ -28,6 +28,7 @@ GetPrimaryListReplyMsg::GetPrimaryListReplyMsg(Communicator* communicator,
 	_msgHeader.requestId = requestId;
 	_sockfd = mdsSockfd;
 	_primaryList = primaryList;
+	_threadPoolLevel = 1;
 }
 
 void GetPrimaryListReplyMsg::prepareProtocolMsg() {
