@@ -18,8 +18,15 @@ ConfigLayer* configLayer;
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
-	if (signum == SIGINT)
+	cout << "Signal" << signum << "received" << endl;
+	if (signum == SIGINT) {
 		exit(42);
+	} else if (signum == SIGUSR1) {
+		cout << "Clearing object disk cache...";
+		fflush (stdout);
+		osd->getStorageModule()->clearObjectDiskCache();
+		cout << "done" << endl;
+	}
 }
 
 void startGarbageCollectionThread() {
@@ -61,6 +68,7 @@ void startTestThread(Communicator* communicator) {
 int main(int argc, char* argv[]) {
 
 	signal(SIGINT, sighandler);
+	signal(SIGUSR1, sighandler);
 
 	string configFilePath;
 
