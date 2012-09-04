@@ -6,6 +6,8 @@
 
 #include "client.hh"
 #include "client_communicator.hh"
+#include "filedatamodule.hh"
+#include "filedatacache.hh"
 
 #include "../common/metadata.hh"
 #include "../common/garbagecollector.hh"
@@ -17,6 +19,8 @@ Client* client;
 ConfigLayer* configLayer;
 
 ClientCommunicator* communicator;
+
+FileDataModule* fileDataModule;
 
 uint32_t clientId = 51000;
 
@@ -122,6 +126,12 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi)
 	return 0;
 }
 
+static int ncvfs_create(const char *, mode_t, struct fuse_file_info *)
+{
+	uint32_t objectCount = configLayer->getConfigInt("Fuse>PreallocateObjectNumber");
+	//fileDataModule->createFileDataCache(		
+}
+
 static int ncvfs_read(const char *path, char *buf, size_t size,
 		     off_t offset, struct fuse_file_info *fi)
 {
@@ -188,6 +198,7 @@ struct ncvfs_fuse_operations: fuse_operations
 		open	= ncvfs_open;
 		read	= ncvfs_read;
 		write	= ncvfs_write;
+		create	= ncvfs_create;
 		destroy = ncvfs_destroy;
 	}
 };
@@ -198,6 +209,7 @@ int main(int argc, char *argv[])
 {
 	configLayer = new ConfigLayer("clientconfig.xml");
 	client = new Client();
+	fileDataModule = new FileDataModule();
 	communicator = client->getCommunicator();
 	return fuse_main(argc, argv, &ncvfs_oper, NULL);
 }
