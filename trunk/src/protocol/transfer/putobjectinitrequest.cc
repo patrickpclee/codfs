@@ -30,7 +30,7 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
 	_chunkCount = chunkCount;
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
-	_threadPoolLevel = 1;
+	_msgHeader.threadPoolLevel = 2;
 }
 
 void PutObjectInitRequestMsg::prepareProtocolMsg() {

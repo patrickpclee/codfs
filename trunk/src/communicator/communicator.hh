@@ -259,9 +259,10 @@ protected:
 	 * Execute message.handle() in a separate thread
 	 * @param buf Pointer to the buffer holding the Message
 	 * @param sockfd Socket Descriptor of incoming connection
+	 * @param threadPoolLevel Level of thread pool that the dispatch function is executed
 	 */
 
-	void dispatch(char* buf, uint32_t sockfd, bool isSpecial);
+	void dispatch(char* buf, uint32_t sockfd, uint32_t threadPoolLevel);
 
 	/**
 	 * Get the first message in the queue
@@ -337,19 +338,12 @@ protected:
 	uint32_t _timeoutSec, _timeoutUsec;
 	uint32_t _chunkSize;
 	uint32_t _pollingInterval;
-	uint32_t _numDispatchThread_lv0;
-	uint32_t _numDispatchThread_lv1;
-	uint32_t _numDispatchThread_lv2;
+	uint32_t _numThreadPerPool;
 
 	// component list
 	vector<Component> mdsList;
 	vector<Component> osdList;
 	vector<Component> monitorList;
-
-	// debug
-	ConcurrentMap <uint32_t, MsgType> _tpLevel_0;
-	ConcurrentMap <uint32_t, MsgType> _tpLevel_1;
-	ConcurrentMap <uint32_t, MsgType> _tpLevel_2;
 
 };
 #endif
