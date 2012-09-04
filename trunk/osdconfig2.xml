@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
-    <Osdid>52001</Osdid>
+    <Osdid>52002</Osdid>
     
     <Communication>
         
-        <ServerPort>52001</ServerPort>
+        <ServerPort>52002</ServerPort>
         
     </Communication>
     
