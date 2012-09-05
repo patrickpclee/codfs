@@ -246,9 +246,6 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount,
 		CodingScheme codingScheme, string setting, string checksum) {
 
-	// TODO: checksum not yet used
-	debug ("put object md5 = %s\n", checksum.c_str());
-
 	struct CodingSetting codingSetting;
 	codingSetting.codingScheme = codingScheme;
 	codingSetting.setting = setting;
@@ -262,6 +259,9 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	// create object and cache
 	_storageModule->createObjectCache(objectId, length);
 	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
+
+	// save md5 to map
+	_checksumMap.set(objectId, checksum);
 
 }
 
@@ -280,6 +280,15 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			unsigned char checksum[MD5_DIGEST_LENGTH];
 			MD5((unsigned char*) objectCache.buf, objectCache.length, checksum);
 			debug_cyan ("md5 of object ID %" PRIu64 " = %s\n", objectId, md5ToHex(checksum).c_str());
+
+			// compare md5 with saved one
+			if (_checksumMap.get(objectId) != md5ToHex(checksum)) {
+				debug ("MD5 of Object ID = %" PRIu64 " mismatch!\n", objectId);
+				exit (-1);
+			} else {
+				debug ("MD5 of Object ID = %" PRIu64 " match\n", objectId);
+				_checksumMap.erase(objectId);
+			}
 
 			// perform coding
 			struct CodingSetting codingSetting = _codingSettingMap.get(

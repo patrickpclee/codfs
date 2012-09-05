@@ -56,12 +56,44 @@ void startUploadThread(uint32_t clientId, uint32_t sockfd,
 
 void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId,
 		uint64_t offset, FILE* filePtr, string dstPath) {
-	client->getCommunicator()->getObjectAndWriteFile(clientId, sockfd, objectId,
-			offset, filePtr, dstPath);
+	client->getObject(clientId, sockfd, objectId, offset, filePtr, dstPath);
 	debug("Object ID = %" PRIu64 " finished download\n", objectId);
 }
 
 #endif
+
+void Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId,
+		uint64_t offset, FILE* filePtr, string dstPath) {
+
+	struct ObjectTransferCache objectCache = { };
+
+	// get object from cache directly if possible
+	if (_storageModule->locateObjectCache(objectId)) {
+		objectCache = _storageModule->getObjectCache(objectId);
+	}
+
+	// unknown number of chunks at this point
+	_pendingObjectChunk.set(objectId, -1);
+
+	_clientCommunicator->requestObject(dstSockfd, objectId);
+
+	// wait until the object is fully downloaded
+	while (_pendingObjectChunk.count(objectId)) {
+		usleep(10000);
+	}
+
+	// write object from cache to file
+	objectCache = _storageModule->getObjectCache(objectId);
+	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
+			objectCache.length);
+
+	debug(
+			"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
+			objectId, offset, objectCache.length, dstPath.c_str());
+
+	_storageModule->closeObject(objectId);
+
+}
 
 uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		string codingSetting) {
@@ -97,12 +129,14 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 
 		// get checksum
 		unsigned char checksum[MD5_DIGEST_LENGTH];
-		MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+		MD5((unsigned char*) objectData.buf, objectData.info.objectSize,
+				checksum);
 
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(
 				boost::bind(startUploadThread, _clientId, dstOsdSockfd,
-						objectData, codingScheme, codingSetting, md5ToHex(checksum)));
+						objectData, codingScheme, codingSetting,
+						md5ToHex(checksum)));
 #else
 		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData,
 				codingScheme, codingSetting, md5ToHex(checksum));
@@ -124,15 +158,14 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 
 	cout << fixed;
 	cout << setprecision(2);
-	cout << formatSize(fileSize) << " transferred in " << duration << " secs, Rate = "
-			<< formatSize(fileSize / duration) << "/s" << endl;
-
+	cout << formatSize(fileSize) << " transferred in " << duration
+			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s"
+			<< endl;
 
 	/*
-	int rtnval = system("./mid.sh");
-	exit(42);
-	*/
-
+	 int rtnval = system("./mid.sh");
+	 exit(42);
+	 */
 
 	return fileMetaData._id;
 }
@@ -188,22 +221,20 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 	cout << fixed;
 	cout << setprecision(2);
-	cout << formatSize(fileMetaData._size) << " transferred in " << duration << " secs, Rate = "
-			<< formatSize(fileMetaData._size / duration) << "/s" << endl;
-
+	cout << formatSize(fileMetaData._size) << " transferred in " << duration
+			<< " secs, Rate = " << formatSize(fileMetaData._size / duration)
+			<< "/s" << endl;
 
 	/*
-	int rtnval = system("./mid.sh");
-	exit(42);
-	*/
+	 int rtnval = system("./mid.sh");
+	 exit(42);
+	 */
 
 }
 
 void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint32_t length, uint32_t chunkCount, string checksum) {
-
-	// TODO: checksum not yet used
-	debug ("put object md5 = %s\n", checksum.c_str());
+		uint64_t objectId, uint32_t length, uint32_t chunkCount,
+		string checksum) {
 
 	// initialize chunkCount value
 	_pendingObjectChunk.set(objectId, chunkCount);
@@ -213,6 +244,9 @@ void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	if (!_storageModule->locateObjectCache(objectId))
 		_storageModule->createObjectCache(objectId, length);
 	_clientCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
+
+	// save md5 to map
+	_checksumMap.set(objectId, checksum);
 
 }
 
@@ -240,34 +274,15 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
-	debug ("objectDataProcessor for objectID = %" PRIu64 "\n", objectId);
-
 	uint32_t byteWritten;
-	debug ("before objectCache written for objectID = %" PRIu64 "\n", objectId);
 	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
 			length);
-	debug ("after objectCache written for objectID = %" PRIu64 "\n", objectId);
 	_pendingObjectChunk.decrement(objectId);
-	debug ("after decrement objectID = %" PRIu64 "\n", objectId);
 
 	if (_pendingObjectChunk.get(objectId) == 0) {
-	debug ("before erase objectID = %" PRIu64 "\n", objectId);
 		_pendingObjectChunk.erase(objectId);
-	debug ("after erase objectID = %" PRIu64 "\n", objectId);
 	}
-	debug ("before return objectID = %" PRIu64 "\n", objectId);
 	return byteWritten;
-}
-
-void Client::setPendingChunkCount(uint64_t objectId, int chunkCount) {
-	_pendingObjectChunk.set(objectId, chunkCount);
-}
-
-int Client::getPendingChunkCount(uint64_t objectId) {
-	if (!_pendingObjectChunk.count(objectId)) {
-		return 0;
-	}
-	return _pendingObjectChunk.get(objectId);
 }
 
 uint32_t Client::getClientId() {
