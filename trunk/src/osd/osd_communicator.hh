@@ -143,10 +143,11 @@ public:
 	 * @param codingScheme Coding Scheme
 	 * @param codingSetting Coding Setting
 	 * @param nodeList List of OSD that saved segments for the object
+	 * @param checksum Checksum of the object
 	 */
 
 	void objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
-		string codingSetting, vector<uint32_t> nodeList);
+		string codingSetting, vector<uint32_t> nodeList, string checksum);
 
 	void registerToMonitor();
 private:

@@ -4,6 +4,7 @@
 
 #include <thread>
 #include <vector>
+#include <openssl/md5.h>
 #include "osd.hh"
 #include "segmentlocation.hh"
 #include "../common/debug.hh"
@@ -243,7 +244,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme, string setting) {
+		CodingScheme codingScheme, string setting, string checksum) {
+
+	// TODO: checksum not yet used
+	debug ("put object md5 = %s\n", checksum.c_str());
 
 	struct CodingSetting codingSetting;
 	codingSetting.codingScheme = codingScheme;
@@ -271,6 +275,11 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			// if all chunks have arrived
 			struct ObjectTransferCache objectCache =
 					_storageModule->getObjectCache(objectId);
+
+			// compute md5 checksum
+			unsigned char checksum[MD5_DIGEST_LENGTH];
+			MD5((unsigned char*) objectCache.buf, objectCache.length, checksum);
+			debug_cyan ("md5 of object ID %" PRIu64 " = %s\n", objectId, md5ToHex(checksum).c_str());
 
 			// perform coding
 			struct CodingSetting codingSetting = _codingSettingMap.get(
@@ -324,7 +333,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			// Acknowledge MDS for Object Upload Completed
 			_osdCommunicator->objectUploadAck(objectId,
 					codingSetting.codingScheme, codingSetting.setting,
-					nodeList);
+					nodeList, md5ToHex(checksum));
 
 			cout << "Object " << objectId << " uploaded" << endl;
 
