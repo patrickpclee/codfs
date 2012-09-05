@@ -46,9 +46,14 @@ void FileMetaDataModule::createFile(uint32_t clientId, string path,
  */
 uint32_t FileMetaDataModule::lookupFileId(string path)
 {
-	BSONObj queryObject = BSON ("path" << path.erase(0,1));
-	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
-	return (uint32_t)result.getField("id").numberInt();
+	BSONObj queryObject = BSON ("path" << path);
+	uint32_t fileId = 0;
+	try {
+		BSONObj result = _fileMetaDataStorage->readOne(queryObject);
+		fileId = (uint32_t)result.getField("id").numberInt();
+	} catch (...) {
+	}
+	return fileId;
 }
 
 /**
@@ -84,7 +89,8 @@ uint64_t FileMetaDataModule::readFileSize(uint32_t fileId)
  * @brief	Save the Object List of a File
  */
 void FileMetaDataModule::saveObjectList(uint32_t fileId,
-		vector<uint64_t> objectList) {
+		
+	vector<uint64_t> objectList) {
 	vector<uint64_t>::iterator it;
 	BSONObj queryObject = BSON ("id" << fileId);
 	_fileMetaDataStorage->removeField(queryObject,"objectList");
