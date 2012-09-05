@@ -128,24 +128,28 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, uint32_t fileId, string path) {
 	vector<uint64_t> objectList;
 	vector<uint32_t> primaryList;
+	uint64_t fileSize = 0;
+	string checksum = "";
 
 	_nameSpaceModule->openFile(clientId, path);
 	_metaDataModule->openFile(clientId, fileId);
-	debug("Read object List %" PRIu32 "\n", fileId);
-	objectList = _metaDataModule->readObjectList(fileId);
+	if(fileId != 0) {
+		debug("Read object List %" PRIu32 "\n", fileId);
+		objectList = _metaDataModule->readObjectList(fileId);
 
-	vector<uint64_t>::iterator it;
-	uint32_t primaryId;
-	for (it = objectList.begin(); it < objectList.end(); ++it) {
-		debug("Read primary list %" PRIu64 "\n", *it);
-		primaryId = _metaDataModule->getPrimary(*it);
-		primaryList.push_back(primaryId);
+		vector<uint64_t>::iterator it;
+		uint32_t primaryId;
+		for (it = objectList.begin(); it < objectList.end(); ++it) {
+			debug("Read primary list %" PRIu64 "\n", *it);
+			primaryId = _metaDataModule->getPrimary(*it);
+			primaryList.push_back(primaryId);
+		}
+
+		fileSize = _metaDataModule->readFileSize(fileId);
+		checksum = _metaDataModule->readChecksum(fileId);
+
+		debug ("FILESIZE = %" PRIu64 "\n", fileSize);\
 	}
-
-	uint64_t fileSize = _metaDataModule->readFileSize(fileId);
-	string checksum = _metaDataModule->readChecksum(fileId);
-
-	debug ("FILESIZE = %" PRIu64 "\n", fileSize);
 	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path, fileSize, checksum, objectList, primaryList);
 
 	return;

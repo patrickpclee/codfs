@@ -10,6 +10,7 @@
 #include "../protocol/metadata/uploadfilerequest.hh"
 #include "../protocol/metadata/downloadfilerequest.hh"
 #include "../protocol/metadata/saveobjectlistrequest.hh"
+#include "../protocol/metadata/setfilesizerequest.hh"
 #include "../protocol/transfer/putobjectinitrequest.hh"
 #include "../protocol/transfer/putobjectinitreply.hh"
 #include "../protocol/transfer/objecttransferendrequest.hh"
@@ -159,6 +160,16 @@ void ClientCommunicator::saveObjectList(uint32_t clientId, uint32_t fileId,
 	addMessage(saveObjectListRequestMsg);
 
 	return;
+}
+
+void ClientCommunicator::saveFileSize(uint32_t clientId, uint32_t fileId, uint64_t fileSize)
+{
+	uint32_t mdsSockfd = getMdsSockfd();
+	SetFileSizeRequestMsg* setFileSizeRequestMsg = new SetFileSizeRequestMsg(this, mdsSockfd, clientId, fileId, fileSize);
+	
+	setFileSizeRequestMsg->prepareProtocolMsg();
+	addMessage(setFileSizeRequestMsg);
+	return ;
 }
 
 void ClientCommunicator::replyPutObjectInit(uint32_t requestId,
