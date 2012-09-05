@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <thread>
 #include <cstdio>
 #include "monitor_communicator.hh"
 #include "../common/enums.hh"
@@ -12,15 +13,18 @@
 #include "../common/debug.hh"
 #include "../protocol/nodelist/getprimarylistreply.hh"
 #include "../protocol/nodelist/getsecondarylistreply.hh"
+#include "../protocol/nodelist/getosdconfigreply.hh"
 
 using namespace std;
+
+mutex osdCountMutex;
 
 /**
  * Constructor
  */
 
 MonitorCommunicator::MonitorCommunicator() {
-
+	_osdCount = 52001;
 }
 
 /**
@@ -44,5 +48,15 @@ void MonitorCommunicator::replySecondaryList(uint32_t requestId, uint32_t sockfd
 	getSecondaryListReplyMsg->prepareProtocolMsg();
 
 	addMessage(getSecondaryListReplyMsg);
+	return;
+}
+
+void MonitorCommunicator::replyOsdConfig(uint32_t requestId, uint32_t sockfd){
+	GetOsdConfigReplyMsg* getOsdConfigReplyMsg = new GetOsdConfigReplyMsg(this, requestId, sockfd, _osdCount, _osdCount, 10, 5, "./osd_segment/", "./osd_object/");
+	getOsdConfigReplyMsg->prepareProtocolMsg();
+
+	addMessage(getOsdConfigReplyMsg);
+	lock_guard<mutex> lk(osdCountMutex);
+	_osdCount++;
 	return;
 }
