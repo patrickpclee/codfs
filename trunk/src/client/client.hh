@@ -66,8 +66,9 @@ public:
 	 * @param	objectId	Object ID
 	 * @param	length		Data Length
 	 * @param 	chunkCount	Number of Chunks
+	 * @param	checksum	CheckSum of the Object
 	 */
-	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint32_t length, uint32_t chunkCount);
+	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd, uint64_t objectId, uint32_t length, uint32_t chunkCount, string checksum);
 
 	/**
 	 * @brief	ObjectDataMsg Handler: receive Object Data

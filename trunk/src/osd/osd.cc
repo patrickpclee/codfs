@@ -244,7 +244,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme, string setting) {
+		CodingScheme codingScheme, string setting, string checksum) {
+
+	// TODO: checksum not yet used
+	debug ("put object md5 = %s\n", checksum.c_str());
 
 	struct CodingSetting codingSetting;
 	codingSetting.codingScheme = codingScheme;

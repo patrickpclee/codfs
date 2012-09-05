@@ -105,11 +105,12 @@ public:
 	 * @param chunkCount number of chunks that will be received
 	 * @param codingScheme Coding Scheme for the object
 	 * @param setting Coding setting for the object
+	 * @param checksum Checksum of the object
 	 */
 
 	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t objectId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme, string setting);
+			CodingScheme codingScheme, string setting, string checksum);
 
 	/**
 	 * Action when a put object end is received
