@@ -163,7 +163,7 @@ uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf,
 }
 
 bool ClientStorageModule::locateObjectCache(uint64_t objectId){
-	return (_objectCache.count(objectId) > 0);
+	return _objectCache.count(objectId);
 }
 
 struct ObjectTransferCache ClientStorageModule::getObjectCache(uint64_t objectId) {

@@ -302,6 +302,7 @@ private:
 	// upload
 	ConcurrentMap<uint64_t, uint32_t> _pendingObjectChunk;
 	ConcurrentMap<uint64_t, struct CodingSetting> _codingSettingMap;
+	ConcurrentMap<uint64_t, string> _checksumMap;
 
 	// download
 	/*

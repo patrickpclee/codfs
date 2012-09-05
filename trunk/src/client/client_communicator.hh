@@ -86,23 +86,12 @@ public:
 	void saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
 
 	/**
-	 * Get an object from the primary OSD and Write to File
-	 * @param clientId Client ID
-	 * @param dstSockfd Destination Socket Descriptor
+	 * @brief	Send a request to OSD for the object
+	 * @param dstSockfd OSD Socket Descriptor
 	 * @param objectId Object ID
 	 */
 
-	void getObjectAndWriteFile(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId, uint64_t offset, FILE* filePtr, string dstPath);
-
-	/**
-	 * Get an object from the primary OSD
-	 * @param clientId Client ID
-	 * @param dstSockfd Destination Socket Descriptor
-	 * @param objectId Object ID
-	 * @return ObjectCache structure
-	 */
-
-	struct ObjectTransferCache getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId);
+	void requestObject (uint32_t dstSockfd, uint64_t objectId);
 
 	/**
 	 * 1. Send an init message
@@ -139,14 +128,6 @@ public:
 	void connectToMds();
 	void connectToOsd();
 private:
-
-	/**
-	 * object data transfer message handler.
-	 * @param
-	 * @param
-	 * @param
-	 */
-//	void getObjectData(uint32_t clientID, uint32_t dstOsdSockfd, uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
 
 };
 #endif
