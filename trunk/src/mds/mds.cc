@@ -56,16 +56,18 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 	uint32_t fileId = 0;
 
 	_nameSpaceModule->createFile(clientId, dstPath);
-	fileId = _metaDataModule->createFile(clientId, dstPath, fileSize, codingScheme, codingSetting);
+	fileId = _metaDataModule->createFile(clientId, dstPath, fileSize,
+			codingScheme, codingSetting);
 
 	objectList = _metaDataModule->newObjectList(numOfObjs);
 	_metaDataModule->saveObjectList(fileId, objectList);
 
-	
 //	primaryList = _mdsCommunicator->askPrimaryList(numOfObjs);
-	primaryList = _mdsCommunicator->getPrimaryList(_mdsCommunicator->getMonitorSockfd(), numOfObjs);
+	primaryList = _mdsCommunicator->getPrimaryList(
+			_mdsCommunicator->getMonitorSockfd(), numOfObjs);
 	for (uint32_t i = 0; i < primaryList.size(); i++) {
-		debug("Get primary list index %" PRIu32 " = %" PRIu32 "\n", i, primaryList[i]);
+		debug("Get primary list index %" PRIu32 " = %" PRIu32 "\n",
+				i, primaryList[i]);
 	}
 
 	_mdsCommunicator->replyObjectandPrimaryList(requestId, connectionId, fileId,
@@ -81,13 +83,15 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
  * 2. Set the Primary for the object
  */
 void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, CodingScheme codingScheme, string codingSetting, vector<uint32_t> objectNodeList) {
+		uint64_t objectId, CodingScheme codingScheme, string codingSetting,
+		vector<uint32_t> objectNodeList, string checksum) {
 	struct ObjectMetaData objectMetaData;
 	objectMetaData._id = objectId;
 	objectMetaData._nodeList = objectNodeList;
 	objectMetaData._primary = objectNodeList[0];
 	objectMetaData._codingScheme = codingScheme;
 	objectMetaData._codingSetting = codingSetting;
+	objectMetaData._checksum = checksum;
 	_metaDataModule->saveObjectInfo(objectId, objectMetaData);
 	//_metaDataModule->saveNodeList(objectId, objectNodeList);
 	//_metaDataModule->setPrimary(objectId, objectNodeList[0]);
@@ -101,7 +105,7 @@ void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
 void Mds::downloadFileProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, string dstPath) {
 	uint32_t fileId = _metaDataModule->lookupFileId(dstPath);
-	debug("Path = %s [%" PRIu32 "]\n",dstPath.c_str(), fileId);
+	debug("Path = %s [%" PRIu32 "]\n", dstPath.c_str(), fileId);
 	return downloadFileProcess(requestId, connectionId, clientId, fileId,
 			dstPath);
 }
@@ -145,8 +149,9 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	uint64_t fileSize = _metaDataModule->readFileSize(fileId);
 	string checksum = _metaDataModule->readChecksum(fileId);
 
-	debug ("FILESIZE = %" PRIu64 "\n", fileSize);
-	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path, fileSize, checksum, objectList, primaryList);
+	debug("FILESIZE = %" PRIu64 "\n", fileSize);
+	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path,
+			fileSize, checksum, objectList, primaryList);
 
 	return;
 }
@@ -154,31 +159,34 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 /**
  * @brief	Handle Get Object ID Lsit
  */
-void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t numOfObjs)
-{
+void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t numOfObjs) {
 	vector<uint64_t> objectList = _metaDataModule->newObjectList(numOfObjs);
 	_mdsCommunicator->replyObjectIdList(requestId, connectionId, objectList);
-	return ;
+	return;
 }
 
 /**
  * @brief	Handle Get File Info Request
  */
-void Mds::getFileInfoProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, string path)
-{
-	downloadFileProcessor(requestId, connectionId, clientId, path);	
+void Mds::getFileInfoProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t clientId, string path) {
+	downloadFileProcessor(requestId, connectionId, clientId, path);
 
-	return ;
+	return;
 }
 
 /**
  * @brief	Handle the Object Info Request from Osd
  * TODO: Currently Only Supplying Info Same as Download
  */
-void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId, uint64_t objectId)
-{
-	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(objectId);
-	_mdsCommunicator->replyObjectInfo(requestId, connectionId, objectId, objectMetaData._nodeList, objectMetaData._codingScheme, objectMetaData._codingSetting);
+void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId,
+		uint64_t objectId) {
+	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(
+			objectId);
+	_mdsCommunicator->replyObjectInfo(requestId, connectionId, objectId,
+			objectMetaData._nodeList, objectMetaData._codingScheme,
+			objectMetaData._codingSetting);
 
 	return;
 }
@@ -275,10 +283,10 @@ void Mds::nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
 /**
  * @brief	Handle Object List Save Request
  */
-void Mds::saveObjectListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList)
-{
+void Mds::saveObjectListProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList) {
 	_metaDataModule->saveObjectList(fileId, objectList);
-	return ;
+	return;
 }
 
 MdsCommunicator* Mds::getCommunicator() {
@@ -301,11 +309,11 @@ void startReceiveThread(Communicator* communicator) {
 /**
  * @brief	Handle Set File Size Request
  */
-void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, uint64_t fileSize)
-{
-	_metaDataModule->setFileSize(fileId, fileSize);	
+void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t clientId, uint32_t fileId, uint64_t fileSize) {
+	_metaDataModule->setFileSize(fileId, fileSize);
 
-	return ;
+	return;
 }
 
 /**
@@ -313,37 +321,37 @@ void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32
  */
 void Mds::test() {
 	/*
-	uint64_t objectId = 976172415;
-	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(objectId);
+	 uint64_t objectId = 976172415;
+	 struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(objectId);
 
-	debug("Object %" PRIu64 "- Coding %d:%s\n",objectId, (int)objectMetaData._codingScheme, objectMetaData._codingSetting.c_str());
-	for(const auto node : objectMetaData._nodeList) {
-		debug("%" PRIu32 "\n",node);
-	}
-	*/
+	 debug("Object %" PRIu64 "- Coding %d:%s\n",objectId, (int)objectMetaData._codingScheme, objectMetaData._codingSetting.c_str());
+	 for(const auto node : objectMetaData._nodeList) {
+	 debug("%" PRIu32 "\n",node);
+	 }
+	 */
 	/*
-	uint32_t fileId = 216;
-	vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);
-	debug("Object List [%" PRIu32 "]\n",fileId);
-	for(const auto object : objectList){
-		uint32_t primaryId = _metaDataModule->getPrimary(object);
-		printf("%" PRIu64 " [%" PRIu32 "]- ", object,primaryId);
-	}
-	printf("\n");
-	*/
+	 uint32_t fileId = 216;
+	 vector <uint64_t> objectList = _metaDataModule->readObjectList(fileId);
+	 debug("Object List [%" PRIu32 "]\n",fileId);
+	 for(const auto object : objectList){
+	 uint32_t primaryId = _metaDataModule->getPrimary(object);
+	 printf("%" PRIu64 " [%" PRIu32 "]- ", object,primaryId);
+	 }
+	 printf("\n");
+	 */
 	/*
-	debug("%s\n", "Test\n");
-	for (int i = 0; i < 10; ++i) {
-		uint32_t temp = _metaDataModule->createFile(1, ".", 1024, RAID1_CODING);
-		vector<uint64_t> objectList;
-		objectList = _metaDataModule->newObjectList(10);
-		_metaDataModule->saveObjectList(temp, objectList);
-		for (int j = 0; j < 10; ++j) {
-			_metaDataModule->saveNodeList(objectList[j], { 1 });
-			_metaDataModule->setPrimary(objectList[j], 1);
-		}
-	}
-	*/
+	 debug("%s\n", "Test\n");
+	 for (int i = 0; i < 10; ++i) {
+	 uint32_t temp = _metaDataModule->createFile(1, ".", 1024, RAID1_CODING);
+	 vector<uint64_t> objectList;
+	 objectList = _metaDataModule->newObjectList(10);
+	 _metaDataModule->saveObjectList(temp, objectList);
+	 for (int j = 0; j < 10; ++j) {
+	 _metaDataModule->saveNodeList(objectList[j], { 1 });
+	 _metaDataModule->setPrimary(objectList[j], 1);
+	 }
+	 }
+	 */
 }
 
 int main(void) {
@@ -356,7 +364,6 @@ int main(void) {
 	communicator->createServerSocket();
 	communicator->setId(50000);
 	communicator->setComponentType(MDS);
-
 
 	// 1. Garbage Collection Thread
 	thread garbageCollectionThread(startGarbageCollectionThread);

@@ -178,6 +178,7 @@ message UploadObjectAckPro {
 	optional PutObjectInitRequestPro.CodingScheme codingScheme = 2;	
 	optional string codingSetting = 3;
 	repeated fixed32 nodeList = 4;
+	optional string checksum = 5;
 }
 
 message GetObjectInfoRequestPro {
