@@ -80,7 +80,7 @@ void GetOsdConfigReplyMsg::doHandle() {
 	GetOsdConfigRequestMsg* getOsdConfigRequestMsg =
 			(GetOsdConfigRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
-	getOsdConfigRequestMsg->setParam(_osdId,_servePort,_segmentCapacity, _objectCacheCapacity, _segmentFolder, _objectCacheFolder)
+	getOsdConfigRequestMsg->setParam(_osdId,_servePort,_segmentCapacity, _objectCacheCapacity, _segmentFolder, _objectCacheFolder);
 	getOsdConfigRequestMsg->setStatus(READY);
 }
 
