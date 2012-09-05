@@ -21,7 +21,8 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator) :
 
 PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
 		uint32_t osdSockfd, uint64_t objectId, uint32_t objectSize,
-		uint32_t chunkCount, CodingScheme codingScheme, string codingSetting) :
+		uint32_t chunkCount, CodingScheme codingScheme, string codingSetting,
+		string checksum) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -30,7 +31,8 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
 	_chunkCount = chunkCount;
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
-	
+	_checksum = checksum;
+
 }
 
 void PutObjectInitRequestMsg::prepareProtocolMsg() {
@@ -43,6 +45,7 @@ void PutObjectInitRequestMsg::prepareProtocolMsg() {
 	putObjectInitRequestPro.set_codingscheme(
 			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
 	putObjectInitRequestPro.set_codingsetting(_codingSetting);
+	putObjectInitRequestPro.set_checksum(_checksum);
 
 	if (!putObjectInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -68,23 +71,24 @@ void PutObjectInitRequestMsg::parse(char* buf) {
 	_chunkCount = putObjectInitRequestPro.chunkcount();
 	_codingScheme = (CodingScheme) putObjectInitRequestPro.codingscheme();
 	_codingSetting = putObjectInitRequestPro.codingsetting();
+	_checksum = putObjectInitRequestPro.checksum();
 
 }
 
 void PutObjectInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId,
-			_objectSize, _chunkCount, _codingScheme, _codingSetting);
+			_objectSize, _chunkCount, _codingScheme, _codingSetting, _checksum);
 #endif
 
 #ifdef COMPILE_FOR_CLIENT
 	client->putObjectInitProcessor (_msgHeader.requestId, _sockfd, _objectId,
-			_objectSize, _chunkCount);
+			_objectSize, _chunkCount, _checksum);
 #endif
 }
 
 void PutObjectInitRequestMsg::printProtocol() {
 	debug(
-			"[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 " CodingScheme = %" PRIu32 " CodingSetting = %s\n",
-			_objectId, _objectSize, _chunkCount, _codingScheme, _codingSetting.c_str());
+			"[PUT_OBJECT_INIT_REQUEST] Object ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 " CodingScheme = %" PRIu32 " CodingSetting = %s Checksum = %s\n",
+			_objectId, _objectSize, _chunkCount, _codingScheme, _codingSetting.c_str(), _checksum.c_str());
 }

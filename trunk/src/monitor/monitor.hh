@@ -66,6 +66,8 @@ public:
 		uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip,
 		uint16_t port);
 
+	void getOsdConfigProcessor(uint32_t requestId, uint32_t sockfd);
+
 	/**
 	 * Action when an OSD update its status message received
 	 * @param requestId Request ID

@@ -33,7 +33,7 @@ struct FileMetaData {
 	vector<uint64_t> _objectList;
 	vector<uint32_t> _primaryList;
 
-	unsigned char* _checksum;
+	string _checksum;
 	//uint64_t* _objectList[];
 	FileType _fileType;	
 };

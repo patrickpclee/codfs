@@ -196,12 +196,13 @@ public:
 	 * @param objectData ObjectData structure
 	 * @param codingScheme (Optional) Coding Scheme
 	 * @param codingSetting (Optional) Coding Setting
+	 * @param checksum (Optional) Checksum
 	 * @return Number of bytes sent
 	 */
 
 	uint32_t sendObject(uint32_t componentId, uint32_t sockfd,
 			struct ObjectData objectData, CodingScheme codingScheme =
-					DEFAULT_CODING, string codingSetting = "");
+					DEFAULT_CODING, string codingSetting = "", string checksum = "");
 
 	/**
 	 * Connect to monitor (test)
@@ -217,11 +218,12 @@ protected:
 	 * @param objectId Object ID
 	 * @param length Size of the object
 	 * @param chunkCount Number of chunks that will be sent
+	 * @param checksum Checksum of Object
 	 */
 
 	void putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
 			uint64_t objectId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme, string codingSetting);
+			CodingScheme codingScheme, string codingSetting, string checksum);
 
 	/**
 	 * Send an object chunk to OSD (Step 2)

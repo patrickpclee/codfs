@@ -25,21 +25,23 @@ public:
 	 * @param	communicator	Communicator the Message belongs to
 	 */
 
-	UploadObjectAckMsg (Communicator* communicator);
+	UploadObjectAckMsg(Communicator* communicator);
 
 	/**
 	 * Constructor - Save parameters in private variables
 	 *
 	 * @param	communicator	Communicator the Message belongs to
 	 */
-	UploadObjectAckMsg (Communicator* communicator, uint32_t sockfd, uint64_t objectId, CodingScheme codingScheme, string codingSetting, vector<uint32_t> nodeList);
+	UploadObjectAckMsg(Communicator* communicator, uint32_t sockfd,
+			uint64_t objectId, CodingScheme codingScheme, string codingSetting,
+			vector<uint32_t> nodeList, string checksum);
 
 	/**
 	 * Copy values in private variables to protocol message
 	 * Serialize protocol message and copy to private variable
 	 */
 
-	void prepareProtocolMsg ();
+	void prepareProtocolMsg();
 
 	/**
 	 * Override
@@ -47,27 +49,28 @@ public:
 	 * @param buf Raw buffer storing header + protocol + payload
 	 */
 
-	void parse (char* buf);
+	void parse(char* buf);
 
 	/**
 	 * Override
 	 * Execute the corresponding Processor
 	 */
 
-	void doHandle ();
+	void doHandle();
 
 	/**
 	 * Override
 	 * DEBUG: print protocol message
 	 */
 
-	void printProtocol ();
+	void printProtocol();
 
 private:
 	uint64_t _objectId;
 	CodingScheme _codingScheme;
 	string _codingSetting;
 	vector<uint32_t> _nodeList;
+	string _checksum;
 };
 
 #endif

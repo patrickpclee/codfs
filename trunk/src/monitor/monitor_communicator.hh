@@ -44,8 +44,10 @@ public:
 	void replySecondaryList(uint32_t requestId, uint32_t sockfd, 
 		vector<struct SegmentLocation> secondaryList);
 
-private:
+	void replyOsdConfig(uint32_t requestId, uint32_t sockfd);
 
+private:
+	uint32_t _osdCount;
 };
 
 #endif
