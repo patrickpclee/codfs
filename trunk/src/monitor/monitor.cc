@@ -76,6 +76,11 @@ void Monitor::getPrimaryListProcessor (uint32_t requestId, uint32_t sockfd, uint
 	return;
 }
 
+void Monitor::getOsdConfigProcessor(uint32_t requestId, uint32_t sockfd){
+	_monitorCommunicator->replyOsdConfig(requestId,sockfd);
+	return;
+}
+
 void Monitor::getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfSegs){
 	vector<struct SegmentLocation> secondaryList;
 	secondaryList = _selectionModule->ChooseSecondary(numOfSegs);
