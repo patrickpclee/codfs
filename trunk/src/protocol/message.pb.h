@@ -2404,6 +2404,17 @@ class UploadObjectAckPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
       mutable_nodelist();
   
+  // optional string checksum = 5;
+  inline bool has_checksum() const;
+  inline void clear_checksum();
+  static const int kChecksumFieldNumber = 5;
+  inline const ::std::string& checksum() const;
+  inline void set_checksum(const ::std::string& value);
+  inline void set_checksum(const char* value);
+  inline void set_checksum(const char* value, size_t size);
+  inline ::std::string* mutable_checksum();
+  inline ::std::string* release_checksum();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.UploadObjectAckPro)
  private:
   inline void set_has_objectid();
@@ -2412,16 +2423,19 @@ class UploadObjectAckPro : public ::google::protobuf::Message {
   inline void clear_has_codingscheme();
   inline void set_has_codingsetting();
   inline void clear_has_codingsetting();
+  inline void set_has_checksum();
+  inline void clear_has_checksum();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 objectid_;
   ::std::string* codingsetting_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > nodelist_;
+  ::std::string* checksum_;
   int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -6044,6 +6058,64 @@ UploadObjectAckPro::nodelist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
 UploadObjectAckPro::mutable_nodelist() {
   return &nodelist_;
+}
+
+// optional string checksum = 5;
+inline bool UploadObjectAckPro::has_checksum() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void UploadObjectAckPro::set_has_checksum() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void UploadObjectAckPro::clear_has_checksum() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void UploadObjectAckPro::clear_checksum() {
+  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
+    checksum_->clear();
+  }
+  clear_has_checksum();
+}
+inline const ::std::string& UploadObjectAckPro::checksum() const {
+  return *checksum_;
+}
+inline void UploadObjectAckPro::set_checksum(const ::std::string& value) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(value);
+}
+inline void UploadObjectAckPro::set_checksum(const char* value) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(value);
+}
+inline void UploadObjectAckPro::set_checksum(const char* value, size_t size) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* UploadObjectAckPro::mutable_checksum() {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  return checksum_;
+}
+inline ::std::string* UploadObjectAckPro::release_checksum() {
+  clear_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = checksum_;
+    checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------

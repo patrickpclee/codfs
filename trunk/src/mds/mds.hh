@@ -51,10 +51,11 @@ public:
 	 * @param	codingScheme	Coding Scheme
 	 * @param 	codingSetting	Coding Scheme Setting
 	 * @param	objectNodeList	List of the Osd
+	 * @param	checksum	Checksum
 	 */
 	void uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
 			uint64_t objectId, CodingScheme codingScheme, string codingSetting, 
-			vector<uint32_t> objectNodeList);
+			vector<uint32_t> objectNodeList, string checksum);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)

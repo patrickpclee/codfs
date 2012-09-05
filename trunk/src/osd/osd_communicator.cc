@@ -283,11 +283,11 @@ void OsdCommunicator::putSegmentEnd(uint32_t sockfd, uint64_t objectId,
 
 void OsdCommunicator::objectUploadAck(uint64_t objectId,
 		CodingScheme codingScheme, string codingSetting,
-		vector<uint32_t> nodeList) {
+		vector<uint32_t> nodeList, string checksum) {
 	uint32_t mdsSockFd = getMdsSockfd();
 
 	UploadObjectAckMsg* uploadObjectAckMsg = new UploadObjectAckMsg(this,
-			mdsSockFd, objectId, codingScheme, codingSetting, nodeList);
+			mdsSockFd, objectId, codingScheme, codingSetting, nodeList, checksum);
 
 	uploadObjectAckMsg->prepareProtocolMsg();
 	addMessage(uploadObjectAckMsg, false);
