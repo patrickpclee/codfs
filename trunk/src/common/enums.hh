@@ -17,6 +17,10 @@ enum FileType {
 	NORMAL, FOLDER
 };
 
+enum ObjectDataStatus {
+	NEW, UNFETCHED, CLEAN, DIRTY
+};
+
 enum MsgType {
 	DEFAULT,
 

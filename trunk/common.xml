@@ -29,16 +29,17 @@
 			<count>1</count>
 			<MDS0>
 				<id>50000</id>
-				<ip>137.189.89.130</ip>
+				<ip>127.0.0.1</ip>
 				<port>50000</port>
 			</MDS0>
 		</MDS>
 		
 		<OSD>
-			<count>4</count>
+			<count>1</count>
 			<OSD0>
 				<id>52000</id>
-				<ip>137.189.89.130</ip>
+				<!--<ip>137.189.89.130</ip>-->
+				<ip>127.0.0.1</ip>
 				<port>52000</port>
 			</OSD0>
 			<OSD1>
@@ -48,7 +49,7 @@
 			</OSD1>
 			<OSD2>
 				<id>52002</id>
-				<ip>137.189.89.18</ip>
+				<ip>127.0.0.1</ip>
 				<port>52002</port>
 			</OSD2>
 			<OSD3>
@@ -62,7 +63,8 @@
 			<count>1</count>
 			<MONITOR0>
 				<id>53000</id>
-				<ip>137.189.89.130</ip>
+				<!--<ip>137.189.89.130</ip>-->
+				<ip>127.0.0.1</ip>
 				<port>53000</port>
 			</MONITOR0>
 		</MONITOR>
