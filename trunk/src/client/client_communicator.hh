@@ -83,6 +83,7 @@ public:
 	 * @param	fileId	ID of the File
 	 * @param	objectList	Object List of the File
 	 */
+
 	void saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
 
 	/**

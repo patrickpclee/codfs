@@ -15,6 +15,7 @@
     </Storage>
 
 	<Fuse>
+		<PreallocateObjectNumber>100</PreallocateObjectNumber>
 		<TempStorage>/tmp/</TempStorage>
 	</Fuse>
 </NcvfsConfig>
