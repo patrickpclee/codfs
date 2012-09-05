@@ -13,34 +13,37 @@ extern Mds* mds;
 #endif
 
 UploadObjectAckMsg::UploadObjectAckMsg(Communicator* communicator) :
-	Message(communicator) {
+		Message(communicator) {
 }
 
-UploadObjectAckMsg::UploadObjectAckMsg (Communicator* communicator, uint32_t sockfd, uint64_t objectId, CodingScheme codingScheme, string codingSetting, vector<uint32_t> nodeList) : 
-	Message(communicator) {
+UploadObjectAckMsg::UploadObjectAckMsg(Communicator* communicator,
+		uint32_t sockfd, uint64_t objectId, CodingScheme codingScheme,
+		string codingSetting, vector<uint32_t> nodeList, string checksum) :
+		Message(communicator) {
 	_sockfd = sockfd;
 	_objectId = objectId;
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
 	_nodeList = nodeList;
+	_checksum = checksum;
 }
 
-void UploadObjectAckMsg::prepareProtocolMsg()
-{
+void UploadObjectAckMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::UploadObjectAckPro uploadObjectAckPro;
 
-	uploadObjectAckPro.set_objectid((long long int)_objectId);
-	uploadObjectAckPro.set_codingscheme((ncvfs::PutObjectInitRequestPro_CodingScheme)_codingScheme);
+	uploadObjectAckPro.set_objectid((long long int) _objectId);
+	uploadObjectAckPro.set_codingscheme(
+			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
 	uploadObjectAckPro.set_codingsetting(_codingSetting);
+	uploadObjectAckPro.set_checksum(_checksum);
 
 	vector<uint32_t>::iterator it;
 
 	for (it = _nodeList.begin(); it < _nodeList.end(); ++it) {
 		uploadObjectAckPro.add_nodelist(*it);
 	}
-
 
 	if (!uploadObjectAckPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -62,19 +65,20 @@ void UploadObjectAckMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_objectId = uploadObjectAckPro.objectid();
-	_codingScheme = (CodingScheme)uploadObjectAckPro.codingscheme();
+	_codingScheme = (CodingScheme) uploadObjectAckPro.codingscheme();
 	_codingSetting = uploadObjectAckPro.codingsetting();
-	
-	for(int i = 0; i < uploadObjectAckPro.nodelist_size(); ++i) {
+	_checksum = uploadObjectAckPro.checksum();
+
+	for (int i = 0; i < uploadObjectAckPro.nodelist_size(); ++i) {
 		_nodeList.push_back(uploadObjectAckPro.nodelist(i));
 	}
 
-	return ;
+	return;
 }
 
 void UploadObjectAckMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->uploadObjectAckProcessor(_msgHeader.requestId, _sockfd, _objectId, _codingScheme, _codingSetting, _nodeList);
+	mds->uploadObjectAckProcessor(_msgHeader.requestId, _sockfd, _objectId, _codingScheme, _codingSetting, _nodeList, _checksum);
 #endif
 }
 

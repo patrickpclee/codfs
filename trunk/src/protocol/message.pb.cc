@@ -506,11 +506,12 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrimaryListRequestPro));
   UploadObjectAckPro_descriptor_ = file->message_type(21);
-  static const int UploadObjectAckPro_offsets_[4] = {
+  static const int UploadObjectAckPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, codingscheme_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, codingsetting_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, nodelist_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, checksum_),
   };
   UploadObjectAckPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1069,44 +1070,44 @@ void protobuf_AddDesc_message_2eproto() {
     "ngScheme\030\003 \001(\0162+.ncvfs.PutObjectInitRequ"
     "estPro.CodingScheme\022\025\n\rcodingSetting\030\004 \001"
     "(\t\"B\n\030GetPrimaryListRequestPro\022\021\n\tnumOfO"
-    "bjs\030\001 \001(\007\022\023\n\013primaryList\030\002 \003(\007\"\222\001\n\022Uploa"
+    "bjs\030\001 \001(\007\022\023\n\013primaryList\030\002 \003(\007\"\244\001\n\022Uploa"
     "dObjectAckPro\022\020\n\010objectId\030\001 \001(\006\022A\n\014codin"
     "gScheme\030\002 \001(\0162+.ncvfs.PutObjectInitReque"
     "stPro.CodingScheme\022\025\n\rcodingSetting\030\003 \001("
-    "\t\022\020\n\010nodeList\030\004 \003(\007\"+\n\027GetObjectInfoRequ"
-    "estPro\022\020\n\010objectId\030\001 \001(\006\")\n\025PutObjectIni"
-    "tReplyPro\022\020\n\010objectId\030\001 \001(\006\"-\n\031ObjectTra"
-    "nsferEndReplyPro\022\020\n\010objectId\030\001 \001(\006\"M\n\021Ge"
-    "tObjectReplyPro\022\020\n\010objectId\030\001 \001(\006\022\022\n\nobj"
-    "ectSize\030\002 \001(\007\022\022\n\nchunkCount\030\003 \001(\007\"h\n\030Put"
-    "SegmentInitRequestPro\022\020\n\010objectId\030\001 \001(\006\022"
-    "\021\n\tsegmentId\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001(\007\022"
-    "\022\n\nchunkCount\030\004 \001(\007\"U\n\016SegmentDataPro\022\020\n"
-    "\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\016\n\006of"
-    "fset\030\003 \001(\006\022\016\n\006length\030\004 \001(\007\"C\n\034SegmentTra"
-    "nsferEndRequestPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\t"
-    "segmentId\030\002 \001(\007\"=\n\026PutSegmentInitReplyPr"
-    "o\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"A"
-    "\n\032SegmentTransferEndReplyPro\022\020\n\010objectId"
-    "\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"\?\n\030GetSegmentI"
-    "nitRequestPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegme"
-    "ntId\030\002 \001(\007\"f\n\026GetSegmentInitReplyPro\022\020\n\010"
-    "objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013seg"
-    "mentSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"9\n\022Ge"
-    "tSegmentReadyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tse"
-    "gmentId\030\002 \001(\007\"g\n\rOsdStartupPro\022\r\n\005osdId\030"
-    "\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoading"
-    "\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007\"\037"
-    "\n\016OsdShutdownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025OsdSt"
-    "atUpdateReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCa"
-    "pacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"a\n\032GetS"
-    "econdaryListRequestPro\022\021\n\tnumOfSegs\030\001 \001("
-    "\007\0220\n\rsecondaryList\030\002 \003(\0132\031.ncvfs.Segment"
-    "LocationPro\"\031\n\027OsdStatUpdateRequestPro\"L"
-    "\n\030GetSecondaryListReplyPro\0220\n\rsecondaryL"
-    "ist\030\001 \003(\0132\031.ncvfs.SegmentLocationPro\"-\n\026"
-    "GetPrimaryListReplyPro\022\023\n\013primaryList\030\001 "
-    "\003(\007B\002H\001", 3447);
+    "\t\022\020\n\010nodeList\030\004 \003(\007\022\020\n\010checksum\030\005 \001(\t\"+\n"
+    "\027GetObjectInfoRequestPro\022\020\n\010objectId\030\001 \001"
+    "(\006\")\n\025PutObjectInitReplyPro\022\020\n\010objectId\030"
+    "\001 \001(\006\"-\n\031ObjectTransferEndReplyPro\022\020\n\010ob"
+    "jectId\030\001 \001(\006\"M\n\021GetObjectReplyPro\022\020\n\010obj"
+    "ectId\030\001 \001(\006\022\022\n\nobjectSize\030\002 \001(\007\022\022\n\nchunk"
+    "Count\030\003 \001(\007\"h\n\030PutSegmentInitRequestPro\022"
+    "\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\022\023\n\013"
+    "segmentSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"U\n"
+    "\016SegmentDataPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tseg"
+    "mentId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006length\030\004"
+    " \001(\007\"C\n\034SegmentTransferEndRequestPro\022\020\n\010"
+    "objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"=\n\026Put"
+    "SegmentInitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n"
+    "\tsegmentId\030\002 \001(\007\"A\n\032SegmentTransferEndRe"
+    "plyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 "
+    "\001(\007\"\?\n\030GetSegmentInitRequestPro\022\020\n\010objec"
+    "tId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"f\n\026GetSegme"
+    "ntInitReplyPro\022\020\n\010objectId\030\001 \001(\006\022\021\n\tsegm"
+    "entId\030\002 \001(\007\022\023\n\013segmentSize\030\003 \001(\007\022\022\n\nchun"
+    "kCount\030\004 \001(\007\"9\n\022GetSegmentReadyPro\022\020\n\010ob"
+    "jectId\030\001 \001(\006\022\021\n\tsegmentId\030\002 \001(\007\"g\n\rOsdSt"
+    "artupPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002"
+    " \001(\007\022\022\n\nosdLoading\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022"
+    "\017\n\007osdPort\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005os"
+    "dId\030\001 \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005os"
+    "dId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoa"
+    "ding\030\003 \001(\007\"a\n\032GetSecondaryListRequestPro"
+    "\022\021\n\tnumOfSegs\030\001 \001(\007\0220\n\rsecondaryList\030\002 \003"
+    "(\0132\031.ncvfs.SegmentLocationPro\"\031\n\027OsdStat"
+    "UpdateRequestPro\"L\n\030GetSecondaryListRepl"
+    "yPro\0220\n\rsecondaryList\030\001 \003(\0132\031.ncvfs.Segm"
+    "entLocationPro\"-\n\026GetPrimaryListReplyPro"
+    "\022\023\n\013primaryList\030\001 \003(\007B\002H\001", 3465);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -7189,6 +7190,7 @@ const int UploadObjectAckPro::kObjectIdFieldNumber;
 const int UploadObjectAckPro::kCodingSchemeFieldNumber;
 const int UploadObjectAckPro::kCodingSettingFieldNumber;
 const int UploadObjectAckPro::kNodeListFieldNumber;
+const int UploadObjectAckPro::kChecksumFieldNumber;
 #endif  // !_MSC_VER
 
 UploadObjectAckPro::UploadObjectAckPro()
@@ -7210,6 +7212,7 @@ void UploadObjectAckPro::SharedCtor() {
   objectid_ = GOOGLE_ULONGLONG(0);
   codingscheme_ = 1;
   codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -7220,6 +7223,9 @@ UploadObjectAckPro::~UploadObjectAckPro() {
 void UploadObjectAckPro::SharedDtor() {
   if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
     delete codingsetting_;
+  }
+  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
+    delete checksum_;
   }
   if (this != default_instance_) {
   }
@@ -7252,6 +7258,11 @@ void UploadObjectAckPro::Clear() {
     if (has_codingsetting()) {
       if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
         codingsetting_->clear();
+      }
+    }
+    if (has_checksum()) {
+      if (checksum_ != &::google::protobuf::internal::kEmptyString) {
+        checksum_->clear();
       }
     }
   }
@@ -7337,6 +7348,23 @@ bool UploadObjectAckPro::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(37)) goto parse_nodeList;
+        if (input->ExpectTag(42)) goto parse_checksum;
+        break;
+      }
+      
+      // optional string checksum = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_checksum:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_checksum()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->checksum().data(), this->checksum().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -7385,6 +7413,15 @@ void UploadObjectAckPro::SerializeWithCachedSizes(
       4, this->nodelist(i), output);
   }
   
+  // optional string checksum = 5;
+  if (has_checksum()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->checksum().data(), this->checksum().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      5, this->checksum(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -7420,6 +7457,16 @@ void UploadObjectAckPro::SerializeWithCachedSizes(
       WriteFixed32ToArray(4, this->nodelist(i), target);
   }
   
+  // optional string checksum = 5;
+  if (has_checksum()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->checksum().data(), this->checksum().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        5, this->checksum(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -7447,6 +7494,13 @@ int UploadObjectAckPro::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->codingsetting());
+    }
+    
+    // optional string checksum = 5;
+    if (has_checksum()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->checksum());
     }
     
   }
@@ -7493,6 +7547,9 @@ void UploadObjectAckPro::MergeFrom(const UploadObjectAckPro& from) {
     if (from.has_codingsetting()) {
       set_codingsetting(from.codingsetting());
     }
+    if (from.has_checksum()) {
+      set_checksum(from.checksum());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -7520,6 +7577,7 @@ void UploadObjectAckPro::Swap(UploadObjectAckPro* other) {
     std::swap(codingscheme_, other->codingscheme_);
     std::swap(codingsetting_, other->codingsetting_);
     nodelist_.Swap(&other->nodelist_);
+    std::swap(checksum_, other->checksum_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
