@@ -70,7 +70,9 @@ class OsdStartupPro;
 class OsdShutdownPro;
 class OsdStatUpdateReplyPro;
 class GetSecondaryListRequestPro;
+class GetOsdConfigRequestPro;
 class OsdStatUpdateRequestPro;
+class GetOsdConfigReplyPro;
 class GetSecondaryListReplyPro;
 class GetPrimaryListReplyPro;
 
@@ -3977,6 +3979,78 @@ class GetSecondaryListRequestPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class GetOsdConfigRequestPro : public ::google::protobuf::Message {
+ public:
+  GetOsdConfigRequestPro();
+  virtual ~GetOsdConfigRequestPro();
+  
+  GetOsdConfigRequestPro(const GetOsdConfigRequestPro& from);
+  
+  inline GetOsdConfigRequestPro& operator=(const GetOsdConfigRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetOsdConfigRequestPro& default_instance();
+  
+  void Swap(GetOsdConfigRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  GetOsdConfigRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetOsdConfigRequestPro& from);
+  void MergeFrom(const GetOsdConfigRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.GetOsdConfigRequestPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[1];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static GetOsdConfigRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class OsdStatUpdateRequestPro : public ::google::protobuf::Message {
  public:
   OsdStatUpdateRequestPro();
@@ -4046,6 +4120,146 @@ class OsdStatUpdateRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static OsdStatUpdateRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class GetOsdConfigReplyPro : public ::google::protobuf::Message {
+ public:
+  GetOsdConfigReplyPro();
+  virtual ~GetOsdConfigReplyPro();
+  
+  GetOsdConfigReplyPro(const GetOsdConfigReplyPro& from);
+  
+  inline GetOsdConfigReplyPro& operator=(const GetOsdConfigReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetOsdConfigReplyPro& default_instance();
+  
+  void Swap(GetOsdConfigReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  GetOsdConfigReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetOsdConfigReplyPro& from);
+  void MergeFrom(const GetOsdConfigReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 osdId = 1;
+  inline bool has_osdid() const;
+  inline void clear_osdid();
+  static const int kOsdIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 port = 2;
+  inline bool has_port() const;
+  inline void clear_port();
+  static const int kPortFieldNumber = 2;
+  inline ::google::protobuf::uint32 port() const;
+  inline void set_port(::google::protobuf::uint32 value);
+  
+  // optional fixed32 segmentCapacity = 3;
+  inline bool has_segmentcapacity() const;
+  inline void clear_segmentcapacity();
+  static const int kSegmentCapacityFieldNumber = 3;
+  inline ::google::protobuf::uint32 segmentcapacity() const;
+  inline void set_segmentcapacity(::google::protobuf::uint32 value);
+  
+  // optional fixed32 objectCacheCapacity = 4;
+  inline bool has_objectcachecapacity() const;
+  inline void clear_objectcachecapacity();
+  static const int kObjectCacheCapacityFieldNumber = 4;
+  inline ::google::protobuf::uint32 objectcachecapacity() const;
+  inline void set_objectcachecapacity(::google::protobuf::uint32 value);
+  
+  // optional string segmentFolder = 5;
+  inline bool has_segmentfolder() const;
+  inline void clear_segmentfolder();
+  static const int kSegmentFolderFieldNumber = 5;
+  inline const ::std::string& segmentfolder() const;
+  inline void set_segmentfolder(const ::std::string& value);
+  inline void set_segmentfolder(const char* value);
+  inline void set_segmentfolder(const char* value, size_t size);
+  inline ::std::string* mutable_segmentfolder();
+  inline ::std::string* release_segmentfolder();
+  
+  // optional string objectCacheFolder = 6;
+  inline bool has_objectcachefolder() const;
+  inline void clear_objectcachefolder();
+  static const int kObjectCacheFolderFieldNumber = 6;
+  inline const ::std::string& objectcachefolder() const;
+  inline void set_objectcachefolder(const ::std::string& value);
+  inline void set_objectcachefolder(const char* value);
+  inline void set_objectcachefolder(const char* value, size_t size);
+  inline ::std::string* mutable_objectcachefolder();
+  inline ::std::string* release_objectcachefolder();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.GetOsdConfigReplyPro)
+ private:
+  inline void set_has_osdid();
+  inline void clear_has_osdid();
+  inline void set_has_port();
+  inline void clear_has_port();
+  inline void set_has_segmentcapacity();
+  inline void clear_has_segmentcapacity();
+  inline void set_has_objectcachecapacity();
+  inline void clear_has_objectcachecapacity();
+  inline void set_has_segmentfolder();
+  inline void clear_has_segmentfolder();
+  inline void set_has_objectcachefolder();
+  inline void clear_has_objectcachefolder();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 osdid_;
+  ::google::protobuf::uint32 port_;
+  ::google::protobuf::uint32 segmentcapacity_;
+  ::google::protobuf::uint32 objectcachecapacity_;
+  ::std::string* segmentfolder_;
+  ::std::string* objectcachefolder_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static GetOsdConfigReplyPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -6973,7 +7187,219 @@ GetSecondaryListRequestPro::mutable_secondarylist() {
 
 // -------------------------------------------------------------------
 
+// GetOsdConfigRequestPro
+
+// -------------------------------------------------------------------
+
 // OsdStatUpdateRequestPro
+
+// -------------------------------------------------------------------
+
+// GetOsdConfigReplyPro
+
+// optional fixed32 osdId = 1;
+inline bool GetOsdConfigReplyPro::has_osdid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void GetOsdConfigReplyPro::set_has_osdid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void GetOsdConfigReplyPro::clear_has_osdid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void GetOsdConfigReplyPro::clear_osdid() {
+  osdid_ = 0u;
+  clear_has_osdid();
+}
+inline ::google::protobuf::uint32 GetOsdConfigReplyPro::osdid() const {
+  return osdid_;
+}
+inline void GetOsdConfigReplyPro::set_osdid(::google::protobuf::uint32 value) {
+  set_has_osdid();
+  osdid_ = value;
+}
+
+// optional fixed32 port = 2;
+inline bool GetOsdConfigReplyPro::has_port() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void GetOsdConfigReplyPro::set_has_port() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void GetOsdConfigReplyPro::clear_has_port() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void GetOsdConfigReplyPro::clear_port() {
+  port_ = 0u;
+  clear_has_port();
+}
+inline ::google::protobuf::uint32 GetOsdConfigReplyPro::port() const {
+  return port_;
+}
+inline void GetOsdConfigReplyPro::set_port(::google::protobuf::uint32 value) {
+  set_has_port();
+  port_ = value;
+}
+
+// optional fixed32 segmentCapacity = 3;
+inline bool GetOsdConfigReplyPro::has_segmentcapacity() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void GetOsdConfigReplyPro::set_has_segmentcapacity() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void GetOsdConfigReplyPro::clear_has_segmentcapacity() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void GetOsdConfigReplyPro::clear_segmentcapacity() {
+  segmentcapacity_ = 0u;
+  clear_has_segmentcapacity();
+}
+inline ::google::protobuf::uint32 GetOsdConfigReplyPro::segmentcapacity() const {
+  return segmentcapacity_;
+}
+inline void GetOsdConfigReplyPro::set_segmentcapacity(::google::protobuf::uint32 value) {
+  set_has_segmentcapacity();
+  segmentcapacity_ = value;
+}
+
+// optional fixed32 objectCacheCapacity = 4;
+inline bool GetOsdConfigReplyPro::has_objectcachecapacity() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void GetOsdConfigReplyPro::set_has_objectcachecapacity() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void GetOsdConfigReplyPro::clear_has_objectcachecapacity() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void GetOsdConfigReplyPro::clear_objectcachecapacity() {
+  objectcachecapacity_ = 0u;
+  clear_has_objectcachecapacity();
+}
+inline ::google::protobuf::uint32 GetOsdConfigReplyPro::objectcachecapacity() const {
+  return objectcachecapacity_;
+}
+inline void GetOsdConfigReplyPro::set_objectcachecapacity(::google::protobuf::uint32 value) {
+  set_has_objectcachecapacity();
+  objectcachecapacity_ = value;
+}
+
+// optional string segmentFolder = 5;
+inline bool GetOsdConfigReplyPro::has_segmentfolder() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void GetOsdConfigReplyPro::set_has_segmentfolder() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void GetOsdConfigReplyPro::clear_has_segmentfolder() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void GetOsdConfigReplyPro::clear_segmentfolder() {
+  if (segmentfolder_ != &::google::protobuf::internal::kEmptyString) {
+    segmentfolder_->clear();
+  }
+  clear_has_segmentfolder();
+}
+inline const ::std::string& GetOsdConfigReplyPro::segmentfolder() const {
+  return *segmentfolder_;
+}
+inline void GetOsdConfigReplyPro::set_segmentfolder(const ::std::string& value) {
+  set_has_segmentfolder();
+  if (segmentfolder_ == &::google::protobuf::internal::kEmptyString) {
+    segmentfolder_ = new ::std::string;
+  }
+  segmentfolder_->assign(value);
+}
+inline void GetOsdConfigReplyPro::set_segmentfolder(const char* value) {
+  set_has_segmentfolder();
+  if (segmentfolder_ == &::google::protobuf::internal::kEmptyString) {
+    segmentfolder_ = new ::std::string;
+  }
+  segmentfolder_->assign(value);
+}
+inline void GetOsdConfigReplyPro::set_segmentfolder(const char* value, size_t size) {
+  set_has_segmentfolder();
+  if (segmentfolder_ == &::google::protobuf::internal::kEmptyString) {
+    segmentfolder_ = new ::std::string;
+  }
+  segmentfolder_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* GetOsdConfigReplyPro::mutable_segmentfolder() {
+  set_has_segmentfolder();
+  if (segmentfolder_ == &::google::protobuf::internal::kEmptyString) {
+    segmentfolder_ = new ::std::string;
+  }
+  return segmentfolder_;
+}
+inline ::std::string* GetOsdConfigReplyPro::release_segmentfolder() {
+  clear_has_segmentfolder();
+  if (segmentfolder_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = segmentfolder_;
+    segmentfolder_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional string objectCacheFolder = 6;
+inline bool GetOsdConfigReplyPro::has_objectcachefolder() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void GetOsdConfigReplyPro::set_has_objectcachefolder() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void GetOsdConfigReplyPro::clear_has_objectcachefolder() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void GetOsdConfigReplyPro::clear_objectcachefolder() {
+  if (objectcachefolder_ != &::google::protobuf::internal::kEmptyString) {
+    objectcachefolder_->clear();
+  }
+  clear_has_objectcachefolder();
+}
+inline const ::std::string& GetOsdConfigReplyPro::objectcachefolder() const {
+  return *objectcachefolder_;
+}
+inline void GetOsdConfigReplyPro::set_objectcachefolder(const ::std::string& value) {
+  set_has_objectcachefolder();
+  if (objectcachefolder_ == &::google::protobuf::internal::kEmptyString) {
+    objectcachefolder_ = new ::std::string;
+  }
+  objectcachefolder_->assign(value);
+}
+inline void GetOsdConfigReplyPro::set_objectcachefolder(const char* value) {
+  set_has_objectcachefolder();
+  if (objectcachefolder_ == &::google::protobuf::internal::kEmptyString) {
+    objectcachefolder_ = new ::std::string;
+  }
+  objectcachefolder_->assign(value);
+}
+inline void GetOsdConfigReplyPro::set_objectcachefolder(const char* value, size_t size) {
+  set_has_objectcachefolder();
+  if (objectcachefolder_ == &::google::protobuf::internal::kEmptyString) {
+    objectcachefolder_ = new ::std::string;
+  }
+  objectcachefolder_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* GetOsdConfigReplyPro::mutable_objectcachefolder() {
+  set_has_objectcachefolder();
+  if (objectcachefolder_ == &::google::protobuf::internal::kEmptyString) {
+    objectcachefolder_ = new ::std::string;
+  }
+  return objectcachefolder_;
+}
+inline ::std::string* GetOsdConfigReplyPro::release_objectcachefolder() {
+  clear_has_objectcachefolder();
+  if (objectcachefolder_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = objectcachefolder_;
+    objectcachefolder_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
 
 // -------------------------------------------------------------------
 
