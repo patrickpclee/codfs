@@ -727,7 +727,7 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 
 uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 		struct ObjectData objectData, CodingScheme codingScheme,
-		string codingSetting) {
+		string codingSetting, string checksum) {
 
 	debug("Send object ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
 			objectData.info.objectId, sockfd);
@@ -741,7 +741,7 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 	// Step 1 : Send Init message (wait for reply)
 
 	putObjectInit(componentId, sockfd, objectId, totalSize, chunkCount,
-			codingScheme, codingSetting);
+			codingScheme, codingSetting, checksum);
 	debug("%s\n", "Put Object Init ACK-ed");
 
 	// Step 2 : Send data chunk by chunk
@@ -782,13 +782,13 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 // codingScheme (DEFAULT_CODING) and codingSetting ("") are optional
 void Communicator::putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
 		uint64_t objectId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme, string codingSetting) {
+		CodingScheme codingScheme, string codingSetting, string checksum) {
 
 	// Step 1 of the upload process
 
 	PutObjectInitRequestMsg* putObjectInitRequestMsg =
 			new PutObjectInitRequestMsg(this, dstOsdSockfd, objectId, length,
-					chunkCount, codingScheme, codingSetting);
+					chunkCount, codingScheme, codingSetting, checksum);
 
 	putObjectInitRequestMsg->prepareProtocolMsg();
 	addMessage(putObjectInitRequestMsg, true);

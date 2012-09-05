@@ -1078,6 +1078,17 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_codingsetting();
   inline ::std::string* release_codingsetting();
   
+  // optional string checksum = 6;
+  inline bool has_checksum() const;
+  inline void clear_checksum();
+  static const int kChecksumFieldNumber = 6;
+  inline const ::std::string& checksum() const;
+  inline void set_checksum(const ::std::string& value);
+  inline void set_checksum(const char* value);
+  inline void set_checksum(const char* value, size_t size);
+  inline ::std::string* mutable_checksum();
+  inline ::std::string* release_checksum();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.PutObjectInitRequestPro)
  private:
   inline void set_has_objectid();
@@ -1090,6 +1101,8 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_codingscheme();
   inline void set_has_codingsetting();
   inline void clear_has_codingsetting();
+  inline void set_has_checksum();
+  inline void clear_has_checksum();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -1097,10 +1110,11 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 objectsize_;
   ::google::protobuf::uint32 chunkcount_;
   ::std::string* codingsetting_;
+  ::std::string* checksum_;
   int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -5261,6 +5275,64 @@ inline ::std::string* PutObjectInitRequestPro::release_codingsetting() {
   } else {
     ::std::string* temp = codingsetting_;
     codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional string checksum = 6;
+inline bool PutObjectInitRequestPro::has_checksum() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void PutObjectInitRequestPro::set_has_checksum() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void PutObjectInitRequestPro::clear_has_checksum() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void PutObjectInitRequestPro::clear_checksum() {
+  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
+    checksum_->clear();
+  }
+  clear_has_checksum();
+}
+inline const ::std::string& PutObjectInitRequestPro::checksum() const {
+  return *checksum_;
+}
+inline void PutObjectInitRequestPro::set_checksum(const ::std::string& value) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(value);
+}
+inline void PutObjectInitRequestPro::set_checksum(const char* value) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(value);
+}
+inline void PutObjectInitRequestPro::set_checksum(const char* value, size_t size) {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  checksum_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* PutObjectInitRequestPro::mutable_checksum() {
+  set_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    checksum_ = new ::std::string;
+  }
+  return checksum_;
+}
+inline ::std::string* PutObjectInitRequestPro::release_checksum() {
+  clear_has_checksum();
+  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = checksum_;
+    checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
 }
