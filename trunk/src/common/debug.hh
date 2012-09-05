@@ -39,6 +39,7 @@
                                 __LINE__, __func__, __VA_ARGS__); } while (0)
 
 void printhex(char* buf, int n);
+std::string md5ToHex(unsigned char* hash);
 std::string getTime();
 std::string formatSize(uint64_t size);
 

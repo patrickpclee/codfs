@@ -5,6 +5,7 @@
 #include <chrono>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
+#include <openssl/md5.h>
 #include "client.hh"
 #include "client_storagemodule.hh"
 #include "../config/config.hh"
@@ -47,9 +48,9 @@ ClientStorageModule* Client::getStorageModule() {
 
 void startUploadThread(uint32_t clientId, uint32_t sockfd,
 		struct ObjectData objectData, CodingScheme codingScheme,
-		string codingSetting) {
+		string codingSetting, string checksum) {
 	client->getCommunicator()->sendObject(clientId, sockfd, objectData,
-			codingScheme, codingSetting);
+			codingScheme, codingSetting, checksum);
 	MemoryPool::getInstance().poolFree(objectData.buf);
 }
 
@@ -94,13 +95,17 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		objectData.info.objectId = fileMetaData._objectList[i];
 
+		// get checksum
+		unsigned char checksum[MD5_DIGEST_LENGTH];
+		MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(
 				boost::bind(startUploadThread, _clientId, dstOsdSockfd,
-						objectData, codingScheme, codingSetting));
+						objectData, codingScheme, codingSetting, md5ToHex(checksum)));
 #else
 		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData,
-				codingScheme, codingSetting);
+				codingScheme, codingSetting, md5ToHex(checksum));
 		MemoryPool::getInstance().poolFree(objectData.buf);
 #endif
 	}
@@ -123,8 +128,10 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 			<< formatSize(fileSize / duration) << "/s" << endl;
 
 
+	/*
 	int rtnval = system("./mid.sh");
 	exit(42);
+	*/
 
 
 	return fileMetaData._id;
@@ -185,13 +192,18 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 			<< formatSize(fileMetaData._size / duration) << "/s" << endl;
 
 
+	/*
 	int rtnval = system("./mid.sh");
 	exit(42);
+	*/
 
 }
 
 void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint32_t length, uint32_t chunkCount) {
+		uint64_t objectId, uint32_t length, uint32_t chunkCount, string checksum) {
+
+	// TODO: checksum not yet used
+	debug ("put object md5 = %s\n", checksum.c_str());
 
 	// initialize chunkCount value
 	_pendingObjectChunk.set(objectId, chunkCount);

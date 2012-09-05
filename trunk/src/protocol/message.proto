@@ -81,6 +81,7 @@ message PutObjectInitRequestPro {
 	
 	optional CodingScheme codingScheme = 4;
 	optional string codingSetting = 5;
+	optional string checksum = 6;
 }
 
 message ObjectDataPro {
@@ -178,11 +179,13 @@ message UploadObjectAckPro {
 	optional PutObjectInitRequestPro.CodingScheme codingScheme = 2;	
 	optional string codingSetting = 3;
 	repeated fixed32 nodeList = 4;
+	optional string checksum = 5;
 }
 
 message GetObjectInfoRequestPro {
 	optional fixed64 objectId = 1;	
 }
+
 
 //
 // OSD -> CLIENT
@@ -281,6 +284,10 @@ message GetSecondaryListRequestPro{
 	repeated SegmentLocationPro secondaryList = 2;
 }
 
+message GetOsdConfigRequestPro {
+
+}
+
 ///////////////// FROM MONITOR /////////////////
 //
 // MONITOR -> OSD
@@ -288,6 +295,15 @@ message GetSecondaryListRequestPro{
 
 message OsdStatUpdateRequestPro {
 
+}
+
+message GetOsdConfigReplyPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 port = 2;
+	optional fixed32 segmentCapacity = 3;
+	optional fixed32 objectCacheCapacity = 4;
+	optional string segmentFolder = 5;
+	optional string objectCacheFolder = 6;
 }
 
 message GetSecondaryListReplyPro{
