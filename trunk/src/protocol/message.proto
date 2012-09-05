@@ -81,6 +81,7 @@ message PutObjectInitRequestPro {
 	
 	optional CodingScheme codingScheme = 4;
 	optional string codingSetting = 5;
+	optional string checksum = 6;
 }
 
 message ObjectDataPro {
