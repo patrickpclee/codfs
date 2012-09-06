@@ -7,6 +7,7 @@
 #include "../protocol/nodelist/getprimarylistrequest.hh"
 #include "../protocol/metadata/getobjectinforeply.hh"
 #include "../protocol/metadata/downloadfilereply.hh"
+#include "../protocol/metadata/getobjectidlistreply.hh"
 
 /**
  * @brief	Reply With Folder Data
@@ -112,8 +113,11 @@ void MdsCommunicator::replyPrimary(uint32_t requestId, uint32_t connectionId,
 /**
  * @brief	Reply Object ID List
  */
-void MdsCommunicator::replyObjectIdList(uint32_t requestId, uint32_t connectionId, vector<uint64_t> objectList)
+void MdsCommunicator::replyObjectIdList(uint32_t requestId, uint32_t connectionId, vector<uint64_t> objectList, vector<uint32_t> primaryList)
 {
+	GetObjectIdListReplyMsg* getObjectIdListReplyMsg = new GetObjectIdListReplyMsg(this, requestId, connectionId, objectList, primaryList);
+	getObjectIdListReplyMsg->prepareProtocolMsg();
+	addMessage(getObjectIdListReplyMsg);
 	return ;
 }
 
