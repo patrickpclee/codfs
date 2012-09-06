@@ -45,8 +45,9 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	objectList	Object ID List
+	 * @parma	primaryList	Primary List
 	 */
-	void replyObjectIdList(uint32_t requestId, uint32_t connectionId, vector<uint64_t> objectList);
+	void replyObjectIdList(uint32_t requestId, uint32_t connectionId, vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Object Information to Osd

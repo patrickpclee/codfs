@@ -82,3 +82,13 @@ vector<uint64_t> GetObjectIdListRequestMsg::getObjectIdList ()
 {
 	return _objectIdList;
 }
+
+void GetObjectIdListRequestMsg::setPrimaryList (vector<uint32_t> primaryList)
+{
+	_primaryList = primaryList;
+}
+
+vector<uint32_t> GetObjectIdListRequestMsg::getPrimaryList ()
+{
+	return _primaryList;
+}
