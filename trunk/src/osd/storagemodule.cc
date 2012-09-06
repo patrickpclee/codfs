@@ -23,7 +23,7 @@ extern ConfigLayer* configLayer;
 mutex fileMutex;
 mutex openedFileMutex;
 mutex cacheMutex;
-mutex queueMutex;
+mutex lruCacheMutex;
 
 StorageModule::StorageModule() {
 	_openedFile = {};
@@ -98,7 +98,12 @@ void StorageModule::initializeStorageStatus() {
 		objectDiskCache.length = st.st_size;
 		objectDiskCache.lastAccessedTime = st.st_atim;
 		objectDiskCache.filepath = _objectFolder + dent->d_name;
-		_objectDiskCacheMap.set(objectId, objectDiskCache);
+
+		{
+			lock_guard<mutex> lk(lruCacheMutex);
+			_objectDiskCacheMap.set(objectId, objectDiskCache);
+			_objectCacheQueue.push_back(objectId);
+		}
 
 		_freeObjectSpace -= st.st_size;
 		_currentObjectUsage += st.st_size;
@@ -205,13 +210,14 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 }
 
 bool StorageModule::isObjectCached(uint64_t objectId) {
+	lock_guard<mutex> lk(lruCacheMutex);
 	if (_objectDiskCacheMap.count(objectId)) {
 
 		_objectDiskCacheMap.get(objectId).lastAccessedTime = {time(NULL), 0};
 
-		lock_guard<mutex> lk(queueMutex);
 		_objectCacheQueue.remove(objectId);
-		_objectCacheQueue.insert(_objectCacheQueue.end(),objectId);
+		_objectCacheQueue.push_back(objectId);
+
 		return true;
 	}
 	return false;
@@ -662,15 +668,17 @@ void StorageModule::updateSegmentFreespace(uint32_t new_segment_size) {
 
 }
 
-void StorageModule::updateObjectFreespace(uint32_t new_object_size) {
-	uint32_t update_space = new_object_size;
-	if (verifyObjectSpace(update_space)) {
-		_currentObjectUsage += update_space;
-		_freeObjectSpace -= update_space;
-	} else {
-		perror("object free space not enough.\n");
-	}
-}
+/*
+ void StorageModule::updateObjectFreespace(uint32_t new_object_size) {
+ uint32_t update_space = new_object_size;
+ if (verifyObjectSpace(update_space)) {
+ _currentObjectUsage += update_space;
+ _freeObjectSpace -= update_space;
+ } else {
+ perror("object free space not enough.\n");
+ }
+ }
+ */
 
 uint32_t StorageModule::getCurrentSegmentCapacity() {
 	return _currentSegmentUsage;
@@ -688,7 +696,7 @@ uint32_t StorageModule::getFreeObjectSpace() {
 	return _freeObjectSpace;
 }
 
-int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
+int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
 	//TODO delete old objects and make room for new one.
 
 //	 lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
@@ -696,36 +704,80 @@ int32_t StorageModule::spareObjectSpace(uint32_t new_object_size) {
 //	 _objectDiskCacheMap.erase (objectId);
 //	 _objectDiskCacheMutex.erase(objectId);
 
-	uint32_t new_space = 0;
-	uint64_t objectId;
-	while (new_space < new_object_size) {
-		{
-			lock_guard<mutex> lk(queueMutex);
-			objectId = *(_objectCacheQueue.begin());
-		}
+	/*
+	 uint32_t new_space = 0;
+	 uint64_t objectId;
+	 while (new_space < newObjectSize) {
+	 {
+	 lock_guard<mutex> lk(queueMutex);
+	 objectId = *(_objectCacheQueue.begin());
+	 }
 
-		struct ObjectDiskCache objectCache = _objectDiskCacheMap.get(objectId);
+	 struct ObjectDiskCache objectCache = _objectDiskCacheMap.get(objectId);
 
-		remove(objectCache.filepath.c_str());
-		new_space += objectCache.length;
-		_objectDiskCacheMap.erase(objectId);
+	 remove(objectCache.filepath.c_str());
+	 new_space += objectCache.length;
+	 _objectDiskCacheMap.erase(objectId);
 
-		lock_guard<mutex> lk(queueMutex);
-		_objectCacheQueue.remove(objectId);
+	 lock_guard<mutex> lk(queueMutex);
+	 _objectCacheQueue.remove(objectId);
+	 }
+
+	 return newObjectSize - new_space;
+	 */
+
+	if (_maxObjectCache < newObjectSize) {
+		return -1; // error: object size larger than cache
 	}
 
-	return new_object_size - new_space;
+	while (_freeObjectSpace < newObjectSize) {
+		uint64_t objectId = 0;
+		struct ObjectDiskCache objectCache;
+
+		{
+			lock_guard<mutex> lk(lruCacheMutex);
+			objectId = _objectCacheQueue.front();
+			objectCache = _objectDiskCacheMap.get(objectId);
+		}
+
+		remove(objectCache.filepath.c_str());
+
+		// update size
+		_freeObjectSpace += objectCache.length;
+		_currentObjectUsage -= objectCache.length;
+
+		// remove from queue and map
+		{
+			lock_guard<mutex> lk(lruCacheMutex);
+			_objectCacheQueue.remove(objectId);
+			_objectDiskCacheMap.erase(objectId);
+		}
+	}
+
+	return 0;
+
 }
 
 void StorageModule::saveObjectToDisk(uint64_t objectId,
 		ObjectTransferCache objectCache) {
 
-	uint32_t update_size = objectCache.length;
-	if (verifyObjectSpace(update_size)) {
-		updateObjectFreespace(update_size);
+	uint32_t objectSize = objectCache.length;
+	if (verifyObjectSpace(objectSize)) {
+		//updateObjectFreespace(objectSize);
+		_currentObjectUsage += objectSize;
+		_freeObjectSpace -= objectSize;
 	} else {
 		// clear cache if space is not available
-		updateObjectFreespace(spareObjectSpace(update_size));
+		//updateObjectFreespace(spareObjectSpace(objectSize));
+		if (spareObjectSpace(objectSize) == -1) {
+			debug(
+					"Not enough space to cache object! Object Size = %" PRIu32 "\n",
+					objectSize);
+			return;
+		} else {
+			_currentObjectUsage += objectSize;
+			_freeObjectSpace -= objectSize;
+		}
 	}
 
 	// write cache to disk
@@ -745,23 +797,30 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	objectDiskCache.length = objectCache.length;
 	objectDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
 
-	_objectDiskCacheMap.set(objectId, objectDiskCache);
-
-	lock_guard<mutex> lk(queueMutex);
-	_objectCacheQueue.insert(_objectCacheQueue.end(), objectId);
+	{
+		lock_guard<mutex> lk(lruCacheMutex);
+		_objectDiskCacheMap.set(objectId, objectDiskCache);
+		_objectCacheQueue.push_back(objectId);
+	}
 }
 
 struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
 	struct ObjectData objectData;
-	struct ObjectDiskCache objectDiskCache = _objectDiskCacheMap.get(objectId);
+	struct ObjectDiskCache objectDiskCache;
+	{
+		lock_guard<mutex> lk(lruCacheMutex);
+		objectDiskCache = _objectDiskCacheMap.get(objectId);
+	}
 	objectData = readObject(objectId, 0, objectDiskCache.length);
 	return objectData;
 }
 
 void StorageModule::clearObjectDiskCache() {
-	lock_guard<mutex> lk(queueMutex);
-	_objectCacheQueue.empty();
-	_objectDiskCacheMap.empty();
+	{
+		lock_guard<mutex> lk(lruCacheMutex);
+		_objectCacheQueue.empty();
+		_objectDiskCacheMap.empty();
+	}
 
 	struct dirent *file;
 	DIR *dir;
