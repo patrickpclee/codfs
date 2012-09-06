@@ -16,6 +16,7 @@
 #include "../protocol/transfer/objecttransferendrequest.hh"
 #include "../protocol/transfer/objecttransferendreply.hh"
 #include "../protocol/transfer/objectdatamsg.hh"
+#include "../protocol/metadata/getobjectidlistrequest.hh"
 #include "../protocol/transfer/getobjectrequest.hh"
 
 /**
@@ -160,6 +161,36 @@ void ClientCommunicator::saveObjectList(uint32_t clientId, uint32_t fileId,
 	addMessage(saveObjectListRequestMsg);
 
 	return;
+}
+
+vector<struct ObjectMetaData> ClientCommunicator::getNewObjectList (uint32_t clientId, uint32_t numOfObjs)
+{
+	uint32_t mdsSockfd = getMdsSockfd();
+	debug("Requesting New Object Id, Number of Objects %" PRIu32 "\n", numOfObjs);
+	GetObjectIdListRequestMsg* getObjectIdListRequestMsg = new GetObjectIdListRequestMsg(this, mdsSockfd, clientId, numOfObjs);
+	getObjectIdListRequestMsg->prepareProtocolMsg();
+
+	addMessage(getObjectIdListRequestMsg,true);
+
+	MessageStatus status = getObjectIdListRequestMsg->waitForStatusChange();
+
+	if(status == READY) {
+		vector<struct ObjectMetaData> objectMetaDataList;
+		vector<uint32_t> primaryList = getObjectIdListRequestMsg->getPrimaryList();
+		vector<uint64_t> objectList = getObjectIdListRequestMsg->getObjectIdList();
+		for(uint32_t i = 0; i < primaryList.size(); ++i){
+			struct ObjectMetaData tempObjectMetaData;
+			tempObjectMetaData._id =  objectList[i];
+			tempObjectMetaData._primary = primaryList[i];
+			objectMetaDataList.push_back(tempObjectMetaData);
+		}
+		return objectMetaDataList;
+	} else {
+		debug("%s\n","Get New Object List Failed");
+		exit(-1);
+	}
+
+	return {};
 }
 
 void ClientCommunicator::saveFileSize(uint32_t clientId, uint32_t fileId, uint64_t fileSize)
