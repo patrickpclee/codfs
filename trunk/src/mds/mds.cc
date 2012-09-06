@@ -162,8 +162,7 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 /**
  * @brief	Handle Get Object ID Lsit
  */
-void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t numOfObjs) {
+void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t numOfObjs) {
 	vector<uint64_t> objectList = _metaDataModule->newObjectList(numOfObjs);
 	vector<uint32_t> primaryList = _mdsCommunicator->getPrimaryList(_mdsCommunicator->getMonitorSockfd(), numOfObjs);
 	_mdsCommunicator->replyObjectIdList(requestId, connectionId, objectList, primaryList);
