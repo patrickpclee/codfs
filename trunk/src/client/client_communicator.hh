@@ -87,6 +87,14 @@ public:
 	void saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
 
 	/**
+	 * @brief	Get New Object List
+	 *
+	 * @param	clientId	Client ID
+	 * @param	numOfObjs	Number of Objects
+	 */
+	vector<struct ObjectMetaData> getNewObjectList (uint32_t clientId, uint32_t numOfObjs);
+
+	/**
 	 * @brief	Save Object Size of a File
 	 *
 	 * @param	clientId	Client ID
