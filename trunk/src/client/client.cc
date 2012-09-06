@@ -63,14 +63,14 @@ void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId,
 
 #endif
 
-void Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId,
-		uint64_t offset, FILE* filePtr, string dstPath) {
-
+struct ObjectTransferCache Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId)
+{
 	struct ObjectTransferCache objectCache = { };
 
 	// get object from cache directly if possible
 	if (_storageModule->locateObjectCache(objectId)) {
 		objectCache = _storageModule->getObjectCache(objectId);
+		return objectCache;
 	}
 
 	// unknown number of chunks at this point
@@ -85,6 +85,17 @@ void Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId,
 
 	// write object from cache to file
 	objectCache = _storageModule->getObjectCache(objectId);
+
+	return objectCache;
+}
+
+void Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId,
+		uint64_t offset, FILE* filePtr, string dstPath) {
+
+	struct ObjectTransferCache objectCache = { };
+
+	objectCache = getObject(clientId, dstSockfd, objectId);
+
 	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
 			objectCache.length);
 
