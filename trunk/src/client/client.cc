@@ -13,6 +13,7 @@
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
 #include "../common/convertor.hh"
+#include "../../lib/logger.hh"
 
 using namespace std;
 
@@ -63,8 +64,8 @@ void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId,
 
 #endif
 
-struct ObjectTransferCache Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId)
-{
+struct ObjectTransferCache Client::getObject(uint32_t clientId,
+		uint32_t dstSockfd, uint64_t objectId) {
 	struct ObjectTransferCache objectCache = { };
 
 	// get object from cache directly if possible
@@ -161,18 +162,24 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	_tp.wait();
 #endif
 
-	cout << "Upload " << path << " Done [" << fileMetaData._id << "]" << endl;
-
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1024.0;
+
+	// allow time for messages to go out
+	usleep(10000);
+
+	cout << "Upload " << path << " Done [" << fileMetaData._id << "]" << endl;
 
 	cout << fixed;
 	cout << setprecision(2);
 	cout << formatSize(fileSize) << " transferred in " << duration
 			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s"
 			<< endl;
+
+	FILE_LOG(logINFO) << formatSize(fileSize) << " transferred in " << duration
+			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s";
 
 	/*
 	 int rtnval = system("./mid.sh");
@@ -231,11 +238,18 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1024.0;
 
+	// allow time for messages to go out
+	usleep(10000);
+
 	cout << fixed;
 	cout << setprecision(2);
 	cout << formatSize(fileMetaData._size) << " transferred in " << duration
 			<< " secs, Rate = " << formatSize(fileMetaData._size / duration)
 			<< "/s" << endl;
+
+	FILE_LOG(logINFO) << formatSize(fileMetaData._size) << " transferred in "
+			<< duration << " secs, Rate = "
+			<< formatSize(fileMetaData._size / duration) << "/s";
 
 	/*
 	 int rtnval = system("./mid.sh");

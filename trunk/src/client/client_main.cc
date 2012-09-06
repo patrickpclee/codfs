@@ -4,10 +4,9 @@
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 #include "../coding/raid1coding.hh"
+#include "../../lib/logger.hh"
 
 using namespace std;
-//using namespace log4cxx;
-//using namespace log4cxx::helpers;
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
@@ -50,6 +49,12 @@ int main(int argc, char *argv[]) {
 	client = new Client();
 	ClientCommunicator* communicator = client->getCommunicator();
 
+	// setup log
+	FILELog::ReportingLevel() = logDEBUG3;
+	std::string logFileName = "client_" + to_string(client->getClientId()) + ".log";
+	FILE* log_fd = fopen(logFileName.c_str(), "w");
+	Output2FILE::Stream() = log_fd;
+
 	// start server
 	communicator->createServerSocket();
 
@@ -69,7 +74,6 @@ int main(int argc, char *argv[]) {
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
 	// TEST LOGGING
-
 
 	// TEST PUT OBJECT
 
