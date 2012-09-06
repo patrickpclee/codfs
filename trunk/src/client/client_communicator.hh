@@ -87,6 +87,15 @@ public:
 	void saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
 
 	/**
+	 * @brief	Save Object Size of a File
+	 *
+	 * @param	clientId	Client ID
+	 * @param	fileId	ID of the File
+	 * @param	fileSize	Size of the file
+	 */
+	void saveFileSize (uint32_t clientId, uint32_t fileId, uint64_t fileSize);
+
+	/**
 	 * @brief	Send a request to OSD for the object
 	 * @param dstSockfd OSD Socket Descriptor
 	 * @param objectId Object ID
