@@ -16,6 +16,7 @@
 #include <dirent.h>
 #include "storagemodule.hh"
 #include "../common/debug.hh"
+#include "../common/convertor.hh"
 
 // global variable defined in each component
 extern ConfigLayer* configLayer;
@@ -31,12 +32,9 @@ StorageModule::StorageModule() {
 	_objectFolder = configLayer->getConfigString("Storage>ObjectCacheLocation");
 	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
 
-	// Unit in XML: GB
 	// Unit in StorageModule: Bytes
-	_maxObjectCache = configLayer->getConfigInt("Storage>ObjectCacheCapacity")
-	* 1073741824ULL;
-	_maxSegmentCapacity = configLayer->getConfigInt("Storage>SegmentCapacity")
-	* 1073741824ULL;
+	_maxObjectCache = stringToByte(configLayer->getConfigString("Storage>ObjectCacheCapacity"));
+	_maxSegmentCapacity = stringToByte(configLayer->getConfigString("Storage>SegmentCapacity"));
 
 	cout << "=== STORAGE ===" << endl;
 	cout << "Object Cache Location = " << _objectFolder << " Size = "
