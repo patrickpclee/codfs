@@ -45,7 +45,15 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 	uint32_t objectWriteOffset;
 	uint32_t writeSize;
 	while (lastObjectToWrite >= _objectStatusList.size()) {
-	
+		vector<struct ObjectMetaData> objectMetaDataList = _clientCommunicator->getNewObjectList(_clientId, _objectStatusList.size() / 2 + 1);	
+		for(uint32_t i = 0; i < objectMetaDataList.size(); ++i){
+			struct ObjectData tempObjectData;
+			tempObjectData.info.objectId = objectMetaDataList[i]._id;
+			tempObjectData.info.objectSize = _objectSize;
+			_primaryList.push_back(objectMetaDataList[i]._primary);
+			_objectDataList.push_back(tempObjectData);
+			_objectStatusList.push_back(NEW);
+		}
 	}
 
 	for(uint32_t i = firstObjectToWrite; i <= lastObjectToWrite; ++i)
