@@ -6,6 +6,8 @@
 #include "../coding/raid1coding.hh"
 
 using namespace std;
+//using namespace log4cxx;
+//using namespace log4cxx::helpers;
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
@@ -66,13 +68,16 @@ int main(int argc, char *argv[]) {
 
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
+	// TEST LOGGING
+
+
 	// TEST PUT OBJECT
 
 	// RAID 1
 	/*
-	const uint32_t replicationFactor = 3;
-	CodingScheme codingScheme = RAID1_CODING;
-	*/
+	 const uint32_t replicationFactor = 3;
+	 CodingScheme codingScheme = RAID1_CODING;
+	 */
 
 	// RAID 0
 	const uint32_t stripFactor = 2;
