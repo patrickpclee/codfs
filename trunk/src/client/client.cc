@@ -12,6 +12,7 @@
 #include "../common/debug.hh"
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
+#include "../common/convertor.hh"
 
 using namespace std;
 

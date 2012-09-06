@@ -18,6 +18,7 @@
 #include "../common/enums.hh"
 #include "../common/enumtostring.hh"
 #include "../common/debug.hh"
+#include "../common/convertor.hh"
 #include "../common/objectdata.hh"
 #include "../protocol/message.pb.h"
 #include "../protocol/messagefactory.hh"
@@ -62,7 +63,7 @@ Communicator::Communicator() {
 			"Communication>SelectTimeout>usec");
 
 	// chunk size
-	_chunkSize = configLayer->getConfigInt("Communication>ChunkSize");
+	_chunkSize = stringToByte(configLayer->getConfigString("Communication>ChunkSize"));
 
 	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
 

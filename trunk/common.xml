@@ -16,8 +16,8 @@
             <usec>0</usec>
         </SelectTimeout>
 	
-		<!-- Chunk Size used in transfer in Byte-->
-		<ChunkSize>524288</ChunkSize> <!-- 512KB -->
+		<!-- Chunk Size used in transfer -->
+		<ChunkSize>512K</ChunkSize>
 
 		<!-- No of dispatch thread created for each thread pool -->
 		<NumThreadPerPool>1</NumThreadPerPool>

@@ -9,6 +9,7 @@
 #include "segmentlocation.hh"
 #include "../common/debug.hh"
 #include "../common/metadata.hh"
+#include "../common/convertor.hh"
 #include "../config/config.hh"
 #include "../protocol/status/osdstartupmsg.hh"
 #include "../protocol/status/osdshutdownmsg.hh"
