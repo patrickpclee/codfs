@@ -24,19 +24,6 @@ void printhex(char* buf, int n) {
 	printf("\n");
 }
 
-string md5ToHex(unsigned char* hash) {
-	std::string result;
-	result.reserve(32);  // C++11 only, otherwise ignore
-
-	for (std::size_t i = 0; i != 16; ++i)
-	{
-	  result += "0123456789abcdef"[hash[i] / 16];
-	  result += "0123456789abcdef"[hash[i] % 16];
-	}
-
-	return result;
-}
-
 
 string getTime() {
 	struct timeval tv;

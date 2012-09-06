@@ -12,8 +12,8 @@
     	<ObjectCacheLocation>./osd_object/</ObjectCacheLocation>
     	<SegmentLocation>./osd_segment/</SegmentLocation>
     	
-    	<SegmentCapacity>10</SegmentCapacity> <!-- GB -->
-    	<ObjectCacheCapacity>5</ObjectCacheCapacity> <!-- GB -->
+    	<SegmentCapacity>10G</SegmentCapacity>
+    	<ObjectCacheCapacity>100M</ObjectCacheCapacity>
     </Storage>
     
 </NcvfsConfig>
