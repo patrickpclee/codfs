@@ -25,6 +25,7 @@ mutex fileMutex;
 mutex openedFileMutex;
 mutex cacheMutex;
 mutex lruCacheMutex;
+mutex verifyAndUpdateSpaceMutex;
 
 StorageModule::StorageModule() {
 	_openedFile = {};
@@ -695,34 +696,6 @@ uint32_t StorageModule::getFreeObjectSpace() {
 }
 
 int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
-	//TODO delete old objects and make room for new one.
-
-//	 lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
-//	 remove (filepath);
-//	 _objectDiskCacheMap.erase (objectId);
-//	 _objectDiskCacheMutex.erase(objectId);
-
-	/*
-	 uint32_t new_space = 0;
-	 uint64_t objectId;
-	 while (new_space < newObjectSize) {
-	 {
-	 lock_guard<mutex> lk(queueMutex);
-	 objectId = *(_objectCacheQueue.begin());
-	 }
-
-	 struct ObjectDiskCache objectCache = _objectDiskCacheMap.get(objectId);
-
-	 remove(objectCache.filepath.c_str());
-	 new_space += objectCache.length;
-	 _objectDiskCacheMap.erase(objectId);
-
-	 lock_guard<mutex> lk(queueMutex);
-	 _objectCacheQueue.remove(objectId);
-	 }
-
-	 return newObjectSize - new_space;
-	 */
 
 	if (_maxObjectCache < newObjectSize) {
 		return -1; // error: object size larger than cache
@@ -759,24 +732,30 @@ int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
 void StorageModule::saveObjectToDisk(uint64_t objectId,
 		ObjectTransferCache objectCache) {
 
+	debug("Before saving object ID = %" PRIu64 ", cache = %s\n",
+			objectId, formatSize(_freeObjectSpace).c_str());
+
 	uint32_t objectSize = objectCache.length;
-	if (verifyObjectSpace(objectSize)) {
-		//updateObjectFreespace(objectSize);
-		_currentObjectUsage += objectSize;
-		_freeObjectSpace -= objectSize;
-	} else {
-		// clear cache if space is not available
-		//updateObjectFreespace(spareObjectSpace(objectSize));
-		if (spareObjectSpace(objectSize) == -1) {
-			debug(
-					"Not enough space to cache object! Object Size = %" PRIu32 "\n",
-					objectSize);
-			return;
-		} else {
-			_currentObjectUsage += objectSize;
-			_freeObjectSpace -= objectSize;
+
+	{
+
+		lock_guard<mutex> lk(verifyAndUpdateSpaceMutex);
+
+		if (!verifyObjectSpace(objectSize)) {
+			// clear cache if space is not available
+			//updateObjectFreespace(spareObjectSpace(objectSize));
+			if (spareObjectSpace(objectSize) == -1) {
+				debug(
+						"Not enough space to cache object! Object Size = %" PRIu32 "\n",
+						objectSize);
+				return;
+			}
 		}
+
 	}
+
+	debug("Spare space for saving object ID = %" PRIu64 ", cache = %s\n",
+			objectId, formatSize(_freeObjectSpace).c_str());
 
 	// write cache to disk
 	createAndOpenObjectFile(objectId, objectCache.length);
@@ -789,6 +768,9 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	}
 	closeObjectFile(objectId);
 
+	_currentObjectUsage += objectSize;
+	_freeObjectSpace -= objectSize;
+
 	// save cache to map
 	struct ObjectDiskCache objectDiskCache;
 	objectDiskCache.filepath = generateObjectPath(objectId, _objectFolder);
@@ -800,6 +782,10 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 		_objectDiskCacheMap.set(objectId, objectDiskCache);
 		_objectCacheQueue.push_back(objectId);
 	}
+
+	debug("After saving object ID = %" PRIu64 ", cache = %s\n",
+			objectId, formatSize(_freeObjectSpace).c_str());
+
 }
 
 struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
