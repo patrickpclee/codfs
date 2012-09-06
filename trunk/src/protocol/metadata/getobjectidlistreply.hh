@@ -32,8 +32,7 @@ public:
 	 * Constructor - Save parameters in private variables
 	 *
 	 */
-	GetObjectIdListReplyMsg(Communicator* communicator, uint32_t mdsSockfd,
-			vector<uint64_t>objectIdList);
+	GetObjectIdListReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t mdsSockfd, vector<uint64_t>objectIdList, vector<uint32_t>primaryList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -64,11 +63,12 @@ public:
 
 	void printProtocol();
 
-	void setObjectIdList (vector<uint64_t> objectIdList);
-	vector<uint64_t> getObjectIdList ();
+	//void setObjectIdList (vector<uint64_t> objectIdList);
+	//vector<uint64_t> getObjectIdList ();
 
 private:
 	vector<uint64_t> _objectIdList;
+	vector<uint32_t> _primaryList;
 };
 
 #endif

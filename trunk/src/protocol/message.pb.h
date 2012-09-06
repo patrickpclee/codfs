@@ -2096,15 +2096,28 @@ class GetObjectIdListReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
       mutable_objectidlist();
   
+  // repeated fixed32 primaryList = 2;
+  inline int primarylist_size() const;
+  inline void clear_primarylist();
+  static const int kPrimaryListFieldNumber = 2;
+  inline ::google::protobuf::uint32 primarylist(int index) const;
+  inline void set_primarylist(int index, ::google::protobuf::uint32 value);
+  inline void add_primarylist(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      primarylist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_primarylist();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetObjectIdListReplyPro)
  private:
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectidlist_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -6029,6 +6042,31 @@ GetObjectIdListReplyPro::objectidlist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
 GetObjectIdListReplyPro::mutable_objectidlist() {
   return &objectidlist_;
+}
+
+// repeated fixed32 primaryList = 2;
+inline int GetObjectIdListReplyPro::primarylist_size() const {
+  return primarylist_.size();
+}
+inline void GetObjectIdListReplyPro::clear_primarylist() {
+  primarylist_.Clear();
+}
+inline ::google::protobuf::uint32 GetObjectIdListReplyPro::primarylist(int index) const {
+  return primarylist_.Get(index);
+}
+inline void GetObjectIdListReplyPro::set_primarylist(int index, ::google::protobuf::uint32 value) {
+  primarylist_.Set(index, value);
+}
+inline void GetObjectIdListReplyPro::add_primarylist(::google::protobuf::uint32 value) {
+  primarylist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+GetObjectIdListReplyPro::primarylist() const {
+  return primarylist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+GetObjectIdListReplyPro::mutable_primarylist() {
+  return &primarylist_;
 }
 
 // -------------------------------------------------------------------

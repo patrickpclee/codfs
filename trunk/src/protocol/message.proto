@@ -146,6 +146,7 @@ message DownloadFileReplyPro {
 
 message GetObjectIdListReplyPro {
 	repeated fixed64 objectIdList = 1;
+	repeated fixed32 primaryList = 2;
 }
 
 //
