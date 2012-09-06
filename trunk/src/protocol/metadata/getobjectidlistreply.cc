@@ -37,6 +37,11 @@ void GetObjectIdListReplyMsg::prepareProtocolMsg() {
 		getObjectIdListReplyPro.add_primarylist(_primaryList[i]);
 	}
 
+	if (!getObjectIdListReplyPro.SerializeToString(&serializedString)) {
+		cerr << "Failed to write string." << endl;
+		return;
+	}
+
 	setProtocolSize(serializedString.length());
 	setProtocolType(GET_OBJECT_ID_LIST_REPLY);
 	setProtocolMsg(serializedString);
@@ -67,7 +72,7 @@ void GetObjectIdListReplyMsg::doHandle() {
 
 void GetObjectIdListReplyMsg::printProtocol() {
 	debug(
-			"[GET_OBJECT_ID_LIST_REPLY] Number of Objects= %zu\n",
+			"[GET_OBJECT_ID_LIST_REPLY] Number of Objects = %zu\n",
 			_objectIdList.size());
 }
 
