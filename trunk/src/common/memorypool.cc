@@ -5,16 +5,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <thread>
-#include <mutex>
 
 #include "memorypool.hh"
 
 #define USE_MEMORY_POOL
-
-#ifdef USE_MEMORY_POOL
-std::mutex memoryPoolMutex;
-#endif
 
 MemoryPool::MemoryPool() {
 #ifdef USE_MEMORY_POOL
