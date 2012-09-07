@@ -54,6 +54,21 @@ public:
 	void setStatById (uint32_t osdId, uint32_t sockfd, uint32_t capacity,
 		 uint32_t loading, enum OsdHealthStat health, uint32_t ip, uint16_t port);
 	
+	/**
+	 * Get the current online Osd list to form a list of struct OnlineOsd
+	 * @param list a vector reference of online osd list with its ip, port, id
+	 */
+	void getOnlineOsdList(vector<struct OnlineOsd>& list);
+
+	/**
+	 * When a new osd register, broadcast its id,ip,port to all online osds
+	 * @param communicator pointer to monitor communicator
+	 * @param osdId new OSD ID
+	 * @param ip IP of the new OSD for other components' connection
+	 * @param port Port of the OSD for other components' connetion
+	 */
+	void broadcastNewOsd(Communicator* communicator, uint32_t osdId, 
+		uint32_t ip, uint32_t port);
 
 private:
 

@@ -1,10 +1,13 @@
 #include "statmodule.hh"
+#include "../osd/onlineosd.hh"
+#include "../protocol/status/newosdregistermsg.hh"
 #include <ctime>
 
 
 /*  Constructor */
 StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
-	_osdStatMap(mapRef) { }
+	_osdStatMap(mapRef) { 
+}
 
 void StatModule::updateOsdStatMap (Communicator* communicator) {
 	while (1) {
@@ -70,5 +73,35 @@ void StatModule::setStatById (uint32_t osdId, uint32_t sockfd,
 		iter->second.osdIp = ip;
 		iter->second.osdPort = port;
 		iter->second.timestamp = time(NULL);
+	}
+}
+
+
+
+void StatModule::getOnlineOsdList(vector<struct OnlineOsd>& list) {
+	list.clear();
+	{
+		lock_guard<mutex> lk(osdStatMapMutex);
+		for (auto& entry: _osdStatMap) {
+			if (entry.second.osdHealth == ONLINE) 
+				list.push_back (OnlineOsd (entry.first, 
+					entry.second.osdIp, entry.second.osdPort));
+		}
+	}
+}
+
+void StatModule::broadcastNewOsd(Communicator* communicator,
+	uint32_t osdId, uint32_t ip, uint32_t port) {
+
+	lock_guard<mutex> lk(osdStatMapMutex);
+	for (auto& entry: _osdStatMap) {
+		if (entry.second.osdHealth == ONLINE) {
+
+			NewOsdRegisterMsg* newOsdRegisterMsg = new NewOsdRegisterMsg(
+				communicator, entry.second.osdSockfd, osdId, ip, port);
+			newOsdRegisterMsg->prepareProtocolMsg();
+
+			communicator->addMessage(newOsdRegisterMsg);
+		}
 	}
 }

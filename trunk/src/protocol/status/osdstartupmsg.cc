@@ -7,7 +7,7 @@ using namespace std;
 #include "../../common/memorypool.hh"
 
 #ifdef COMPILE_FOR_MONITOR
-#include "../monitor/monitor.hh"
+#include "../../monitor/monitor.hh"
 extern Monitor* monitor;
 #endif
 

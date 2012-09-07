@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <vector>
 #include "../communicator/communicator.hh"
+#include "../osd/onlineosd.hh"
 
 using namespace std;
 
@@ -43,6 +44,14 @@ public:
 	 */
 	void replySecondaryList(uint32_t requestId, uint32_t sockfd, 
 		vector<struct SegmentLocation> secondaryList);
+
+	/**
+	 * Action to send current online OSDs to the newly start one
+	 * @param newOsdSockfd Socket ID of the newly start OSD
+	 * @param onlineOsdList List of online OSDs with their ip,port,id 
+	 */
+	void sendOnlineOsdList(uint32_t newOsdSockfd, 
+		vector<struct OnlineOsd>& onlineOsdList);
 
 	void replyOsdConfig(uint32_t requestId, uint32_t sockfd);
 

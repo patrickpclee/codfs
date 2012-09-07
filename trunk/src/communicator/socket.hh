@@ -14,6 +14,8 @@
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 10;
 
+using namespace std;
+
 class Socket {
 public:
 
