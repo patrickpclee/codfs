@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 #include "../common/debug.hh"
 #include "coding.hh"
 #include "raid1coding.hh"
@@ -59,21 +60,19 @@ uint32_t Raid1Coding::getNoOfReplications(string setting) {
 	return noOfReplications;
 }
 
-/*
-string Raid1Coding::generateSetting (int noOfReplications) {
-	return to_string (noOfReplications);
-}
-*/
+vector<uint32_t> Raid1Coding::getRequiredSegmentIds (string setting,
+		vector<bool> secondaryOsdStatus) {
 
-vector<uint32_t> Raid1Coding::getRequiredSegmentIds (string setting) {
-	// for Raid1 Coding, only require the first segment
-	return {0};
-}
+	// for Raid1 Coding, find the first running OSD
+	vector<bool>::iterator it;
+	it = find(secondaryOsdStatus.begin(), secondaryOsdStatus.end(), true);
 
-uint32_t Raid1Coding::getNumberOfSegments(string setting) {
-	return getNoOfReplications(setting);
-}
+	// not found (no OSD is running)
+	if (it == secondaryOsdStatus.end()) {
+		return {};
+	}
 
-void Raid1Coding::display() {
-
+	// return the index
+	uint32_t offset = it - secondaryOsdStatus.begin();
+	return {offset};
 }
