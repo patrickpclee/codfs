@@ -1,5 +1,6 @@
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 #include "coding.hh"
 #include "raid0coding.hh"
 #include "../common/debug.hh"
@@ -74,7 +75,8 @@ struct ObjectData Raid0Coding::decode(vector<struct SegmentData> segmentData,
 	} else {
 		// objectsize = first segment * (segmentCount - 1) + last segment
 		objectData.info.objectSize = segmentData[0].info.segmentSize
-				* (segmentCount - 1) + (segmentData.end()-1)->info.segmentSize;
+				* (segmentCount - 1)
+				+ (segmentData.end() - 1)->info.segmentSize;
 	}
 
 	objectData.buf = MemoryPool::getInstance().poolMalloc(
@@ -95,13 +97,17 @@ uint32_t Raid0Coding::getNoOfStrips(string setting) {
 	return noOfStrips;
 }
 
-/*
- string Raid0Coding::generateSetting(int noOfStrips) {
- return to_string(noOfStrips);
- }
- */
+vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting,
+		vector<bool> secondaryOsdStatus) {
 
-vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting) {
+	// if any one in secondaryOsdStatus is false, return {} (error)
+	int failedOsdCount = (int) count(secondaryOsdStatus.begin(),
+			secondaryOsdStatus.end(), false);
+
+	if (failedOsdCount > 0) {
+		return {};
+	}
+
 	// for Raid0 Coding, require all segments for decode
 	const uint32_t noOfStrips = getNoOfStrips(setting);
 	vector<uint32_t> requiredSegments(noOfStrips);
@@ -109,12 +115,4 @@ vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting) {
 		requiredSegments[i] = i;
 	}
 	return requiredSegments;
-}
-
-uint32_t Raid0Coding::getNumberOfSegments(string setting) {
-	return getNoOfStrips(setting);
-}
-
-void Raid0Coding::display() {
-
 }
