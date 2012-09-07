@@ -175,7 +175,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size,
 		struct ObjectTransferCache objectCache;
 		{
 			lock_guard<mutex> lk(_objectProcessingMutex);
-			objectCache = _clientCommunicator->getObject(_clientId, sockfd, objectId); 
+			objectCache = client->getObject(_clientId, sockfd, objectId); 
 		}
 		uint64_t copySize = min(objectSize,size - byteWritten);
 		copySize = min(copySize, (i+1) * objectSize - (offset + byteWritten));
@@ -209,6 +209,7 @@ static int ncvfs_release(const char* path, struct fuse_file_info *fi)
 	delete _fileDataCache[fi->fh];
 	_fileDataCache.erase(fi->fh);
 	_fileInfoCache.erase(fi->fh);
+	_fileIdCache.erase(path);
 	return 0;
 }
 

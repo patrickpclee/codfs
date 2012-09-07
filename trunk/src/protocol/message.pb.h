@@ -935,24 +935,34 @@ class GetObjectIdListRequestPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional fixed32 numOfObjs = 1;
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 numOfObjs = 2;
   inline bool has_numofobjs() const;
   inline void clear_numofobjs();
-  static const int kNumOfObjsFieldNumber = 1;
+  static const int kNumOfObjsFieldNumber = 2;
   inline ::google::protobuf::uint32 numofobjs() const;
   inline void set_numofobjs(::google::protobuf::uint32 value);
   
   // @@protoc_insertion_point(class_scope:ncvfs.GetObjectIdListRequestPro)
  private:
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
   inline void set_has_numofobjs();
   inline void clear_has_numofobjs();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
+  ::google::protobuf::uint32 clientid_;
   ::google::protobuf::uint32 numofobjs_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -2099,15 +2109,28 @@ class GetObjectIdListReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
       mutable_objectidlist();
   
+  // repeated fixed32 primaryList = 2;
+  inline int primarylist_size() const;
+  inline void clear_primarylist();
+  static const int kPrimaryListFieldNumber = 2;
+  inline ::google::protobuf::uint32 primarylist(int index) const;
+  inline void set_primarylist(int index, ::google::protobuf::uint32 value);
+  inline void add_primarylist(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      primarylist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_primarylist();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetObjectIdListReplyPro)
  private:
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectidlist_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -5398,15 +5421,37 @@ inline void SetFileSizeRequestPro::set_filesize(::google::protobuf::uint64 value
 
 // GetObjectIdListRequestPro
 
-// optional fixed32 numOfObjs = 1;
-inline bool GetObjectIdListRequestPro::has_numofobjs() const {
+// optional fixed32 clientId = 1;
+inline bool GetObjectIdListRequestPro::has_clientid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void GetObjectIdListRequestPro::set_has_numofobjs() {
+inline void GetObjectIdListRequestPro::set_has_clientid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void GetObjectIdListRequestPro::clear_has_numofobjs() {
+inline void GetObjectIdListRequestPro::clear_has_clientid() {
   _has_bits_[0] &= ~0x00000001u;
+}
+inline void GetObjectIdListRequestPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
+}
+inline ::google::protobuf::uint32 GetObjectIdListRequestPro::clientid() const {
+  return clientid_;
+}
+inline void GetObjectIdListRequestPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
+}
+
+// optional fixed32 numOfObjs = 2;
+inline bool GetObjectIdListRequestPro::has_numofobjs() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void GetObjectIdListRequestPro::set_has_numofobjs() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void GetObjectIdListRequestPro::clear_has_numofobjs() {
+  _has_bits_[0] &= ~0x00000002u;
 }
 inline void GetObjectIdListRequestPro::clear_numofobjs() {
   numofobjs_ = 0u;
@@ -6321,6 +6366,31 @@ GetObjectIdListReplyPro::objectidlist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
 GetObjectIdListReplyPro::mutable_objectidlist() {
   return &objectidlist_;
+}
+
+// repeated fixed32 primaryList = 2;
+inline int GetObjectIdListReplyPro::primarylist_size() const {
+  return primarylist_.size();
+}
+inline void GetObjectIdListReplyPro::clear_primarylist() {
+  primarylist_.Clear();
+}
+inline ::google::protobuf::uint32 GetObjectIdListReplyPro::primarylist(int index) const {
+  return primarylist_.Get(index);
+}
+inline void GetObjectIdListReplyPro::set_primarylist(int index, ::google::protobuf::uint32 value) {
+  primarylist_.Set(index, value);
+}
+inline void GetObjectIdListReplyPro::add_primarylist(::google::protobuf::uint32 value) {
+  primarylist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+GetObjectIdListReplyPro::primarylist() const {
+  return primarylist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+GetObjectIdListReplyPro::mutable_primarylist() {
+  return &primarylist_;
 }
 
 // -------------------------------------------------------------------
