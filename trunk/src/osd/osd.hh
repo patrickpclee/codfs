@@ -12,6 +12,7 @@
 #include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
 #include "segmentlocation.hh"
+#include "onlineosd.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
 #include "../datastructure/concurrentmap.hh"
@@ -192,6 +193,27 @@ public:
 	 * @param sockfd Socket descriptor of message source
 	 */
 	void OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd);
+
+	/**
+	 * Action when a monitor tells a new osd is startup,to connect it if my id > its id 
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param osdId the id of the newly startup osd
+	 * @param osdIp the ip addr of the newly startup osd
+	 * @param osdPort the port of the newly startup osd
+	 */
+	void NewOsdRegisterProcessor(uint32_t requestId, uint32_t sockfd, 
+		uint32_t osdId, uint32_t osdIp, uint32_t osdPort);
+
+
+	/**
+	 * Action when a monitor flush the online list to a osd 
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param onlineOsdList list reference contains all the online osd with its<ip, port, id>
+	 */
+	void OnlineOsdListProcessor(uint32_t requestId, uint32_t sockfd,
+		vector<struct OnlineOsd>& onlineOsdList);
 
 	// getters
 

@@ -56,6 +56,17 @@ uint32_t Monitor::getMonitorId() {
 void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 	uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip, 
 	uint16_t port ) {
+
+	// Send online osd list to the newly startup osd
+	vector<struct OnlineOsd> onlineOsdList;
+	
+	_statModule->getOnlineOsdList(onlineOsdList);
+	_monitorCommunicator->sendOnlineOsdList(sockfd, onlineOsdList);
+
+	// Send the newly startup osd stat to online osd
+	_statModule->broadcastNewOsd(_monitorCommunicator, osdId, ip, port);
+
+	// Add the newly startup osd to the map
 	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE, ip, port);
 }
 

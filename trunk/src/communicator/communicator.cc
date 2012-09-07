@@ -105,6 +105,14 @@ void Communicator::createServerSocket() {
 			_serverPort, _serverSocket.getSockfd());
 }
 
+uint32_t Communicator::getSelfIp() {
+	return _serverSocket.getIpInt();
+}
+
+uint16_t Communicator::getSelfPort() {
+	return _serverSocket.getPort();
+}
+
 /*
  * Runs in a while (1) loop
  * 1. Add serverSockfd to fd_set
@@ -696,6 +704,10 @@ void Communicator::connectToMonitor() {
 	vector<Component> monitorList = parseConfigFile("MONITOR");
 	printComponents("MONITOR", monitorList);
 	connectToComponents(monitorList);
+}
+
+void Communicator::connectToOsd(uint32_t dstOsdIp, uint32_t dstOsdPort) {
+	//uint32_t sockfd = connectAndAdd(dstOsdIp, dstOsdPort, OSD);
 }
 
 void Communicator::connectAllComponents() {

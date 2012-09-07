@@ -101,9 +101,13 @@ int main(int argc, char* argv[]) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	communicator->connectAllComponents();
-	communicator->connectToMonitor();
-	communicator->registerToMonitor();
+	uint32_t myip = communicator->getSelfIp();
+	uint16_t myport = communicator->getSelfPort();
+	printf("=======MY IP = %u.%u.%u.%u======port = %hu=======\n",(myip>>24)&0xff, (myip>>16)&0xff, (myip>>8)&0xff, (myip&0xff), myport);
+	//communicator->connectAllComponents();
+	//communicator->connectToMds();
+	//communicator->connectToMonitor();
+	//communicator->registerToMonitor();
 
 	debug("%s\n", "starting test thread");
 	sleep(5);

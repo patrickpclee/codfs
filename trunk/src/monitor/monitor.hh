@@ -7,6 +7,7 @@
 #include "selectionmodule.hh"
 #include "recoverymodule.hh"
 #include "statmodule.hh"
+#include "../osd/onlineosd.hh"
 #include <map>
 
 using namespace std;
@@ -129,6 +130,7 @@ private:
 	 * the map used to store all the osd status
 	 */	
 	map<uint32_t, struct OsdStat> _osdStatMap;
+
 
 	/**
 	 * Unique ID for this monitor

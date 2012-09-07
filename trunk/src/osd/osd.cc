@@ -14,6 +14,7 @@
 #include "../protocol/status/osdstartupmsg.hh"
 #include "../protocol/status/osdshutdownmsg.hh"
 #include "../protocol/status/osdstatupdatereplymsg.hh"
+#include "../protocol/status/newosdregistermsg.hh"
 
 // for random srand() time() rand() getloadavg()
 #include <stdlib.h>
@@ -480,6 +481,27 @@ void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
 			_osdCommunicator, sockfd, _osdId, getFreespace(), getCpuLoadavg(2));
 	replyMsg->prepareProtocolMsg();
 	_osdCommunicator->addMessage(replyMsg);
+}
+
+void Osd::NewOsdRegisterProcessor(uint32_t requestId, uint32_t sockfd, 
+	uint32_t osdId, uint32_t osdIp, uint32_t osdPort) {
+	if (_osdId > osdId ) {
+		// Do connect
+		_osdCommunicator->connectToOsd(osdIp, osdPort);
+	}
+}
+
+void Osd::OnlineOsdListProcessor(uint32_t requestId, uint32_t sockfd,
+	vector<struct OnlineOsd>& onlineOsdList) {
+
+	for (int i = 0; i < onlineOsdList.size(); ++i) {
+		if (_osdId > onlineOsdList[i].osdId) {
+			// Do connect
+			_osdCommunicator->connectToOsd(onlineOsdList[i].osdIp, 
+										   onlineOsdList[i].osdPort);
+
+		}
+	}
 }
 
 uint32_t Osd::getCpuLoadavg(int idx) {
