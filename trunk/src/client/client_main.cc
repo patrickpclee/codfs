@@ -4,6 +4,7 @@
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 #include "../coding/raid1coding.hh"
+#include "../../lib/logger.hh"
 
 using namespace std;
 
@@ -48,6 +49,12 @@ int main(int argc, char *argv[]) {
 	client = new Client();
 	ClientCommunicator* communicator = client->getCommunicator();
 
+	// setup log
+	FILELog::ReportingLevel() = logDEBUG3;
+	std::string logFileName = "client_" + to_string(client->getClientId()) + ".log";
+	FILE* log_fd = fopen(logFileName.c_str(), "w+");
+	Output2FILE::Stream() = log_fd;
+
 	// start server
 	communicator->createServerSocket();
 
@@ -66,13 +73,15 @@ int main(int argc, char *argv[]) {
 
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 
+	// TEST LOGGING
+
 	// TEST PUT OBJECT
 
 	// RAID 1
 	/*
-	const uint32_t replicationFactor = 3;
-	CodingScheme codingScheme = RAID1_CODING;
-	*/
+	 const uint32_t replicationFactor = 3;
+	 CodingScheme codingScheme = RAID1_CODING;
+	 */
 
 	// RAID 0
 	const uint32_t stripFactor = 2;

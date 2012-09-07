@@ -1,10 +1,12 @@
 #include "filedatacache.hh"
 
+#include <openssl/md5.h>
+
 #include "../client/client_communicator.hh"
 
 #include "../common/memorypool.hh"
-
 #include "../common/debug.hh"
+#include "../common/convertor.hh"
 
 extern ClientCommunicator* _clientCommunicator;
 extern string codingSetting;
@@ -42,6 +44,18 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 	uint64_t bufOffset = 0;
 	uint32_t objectWriteOffset;
 	uint32_t writeSize;
+	while (lastObjectToWrite >= _objectStatusList.size()) {
+		vector<struct ObjectMetaData> objectMetaDataList = _clientCommunicator->getNewObjectList(_clientId, _objectStatusList.size() / 2 + 1);	
+		for(uint32_t i = 0; i < objectMetaDataList.size(); ++i){
+			struct ObjectData tempObjectData;
+			tempObjectData.info.objectId = objectMetaDataList[i]._id;
+			tempObjectData.info.objectSize = _objectSize;
+			_primaryList.push_back(objectMetaDataList[i]._primary);
+			_objectDataList.push_back(tempObjectData);
+			_objectStatusList.push_back(NEW);
+		}
+	}
+
 	for(uint32_t i = firstObjectToWrite; i <= lastObjectToWrite; ++i)
 	{
 		objectWriteOffset = (offset + byteWritten) - (i * _objectSize);
@@ -76,6 +90,7 @@ FileDataCache::~FileDataCache ()
 	uint32_t osdSockfd;
 	vector<uint64_t> objectList;
 	_objectDataList.resize(_lastObjectCount + 1);
+	unsigned char checksum[MD5_DIGEST_LENGTH];
 	for (uint32_t i = 0; i < _lastObjectCount; ++i)
 	{
 		if(_objectStatusList[i] != DIRTY)
@@ -84,7 +99,9 @@ FileDataCache::~FileDataCache ()
 		objectList.push_back(objectData.info.objectId);
 		primary = _primaryList[i];
 		osdSockfd = _clientCommunicator->getSockfdFromId(primary);
-		_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting);
+		
+		MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+		_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
 		_objectStatusList[i] = CLEAN;
 	}
 	objectData = _objectDataList[_lastObjectCount];
@@ -96,5 +113,6 @@ FileDataCache::~FileDataCache ()
 	osdSockfd = _clientCommunicator->getSockfdFromId(primary);
 	_clientCommunicator->saveFileSize(_clientId, _fileId, _fileSize); 
 	_clientCommunicator->saveObjectList(_clientId, _fileId, objectList);
-	_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting);
+	MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+	_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
 }

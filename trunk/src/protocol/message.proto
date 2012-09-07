@@ -61,7 +61,8 @@ message SetFileSizeRequestPro {
 }
 
 message GetObjectIdListRequestPro {
-	optional fixed32 numOfObjs = 1;
+	optional fixed32 clientId = 1;
+	optional fixed32 numOfObjs = 2;
 }
 
 //
@@ -146,6 +147,7 @@ message DownloadFileReplyPro {
 
 message GetObjectIdListReplyPro {
 	repeated fixed64 objectIdList = 1;
+	repeated fixed32 primaryList = 2;
 }
 
 //

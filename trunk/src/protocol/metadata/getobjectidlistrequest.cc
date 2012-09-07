@@ -21,10 +21,10 @@ GetObjectIdListRequestMsg::GetObjectIdListRequestMsg(Communicator* communicator)
 /**
  * Constructor - Save parameters in private variables
  */
-GetObjectIdListRequestMsg::GetObjectIdListRequestMsg(Communicator* communicator,
-		uint32_t mdsSockfd, uint32_t numOfObjs) :
+GetObjectIdListRequestMsg::GetObjectIdListRequestMsg(Communicator* communicator, uint32_t mdsSockfd, uint32_t clientId, uint32_t numOfObjs) :
 		Message(communicator) {
 	_sockfd = mdsSockfd;
+	_clientId = clientId;
 	_numOfObjs = numOfObjs;
 }
 
@@ -33,7 +33,13 @@ void GetObjectIdListRequestMsg::prepareProtocolMsg() {
 
 	ncvfs::GetObjectIdListRequestPro getObjectIdListRequestPro;
 
+	getObjectIdListRequestPro.set_clientid(_clientId);
 	getObjectIdListRequestPro.set_numofobjs(_numOfObjs);
+
+	if (!getObjectIdListRequestPro.SerializeToString(&serializedString)) {
+		cerr << "Failed to write string." << endl;
+		return;
+	}
 
 	setProtocolSize(serializedString.length());
 	setProtocolType(GET_OBJECT_ID_LIST_REQUEST);
@@ -48,19 +54,19 @@ void GetObjectIdListRequestMsg::parse(char* buf) {
 	getObjectIdListRequestPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
+	_clientId = getObjectIdListRequestPro.clientid();
 	_numOfObjs = getObjectIdListRequestPro.numofobjs();
 }
 
 void GetObjectIdListRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->getObjectIdListProcessor(_msgHeader.requestId, _sockfd, _numOfObjs);
+	mds->getObjectIdListProcessor(_msgHeader.requestId, _sockfd, _clientId, _numOfObjs);
 #endif
 }
 
 void GetObjectIdListRequestMsg::printProtocol() {
 	debug(
-			"[GET_OBJECT_ID_LIST_REQUEST] Number of Objects= %" PRIu32 "\n",
-			_numOfObjs);
+			"[GET_OBJECT_ID_LIST_REQUEST] Number of Objects = %" PRIu32 "\n", _numOfObjs);
 }
 
 void GetObjectIdListRequestMsg::setNumOfObjs (uint32_t numOfObjs)
@@ -81,4 +87,14 @@ void GetObjectIdListRequestMsg::setObjectIdList (vector<uint64_t> objectIdList)
 vector<uint64_t> GetObjectIdListRequestMsg::getObjectIdList ()
 {
 	return _objectIdList;
+}
+
+void GetObjectIdListRequestMsg::setPrimaryList (vector<uint32_t> primaryList)
+{
+	_primaryList = primaryList;
+}
+
+vector<uint32_t> GetObjectIdListRequestMsg::getPrimaryList ()
+{
+	return _primaryList;
 }

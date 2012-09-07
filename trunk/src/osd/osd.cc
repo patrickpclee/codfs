@@ -104,7 +104,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 			if (_storageModule->isObjectCached(objectId)) {
 				// case 1: if object exists in cache
-				debug ("Object ID = %" PRIu64 " exists in cache", objectId);
+				debug("Object ID = %" PRIu64 " exists in cache", objectId);
 				objectData = _storageModule->getObjectFromDiskCache(objectId);
 			} else {
 				// case 2: if object does not exist in cache
@@ -220,7 +220,10 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			struct ObjectTransferCache objectTransferCache;
 			objectTransferCache.buf = objectData.buf;
 			objectTransferCache.length = objectData.info.objectSize;
-			_storageModule->saveObjectToDisk(objectId, objectTransferCache);
+
+			if (!_storageModule->isObjectCached(objectId)) {
+				_storageModule->saveObjectToDisk(objectId, objectTransferCache);
+			}
 
 			// free objectData
 			debug("free object %" PRIu64 "\n", objectId);
@@ -281,14 +284,15 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			// compute md5 checksum
 			unsigned char checksum[MD5_DIGEST_LENGTH];
 			MD5((unsigned char*) objectCache.buf, objectCache.length, checksum);
-			debug_cyan ("md5 of object ID %" PRIu64 " = %s\n", objectId, md5ToHex(checksum).c_str());
+			debug_cyan("md5 of object ID %" PRIu64 " = %s\n",
+					objectId, md5ToHex(checksum).c_str());
 
 			// compare md5 with saved one
 			if (_checksumMap.get(objectId) != md5ToHex(checksum)) {
-				debug ("MD5 of Object ID = %" PRIu64 " mismatch!\n", objectId);
-				exit (-1);
+				debug("MD5 of Object ID = %" PRIu64 " mismatch!\n", objectId);
+				exit(-1);
 			} else {
-				debug ("MD5 of Object ID = %" PRIu64 " match\n", objectId);
+				debug("MD5 of Object ID = %" PRIu64 " match\n", objectId);
 				_checksumMap.erase(objectId);
 			}
 
@@ -343,8 +347,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			// Acknowledge MDS for Object Upload Completed
 			_osdCommunicator->objectUploadAck(objectId,
-					codingSetting.codingScheme, codingSetting.setting,
-					nodeList, md5ToHex(checksum));
+					codingSetting.codingScheme, codingSetting.setting, nodeList,
+					md5ToHex(checksum));
 
 			cout << "Object " << objectId << " uploaded" << endl;
 
