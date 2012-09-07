@@ -17,11 +17,12 @@ GetObjectIdListReplyMsg::GetObjectIdListReplyMsg(Communicator* communicator) :
 /**
  * Constructor - Save parameters in private variables
  */
-GetObjectIdListReplyMsg::GetObjectIdListReplyMsg(Communicator* communicator,
-		uint32_t mdsSockfd, vector<uint64_t> objectIdList) :
+GetObjectIdListReplyMsg::GetObjectIdListReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t mdsSockfd, vector<uint64_t> objectIdList, vector<uint32_t> primaryList) :
 		Message(communicator) {
+	_msgHeader.requestId = requestId;
 	_sockfd = mdsSockfd;
 	_objectIdList = objectIdList;
+	_primaryList = primaryList;
 	
 }
 
@@ -31,8 +32,14 @@ void GetObjectIdListReplyMsg::prepareProtocolMsg() {
 	ncvfs::GetObjectIdListReplyPro getObjectIdListReplyPro;
 
 	//getObjectIdListReplyPro.set_numofobjs(_numOfObjs);
-	for (auto objectId : _objectIdList) {
-		getObjectIdListReplyPro.add_objectidlist(objectId);
+	for (uint32_t i = 0; i < _objectIdList.size(); ++i) {
+		getObjectIdListReplyPro.add_objectidlist(_objectIdList[i]);
+		getObjectIdListReplyPro.add_primarylist(_primaryList[i]);
+	}
+
+	if (!getObjectIdListReplyPro.SerializeToString(&serializedString)) {
+		cerr << "Failed to write string." << endl;
+		return;
 	}
 
 	setProtocolSize(serializedString.length());
@@ -50,6 +57,7 @@ void GetObjectIdListReplyMsg::parse(char* buf) {
 
 	for (int i = 0; i < getObjectIdListReplyPro.objectidlist_size(); i++) {
 		_objectIdList.push_back(getObjectIdListReplyPro.objectidlist(i));
+		_primaryList.push_back(getObjectIdListReplyPro.primarylist(i));
 	}
 }
 
@@ -58,15 +66,17 @@ void GetObjectIdListReplyMsg::doHandle() {
 			(GetObjectIdListRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
 	getObjectIdListRequestMsg->setObjectIdList(_objectIdList);
+	getObjectIdListRequestMsg->setPrimaryList(_primaryList);
 	getObjectIdListRequestMsg->setStatus(READY);
 }
 
 void GetObjectIdListReplyMsg::printProtocol() {
 	debug(
-			"[GET_OBJECT_ID_LIST_REPLY] Number of Objects= %zu\n",
+			"[GET_OBJECT_ID_LIST_REPLY] Number of Objects = %zu\n",
 			_objectIdList.size());
 }
 
+/*
 void GetObjectIdListReplyMsg::setObjectIdList (vector<uint64_t> objectIdList)
 {
 	_objectIdList = objectIdList;
@@ -76,3 +86,4 @@ vector<uint64_t> GetObjectIdListReplyMsg::getObjectIdList ()
 {
 	return _objectIdList;
 }
+*/
