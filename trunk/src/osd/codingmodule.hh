@@ -47,6 +47,7 @@ public:
 	 * Decode a list of segments into an object
 	 * @param objectId Destination object ID
 	 * @param segmentData a list of SegmentData structure
+	 * @param secondaryOsdStatus a bool array containing the status of the OSD
 	 * @return an ObjectData structure
 	 */
 
@@ -61,7 +62,8 @@ public:
 	 * @return list of segment ID
 	 */
 
-	vector<uint32_t> getRequiredSegmentIds (CodingScheme codingScheme, string setting);
+	vector<uint32_t> getRequiredSegmentIds(CodingScheme codingScheme,
+			string setting, vector<bool> secondaryOsdStatus);
 
 	/**
 	 * Get the number of segments that the scheme uses
