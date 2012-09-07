@@ -145,6 +145,15 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* GetSecondaryListReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   GetSecondaryListReplyPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* NewOsdRegisterPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  NewOsdRegisterPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* OnlineOsdPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  OnlineOsdPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* OnlineOsdListPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  OnlineOsdListPro_reflection_ = NULL;
 const ::google::protobuf::Descriptor* GetPrimaryListReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   GetPrimaryListReplyPro_reflection_ = NULL;
@@ -857,7 +866,56 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetSecondaryListReplyPro));
-  GetPrimaryListReplyPro_descriptor_ = file->message_type(42);
+  NewOsdRegisterPro_descriptor_ = file->message_type(42);
+  static const int NewOsdRegisterPro_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NewOsdRegisterPro, osdid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NewOsdRegisterPro, osdip_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NewOsdRegisterPro, osdport_),
+  };
+  NewOsdRegisterPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      NewOsdRegisterPro_descriptor_,
+      NewOsdRegisterPro::default_instance_,
+      NewOsdRegisterPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NewOsdRegisterPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NewOsdRegisterPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(NewOsdRegisterPro));
+  OnlineOsdPro_descriptor_ = file->message_type(43);
+  static const int OnlineOsdPro_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdPro, osdid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdPro, osdip_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdPro, osdport_),
+  };
+  OnlineOsdPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      OnlineOsdPro_descriptor_,
+      OnlineOsdPro::default_instance_,
+      OnlineOsdPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(OnlineOsdPro));
+  OnlineOsdListPro_descriptor_ = file->message_type(44);
+  static const int OnlineOsdListPro_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdListPro, onlineosdlist_),
+  };
+  OnlineOsdListPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      OnlineOsdListPro_descriptor_,
+      OnlineOsdListPro::default_instance_,
+      OnlineOsdListPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdListPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdListPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(OnlineOsdListPro));
+  GetPrimaryListReplyPro_descriptor_ = file->message_type(45);
   static const int GetPrimaryListReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListReplyPro, primarylist_),
   };
@@ -969,6 +1027,12 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     GetSecondaryListReplyPro_descriptor_, &GetSecondaryListReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    NewOsdRegisterPro_descriptor_, &NewOsdRegisterPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    OnlineOsdPro_descriptor_, &OnlineOsdPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    OnlineOsdListPro_descriptor_, &OnlineOsdListPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     GetPrimaryListReplyPro_descriptor_, &GetPrimaryListReplyPro::default_instance());
 }
 
@@ -1059,6 +1123,12 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete GetOsdConfigReplyPro_reflection_;
   delete GetSecondaryListReplyPro::default_instance_;
   delete GetSecondaryListReplyPro_reflection_;
+  delete NewOsdRegisterPro::default_instance_;
+  delete NewOsdRegisterPro_reflection_;
+  delete OnlineOsdPro::default_instance_;
+  delete OnlineOsdPro_reflection_;
+  delete OnlineOsdListPro::default_instance_;
+  delete OnlineOsdListPro_reflection_;
   delete GetPrimaryListReplyPro::default_instance_;
   delete GetPrimaryListReplyPro_reflection_;
 }
@@ -1160,8 +1230,13 @@ void protobuf_AddDesc_message_2eproto() {
     "ty\030\004 \001(\007\022\025\n\rsegmentFolder\030\005 \001(\t\022\031\n\021objec"
     "tCacheFolder\030\006 \001(\t\"L\n\030GetSecondaryListRe"
     "plyPro\0220\n\rsecondaryList\030\001 \003(\0132\031.ncvfs.Se"
-    "gmentLocationPro\"-\n\026GetPrimaryListReplyP"
-    "ro\022\023\n\013primaryList\030\001 \003(\007B\002H\001", 3667);
+    "gmentLocationPro\"B\n\021NewOsdRegisterPro\022\r\n"
+    "\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003"
+    " \001(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005o"
+    "sdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020OnlineOsd"
+    "ListPro\022*\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs.O"
+    "nlineOsdPro\"-\n\026GetPrimaryListReplyPro\022\023\n"
+    "\013primaryList\030\001 \003(\007B\002H\001", 3862);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -1206,6 +1281,9 @@ void protobuf_AddDesc_message_2eproto() {
   OsdStatUpdateRequestPro::default_instance_ = new OsdStatUpdateRequestPro();
   GetOsdConfigReplyPro::default_instance_ = new GetOsdConfigReplyPro();
   GetSecondaryListReplyPro::default_instance_ = new GetSecondaryListReplyPro();
+  NewOsdRegisterPro::default_instance_ = new NewOsdRegisterPro();
+  OnlineOsdPro::default_instance_ = new OnlineOsdPro();
+  OnlineOsdListPro::default_instance_ = new OnlineOsdListPro();
   GetPrimaryListReplyPro::default_instance_ = new GetPrimaryListReplyPro();
   HandshakeRequestPro::default_instance_->InitAsDefaultInstance();
   HandshakeReplyPro::default_instance_->InitAsDefaultInstance();
@@ -1249,6 +1327,9 @@ void protobuf_AddDesc_message_2eproto() {
   OsdStatUpdateRequestPro::default_instance_->InitAsDefaultInstance();
   GetOsdConfigReplyPro::default_instance_->InitAsDefaultInstance();
   GetSecondaryListReplyPro::default_instance_->InitAsDefaultInstance();
+  NewOsdRegisterPro::default_instance_->InitAsDefaultInstance();
+  OnlineOsdPro::default_instance_->InitAsDefaultInstance();
+  OnlineOsdListPro::default_instance_->InitAsDefaultInstance();
   GetPrimaryListReplyPro::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
 }
@@ -12805,6 +12886,770 @@ void GetSecondaryListReplyPro::Swap(GetSecondaryListReplyPro* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = GetSecondaryListReplyPro_descriptor_;
   metadata.reflection = GetSecondaryListReplyPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int NewOsdRegisterPro::kOsdIdFieldNumber;
+const int NewOsdRegisterPro::kOsdIpFieldNumber;
+const int NewOsdRegisterPro::kOsdPortFieldNumber;
+#endif  // !_MSC_VER
+
+NewOsdRegisterPro::NewOsdRegisterPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void NewOsdRegisterPro::InitAsDefaultInstance() {
+}
+
+NewOsdRegisterPro::NewOsdRegisterPro(const NewOsdRegisterPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void NewOsdRegisterPro::SharedCtor() {
+  _cached_size_ = 0;
+  osdid_ = 0u;
+  osdip_ = 0u;
+  osdport_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+NewOsdRegisterPro::~NewOsdRegisterPro() {
+  SharedDtor();
+}
+
+void NewOsdRegisterPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void NewOsdRegisterPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* NewOsdRegisterPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return NewOsdRegisterPro_descriptor_;
+}
+
+const NewOsdRegisterPro& NewOsdRegisterPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+NewOsdRegisterPro* NewOsdRegisterPro::default_instance_ = NULL;
+
+NewOsdRegisterPro* NewOsdRegisterPro::New() const {
+  return new NewOsdRegisterPro;
+}
+
+void NewOsdRegisterPro::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    osdid_ = 0u;
+    osdip_ = 0u;
+    osdport_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool NewOsdRegisterPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed32 osdId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdid_)));
+          set_has_osdid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_osdIp;
+        break;
+      }
+      
+      // optional fixed32 osdIp = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdIp:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdip_)));
+          set_has_osdip();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(29)) goto parse_osdPort;
+        break;
+      }
+      
+      // optional fixed32 osdPort = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdPort:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdport_)));
+          set_has_osdport();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void NewOsdRegisterPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->osdid(), output);
+  }
+  
+  // optional fixed32 osdIp = 2;
+  if (has_osdip()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->osdip(), output);
+  }
+  
+  // optional fixed32 osdPort = 3;
+  if (has_osdport()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->osdport(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* NewOsdRegisterPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->osdid(), target);
+  }
+  
+  // optional fixed32 osdIp = 2;
+  if (has_osdip()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->osdip(), target);
+  }
+  
+  // optional fixed32 osdPort = 3;
+  if (has_osdport()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->osdport(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int NewOsdRegisterPro::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed32 osdId = 1;
+    if (has_osdid()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdIp = 2;
+    if (has_osdip()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdPort = 3;
+    if (has_osdport()) {
+      total_size += 1 + 4;
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void NewOsdRegisterPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const NewOsdRegisterPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const NewOsdRegisterPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void NewOsdRegisterPro::MergeFrom(const NewOsdRegisterPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_osdid()) {
+      set_osdid(from.osdid());
+    }
+    if (from.has_osdip()) {
+      set_osdip(from.osdip());
+    }
+    if (from.has_osdport()) {
+      set_osdport(from.osdport());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void NewOsdRegisterPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void NewOsdRegisterPro::CopyFrom(const NewOsdRegisterPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool NewOsdRegisterPro::IsInitialized() const {
+  
+  return true;
+}
+
+void NewOsdRegisterPro::Swap(NewOsdRegisterPro* other) {
+  if (other != this) {
+    std::swap(osdid_, other->osdid_);
+    std::swap(osdip_, other->osdip_);
+    std::swap(osdport_, other->osdport_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata NewOsdRegisterPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = NewOsdRegisterPro_descriptor_;
+  metadata.reflection = NewOsdRegisterPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int OnlineOsdPro::kOsdIdFieldNumber;
+const int OnlineOsdPro::kOsdIpFieldNumber;
+const int OnlineOsdPro::kOsdPortFieldNumber;
+#endif  // !_MSC_VER
+
+OnlineOsdPro::OnlineOsdPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void OnlineOsdPro::InitAsDefaultInstance() {
+}
+
+OnlineOsdPro::OnlineOsdPro(const OnlineOsdPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void OnlineOsdPro::SharedCtor() {
+  _cached_size_ = 0;
+  osdid_ = 0u;
+  osdip_ = 0u;
+  osdport_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+OnlineOsdPro::~OnlineOsdPro() {
+  SharedDtor();
+}
+
+void OnlineOsdPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void OnlineOsdPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* OnlineOsdPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return OnlineOsdPro_descriptor_;
+}
+
+const OnlineOsdPro& OnlineOsdPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+OnlineOsdPro* OnlineOsdPro::default_instance_ = NULL;
+
+OnlineOsdPro* OnlineOsdPro::New() const {
+  return new OnlineOsdPro;
+}
+
+void OnlineOsdPro::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    osdid_ = 0u;
+    osdip_ = 0u;
+    osdport_ = 0u;
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool OnlineOsdPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed32 osdId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdid_)));
+          set_has_osdid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_osdIp;
+        break;
+      }
+      
+      // optional fixed32 osdIp = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdIp:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdip_)));
+          set_has_osdip();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(29)) goto parse_osdPort;
+        break;
+      }
+      
+      // optional fixed32 osdPort = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdPort:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdport_)));
+          set_has_osdport();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void OnlineOsdPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->osdid(), output);
+  }
+  
+  // optional fixed32 osdIp = 2;
+  if (has_osdip()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->osdip(), output);
+  }
+  
+  // optional fixed32 osdPort = 3;
+  if (has_osdport()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(3, this->osdport(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* OnlineOsdPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed32 osdId = 1;
+  if (has_osdid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->osdid(), target);
+  }
+  
+  // optional fixed32 osdIp = 2;
+  if (has_osdip()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->osdip(), target);
+  }
+  
+  // optional fixed32 osdPort = 3;
+  if (has_osdport()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(3, this->osdport(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int OnlineOsdPro::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed32 osdId = 1;
+    if (has_osdid()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdIp = 2;
+    if (has_osdip()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional fixed32 osdPort = 3;
+    if (has_osdport()) {
+      total_size += 1 + 4;
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void OnlineOsdPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const OnlineOsdPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const OnlineOsdPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void OnlineOsdPro::MergeFrom(const OnlineOsdPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_osdid()) {
+      set_osdid(from.osdid());
+    }
+    if (from.has_osdip()) {
+      set_osdip(from.osdip());
+    }
+    if (from.has_osdport()) {
+      set_osdport(from.osdport());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void OnlineOsdPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void OnlineOsdPro::CopyFrom(const OnlineOsdPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool OnlineOsdPro::IsInitialized() const {
+  
+  return true;
+}
+
+void OnlineOsdPro::Swap(OnlineOsdPro* other) {
+  if (other != this) {
+    std::swap(osdid_, other->osdid_);
+    std::swap(osdip_, other->osdip_);
+    std::swap(osdport_, other->osdport_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata OnlineOsdPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = OnlineOsdPro_descriptor_;
+  metadata.reflection = OnlineOsdPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int OnlineOsdListPro::kOnlineOsdListFieldNumber;
+#endif  // !_MSC_VER
+
+OnlineOsdListPro::OnlineOsdListPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void OnlineOsdListPro::InitAsDefaultInstance() {
+}
+
+OnlineOsdListPro::OnlineOsdListPro(const OnlineOsdListPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void OnlineOsdListPro::SharedCtor() {
+  _cached_size_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+OnlineOsdListPro::~OnlineOsdListPro() {
+  SharedDtor();
+}
+
+void OnlineOsdListPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void OnlineOsdListPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* OnlineOsdListPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return OnlineOsdListPro_descriptor_;
+}
+
+const OnlineOsdListPro& OnlineOsdListPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+OnlineOsdListPro* OnlineOsdListPro::default_instance_ = NULL;
+
+OnlineOsdListPro* OnlineOsdListPro::New() const {
+  return new OnlineOsdListPro;
+}
+
+void OnlineOsdListPro::Clear() {
+  onlineosdlist_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool OnlineOsdListPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_onlineOsdList:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+                input, add_onlineosdlist()));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(10)) goto parse_onlineOsdList;
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void OnlineOsdListPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+  for (int i = 0; i < this->onlineosdlist_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, this->onlineosdlist(i), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* OnlineOsdListPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+  for (int i = 0; i < this->onlineosdlist_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        1, this->onlineosdlist(i), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int OnlineOsdListPro::ByteSize() const {
+  int total_size = 0;
+  
+  // repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+  total_size += 1 * this->onlineosdlist_size();
+  for (int i = 0; i < this->onlineosdlist_size(); i++) {
+    total_size +=
+      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        this->onlineosdlist(i));
+  }
+  
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void OnlineOsdListPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const OnlineOsdListPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const OnlineOsdListPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void OnlineOsdListPro::MergeFrom(const OnlineOsdListPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  onlineosdlist_.MergeFrom(from.onlineosdlist_);
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void OnlineOsdListPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void OnlineOsdListPro::CopyFrom(const OnlineOsdListPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool OnlineOsdListPro::IsInitialized() const {
+  
+  return true;
+}
+
+void OnlineOsdListPro::Swap(OnlineOsdListPro* other) {
+  if (other != this) {
+    onlineosdlist_.Swap(&other->onlineosdlist_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata OnlineOsdListPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = OnlineOsdListPro_descriptor_;
+  metadata.reflection = OnlineOsdListPro_reflection_;
   return metadata;
 }
 

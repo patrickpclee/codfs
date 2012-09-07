@@ -10,6 +10,16 @@ class EnumToString {
   EnumToString(); // utility class, no instances
 
 public:
+  static const char * toString( ObjectDataStatus en ) {
+    switch( en ) {
+      case CLEAN: return "CLEAN";
+      case DIRTY: return "DIRTY";
+      case NEW: return "NEW";
+      case UNFETCHED: return "UNFETCHED";
+    }
+    return "???";
+  }
+
   static const char * toString( ComponentType en ) {
     switch( en ) {
       case CLIENT: return "CLIENT";
@@ -42,9 +52,11 @@ public:
       case LIST_DIRECTORY_REPLY: return "LIST_DIRECTORY_REPLY";
       case LIST_DIRECTORY_REQUEST: return "LIST_DIRECTORY_REQUEST";
       case MSGTYPE_END: return "MSGTYPE_END";
+      case NEW_OSD_REGISTER: return "NEW_OSD_REGISTER";
       case OBJECT_DATA: return "OBJECT_DATA";
       case OBJECT_TRANSFER_END_REPLY: return "OBJECT_TRANSFER_END_REPLY";
       case OBJECT_TRANSFER_END_REQUEST: return "OBJECT_TRANSFER_END_REQUEST";
+      case ONLINE_OSD_LIST: return "ONLINE_OSD_LIST";
       case OSDSTAT_UPDATE_REPLY: return "OSDSTAT_UPDATE_REPLY";
       case OSDSTAT_UPDATE_REQUEST: return "OSDSTAT_UPDATE_REQUEST";
       case OSD_SHUTDOWN: return "OSD_SHUTDOWN";

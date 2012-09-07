@@ -74,6 +74,9 @@ class GetOsdConfigRequestPro;
 class OsdStatUpdateRequestPro;
 class GetOsdConfigReplyPro;
 class GetSecondaryListReplyPro;
+class NewOsdRegisterPro;
+class OnlineOsdPro;
+class OnlineOsdListPro;
 class GetPrimaryListReplyPro;
 
 enum HandshakeRequestPro_ComponentType {
@@ -4376,6 +4379,295 @@ class GetSecondaryListReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class NewOsdRegisterPro : public ::google::protobuf::Message {
+ public:
+  NewOsdRegisterPro();
+  virtual ~NewOsdRegisterPro();
+  
+  NewOsdRegisterPro(const NewOsdRegisterPro& from);
+  
+  inline NewOsdRegisterPro& operator=(const NewOsdRegisterPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const NewOsdRegisterPro& default_instance();
+  
+  void Swap(NewOsdRegisterPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  NewOsdRegisterPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const NewOsdRegisterPro& from);
+  void MergeFrom(const NewOsdRegisterPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 osdId = 1;
+  inline bool has_osdid() const;
+  inline void clear_osdid();
+  static const int kOsdIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 osdIp = 2;
+  inline bool has_osdip() const;
+  inline void clear_osdip();
+  static const int kOsdIpFieldNumber = 2;
+  inline ::google::protobuf::uint32 osdip() const;
+  inline void set_osdip(::google::protobuf::uint32 value);
+  
+  // optional fixed32 osdPort = 3;
+  inline bool has_osdport() const;
+  inline void clear_osdport();
+  static const int kOsdPortFieldNumber = 3;
+  inline ::google::protobuf::uint32 osdport() const;
+  inline void set_osdport(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.NewOsdRegisterPro)
+ private:
+  inline void set_has_osdid();
+  inline void clear_has_osdid();
+  inline void set_has_osdip();
+  inline void clear_has_osdip();
+  inline void set_has_osdport();
+  inline void clear_has_osdport();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 osdid_;
+  ::google::protobuf::uint32 osdip_;
+  ::google::protobuf::uint32 osdport_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static NewOsdRegisterPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class OnlineOsdPro : public ::google::protobuf::Message {
+ public:
+  OnlineOsdPro();
+  virtual ~OnlineOsdPro();
+  
+  OnlineOsdPro(const OnlineOsdPro& from);
+  
+  inline OnlineOsdPro& operator=(const OnlineOsdPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const OnlineOsdPro& default_instance();
+  
+  void Swap(OnlineOsdPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  OnlineOsdPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const OnlineOsdPro& from);
+  void MergeFrom(const OnlineOsdPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 osdId = 1;
+  inline bool has_osdid() const;
+  inline void clear_osdid();
+  static const int kOsdIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 osdIp = 2;
+  inline bool has_osdip() const;
+  inline void clear_osdip();
+  static const int kOsdIpFieldNumber = 2;
+  inline ::google::protobuf::uint32 osdip() const;
+  inline void set_osdip(::google::protobuf::uint32 value);
+  
+  // optional fixed32 osdPort = 3;
+  inline bool has_osdport() const;
+  inline void clear_osdport();
+  static const int kOsdPortFieldNumber = 3;
+  inline ::google::protobuf::uint32 osdport() const;
+  inline void set_osdport(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.OnlineOsdPro)
+ private:
+  inline void set_has_osdid();
+  inline void clear_has_osdid();
+  inline void set_has_osdip();
+  inline void clear_has_osdip();
+  inline void set_has_osdport();
+  inline void clear_has_osdport();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 osdid_;
+  ::google::protobuf::uint32 osdip_;
+  ::google::protobuf::uint32 osdport_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static OnlineOsdPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class OnlineOsdListPro : public ::google::protobuf::Message {
+ public:
+  OnlineOsdListPro();
+  virtual ~OnlineOsdListPro();
+  
+  OnlineOsdListPro(const OnlineOsdListPro& from);
+  
+  inline OnlineOsdListPro& operator=(const OnlineOsdListPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const OnlineOsdListPro& default_instance();
+  
+  void Swap(OnlineOsdListPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  OnlineOsdListPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const OnlineOsdListPro& from);
+  void MergeFrom(const OnlineOsdListPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+  inline int onlineosdlist_size() const;
+  inline void clear_onlineosdlist();
+  static const int kOnlineOsdListFieldNumber = 1;
+  inline const ::ncvfs::OnlineOsdPro& onlineosdlist(int index) const;
+  inline ::ncvfs::OnlineOsdPro* mutable_onlineosdlist(int index);
+  inline ::ncvfs::OnlineOsdPro* add_onlineosdlist();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >&
+      onlineosdlist() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >*
+      mutable_onlineosdlist();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.OnlineOsdListPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro > onlineosdlist_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static OnlineOsdListPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class GetPrimaryListReplyPro : public ::google::protobuf::Message {
  public:
   GetPrimaryListReplyPro();
@@ -7572,6 +7864,175 @@ GetSecondaryListReplyPro::secondarylist() const {
 inline ::google::protobuf::RepeatedPtrField< ::ncvfs::SegmentLocationPro >*
 GetSecondaryListReplyPro::mutable_secondarylist() {
   return &secondarylist_;
+}
+
+// -------------------------------------------------------------------
+
+// NewOsdRegisterPro
+
+// optional fixed32 osdId = 1;
+inline bool NewOsdRegisterPro::has_osdid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void NewOsdRegisterPro::set_has_osdid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void NewOsdRegisterPro::clear_has_osdid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void NewOsdRegisterPro::clear_osdid() {
+  osdid_ = 0u;
+  clear_has_osdid();
+}
+inline ::google::protobuf::uint32 NewOsdRegisterPro::osdid() const {
+  return osdid_;
+}
+inline void NewOsdRegisterPro::set_osdid(::google::protobuf::uint32 value) {
+  set_has_osdid();
+  osdid_ = value;
+}
+
+// optional fixed32 osdIp = 2;
+inline bool NewOsdRegisterPro::has_osdip() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void NewOsdRegisterPro::set_has_osdip() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void NewOsdRegisterPro::clear_has_osdip() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void NewOsdRegisterPro::clear_osdip() {
+  osdip_ = 0u;
+  clear_has_osdip();
+}
+inline ::google::protobuf::uint32 NewOsdRegisterPro::osdip() const {
+  return osdip_;
+}
+inline void NewOsdRegisterPro::set_osdip(::google::protobuf::uint32 value) {
+  set_has_osdip();
+  osdip_ = value;
+}
+
+// optional fixed32 osdPort = 3;
+inline bool NewOsdRegisterPro::has_osdport() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void NewOsdRegisterPro::set_has_osdport() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void NewOsdRegisterPro::clear_has_osdport() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void NewOsdRegisterPro::clear_osdport() {
+  osdport_ = 0u;
+  clear_has_osdport();
+}
+inline ::google::protobuf::uint32 NewOsdRegisterPro::osdport() const {
+  return osdport_;
+}
+inline void NewOsdRegisterPro::set_osdport(::google::protobuf::uint32 value) {
+  set_has_osdport();
+  osdport_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// OnlineOsdPro
+
+// optional fixed32 osdId = 1;
+inline bool OnlineOsdPro::has_osdid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void OnlineOsdPro::set_has_osdid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void OnlineOsdPro::clear_has_osdid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void OnlineOsdPro::clear_osdid() {
+  osdid_ = 0u;
+  clear_has_osdid();
+}
+inline ::google::protobuf::uint32 OnlineOsdPro::osdid() const {
+  return osdid_;
+}
+inline void OnlineOsdPro::set_osdid(::google::protobuf::uint32 value) {
+  set_has_osdid();
+  osdid_ = value;
+}
+
+// optional fixed32 osdIp = 2;
+inline bool OnlineOsdPro::has_osdip() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void OnlineOsdPro::set_has_osdip() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void OnlineOsdPro::clear_has_osdip() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void OnlineOsdPro::clear_osdip() {
+  osdip_ = 0u;
+  clear_has_osdip();
+}
+inline ::google::protobuf::uint32 OnlineOsdPro::osdip() const {
+  return osdip_;
+}
+inline void OnlineOsdPro::set_osdip(::google::protobuf::uint32 value) {
+  set_has_osdip();
+  osdip_ = value;
+}
+
+// optional fixed32 osdPort = 3;
+inline bool OnlineOsdPro::has_osdport() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void OnlineOsdPro::set_has_osdport() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void OnlineOsdPro::clear_has_osdport() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void OnlineOsdPro::clear_osdport() {
+  osdport_ = 0u;
+  clear_has_osdport();
+}
+inline ::google::protobuf::uint32 OnlineOsdPro::osdport() const {
+  return osdport_;
+}
+inline void OnlineOsdPro::set_osdport(::google::protobuf::uint32 value) {
+  set_has_osdport();
+  osdport_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// OnlineOsdListPro
+
+// repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+inline int OnlineOsdListPro::onlineosdlist_size() const {
+  return onlineosdlist_.size();
+}
+inline void OnlineOsdListPro::clear_onlineosdlist() {
+  onlineosdlist_.Clear();
+}
+inline const ::ncvfs::OnlineOsdPro& OnlineOsdListPro::onlineosdlist(int index) const {
+  return onlineosdlist_.Get(index);
+}
+inline ::ncvfs::OnlineOsdPro* OnlineOsdListPro::mutable_onlineosdlist(int index) {
+  return onlineosdlist_.Mutable(index);
+}
+inline ::ncvfs::OnlineOsdPro* OnlineOsdListPro::add_onlineosdlist() {
+  return onlineosdlist_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >&
+OnlineOsdListPro::onlineosdlist() const {
+  return onlineosdlist_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >*
+OnlineOsdListPro::mutable_onlineosdlist() {
+  return &onlineosdlist_;
 }
 
 // -------------------------------------------------------------------

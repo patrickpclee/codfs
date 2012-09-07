@@ -14,6 +14,7 @@
 #include "../protocol/nodelist/getprimarylistreply.hh"
 #include "../protocol/nodelist/getsecondarylistreply.hh"
 #include "../protocol/nodelist/getosdconfigreply.hh"
+#include "../protocol/status/onlineosdlistmsg.hh"
 
 using namespace std;
 
@@ -59,4 +60,11 @@ void MonitorCommunicator::replyOsdConfig(uint32_t requestId, uint32_t sockfd){
 	lock_guard<mutex> lk(osdCountMutex);
 	_osdCount++;
 	return;
+}
+
+void MonitorCommunicator::sendOnlineOsdList(uint32_t newOsdSockfd, 
+		vector<struct OnlineOsd>& onlineOsdList) {
+	OnlineOsdListMsg* onlineOsdListMsg = new OnlineOsdListMsg(this, newOsdSockfd, onlineOsdList);
+	onlineOsdListMsg->prepareProtocolMsg();
+	addMessage(onlineOsdListMsg);
 }

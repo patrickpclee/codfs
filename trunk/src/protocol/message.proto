@@ -310,6 +310,22 @@ message GetSecondaryListReplyPro{
 	repeated SegmentLocationPro secondaryList = 1;
 }
 
+message NewOsdRegisterPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdIp = 2;
+	optional fixed32 osdPort = 3;
+}
+
+message OnlineOsdPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdIp = 2;
+	optional fixed32 osdPort = 3;
+}
+
+message OnlineOsdListPro {
+	repeated OnlineOsdPro onlineOsdList = 1;
+}
+
 //
 // MONITOR -> MDS
 //

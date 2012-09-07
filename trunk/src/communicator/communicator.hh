@@ -208,7 +208,9 @@ public:
 	 * Connect to monitor (test)
 	 */
 	void connectToMonitor();
+//TODO: documentation
 
+	void connectToOsd(uint32_t ip, uint32_t port);
 protected:
 
 	/**
