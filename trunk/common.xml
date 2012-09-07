@@ -41,16 +41,16 @@
 				<ip>137.189.89.130</ip>
 				<port>52000</port>
 			</OSD0>
-			<OSD2>
+			<OSD1>
 				<id>52001</id>
 				<ip>137.189.89.142</ip>
 				<port>52001</port>
-			</OSD2>
-			<OSD3>
+			</OSD1>
+			<OSD2>
 				<id>52002</id>
 				<ip>137.189.90.84</ip>
 				<port>52002</port>
-			</OSD3>
+			</OSD2>
 		</OSD>
 		
 		<MONITOR>
