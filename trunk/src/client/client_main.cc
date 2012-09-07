@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
 	// setup log
 	FILELog::ReportingLevel() = logDEBUG3;
 	std::string logFileName = "client_" + to_string(client->getClientId()) + ".log";
-	FILE* log_fd = fopen(logFileName.c_str(), "w+");
+	FILE* log_fd = fopen(logFileName.c_str(), "a");
 	Output2FILE::Stream() = log_fd;
 
 	// start server
