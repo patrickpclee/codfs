@@ -248,6 +248,13 @@ public:
 private:
 
 	/**
+	 * Set the bool array containing the status of the OSDs holding the segments
+	 * @param osdListStatus Bool array representing OSD status (true = up, false = down)
+	 */
+
+	void setOsdListStatus (vector<bool> &secondaryOsdStatus);
+
+	/**
 	 * Retrieve a segment from the storage
 	 * @param objectId ID of the object that the segment is belonged to
 	 * @param segmentId Target Segment ID
