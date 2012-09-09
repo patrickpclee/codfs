@@ -1,6 +1,7 @@
 #include "statmodule.hh"
 #include "../osd/onlineosd.hh"
 #include "../protocol/status/newosdregistermsg.hh"
+#include "../common/debug.hh"
 #include <ctime>
 
 
@@ -35,6 +36,18 @@ void StatModule::updateOsdStatMap (Communicator* communicator) {
 void StatModule::removeStatById (uint32_t osdId) {
 	lock_guard<mutex> lk(osdStatMapMutex);
 	_osdStatMap.erase(osdId);
+}
+
+void StatModule::removeStatBySockfd (uint32_t sockfd) {
+	lock_guard<mutex> lk(osdStatMapMutex);
+	debug_yellow("Try to delete sockfd = %" PRIu32 "\n", sockfd);
+	map<uint32_t, struct OsdStat>::iterator p;
+	p = _osdStatMap.begin();
+	while (p != _osdStatMap.end()) {
+		if (p->second.osdSockfd == sockfd)
+			_osdStatMap.erase(p++);
+		p++;
+	}	
 }
 
 void StatModule::setStatById (uint32_t osdId, uint32_t sockfd, 

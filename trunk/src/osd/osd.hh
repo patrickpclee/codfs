@@ -53,7 +53,7 @@ public:
 	 * Constructor
 	 */
 
-	Osd(string configFilePath);
+	Osd(uint32_t selfId);
 
 	/**
 	 * Destructor

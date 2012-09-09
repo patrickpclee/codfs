@@ -69,7 +69,12 @@ int main(int argc, char *argv[]) {
 
 	communicator->setId(client->getClientId());
 	communicator->setComponentType(CLIENT);
-	communicator->connectAllComponents();
+	
+	//communicator->connectAllComponents();
+	communicator->connectToMds();
+	communicator->connectToMonitor();
+	communicator->getOsdListAndConnect();
+
 
 	////////////////////// TEST FUNCTIONS ////////////////////////////
 

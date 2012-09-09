@@ -9,6 +9,7 @@
 #include "segmentlocation.hh"
 #include "../common/debug.hh"
 #include "../common/garbagecollector.hh"
+#include "../common/netfunc.hh"
 
 /// Osd Object
 Osd* osd;
@@ -70,17 +71,19 @@ int main(int argc, char* argv[]) {
 	signal(SIGINT, sighandler);
 	signal(SIGUSR1, sighandler);
 
-	string configFilePath;
+	char* interfaceName = NULL;
+	uint32_t selfId = 0;
 
-	if (argc < 2) {
-		cout << "Usage: ./OSD [OSD CONFIG FILE]" << endl;
+	if (argc < 3) {
+		cout << "Usage: ./OSD [ID] [NETWORK INTERFACE]" << endl;
 		exit(0);
 	} else {
-		configFilePath = string(argv[1]);
+		selfId = atoi(argv[1]);
+		interfaceName = argv[2];
 	}
 
 	// create new OSD object and communicator
-	osd = new Osd(configFilePath);
+	osd = new Osd(selfId);
 
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
@@ -101,13 +104,19 @@ int main(int argc, char* argv[]) {
 	// 3. Send Thread
 	thread sendThread(startSendThread);
 
-	uint32_t myip = communicator->getSelfIp();
-	uint16_t myport = communicator->getSelfPort();
-	printf("=======MY IP = %u.%u.%u.%u======port = %hu=======\n",(myip>>24)&0xff, (myip>>16)&0xff, (myip>>8)&0xff, (myip&0xff), myport);
+	uint32_t selfAddr = getInterfaceAddressV4(interfaceName);
+	uint16_t selfPort = communicator->getServerPort();
+	printIp(selfAddr);
+	printf("Port = %hu\n",selfPort);
+
 	//communicator->connectAllComponents();
-	//communicator->connectToMds();
-	//communicator->connectToMonitor();
-	//communicator->registerToMonitor();
+	printf("1\n");
+	communicator->connectToMds();
+	printf("2j\n");
+	communicator->connectToMonitor();
+	printf("3\n");
+	communicator->registerToMonitor(selfAddr, selfPort);
+	printf("4\n");
 
 	debug("%s\n", "starting test thread");
 	sleep(5);

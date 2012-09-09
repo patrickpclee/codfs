@@ -38,15 +38,16 @@ extern ConfigLayer* configLayer;
  */
 mutex objectRequestCountMutex;
 
-Osd::Osd(string configFilePath) {
+Osd::Osd(uint32_t selfId) {
 
-	configLayer = new ConfigLayer(configFilePath.c_str(), "common.xml");
+	configLayer = new ConfigLayer("osdconfig.xml", "common.xml");
 	//segmentLocationCache = new SegmentLocationCache();
 	_storageModule = new StorageModule();
 	_osdCommunicator = new OsdCommunicator();
 	_codingModule = new CodingModule();
 
-	_osdId = configLayer->getConfigInt("Osdid");
+	//_osdId = configLayer->getConfigInt("Osdid");
+	_osdId = selfId;
 
 	srand(time(NULL)); //random test
 }
@@ -498,7 +499,7 @@ void Osd::NewOsdRegisterProcessor(uint32_t requestId, uint32_t sockfd,
 void Osd::OnlineOsdListProcessor(uint32_t requestId, uint32_t sockfd,
 	vector<struct OnlineOsd>& onlineOsdList) {
 
-	for (int i = 0; i < onlineOsdList.size(); ++i) {
+	for (uint32_t i = 0; i < onlineOsdList.size(); ++i) {
 		if (_osdId > onlineOsdList[i].osdId) {
 			// Do connect
 			_osdCommunicator->connectToOsd(onlineOsdList[i].osdIp, 

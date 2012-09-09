@@ -142,9 +142,11 @@ public:
 	 */
 	void replyPutObjectEnd(uint32_t requestId, uint32_t connectionId, uint64_t objectId); //new version
 
-	// TODO: CONNECT TO COMPONENT: PRIMITIVE DESIGN
-	void connectToMds();
-	void connectToOsd();
+	/**
+	 * Send a request to monitor to get Osd List and connect 
+	 */
+	void getOsdListAndConnect();
+
 private:
 
 };

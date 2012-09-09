@@ -208,9 +208,12 @@ public:
 	 * Connect to monitor (test)
 	 */
 	void connectToMonitor();
+	void connectToMds();
 //TODO: documentation
 
 	void connectToOsd(uint32_t ip, uint32_t port);
+
+	uint16_t getServerPort();
 protected:
 
 	/**
