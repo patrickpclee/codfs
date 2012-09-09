@@ -7,21 +7,22 @@ class Raid1Coding: public Coding {
 public:
 	Raid1Coding();
 	~Raid1Coding();
-	void display();
+
 	struct ObjectData decode(vector<struct SegmentData> segmentData,
 			string setting);
+
 	vector<struct SegmentData> encode(struct ObjectData objectData,
 			string setting);
-	uint32_t getNoOfReplications(string setting);
 
-	vector<uint32_t> getRequiredSegmentIds (string setting);
-	uint32_t getNumberOfSegments(string setting);
+	vector<uint32_t> getRequiredSegmentIds (string setting,
+			vector<bool> secondaryOsdStatus);
 
 	static string generateSetting(int noOfReplications) {
 		return to_string(noOfReplications);
 	}
 
 private:
+	uint32_t getNoOfReplications(string setting);
 };
 
 #endif
