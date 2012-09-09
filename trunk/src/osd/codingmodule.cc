@@ -61,33 +61,7 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 }
 
 vector<uint32_t> CodingModule::getRequiredSegmentIds(CodingScheme codingScheme,
-		string setting) {
-	return getCoding(codingScheme)->getRequiredSegmentIds(setting);
+		string setting, vector<bool> secondaryOsdStatus) {
+	return getCoding(codingScheme)->getRequiredSegmentIds(setting,
+			secondaryOsdStatus);
 }
-
-uint32_t CodingModule::getNumberOfSegments(CodingScheme codingScheme,
-		string setting) {
-	return getCoding(codingScheme)->getNumberOfSegments(setting);
-}
-
-/*
- Coding* CodingModule::codingWorkerFactory (CodingScheme codingScheme) {
-
- Coding* coding = NULL;
-
- if (codingScheme == RAID0_CODING) {
- const uint32_t noOfStrips = 2;
- coding = new Raid0Coding(noOfStrips);
- } else if (codingScheme == RAID1_CODING) {
- const uint32_t noOfReplications = 3;
- coding = new Raid1Coding(noOfReplications);
- }
-
- if (coding == NULL) {
- debug ("%s\n", "Wrong Coding Scheme specified");
- exit (-1);
- }
-
- return coding;
- }
- */

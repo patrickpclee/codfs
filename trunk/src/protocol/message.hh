@@ -11,11 +11,14 @@
 #include <iostream>
 
 #include "../common/enums.hh"
+//#include "../common/memorypool.hh"
 #include "../communicator/communicator.hh"
 
 class Communicator;
 
 using namespace std;
+
+#define USE_MESSAGE_MEMORY_POOL
 
 /**
  * struct for message Header
@@ -45,6 +48,11 @@ public:
 
 	Message(Communicator* communicator);
 
+	#ifdef USE_MESSAGE_MEMORY_POOL
+	static void* operator new (size_t n);
+
+	static void operator delete (void* p);	
+	#endif
 	/**
 	 * Destructor
 	 */
