@@ -1,13 +1,5 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
-    <Osdid>52000</Osdid>
-    
-    <Communication>
-        
-        <ServerPort>52000</ServerPort>
-        
-    </Communication>
-    
     <Storage>
     	<ObjectCacheLocation>./osd_object/</ObjectCacheLocation>
     	<SegmentLocation>./osd_segment/</SegmentLocation>
