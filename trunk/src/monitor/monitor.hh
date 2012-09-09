@@ -103,7 +103,15 @@ public:
 	 * @param numOfSegs Number of OSDs required for coding
 	 */
 	void getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfSegs);
+
+	/**
+	 * Action when a CLIENT request current ONLIE OSDs for connection
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 */
+	void getOsdListProcessor (uint32_t requestId, uint32_t sockfd);
 	
+
 private:
 	
 	/**

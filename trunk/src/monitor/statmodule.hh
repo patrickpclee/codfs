@@ -30,6 +30,13 @@ public:
 	 */
 	void removeStatById (uint32_t osdId);
 
+	/**  
+	 * Remove an osd status entry by its osdId 
+	 * @param sockfd OSD socket id
+	 */
+	void removeStatBySockfd (uint32_t sockfd);
+
+
 	/**
 	 * Set an osd status entry, if not in the map, create it, else update the result
 	 * @param osdId OSD ID

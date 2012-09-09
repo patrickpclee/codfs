@@ -46,21 +46,6 @@ OsdCommunicator::~OsdCommunicator() {
 
 }
 
-/**
- * Establish connection to MDS
- */
-
-void OsdCommunicator::connectToMds() {
-
-	// example
-	string ip = "127.0.0.1";
-	uint16_t port = 30000;
-	ComponentType connectionType = MDS;
-
-	// do connection
-	connectAndAdd(ip, port, connectionType);
-}
-
 void OsdCommunicator::replyPutObjectInit(uint32_t requestId,
 		uint32_t connectionId, uint64_t objectId) {
 
@@ -336,9 +321,9 @@ struct ObjectTransferOsdInfo OsdCommunicator::getObjectInfoRequest(
 	return objectInfo;
 }
 
-void OsdCommunicator::registerToMonitor() {
+void OsdCommunicator::registerToMonitor(uint32_t ip, uint16_t port) {
 	OsdStartupMsg* startupMsg = new OsdStartupMsg(this, getMonitorSockfd(), 
-		osd->getOsdId(), osd->getFreespace(), osd->getCpuLoadavg(0));
+		osd->getOsdId(), osd->getFreespace(), osd->getCpuLoadavg(0), ip, port);
 	startupMsg->prepareProtocolMsg();
 	addMessage(startupMsg);
 }

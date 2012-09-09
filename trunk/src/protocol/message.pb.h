@@ -45,6 +45,7 @@ class ObjectDataPro;
 class GetObjectRequestPro;
 class GetObjectReadyPro;
 class ObjectTransferEndRequestPro;
+class GetOsdListRequestPro;
 class ListDirectoryReplyPro;
 class FileInfoPro;
 class SegmentLocationPro;
@@ -78,6 +79,7 @@ class NewOsdRegisterPro;
 class OnlineOsdPro;
 class OnlineOsdListPro;
 class GetPrimaryListReplyPro;
+class GetOsdListReplyPro;
 
 enum HandshakeRequestPro_ComponentType {
   HandshakeRequestPro_ComponentType_CLIENT = 1,
@@ -1503,6 +1505,78 @@ class ObjectTransferEndRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static ObjectTransferEndRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class GetOsdListRequestPro : public ::google::protobuf::Message {
+ public:
+  GetOsdListRequestPro();
+  virtual ~GetOsdListRequestPro();
+  
+  GetOsdListRequestPro(const GetOsdListRequestPro& from);
+  
+  inline GetOsdListRequestPro& operator=(const GetOsdListRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetOsdListRequestPro& default_instance();
+  
+  void Swap(GetOsdListRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  GetOsdListRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetOsdListRequestPro& from);
+  void MergeFrom(const GetOsdListRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.GetOsdListRequestPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[1];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static GetOsdListRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -4774,6 +4848,91 @@ class GetPrimaryListReplyPro : public ::google::protobuf::Message {
   void InitAsDefaultInstance();
   static GetPrimaryListReplyPro* default_instance_;
 };
+// -------------------------------------------------------------------
+
+class GetOsdListReplyPro : public ::google::protobuf::Message {
+ public:
+  GetOsdListReplyPro();
+  virtual ~GetOsdListReplyPro();
+  
+  GetOsdListReplyPro(const GetOsdListReplyPro& from);
+  
+  inline GetOsdListReplyPro& operator=(const GetOsdListReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetOsdListReplyPro& default_instance();
+  
+  void Swap(GetOsdListReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  GetOsdListReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetOsdListReplyPro& from);
+  void MergeFrom(const GetOsdListReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+  inline int onlineosdlist_size() const;
+  inline void clear_onlineosdlist();
+  static const int kOnlineOsdListFieldNumber = 1;
+  inline const ::ncvfs::OnlineOsdPro& onlineosdlist(int index) const;
+  inline ::ncvfs::OnlineOsdPro* mutable_onlineosdlist(int index);
+  inline ::ncvfs::OnlineOsdPro* add_onlineosdlist();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >&
+      onlineosdlist() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >*
+      mutable_onlineosdlist();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.GetOsdListReplyPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro > onlineosdlist_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static GetOsdListReplyPro* default_instance_;
+};
 // ===================================================================
 
 
@@ -5865,6 +6024,10 @@ inline void ObjectTransferEndRequestPro::set_objectid(::google::protobuf::uint64
   set_has_objectid();
   objectid_ = value;
 }
+
+// -------------------------------------------------------------------
+
+// GetOsdListRequestPro
 
 // -------------------------------------------------------------------
 
@@ -8132,6 +8295,35 @@ GetPrimaryListReplyPro::primarylist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
 GetPrimaryListReplyPro::mutable_primarylist() {
   return &primarylist_;
+}
+
+// -------------------------------------------------------------------
+
+// GetOsdListReplyPro
+
+// repeated .ncvfs.OnlineOsdPro onlineOsdList = 1;
+inline int GetOsdListReplyPro::onlineosdlist_size() const {
+  return onlineosdlist_.size();
+}
+inline void GetOsdListReplyPro::clear_onlineosdlist() {
+  onlineosdlist_.Clear();
+}
+inline const ::ncvfs::OnlineOsdPro& GetOsdListReplyPro::onlineosdlist(int index) const {
+  return onlineosdlist_.Get(index);
+}
+inline ::ncvfs::OnlineOsdPro* GetOsdListReplyPro::mutable_onlineosdlist(int index) {
+  return onlineosdlist_.Mutable(index);
+}
+inline ::ncvfs::OnlineOsdPro* GetOsdListReplyPro::add_onlineosdlist() {
+  return onlineosdlist_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >&
+GetOsdListReplyPro::onlineosdlist() const {
+  return onlineosdlist_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >*
+GetOsdListReplyPro::mutable_onlineosdlist() {
+  return &onlineosdlist_;
 }
 
 

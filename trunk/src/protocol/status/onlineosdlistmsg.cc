@@ -76,4 +76,8 @@ void OnlineOsdListMsg::doHandle() {
 
 void OnlineOsdListMsg::printProtocol() {
 	debug("%s\n", "[ONLINE_OSD_LIST] built" );
+	for (int i=0; i<_onlineOsdList.size();i++) {
+		debug("[ONLINE_OSD_LIST] contains %" PRIu32 " = (%" PRIu32 " %" PRIu32 " %" PRIu32 ")\n",i,
+			_onlineOsdList[i].osdId, _onlineOsdList[i].osdIp, _onlineOsdList[i].osdPort);
+	}
 }

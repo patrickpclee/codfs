@@ -184,3 +184,13 @@ void Socket::set_non_blocking(const bool b) {
 uint32_t Socket::getSockfd() {
 	return (uint32_t) m_sock;
 }
+
+uint16_t Socket::getPort() {
+	struct sockaddr_in sin;
+	socklen_t len = sizeof(sin);
+	if (getsockname(m_sock, (struct sockaddr *)&sin, &len) == -1)
+		perror("getsockname");
+	else 
+		return ntohs(sin.sin_port);
+	return 0;
+}

@@ -6,6 +6,7 @@
 #include "../config/config.hh"
 #include "../osd/segmentlocation.hh"
 #include "../common/garbagecollector.hh"
+#include "../common/debug.hh"
 
 ConfigLayer* configLayer;
 
@@ -57,6 +58,8 @@ void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 	uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip, 
 	uint16_t port ) {
 
+
+	debug("OSD Startup Processor: on id = %" PRIu32 " ip = %" PRIu32 " port = %" PRIu32 "\n", osdId, ip, port);
 	// Send online osd list to the newly startup osd
 	vector<struct OnlineOsd> onlineOsdList;
 	
@@ -99,6 +102,11 @@ void Monitor::getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, ui
 	return;
 }
 
+void Monitor::getOsdListProcessor (uint32_t requestId, uint32_t sockfd) {
+	vector<struct OnlineOsd> osdList;
+	_statModule->getOnlineOsdList(osdList);
+	_monitorCommunicator->replyOsdList(requestId, sockfd, osdList);
+}
 
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
