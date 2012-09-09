@@ -108,6 +108,13 @@ message ObjectTransferEndRequestPro {
 	optional fixed64 objectId = 1;
 }
 
+//
+// CLIENT -> MONITOR
+//
+
+message GetOsdListRequestPro {
+}
+
 ///////////////// FROM MDS /////////////////
 
 //
@@ -334,4 +341,12 @@ message OnlineOsdListPro {
 
 message GetPrimaryListReplyPro{
 	repeated fixed32 primaryList = 1;
+}
+
+//
+// MONITOR -> CLIENT
+//
+
+message GetOsdListReplyPro {
+	repeated OnlineOsdPro onlineOsdList = 1;
 }

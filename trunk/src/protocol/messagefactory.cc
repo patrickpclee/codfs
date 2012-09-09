@@ -45,6 +45,8 @@
 #include "status/osdshutdownmsg.hh"
 #include "status/osdstatupdaterequestmsg.hh"
 #include "status/osdstatupdatereplymsg.hh"
+#include "status/newosdregistermsg.hh"
+#include "status/onlineosdlistmsg.hh"
 
 #include "nodelist/getprimarylistrequest.hh"
 #include "nodelist/getprimarylistreply.hh"
@@ -53,6 +55,9 @@
 
 #include "nodelist/getosdconfigrequest.hh"
 #include "nodelist/getosdconfigreply.hh"
+
+#include "nodelist/getosdlistrequest.hh"
+#include "nodelist/getosdlistreply.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -176,6 +181,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (OSDSTAT_UPDATE_REPLY):
 		return new OsdStatUpdateReplyMsg(communicator);
 		break;
+	case (NEW_OSD_REGISTER):
+		return new NewOsdRegisterMsg(communicator);
+		break;
+	case (ONLINE_OSD_LIST):
+		return new OnlineOsdListMsg(communicator);
+		break;
 
 		//NODELIST
 	case (GET_PRIMARY_LIST_REQUEST):
@@ -196,6 +207,13 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_OSD_CONFIG_REPLY):
 		return new GetOsdConfigReplyMsg(communicator);
 		break;
+	case (GET_OSD_LIST_REQUEST):
+		return new GetOsdListRequestMsg(communicator);
+		break;
+	case (GET_OSD_LIST_REPLY):
+		return new GetOsdListReplyMsg(communicator);
+		break;
+
 
 
 	default:

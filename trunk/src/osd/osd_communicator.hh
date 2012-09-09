@@ -34,12 +34,6 @@ public:
 	~OsdCommunicator();
 
 	/**
-	 * Initiate a connection to the MDS
-	 */
-
-	void connectToMds();
-
-	/**
 	 * Reply PutObjectInitRequest
 	 * @param requestId Request ID
 	 * @param connectionId Connection ID
@@ -149,7 +143,7 @@ public:
 	void objectUploadAck(uint64_t objectId, CodingScheme codingScheme,
 		string codingSetting, vector<uint32_t> nodeList, string checksum);
 
-	void registerToMonitor();
+	void registerToMonitor(uint32_t selfIp, uint16_t selfPort);
 private:
 
 	/**

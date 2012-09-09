@@ -40,10 +40,20 @@ public:
 	 * Action to reply a request from OSD for secondary OSD list
 	 * @param requestId Request ID
 	 * @param sockfd Socket ID between the connection
-	 * @param primaryList List of selected secondary osd IDs 
+	 * @param secondaryList List of selected secondary osd IDs 
 	 */
 	void replySecondaryList(uint32_t requestId, uint32_t sockfd, 
 		vector<struct SegmentLocation> secondaryList);
+
+	/**
+	 * Action to reply a request from CLIENT for online OSD list
+	 * @param requestId Request ID
+	 * @param sockfd Socket ID between the connection
+	 * @param osdList List of online osd 
+	 */
+	void replyOsdList(uint32_t requestId, uint32_t sockfd, 
+		vector<struct OnlineOsd>& osdList);
+
 
 	/**
 	 * Action to send current online OSDs to the newly start one

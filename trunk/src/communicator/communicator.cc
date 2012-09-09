@@ -27,6 +27,12 @@
 #include "../protocol/transfer/putobjectinitrequest.hh"
 #include "../protocol/transfer/objecttransferendrequest.hh"
 #include "../protocol/transfer/objectdatamsg.hh"
+#include "../common/netfunc.hh"
+
+#ifdef COMPILE_FOR_MONITOR
+#include "../monitor/monitor.hh"
+extern Monitor* monitor;
+#endif
 
 using namespace std;
 
@@ -64,8 +70,11 @@ Communicator::Communicator() {
 
 	// chunk size
 	_chunkSize = stringToByte(configLayer->getConfigString("Communication>ChunkSize"));
-
+#ifdef COMPILE_FOR_OSD
+	_serverPort = 0;	//OSD use random port
+#else 
 	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
+#endif
 
 	_pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
@@ -101,16 +110,12 @@ void Communicator::createServerSocket() {
 		throw SocketException("Could not listen to socket.");
 	}
 
+#ifdef COMPILE_FOR_OSD
+	_serverPort = _serverSocket.getPort();
+#endif
+
 	debug("Server Port = %" PRIu16 " sockfd = %" PRIu32 "\n",
 			_serverPort, _serverSocket.getSockfd());
-}
-
-uint32_t Communicator::getSelfIp() {
-	return _serverSocket.getIpInt();
-}
-
-uint16_t Communicator::getSelfPort() {
-	return _serverSocket.getPort();
 }
 
 /*
@@ -237,7 +242,9 @@ void Communicator::waitForMessage() {
 						// disconnect and remove from _connectionMap
 						debug("SOCKFD = %" PRIu32 " connection lost\n",
 								p->first);
-
+#ifdef COMPILE_FOR_MONITOR
+						monitor->getStatModule()->removeStatBySockfd(sockfd);
+#endif
 						// hack: post-increment adjusts iterator even erase is called
 						_connectionMap.erase(p++);
 						continue;
@@ -348,6 +355,9 @@ void Communicator::sendMessage() {
 			if (sockfd == (uint32_t) -1) {
 				debug("Message (ID: %" PRIu32 ") disconnected, ignore\n",
 						message->getMsgHeader().requestId);
+				debug("Deleting Message since sockfd == -1 (Type = %d ID: %" PRIu32 ")\n",
+						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+				delete message;
 				continue;
 			}
 
@@ -357,7 +367,10 @@ void Communicator::sendMessage() {
 				if (!(_connectionMap.count(sockfd))) {
 					debug("Connection SOCKFD = %" PRIu32 " not found!\n",
 							sockfd);
-					exit(-1);
+					debug("Deleting Message since sockfd not found (Type = %d ID: %" PRIu32 ")\n",
+						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+					delete message;
+					continue;
 				}
 				_connectionMap[sockfd]->sendMessage(message);
 			}
@@ -703,11 +716,26 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 void Communicator::connectToMonitor() {
 	vector<Component> monitorList = parseConfigFile("MONITOR");
 	printComponents("MONITOR", monitorList);
-	connectToComponents(monitorList);
+	for (Component component: monitorList) {
+		uint32_t sockfd = connectAndAdd(component.ip, component.port,
+				component.type);
+		requestHandshake(sockfd, _componentId, _componentType);
+	}
+}
+
+void Communicator::connectToMds() {
+	vector<Component> mdsList = parseConfigFile("MDS");
+	printComponents("MDS", mdsList);
+	for (Component component: mdsList) {
+		uint32_t sockfd = connectAndAdd(component.ip, component.port,
+				component.type);
+		requestHandshake(sockfd, _componentId, _componentType);
+	}
 }
 
 void Communicator::connectToOsd(uint32_t dstOsdIp, uint32_t dstOsdPort) {
-	//uint32_t sockfd = connectAndAdd(dstOsdIp, dstOsdPort, OSD);
+	uint32_t sockfd = connectAndAdd(Ipv4Int2Str(dstOsdIp), dstOsdPort, _componentType);
+	requestHandshake(sockfd, _componentId, _componentType);
 }
 
 void Communicator::connectAllComponents() {
@@ -849,4 +877,8 @@ void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
 		debug("%s\n", "Put Object End Failed");
 		exit(-1);
 	}
+}
+
+uint16_t Communicator::getServerPort() {
+	return _serverPort;
 }

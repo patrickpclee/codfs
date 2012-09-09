@@ -18,6 +18,8 @@
 #include "../protocol/transfer/objectdatamsg.hh"
 #include "../protocol/metadata/getobjectidlistrequest.hh"
 #include "../protocol/transfer/getobjectrequest.hh"
+#include "../protocol/nodelist/getosdlistrequest.hh"
+#include "../protocol/nodelist/getosdlistreply.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
@@ -233,25 +235,18 @@ void ClientCommunicator::requestObject(uint32_t dstSockfd, uint64_t objectId) {
 	addMessage(getObjectRequestMsg);
 }
 
-//
-// TODO: DUMMY CONNECTION FOR NOW
-//
-void ClientCommunicator::connectToMds() {
-	uint16_t port = 50000;
-	string ip = "127.0.0.1";
-	ComponentType connectionType = MDS;
+void ClientCommunicator::getOsdListAndConnect() {
+	GetOsdListRequestMsg* getOsdListRequestMsg = new GetOsdListRequestMsg(this,
+		getMonitorSockfd());
+	getOsdListRequestMsg->prepareProtocolMsg();
+	addMessage(getOsdListRequestMsg, true);
+	MessageStatus status = getOsdListRequestMsg->waitForStatusChange();
 
-	connectAndAdd(ip, port, connectionType);
-
-	return;
-}
-
-void ClientCommunicator::connectToOsd() {
-	uint16_t port = 52000;
-	string ip = "127.0.0.1";
-	ComponentType connectionType = OSD;
-
-	connectAndAdd(ip, port, connectionType);
-
-	return;
+	if (status == READY) {
+		vector<struct OnlineOsd>& onlineList =
+				getOsdListRequestMsg->getOsdList();
+		for (uint32_t i = 0; i < onlineList.size(); i++)
+			connectToOsd(onlineList[i].osdIp, onlineList[i].osdPort);
+	}
+	
 }

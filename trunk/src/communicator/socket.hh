@@ -106,6 +106,7 @@ public:
 	}
 
 	uint32_t getSockfd();
+	uint16_t getPort();
 
 private:
 

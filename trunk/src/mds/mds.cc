@@ -379,7 +379,7 @@ int main(void) {
 
 	communicator->connectToMonitor();
 
-	mds->test();
+	//mds->test();
 
 	garbageCollectionThread.join();
 	receiveThread.join();
