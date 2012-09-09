@@ -15,7 +15,7 @@
 #include <apr-1.0/apr_general.h>
 #include <apr-1.0/apr_pools.h>
 #include <thread>
-//#include <mutex>
+#include <mutex>
 
 const apr_size_t POOL_MAX_FREE_SIZE = 20*1024*1024;
 /**

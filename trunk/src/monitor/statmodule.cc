@@ -46,8 +46,10 @@ void StatModule::removeStatBySockfd (uint32_t sockfd) {
 	while (p != _osdStatMap.end()) {
 		if (p->second.osdSockfd == sockfd)
 			_osdStatMap.erase(p++);
-		p++;
+		else
+			p++;
 	}	
+	debug_yellow("Delete sockfd = %" PRIu32 "\n", sockfd);
 }
 
 void StatModule::setStatById (uint32_t osdId, uint32_t sockfd, 
