@@ -119,13 +119,25 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				const CodingScheme codingScheme = objectInfo._codingScheme;
 				const string codingSetting = objectInfo._codingSetting;
 
+				// initialize a bool array to store sdListStatus
+				vector<bool> secondaryOsdStatus(objectInfo._osdList.size());
+
+				// check other osd status (from cache or from monitor)
+				setOsdListStatus(secondaryOsdStatus);
+
 				// check which segments are needed to request
+				uint32_t totalNumOfSegments = objectInfo._osdList.size();
 				vector<uint32_t> requiredSegments =
 						_codingModule->getRequiredSegmentIds(codingScheme,
-								codingSetting);
-				uint32_t totalNumOfSegments =
-						_codingModule->getNumberOfSegments(codingScheme,
-								codingSetting);
+								codingSetting, secondaryOsdStatus);
+
+				// error in finding required Segments (not enough segments to rebuild object)
+				if (requiredSegments.size() == 0) {
+					debug(
+							"Not enough segments available to rebuild Object ID %" PRIu64
+							"\n", objectId);
+					exit(-1);
+				}
 
 				// 2. initialize list and count
 
@@ -551,19 +563,9 @@ uint32_t Osd::getOsdId() {
 	return _osdId;
 }
 
-/*
- bool Osd::isSegmentRequested(uint64_t objectId, uint32_t segmentId) {
- lock_guard<mutex> lk(requestedSegmentsMutex);
- bool requested = _requestedSegments.get(objectId)[segmentId];
-
- // if segment is already requested, return true
- if (requested) {
- return true;
- }
-
- // else, ask this thread to send request and set it to true
- _requestedSegments.get(objectId)[segmentId] = true;
- return false;
- }
- */
-
+void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
+	// for now, assume all OSDs are up
+	for (auto osdStatus : secondaryOsdStatus) {
+		osdStatus = true;
+	}
+}

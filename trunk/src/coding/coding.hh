@@ -16,11 +16,8 @@ public:
 	virtual struct ObjectData decode(vector<struct SegmentData> segmentData,
 			string setting) = 0;
 
-	virtual vector<uint32_t> getRequiredSegmentIds (string setting) = 0;
-
-	virtual uint32_t getNumberOfSegments(string setting) = 0;
-
-	virtual void display() = 0; // make class abstract
+	virtual vector<uint32_t> getRequiredSegmentIds(string setting,
+			vector<bool> secondaryOsdStatus) = 0;
 }
 ;
 
