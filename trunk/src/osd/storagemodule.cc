@@ -800,21 +800,14 @@ struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
 }
 
 void StorageModule::clearObjectDiskCache() {
+
+	for (auto object : _objectCacheQueue) {
+		remove (string(_objectFolder + to_string(object)).c_str());
+	}
+
 	{
 		lock_guard<mutex> lk(lruCacheMutex);
 		_objectCacheQueue.empty();
 		_objectDiskCacheMap.empty();
-	}
-
-	struct dirent *file;
-	DIR *dir;
-
-	char filepath[256];
-	dir = opendir(_objectFolder.c_str());
-
-	while ((file = readdir(dir)) != NULL) {
-		// build the full path for each file in the folder
-		sprintf(filepath, "%s/%s", _objectFolder.c_str(), file->d_name);
-		remove(filepath);
 	}
 }
