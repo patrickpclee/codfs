@@ -10,6 +10,9 @@ using namespace std;
 
 class MdsCommunicator : public Communicator {
 public:
+
+	MdsCommunicator();
+
 	void display ();
 
 	// Reply to Request

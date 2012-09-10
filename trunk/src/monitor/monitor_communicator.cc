@@ -8,6 +8,7 @@
 #include <thread>
 #include <cstdio>
 #include "monitor_communicator.hh"
+#include "../config/config.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
 #include "../common/debug.hh"
@@ -19,6 +20,7 @@
 
 using namespace std;
 
+extern ConfigLayer* configLayer;
 mutex osdCountMutex;
 
 /**
@@ -27,6 +29,7 @@ mutex osdCountMutex;
 
 MonitorCommunicator::MonitorCommunicator() {
 	_osdCount = 52001;
+	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
 }
 
 /**
