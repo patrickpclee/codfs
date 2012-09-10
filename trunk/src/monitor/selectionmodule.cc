@@ -1,9 +1,12 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <set>
 #include "../config/config.hh"
 #include "../common/debug.hh"
 #include "selectionmodule.hh"
+
+using namespace std;
 
 extern ConfigLayer* configLayer;
 
@@ -38,15 +41,19 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 	//HARDCODE NOW, SHOULD BE ALGORITHMS-INVOLVED..
 	vector<struct SegmentLocation> secondaryList;
 	{
+		set<uint32_t> selected;
 		lock_guard<mutex> lk(osdStatMapMutex);
 		while (numOfSegs>0) {
 			for(auto& entry: _osdStatMap) {
-				if (entry.second.osdHealth == ONLINE && (rand()&1)) {
+				bool isAllOsdUsed = selected.size() >= _osdStatMap.size();
+				if (entry.second.osdHealth == ONLINE && (isAllOsdUsed ||
+							(!isAllOsdUsed && !selected.count(entry.first))) && (rand()&1)) {
 					// choose this as a secondary
 					struct SegmentLocation segmentLocation;
 					segmentLocation.osdId = entry.first;
-					segmentLocation.segmentId = 0;
+					segmentLocation.segmentId = 0;	// segmentId will be set by OSD
 					secondaryList.push_back(segmentLocation);
+					selected.insert(entry.first);
 					--numOfSegs;
 					if (!numOfSegs) break;
 				}
