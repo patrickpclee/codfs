@@ -134,8 +134,8 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// error in finding required Segments (not enough segments to rebuild object)
 				if (requiredSegments.size() == 0) {
 					debug(
-							"Not enough segments available to rebuild Object ID %" PRIu64
-							"\n", objectId);
+							"Not enough segments available to rebuild Object ID %" PRIu64 "\n",
+							objectId);
 					exit(-1);
 				}
 
@@ -165,7 +165,8 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 						struct SegmentData segmentData =
 								_storageModule->readSegment(objectId, i, 0);
 
-						// segmentDataList only reserved space for the requiredSegments
+						// segmentDataList reserved space for "all segments"
+						// only fill in data for "required segments"
 						segmentDataList[i] = segmentData;
 
 						_downloadSegmentRemaining.decrement(objectId);
@@ -190,7 +191,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 								"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
 								(int)codingScheme, codingSetting.c_str());
 						objectData = _codingModule->decodeSegmentToObject(
-								codingScheme, objectId, segmentDataList,
+								codingScheme, objectId, segmentDataList, requiredSegments,
 								codingSetting);
 
 						// clean up segment data
@@ -500,22 +501,22 @@ void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
 	_osdCommunicator->addMessage(replyMsg);
 }
 
-void Osd::NewOsdRegisterProcessor(uint32_t requestId, uint32_t sockfd, 
-	uint32_t osdId, uint32_t osdIp, uint32_t osdPort) {
-	if (_osdId > osdId ) {
+void Osd::NewOsdRegisterProcessor(uint32_t requestId, uint32_t sockfd,
+		uint32_t osdId, uint32_t osdIp, uint32_t osdPort) {
+	if (_osdId > osdId) {
 		// Do connect
 		_osdCommunicator->connectToOsd(osdIp, osdPort);
 	}
 }
 
 void Osd::OnlineOsdListProcessor(uint32_t requestId, uint32_t sockfd,
-	vector<struct OnlineOsd>& onlineOsdList) {
+		vector<struct OnlineOsd>& onlineOsdList) {
 
 	for (uint32_t i = 0; i < onlineOsdList.size(); ++i) {
 		if (_osdId > onlineOsdList[i].osdId) {
 			// Do connect
-			_osdCommunicator->connectToOsd(onlineOsdList[i].osdIp, 
-										   onlineOsdList[i].osdPort);
+			_osdCommunicator->connectToOsd(onlineOsdList[i].osdIp,
+					onlineOsdList[i].osdPort);
 
 		}
 	}

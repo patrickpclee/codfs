@@ -14,7 +14,7 @@ public:
 	virtual vector<struct SegmentData> encode(struct ObjectData objectData,
 			string setting) = 0;
 	virtual struct ObjectData decode(vector<struct SegmentData> segmentData,
-			string setting) = 0;
+			vector<uint32_t> requiredSegments, string setting) = 0;
 
 	virtual vector<uint32_t> getRequiredSegmentIds(string setting,
 			vector<bool> secondaryOsdStatus) = 0;
