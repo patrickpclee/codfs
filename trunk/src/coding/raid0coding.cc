@@ -60,10 +60,11 @@ vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
 }
 
 struct ObjectData Raid0Coding::decode(vector<struct SegmentData> segmentData,
-		string setting) {
+		vector<uint32_t> requiredSegments, string setting) {
+
+	// for raid 0, requiredSegments is not used as all segments are required to decode
 
 	const uint32_t segmentCount = (uint32_t) segmentData.size();
-	//const uint32_t noOfStrips = getNoOfStrips(setting);
 
 	struct ObjectData objectData;
 

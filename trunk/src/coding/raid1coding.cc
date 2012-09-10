@@ -14,12 +14,13 @@ Raid1Coding::~Raid1Coding() {
 
 }
 
-vector<struct SegmentData> Raid1Coding::encode(struct ObjectData objectData, string setting) {
+vector<struct SegmentData> Raid1Coding::encode(struct ObjectData objectData,
+		string setting) {
 
 	const uint32_t noOfReplications = getNoOfReplications(setting);
 	vector<struct SegmentData> segmentDataList;
 
-	debug ("RAID1: Replication No = %" PRIu32 "\n", noOfReplications);
+	debug("RAID1: Replication No = %" PRIu32 "\n", noOfReplications);
 
 	for (uint32_t i = 0; i < noOfReplications; i++) {
 
@@ -42,14 +43,18 @@ vector<struct SegmentData> Raid1Coding::encode(struct ObjectData objectData, str
 	return segmentDataList;
 }
 
-struct ObjectData Raid1Coding::decode(vector<struct SegmentData> segmentData, string setting) {
+struct ObjectData Raid1Coding::decode(vector<struct SegmentData> segmentData,
+		vector<uint32_t> requiredSegments, string setting) {
+
+	// for raid1, only use first required segment to decode
+	uint32_t segmentId = requiredSegments[0];
 
 	struct ObjectData objectData;
-	objectData.info.objectId = segmentData[0].info.objectId;
-	objectData.info.objectSize = segmentData[0].info.segmentSize;
+	objectData.info.objectId = segmentData[segmentId].info.objectId;
+	objectData.info.objectSize = segmentData[segmentId].info.segmentSize;
 	objectData.buf = MemoryPool::getInstance().poolMalloc(
 			objectData.info.objectSize);
-	memcpy (objectData.buf, segmentData[0].buf, objectData.info.objectSize);
+	memcpy(objectData.buf, segmentData[segmentId].buf, objectData.info.objectSize);
 
 	return objectData;
 }
@@ -60,7 +65,7 @@ uint32_t Raid1Coding::getNoOfReplications(string setting) {
 	return noOfReplications;
 }
 
-vector<uint32_t> Raid1Coding::getRequiredSegmentIds (string setting,
+vector<uint32_t> Raid1Coding::getRequiredSegmentIds(string setting,
 		vector<bool> secondaryOsdStatus) {
 
 	// for Raid1 Coding, find the first running OSD
