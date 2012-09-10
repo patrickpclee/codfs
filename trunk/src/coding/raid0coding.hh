@@ -12,7 +12,7 @@ public:
 	vector<struct SegmentData> encode(struct ObjectData objectData,
 			string setting);
 
-	struct ObjectData decode(vector<struct SegmentData> segmentData,
+	struct ObjectData decode(vector<struct SegmentData> segmentData, vector<uint32_t> requiredSegments,
 			string setting);
 
 	vector<uint32_t> getRequiredSegmentIds(string setting,

@@ -9,12 +9,12 @@ public:
 	~Raid1Coding();
 
 	struct ObjectData decode(vector<struct SegmentData> segmentData,
-			string setting);
+			vector<uint32_t> requiredSegments, string setting);
 
 	vector<struct SegmentData> encode(struct ObjectData objectData,
 			string setting);
 
-	vector<uint32_t> getRequiredSegmentIds (string setting,
+	vector<uint32_t> getRequiredSegmentIds(string setting,
 			vector<bool> secondaryOsdStatus);
 
 	static string generateSetting(int noOfReplications) {
