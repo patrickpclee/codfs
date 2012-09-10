@@ -1,6 +1,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <string.h>
 #include "../common/debug.hh"
 #include "coding.hh"
 #include "raid1coding.hh"
