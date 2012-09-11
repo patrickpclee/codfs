@@ -44,13 +44,6 @@ StorageModule::StorageModule() {
 	<< formatSize(_maxSegmentCapacity) << endl;
 	cout << "===============" << endl;
 
-	/*
-	 _freeSegmentSpace = _maxSegmentCapacity;
-	 _freeObjectSpace = _maxObjectCache;
-	 _currentSegment = 0;
-	 _currentObject = 0;
-	 */
-
 	initializeStorageStatus();
 }
 
@@ -201,7 +194,6 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 	createAndOpenSegment(objectId, segmentId, length);
 
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
-	writeSegmentInfo(objectId, segmentId, length, filepath);
 
 	debug(
 			"Segment created ObjID = %" PRIu64 " SegmentID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
@@ -351,7 +343,6 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 		uint32_t length) {
 
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
-	writeSegmentInfo(objectId, segmentId, length, filepath);
 
 	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " created\n",
 			objectId, segmentId);
@@ -410,22 +401,6 @@ struct ObjectInfo StorageModule::readObjectInfo(uint64_t objectId) {
 	return objectInfo;
 }
 
-void StorageModule::writeSegmentInfo(uint64_t objectId, uint32_t segmentId,
-		uint32_t segmentSize, string filepath) {
-	// TODO: Database to be implemented
-
-}
-
-/*
- struct SegmentInfo StorageModule::readSegmentInfo(uint64_t objectId,
- uint32_t segmentId) {
- // TODO: Database to be implemented
- struct SegmentInfo segmentInfo;
-
- return segmentInfo;
- }
- */
-
 uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length) {
 
@@ -441,25 +416,8 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 		exit(-1);
 	}
 
-	/*
-
-	 // Read Lock
-	 if (flock(fileno(file), LOCK_SH) == -1) {
-	 debug("%s\n", "ERROR: Cannot LOCK_SH");
-	 exit(-1);
-	 }
-	 */
-
 	// Read file contents into buffer
 	uint32_t byteRead = pread(fileno(file), buf, length, offset);
-
-	/*
-	 // Release lock
-	 if (flock(fileno(file), LOCK_UN) == -1) {
-	 debug("%s\n", "ERROR: Cannot LOCK_UN");
-	 exit(-1);
-	 }
-	 */
 
 	if (byteRead != length) {
 		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
@@ -483,34 +441,8 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 		exit(-1);
 	}
 
-	/*
-
-	 // Write Lock
-	 if (flock(fileno(file), LOCK_EX) == -1) {
-	 debug("%s\n", "ERROR: Cannot LOCK_EX");
-	 exit(-1);
-	 }
-
-	 */
-
 	// Write file contents from buffer
 	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
-
-	/*
-	 fseek (file, offset, SEEK_SET);
-	 uint32_t byteWritten = fwrite (buf, 1, length, file);
-	 fflush (file);
-	 */
-
-	/*
-
-	 // Release lock
-	 if (flock(fileno(file), LOCK_UN) == -1) {
-	 debug("%s\n", "ERROR: Cannot LOCK_UN");
-	 exit(-1);
-	 }
-
-	 */
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
@@ -555,8 +487,6 @@ FILE* StorageModule::createFile(string filepath) {
 
 	// set buffer to zero to avoid memory leak
 	setvbuf(filePtr, NULL, _IONBF, 0);
-
-	debug("fileptr = %p\n", filePtr);
 
 	if (filePtr == NULL) {
 		debug("%s\n", "Unable to create file!");
@@ -666,18 +596,6 @@ void StorageModule::updateSegmentFreespace(uint32_t new_segment_size) {
 	}
 
 }
-
-/*
- void StorageModule::updateObjectFreespace(uint32_t new_object_size) {
- uint32_t update_space = new_object_size;
- if (verifyObjectSpace(update_space)) {
- _currentObjectUsage += update_space;
- _freeObjectSpace -= update_space;
- } else {
- perror("object free space not enough.\n");
- }
- }
- */
 
 uint32_t StorageModule::getCurrentSegmentCapacity() {
 	return _currentSegmentUsage;
