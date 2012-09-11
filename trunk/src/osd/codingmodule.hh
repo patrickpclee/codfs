@@ -47,18 +47,19 @@ public:
 	 * Decode a list of segments into an object
 	 * @param objectId Destination object ID
 	 * @param segmentData a list of SegmentData structure
-	 * @param secondaryOsdStatus a bool array containing the status of the OSD
+	 * @param requiredSegments IDs of segments that are required to do decode
 	 * @return an ObjectData structure
 	 */
 
 	struct ObjectData decodeSegmentToObject(CodingScheme codingScheme,
 			uint64_t objectId, vector<struct SegmentData> segmentData,
-			string setting);
+			vector<uint32_t> requiredSegments, string setting);
 
 	/**
 	 * Get the list of segments required to do decode
 	 * @param codingScheme Coding Scheme
 	 * @param setting Coding Setting
+	 * @param secondaryOsdStatus a bool array containing the status of the OSD
 	 * @return list of segment ID
 	 */
 

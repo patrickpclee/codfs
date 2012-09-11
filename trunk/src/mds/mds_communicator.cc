@@ -2,12 +2,19 @@
 #include "mds_communicator.hh"
 
 #include "../common/debug.hh"
+#include "../config/config.hh"
 #include "../protocol/metadata/listdirectoryreply.hh"
 #include "../protocol/metadata/uploadfilereply.hh"
 #include "../protocol/nodelist/getprimarylistrequest.hh"
 #include "../protocol/metadata/getobjectinforeply.hh"
 #include "../protocol/metadata/downloadfilereply.hh"
 #include "../protocol/metadata/getobjectidlistreply.hh"
+
+extern ConfigLayer* configLayer;
+
+MdsCommunicator::MdsCommunicator() {
+	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
+}
 
 /**
  * @brief	Reply With Folder Data

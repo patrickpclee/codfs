@@ -22,11 +22,11 @@ using namespace std;
 extern Client* client;
 extern ConfigLayer* configLayer;
 
-Client::Client() {
+Client::Client(uint32_t clientId) {
 	_clientCommunicator = new ClientCommunicator();
 	_storageModule = new ClientStorageModule();
 
-	_clientId = configLayer->getConfigInt("Clientid");
+	_clientId = clientId;
 
 	_numClientThreads = configLayer->getConfigInt(
 			"Communication>NumClientThreads");

@@ -15,7 +15,7 @@
 class Client {
 public:
 
-	Client();
+	Client(uint32_t clientId);
 
 	/**
 	 * @brief	Request to List a Folder
