@@ -8,7 +8,6 @@
 #include "../common/debug.hh"
 #include "../protocol/nodelist/getprimarylistreply.hh"
 #include "../protocol/nodelist/getsecondarylistreply.hh"
-#include "../protocol/nodelist/getosdconfigreply.hh"
 #include "../protocol/status/onlineosdlistmsg.hh"
 #include "../protocol/nodelist/getosdlistreply.hh"
 
