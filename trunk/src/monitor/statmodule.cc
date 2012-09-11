@@ -1,7 +1,7 @@
 #include "statmodule.hh"
-#include "../osd/onlineosd.hh"
-#include "../protocol/status/newosdregistermsg.hh"
+#include "../common/onlineosd.hh"
 #include "../common/debug.hh"
+#include "../protocol/status/newosdregistermsg.hh"
 #include <ctime>
 
 

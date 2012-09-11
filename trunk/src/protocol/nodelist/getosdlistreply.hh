@@ -7,7 +7,7 @@
 
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
-#include "../../osd/onlineosd.hh"
+#include "../../common/onlineosd.hh"
 
 using namespace std;
 
