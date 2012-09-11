@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+    <Storage>
+    	<ObjectCacheLocation>./osd_object/</ObjectCacheLocation>
+    	<SegmentLocation>./osd_segment/</SegmentLocation>
+    	
+    	<SegmentCapacity>10G</SegmentCapacity>
+    	<ObjectCacheCapacity>100M</ObjectCacheCapacity>
+    </Storage>
+    
+</NcvfsConfig>

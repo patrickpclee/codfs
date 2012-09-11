@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+    <Communication>
+		<NumClientThreads>10</NumClientThreads>
+    </Communication>
+    
+    <Storage>
+    	<!-- KB -->
+    	<ObjectSize>10240</ObjectSize>
+    </Storage>
+
+	<Fuse>
+		<PreallocateObjectNumber>10</PreallocateObjectNumber>
+		<TempStorage>/tmp/</TempStorage>
+	</Fuse>
+</NcvfsConfig>

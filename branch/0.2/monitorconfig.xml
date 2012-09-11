@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+	<MonitorId>53000</MonitorId>
+    <Communication>
+    
+        <ServerPort>53000</ServerPort>
+        
+    </Communication>
+</NcvfsConfig>

@@ -1,0 +1,339 @@
+package ncvfs;
+option optimize_for = SPEED;
+
+///////////////// UNIVERSAL /////////////////
+
+message HandshakeRequestPro {
+	optional fixed32 componentId = 1;
+	
+	enum ComponentType {
+		CLIENT = 1;
+		OSD = 2;
+		MDS = 3;
+		MONITOR = 4;
+	}
+  
+  	optional ComponentType componentType = 2;
+}
+
+message HandshakeReplyPro {
+	optional fixed32 componentId = 1;
+	optional HandshakeRequestPro.ComponentType componentType = 2; 
+}
+
+
+///////////////// FROM CLIENT /////////////////
+
+//
+// CLIENT -> MDS
+//
+
+message ListDirectoryRequestPro {
+	optional fixed32 osdId = 1;
+	optional string directoryPath = 2;
+}
+
+message UploadFileRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed64 fileSize = 2;
+	optional fixed32 numOfObjs = 3;
+	optional string path = 4;
+	optional PutObjectInitRequestPro.CodingScheme codingScheme = 5;	
+	optional string codingSetting = 6;
+}
+
+message DownloadFileRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	optional string filePath = 3;
+}
+
+message SaveObjectListRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	repeated fixed64 objectList = 3;
+}
+
+message SetFileSizeRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	optional fixed64 fileSize = 3;
+}
+
+message GetObjectIdListRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 numOfObjs = 2;
+}
+
+//
+// CLIENT -> OSD
+//
+
+message PutObjectInitRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 objectSize = 2;
+	optional fixed32 chunkCount = 3;
+	
+	enum CodingScheme {
+		RAID0_CODING = 1;
+		RAID1_CODING = 2;
+		DEFAULT_CODING = 15;
+	}
+	
+	optional CodingScheme codingScheme = 4;
+	optional string codingSetting = 5;
+	optional string checksum = 6;
+}
+
+message ObjectDataPro {
+	optional fixed64 objectId = 1;
+	optional fixed64 offset = 2;
+	optional fixed32 length = 3;
+}
+
+message GetObjectRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 objectSize = 2;
+	optional fixed32 chunkCount = 3;
+}
+
+message GetObjectReadyPro {
+	optional fixed64 objectId = 1;
+}
+
+// Upload: CLIENT -> OSD
+// Download: OSD -> CLIENT
+
+message ObjectTransferEndRequestPro {
+	optional fixed64 objectId = 1;
+}
+
+//
+// CLIENT -> MONITOR
+//
+
+message GetOsdListRequestPro {
+}
+
+///////////////// FROM MDS /////////////////
+
+//
+// MDS -> CLIENT
+//
+
+message ListDirectoryReplyPro {
+	repeated FileInfoPro fileInfoPro = 1;
+} 
+
+message FileInfoPro {
+	optional fixed32 fileId = 1;
+	optional fixed64 fileSize = 2;
+	optional string fileName = 3;
+}
+
+message SegmentLocationPro {
+   	optional fixed32 osdId = 1;
+   	optional fixed32 segmentId = 2;
+}
+
+message UploadFileReplyPro {
+	optional fixed32 fileId = 1;
+	repeated fixed64 objectList = 2;
+	repeated fixed32 primaryList = 3;
+}
+
+message DownloadFileReplyPro {
+//	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	optional string filePath = 3;
+	optional fixed64 fileSize = 4;
+	optional string checksum = 5;
+	repeated fixed64 objectList = 6;
+	repeated fixed32 primaryList = 7;
+}
+
+message GetObjectIdListReplyPro {
+	repeated fixed64 objectIdList = 1;
+	repeated fixed32 primaryList = 2;
+}
+
+//
+// MDS -> OSD
+//
+
+message GetObjectInfoReplyPro {
+	optional fixed64 objectId = 1;
+	repeated fixed32 nodeList = 2;
+	optional PutObjectInitRequestPro.CodingScheme codingScheme = 3;	
+	optional string codingSetting = 4;
+}
+
+//
+// MDS -> MONITOR
+//
+
+message GetPrimaryListRequestPro{
+	optional fixed32 numOfObjs = 1;
+	repeated fixed32 primaryList = 2;
+}
+
+///////////////// FROM OSD /////////////////
+
+//
+// OSD -> MDS
+//
+
+message UploadObjectAckPro {
+	optional fixed64 objectId = 1;
+	optional PutObjectInitRequestPro.CodingScheme codingScheme = 2;	
+	optional string codingSetting = 3;
+	repeated fixed32 nodeList = 4;
+	optional string checksum = 5;
+}
+
+message GetObjectInfoRequestPro {
+	optional fixed64 objectId = 1;	
+}
+
+
+//
+// OSD -> CLIENT
+//
+
+message PutObjectInitReplyPro {
+	optional fixed64 objectId = 1;
+}
+
+// Upload: OSD -> CLIENT
+// Download: CLIENT -> OSD
+
+message ObjectTransferEndReplyPro {
+	optional fixed64 objectId = 1;
+}
+
+message GetObjectReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 objectSize = 2;
+	optional fixed32 chunkCount = 3;
+}
+
+//
+// OSD -> OSD
+//
+
+message PutSegmentInitRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+	optional fixed32 segmentSize = 3;
+	optional fixed32 chunkCount = 4;
+}
+
+message SegmentDataPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+	optional fixed64 offset = 3;
+	optional fixed32 length = 4;
+}
+
+message SegmentTransferEndRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message PutSegmentInitReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message SegmentTransferEndReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message GetSegmentInitRequestPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+message GetSegmentInitReplyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+	optional fixed32 segmentSize = 3;
+	optional fixed32 chunkCount = 4;
+}
+
+message GetSegmentReadyPro {
+	optional fixed64 objectId = 1;
+	optional fixed32 segmentId = 2;
+}
+
+//
+// OSD -> MONITOR 
+//
+message OsdStartupPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdCapacity = 2;
+	optional fixed32 osdLoading = 3;
+	optional fixed32 osdIp = 4;
+	optional fixed32 osdPort = 5;
+}
+
+message OsdShutdownPro {
+	optional fixed32 osdId = 1;
+}
+
+message OsdStatUpdateReplyPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdCapacity = 2;
+	optional fixed32 osdLoading = 3;
+}
+
+message GetSecondaryListRequestPro{
+	optional fixed32 numOfSegs = 1;
+	repeated SegmentLocationPro secondaryList = 2;
+}
+
+///////////////// FROM MONITOR /////////////////
+//
+// MONITOR -> OSD
+//
+
+message OsdStatUpdateRequestPro {
+
+}
+
+message GetSecondaryListReplyPro{
+	repeated SegmentLocationPro secondaryList = 1;
+}
+
+message NewOsdRegisterPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdIp = 2;
+	optional fixed32 osdPort = 3;
+}
+
+message OnlineOsdPro {
+	optional fixed32 osdId = 1;
+	optional fixed32 osdIp = 2;
+	optional fixed32 osdPort = 3;
+}
+
+message OnlineOsdListPro {
+	repeated OnlineOsdPro onlineOsdList = 1;
+}
+
+//
+// MONITOR -> MDS
+//
+
+message GetPrimaryListReplyPro{
+	repeated fixed32 primaryList = 1;
+}
+
+//
+// MONITOR -> CLIENT
+//
+
+message GetOsdListReplyPro {
+	repeated OnlineOsdPro onlineOsdList = 1;
+}
