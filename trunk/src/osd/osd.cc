@@ -6,7 +6,7 @@
 #include <vector>
 #include <openssl/md5.h>
 #include "osd.hh"
-#include "segmentlocation.hh"
+#include "../common/segmentlocation.hh"
 #include "../common/debug.hh"
 #include "../common/metadata.hh"
 #include "../common/convertor.hh"

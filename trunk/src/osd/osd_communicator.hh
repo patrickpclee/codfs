@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdint.h>
 #include "../common/metadata.hh"
-#include "segmentlocation.hh"
+#include "../common/segmentlocation.hh"
 #include "../communicator/communicator.hh"
 
 using namespace std;

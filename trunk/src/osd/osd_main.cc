@@ -6,7 +6,7 @@
 #include <thread>
 #include <vector>
 #include "osd.hh"
-#include "segmentlocation.hh"
+#include "../common/segmentlocation.hh"
 #include "../common/debug.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/netfunc.hh"

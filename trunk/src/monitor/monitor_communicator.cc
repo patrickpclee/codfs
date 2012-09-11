@@ -1,9 +1,3 @@
-/**
- * monitor _communicator.cc
- * by DING Qian
- * Aug 9, 2012
- */
-
 #include <iostream>
 #include <thread>
 #include <cstdio>
@@ -21,14 +15,12 @@
 using namespace std;
 
 extern ConfigLayer* configLayer;
-mutex osdCountMutex;
 
 /**
  * Constructor
  */
 
 MonitorCommunicator::MonitorCommunicator() {
-	_osdCount = 52001;
 	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
 }
 
@@ -53,16 +45,6 @@ void MonitorCommunicator::replySecondaryList(uint32_t requestId, uint32_t sockfd
 	getSecondaryListReplyMsg->prepareProtocolMsg();
 
 	addMessage(getSecondaryListReplyMsg);
-	return;
-}
-
-void MonitorCommunicator::replyOsdConfig(uint32_t requestId, uint32_t sockfd){
-	GetOsdConfigReplyMsg* getOsdConfigReplyMsg = new GetOsdConfigReplyMsg(this, requestId, sockfd, _osdCount, _osdCount, 10, 5, "./osd_segment/", "./osd_object/");
-	getOsdConfigReplyMsg->prepareProtocolMsg();
-
-	addMessage(getOsdConfigReplyMsg);
-	lock_guard<mutex> lk(osdCountMutex);
-	_osdCount++;
 	return;
 }
 
