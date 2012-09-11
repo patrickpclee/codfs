@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <vector>
 #include "../communicator/communicator.hh"
-#include "../osd/onlineosd.hh"
+#include "../common/onlineosd.hh"
 
 using namespace std;
 
