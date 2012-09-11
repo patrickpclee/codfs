@@ -83,6 +83,7 @@ private:
 	 * Reference of the map defined in the monitor class 
 	 */
 	map<uint32_t, struct OsdStat>& _osdStatMap;
+
 };
 
 #endif

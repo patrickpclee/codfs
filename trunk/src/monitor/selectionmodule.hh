@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 #include "../common/osdstat.hh"
-#include "../osd/segmentlocation.hh"
+#include "../common/segmentlocation.hh"
 #include "../protocol/status/osdstatupdaterequestmsg.hh"
 
 using namespace std;
@@ -33,12 +33,6 @@ public:
 	 * @return a list of selected osd IDs  
 	 */
 	vector<struct SegmentLocation> ChooseSecondary(uint32_t numOfSegs);
-
-// Abandomed functions
-//	uint32_t findNextOsd(); // osd to store the next object
-//	uint32_t* findSecondaryOsdList(uint32_t splitFactor);
-//	uint32_t* findPrimaryOsdList(uint32_t numOfOsd);
-//	uint32_t findRecoveryOsd(struct OjbectOwnership objectOwnership);
 
 private:
 

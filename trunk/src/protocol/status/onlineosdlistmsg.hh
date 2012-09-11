@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "../message.hh"
-#include "../../osd/onlineosd.hh"
+#include "../../common/onlineosd.hh"
 using namespace std;
 
 /**

@@ -11,7 +11,7 @@
 
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
-#include "../../osd/segmentlocation.hh"
+#include "../../common/segmentlocation.hh"
 
 using namespace std;
 

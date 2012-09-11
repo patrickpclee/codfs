@@ -1,13 +1,13 @@
 #ifndef __MONITOR_HH__
 #define __MONITOR_HH__
 
-#include "../cache/cache.hh"
-#include "../common/osdstat.hh"
 #include "monitor_communicator.hh"
 #include "selectionmodule.hh"
 #include "recoverymodule.hh"
 #include "statmodule.hh"
-#include "../osd/onlineosd.hh"
+#include "../common/onlineosd.hh"
+#include "../common/osdstat.hh"
+#include "../cache/cache.hh"
 #include <map>
 
 using namespace std;
@@ -66,8 +66,6 @@ public:
 	void OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 		uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip,
 		uint16_t port);
-
-	void getOsdConfigProcessor(uint32_t requestId, uint32_t sockfd);
 
 	/**
 	 * Action when an OSD update its status message received

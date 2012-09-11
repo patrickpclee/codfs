@@ -1,13 +1,14 @@
 #include "statmodule.hh"
-#include "../osd/onlineosd.hh"
-#include "../protocol/status/newosdregistermsg.hh"
+#include "../common/onlineosd.hh"
 #include "../common/debug.hh"
+#include "../protocol/status/newosdregistermsg.hh"
 #include <ctime>
 
 
 /*  Constructor */
 StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
 	_osdStatMap(mapRef) { 
+
 }
 
 void StatModule::updateOsdStatMap (Communicator* communicator) {

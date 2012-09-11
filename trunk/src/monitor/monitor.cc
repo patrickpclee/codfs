@@ -4,7 +4,7 @@
 #include <ctime>
 #include "monitor.hh"
 #include "../config/config.hh"
-#include "../osd/segmentlocation.hh"
+#include "../common/segmentlocation.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 
@@ -87,11 +87,6 @@ void Monitor::getPrimaryListProcessor (uint32_t requestId, uint32_t sockfd, uint
 	vector<uint32_t> primaryList;
 	primaryList = _selectionModule->ChoosePrimary(numOfObjs);
 	_monitorCommunicator->replyPrimaryList(requestId, sockfd, primaryList);
-	return;
-}
-
-void Monitor::getOsdConfigProcessor(uint32_t requestId, uint32_t sockfd){
-	_monitorCommunicator->replyOsdConfig(requestId,sockfd);
 	return;
 }
 
