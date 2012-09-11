@@ -7,7 +7,6 @@
 #include "../common/debug.hh"
 #include "../common/enums.hh"
 #include "../common/enumtostring.hh"
-
 #include "metadata/listdirectoryrequest.hh"
 #include "metadata/listdirectoryreply.hh"
 #include "metadata/uploadfilerequest.hh"
@@ -21,7 +20,6 @@
 #include "metadata/getobjectinforeply.hh"
 #include "metadata/saveobjectlistrequest.hh"
 #include "metadata/setfilesizerequest.hh"
-
 #include "transfer/putobjectinitrequest.hh"
 #include "transfer/putobjectinitreply.hh"
 #include "transfer/segmenttransferendrequest.hh"
@@ -32,27 +30,20 @@
 #include "transfer/objecttransferendrequest.hh"
 #include "transfer/objectdatamsg.hh"
 #include "transfer/segmentdatamsg.hh"
-//#include "transfer/getobjectreadymsg.hh"
-//#include "transfer/getsegmentreadymsg.hh"
 #include "transfer/getsegmentinitrequest.hh"
 #include "transfer/getobjectrequest.hh"
-//#include "transfer/getobjectreplymsg.hh"
-
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
-
 #include "status/osdstartupmsg.hh"
 #include "status/osdshutdownmsg.hh"
 #include "status/osdstatupdaterequestmsg.hh"
 #include "status/osdstatupdatereplymsg.hh"
 #include "status/newosdregistermsg.hh"
 #include "status/onlineosdlistmsg.hh"
-
 #include "nodelist/getprimarylistrequest.hh"
 #include "nodelist/getprimarylistreply.hh"
 #include "nodelist/getsecondarylistrequest.hh"
 #include "nodelist/getsecondarylistreply.hh"
-
 #include "nodelist/getosdlistrequest.hh"
 #include "nodelist/getosdlistreply.hh"
 
@@ -66,8 +57,10 @@ MessageFactory::~MessageFactory() {
 
 Message* MessageFactory::createMessage(Communicator* communicator,
 		MsgType messageType) {
+
 	switch (messageType) {
-	//HAND SHAKE
+
+	//HANDSHAKE
 	case (HANDSHAKE_REQUEST):
 		return new HandshakeRequestMsg(communicator);
 		break;
@@ -75,7 +68,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new HandshakeReplyMsg(communicator);
 		break;
 
-		//METADATA
+	//METADATA
 	case (LIST_DIRECTORY_REQUEST):
 		return new ListDirectoryRequestMsg(communicator);
 		break;
@@ -116,7 +109,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new SetFileSizeRequestMsg(communicator);
 		break;
 
-		//TRANSFER
+	//TRANSFER
 	case (PUT_OBJECT_INIT_REQUEST):
 		return new PutObjectInitRequestMsg(communicator);
 		break;
@@ -150,22 +143,11 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_OBJECT_REQUEST):
 		return new GetObjectRequestMsg(communicator);
 		break;
-		/*
-	case (GET_OBJECT_READY):
-		return new GetObjectReadyMsg(communicator);
-		break;
-	case (GET_OBJECT_REPLY):
-		return new GetObjectReplyMsg(communicator);
-		break;
-		 case (GET_SEGMENT_READY):
-		 return new GetSegmentReadyMsg(communicator);
-		 break;
-		 */
 	case (GET_SEGMENT_INIT_REQUEST):
 		return new GetSegmentInitRequestMsg(communicator);
 		break;
 
-		//STATUS
+	//STATUS
 	case (OSD_STARTUP):
 		return new OsdStartupMsg(communicator);
 		break;
@@ -185,7 +167,7 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new OnlineOsdListMsg(communicator);
 		break;
 
-		//NODELIST
+	//NODELIST
 	case (GET_PRIMARY_LIST_REQUEST):
 		return new GetPrimaryListRequestMsg(communicator);
 		break;
@@ -204,8 +186,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_OSD_LIST_REPLY):
 		return new GetOsdListReplyMsg(communicator);
 		break;
-
-
 
 	default:
 		debug("Invalid message type : %s\n", EnumToString::toString(messageType));
