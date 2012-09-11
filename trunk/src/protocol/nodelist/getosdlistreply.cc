@@ -79,7 +79,7 @@ void GetOsdListReplyMsg::doHandle() {
 
 void GetOsdListReplyMsg::printProtocol() {
 	debug("%s\n", "[GET_OSD_LIST_REPLY] GOT.");
-	for (int i = 0; i < _osdList.size(); i++) {
+	for (uint32_t i = 0; i < (uint32_t) _osdList.size(); i++) {
 		debug("LIST i=%" PRIu32 " ip = %" PRIu32 " port = %" PRIu32 "\n",i, _osdList[i].osdIp, _osdList[i].osdPort);
 	}
 }
