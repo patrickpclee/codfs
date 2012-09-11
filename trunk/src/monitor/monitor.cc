@@ -4,7 +4,7 @@
 #include <ctime>
 #include "monitor.hh"
 #include "../config/config.hh"
-#include "../osd/segmentlocation.hh"
+#include "../common/segmentlocation.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 

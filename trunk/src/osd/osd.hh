@@ -6,15 +6,15 @@
 #define __OSD_HH__
 #include <stdint.h>
 #include <vector>
-#include "../common/metadata.hh"
-#include "../protocol/message.hh"
 #include "osd_communicator.hh"
-#include "../common/objectdata.hh"
-#include "../common/segmentdata.hh"
-#include "segmentlocation.hh"
-#include "onlineosd.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
+#include "../common/metadata.hh"
+#include "../common/objectdata.hh"
+#include "../common/segmentdata.hh"
+#include "../common/segmentlocation.hh"
+#include "../common/onlineosd.hh"
+#include "../protocol/message.hh"
 #include "../datastructure/concurrentmap.hh"
 
 /**

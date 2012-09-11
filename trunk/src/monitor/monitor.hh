@@ -1,13 +1,13 @@
 #ifndef __MONITOR_HH__
 #define __MONITOR_HH__
 
-#include "../cache/cache.hh"
-#include "../common/osdstat.hh"
 #include "monitor_communicator.hh"
 #include "selectionmodule.hh"
 #include "recoverymodule.hh"
 #include "statmodule.hh"
-#include "../osd/onlineosd.hh"
+#include "../common/onlineosd.hh"
+#include "../common/osdstat.hh"
+#include "../cache/cache.hh"
 #include <map>
 
 using namespace std;

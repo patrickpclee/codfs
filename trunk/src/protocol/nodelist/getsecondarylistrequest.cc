@@ -4,7 +4,7 @@ using namespace std;
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../../osd/segmentlocation.hh"
+#include "../../common/segmentlocation.hh"
 #include "getsecondarylistrequest.hh"
 
 #ifdef COMPILE_FOR_OSD
