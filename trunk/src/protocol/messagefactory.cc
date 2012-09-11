@@ -53,9 +53,6 @@
 #include "nodelist/getsecondarylistrequest.hh"
 #include "nodelist/getsecondarylistreply.hh"
 
-#include "nodelist/getosdconfigrequest.hh"
-#include "nodelist/getosdconfigreply.hh"
-
 #include "nodelist/getosdlistrequest.hh"
 #include "nodelist/getosdlistreply.hh"
 
@@ -200,12 +197,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_SECONDARY_LIST_REPLY):
 		return new GetSecondaryListReplyMsg(communicator);
-		break;
-	case (GET_OSD_CONFIG_REQUEST):
-		return new GetOsdConfigRequestMsg(communicator);
-		break;
-	case (GET_OSD_CONFIG_REPLY):
-		return new GetOsdConfigReplyMsg(communicator);
 		break;
 	case (GET_OSD_LIST_REQUEST):
 		return new GetOsdListRequestMsg(communicator);
