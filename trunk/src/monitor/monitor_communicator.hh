@@ -63,10 +63,8 @@ public:
 	void sendOnlineOsdList(uint32_t newOsdSockfd, 
 		vector<struct OnlineOsd>& onlineOsdList);
 
-	void replyOsdConfig(uint32_t requestId, uint32_t sockfd);
-
 private:
-	uint32_t _osdCount;
+
 };
 
 #endif
