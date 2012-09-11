@@ -1,12 +1,7 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
-	<Clientid>51000</Clientid>
-
     <Communication>
-    
-        <ServerPort>51000</ServerPort>
 		<NumClientThreads>10</NumClientThreads>
-        
     </Communication>
     
     <Storage>

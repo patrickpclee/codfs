@@ -2,6 +2,7 @@
 #include <thread>
 #include <cstdio>
 #include "monitor_communicator.hh"
+#include "../config/config.hh"
 #include "../common/enums.hh"
 #include "../common/memorypool.hh"
 #include "../common/debug.hh"
@@ -13,12 +14,14 @@
 
 using namespace std;
 
+extern ConfigLayer* configLayer;
+
 /**
  * Constructor
  */
 
 MonitorCommunicator::MonitorCommunicator() {
-
+	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
 }
 
 /**

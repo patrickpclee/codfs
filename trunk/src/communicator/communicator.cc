@@ -70,11 +70,10 @@ Communicator::Communicator() {
 
 	// chunk size
 	_chunkSize = stringToByte(configLayer->getConfigString("Communication>ChunkSize"));
-#ifdef COMPILE_FOR_OSD
-	_serverPort = 0;	//OSD use random port
-#else 
-	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
-#endif
+
+	// default: use random port
+	_serverPort = 0;
+
 
 	_pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
