@@ -13,6 +13,7 @@
 #include "../common/enumtostring.hh"
 #include "../common/memorypool.hh"
 #include "../common/debug.hh"
+#include "../common/msgmemorypool.hh"
 #include "message.hh"
 
 using namespace std;
@@ -34,12 +35,12 @@ Message::Message(Communicator* communicator) {
 
 #ifdef USE_MESSAGE_MEMORY_POOL
 void* Message::operator new (size_t n) {
-	return MessageMemoryPool::getInstance().poolMalloc(n);
+	return MsgMemoryPool::getInstance().poolMalloc(n);
 }
 
 
 void Message::operator delete (void* p){
-	return MessageMemoryPool::getInstance().poolFree((char*)p);
+	return MsgMemoryPool::getInstance().poolFree((char*)p);
 }
 #endif
 
