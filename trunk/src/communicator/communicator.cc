@@ -69,22 +69,14 @@ Communicator::Communicator() {
 			"Communication>SelectTimeout>usec");
 
 	// chunk size
-	_chunkSize = stringToByte(configLayer->getConfigString("Communication>ChunkSize"));
+	_chunkSize = stringToByte(
+			configLayer->getConfigString("Communication>ChunkSize"));
 
 	// default: use random port
 	_serverPort = 0;
 
-
 	_pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
-
-#ifdef USE_THREAD_POOL
-	/*
-	 // thread pool
-	 _numThreadPerPool = configLayer->getConfigInt(
-	 "Communication>NumThreadPerPool");
-	 */
-#endif
 
 	debug("%s\n", "Communicator constructed");
 
@@ -109,9 +101,7 @@ void Communicator::createServerSocket() {
 		throw SocketException("Could not listen to socket.");
 	}
 
-#ifdef COMPILE_FOR_OSD
 	_serverPort = _serverSocket.getPort();
-#endif
 
 	debug("Server Port = %" PRIu16 " sockfd = %" PRIu32 "\n",
 			_serverPort, _serverSocket.getSockfd());
@@ -145,16 +135,14 @@ void Communicator::waitForMessage() {
 	}
 
 #ifdef USE_THREAD_POOL
-	// initialize thread pool
+
+	// each MsgType has its own threadpool
+	// number of threads in each pool is defined in _threadPoolSize in the message
 	pool threadPools[MSGTYPE_END];
-	for (int i = 1; i < MSGTYPE_END; i++) { // skip DEFAULT
+	for (int i = 1; i < MSGTYPE_END; i++) { // i = 1 skip DEFAULT
 		Message* tempMessage = MessageFactory::createMessage(this, (MsgType) i);
 		uint32_t threadPoolSize = tempMessage->getThreadPoolSize();
 		threadPools[i].size_controller().resize(threadPoolSize);
-		/*
-		debug_cyan("Size of thread pool for message type %s = %" PRIu32 "\n",
-				EnumToString::toString((MsgType)i), threadPoolSize);
-		*/
 		delete tempMessage;
 	}
 
@@ -180,16 +168,15 @@ void Communicator::waitForMessage() {
 		}
 
 		// invoke select
-//		debug("%s\n", "invoke select");
 		result = select(_maxFd + 1, &sockfdSet, NULL, NULL, &tv);
 
 		if (result < 0) {
 			cerr << "select error" << endl;
 			return;
 		} else if (result == 0) {
-//			debug("%s\n", "select timeout");
+			// select timeout
 		} else {
-//			debug("%s\n", "select returns");
+			// select returns normally
 		}
 
 		// if there is a new connection
@@ -222,8 +209,6 @@ void Communicator::waitForMessage() {
 
 				uint32_t sockfd = p->second->getSockfd();
 
-//				debug("Checking FD_ISSET FD = %" PRIu32 "\n", sockfd);
-
 				// if socket has data available
 				if (FD_ISSET(sockfd, &sockfdSet)) {
 
@@ -234,7 +219,7 @@ void Communicator::waitForMessage() {
 					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 					if (nbytes == 0) {
 
-						//boost::upgrade_lock lock(connectionMapMutex);
+						// upgrade shared lock to exclusive lock
 						boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
 								lock);
 
@@ -251,24 +236,11 @@ void Communicator::waitForMessage() {
 						// receive message into buffer, memory allocated in recvMessage
 						buf = p->second->recvMessage();
 
-						// use thread pool implementation
 #ifdef USE_THREAD_POOL
-						/*
-						 struct MsgHeader msgHeader;
-						 memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
-						 */
-						uint32_t requestId =
-								((struct MsgHeader*) buf)->requestId;
 						MsgType msgType =
 								((struct MsgHeader*) buf)->protocolMsgType;
 
-						// blocking threads are put into tp
-						// threads which are needed to unblock the blocking threads are put in tpSpecial
-
-						debug_cyan(
-								"schedule request ID = %" PRIu32 "to tp %d Type = %s\n",
-								requestId, (int)msgType, EnumToString::toString(msgType));
-
+						// schedule message in its own threadpool
 						threadPools[msgType].schedule(
 								boost::bind(&Communicator::dispatch, this, buf,
 										p->first, 0));
@@ -285,9 +257,6 @@ void Communicator::waitForMessage() {
 
 	} // end while (1)
 
-#ifdef USE_THREAD_POOL
-	// wait()
-#endif
 }
 
 /**
@@ -309,7 +278,6 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 		{
 			const uint32_t requestId = message->getMsgHeader().requestId;
 			_waitReplyMessageMap.set(requestId, message);
-//			_waitReplyMessageMap[requestId] = message;
 			debug(
 					"Message (ID: %" PRIu32 " Type = %d FD = %" PRIu32 ") added to waitReplyMessageMap\n",
 					requestId, (int) message->getMsgHeader().protocolMsgType, message->getSockfd());
@@ -354,7 +322,8 @@ void Communicator::sendMessage() {
 			if (sockfd == (uint32_t) -1) {
 				debug("Message (ID: %" PRIu32 ") disconnected, ignore\n",
 						message->getMsgHeader().requestId);
-				debug("Deleting Message since sockfd == -1 (Type = %d ID: %" PRIu32 ")\n",
+				debug(
+						"Deleting Message since sockfd == -1 (Type = %d ID: %" PRIu32 ")\n",
 						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
 				delete message;
 				continue;
@@ -366,8 +335,9 @@ void Communicator::sendMessage() {
 				if (!(_connectionMap.count(sockfd))) {
 					debug("Connection SOCKFD = %" PRIu32 " not found!\n",
 							sockfd);
-					debug("Deleting Message since sockfd not found (Type = %d ID: %" PRIu32 ")\n",
-						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+					debug(
+							"Deleting Message since sockfd not found (Type = %d ID: %" PRIu32 ")\n",
+							(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
 					delete message;
 					continue;
 				}
@@ -391,9 +361,9 @@ void Communicator::sendMessage() {
 			}
 		}
 
-		// in terms of 10^-6 seconds
 #ifdef USE_LOWLOCK_QUEUE
-		usleep(_pollingInterval);
+		// polling is not required for concurrent queue since it uses conditional signal
+		usleep(_pollingInterval); // in terms of 10^-6 seconds
 #endif
 	}
 }
@@ -440,6 +410,7 @@ void Communicator::disconnectAndRemove(uint32_t sockfd) {
 		debug("Connection erased for sockfd = %" PRIu32 "\n", sockfd);
 	} else {
 		cerr << "Connection not found, cannot remove connection" << endl;
+		exit (-1);
 	}
 
 }
@@ -533,7 +504,6 @@ void Communicator::dispatch(char* buf, uint32_t sockfd,
 	// debug
 	message->printHeader();
 	message->printProtocol();
-	//message->printPayloadHex();
 
 #ifdef USE_THREAD_POOL
 	message->handle();
@@ -545,7 +515,6 @@ void Communicator::dispatch(char* buf, uint32_t sockfd,
 }
 
 inline uint32_t Communicator::generateRequestId() {
-	// increment _requestId
 	return ++_requestId;
 }
 
@@ -591,13 +560,11 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		// retrieve replied values
 		uint32_t targetComponentId =
 				requestHandshakeMsg->getTargetComponentId();
-		//ComponentType targetComponentType =
-		//		requestHandshakeMsg->getTargetComponentType();
 
 		// delete message
 		waitAndDelete(requestHandshakeMsg);
 
-		// add ID -> sockfd mapping to map
+		// add <ID> <sockfd> mapping to map
 		_componentIdMap.set(targetComponentId, sockfd);
 		debug(
 				"[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
@@ -715,7 +682,7 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 void Communicator::connectToMonitor() {
 	vector<Component> monitorList = parseConfigFile("MONITOR");
 	printComponents("MONITOR", monitorList);
-	for (Component component: monitorList) {
+	for (Component component : monitorList) {
 		uint32_t sockfd = connectAndAdd(component.ip, component.port,
 				component.type);
 		requestHandshake(sockfd, _componentId, _componentType);
@@ -725,7 +692,7 @@ void Communicator::connectToMonitor() {
 void Communicator::connectToMds() {
 	vector<Component> mdsList = parseConfigFile("MDS");
 	printComponents("MDS", mdsList);
-	for (Component component: mdsList) {
+	for (Component component : mdsList) {
 		uint32_t sockfd = connectAndAdd(component.ip, component.port,
 				component.type);
 		requestHandshake(sockfd, _componentId, _componentType);
@@ -733,7 +700,8 @@ void Communicator::connectToMds() {
 }
 
 void Communicator::connectToOsd(uint32_t dstOsdIp, uint32_t dstOsdPort) {
-	uint32_t sockfd = connectAndAdd(Ipv4Int2Str(dstOsdIp), dstOsdPort, _componentType);
+	uint32_t sockfd = connectAndAdd(Ipv4Int2Str(dstOsdIp), dstOsdPort,
+			_componentType);
 	requestHandshake(sockfd, _componentId, _componentType);
 }
 
