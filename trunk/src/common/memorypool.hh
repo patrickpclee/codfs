@@ -67,6 +67,8 @@ public:
 
 	void poolFree(char* ptr);
 
+	char* poolMallocMsg();
+
 private:
 	// Dont forget to declare these two. You want to make sure they
 	// are unaccessable otherwise you may accidently get copies of
@@ -79,10 +81,8 @@ private:
 	apr_allocator_t* alloc;
 	apr_bucket_alloc_t* balloc;
 
-	std::mutex memoryPoolMutex;
-};
+	uint32_t _maxMsgSize;
 
-class MessageMemoryPool : public MemoryPool {
-	
+	std::mutex memoryPoolMutex;
 };
 #endif
