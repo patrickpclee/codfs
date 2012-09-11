@@ -31,8 +31,8 @@ void OnlineOsdListMsg::prepareProtocolMsg() {
 	vector<struct OnlineOsd>::iterator it;
 
 	for (it = _onlineOsdListRef.begin(); it < _onlineOsdListRef.end(); ++it) {
-		ncvfs::OnlineOsdPro* onlineOsdPro = 
-			onlineOsdListPro.add_onlineosdlist();
+		ncvfs::OnlineOsdPro* onlineOsdPro =
+				onlineOsdListPro.add_onlineosdlist();
 		onlineOsdPro->set_osdid((*it).osdId);
 		onlineOsdPro->set_osdip((*it).osdIp);
 		onlineOsdPro->set_osdport((*it).osdPort);
@@ -44,7 +44,7 @@ void OnlineOsdListMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType (ONLINE_OSD_LIST);
+	setProtocolType(ONLINE_OSD_LIST);
 	setProtocolMsg(serializedString);
 
 }
@@ -70,14 +70,15 @@ void OnlineOsdListMsg::parse(char* buf) {
 
 void OnlineOsdListMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->OnlineOsdListProcessor(_msgHeader.requestId, _sockfd, _onlineOsdList); 
+	osd->OnlineOsdListProcessor(_msgHeader.requestId, _sockfd, _onlineOsdList);
 #endif
 }
 
 void OnlineOsdListMsg::printProtocol() {
-	debug("%s\n", "[ONLINE_OSD_LIST] built" );
-	for (int i=0; i<_onlineOsdList.size();i++) {
-		debug("[ONLINE_OSD_LIST] contains %" PRIu32 " = (%" PRIu32 " %" PRIu32 " %" PRIu32 ")\n",i,
-			_onlineOsdList[i].osdId, _onlineOsdList[i].osdIp, _onlineOsdList[i].osdPort);
+	debug("%s\n", "[ONLINE_OSD_LIST] built");
+	for (uint32_t i = 0; i < _onlineOsdList.size(); i++) {
+		debug(
+				"[ONLINE_OSD_LIST] contains %" PRIu32 "  = (%" PRIu32 " %" PRIu32 " %" PRIu32 ")\n",
+				i, _onlineOsdList[i].osdId, _onlineOsdList[i].osdIp, _onlineOsdList[i].osdPort);
 	}
 }

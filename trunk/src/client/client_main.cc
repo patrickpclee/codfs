@@ -37,16 +37,16 @@ void startReceiveThread(Communicator* communicator) {
 int main(int argc, char *argv[]) {
 
 	if (argc < 4 || argc > 5) {
-		cout << "Upload: ./CLIENT [CONFIG] upload [SRC]" << endl;
-		cout << "Download: ./CLIENT [CONFIG] download [FILEID] [DST]" << endl;
+		cout << "Upload: ./CLIENT [CLIENT ID] upload [SRC]" << endl;
+		cout << "Download: ./CLIENT [CLIENT ID] download [FILEID] [DST]" << endl;
 		exit(-1);
 	}
 
 	// handle signal for profiler
 	signal(SIGINT, sighandler);
 
-	configLayer = new ConfigLayer(argv[1]);
-	client = new Client();
+	configLayer = new ConfigLayer("clientconfig.xml");
+	client = new Client(atoi(argv[1]));
 	ClientCommunicator* communicator = client->getCommunicator();
 
 	// setup log

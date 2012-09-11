@@ -29,7 +29,7 @@
 			<count>1</count>
 			<MDS0>
 				<id>50000</id>
-				<ip>137.189.90.84</ip>
+				<ip>127.0.0.1</ip>
 				<port>50000</port>
 			</MDS0>
 		</MDS>
@@ -38,7 +38,7 @@
 			<count>1</count>
 			<MONITOR0>
 				<id>53000</id>
-				<ip>137.189.90.84</ip>
+				<ip>127.0.0.1</ip>
 				<port>53000</port>
 			</MONITOR0>
 		</MONITOR>
