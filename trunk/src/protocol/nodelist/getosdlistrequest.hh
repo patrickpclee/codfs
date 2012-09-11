@@ -1,14 +1,10 @@
-/**
- * getosdlistrequest.hh
- */
-
 #ifndef __GET_OSD_LIST_REQUEST_HH__
 #define __GET_OSD_LIST_REQUEST_HH__
 
 #include <string>
 #include "../message.hh"
 
-#include "../../osd/onlineosd.hh"
+#include "../../common/onlineosd.hh"
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
 

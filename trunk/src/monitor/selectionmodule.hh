@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 #include "../common/osdstat.hh"
-#include "../osd/segmentlocation.hh"
+#include "../common/segmentlocation.hh"
 #include "../protocol/status/osdstatupdaterequestmsg.hh"
 
 using namespace std;
