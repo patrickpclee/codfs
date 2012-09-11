@@ -25,28 +25,17 @@
 #define INF (1<<29)
 #define DISK_PATH "/"
 
-/// Osd Object
+// Global Variables
 extern Osd* osd;
-
-/// Config Object
 extern ConfigLayer* configLayer;
-
-/*
- mutex requestedSegmentsMutex;
- mutex initializationMutex;
- mutex cleanupMutex;
- */
 mutex objectRequestCountMutex;
 
 Osd::Osd(uint32_t selfId) {
 
 	configLayer = new ConfigLayer("osdconfig.xml", "common.xml");
-	//segmentLocationCache = new SegmentLocationCache();
 	_storageModule = new StorageModule();
 	_osdCommunicator = new OsdCommunicator();
 	_codingModule = new CodingModule();
-
-	//_osdId = configLayer->getConfigInt("Osdid");
 	_osdId = selfId;
 
 	srand(time(NULL)); //random test
@@ -56,23 +45,6 @@ Osd::~Osd() {
 	//delete _segmentLocationCache;
 	delete _storageModule;
 	delete _osdCommunicator;
-}
-
-/**
- * Save the received OSD list into the SegmentLocationCache
- * 1. If existing list is found, delete it
- * 2. Insert the new list into the cache
- */
-
-uint32_t Osd::osdListProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, vector<SegmentLocation> osdList) {
-
-	/*
-	 _segmentLocationCache->deleteSegmentLocation(objectId);
-	 _segmentLocationCache->writeSegmentLocation(objectId, osdList);
-	 */
-
-	return 0;
 }
 
 /**
@@ -96,10 +68,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	objectRequestCountMutex.unlock();
 
 	{
-
-		debug("Before Lock for objectId = %" PRIu64 "\n", objectId);
 		lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
-		debug("Inside Lock for objectId = %" PRIu64 "\n", objectId);
 
 		if (!_isObjectDownloaded.get(objectId)) {
 
@@ -191,8 +160,8 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 								"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
 								(int)codingScheme, codingSetting.c_str());
 						objectData = _codingModule->decodeSegmentToObject(
-								codingScheme, objectId, segmentDataList, requiredSegments,
-								codingSetting);
+								codingScheme, objectId, segmentDataList,
+								requiredSegments, codingSetting);
 
 						// clean up segment data
 						_downloadSegmentRemaining.erase(objectId);
@@ -553,12 +522,6 @@ OsdCommunicator* Osd::getCommunicator() {
 StorageModule* Osd::getStorageModule() {
 	return _storageModule;
 }
-
-/*
- SegmentLocationCache* Osd::getSegmentLocationCache() {
- return _segmentLocationCache;
- }
- */
 
 uint32_t Osd::getOsdId() {
 	return _osdId;
