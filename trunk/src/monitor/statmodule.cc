@@ -8,6 +8,7 @@
 /*  Constructor */
 StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
 	_osdStatMap(mapRef) { 
+
 }
 
 void StatModule::updateOsdStatMap (Communicator* communicator) {
