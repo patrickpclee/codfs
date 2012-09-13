@@ -103,6 +103,7 @@ inline bool HandshakeRequestPro_ComponentType_Parse(
 enum PutObjectInitRequestPro_CodingScheme {
   PutObjectInitRequestPro_CodingScheme_RAID0_CODING = 1,
   PutObjectInitRequestPro_CodingScheme_RAID1_CODING = 2,
+  PutObjectInitRequestPro_CodingScheme_RAID5_CODING = 3,
   PutObjectInitRequestPro_CodingScheme_DEFAULT_CODING = 15
 };
 bool PutObjectInitRequestPro_CodingScheme_IsValid(int value);
@@ -1028,6 +1029,7 @@ class PutObjectInitRequestPro : public ::google::protobuf::Message {
   typedef PutObjectInitRequestPro_CodingScheme CodingScheme;
   static const CodingScheme RAID0_CODING = PutObjectInitRequestPro_CodingScheme_RAID0_CODING;
   static const CodingScheme RAID1_CODING = PutObjectInitRequestPro_CodingScheme_RAID1_CODING;
+  static const CodingScheme RAID5_CODING = PutObjectInitRequestPro_CodingScheme_RAID5_CODING;
   static const CodingScheme DEFAULT_CODING = PutObjectInitRequestPro_CodingScheme_DEFAULT_CODING;
   static inline bool CodingScheme_IsValid(int value) {
     return PutObjectInitRequestPro_CodingScheme_IsValid(value);

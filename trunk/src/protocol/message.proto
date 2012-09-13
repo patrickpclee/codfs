@@ -77,6 +77,7 @@ message PutObjectInitRequestPro {
 	enum CodingScheme {
 		RAID0_CODING = 1;
 		RAID1_CODING = 2;
+		RAID5_CODING = 3;
 		DEFAULT_CODING = 15;
 	}
 	
