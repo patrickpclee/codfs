@@ -83,7 +83,7 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
  * 2. Set the Primary for the object
  */
 void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, CodingScheme codingScheme, string codingSetting,
+		uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, string codingSetting,
 		vector<uint32_t> objectNodeList, string checksum) {
 	struct ObjectMetaData objectMetaData;
 	objectMetaData._id = objectId;
@@ -92,6 +92,7 @@ void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
 	objectMetaData._codingScheme = codingScheme;
 	objectMetaData._codingSetting = codingSetting;
 	objectMetaData._checksum = checksum;
+	objectMetaData._size = objectSize;
 	_metaDataModule->saveObjectInfo(objectId, objectMetaData);
 	//_metaDataModule->saveNodeList(objectId, objectNodeList);
 	//_metaDataModule->setPrimary(objectId, objectNodeList[0]);
@@ -137,7 +138,7 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 
 	_nameSpaceModule->openFile(clientId, path);
 	_metaDataModule->openFile(clientId, fileId);
-	if(fileId != 0) {
+	if (fileId != 0) {
 		debug("Read object List %" PRIu32 "\n", fileId);
 		objectList = _metaDataModule->readObjectList(fileId);
 
@@ -153,8 +154,10 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		checksum = _metaDataModule->readChecksum(fileId);
 
 		debug ("FILESIZE = %" PRIu64 "\n", fileSize);\
+
 	}
-	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path, fileSize, checksum, objectList, primaryList);
+	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path,
+			fileSize, checksum, objectList, primaryList);
 
 	return;
 }
@@ -162,10 +165,13 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 /**
  * @brief	Handle Get Object ID Lsit
  */
-void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t numOfObjs) {
+void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t clientId, uint32_t numOfObjs) {
 	vector<uint64_t> objectList = _metaDataModule->newObjectList(numOfObjs);
-	vector<uint32_t> primaryList = _mdsCommunicator->getPrimaryList(_mdsCommunicator->getMonitorSockfd(), numOfObjs);
-	_mdsCommunicator->replyObjectIdList(requestId, connectionId, objectList, primaryList);
+	vector<uint32_t> primaryList = _mdsCommunicator->getPrimaryList(
+			_mdsCommunicator->getMonitorSockfd(), numOfObjs);
+	_mdsCommunicator->replyObjectIdList(requestId, connectionId, objectList,
+			primaryList);
 	return;
 }
 
@@ -188,8 +194,8 @@ void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId,
 	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(
 			objectId);
 	_mdsCommunicator->replyObjectInfo(requestId, connectionId, objectId,
-			objectMetaData._nodeList, objectMetaData._codingScheme,
-			objectMetaData._codingSetting);
+			objectMetaData._size, objectMetaData._nodeList,
+			objectMetaData._codingScheme, objectMetaData._codingSetting);
 
 	return;
 }

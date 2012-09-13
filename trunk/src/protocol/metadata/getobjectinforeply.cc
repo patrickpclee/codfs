@@ -13,18 +13,19 @@ GetObjectInfoReplyMsg::GetObjectInfoReplyMsg(Communicator* communicator) :
 
 GetObjectInfoReplyMsg::GetObjectInfoReplyMsg(Communicator* communicator,
 		uint32_t requestId, uint32_t dstSockfd, uint64_t objectId,
-		vector<uint32_t> nodeList, CodingScheme codingScheme,
-		string codingSetting) :
-		Message(communicator){
+		uint32_t objectSize, vector<uint32_t> nodeList,
+		CodingScheme codingScheme, string codingSetting) :
+		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
 	_sockfd = dstSockfd;
 
 	_objectId = objectId;
+	_objectSize = objectSize;
 	_nodeList = nodeList;
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
-	
+
 }
 
 void GetObjectInfoReplyMsg::prepareProtocolMsg() {
@@ -60,6 +61,7 @@ void GetObjectInfoReplyMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_objectId = getObjectInfoReplyPro.objectid();
+	_objectSize = getObjectInfoReplyPro.objectsize();
 	_codingScheme = (CodingScheme) getObjectInfoReplyPro.codingscheme();
 	_codingSetting = getObjectInfoReplyPro.codingsetting();
 
@@ -76,11 +78,12 @@ void GetObjectInfoReplyMsg::doHandle() {
 	getObjectInfoRequestMsg->setCodingScheme(_codingScheme);
 	getObjectInfoRequestMsg->setCodingSetting(_codingSetting);
 	getObjectInfoRequestMsg->setNodeList(_nodeList);
+	getObjectInfoRequestMsg->setObjectSize(_objectSize);
 	getObjectInfoRequestMsg->setStatus(READY);
 }
 
 void GetObjectInfoReplyMsg::printProtocol() {
 	debug(
-			"[GET_OBJECT_INFO_REPLY] Object ID = %" PRIu64 "CodingScheme = %d Setting = %s\n",
-			_objectId, (int)_codingScheme, _codingSetting.c_str());
+			"[GET_OBJECT_INFO_REPLY] Object ID = %" PRIu64 " Size = %" PRIu32 " CodingScheme = %d Setting = %s\n",
+			_objectId, _objectSize, (int)_codingScheme, _codingSetting.c_str());
 }

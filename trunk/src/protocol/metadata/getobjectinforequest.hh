@@ -49,7 +49,7 @@ public:
 	void printProtocol();
 
 	uint64_t getObjectSize();
-	void setObjectSize(uint64_t objectSize);
+	void setObjectSize(uint32_t objectSize);
 	vector<uint32_t> getNodeList();
 	void setNodeList(vector<uint32_t> nodeList);
 	CodingScheme getCodingScheme();
@@ -64,7 +64,7 @@ private:
 	uint64_t _objectId;
 
 	// reply
-	uint64_t _objectSize;
+	uint32_t _objectSize;
 	vector<uint32_t> _nodeList;
 	CodingScheme _codingScheme;
 	string _codingSetting;

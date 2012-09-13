@@ -157,46 +157,47 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 		uint64_t objectId, ComponentType dstComponent, uint32_t segmentCount) {
 
 	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
-			new GetSecondaryListRequestMsg(this, getMonitorSockfd(), segmentCount);
+			new GetSecondaryListRequestMsg(this, getMonitorSockfd(),
+					segmentCount);
 	getSecondaryListRequestMsg->prepareProtocolMsg();
 
 	addMessage(getSecondaryListRequestMsg, true);
 	MessageStatus status = getSecondaryListRequestMsg->waitForStatusChange();
 
 	if (status == READY) {
-		vector<struct SegmentLocation> osdList = 
+		vector<struct SegmentLocation> osdList =
 				getSecondaryListRequestMsg->getSecondaryList();
 		return osdList;
 	}
 
 	return {};
 	/* 
-	srand(time(NULL));
+	 srand(time(NULL));
 
-	// TODO: request to MONITOR (HARDCODE FOR NOW)
+	 // TODO: request to MONITOR (HARDCODE FOR NOW)
 
-	for (uint32_t i = 0; i < segmentCount; i++) {
-		struct SegmentLocation segmentLocation;
+	 for (uint32_t i = 0; i < segmentCount; i++) {
+	 struct SegmentLocation segmentLocation;
 
-		// DEBUG 1: random assignment
-		segmentLocation.osdId = rand() % 2 + 52000;
+	 // DEBUG 1: random assignment
+	 segmentLocation.osdId = rand() % 2 + 52000;
 
-		// DEBUG 2: must be local
-		//segmentLocation.osdId = _componentId;
+	 // DEBUG 2: must be local
+	 //segmentLocation.osdId = _componentId;
 
-		// DEBUG 3: must be foreign
-		if (_componentId == 52000) {
-			segmentLocation.osdId = 52001;
-		} else {
-			segmentLocation.osdId = 52000;
-		}
+	 // DEBUG 3: must be foreign
+	 if (_componentId == 52000) {
+	 segmentLocation.osdId = 52001;
+	 } else {
+	 segmentLocation.osdId = 52000;
+	 }
 
-		segmentLocation.segmentId = 0;
-		osdList.push_back(segmentLocation);
-	}
+	 segmentLocation.segmentId = 0;
+	 osdList.push_back(segmentLocation);
+	 }
 
-	return osdList;
-	*/
+	 return osdList;
+	 */
 
 }
 
@@ -266,13 +267,14 @@ void OsdCommunicator::putSegmentEnd(uint32_t sockfd, uint64_t objectId,
 	}
 }
 
-void OsdCommunicator::objectUploadAck(uint64_t objectId,
+void OsdCommunicator::objectUploadAck(uint64_t objectId, uint32_t objectSize,
 		CodingScheme codingScheme, string codingSetting,
 		vector<uint32_t> nodeList, string checksum) {
 	uint32_t mdsSockFd = getMdsSockfd();
 
 	UploadObjectAckMsg* uploadObjectAckMsg = new UploadObjectAckMsg(this,
-			mdsSockFd, objectId, codingScheme, codingSetting, nodeList, checksum);
+			mdsSockFd, objectId, objectSize, codingScheme, codingSetting,
+			nodeList, checksum);
 
 	uploadObjectAckMsg->prepareProtocolMsg();
 	addMessage(uploadObjectAckMsg, false);
@@ -322,8 +324,9 @@ struct ObjectTransferOsdInfo OsdCommunicator::getObjectInfoRequest(
 }
 
 void OsdCommunicator::registerToMonitor(uint32_t ip, uint16_t port) {
-	OsdStartupMsg* startupMsg = new OsdStartupMsg(this, getMonitorSockfd(), 
-		osd->getOsdId(), osd->getFreespace(), osd->getCpuLoadavg(0), ip, port);
+	OsdStartupMsg* startupMsg = new OsdStartupMsg(this, getMonitorSockfd(),
+			osd->getOsdId(), osd->getFreespace(), osd->getCpuLoadavg(0), ip,
+			port);
 	startupMsg->prepareProtocolMsg();
 	addMessage(startupMsg);
 }

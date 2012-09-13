@@ -31,6 +31,7 @@ void ObjectMetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaDa
 	BSONObj insertObject = BSON ("id" << (long long int)objectId
 							<< "primary" << objectInfo._primary
 							<< "checksum" << objectInfo._checksum
+							<< "size" << objectInfo._size
 							<< "codingScheme" << (int)objectInfo._codingScheme
 							<< "codingSetting" << objectInfo._codingSetting);
 	_objectMetaDataStorage->update(queryObject, insertObject);
@@ -56,6 +57,7 @@ struct ObjectMetaData ObjectMetaDataModule::readObjectInfo(uint64_t objectId)
 	}
 	objectMetaData._primary = (uint32_t)result.getField("primary").numberInt();
 	objectMetaData._checksum = result.getField("checksum").str();
+	objectMetaData._size = (uint32_t)result.getField("size").numberInt();
 	objectMetaData._codingScheme = (CodingScheme)result.getField("codingScheme").numberInt();
 	objectMetaData._codingSetting = result.getField("codingSetting").str();
 

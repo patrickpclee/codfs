@@ -17,7 +17,7 @@ public:
 	GetObjectInfoReplyMsg(Communicator* communicator);
 
 	GetObjectInfoReplyMsg(Communicator* communicator, uint32_t requestId,
-			uint32_t dstSockfd, uint64_t objectId, vector<uint32_t> nodeList,
+			uint32_t dstSockfd, uint64_t objectId, uint32_t objectSize, vector<uint32_t> nodeList,
 			CodingScheme codingScheme, string codingSetting);
 
 	/**
@@ -51,6 +51,7 @@ public:
 
 private:
 	uint64_t _objectId;
+	uint32_t _objectSize;
 
 	vector<uint32_t> _nodeList;
 	CodingScheme _codingScheme;

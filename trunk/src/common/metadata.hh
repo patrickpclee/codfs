@@ -12,14 +12,14 @@ using namespace std;
 // use in client
 struct ObjectTransferClientInfo {
 	uint64_t _id;
-	uint64_t _size;
+	uint32_t _size;
 	uint32_t _chunkCount;
 };
 
 // use in OSD
 struct ObjectTransferOsdInfo {
 	uint64_t _id;
-	uint64_t _size;
+	uint32_t _size;
 	vector <uint32_t> _osdList;
 	CodingScheme _codingScheme;
 	string _codingSetting;
@@ -40,6 +40,7 @@ struct FileMetaData {
 
 struct ObjectMetaData {
 	uint64_t _id;
+	uint32_t _size;
 	//uint32_t _segmentCount;
 	//uint32_t* _segmentList;
 	//uint32_t _offsetInFile;

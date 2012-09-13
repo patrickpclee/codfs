@@ -87,6 +87,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 						_osdCommunicator->getObjectInfoRequest(objectId);
 				const CodingScheme codingScheme = objectInfo._codingScheme;
 				const string codingSetting = objectInfo._codingSetting;
+				const uint32_t objectSize = objectInfo._size;
 
 				// initialize a bool array to store sdListStatus
 				vector<bool> secondaryOsdStatus(objectInfo._osdList.size());
@@ -161,7 +162,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 								(int)codingScheme, codingSetting.c_str());
 						objectData = _codingModule->decodeSegmentToObject(
 								codingScheme, objectId, segmentDataList,
-								requiredSegments, codingSetting);
+								requiredSegments, objectSize, codingSetting);
 
 						// clean up segment data
 						_downloadSegmentRemaining.erase(objectId);
@@ -329,7 +330,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_pendingObjectChunk.erase(objectId);
 
 			// Acknowledge MDS for Object Upload Completed
-			_osdCommunicator->objectUploadAck(objectId,
+			_osdCommunicator->objectUploadAck(objectId, objectCache.length,
 					codingSetting.codingScheme, codingSetting.setting, nodeList,
 					md5ToHex(checksum));
 

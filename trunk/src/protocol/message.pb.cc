@@ -504,11 +504,12 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetObjectIdListReplyPro));
   GetObjectInfoReplyPro_descriptor_ = file->message_type(20);
-  static const int GetObjectInfoReplyPro_offsets_[4] = {
+  static const int GetObjectInfoReplyPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectInfoReplyPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectInfoReplyPro, nodelist_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectInfoReplyPro, codingscheme_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectInfoReplyPro, codingsetting_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetObjectInfoReplyPro, objectsize_),
   };
   GetObjectInfoReplyPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -538,12 +539,13 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrimaryListRequestPro));
   UploadObjectAckPro_descriptor_ = file->message_type(22);
-  static const int UploadObjectAckPro_offsets_[5] = {
+  static const int UploadObjectAckPro_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, objectid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, codingscheme_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, codingsetting_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, nodelist_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, checksum_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadObjectAckPro, objectsize_),
   };
   UploadObjectAckPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1183,16 +1185,17 @@ void protobuf_AddDesc_message_2eproto() {
     "(\006\022\020\n\010checksum\030\005 \001(\t\022\022\n\nobjectList\030\006 \003(\006"
     "\022\023\n\013primaryList\030\007 \003(\007\"D\n\027GetObjectIdList"
     "ReplyPro\022\024\n\014objectIdList\030\001 \003(\006\022\023\n\013primar"
-    "yList\030\002 \003(\007\"\225\001\n\025GetObjectInfoReplyPro\022\020\n"
+    "yList\030\002 \003(\007\"\251\001\n\025GetObjectInfoReplyPro\022\020\n"
     "\010objectId\030\001 \001(\006\022\020\n\010nodeList\030\002 \003(\007\022A\n\014cod"
     "ingScheme\030\003 \001(\0162+.ncvfs.PutObjectInitReq"
     "uestPro.CodingScheme\022\025\n\rcodingSetting\030\004 "
-    "\001(\t\"B\n\030GetPrimaryListRequestPro\022\021\n\tnumOf"
-    "Objs\030\001 \001(\007\022\023\n\013primaryList\030\002 \003(\007\"\244\001\n\022Uplo"
-    "adObjectAckPro\022\020\n\010objectId\030\001 \001(\006\022A\n\014codi"
-    "ngScheme\030\002 \001(\0162+.ncvfs.PutObjectInitRequ"
-    "estPro.CodingScheme\022\025\n\rcodingSetting\030\003 \001"
-    "(\t\022\020\n\010nodeList\030\004 \003(\007\022\020\n\010checksum\030\005 \001(\t\"+"
+    "\001(\t\022\022\n\nobjectSize\030\005 \001(\007\"B\n\030GetPrimaryLis"
+    "tRequestPro\022\021\n\tnumOfObjs\030\001 \001(\007\022\023\n\013primar"
+    "yList\030\002 \003(\007\"\270\001\n\022UploadObjectAckPro\022\020\n\010ob"
+    "jectId\030\001 \001(\006\022A\n\014codingScheme\030\002 \001(\0162+.ncv"
+    "fs.PutObjectInitRequestPro.CodingScheme\022"
+    "\025\n\rcodingSetting\030\003 \001(\t\022\020\n\010nodeList\030\004 \003(\007"
+    "\022\020\n\010checksum\030\005 \001(\t\022\022\n\nobjectSize\030\006 \001(\007\"+"
     "\n\027GetObjectInfoRequestPro\022\020\n\010objectId\030\001 "
     "\001(\006\")\n\025PutObjectInitReplyPro\022\020\n\010objectId"
     "\030\001 \001(\006\"-\n\031ObjectTransferEndReplyPro\022\020\n\010o"
@@ -1232,7 +1235,7 @@ void protobuf_AddDesc_message_2eproto() {
     "lineOsdPro\"-\n\026GetPrimaryListReplyPro\022\023\n\013"
     "primaryList\030\001 \003(\007\"@\n\022GetOsdListReplyPro\022"
     "*\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs.OnlineOsd"
-    "ProB\002H\001", 3807);
+    "ProB\002H\001", 3847);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -7017,6 +7020,7 @@ const int GetObjectInfoReplyPro::kObjectIdFieldNumber;
 const int GetObjectInfoReplyPro::kNodeListFieldNumber;
 const int GetObjectInfoReplyPro::kCodingSchemeFieldNumber;
 const int GetObjectInfoReplyPro::kCodingSettingFieldNumber;
+const int GetObjectInfoReplyPro::kObjectSizeFieldNumber;
 #endif  // !_MSC_VER
 
 GetObjectInfoReplyPro::GetObjectInfoReplyPro()
@@ -7038,6 +7042,7 @@ void GetObjectInfoReplyPro::SharedCtor() {
   objectid_ = GOOGLE_ULONGLONG(0);
   codingscheme_ = 1;
   codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  objectsize_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -7082,6 +7087,7 @@ void GetObjectInfoReplyPro::Clear() {
         codingsetting_->clear();
       }
     }
+    objectsize_ = 0u;
   }
   nodelist_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -7165,6 +7171,22 @@ bool GetObjectInfoReplyPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(45)) goto parse_objectSize;
+        break;
+      }
+      
+      // optional fixed32 objectSize = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_objectSize:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &objectsize_)));
+          set_has_objectsize();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -7213,6 +7235,11 @@ void GetObjectInfoReplyPro::SerializeWithCachedSizes(
       4, this->codingsetting(), output);
   }
   
+  // optional fixed32 objectSize = 5;
+  if (has_objectsize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(5, this->objectsize(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -7248,6 +7275,11 @@ void GetObjectInfoReplyPro::SerializeWithCachedSizes(
         4, this->codingsetting(), target);
   }
   
+  // optional fixed32 objectSize = 5;
+  if (has_objectsize()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(5, this->objectsize(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -7275,6 +7307,11 @@ int GetObjectInfoReplyPro::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->codingsetting());
+    }
+    
+    // optional fixed32 objectSize = 5;
+    if (has_objectsize()) {
+      total_size += 1 + 4;
     }
     
   }
@@ -7321,6 +7358,9 @@ void GetObjectInfoReplyPro::MergeFrom(const GetObjectInfoReplyPro& from) {
     if (from.has_codingsetting()) {
       set_codingsetting(from.codingsetting());
     }
+    if (from.has_objectsize()) {
+      set_objectsize(from.objectsize());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -7348,6 +7388,7 @@ void GetObjectInfoReplyPro::Swap(GetObjectInfoReplyPro* other) {
     nodelist_.Swap(&other->nodelist_);
     std::swap(codingscheme_, other->codingscheme_);
     std::swap(codingsetting_, other->codingsetting_);
+    std::swap(objectsize_, other->objectsize_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
@@ -7621,6 +7662,7 @@ const int UploadObjectAckPro::kCodingSchemeFieldNumber;
 const int UploadObjectAckPro::kCodingSettingFieldNumber;
 const int UploadObjectAckPro::kNodeListFieldNumber;
 const int UploadObjectAckPro::kChecksumFieldNumber;
+const int UploadObjectAckPro::kObjectSizeFieldNumber;
 #endif  // !_MSC_VER
 
 UploadObjectAckPro::UploadObjectAckPro()
@@ -7643,6 +7685,7 @@ void UploadObjectAckPro::SharedCtor() {
   codingscheme_ = 1;
   codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  objectsize_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -7695,6 +7738,7 @@ void UploadObjectAckPro::Clear() {
         checksum_->clear();
       }
     }
+    objectsize_ = 0u;
   }
   nodelist_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -7795,6 +7839,22 @@ bool UploadObjectAckPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(53)) goto parse_objectSize;
+        break;
+      }
+      
+      // optional fixed32 objectSize = 6;
+      case 6: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_objectSize:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &objectsize_)));
+          set_has_objectsize();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -7852,6 +7912,11 @@ void UploadObjectAckPro::SerializeWithCachedSizes(
       5, this->checksum(), output);
   }
   
+  // optional fixed32 objectSize = 6;
+  if (has_objectsize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(6, this->objectsize(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -7897,6 +7962,11 @@ void UploadObjectAckPro::SerializeWithCachedSizes(
         5, this->checksum(), target);
   }
   
+  // optional fixed32 objectSize = 6;
+  if (has_objectsize()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(6, this->objectsize(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -7931,6 +8001,11 @@ int UploadObjectAckPro::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->checksum());
+    }
+    
+    // optional fixed32 objectSize = 6;
+    if (has_objectsize()) {
+      total_size += 1 + 4;
     }
     
   }
@@ -7980,6 +8055,9 @@ void UploadObjectAckPro::MergeFrom(const UploadObjectAckPro& from) {
     if (from.has_checksum()) {
       set_checksum(from.checksum());
     }
+    if (from.has_objectsize()) {
+      set_objectsize(from.objectsize());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -8008,6 +8086,7 @@ void UploadObjectAckPro::Swap(UploadObjectAckPro* other) {
     std::swap(codingsetting_, other->codingsetting_);
     nodelist_.Swap(&other->nodelist_);
     std::swap(checksum_, other->checksum_);
+    std::swap(objectsize_, other->objectsize_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

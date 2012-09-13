@@ -2304,6 +2304,13 @@ class GetObjectInfoReplyPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_codingsetting();
   inline ::std::string* release_codingsetting();
   
+  // optional fixed32 objectSize = 5;
+  inline bool has_objectsize() const;
+  inline void clear_objectsize();
+  static const int kObjectSizeFieldNumber = 5;
+  inline ::google::protobuf::uint32 objectsize() const;
+  inline void set_objectsize(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetObjectInfoReplyPro)
  private:
   inline void set_has_objectid();
@@ -2312,6 +2319,8 @@ class GetObjectInfoReplyPro : public ::google::protobuf::Message {
   inline void clear_has_codingscheme();
   inline void set_has_codingsetting();
   inline void clear_has_codingsetting();
+  inline void set_has_objectsize();
+  inline void clear_has_objectsize();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -2319,9 +2328,10 @@ class GetObjectInfoReplyPro : public ::google::protobuf::Message {
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > nodelist_;
   ::std::string* codingsetting_;
   int codingscheme_;
+  ::google::protobuf::uint32 objectsize_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -2529,6 +2539,13 @@ class UploadObjectAckPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_checksum();
   inline ::std::string* release_checksum();
   
+  // optional fixed32 objectSize = 6;
+  inline bool has_objectsize() const;
+  inline void clear_objectsize();
+  static const int kObjectSizeFieldNumber = 6;
+  inline ::google::protobuf::uint32 objectsize() const;
+  inline void set_objectsize(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.UploadObjectAckPro)
  private:
   inline void set_has_objectid();
@@ -2539,17 +2556,20 @@ class UploadObjectAckPro : public ::google::protobuf::Message {
   inline void clear_has_codingsetting();
   inline void set_has_checksum();
   inline void clear_has_checksum();
+  inline void set_has_objectsize();
+  inline void clear_has_objectsize();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 objectid_;
   ::std::string* codingsetting_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > nodelist_;
-  ::std::string* checksum_;
   int codingscheme_;
+  ::google::protobuf::uint32 objectsize_;
+  ::std::string* checksum_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -6474,6 +6494,28 @@ inline ::std::string* GetObjectInfoReplyPro::release_codingsetting() {
   }
 }
 
+// optional fixed32 objectSize = 5;
+inline bool GetObjectInfoReplyPro::has_objectsize() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void GetObjectInfoReplyPro::set_has_objectsize() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void GetObjectInfoReplyPro::clear_has_objectsize() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void GetObjectInfoReplyPro::clear_objectsize() {
+  objectsize_ = 0u;
+  clear_has_objectsize();
+}
+inline ::google::protobuf::uint32 GetObjectInfoReplyPro::objectsize() const {
+  return objectsize_;
+}
+inline void GetObjectInfoReplyPro::set_objectsize(::google::protobuf::uint32 value) {
+  set_has_objectsize();
+  objectsize_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // GetPrimaryListRequestPro
@@ -6713,6 +6755,28 @@ inline ::std::string* UploadObjectAckPro::release_checksum() {
     checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// optional fixed32 objectSize = 6;
+inline bool UploadObjectAckPro::has_objectsize() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void UploadObjectAckPro::set_has_objectsize() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void UploadObjectAckPro::clear_has_objectsize() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void UploadObjectAckPro::clear_objectsize() {
+  objectsize_ = 0u;
+  clear_has_objectsize();
+}
+inline ::google::protobuf::uint32 UploadObjectAckPro::objectsize() const {
+  return objectsize_;
+}
+inline void UploadObjectAckPro::set_objectsize(::google::protobuf::uint32 value) {
+  set_has_objectsize();
+  objectsize_ = value;
 }
 
 // -------------------------------------------------------------------
