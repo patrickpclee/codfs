@@ -89,7 +89,7 @@ enum StorageType {
 };
 
 enum CodingScheme {
-	DEFAULT_CODING = 15, RAID0_CODING = 1, RAID1_CODING = 2
+	DEFAULT_CODING = 15, RAID0_CODING = 1, RAID1_CODING = 2, RAID5_CODING = 3
 };
 
 #endif

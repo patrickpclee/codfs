@@ -84,6 +84,10 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 		vector<uint32_t> &requiredSegments, uint32_t objectSize,
 		string setting) {
 
+	for (uint32_t segmentId : requiredSegments) {
+		debug ("before decode, Require ID = %" PRIu32 ", Buf = %p\n", segmentId, segmentData[segmentId].buf);
+	}
+
 	if (requiredSegments.size() < 2) {
 		cerr << "At least 2 stripes are needed for RAID-5 decode" << endl;
 		exit(-1);
@@ -169,6 +173,11 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 		offset += segmentData[segmentId].info.segmentSize;
 	}
 
+	for (uint32_t segmentId : requiredSegments) {
+		debug ("after decode, Require ID = %" PRIu32 ", Buf = %p\n", segmentId, segmentData[segmentId].buf);
+	}
+
+
 	return objectData;
 }
 
@@ -178,6 +187,8 @@ vector<uint32_t> Raid5Coding::getRequiredSegmentIds(string setting,
 	// if more than one in secondaryOsdStatus is false, return {} (error)
 	int failedOsdCount = (int) count(secondaryOsdStatus.begin(),
 			secondaryOsdStatus.end(), false);
+
+	debug ("Failed OSD = %" PRIu32 "\n", failedOsdCount);
 
 	if (failedOsdCount > 1) {
 		return {};
@@ -192,7 +203,7 @@ vector<uint32_t> Raid5Coding::getRequiredSegmentIds(string setting,
 	if (failedOsdCount == 0
 			|| (failedOsdCount == 1 && secondaryOsdStatus.back() == false)) {
 		for (uint32_t i = 0; i < noOfDataStripes; i++) {
-			requiredSegments[i] = i;
+				requiredSegments.push_back(i);
 		}
 	}
 

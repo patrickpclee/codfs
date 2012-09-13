@@ -533,4 +533,6 @@ void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
 	for (auto osdStatus : secondaryOsdStatus) {
 		osdStatus = true;
 	}
+
+	secondaryOsdStatus[0] = false;
 }

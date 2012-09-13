@@ -3,7 +3,9 @@
 #include "client.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
+#include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
+#include "../coding/raid5coding.hh"
 #include "../../lib/logger.hh"
 
 using namespace std;
@@ -89,12 +91,19 @@ int main(int argc, char *argv[]) {
 	 */
 
 	// RAID 0
+	/*
 	const uint32_t stripFactor = 2;
 	CodingScheme codingScheme = RAID0_CODING;
+	*/
+
+	// RAID 5
+	const uint32_t noOfDataStripes = 2;
+	CodingScheme codingScheme = RAID5_CODING;
 
 	if (strncmp(argv[2], "upload", 6) == 0) {
-		string codingSetting = Raid1Coding::generateSetting(stripFactor);
+	//	string codingSetting = Raid0Coding::generateSetting(stripFactor);
 		//string codingSetting = Raid1Coding::generateSetting(replicationFactor);
+		string codingSetting = Raid5Coding::generateSetting(noOfDataStripes);
 		client->uploadFileRequest(argv[3], codingScheme, codingSetting);
 	} else {
 		client->downloadFileRequest(atoi(argv[3]), argv[4]);

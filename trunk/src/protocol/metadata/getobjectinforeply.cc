@@ -33,6 +33,7 @@ void GetObjectInfoReplyMsg::prepareProtocolMsg() {
 
 	ncvfs::GetObjectInfoReplyPro getObjectInfoReplyPro;
 	getObjectInfoReplyPro.set_objectid(_objectId);
+	getObjectInfoReplyPro.set_objectsize(_objectSize);
 	getObjectInfoReplyPro.set_codingscheme(
 			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
 	getObjectInfoReplyPro.set_codingsetting(_codingSetting);
