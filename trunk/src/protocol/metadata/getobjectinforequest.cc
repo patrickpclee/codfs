@@ -91,7 +91,7 @@ uint64_t GetObjectInfoRequestMsg::getObjectSize() {
 	return _objectSize;
 }
 
-void GetObjectInfoRequestMsg::setObjectSize(uint64_t objectSize) {
+void GetObjectInfoRequestMsg::setObjectSize(uint32_t objectSize) {
 	_objectSize = objectSize;
 }
 

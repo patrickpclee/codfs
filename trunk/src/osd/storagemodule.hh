@@ -19,7 +19,7 @@ using namespace std;
  */
 
 struct ObjectTransferCache {
-	uint64_t length;
+	uint32_t length;
 	char* buf;
 };
 
@@ -27,7 +27,7 @@ struct ObjectTransferCache {
  * For retrieving an object cache file from the disk
  */
 struct ObjectDiskCache {
-	uint64_t length;
+	uint32_t length;
 	string filepath;
 	struct timespec lastAccessedTime;
 };

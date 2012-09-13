@@ -1,13 +1,13 @@
-#ifndef __RAID0CODING_HH__
-#define __RAID0CODING_HH__
+#ifndef __RAID5CODING_HH__
+#define __RAID5CODING_HH__
 
 #include "coding.hh"
 
-class Raid0Coding: public Coding {
+class Raid5Coding: public Coding {
 public:
 
-	Raid0Coding();
-	~Raid0Coding();
+	Raid5Coding();
+	~Raid5Coding();
 
 	vector<struct SegmentData> encode(struct ObjectData objectData,
 			string setting);
@@ -19,12 +19,12 @@ public:
 	vector<uint32_t> getRequiredSegmentIds(string setting,
 			vector<bool> secondaryOsdStatus);
 
-	static string generateSetting(int noOfStrips) {
-		return to_string(noOfStrips);
+	static string generateSetting(int noOfDataStripes) {
+		return to_string(noOfDataStripes);
 	}
 
 private:
-	uint32_t getNoOfStrips(string setting);
+	uint32_t getNoOfDataStripes(string setting);
 };
 
 #endif

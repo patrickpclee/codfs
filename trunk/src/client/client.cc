@@ -101,7 +101,7 @@ void Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId,
 			objectCache.length);
 
 	debug(
-			"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu64 " to %s\n",
+			"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu32 " to %s\n",
 			objectId, offset, objectCache.length, dstPath.c_str());
 
 	_storageModule->closeObject(objectId);

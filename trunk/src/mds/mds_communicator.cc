@@ -61,10 +61,10 @@ void MdsCommunicator::display() {
 }
 
 void MdsCommunicator::replyObjectInfo(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, vector<uint32_t> nodeList, CodingScheme codingScheme,
+		uint64_t objectId, uint32_t objectSize, vector<uint32_t> nodeList, CodingScheme codingScheme,
 		string codingSetting) {
 	GetObjectInfoReplyMsg* getObjectInfoReplyMsg = new GetObjectInfoReplyMsg(
-			this, requestId, connectionId, objectId, nodeList, codingScheme,
+			this, requestId, connectionId, objectId, objectSize, nodeList, codingScheme,
 			codingSetting);
 	getObjectInfoReplyMsg->prepareProtocolMsg();
 

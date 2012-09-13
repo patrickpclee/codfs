@@ -33,7 +33,7 @@ public:
 	 * @param	communicator	Communicator the Message belongs to
 	 */
 	UploadObjectAckMsg(Communicator* communicator, uint32_t sockfd,
-			uint64_t objectId, CodingScheme codingScheme, string codingSetting,
+			uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, string codingSetting,
 			vector<uint32_t> nodeList, string checksum);
 
 	/**
@@ -71,6 +71,7 @@ private:
 	string _codingSetting;
 	vector<uint32_t> _nodeList;
 	string _checksum;
+	uint32_t _objectSize;
 };
 
 #endif
