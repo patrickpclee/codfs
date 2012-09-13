@@ -19,10 +19,6 @@ Raid0Coding::~Raid0Coding() {
 
 }
 
-uint32_t roundTo(unsigned int value, unsigned int roundTo) {
-	return ((value + roundTo - 1) / roundTo) * roundTo;
-}
-
 vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
 		string setting) {
 
@@ -30,7 +26,7 @@ vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
 	const uint32_t noOfStrips = getNoOfStrips(setting);
 
 	// calculate size of each strip
-	const uint32_t stripSize = roundTo(objectData.info.objectSize, noOfStrips)
+	const uint32_t stripSize = Coding::roundTo(objectData.info.objectSize, noOfStrips)
 			/ noOfStrips;
 
 	for (uint32_t i = 0; i < noOfStrips; i++) {
@@ -60,29 +56,18 @@ vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
 	return segmentDataList;
 }
 
-struct ObjectData Raid0Coding::decode(vector<struct SegmentData> segmentData,
-		vector<uint32_t> requiredSegments, string setting) {
+struct ObjectData Raid0Coding::decode(vector<struct SegmentData> &segmentData,
+		vector<uint32_t> &requiredSegments,  uint32_t objectSize, string setting) {
 
 	// for raid 0, requiredSegments is not used as all segments are required to decode
-
-	const uint32_t segmentCount = (uint32_t) segmentData.size();
 
 	struct ObjectData objectData;
 
 	// copy objectID from first segment
 	objectData.info.objectId = segmentData[0].info.objectId;
+	objectData.info.objectSize = objectSize;
 
-	if (segmentCount == 1) {
-		objectData.info.objectSize = segmentData[0].info.segmentSize;
-	} else {
-		// objectsize = first segment * (segmentCount - 1) + last segment
-		objectData.info.objectSize = segmentData[0].info.segmentSize
-				* (segmentCount - 1)
-				+ (segmentData.end() - 1)->info.segmentSize;
-	}
-
-	objectData.buf = MemoryPool::getInstance().poolMalloc(
-			objectData.info.objectSize);
+	objectData.buf = MemoryPool::getInstance().poolMalloc(objectSize);
 
 	uint64_t offset = 0;
 	for (struct SegmentData segment : segmentData) {

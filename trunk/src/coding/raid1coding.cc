@@ -44,15 +44,15 @@ vector<struct SegmentData> Raid1Coding::encode(struct ObjectData objectData,
 	return segmentDataList;
 }
 
-struct ObjectData Raid1Coding::decode(vector<struct SegmentData> segmentData,
-		vector<uint32_t> requiredSegments, string setting) {
+struct ObjectData Raid1Coding::decode(vector<struct SegmentData> &segmentData,
+		vector<uint32_t> &requiredSegments,  uint32_t objectSize, string setting) {
 
 	// for raid1, only use first required segment to decode
 	uint32_t segmentId = requiredSegments[0];
 
 	struct ObjectData objectData;
 	objectData.info.objectId = segmentData[segmentId].info.objectId;
-	objectData.info.objectSize = segmentData[segmentId].info.segmentSize;
+	objectData.info.objectSize = objectSize;
 	objectData.buf = MemoryPool::getInstance().poolMalloc(
 			objectData.info.objectSize);
 	memcpy(objectData.buf, segmentData[segmentId].buf, objectData.info.objectSize);

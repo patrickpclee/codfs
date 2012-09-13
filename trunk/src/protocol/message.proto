@@ -166,6 +166,7 @@ message GetObjectInfoReplyPro {
 	repeated fixed32 nodeList = 2;
 	optional PutObjectInitRequestPro.CodingScheme codingScheme = 3;	
 	optional string codingSetting = 4;
+	optional fixed32 objectSize = 5;
 }
 
 //
@@ -189,6 +190,7 @@ message UploadObjectAckPro {
 	optional string codingSetting = 3;
 	repeated fixed32 nodeList = 4;
 	optional string checksum = 5;
+	optional fixed32 objectSize = 6;
 }
 
 message GetObjectInfoRequestPro {

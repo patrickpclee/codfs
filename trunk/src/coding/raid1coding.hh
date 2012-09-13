@@ -8,10 +8,11 @@ public:
 	Raid1Coding();
 	~Raid1Coding();
 
-	struct ObjectData decode(vector<struct SegmentData> segmentData,
-			vector<uint32_t> requiredSegments, string setting);
-
 	vector<struct SegmentData> encode(struct ObjectData objectData,
+			string setting);
+
+	struct ObjectData decode(vector<struct SegmentData> &segmentData,
+			vector<uint32_t> &requiredSegments, uint32_t objectSize,
 			string setting);
 
 	vector<uint32_t> getRequiredSegmentIds(string setting,

@@ -48,13 +48,14 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	objectId	ID of the object uploaded
+	 * @param 	objectSize	Size of object
 	 * @param	codingScheme	Coding Scheme
 	 * @param 	codingSetting	Coding Scheme Setting
 	 * @param	objectNodeList	List of the Osd
 	 * @param	checksum	Checksum
 	 */
 	void uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, CodingScheme codingScheme, string codingSetting, 
+			uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, string codingSetting,
 			vector<uint32_t> objectNodeList, string checksum);
 
 	/**

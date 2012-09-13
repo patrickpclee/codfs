@@ -8,15 +8,15 @@
 #include <vector>
 using namespace std;
 
-class MdsCommunicator : public Communicator {
+class MdsCommunicator: public Communicator {
 public:
 
 	MdsCommunicator();
 
-	void display ();
+	void display();
 
 	// Reply to Request
-	
+
 	/**
 	 * @brief	Reply Object and Primary List to Client
 	 *
@@ -26,7 +26,9 @@ public:
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
 	 */
-	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList);
+	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId,
+			uint32_t fileId, vector<uint64_t> objectList,
+			vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Download Information to Client
@@ -40,7 +42,10 @@ public:
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
 	 */
-	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId, uint32_t fileId, string filePath, uint64_t fileSize, string checksum, vector<uint64_t> objectList, vector<uint32_t> primaryList);
+	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId,
+			uint32_t fileId, string filePath, uint64_t fileSize,
+			string checksum, vector<uint64_t> objectList,
+			vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Object ID List
@@ -50,7 +55,8 @@ public:
 	 * @param	objectList	Object ID List
 	 * @parma	primaryList	Primary List
 	 */
-	void replyObjectIdList(uint32_t requestId, uint32_t connectionId, vector<uint64_t> objectList, vector<uint32_t> primaryList);
+	void replyObjectIdList(uint32_t requestId, uint32_t connectionId,
+			vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Object Information to Osd
@@ -58,12 +64,15 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	objectId	ID of the Object
+	 * @param 	objectSize	Object Size
 	 * @param	nodeList	Node List
 	 * @param	codingScheme	Coding Scheme for the file
 	 * @param 	codingSetting	Coding Scheme Setting
 	 */
-	void replyObjectInfo(uint32_t requestId, uint32_t connectionId, uint64_t objectId, vector<uint32_t>nodeList, CodingScheme codingScheme, string codingSetting);
-	
+	void replyObjectInfo(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId, uint32_t objectSize, vector<uint32_t> nodeList,
+			CodingScheme codingScheme, string codingSetting);
+
 	/**
 	 * @brief	Reply With Folder Data
 	 *
@@ -72,7 +81,8 @@ public:
 	 * @param	path	Path to the folder
 	 * @param	folderData	Folder Data
 	 */
-	void replyFolderData(uint32_t requestId, uint32_t connectionId, string path, vector<FileMetaData> folderData);
+	void replyFolderData(uint32_t requestId, uint32_t connectionId, string path,
+			vector<FileMetaData> folderData);
 
 	/**
 	 * @brief	Reply Current Primary of an object
@@ -82,8 +92,9 @@ public:
 	 * @param	objectId	ID of the Object
 	 * @oarm	osdId		ID of the Primary Osd
 	 */
-	void replyPrimary(uint32_t requestId, uint32_t connectionId, uint64_t objectId, uint32_t osdId);
-	
+	void replyPrimary(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId, uint32_t osdId);
+
 	/**
 	 * @brief	Reply the Recovery Information (Object List and Associated Node List
 	 * 
@@ -94,11 +105,13 @@ public:
 	 * @param	primaryList	List of Primary Osd of the objects
 	 * @param	objectNodeList	List of Node List of the Objects
 	 */
-	void replyRecoveryInfo(uint32_t requestId, uint32_t connectionId, uint32_t osdId, vector<uint64_t> objectList, vector<uint32_t> primaryList, vector< vector<uint32_t> > objectNodeList);
-
+	void replyRecoveryInfo(uint32_t requestId, uint32_t connectionId,
+			uint32_t osdId, vector<uint64_t> objectList,
+			vector<uint32_t> primaryList,
+			vector<vector<uint32_t> > objectNodeList);
 
 	// Request to Other Nodes
-	
+
 	/**
 	 * @brief	Report Failure to Monitor
 	 * 
@@ -112,9 +125,9 @@ public:
 	 *
 	 * @param	numOfObjs	Number of Objects
 	 */
-	vector<uint32_t> askPrimaryList (uint32_t numOfObjs);
+	vector<uint32_t> askPrimaryList(uint32_t numOfObjs);
 
-	vector<uint32_t> getPrimaryList (uint32_t sockfd, uint32_t numOfObjs);
+	vector<uint32_t> getPrimaryList(uint32_t sockfd, uint32_t numOfObjs);
 
 private:
 };

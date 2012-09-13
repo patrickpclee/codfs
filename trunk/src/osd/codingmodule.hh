@@ -48,12 +48,13 @@ public:
 	 * @param objectId Destination object ID
 	 * @param segmentData a list of SegmentData structure
 	 * @param requiredSegments IDs of segments that are required to do decode
+	 * @param objectSize Size of the original object
 	 * @return an ObjectData structure
 	 */
 
 	struct ObjectData decodeSegmentToObject(CodingScheme codingScheme,
 			uint64_t objectId, vector<struct SegmentData> segmentData,
-			vector<uint32_t> requiredSegments, string setting);
+			vector<uint32_t> requiredSegments, uint32_t objectSize, string setting);
 
 	/**
 	 * Get the list of segments required to do decode

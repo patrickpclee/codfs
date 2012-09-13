@@ -17,11 +17,12 @@ UploadObjectAckMsg::UploadObjectAckMsg(Communicator* communicator) :
 }
 
 UploadObjectAckMsg::UploadObjectAckMsg(Communicator* communicator,
-		uint32_t sockfd, uint64_t objectId, CodingScheme codingScheme,
+		uint32_t sockfd, uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme,
 		string codingSetting, vector<uint32_t> nodeList, string checksum) :
 		Message(communicator) {
 	_sockfd = sockfd;
 	_objectId = objectId;
+	_objectSize = objectSize;
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
 	_nodeList = nodeList;
@@ -38,6 +39,7 @@ void UploadObjectAckMsg::prepareProtocolMsg() {
 			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
 	uploadObjectAckPro.set_codingsetting(_codingSetting);
 	uploadObjectAckPro.set_checksum(_checksum);
+	uploadObjectAckPro.set_objectsize(_objectSize);
 
 	vector<uint32_t>::iterator it;
 
@@ -68,6 +70,7 @@ void UploadObjectAckMsg::parse(char* buf) {
 	_codingScheme = (CodingScheme) uploadObjectAckPro.codingscheme();
 	_codingSetting = uploadObjectAckPro.codingsetting();
 	_checksum = uploadObjectAckPro.checksum();
+	_objectSize = uploadObjectAckPro.objectsize();
 
 	for (int i = 0; i < uploadObjectAckPro.nodelist_size(); ++i) {
 		_nodeList.push_back(uploadObjectAckPro.nodelist(i));
@@ -78,7 +81,7 @@ void UploadObjectAckMsg::parse(char* buf) {
 
 void UploadObjectAckMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->uploadObjectAckProcessor(_msgHeader.requestId, _sockfd, _objectId, _codingScheme, _codingSetting, _nodeList, _checksum);
+	mds->uploadObjectAckProcessor(_msgHeader.requestId, _sockfd, _objectId, _objectSize, _codingScheme, _codingSetting, _nodeList, _checksum);
 #endif
 }
 
