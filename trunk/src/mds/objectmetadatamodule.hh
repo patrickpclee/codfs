@@ -42,7 +42,7 @@ public:
 	 * @param	objectId	ID of the Object
 	 * @param	objectNodeList	List of Node ID
 	 */
-	void saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList);
+	void saveNodeList (uint64_t objectId, const vector<uint32_t> &objectNodeList);
 	
 	/**
 	 * @brief	Read Node List of a Object
