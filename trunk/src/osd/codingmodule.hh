@@ -53,8 +53,8 @@ public:
 	 */
 
 	struct ObjectData decodeSegmentToObject(CodingScheme codingScheme,
-			uint64_t objectId, vector<struct SegmentData> segmentData,
-			vector<uint32_t> requiredSegments, uint32_t objectSize, string setting);
+			uint64_t objectId, vector<struct SegmentData> &segmentData,
+			vector<uint32_t> &requiredSegments, uint32_t objectSize, string setting);
 
 	/**
 	 * Get the list of segments required to do decode
