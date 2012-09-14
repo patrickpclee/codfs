@@ -18,21 +18,13 @@ ListDirectoryReplyMsg::ListDirectoryReplyMsg(Communicator* communicator) :
 }
 
 ListDirectoryReplyMsg::ListDirectoryReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t sockfd, string path,
-		vector<FileMetaData> folderData) :
+		uint32_t requestId, uint32_t sockfd, const string &path,
+		const vector<FileMetaData> &folderData) :
 		Message(communicator) {
-	setVariables(requestId, sockfd, path, folderData);
-}
-
-void ListDirectoryReplyMsg::setVariables(uint32_t requestId, uint32_t sockfd,
-		string path, vector<FileMetaData> folderData) {
 	_sockfd = sockfd;
 	_msgHeader.requestId = requestId;
 	_path = path;
 	_folderData = folderData;
-	
-
-	return;
 }
 
 /**

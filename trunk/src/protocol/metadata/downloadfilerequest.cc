@@ -38,7 +38,7 @@ DownloadFileRequestMsg::DownloadFileRequestMsg(Communicator* communicator,
  * Constructor - Save parameters in private variables
  */
 DownloadFileRequestMsg::DownloadFileRequestMsg(Communicator* communicator,
-		uint32_t mdsSockfd, uint32_t clientId, string filePath) :
+		uint32_t mdsSockfd, uint32_t clientId, const string &filePath) :
 		Message(communicator) {
 	_sockfd = mdsSockfd;
 	_clientId = clientId;

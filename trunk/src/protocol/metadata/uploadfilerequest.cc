@@ -26,8 +26,8 @@ UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator) :
  * Constructor - Save parameters in private variables
  */
 UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator,
-		uint32_t mdsSockfd, uint32_t clientId, string path, uint64_t fileSize,
-		uint32_t numOfObjs, CodingScheme codingScheme, string codingSetting) :
+		uint32_t mdsSockfd, uint32_t clientId, const string &path, uint64_t fileSize,
+		uint32_t numOfObjs, CodingScheme codingScheme, const string &codingSetting) :
 		Message(communicator) {
 	_sockfd = mdsSockfd;
 	_clientId = clientId;

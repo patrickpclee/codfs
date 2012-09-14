@@ -18,7 +18,7 @@ UploadObjectAckMsg::UploadObjectAckMsg(Communicator* communicator) :
 
 UploadObjectAckMsg::UploadObjectAckMsg(Communicator* communicator,
 		uint32_t sockfd, uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme,
-		string codingSetting, vector<uint32_t> nodeList, string checksum) :
+		const string &codingSetting, const vector<uint32_t> &nodeList, const string &checksum) :
 		Message(communicator) {
 	_sockfd = sockfd;
 	_objectId = objectId;

@@ -38,7 +38,7 @@ public:
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
-	GetPrimaryListReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t osdSockfd, vector<uint32_t> primaryList);
+	GetPrimaryListReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t osdSockfd, const vector<uint32_t> &primaryList);
 
 	/**
 	 * Copy values in private variables to protocol message

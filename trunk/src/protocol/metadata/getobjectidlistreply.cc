@@ -17,7 +17,7 @@ GetObjectIdListReplyMsg::GetObjectIdListReplyMsg(Communicator* communicator) :
 /**
  * Constructor - Save parameters in private variables
  */
-GetObjectIdListReplyMsg::GetObjectIdListReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t mdsSockfd, vector<uint64_t> objectIdList, vector<uint32_t> primaryList) :
+GetObjectIdListReplyMsg::GetObjectIdListReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t mdsSockfd, const vector<uint64_t> &objectIdList, const vector<uint32_t> &primaryList) :
 		Message(communicator) {
 	_msgHeader.requestId = requestId;
 	_sockfd = mdsSockfd;

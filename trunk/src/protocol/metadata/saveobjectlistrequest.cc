@@ -18,7 +18,7 @@ SaveObjectListRequestMsg::SaveObjectListRequestMsg(Communicator* communicator) :
 }
 
 SaveObjectListRequestMsg::SaveObjectListRequestMsg(Communicator* communicator,
-		uint32_t sockfd, uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList) :
+		uint32_t sockfd, uint32_t clientId, uint32_t fileId, const vector<uint64_t> &objectList) :
 		Message(communicator) {
 
 	_sockfd = sockfd;

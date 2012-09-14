@@ -17,8 +17,8 @@ public:
 	GetObjectInfoReplyMsg(Communicator* communicator);
 
 	GetObjectInfoReplyMsg(Communicator* communicator, uint32_t requestId,
-			uint32_t dstSockfd, uint64_t objectId, uint32_t objectSize, vector<uint32_t> nodeList,
-			CodingScheme codingScheme, string codingSetting);
+			uint32_t dstSockfd, uint64_t objectId, uint32_t objectSize, const vector<uint32_t> &nodeList,
+			CodingScheme codingScheme, const string &codingSetting);
 
 	/**
 	 * Copy values in private variables to protocol message

@@ -47,9 +47,9 @@ public:
 	 */
 
 	DownloadFileReplyMsg(Communicator* communicator, 
-			uint32_t requestId, uint32_t sockfd, uint32_t fileId, string filePath,
-			uint64_t fileSize, string checksum, 
-			vector<uint64_t> objectList, vector<uint32_t> primaryList);
+			uint32_t requestId, uint32_t sockfd, uint32_t fileId, const string &filePath,
+			uint64_t fileSize, const string &checksum, 
+			const vector<uint64_t> &objectList, const vector<uint32_t> &primaryList);
 
 
 	/**
