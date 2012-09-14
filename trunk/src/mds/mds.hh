@@ -39,8 +39,8 @@ public:
 	 * @return	File ID
 	 */
 	uint32_t uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t clientId, string dstPath, uint64_t fileSize,
-			uint32_t numOfObjs, CodingScheme codingScheme, string codingSetting);
+			uint32_t clientId, const string &dstPath, uint64_t fileSize,
+			uint32_t numOfObjs, CodingScheme codingScheme, const string &codingSetting);
 
 	/**
 	 * @brief	Handle Upload Object Acknowledgement from Primary
@@ -55,8 +55,8 @@ public:
 	 * @param	checksum	Checksum
 	 */
 	void uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, string codingSetting,
-			vector<uint32_t> objectNodeList, string checksum);
+			uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, const string &codingSetting,
+			const vector<uint32_t> &objectNodeList, const string &checksum);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)
@@ -67,7 +67,7 @@ public:
 	 * @param	dstPath		Path of the file
 	 */
 	void downloadFileProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t clientId, string dstPath);
+			uint32_t clientId, const string &dstPath);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with File ID)
@@ -98,7 +98,7 @@ public:
 	 * @param	clientId	ID of the Client
 	 * @param	path	Path of the File
 	 */
-	void getFileInfoProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, string path);
+	void getFileInfoProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, const string &path);
 
 	/**
 	 * @brief	Handle the Object Info Request from Osd
@@ -118,7 +118,7 @@ public:
 	 * @param	path	Path to the Folder
 	 */
 	void listFolderProcessor(uint32_t requestId, uint32_t clientId,
-			uint32_t connectionId, string path);
+			uint32_t connectionId, const string &path);
 
 	/**
 	 * @brief	Handle Primary Node Failure Report from Client
@@ -165,7 +165,7 @@ public:
 	 * @param	objectNodeList	Node List of the Object
 	 */
 	void nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, vector<uint32_t> objectNodeList);
+			uint64_t objectId, const vector<uint32_t> &objectNodeList);
 
 	/**
 	 * @brief	Handle Object List Save Request
@@ -176,7 +176,7 @@ public:
 	 * @param	fileId	ID of the File
 	 * @param	objectList	Object List of the File
 	 */
-	void saveObjectListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
+	void saveObjectListProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, const vector<uint64_t> &objectList);
 
 	/**
 	 * @brief	Handle Set File Size Request
@@ -218,7 +218,7 @@ private:
 	 * @param	path		Path of the File
 	 */
 	void downloadFileProcess(uint32_t requestId, uint32_t connectionId,
-			uint32_t clientId, uint32_t fileId, string path);
+			uint32_t clientId, uint32_t fileId, const string &path);
 
 	/// Handle Communication with other components
 	MdsCommunicator* _mdsCommunicator;

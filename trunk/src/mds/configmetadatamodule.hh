@@ -19,7 +19,7 @@ public:
 	 *
 	 * @param	config	Filed Name of Config
 	 */
-	uint32_t getAndInc (string config);
+	uint32_t getAndInc (const string &config);
 private:
 
 	/// Collection

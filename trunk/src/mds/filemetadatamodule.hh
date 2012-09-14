@@ -27,8 +27,8 @@ public:
 	 * @param	codingScheme	Coding Scheme
 	 * @param	codingSetting	Setting of Coding
 	 */
-	void createFile(uint32_t clientId, string path, uint64_t fileSize,
-			uint32_t fileId, CodingScheme codingScheme, string codingSetting);
+	void createFile(uint32_t clientId, const string &path, uint64_t fileSize,
+			uint32_t fileId, CodingScheme codingScheme, const string &codingSetting);
 
 	/**
 	 * @brief	Lookup the File ID with file Path
@@ -37,7 +37,7 @@ public:
 	 *
 	 * @return	ID of the File
 	 */
-	uint32_t lookupFileId(string path);
+	uint32_t lookupFileId(const string &path);
 
 	/**
 	 *	@brief	Set File Size of a File
@@ -62,7 +62,7 @@ public:
 	 * @param	fileId	ID of the File
 	 * @param	objectList	List of Object ID
 	 */
-	void saveObjectList (uint32_t fileId, vector<uint64_t> objectList);
+	void saveObjectList (uint32_t fileId, const vector<uint64_t> &objectList);
 
 	/**
 	 * @brief	Read the Object List of a File

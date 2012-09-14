@@ -68,9 +68,9 @@ struct ObjectMetaData ObjectMetaDataModule::readObjectInfo(uint64_t objectId)
 /**
  * @brief	Save Node List of a Object
  */
-void ObjectMetaDataModule::saveNodeList (uint64_t objectId, vector<uint32_t> objectNodeList)
+void ObjectMetaDataModule::saveNodeList (uint64_t objectId, const vector<uint32_t> &objectNodeList)
 {
-	vector<uint32_t>::iterator it;
+	vector<uint32_t>::const_iterator it;
 	BSONObj queryObject = BSON ("id" << (long long int)objectId);
 	BSONObj pushObject;
 	for(it = objectNodeList.begin(); it < objectNodeList.end(); ++it) {

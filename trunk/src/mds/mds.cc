@@ -48,8 +48,8 @@ Mds::~Mds() {
  * 5. Reply with Object and Primary List
  */
 uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, string dstPath, uint64_t fileSize,
-		uint32_t numOfObjs, CodingScheme codingScheme, string codingSetting) {
+		uint32_t clientId, const string &dstPath, uint64_t fileSize,
+		uint32_t numOfObjs, CodingScheme codingScheme, const string &codingSetting) {
 
 	vector<uint64_t> objectList(numOfObjs);
 	vector<uint32_t> primaryList(numOfObjs);
@@ -83,8 +83,8 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
  * 2. Set the Primary for the object
  */
 void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, string codingSetting,
-		vector<uint32_t> objectNodeList, string checksum) {
+		uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, const string &codingSetting,
+		const vector<uint32_t> &objectNodeList, const string &checksum) {
 	struct ObjectMetaData objectMetaData;
 	objectMetaData._id = objectId;
 	objectMetaData._nodeList = objectNodeList;
@@ -104,7 +104,7 @@ void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
  * @brief	Handle Download File Request from Client (Request with Path)
  */
 void Mds::downloadFileProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, string dstPath) {
+		uint32_t clientId, const string &dstPath) {
 	uint32_t fileId = _metaDataModule->lookupFileId(dstPath);
 	debug("Path = %s [%" PRIu32 "]\n", dstPath.c_str(), fileId);
 	return downloadFileProcess(requestId, connectionId, clientId, fileId,
@@ -130,7 +130,7 @@ void Mds::downloadFileProcessor(uint32_t requestId, uint32_t connectionId,
  * 5. Reply with Object and Primary List
  */
 void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, uint32_t fileId, string path) {
+		uint32_t clientId, uint32_t fileId, const string &path) {
 	vector<uint64_t> objectList;
 	vector<uint32_t> primaryList;
 	uint64_t fileSize = 0;
@@ -179,7 +179,7 @@ void Mds::getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId,
  * @brief	Handle Get File Info Request
  */
 void Mds::getFileInfoProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, string path) {
+		uint32_t clientId, const string &path) {
 	downloadFileProcessor(requestId, connectionId, clientId, path);
 
 	return;
@@ -207,7 +207,7 @@ void Mds::getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId,
  * 2. Reply with Folder Data
  */
 void Mds::listFolderProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, string path) {
+		uint32_t clientId, const string &path) {
 	vector<FileMetaData> folderData;
 
 	debug("List %s by %" PRIu32 "\n", path.c_str(), clientId);
@@ -283,7 +283,7 @@ void Mds::recoveryProcessor(uint32_t requestId, uint32_t connectionId,
  * @brief	Handle Object Node List Update from Osd
  */
 void Mds::nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, vector<uint32_t> objectNodeList) {
+		uint64_t objectId, const vector<uint32_t> &objectNodeList) {
 	_metaDataModule->saveNodeList(objectId, objectNodeList);
 	_metaDataModule->setPrimary(objectId, objectNodeList[0]);
 	return;
@@ -293,7 +293,7 @@ void Mds::nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
  * @brief	Handle Object List Save Request
  */
 void Mds::saveObjectListProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList) {
+		uint32_t clientId, uint32_t fileId, const vector<uint64_t> &objectList) {
 	_metaDataModule->saveObjectList(fileId, objectList);
 	return;
 }

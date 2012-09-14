@@ -29,10 +29,10 @@ NameSpaceModule::NameSpaceModule () {
  * Simply Perform Readdir
  * @todo	Read File ID
  */
-vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, string path)
+vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, const string &inpath)
 {
 	vector<FileMetaData> folderData;
-
+	string path = inpath;
 	FileMetaData tempFileMetaData;
 	struct stat tempFileStat;
 	string tempFilePath;
@@ -74,7 +74,7 @@ vector<FileMetaData> NameSpaceModule::listFolder (uint32_t clientId, string path
 /**
  * @brief	Create a File with Client ID and Path
  */
-uint32_t NameSpaceModule::createFile(uint32_t clientId, string path)
+uint32_t NameSpaceModule::createFile(uint32_t clientId, const string &path)
 {
 	return 0;
 }
@@ -83,7 +83,7 @@ uint32_t NameSpaceModule::createFile(uint32_t clientId, string path)
 /**
  * @brief	Open a File
  */
-uint32_t NameSpaceModule::openFile(uint32_t clientId, string path)
+uint32_t NameSpaceModule::openFile(uint32_t clientId, const string &path)
 {
 	return 0;
 }
@@ -91,7 +91,7 @@ uint32_t NameSpaceModule::openFile(uint32_t clientId, string path)
 /**
  * @brief	Covert Path to Real One
  */
-string NameSpaceModule::convertPath (string path)
+string NameSpaceModule::convertPath (const string &path)
 {
 	return _basePath + path;
 }

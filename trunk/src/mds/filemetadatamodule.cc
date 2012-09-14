@@ -29,9 +29,9 @@ FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModul
 /**
  * @brief	Create a File
  */
-void FileMetaDataModule::createFile(uint32_t clientId, string path,
+void FileMetaDataModule::createFile(uint32_t clientId, const string &path,
 		uint64_t fileSize, uint32_t fileId, CodingScheme codingScheme,
-		string codingSetting) {
+		const string &codingSetting) {
 	BSONObj insertObject =
 			BSON ("id" << fileId << "path" << path << "fileSize" << (long long int)fileSize
 					<< "clientId" << clientId << "codingScheme" << (int)codingScheme
@@ -44,7 +44,7 @@ void FileMetaDataModule::createFile(uint32_t clientId, string path,
 /**
  * @brief	Lookup the File ID with file Path
  */
-uint32_t FileMetaDataModule::lookupFileId(string path)
+uint32_t FileMetaDataModule::lookupFileId(const string &path)
 {
 	BSONObj queryObject = BSON ("path" << path);
 	uint32_t fileId = 0;
@@ -88,10 +88,8 @@ uint64_t FileMetaDataModule::readFileSize(uint32_t fileId)
 /**
  * @brief	Save the Object List of a File
  */
-void FileMetaDataModule::saveObjectList(uint32_t fileId,
-		
-	vector<uint64_t> objectList) {
-	vector<uint64_t>::iterator it;
+void FileMetaDataModule::saveObjectList(uint32_t fileId, const vector<uint64_t> &objectList) {
+	vector<uint64_t>::const_iterator it;
 	BSONObj queryObject = BSON ("id" << fileId);
 	_fileMetaDataStorage->removeField(queryObject,"objectList");
 	BSONObj pushObject;

@@ -27,8 +27,8 @@ public:
 	 *
 	 * @return	File ID
 	 */
-	uint32_t createFile(uint32_t clientId, string path, uint64_t fileSize,
-			CodingScheme codingScheme, string codingSetting);
+	uint32_t createFile(uint32_t clientId, const string &path, uint64_t fileSize,
+			CodingScheme codingScheme, const string &codingSetting);
 
 	/**
 	 * @brief	Open a File
@@ -70,7 +70,7 @@ public:
 	 * @param	fileId	ID of the File
 	 * @param	objectList	List of Object ID
 	 */
-	void saveObjectList(uint32_t fileId, vector<uint64_t> objectList);
+	void saveObjectList(uint32_t fileId, const vector<uint64_t> &objectList);
 	vector<uint64_t> readObjectList(uint32_t fileId);
 	vector<uint64_t> readOsdObjectList(uint32_t osdId);
 
@@ -125,7 +125,7 @@ public:
 	 * @param	objectId	ID of the Object
 	 * @param	objectNodeList	List of Node ID
 	 */
-	void saveNodeList(uint64_t objectId, vector<uint32_t> objectNodeList);
+	void saveNodeList(uint64_t objectId, const vector<uint32_t> &objectNodeList);
 
 	/**
 	 * @brief	Read Node List of a Object
@@ -152,7 +152,7 @@ public:
 	 *
 	 * @return	ID of the File
 	 */
-	uint32_t lookupFileId(string path);
+	uint32_t lookupFileId(const string &path);
 
 private:
 
