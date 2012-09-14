@@ -23,7 +23,7 @@ GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator) :
 }
 
 GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t sockfd, vector<struct SegmentLocation> secondaryList) :
+		uint32_t requestId, uint32_t sockfd, const vector<struct SegmentLocation> &secondaryList) :
 		Message(communicator) {
 	_msgHeader.requestId = requestId;
 	_sockfd = sockfd;

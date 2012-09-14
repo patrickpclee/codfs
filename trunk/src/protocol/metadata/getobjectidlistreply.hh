@@ -32,7 +32,7 @@ public:
 	 * Constructor - Save parameters in private variables
 	 *
 	 */
-	GetObjectIdListReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t mdsSockfd, vector<uint64_t>objectIdList, vector<uint32_t>primaryList);
+	GetObjectIdListReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t mdsSockfd, const vector<uint64_t> &objectIdList, const vector<uint32_t> &primaryList);
 
 	/**
 	 * Copy values in private variables to protocol message

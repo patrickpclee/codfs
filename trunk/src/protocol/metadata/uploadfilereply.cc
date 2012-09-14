@@ -12,7 +12,7 @@ UploadFileReplyMsg::UploadFileReplyMsg(Communicator* communicator) :
 	Message(communicator) {
 }
 
-UploadFileReplyMsg::UploadFileReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, uint32_t fileId, vector<uint64_t> objectList, vector<uint32_t> primaryList) :
+UploadFileReplyMsg::UploadFileReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, uint32_t fileId, const vector<uint64_t> &objectList, const vector<uint32_t> &primaryList) :
 	Message(communicator) {
 	_sockfd = sockfd;
 	_msgHeader.requestId = requestId;

@@ -39,7 +39,7 @@ public:
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
-	GetSecondaryListReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, vector<struct SegmentLocation> secondaryList);
+	GetSecondaryListReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, const vector<struct SegmentLocation> &secondaryList);
 
 	/**
 	 * Copy values in private variables to protocol message

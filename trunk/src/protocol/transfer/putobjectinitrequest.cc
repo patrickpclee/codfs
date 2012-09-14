@@ -21,8 +21,8 @@ PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator) :
 
 PutObjectInitRequestMsg::PutObjectInitRequestMsg(Communicator* communicator,
 		uint32_t osdSockfd, uint64_t objectId, uint32_t objectSize,
-		uint32_t chunkCount, CodingScheme codingScheme, string codingSetting,
-		string checksum) :
+		uint32_t chunkCount, CodingScheme codingScheme, const string &codingSetting,
+		const string &checksum) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;

@@ -40,7 +40,7 @@ public:
 	 * @param	path	Requested directory path
 	 */
 
-	ListDirectoryRequestMsg (Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, string path);
+	ListDirectoryRequestMsg (Communicator* communicator, uint32_t clientId, uint32_t mdsSockfd, const string &path);
 
 	/**
 	 * Copy values in private variables to protocol message
