@@ -16,7 +16,7 @@ ConfigMetaDataModule::ConfigMetaDataModule(){
 /**
  * @brief	Get a Setting and Increment
  */
-uint32_t ConfigMetaDataModule::getAndInc (string config)
+uint32_t ConfigMetaDataModule::getAndInc (const string &config)
 {
 	BSONObj queryObject = BSON ("id" << "config");
 	BSONObj updateObject = BSON ("$inc" << BSON (config << 1));

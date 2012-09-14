@@ -14,8 +14,8 @@ MetaDataModule::MetaDataModule() {
 /**
  * @brief	Create Meta Data Entry for a New File
  */
-uint32_t MetaDataModule::createFile(uint32_t clientId, string path,
-		uint64_t fileSize, CodingScheme codingScheme, string codingSetting) {
+uint32_t MetaDataModule::createFile(uint32_t clientId, const string &path,
+		uint64_t fileSize, CodingScheme codingScheme, const string &codingSetting) {
 	uint32_t fileId = _fileMetaDataModule->generateFileId();
 
 	_fileMetaDataModule->createFile(clientId, path, fileSize, fileId, codingScheme, codingSetting);
@@ -63,7 +63,7 @@ vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs) {
  * @brief	Save Object List of a File
  */
 void MetaDataModule::saveObjectList(uint32_t fileId,
-		vector<uint64_t> objectList) {
+		const vector<uint64_t> &objectList) {
 	debug("Save %d %zu\n", fileId, objectList.size());
 	_fileMetaDataModule->saveObjectList(fileId, objectList);
 
@@ -128,7 +128,7 @@ uint32_t MetaDataModule::getPrimary(uint64_t objectId) {
  * @brief	Save Node List of a Object
  */
 void MetaDataModule::saveNodeList(uint64_t objectId,
-		vector<uint32_t> objectNodeList) {
+		const vector<uint32_t> &objectNodeList) {
 	_objectMetaDataModule->saveNodeList(objectId, objectNodeList);
 	return;
 }
@@ -140,7 +140,7 @@ vector<uint32_t> MetaDataModule::readNodeList(uint64_t objectId) {
 	return _objectMetaDataModule->readNodeList(objectId);
 }
 
-uint32_t MetaDataModule::lookupFileId(string path) {
+uint32_t MetaDataModule::lookupFileId(const string &path) {
 	return _fileMetaDataModule->lookupFileId(path);
 }
 

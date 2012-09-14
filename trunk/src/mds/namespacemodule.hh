@@ -20,7 +20,7 @@ public:
 	 * @param	clientId	ID of the Client
 	 * @param	path	Path of the File
 	 */
-	uint32_t createFile (uint32_t clientId, string path);
+	uint32_t createFile (uint32_t clientId, const string &path);
 
 //	/**
 //	 * @brief	Delete a File with Client ID and Path
@@ -36,7 +36,7 @@ public:
 	 * @param	clientId	ID of the Client
 	 * @param	path	Path of the File
 	 */
-	uint32_t openFile (uint32_t clientId, string path);
+	uint32_t openFile (uint32_t clientId, const string &path);
 
 	/**
 	 * @brief	List Folder
@@ -44,14 +44,14 @@ public:
 	 * @param	clientId	ID of the Client
 	 * @param	path	Path to the Folder
 	 */
-	vector<FileMetaData> listFolder (uint32_t clientId, string path);
+	vector<FileMetaData> listFolder (uint32_t clientId, const string &inpath);
 private:
 	/**
 	 * @brief	Covert Path to Real One
 	 *
 	 * @param	path	Path
 	 */
-	string convertPath (string path);
+	string convertPath (const string &path);
 
 	/// Base Path of the Namespace Tree
 	string _basePath;
