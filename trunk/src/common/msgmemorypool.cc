@@ -13,8 +13,13 @@ MsgMemoryPool::MsgMemoryPool() {
 }
 
 char* MsgMemoryPool::poolMalloc(uint32_t size) {
-	if(size > _maxMsgSize)
+	if (size > _maxMsgSize)
 		_maxMsgSize = size;
+
+#ifdef USE_MEMORY_POOL
 	return MemoryPool::poolMalloc(_maxMsgSize);
+#else
+	return (char*)malloc (size);
+#endif
 }
 

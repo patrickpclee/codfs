@@ -728,4 +728,7 @@ void StorageModule::clearObjectDiskCache() {
 		_objectCacheQueue.clear();
 		_objectDiskCacheMap.clear();
 	}
+
+	_freeObjectSpace = _maxObjectCache;
+	_currentObjectUsage = 0;
 }
