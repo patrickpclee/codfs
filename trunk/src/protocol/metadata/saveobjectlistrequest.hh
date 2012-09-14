@@ -15,7 +15,7 @@ public:
 
 	SaveObjectListRequestMsg(Communicator* communicator);
 
-	SaveObjectListRequestMsg(Communicator* communicator, uint32_t sockfd, uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
+	SaveObjectListRequestMsg(Communicator* communicator, uint32_t sockfd, uint32_t clientId, uint32_t fileId, const vector<uint64_t> &objectList);
 
 	/**
 	 * Copy values in private variables to protocol message

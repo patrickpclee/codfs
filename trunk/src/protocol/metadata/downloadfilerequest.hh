@@ -52,7 +52,7 @@ public:
 	 */
 
 	DownloadFileRequestMsg(Communicator* communicator, uint32_t mdsSockfd,
-			uint32_t clientId, string filePath);
+			uint32_t clientId, const string &filePath);
 
 	/**
 	 * Copy values in private variables to protocol message

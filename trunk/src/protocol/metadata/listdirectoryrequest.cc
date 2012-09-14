@@ -26,7 +26,7 @@ ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator) :
  * Constructor - Save parameters in private variables
  */
 ListDirectoryRequestMsg::ListDirectoryRequestMsg(Communicator* communicator,
-		uint32_t clientId, uint32_t mdsSockfd, string path) :
+		uint32_t clientId, uint32_t mdsSockfd, const string &path) :
 		Message(communicator) {
 	_clientId = clientId;
 	_directoryPath = path;
