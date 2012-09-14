@@ -725,7 +725,7 @@ void StorageModule::clearObjectDiskCache() {
 
 	{
 		lock_guard<mutex> lk(lruCacheMutex);
-		_objectCacheQueue.empty();
-		_objectDiskCacheMap.empty();
+		_objectCacheQueue.clear();
+		_objectDiskCacheMap.clear();
 	}
 }
