@@ -111,6 +111,8 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 		rebuildSegmentData.buf = MemoryPool::getInstance().poolMalloc(
 				stripeSize);
 
+		debug ("%s\n", "Rebuilding Segment");
+
 		// rebuild
 		uint32_t i = 0;
 		for (uint32_t segmentId : requiredSegments) {
@@ -118,14 +120,17 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 				// memcpy first segment
 				memcpy(rebuildSegmentData.buf, segmentData[segmentId].buf,
 						stripeSize);
+		debug ("%s\n", "1) Memcpy");
 			} else {
 				// XOR second segment onwards
 				Coding::bitwiseXor(rebuildSegmentData.buf,
 						rebuildSegmentData.buf, segmentData[segmentId].buf,
 						stripeSize);
+		debug ("%s\n", "2) XOR");
 			}
 			i++;
 		}
+
 
 		// write rebuildSegmentData to SegmentData
 		uint32_t repairedSegmentIndex = 0;
@@ -157,8 +162,12 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 			}
 		}
 
+		debug ("Rebuild Segment ID %" PRIu32 " completed\n", repairedSegmentIndex);
+
 		// free parity segment
-		MemoryPool::getInstance().poolFree(segmentData[requiredSegments.back()].buf);
+//		MemoryPool::getInstance().poolFree(segmentData[requiredSegments.back()].buf);
+
+		debug ("Free Parity Segment ID %" PRIu32 " completed\n", requiredSegments.back());
 
 		// replace parity in requiredSegments with repaired segment and sort
 		requiredSegments.back() = repairedSegmentIndex;
@@ -172,6 +181,8 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 				segmentData[segmentId].info.segmentSize);
 		offset += segmentData[segmentId].info.segmentSize;
 	}
+
+	debug ("decode offset = %" PRIu64 "\n", offset);
 
 	for (uint32_t segmentId : requiredSegments) {
 		debug ("after decode, Require ID = %" PRIu32 ", Buf = %p\n", segmentId, segmentData[segmentId].buf);
@@ -214,6 +225,10 @@ vector<uint32_t> Raid5Coding::getRequiredSegmentIds(string setting,
 				requiredSegments.push_back(i);
 			}
 		}
+	}
+
+	for (auto segmentId : requiredSegments) {
+		debug ("Require Segment ID = %" PRIu32 "\n", segmentId);
 	}
 
 	return requiredSegments;

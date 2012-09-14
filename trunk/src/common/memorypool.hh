@@ -5,26 +5,32 @@
 #ifndef __MEMORYPOOL_HH__
 #define __MEMORYPOOL_HH__
 
+// if commented, use malloc / free
+#define USE_MEMORY_POOL
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 
+#ifdef USE_MEMORY_POOL
+#include <thread>
+#include <mutex>
+
 #include <apr-1.0/apr_lib.h>
 #include <apr-1.0/apr_buckets.h>
 #include <apr-1.0/apr_general.h>
 #include <apr-1.0/apr_pools.h>
-#include <thread>
-#include <mutex>
 
-const apr_size_t POOL_MAX_FREE_SIZE = 20*1024*1024;
+const apr_size_t POOL_MAX_FREE_SIZE = 20 * 1024 * 1024;
+#endif
+
 /**
  * Provide a memory pool for optimizing frequent malloc / free calls
  * TODO: A dummy memory pool using singleton pattern for now
  * TODO: Should be thread-safe in c++11 (verification needed)
  * Singleton Reference: http://stackoverflow.com/questions/1008019/c-singleton-design-pattern
  */
-
 
 class MemoryPool {
 public:
@@ -77,12 +83,13 @@ private:
 	MemoryPool(MemoryPool const&); // Don't Implement
 	void operator=(MemoryPool const&); // Don't implement
 
+#ifdef USE_MEMORY_POOL
 	apr_pool_t *pool;
 	apr_allocator_t* alloc;
 	apr_bucket_alloc_t* balloc;
 
-	uint32_t _maxMsgSize;
-
 	std::mutex memoryPoolMutex;
+#endif
+	uint32_t _maxMsgSize;
 };
 #endif
