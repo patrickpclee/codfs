@@ -42,6 +42,11 @@ public:
 		_map.erase(key);
 	}
 
+	void clear() {
+		std::lock_guard<std::mutex> lk(this->_m);
+		_map.clear();
+	}
+
 	V pop (K key) {
 		std::lock_guard<std::mutex> lk(this->_m);
 		V value = _map[key];
