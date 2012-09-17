@@ -33,7 +33,7 @@ void Coding::bitwiseXor(char* result, char* srcA, char* srcB, uint32_t length) {
 	// finish all the word-by-word XOR
 	for (uint32_t i = 0; i < xor32Count; i++) {
 		result32[i] = srcA32[i] ^ srcB32[i];
-		offset = (i + 1) * sizeof(uint32_t); // processed bytes
+		offset += sizeof(uint32_t); // processed bytes
 	}
 
 	// finish remaining byte-by-byte XOR
