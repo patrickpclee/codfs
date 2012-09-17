@@ -24,32 +24,35 @@ vector<struct SegmentData> Raid5Coding::encode(struct ObjectData objectData,
 		string setting) {
 
 	vector<struct SegmentData> segmentDataList;
-	const uint32_t noOfDataStripes = getNoOfDataStripes(setting);
-	const uint32_t parityStripeIndex = noOfDataStripes; // data = [0] to [noOfDataStripes -1]
+	const uint32_t raid5_n = getParameters(setting);
+	const uint32_t parityIndex = raid5_n - 1; // index starts from 0, last segment is parity
+	const uint32_t numDataSegment = raid5_n - 1;
+	const uint32_t lastDataIndex = raid5_n - 2;
 
-	if (noOfDataStripes < 2) {
-		cerr << "At least 2 data stripes are needed for RAID-5 encode" << endl;
+	if (raid5_n < 3) {
+		cerr << "At least 3 segments are needed for RAID-5 encode" << endl;
 		exit(-1);
 	}
 
-	// calculate size of each strip
+	// calculate size of each data stripe
 	const uint32_t stripeSize = Coding::roundTo(objectData.info.objectSize,
-			noOfDataStripes) / noOfDataStripes;
+			numDataSegment) / numDataSegment;
 
 	// prepare parity segment
 	struct SegmentData paritySegmentData;
 	paritySegmentData.info.objectId = objectData.info.objectId;
-	paritySegmentData.info.segmentId = parityStripeIndex;
+	paritySegmentData.info.segmentId = parityIndex;
 	paritySegmentData.info.segmentSize = stripeSize;
 	paritySegmentData.buf = MemoryPool::getInstance().poolMalloc(stripeSize);
 
-	for (uint32_t i = 0; i < noOfDataStripes; i++) {
+	// for each data segment
+	for (uint32_t i = 0; i < parityIndex; i++) {
 
 		struct SegmentData segmentData;
 		segmentData.info.objectId = objectData.info.objectId;
 		segmentData.info.segmentId = i;
 
-		if (i == noOfDataStripes - 1) { // last segment
+		if (i == lastDataIndex) { // last data segment
 			segmentData.info.segmentSize = objectData.info.objectSize
 					- i * stripeSize;
 		} else {
@@ -84,20 +87,19 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 		vector<uint32_t> &requiredSegments, uint32_t objectSize,
 		string setting) {
 
-	for (uint32_t segmentId : requiredSegments) {
-		debug ("before decode, Require ID = %" PRIu32 ", Buf = %p\n", segmentId, segmentData[segmentId].buf);
-	}
-
 	if (requiredSegments.size() < 2) {
-		cerr << "At least 2 stripes are needed for RAID-5 decode" << endl;
+		cerr << "At least 2 segments are needed for RAID-5 decode" << endl;
 		exit(-1);
 	}
 
 	struct ObjectData objectData;
-	const uint32_t noOfDataStripes = getNoOfDataStripes(setting);
-	const uint32_t parityStripeIndex = noOfDataStripes; // data = [0] to [noOfDataStripes -1]
-	const uint32_t stripeSize = roundTo(objectSize, noOfDataStripes)
-			/ noOfDataStripes;
+	const uint32_t raid5_n = getParameters(setting);
+	const uint32_t parityIndex = raid5_n - 1; // index starts from 0, last segment is parity
+	const uint32_t numDataSegment = raid5_n - 1;
+	const uint32_t lastDataIndex = raid5_n - 2;
+
+	const uint32_t stripeSize = Coding::roundTo(objectSize,
+			numDataSegment) / numDataSegment;
 
 	// copy objectID from first available segment
 	objectData.info.objectId = segmentData[requiredSegments[0]].info.objectId;
@@ -107,11 +109,9 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 	struct SegmentData rebuildSegmentData;
 
 	// if last segment of requiredSegments is the parity segment, rebuild is needed
-	if (requiredSegments.back() == parityStripeIndex) {
+	if (requiredSegments.back() == parityIndex) {
 		rebuildSegmentData.buf = MemoryPool::getInstance().poolMalloc(
 				stripeSize);
-
-		debug ("%s\n", "Rebuilding Segment");
 
 		// rebuild
 		uint32_t i = 0;
@@ -120,17 +120,14 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 				// memcpy first segment
 				memcpy(rebuildSegmentData.buf, segmentData[segmentId].buf,
 						stripeSize);
-		debug ("%s\n", "1) Memcpy");
 			} else {
 				// XOR second segment onwards
 				Coding::bitwiseXor(rebuildSegmentData.buf,
 						rebuildSegmentData.buf, segmentData[segmentId].buf,
 						stripeSize);
-		debug ("%s\n", "2) XOR");
 			}
 			i++;
 		}
-
 
 		// write rebuildSegmentData to SegmentData
 		uint32_t repairedSegmentIndex = 0;
@@ -146,11 +143,10 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 
 				// fill in rebuildSegmentData Information
 				rebuildSegmentData.info.segmentId = repairedSegmentIndex;
-				rebuildSegmentData.info.segmentPath = ""; // not used
 
 				if (i == segmentData.size() - 1) {
 					rebuildSegmentData.info.segmentSize = objectSize
-							- stripeSize * (noOfDataStripes - 1);
+							- stripeSize * lastDataIndex;
 				} else {
 					rebuildSegmentData.info.segmentSize = stripeSize;
 				}
@@ -162,12 +158,9 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 			}
 		}
 
-		debug ("Rebuild Segment ID %" PRIu32 " completed\n", repairedSegmentIndex);
-
 		// free parity segment
-//		MemoryPool::getInstance().poolFree(segmentData[requiredSegments.back()].buf);
-
-		debug ("Free Parity Segment ID %" PRIu32 " completed\n", requiredSegments.back());
+		MemoryPool::getInstance().poolFree(
+				segmentData[requiredSegments.back()].buf);
 
 		// replace parity in requiredSegments with repaired segment and sort
 		requiredSegments.back() = repairedSegmentIndex;
@@ -182,13 +175,6 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 		offset += segmentData[segmentId].info.segmentSize;
 	}
 
-	debug ("decode offset = %" PRIu64 "\n", offset);
-
-	for (uint32_t segmentId : requiredSegments) {
-		debug ("after decode, Require ID = %" PRIu32 ", Buf = %p\n", segmentId, segmentData[segmentId].buf);
-	}
-
-
 	return objectData;
 }
 
@@ -199,36 +185,30 @@ vector<uint32_t> Raid5Coding::getRequiredSegmentIds(string setting,
 	int failedOsdCount = (int) count(secondaryOsdStatus.begin(),
 			secondaryOsdStatus.end(), false);
 
-	debug ("Failed OSD = %" PRIu32 "\n", failedOsdCount);
-
 	if (failedOsdCount > 1) {
 		return {};
 	}
 
-	// for raid 5, only requires n-1 stripes (noOfDataStripes) to decode
-	const uint32_t noOfDataStripes = getNoOfDataStripes(setting);
+	// for raid 5, only requires n-1 stripes (raid5_n - 1) to decode
+	const uint32_t raid5_n = getParameters(setting);
+	const uint32_t noOfDataSegment = raid5_n - 1;
 	vector<uint32_t> requiredSegments;
-	requiredSegments.reserve(noOfDataStripes);
+	requiredSegments.reserve(noOfDataSegment);
 
-	// no OSD failure / parity OSD failure --> select first n-1 stripes
+	// no OSD failure / parity OSD failure
 	if (failedOsdCount == 0
 			|| (failedOsdCount == 1 && secondaryOsdStatus.back() == false)) {
-		for (uint32_t i = 0; i < noOfDataStripes; i++) {
-				requiredSegments.push_back(i);
+		// select first n-1 segments
+		for (uint32_t i = 0; i < noOfDataSegment; i++) {
+			requiredSegments.push_back(i);
 		}
-	}
-
-	// one OSD failure
-	if (failedOsdCount == 1) {
-		for (uint32_t i = 0; i < noOfDataStripes + 1; i++) {
+	} else {
+		for (uint32_t i = 0; i < raid5_n; i++) {
+			// select only available segments
 			if (secondaryOsdStatus[i] != false) {
 				requiredSegments.push_back(i);
 			}
 		}
-	}
-
-	for (auto segmentId : requiredSegments) {
-		debug ("Require Segment ID = %" PRIu32 "\n", segmentId);
 	}
 
 	return requiredSegments;
@@ -238,8 +218,8 @@ vector<uint32_t> Raid5Coding::getRequiredSegmentIds(string setting,
 // PRIVATE FUNCTION
 //
 
-uint32_t Raid5Coding::getNoOfDataStripes(string setting) {
-	uint32_t noOfDataStripes;
-	istringstream(setting) >> noOfDataStripes;
-	return noOfDataStripes;
+uint32_t Raid5Coding::getParameters(string setting) {
+	uint32_t raid5_n;
+	istringstream(setting) >> raid5_n;
+	return raid5_n;
 }

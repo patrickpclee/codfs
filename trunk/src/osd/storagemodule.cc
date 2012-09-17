@@ -256,7 +256,6 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 			_segmentFolder);
 	segmentData.info.objectId = objectId;
 	segmentData.info.segmentId = segmentId;
-	segmentData.info.segmentPath = segmentPath;
 
 	// check num of bytes to read
 	// if length = 0, read whole segment
