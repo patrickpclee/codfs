@@ -6,6 +6,7 @@
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
 #include "../coding/raid5coding.hh"
+#include "../coding/rscoding.hh"
 #include "../../lib/logger.hh"
 
 using namespace std;
@@ -96,12 +97,17 @@ int main(int argc, char *argv[]) {
 	CodingScheme codingScheme = RAID1_CODING;
 	string codingSetting = Raid1Coding::generateSetting(raid1_n);
 
-	*/
-
 	// RAID 5
 	const uint32_t raid5_n = 3;
 	CodingScheme codingScheme = RAID5_CODING;
 	string codingSetting = Raid5Coding::generateSetting(raid5_n);
+
+	*/
+
+	// RS
+	const uint32_t rs_k = 6, rs_m = 2, rs_w = 8;
+	CodingScheme codingScheme = RS_CODING;
+	string codingSetting = RSCoding::generateSetting(rs_k, rs_m, rs_w);
 
 	if (strncmp(argv[2], "upload", 6) == 0) {
 		client->uploadFileRequest(argv[3], codingScheme, codingSetting);

@@ -11,13 +11,13 @@
 ###############################################################################
 
 CROSS_COMPILE =
-OPTIMIZE := 
+OPTIMIZE := -O2
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_OSD
-EXTRA_CFLAGS := -O2 -g -std=c++0x #`pkg-config --cflags --libs protobuf` -lpthread
+EXTRA_CFLAGS := -g -std=c++0x
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure
+SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../../lib/jerasure
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 
@@ -58,7 +58,7 @@ prefix_objdir  = $(shell echo $(OBJ_DIR)|sed 's:\(\./*\)*::')
 prefix_objdir := $(filter-out /,$(prefix_objdir)/)
 endif
 
-GCC      := $(CROSS_COMPILE)g++
+GCC      := $(CROSS_COMPILE)gcc
 G++      := $(CROSS_COMPILE)g++
 SRC_DIR := $(sort . $(SRC_DIR))
 inc_dir = $(foreach d,$(sort $(INC_DIR) $(SRC_DIR)),-I$d)
@@ -73,6 +73,7 @@ all_objs = $(foreach i,$(SUFFIX),$(obj-$i))
 all_srcs = $(foreach i,$(SUFFIX),$(src-$i))
 
 CFLAGS       = $(EXTRA_CFLAGS) $(WARNINGS) $(OPTIMIZE) $(DEFS)
+GCCFLAGS       = $(OPTIMIZE) $(DEFS)
 TARGET_TYPE := $(strip $(TARGET_TYPE))
 
 ifeq ($(filter $(TARGET_TYPE),so ar app),)
@@ -90,9 +91,14 @@ all: .mkdir $(TARGET)
 
 define cmd_o
 $$(obj-$1): $2%.o: %.$1  $(MAKEFILE_LIST)
-	$(GCC) $(inc_dir) -Wp,-MT,$$@ -Wp,-MMD,$$@.d $(CFLAGS) -c -o $$@ $$<
+ifeq ($1,c)
+	$(GCC) $(inc_dir) -Wp,-MT,$$@ -Wp,-MMD,$$@.d $(GCCFLAGS) -c -o $$@ $$<
+else 
+	$(G++) $(inc_dir) -Wp,-MT,$$@ -Wp,-MMD,$$@.d $(CFLAGS) -c -o $$@ $$<
+endif
 
 endef
+
 $(eval $(foreach i,$(SUFFIX),$(call cmd_o,$i,$(prefix_objdir))))
 
 ifeq ($(TARGET_TYPE),ar)

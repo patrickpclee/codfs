@@ -1,5 +1,6 @@
 #include "coding.hh"
 #include "../common/debug.hh"
+#include "../common/memorypool.hh"
 
 Coding::Coding() {
 }
@@ -8,8 +9,16 @@ Coding::~Coding() {
 
 }
 
-uint32_t Coding::roundTo(unsigned int value, unsigned int roundTo) {
-	return ((value + roundTo - 1) / roundTo) * roundTo;
+
+uint32_t Coding::roundTo(uint32_t numToRound, uint32_t multiple) {
+	if (multiple == 0) {
+		return numToRound;
+	}
+
+	uint32_t remainder = numToRound % multiple;
+	if (remainder == 0)
+		return numToRound;
+	return numToRound + multiple - remainder;
 }
 
 void Coding::bitwiseXor(char* result, char* srcA, char* srcB, uint32_t length) {
