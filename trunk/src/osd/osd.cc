@@ -529,10 +529,11 @@ uint32_t Osd::getOsdId() {
 }
 
 void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
-	// for now, assume all OSDs are up
 	for (auto osdStatus : secondaryOsdStatus) {
 		osdStatus = true;
 	}
 
+	// failure simulation
 	secondaryOsdStatus[0] = false;
+	secondaryOsdStatus[1] = false;
 }

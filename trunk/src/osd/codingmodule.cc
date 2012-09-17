@@ -8,6 +8,7 @@
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
 #include "../coding/raid5coding.hh"
+#include "../coding/rscoding.hh"
 #include "../common/debug.hh"
 
 mutex codingMutex;
@@ -19,6 +20,7 @@ CodingModule::CodingModule() {
 		_codingWorker[RAID0_CODING] = new Raid0Coding();
 		_codingWorker[RAID1_CODING] = new Raid1Coding();
 		_codingWorker[RAID5_CODING] = new Raid5Coding();
+		_codingWorker[RS_CODING] = new RSCoding();
 	}
 }
 
