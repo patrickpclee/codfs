@@ -19,12 +19,12 @@ public:
 	vector<uint32_t> getRequiredSegmentIds(string setting,
 			vector<bool> secondaryOsdStatus);
 
-	static string generateSetting(int noOfStrips) {
-		return to_string(noOfStrips);
+	static string generateSetting(int raid0_n) {
+		return to_string(raid0_n);
 	}
 
 private:
-	uint32_t getNoOfStrips(string setting);
+	uint32_t getParameters(string setting);
 };
 
 #endif
