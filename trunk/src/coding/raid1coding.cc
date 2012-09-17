@@ -18,12 +18,12 @@ Raid1Coding::~Raid1Coding() {
 vector<struct SegmentData> Raid1Coding::encode(struct ObjectData objectData,
 		string setting) {
 
-	const uint32_t noOfReplications = getNoOfReplications(setting);
+	const uint32_t raid1_n = getParameters(setting);
 	vector<struct SegmentData> segmentDataList;
 
-	debug("RAID1: Replication No = %" PRIu32 "\n", noOfReplications);
+	debug("RAID1: Replication No = %" PRIu32 "\n", raid1_n);
 
-	for (uint32_t i = 0; i < noOfReplications; i++) {
+	for (uint32_t i = 0; i < raid1_n; i++) {
 
 		struct SegmentData segmentData;
 		segmentData.info.objectId = objectData.info.objectId;
@@ -60,10 +60,10 @@ struct ObjectData Raid1Coding::decode(vector<struct SegmentData> &segmentData,
 	return objectData;
 }
 
-uint32_t Raid1Coding::getNoOfReplications(string setting) {
-	uint32_t noOfReplications;
-	istringstream(setting) >> noOfReplications;
-	return noOfReplications;
+uint32_t Raid1Coding::getParameters(string setting) {
+	uint32_t raid1_n;
+	istringstream(setting) >> raid1_n;
+	return raid1_n;
 }
 
 vector<uint32_t> Raid1Coding::getRequiredSegmentIds(string setting,

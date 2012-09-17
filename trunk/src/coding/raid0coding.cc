@@ -23,19 +23,19 @@ vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
 		string setting) {
 
 	vector<struct SegmentData> segmentDataList;
-	const uint32_t noOfStrips = getNoOfStrips(setting);
+	const uint32_t raid0_n = getParameters(setting);
 
 	// calculate size of each strip
-	const uint32_t stripSize = Coding::roundTo(objectData.info.objectSize, noOfStrips)
-			/ noOfStrips;
+	const uint32_t stripSize = Coding::roundTo(objectData.info.objectSize, raid0_n)
+			/ raid0_n;
 
-	for (uint32_t i = 0; i < noOfStrips; i++) {
+	for (uint32_t i = 0; i < raid0_n; i++) {
 
 		struct SegmentData segmentData;
 		segmentData.info.objectId = objectData.info.objectId;
 		segmentData.info.segmentId = i;
 
-		if (i == noOfStrips - 1) { // last segment
+		if (i == raid0_n - 1) { // last segment
 			segmentData.info.segmentSize = objectData.info.objectSize
 					- i * stripSize;
 
@@ -78,10 +78,10 @@ struct ObjectData Raid0Coding::decode(vector<struct SegmentData> &segmentData,
 	return objectData;
 }
 
-uint32_t Raid0Coding::getNoOfStrips(string setting) {
-	uint32_t noOfStrips;
-	istringstream(setting) >> noOfStrips;
-	return noOfStrips;
+uint32_t Raid0Coding::getParameters(string setting) {
+	uint32_t raid0_n;
+	istringstream(setting) >> raid0_n;
+	return raid0_n;
 }
 
 vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting,
@@ -96,9 +96,9 @@ vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting,
 	}
 
 	// for Raid0 Coding, require all segments for decode
-	const uint32_t noOfStrips = getNoOfStrips(setting);
-	vector<uint32_t> requiredSegments(noOfStrips);
-	for (uint32_t i = 0; i < noOfStrips; i++) {
+	const uint32_t raid0_n = getParameters(setting);
+	vector<uint32_t> requiredSegments(raid0_n);
+	for (uint32_t i = 0; i < raid0_n; i++) {
 		requiredSegments[i] = i;
 	}
 	return requiredSegments;

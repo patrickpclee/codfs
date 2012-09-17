@@ -142,8 +142,6 @@ uint32_t OsdCommunicator::sendSegment(uint32_t sockfd,
 void OsdCommunicator::getSegmentRequest(uint32_t osdId, uint64_t objectId,
 		uint32_t segmentId) {
 
-	struct SegmentData segmentData;
-
 	uint32_t dstSockfd = getSockfdFromId(osdId);
 	GetSegmentInitRequestMsg* getSegmentInitRequestMsg =
 			new GetSegmentInitRequestMsg(this, dstSockfd, objectId, segmentId);

@@ -84,26 +84,26 @@ int main(int argc, char *argv[]) {
 
 	// TEST PUT OBJECT
 
-	// RAID 1
 	/*
-	 const uint32_t replicationFactor = 3;
-	 CodingScheme codingScheme = RAID1_CODING;
-	 */
 
 	// RAID 0
-	/*
-	const uint32_t stripFactor = 2;
+	const uint32_t raid0_n = 3;
 	CodingScheme codingScheme = RAID0_CODING;
+	string codingSetting = Raid0Coding::generateSetting(raid0_n);
+
+	// RAID 1
+	const uint32_t raid1_n = 3;
+	CodingScheme codingScheme = RAID1_CODING;
+	string codingSetting = Raid1Coding::generateSetting(raid1_n);
+
 	*/
 
 	// RAID 5
-	const uint32_t noOfDataStripes = 2;
+	const uint32_t raid5_n = 3;
 	CodingScheme codingScheme = RAID5_CODING;
+	string codingSetting = Raid5Coding::generateSetting(raid5_n);
 
 	if (strncmp(argv[2], "upload", 6) == 0) {
-	//	string codingSetting = Raid0Coding::generateSetting(stripFactor);
-		//string codingSetting = Raid1Coding::generateSetting(replicationFactor);
-		string codingSetting = Raid5Coding::generateSetting(noOfDataStripes);
 		client->uploadFileRequest(argv[3], codingScheme, codingSetting);
 	} else {
 		client->downloadFileRequest(atoi(argv[3]), argv[4]);

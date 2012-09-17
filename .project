@@ -82,4 +82,15 @@
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 		<nature>org.eclipse.linuxtools.rpm.rpmlint.rpmlintNature</nature>
 	</natures>
+	<filteredResources>
+		<filter>
+			<id>1347520797437</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-true-false-branch</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>
