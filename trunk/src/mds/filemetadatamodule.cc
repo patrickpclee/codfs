@@ -91,16 +91,13 @@ uint64_t FileMetaDataModule::readFileSize(uint32_t fileId)
 void FileMetaDataModule::saveObjectList(uint32_t fileId, const vector<uint64_t> &objectList) {
 	vector<uint64_t>::const_iterator it;
 	BSONObj queryObject = BSON ("id" << fileId);
-	_fileMetaDataStorage->removeField(queryObject,"objectList");
-	BSONObj pushObject;
-	for (it = objectList.begin(); it < objectList.end(); ++it) {
-		//arr << *it;
-		pushObject =
-				BSON ( "$push" << BSON ("objectList" << (long long int)*it));
-		//debug("Push %" PRIu64 "\n", *it);
-		_fileMetaDataStorage->push(queryObject, pushObject);
+	BSONArrayBuilder arrb;
+	for(it = objectList.begin(); it < objectList.end(); ++it) {
+		arrb.append((long long int) *it);
 	}
-
+	BSONArray arr = arrb.arr();
+	BSONObj updateObject = BSON ("$set" << BSON ("objectList" << arr));
+	_fileMetaDataStorage->update(queryObject,updateObject);
 	return;
 }
 
