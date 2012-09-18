@@ -74,7 +74,7 @@ public:
 	 * @param	updateObject	Object to Update
 	 */
 	void update (mongo::Query queryObject, mongo::BSONObj updateObject);
-	
+
 	/**
 	 * @brief	Push Value to a Field of a Record
 	 *
