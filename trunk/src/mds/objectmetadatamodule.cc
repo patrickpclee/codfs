@@ -72,14 +72,13 @@ void ObjectMetaDataModule::saveNodeList (uint64_t objectId, const vector<uint32_
 {
 	vector<uint32_t>::const_iterator it;
 	BSONObj queryObject = BSON ("id" << (long long int)objectId);
-	BSONObj pushObject;
+	BSONArrayBuilder arrb;
 	for(it = objectNodeList.begin(); it < objectNodeList.end(); ++it) {
-		//arr << *it;
-		pushObject = BSON ( "$push" << BSON ("nodeList" << *it));
-		//debug("Push %" PRIu64 "\n",*it);
-		_objectMetaDataStorage->push(queryObject, pushObject);
+		arrb.append(*it);
 	}
-
+	BSONArray arr = arrb.arr();
+	BSONObj updateObject = BSON ("$set" << BSON ("nodeList" << arr));
+	_objectMetaDataStorage->update(queryObject,updateObject);
 	return ;
 }
 
