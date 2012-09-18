@@ -23,21 +23,21 @@ uint32_t Coding::roundTo(uint32_t numToRound, uint32_t multiple) {
 
 void Coding::bitwiseXor(char* result, char* srcA, char* srcB, uint32_t length) {
 
-	uint32_t* srcA32 = (uint32_t*) srcA;
-	uint32_t* srcB32 = (uint32_t*) srcB;
-	uint32_t* result32 = (uint32_t*) result;
+	uint64_t* srcA64 = (uint64_t*) srcA;
+	uint64_t* srcB64 = (uint64_t*) srcB;
+	uint64_t* result64 = (uint64_t*) result;
 
-	uint32_t xor32Count = length / sizeof(uint32_t);
-	uint32_t offset = 0;
+	uint64_t xor64Count = length / sizeof(uint64_t);
+	uint64_t offset = 0;
 
 	// finish all the word-by-word XOR
-	for (uint32_t i = 0; i < xor32Count; i++) {
-		result32[i] = srcA32[i] ^ srcB32[i];
-		offset += sizeof(uint32_t); // processed bytes
+	for (uint64_t i = 0; i < xor64Count; i++) {
+		result64[i] = srcA64[i] ^ srcB64[i];
+		offset += sizeof(uint64_t); // processed bytes
 	}
 
 	// finish remaining byte-by-byte XOR
-	for (uint32_t j = offset; j < length; j++) {
+	for (uint64_t j = offset; j < length; j++) {
 		result[j] = srcA[j] ^ srcB[j];
 	}
 }
