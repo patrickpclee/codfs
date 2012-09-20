@@ -25,11 +25,11 @@ client:
 osd:
 	cd ${OSD_DIR}; make -j3
 
+clientfuse:
+	cd ${FUSE_DIR}; make -j3
+
 monitor:
 	cd ${MONITOR_DIR}; make -j3
-
-fuse:
-	cd ${FUSE_DIR}; make -j3
 
 enum:
 	cd ${COMMON_DIR}; make
