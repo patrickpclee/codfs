@@ -101,7 +101,11 @@ void* ncvfs_init(struct fuse_conn_info *conn)
 
 	_clientCommunicator->setId(client->getClientId());
 	_clientCommunicator->setComponentType(CLIENT);
-	_clientCommunicator->connectAllComponents();
+
+	//_clientCommunicator->connectAllComponents();
+	_clientCommunicator->connectToMds();
+	_clientCommunicator->connectToMonitor();
+	_clientCommunicator->getOsdListAndConnect();
 	return NULL;
 }
 
@@ -240,7 +244,7 @@ static struct ncvfs_fuse_operations ncvfs_oper;
 int main(int argc, char *argv[])
 {
 	configLayer = new ConfigLayer("clientconfig.xml");
-	client = new Client();
+	client = new Client(_clientId);
 	//fileDataModule = new FileDataModule();
 	_clientCommunicator = client->getCommunicator();
 	return fuse_main(argc, argv, &ncvfs_oper, NULL);
