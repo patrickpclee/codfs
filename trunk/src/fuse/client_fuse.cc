@@ -225,11 +225,13 @@ int ncvfs_chmod(const char *path, mode_t mode) {
 	return 0;
 }
 
+// not required
 int ncvfs_chown(const char *path, uid_t uid, gid_t gid) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 }
 
+// not required
 int ncvfs_utime(const char *path, struct utimbuf *ubuf) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
@@ -241,11 +243,13 @@ int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 	return 0;
 }
 
+// not required
 int ncvfs_readlink(const char *path, char *link, size_t size) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 }
 
+// not required
 int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
@@ -267,6 +271,7 @@ int ncvfs_rmdir(const char *path) {
 
 }
 
+// not required
 int ncvfs_symlink(const char *path, const char *link) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
@@ -279,6 +284,7 @@ int ncvfs_rename(const char *path, const char *newpath) {
 
 }
 
+// not required
 int ncvfs_link(const char *path, const char *newpath) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
@@ -291,40 +297,47 @@ int ncvfs_truncate(const char *path, off_t newsize) {
 
 }
 
+// not required
 int ncvfs_statfs(const char *path, struct statvfs *statv) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 
 }
 
+// not required
 int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 
 }
 
+// not strictly required
 int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 }
 
+// not required
 int ncvfs_setxattr(const char *path, const char *name, const char *value,
 		size_t size, int flags) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 }
 
+// not required
 int ncvfs_getxattr(const char *path, const char *name, char *value,
 		size_t size) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 }
 
+// not required
 int ncvfs_listxattr(const char *path, char *list, size_t size) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
 }
 
+// not required
 int ncvfs_removexattr(const char *path, const char *name) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
@@ -346,6 +359,7 @@ int ncvfs_releasedir(const char *path, struct fuse_file_info *fi) {
 	return 0;
 }
 
+// not strictly required
 int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "not implemented");
 	return 0;
@@ -369,41 +383,42 @@ int ncvfs_fgetattr(const char *path, struct stat *statbuf,
 
 struct ncvfs_fuse_operations: fuse_operations {
 	ncvfs_fuse_operations() {
+		init = ncvfs_init;
+		destroy = ncvfs_destroy;
 		getattr = ncvfs_getattr;
-		readlink = ncvfs_readlink;
-		getdir = NULL;
-		mknod = ncvfs_mknod;
+		fgetattr = ncvfs_fgetattr;
+		access = ncvfs_access;
+		readlink = ncvfs_readlink;			// not required
+		opendir = ncvfs_opendir;
+		readdir = ncvfs_readdir;
+		mknod = ncvfs_mknod;				// not required
 		mkdir = ncvfs_mkdir;
 		unlink = ncvfs_unlink;
 		rmdir = ncvfs_rmdir;
-		symlink = ncvfs_symlink;
+		symlink = ncvfs_symlink;			// not required
 		rename = ncvfs_rename;
-		link = ncvfs_link;
+		link = ncvfs_link;					// not required
 		chmod = ncvfs_chmod;
-		chown = ncvfs_chown;
+		chown = ncvfs_chown;				// not required
 		truncate = ncvfs_truncate;
-		utime = ncvfs_utime;
+		ftruncate = ncvfs_ftruncate;
+		utime = ncvfs_utime;				// not required
 		open = ncvfs_open;
 		read = ncvfs_read;
 		write = ncvfs_write;
-		statfs = ncvfs_statfs;
-		flush = ncvfs_flush;
+		statfs = ncvfs_statfs;				// not required
 		release = ncvfs_release;
-		fsync = ncvfs_fsync;
-		setxattr = ncvfs_setxattr;
-		getxattr = ncvfs_getxattr;
-		listxattr = ncvfs_listxattr;
-		removexattr = ncvfs_removexattr;
-		opendir = ncvfs_opendir;
-		readdir = ncvfs_readdir;
 		releasedir = ncvfs_releasedir;
-		fsyncdir = ncvfs_fsyncdir;
-		init = ncvfs_init;
-		destroy = ncvfs_destroy;
-		access = ncvfs_access;
+		fsync = ncvfs_fsync;				// not strictly required
+		fsyncdir = ncvfs_fsyncdir;			// not strictly required
+		flush = ncvfs_flush;				// not required
+		setxattr = ncvfs_setxattr;			// not required
+		getxattr = ncvfs_getxattr;			// not required
+		listxattr = ncvfs_listxattr;		// not required
+		removexattr = ncvfs_removexattr;	// not required
 		create = ncvfs_create;
-		ftruncate = ncvfs_ftruncate;
-		fgetattr = ncvfs_fgetattr;
+
+		flag_nullpath_ok = 0;				// accept NULL path and use fi->fh
 	}
 };
 
