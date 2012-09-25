@@ -3,6 +3,12 @@
 #include <fuse.h>
 #include <errno.h>
 #include <unordered_map>
+#include <ctype.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/xattr.h>
+#include <sys/stat.h>
 
 #include "client.hh"
 #include "client_communicator.hh"
@@ -17,11 +23,16 @@
 
 #include "../config/config.hh"
 
+#define PATH_MAX 50
+
 Client* client;
 
 ConfigLayer* configLayer;
 
 ClientCommunicator* _clientCommunicator;
+
+const char* _fuseFolder = "./fuse";
+const char* _mountDir = "./mount";
 
 CodingScheme codingScheme = RAID1_CODING;
 string codingSetting = Raid1Coding::generateSetting(1);
@@ -39,6 +50,13 @@ unordered_map<string, uint32_t> _fileIdCache;
 thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
+
+int ncvfs_error(const char *str)
+{
+	int ret = -errno;
+	printf("    ERROR %s: %s\n", str, strerror(errno));
+	return ret;
+}
 
 struct FileMetaData getAndCacheFileInfo(string filePath) {
 	struct FileMetaData fileMetaData;
@@ -221,26 +239,80 @@ void ncvfs_destroy(void* userdata) {
 }
 
 int ncvfs_chmod(const char *path, mode_t mode) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = chmod(fpath, mode);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_chmod chmod");
+
+	return retstat;
 }
 
 // not required
 int ncvfs_chown(const char *path, uid_t uid, gid_t gid) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = chown(fpath, uid, gid);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_chown chown");
+
+	return retstat;
 }
 
 // not required
 int ncvfs_utime(const char *path, struct utimbuf *ubuf) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = utime(fpath, ubuf);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_utime utime");
+
+	return retstat;
 }
 
 int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		off_t offset, struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	DIR *dp;
+	struct dirent *de;
+
+	// once again, no need for fullpath -- but note that I need to cast fi->fh
+	dp = (DIR *) (uintptr_t) fi->fh;
+
+	// Every directory contains at least two entries: . and ..  If my
+	// first call to the system readdir() returns NULL I've got an
+	// error; near as I can tell, that's the only condition under
+	// which I can get an error from readdir()
+	de = readdir(dp);
+	if (de == 0)
+		return -errno;
+
+	// This will copy the entire directory into the buffer.  The loop exits
+	// when either the system readdir() returns NULL, or filler()
+	// returns something non-zero.  The first case just means I've
+	// read the whole directory; the second means the buffer is full.
+	do {
+		if (filler(buf, de->d_name, NULL, 0) != 0)
+			return -ENOMEM;
+	} while ((de = readdir(dp)) != NULL);
+
+	return retstat;
 }
 
 // not required
@@ -251,13 +323,52 @@ int ncvfs_readlink(const char *path, char *link, size_t size) {
 
 // not required
 int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	// On Linux this could just be 'mknod(path, mode, rdev)' but this
+	//  is more portable
+	if (S_ISREG(mode)) {
+		retstat = open(fpath, O_CREAT | O_EXCL | O_WRONLY, mode);
+		if (retstat < 0)
+			retstat = ncvfs_error("ncvfs_mknod open");
+		else {
+			retstat = close(retstat);
+			if (retstat < 0)
+				retstat = ncvfs_error("ncvfs_mknod close");
+		}
+	} else
+		if (S_ISFIFO(mode)) {
+			retstat = mkfifo(fpath, mode);
+			if (retstat < 0)
+				retstat = ncvfs_error("ncvfs_mknod mkfifo");
+		} else {
+			retstat = mknod(fpath, mode, dev);
+			if (retstat < 0)
+				retstat = ncvfs_error("ncvfs_mknod mknod");
+		}
+
+
+	return retstat;
 }
 
 int ncvfs_mkdir(const char *path, mode_t mode) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = mkdir(fpath, mode);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncfs_mkdir mkdir");
+
+	return retstat;
 }
 
 int ncvfs_unlink(const char *path) {
@@ -266,21 +377,66 @@ int ncvfs_unlink(const char *path) {
 }
 
 int ncvfs_rmdir(const char *path) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = rmdir(fpath);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncfs_rmdir rmdir");
+
+	return retstat;
 
 }
 
 // not required
 int ncvfs_symlink(const char *path, const char *link) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+	char flink[PATH_MAX];
+	char bpath[PATH_MAX];
+
+	memset(bpath,0,PATH_MAX);
+	bpath[0] = '/';
+	strncat(bpath,path,PATH_MAX - 1);
+
+	strcpy(fpath, _mountDir);
+	strncat(fpath, path, PATH_MAX);
+
+	strcpy(flink, _fuseFolder);
+	strncat(flink, link, PATH_MAX);
+
+	fprintf(stderr,"%s->%s\n%s->%s\n",path,fpath,link,flink);
+
+	retstat = symlink(fpath, flink);
+//	retstat = symlink(path, flink);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_symlink symlink");
+
+	return retstat;
 
 }
 
 int ncvfs_rename(const char *path, const char *newpath) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+	char fnewpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+	strcpy(fnewpath, _fuseFolder);
+	strncat(fnewpath, newpath, PATH_MAX);
+
+	retstat = rename(fpath, fnewpath);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncfs_rename rename");
+
+	return retstat;
 
 }
 
@@ -292,60 +448,146 @@ int ncvfs_link(const char *path, const char *newpath) {
 }
 
 int ncvfs_truncate(const char *path, off_t newsize) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = truncate(fpath, newsize);
+	if (retstat < 0)
+		ncvfs_error("ncvfs_truncate truncate");
+
+	return retstat;
 
 }
 
 // not required
 int ncvfs_statfs(const char *path, struct statvfs *statv) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	// get stats for underlying filesystem
+	retstat = statvfs(fpath, statv);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_statfs statvfs");
+
+	return retstat;
 
 }
 
 // not required
 int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
 
+	return retstat;
 }
 
 // not strictly required
 int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+
+	if (datasync)
+		retstat = fdatasync(fi->fh);
+	else
+		retstat = fsync(fi->fh);
+
+	if (retstat < 0)
+		ncvfs_error("ncvfs_fsync fsync");
+
+	return retstat;
 }
 
 // not required
 int ncvfs_setxattr(const char *path, const char *name, const char *value,
 		size_t size, int flags) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = lsetxattr(fpath, name, value, size, flags);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_setxattr lsetxattr");
+
+	return retstat;
 }
 
 // not required
 int ncvfs_getxattr(const char *path, const char *name, char *value,
 		size_t size) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = lgetxattr(fpath, name, value, size);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_getxattr lgetxattr");
+
+	return retstat;
 }
 
 // not required
 int ncvfs_listxattr(const char *path, char *list, size_t size) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+	//char *ptr;
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = llistxattr(fpath, list, size);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_listxattr llistxattr");
+
+	return retstat;
 }
 
 // not required
 int ncvfs_removexattr(const char *path, const char *name) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = lremovexattr(fpath, name);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_removexattr lrmovexattr");
+
+	return retstat;
 }
 
 int ncvfs_opendir(const char *path, struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	DIR *dp;
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	dp = opendir(fpath);
+	if (dp == NULL)	retstat = ncvfs_error("ncvfs_opendir opendir");
+
+	fi->fh = (intptr_t) dp;
+
+	return retstat;
+
 }
 
 int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
@@ -355,8 +597,12 @@ int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 }
 
 int ncvfs_releasedir(const char *path, struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+
+	closedir((DIR *) (uintptr_t) fi->fh);
+
+	return retstat;
 }
 
 // not strictly required
@@ -366,13 +612,30 @@ int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
 }
 
 int ncvfs_access(const char *path, int mask) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+	char fpath[PATH_MAX];
+
+	strcpy(fpath, _fuseFolder);
+	strncat(fpath, path, PATH_MAX);
+
+	retstat = access(fpath, mask);
+
+	if (retstat < 0)
+		retstat = ncvfs_error("ncfs_access access");
+
+	return retstat;
 }
 
 int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
-	return 0;
+	//debug_cyan ("%s\n", "not implemented");
+	int retstat = 0;
+
+	retstat = ftruncate(fi->fh, offset);
+	if (retstat < 0)
+		retstat = ncvfs_error("ncvfs_ftruncate ftruncate");
+
+	return retstat;
 }
 
 int ncvfs_fgetattr(const char *path, struct stat *statbuf,
