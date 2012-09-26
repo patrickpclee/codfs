@@ -42,6 +42,8 @@ public:
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
 	 */
+	void replyFileSize(uint32_t requestId, uint32_t connectionId, uint32_t fileId, uint64_t fileSize);
+
 	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId,
 			uint32_t fileId, string filePath, uint64_t fileSize,
 			string checksum, vector<uint64_t> objectList,

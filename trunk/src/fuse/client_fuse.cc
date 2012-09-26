@@ -127,6 +127,8 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 	int retstat = 0;
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 
+	debug ("fpath = %s\n", fpath);
+
 	if (strcmp(path, "/") == 0) {
 		stbuf->st_mode = S_IFDIR | 0755;
 		stbuf->st_uid = getuid();

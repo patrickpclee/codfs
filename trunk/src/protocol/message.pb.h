@@ -34,6 +34,7 @@ void protobuf_ShutdownFile_message_2eproto();
 
 class HandshakeRequestPro;
 class HandshakeReplyPro;
+class IWantFileSizeMsgPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
 class DownloadFileRequestPro;
@@ -46,6 +47,7 @@ class GetObjectRequestPro;
 class GetObjectReadyPro;
 class ObjectTransferEndRequestPro;
 class GetOsdListRequestPro;
+class HeresFileSizeMsgPro;
 class ListDirectoryReplyPro;
 class FileInfoPro;
 class SegmentLocationPro;
@@ -331,6 +333,98 @@ class HandshakeReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static HandshakeReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class IWantFileSizeMsgPro : public ::google::protobuf::Message {
+ public:
+  IWantFileSizeMsgPro();
+  virtual ~IWantFileSizeMsgPro();
+  
+  IWantFileSizeMsgPro(const IWantFileSizeMsgPro& from);
+  
+  inline IWantFileSizeMsgPro& operator=(const IWantFileSizeMsgPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const IWantFileSizeMsgPro& default_instance();
+  
+  void Swap(IWantFileSizeMsgPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  IWantFileSizeMsgPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const IWantFileSizeMsgPro& from);
+  void MergeFrom(const IWantFileSizeMsgPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 fileId = 1;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // optional fixed64 fileSize = 2;
+  inline bool has_filesize() const;
+  inline void clear_filesize();
+  static const int kFileSizeFieldNumber = 2;
+  inline ::google::protobuf::uint64 filesize() const;
+  inline void set_filesize(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.IWantFileSizeMsgPro)
+ private:
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  inline void set_has_filesize();
+  inline void clear_has_filesize();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 filesize_;
+  ::google::protobuf::uint32 fileid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static IWantFileSizeMsgPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1579,6 +1673,98 @@ class GetOsdListRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static GetOsdListRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class HeresFileSizeMsgPro : public ::google::protobuf::Message {
+ public:
+  HeresFileSizeMsgPro();
+  virtual ~HeresFileSizeMsgPro();
+  
+  HeresFileSizeMsgPro(const HeresFileSizeMsgPro& from);
+  
+  inline HeresFileSizeMsgPro& operator=(const HeresFileSizeMsgPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const HeresFileSizeMsgPro& default_instance();
+  
+  void Swap(HeresFileSizeMsgPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  HeresFileSizeMsgPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const HeresFileSizeMsgPro& from);
+  void MergeFrom(const HeresFileSizeMsgPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 fileId = 1;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // optional fixed64 fileSize = 2;
+  inline bool has_filesize() const;
+  inline void clear_filesize();
+  static const int kFileSizeFieldNumber = 2;
+  inline ::google::protobuf::uint64 filesize() const;
+  inline void set_filesize(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.HeresFileSizeMsgPro)
+ private:
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  inline void set_has_filesize();
+  inline void clear_has_filesize();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 filesize_;
+  ::google::protobuf::uint32 fileid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static HeresFileSizeMsgPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -4846,6 +5032,54 @@ inline void HandshakeReplyPro::set_componenttype(::ncvfs::HandshakeRequestPro_Co
 
 // -------------------------------------------------------------------
 
+// IWantFileSizeMsgPro
+
+// optional fixed32 fileId = 1;
+inline bool IWantFileSizeMsgPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void IWantFileSizeMsgPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void IWantFileSizeMsgPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void IWantFileSizeMsgPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 IWantFileSizeMsgPro::fileid() const {
+  return fileid_;
+}
+inline void IWantFileSizeMsgPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// optional fixed64 fileSize = 2;
+inline bool IWantFileSizeMsgPro::has_filesize() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void IWantFileSizeMsgPro::set_has_filesize() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void IWantFileSizeMsgPro::clear_has_filesize() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void IWantFileSizeMsgPro::clear_filesize() {
+  filesize_ = GOOGLE_ULONGLONG(0);
+  clear_has_filesize();
+}
+inline ::google::protobuf::uint64 IWantFileSizeMsgPro::filesize() const {
+  return filesize_;
+}
+inline void IWantFileSizeMsgPro::set_filesize(::google::protobuf::uint64 value) {
+  set_has_filesize();
+  filesize_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // ListDirectoryRequestPro
 
 // optional fixed32 osdId = 1;
@@ -5838,6 +6072,54 @@ inline void ObjectTransferEndRequestPro::set_objectid(::google::protobuf::uint64
 // -------------------------------------------------------------------
 
 // GetOsdListRequestPro
+
+// -------------------------------------------------------------------
+
+// HeresFileSizeMsgPro
+
+// optional fixed32 fileId = 1;
+inline bool HeresFileSizeMsgPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void HeresFileSizeMsgPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void HeresFileSizeMsgPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void HeresFileSizeMsgPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 HeresFileSizeMsgPro::fileid() const {
+  return fileid_;
+}
+inline void HeresFileSizeMsgPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// optional fixed64 fileSize = 2;
+inline bool HeresFileSizeMsgPro::has_filesize() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void HeresFileSizeMsgPro::set_has_filesize() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void HeresFileSizeMsgPro::clear_has_filesize() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void HeresFileSizeMsgPro::clear_filesize() {
+  filesize_ = GOOGLE_ULONGLONG(0);
+  clear_has_filesize();
+}
+inline ::google::protobuf::uint64 HeresFileSizeMsgPro::filesize() const {
+  return filesize_;
+}
+inline void HeresFileSizeMsgPro::set_filesize(::google::protobuf::uint64 value) {
+  set_has_filesize();
+  filesize_ = value;
+}
 
 // -------------------------------------------------------------------
 

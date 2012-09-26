@@ -42,6 +42,9 @@ public:
 			uint32_t clientId, const string &dstPath, uint64_t fileSize,
 			uint32_t numOfObjs, CodingScheme codingScheme, const string &codingSetting);
 
+	void FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId);
+
+
 	/**
 	 * @brief	Handle Upload Object Acknowledgement from Primary
 	 *
