@@ -23,16 +23,14 @@
 
 #include "../config/config.hh"
 
-#define PATH_MAX 50
-
 Client* client;
 
 ConfigLayer* configLayer;
 
 ClientCommunicator* _clientCommunicator;
 
-const char* _fuseFolder = "./fuse";
-const char* _mountDir = "./mount";
+string _fuseFolder = "./fuse";
+string _mountDir = "./mount";
 
 CodingScheme codingScheme = RAID1_CODING;
 string codingSetting = Raid1Coding::generateSetting(1);
@@ -51,8 +49,7 @@ thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
 
-int ncvfs_error(const char *str)
-{
+int ncvfs_error(const char *str) {
 	int ret = -errno;
 	printf("    ERROR %s: %s\n", str, strerror(errno));
 	return ret;
@@ -62,7 +59,7 @@ struct FileMetaData getAndCacheFileInfo(string filePath) {
 	struct FileMetaData fileMetaData;
 	uint32_t fileId;
 	lock_guard<mutex> lk(fileInfoCacheMutex);
-	if (_fileIdCache.count(filePath) == 0) {
+	if (_fileInfoCache.count(fileId) == 0) { // if file not found in cache
 		fileMetaData = _clientCommunicator->getFileInfo(_clientId, filePath);
 		_fileIdCache[filePath] = fileMetaData._id;
 		_fileInfoCache[fileMetaData._id] = fileMetaData;
@@ -103,6 +100,7 @@ void startReceiveThread(Communicator* _clientCommunicator) {
 }
 
 void* ncvfs_init(struct fuse_conn_info *conn) {
+	debug_cyan ("%s\n", "implemented");
 	_clientCommunicator->createServerSocket();
 
 	// 1. Garbage Collection Thread
@@ -125,6 +123,9 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 }
 
 static int ncvfs_getattr(const char *path, struct stat *stbuf) {
+	debug_cyan ("%s\n", "implemented");
+	int retstat = 0;
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	if (strcmp(path, "/") == 0) {
 		stbuf->st_mode = S_IFDIR | 0755;
@@ -132,25 +133,46 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 		stbuf->st_gid = getgid();
 		return 0;
 	}
-	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
-	if (fileMetaData._id == 0) {
-		_fileIdCache.erase(path);
-		_fileInfoCache.erase(fileMetaData._id);
+
+	retstat = lstat(fpath, stbuf);
+	if (retstat != -1) { // is file is found in fuseFolder
+		struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
+		if (fileMetaData._id == 0) { // should not happen?
+			_fileIdCache.erase(path);
+			_fileInfoCache.erase(fileMetaData._id);
+			return -ENOENT;
+		} else {
+			stbuf->st_size = fileMetaData._size;
+		}
+	} else {
+		perror("ERROR: lstat");
 		return -ENOENT;
 	}
 
-	stbuf->st_mode = S_IFREG | 0644;
-	stbuf->st_nlink = 1;
-	stbuf->st_uid = getuid();
-	stbuf->st_gid = getgid();
-	stbuf->st_size = fileMetaData._size;
-	stbuf->st_blocks = 0;
-	stbuf->st_atime = stbuf->st_mtime = stbuf->st_ctime = time(NULL);
+	return retstat;
 
-	return 0;
+	/*
+	 struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
+	 if (fileMetaData._id == 0) {
+	 _fileIdCache.erase(path);
+	 _fileInfoCache.erase(fileMetaData._id);
+	 return -ENOENT;
+	 }
+
+	 stbuf->st_mode = S_IFREG | 0644;
+	 stbuf->st_nlink = 1;
+	 stbuf->st_uid = getuid();
+	 stbuf->st_gid = getgid();
+	 stbuf->st_size = fileMetaData._size;
+	 stbuf->st_blocks = 0;
+	 stbuf->st_atime = stbuf->st_mtime = stbuf->st_ctime = time(NULL);
+
+	 return 0;
+	 */
 }
 
 static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
+	debug_cyan ("%s\n", "implemented");
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 	fi->fh = fileMetaData._id;
 	return 0;
@@ -158,6 +180,7 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 
 static int ncvfs_create(const char * path, mode_t mode,
 		struct fuse_file_info *fi) {
+	debug_cyan ("%s\n", "implemented");
 	uint32_t objectCount = configLayer->getConfigInt(
 			"Fuse>PreallocateObjectNumber");
 	uint32_t objectSize = configLayer->getConfigInt("Storage>ObjectSize")
@@ -174,6 +197,7 @@ static int ncvfs_create(const char * path, mode_t mode,
 
 static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 		struct fuse_file_info *fi) {
+	debug_cyan ("%s\n", "implemented");
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(fi->fh);
 
 	if ((offset + size) > fileMetaData._size)
@@ -210,6 +234,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 
 static int ncvfs_write(const char *path, const char *buf, size_t size,
 		off_t offset, struct fuse_file_info *fi) {
+	debug_cyan ("%s\n", "implemented");
 	(void) buf;
 	(void) offset;
 	(void) fi;
@@ -223,6 +248,7 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 }
 
 static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
+	debug_cyan ("%s\n", "implemented");
 	debug("Release %s [%" PRIu32 "]\n", path, (uint32_t)fi->fh);
 	delete _fileDataCache[fi->fh];
 	_fileDataCache.erase(fi->fh);
@@ -232,6 +258,7 @@ static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
 }
 
 void ncvfs_destroy(void* userdata) {
+	debug_cyan ("%s\n", "implemented");
 	//garbageCollectionThread.join();
 	//receiveThread.join();
 	//sendThread.join();
@@ -240,11 +267,9 @@ void ncvfs_destroy(void* userdata) {
 
 int ncvfs_chmod(const char *path, mode_t mode) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = chmod(fpath, mode);
 	if (retstat < 0)
@@ -256,11 +281,9 @@ int ncvfs_chmod(const char *path, mode_t mode) {
 // not required
 int ncvfs_chown(const char *path, uid_t uid, gid_t gid) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = chown(fpath, uid, gid);
 	if (retstat < 0)
@@ -272,11 +295,9 @@ int ncvfs_chown(const char *path, uid_t uid, gid_t gid) {
 // not required
 int ncvfs_utime(const char *path, struct utimbuf *ubuf) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = utime(fpath, ubuf);
 	if (retstat < 0)
@@ -288,6 +309,7 @@ int ncvfs_utime(const char *path, struct utimbuf *ubuf) {
 int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		off_t offset, struct fuse_file_info *fi) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
 	DIR *dp;
 	struct dirent *de;
@@ -317,18 +339,16 @@ int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 
 // not required
 int ncvfs_readlink(const char *path, char *link, size_t size) {
-	debug_cyan ("%s\n", "not implemented");
+	debug_cyan("%s\n", "not implemented");
 	return 0;
 }
 
 // not required
 int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	// On Linux this could just be 'mknod(path, mode, rdev)' but this
 	//  is more portable
@@ -341,28 +361,24 @@ int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
 			if (retstat < 0)
 				retstat = ncvfs_error("ncvfs_mknod close");
 		}
-	} else
-		if (S_ISFIFO(mode)) {
-			retstat = mkfifo(fpath, mode);
-			if (retstat < 0)
-				retstat = ncvfs_error("ncvfs_mknod mkfifo");
-		} else {
-			retstat = mknod(fpath, mode, dev);
-			if (retstat < 0)
-				retstat = ncvfs_error("ncvfs_mknod mknod");
-		}
-
+	} else if (S_ISFIFO(mode)) {
+		retstat = mkfifo(fpath, mode);
+		if (retstat < 0)
+			retstat = ncvfs_error("ncvfs_mknod mkfifo");
+	} else {
+		retstat = mknod(fpath, mode, dev);
+		if (retstat < 0)
+			retstat = ncvfs_error("ncvfs_mknod mknod");
+	}
 
 	return retstat;
 }
 
 int ncvfs_mkdir(const char *path, mode_t mode) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = mkdir(fpath, mode);
 	if (retstat < 0)
@@ -372,17 +388,15 @@ int ncvfs_mkdir(const char *path, mode_t mode) {
 }
 
 int ncvfs_unlink(const char *path) {
-	debug_cyan ("%s\n", "not implemented");
+	debug_cyan("%s\n", "not implemented");
 	return 0;
 }
 
 int ncvfs_rmdir(const char *path) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = rmdir(fpath);
 	if (retstat < 0)
@@ -395,22 +409,13 @@ int ncvfs_rmdir(const char *path) {
 // not required
 int ncvfs_symlink(const char *path, const char *link) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-	char flink[PATH_MAX];
-	char bpath[PATH_MAX];
+	const char* fpath = (_mountDir + string(path)).c_str();
+	const char* flink = (_fuseFolder + string(link)).c_str();
+	//const char* bpath = ("/" + string(path)).c_str();
 
-	memset(bpath,0,PATH_MAX);
-	bpath[0] = '/';
-	strncat(bpath,path,PATH_MAX - 1);
-
-	strcpy(fpath, _mountDir);
-	strncat(fpath, path, PATH_MAX);
-
-	strcpy(flink, _fuseFolder);
-	strncat(flink, link, PATH_MAX);
-
-	fprintf(stderr,"%s->%s\n%s->%s\n",path,fpath,link,flink);
+	fprintf(stderr, "%s->%s\n%s->%s\n", path, fpath, link, flink);
 
 	retstat = symlink(fpath, flink);
 //	retstat = symlink(path, flink);
@@ -423,14 +428,10 @@ int ncvfs_symlink(const char *path, const char *link) {
 
 int ncvfs_rename(const char *path, const char *newpath) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-	char fnewpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
-	strcpy(fnewpath, _fuseFolder);
-	strncat(fnewpath, newpath, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
+	const char* fnewpath = (_fuseFolder + string(newpath)).c_str();
 
 	retstat = rename(fpath, fnewpath);
 	if (retstat < 0)
@@ -442,18 +443,16 @@ int ncvfs_rename(const char *path, const char *newpath) {
 
 // not required
 int ncvfs_link(const char *path, const char *newpath) {
-	debug_cyan ("%s\n", "not implemented");
+	debug_cyan("%s\n", "not implemented");
 	return 0;
 
 }
 
 int ncvfs_truncate(const char *path, off_t newsize) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = truncate(fpath, newsize);
 	if (retstat < 0)
@@ -466,11 +465,9 @@ int ncvfs_truncate(const char *path, off_t newsize) {
 // not required
 int ncvfs_statfs(const char *path, struct statvfs *statv) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	// get stats for underlying filesystem
 	retstat = statvfs(fpath, statv);
@@ -484,6 +481,7 @@ int ncvfs_statfs(const char *path, struct statvfs *statv) {
 // not required
 int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
 
 	return retstat;
@@ -492,6 +490,7 @@ int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 // not strictly required
 int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
 
 	if (datasync)
@@ -509,11 +508,9 @@ int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
 int ncvfs_setxattr(const char *path, const char *name, const char *value,
 		size_t size, int flags) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = lsetxattr(fpath, name, value, size, flags);
 	if (retstat < 0)
@@ -526,11 +523,9 @@ int ncvfs_setxattr(const char *path, const char *name, const char *value,
 int ncvfs_getxattr(const char *path, const char *name, char *value,
 		size_t size) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = lgetxattr(fpath, name, value, size);
 	if (retstat < 0)
@@ -542,12 +537,9 @@ int ncvfs_getxattr(const char *path, const char *name, char *value,
 // not required
 int ncvfs_listxattr(const char *path, char *list, size_t size) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-	//char *ptr;
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = llistxattr(fpath, list, size);
 	if (retstat < 0)
@@ -559,11 +551,9 @@ int ncvfs_listxattr(const char *path, char *list, size_t size) {
 // not required
 int ncvfs_removexattr(const char *path, const char *name) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = lremovexattr(fpath, name);
 	if (retstat < 0)
@@ -574,15 +564,14 @@ int ncvfs_removexattr(const char *path, const char *name) {
 
 int ncvfs_opendir(const char *path, struct fuse_file_info *fi) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	DIR *dp;
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	dp = opendir(fpath);
-	if (dp == NULL)	retstat = ncvfs_error("ncvfs_opendir opendir");
+	if (dp == NULL)
+		retstat = ncvfs_error("ncvfs_opendir opendir");
 
 	fi->fh = (intptr_t) dp;
 
@@ -592,12 +581,13 @@ int ncvfs_opendir(const char *path, struct fuse_file_info *fi) {
 
 int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		off_t offset) {
-	debug_cyan ("%s\n", "not implemented");
+	debug_cyan("%s\n", "not implemented");
 	return 0;
 }
 
 int ncvfs_releasedir(const char *path, struct fuse_file_info *fi) {
 	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
 
 	closedir((DIR *) (uintptr_t) fi->fh);
@@ -607,17 +597,14 @@ int ncvfs_releasedir(const char *path, struct fuse_file_info *fi) {
 
 // not strictly required
 int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
+	debug_cyan("%s\n", "not implemented");
 	return 0;
 }
 
 int ncvfs_access(const char *path, int mask) {
-	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	char fpath[PATH_MAX];
-
-	strcpy(fpath, _fuseFolder);
-	strncat(fpath, path, PATH_MAX);
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = access(fpath, mask);
 
@@ -628,7 +615,7 @@ int ncvfs_access(const char *path, int mask) {
 }
 
 int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
-	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
 
 	retstat = ftruncate(fi->fh, offset);
@@ -640,7 +627,7 @@ int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
 
 int ncvfs_fgetattr(const char *path, struct stat *statbuf,
 		struct fuse_file_info *fi) {
-	debug_cyan ("%s\n", "not implemented");
+	debug_cyan("%s\n", "not implemented");
 	return 0;
 }
 
@@ -651,37 +638,37 @@ struct ncvfs_fuse_operations: fuse_operations {
 		getattr = ncvfs_getattr;
 		fgetattr = ncvfs_fgetattr;
 		access = ncvfs_access;
-		readlink = ncvfs_readlink;			// not required
+		readlink = ncvfs_readlink; // not required
 		opendir = ncvfs_opendir;
 		readdir = ncvfs_readdir;
-		mknod = ncvfs_mknod;				// not required
+		mknod = ncvfs_mknod; // not required
 		mkdir = ncvfs_mkdir;
 		unlink = ncvfs_unlink;
 		rmdir = ncvfs_rmdir;
-		symlink = ncvfs_symlink;			// not required
+		symlink = ncvfs_symlink; // not required
 		rename = ncvfs_rename;
-		link = ncvfs_link;					// not required
+		link = ncvfs_link; // not required
 		chmod = ncvfs_chmod;
-		chown = ncvfs_chown;				// not required
+		chown = ncvfs_chown; // not required
 		truncate = ncvfs_truncate;
 		ftruncate = ncvfs_ftruncate;
-		utime = ncvfs_utime;				// not required
+		utime = ncvfs_utime; // not required
 		open = ncvfs_open;
 		read = ncvfs_read;
 		write = ncvfs_write;
-		statfs = ncvfs_statfs;				// not required
+		statfs = ncvfs_statfs; // not required
 		release = ncvfs_release;
 		releasedir = ncvfs_releasedir;
-		fsync = ncvfs_fsync;				// not strictly required
-		fsyncdir = ncvfs_fsyncdir;			// not strictly required
-		flush = ncvfs_flush;				// not required
-		setxattr = ncvfs_setxattr;			// not required
-		getxattr = ncvfs_getxattr;			// not required
-		listxattr = ncvfs_listxattr;		// not required
-		removexattr = ncvfs_removexattr;	// not required
+		fsync = ncvfs_fsync; // not strictly required
+		fsyncdir = ncvfs_fsyncdir; // not strictly required
+		flush = ncvfs_flush; // not required
+		setxattr = ncvfs_setxattr; // not required
+		getxattr = ncvfs_getxattr; // not required
+		listxattr = ncvfs_listxattr; // not required
+		removexattr = ncvfs_removexattr; // not required
 		create = ncvfs_create;
 
-		flag_nullpath_ok = 0;				// accept NULL path and use fi->fh
+//		flag_nullpath_ok = 0;				// accept NULL path and use fi->fh
 	}
 };
 
