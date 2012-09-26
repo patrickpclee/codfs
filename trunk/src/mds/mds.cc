@@ -82,6 +82,11 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
  * 1. Save the Node List of the object \n
  * 2. Set the Primary for the object
  */
+void Mds::FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId){
+	uint64_t fileSize = _metaDataModule->readFileSize(fileId);
+	_mdsCommunicator->replyFileSize(requestId, connectionId, fileId, fileSize);
+}
+
 void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
 		uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, const string &codingSetting,
 		const vector<uint32_t> &objectNodeList, const string &checksum) {

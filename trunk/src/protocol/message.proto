@@ -28,6 +28,11 @@ message HandshakeReplyPro {
 // CLIENT -> MDS
 //
 
+message IWantFileSizeMsgPro{
+	optional fixed32 fileId = 1;
+	optional fixed64 fileSize = 2;
+}
+
 message ListDirectoryRequestPro {
 	optional fixed32 osdId = 1;
 	optional string directoryPath = 2;
@@ -122,6 +127,11 @@ message GetOsdListRequestPro {
 //
 // MDS -> CLIENT
 //
+
+message HeresFileSizeMsgPro{
+	optional fixed32 fileId = 1;
+	optional fixed64 fileSize = 2;
+}
 
 message ListDirectoryReplyPro {
 	repeated FileInfoPro fileInfoPro = 1;
