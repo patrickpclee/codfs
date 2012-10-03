@@ -59,7 +59,8 @@ struct FileMetaData getAndCacheFileInfo(string filePath) {
 	struct FileMetaData fileMetaData;
 	uint32_t fileId;
 	lock_guard<mutex> lk(fileInfoCacheMutex);
-	if (_fileInfoCache.count(fileId) == 0) { // if file not found in cache
+	if (_fileIdCache.count(filePath) == 0) {
+//	if (_fileInfoCache.count(fileId) == 0) { // if file not found in cache
 		fileMetaData = _clientCommunicator->getFileInfo(_clientId, filePath);
 		_fileIdCache[filePath] = fileMetaData._id;
 		_fileInfoCache[fileMetaData._id] = fileMetaData;
@@ -183,6 +184,10 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 static int ncvfs_create(const char * path, mode_t mode,
 		struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
+	
+	const char* fpath = (_fuseFolder + string(path)).c_str();
+	creat(fpath, mode);
+
 	uint32_t objectCount = configLayer->getConfigInt(
 			"Fuse>PreallocateObjectNumber");
 	uint32_t objectSize = configLayer->getConfigInt("Storage>ObjectSize")
@@ -638,7 +643,7 @@ struct ncvfs_fuse_operations: fuse_operations {
 		init = ncvfs_init;
 		destroy = ncvfs_destroy;
 		getattr = ncvfs_getattr;
-		fgetattr = ncvfs_fgetattr;
+//		fgetattr = ncvfs_fgetattr;
 		access = ncvfs_access;
 		readlink = ncvfs_readlink; // not required
 		opendir = ncvfs_opendir;
@@ -665,7 +670,7 @@ struct ncvfs_fuse_operations: fuse_operations {
 		fsyncdir = ncvfs_fsyncdir; // not strictly required
 		flush = ncvfs_flush; // not required
 		setxattr = ncvfs_setxattr; // not required
-		getxattr = ncvfs_getxattr; // not required
+//		getxattr = ncvfs_getxattr; // not required
 		listxattr = ncvfs_listxattr; // not required
 		removexattr = ncvfs_removexattr; // not required
 		create = ncvfs_create;
