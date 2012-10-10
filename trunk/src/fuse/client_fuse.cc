@@ -138,7 +138,7 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 	}
 
 	retstat = lstat(fpath, stbuf);
-	if (retstat != -1) { // is file is found in fuseFolder
+	if (retstat != -1) { // if file is found in fuseFolder
 		struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 		if (fileMetaData._id == 0) { // should not happen?
 			_fileIdCache.erase(path);
@@ -178,6 +178,7 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 	fi->fh = fileMetaData._id;
+
 	return 0;
 }
 
@@ -396,6 +397,8 @@ int ncvfs_mkdir(const char *path, mode_t mode) {
 
 int ncvfs_unlink(const char *path) {
 	debug_cyan("%s\n", "not implemented");
+	const char* fpath = (_fuseFolder + string(path)).c_str();
+	remove (fpath);
 	return 0;
 }
 
@@ -458,6 +461,11 @@ int ncvfs_link(const char *path, const char *newpath) {
 int ncvfs_truncate(const char *path, off_t newsize) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
+
+	// TODO: return 0 for now, need contact MDS
+	return 0;
+
+	/*
 	int retstat = 0;
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 
@@ -466,6 +474,7 @@ int ncvfs_truncate(const char *path, off_t newsize) {
 		ncvfs_error("ncvfs_truncate truncate");
 
 	return retstat;
+	*/
 
 }
 
@@ -498,6 +507,11 @@ int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
+
+	// TODO: return 0 for now, need contact MDS
+	return 0;
+
+	/*
 	int retstat = 0;
 
 	if (datasync)
@@ -509,6 +523,7 @@ int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
 		ncvfs_error("ncvfs_fsync fsync");
 
 	return retstat;
+	*/
 }
 
 // not required
@@ -605,6 +620,7 @@ int ncvfs_releasedir(const char *path, struct fuse_file_info *fi) {
 // not strictly required
 int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
 	debug_cyan("%s\n", "not implemented");
+	// TODO: return 0 for now, need contact MDS
 	return 0;
 }
 
@@ -623,6 +639,11 @@ int ncvfs_access(const char *path, int mask) {
 
 int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
+
+	// TODO: return 0 for now, need contact MDS
+	return 0;
+
+	/*
 	int retstat = 0;
 
 	retstat = ftruncate(fi->fh, offset);
@@ -630,6 +651,7 @@ int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
 		retstat = ncvfs_error("ncvfs_ftruncate ftruncate");
 
 	return retstat;
+	*/
 }
 
 int ncvfs_fgetattr(const char *path, struct stat *statbuf,

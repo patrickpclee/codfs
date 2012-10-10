@@ -9,7 +9,7 @@
 #include "../protocol/metadata/getobjectinforeply.hh"
 #include "../protocol/metadata/downloadfilereply.hh"
 #include "../protocol/metadata/getobjectidlistreply.hh"
-#include "../protocol/metadata/heresfilesize.hh"
+//#include "../protocol/metadata/heresfilesize.hh"
 
 extern ConfigLayer* configLayer;
 
@@ -30,6 +30,7 @@ void MdsCommunicator::replyFolderData(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
+/*
 void MdsCommunicator::replyFileSize(uint32_t requestId, uint32_t connectionId, uint32_t fileId, uint64_t fileSize){
 	HeresFileSizeMsg* heresFileSizeMsg = new HeresFileSizeMsg(this, requestId, connectionId, fileId, fileSize);
 	heresFileSizeMsg->prepareProtocolMsg();
@@ -37,6 +38,7 @@ void MdsCommunicator::replyFileSize(uint32_t requestId, uint32_t connectionId, u
 	addMessage(heresFileSizeMsg);
 	return;
 }
+*/
 
 /**
  * @brief	Ask Monitor for Primary List
