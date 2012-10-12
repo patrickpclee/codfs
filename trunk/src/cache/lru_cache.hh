@@ -44,6 +44,10 @@ template < typename keyType, typename valueType > class LruCache {
 			typename list <keyType>::iterator it = _accessTimeList.insert(_accessTimeList.end(),key);
 			_valueMap.insert(make_pair(key, make_pair(value, it)));
 		};
+
+		uint32_t count( const keyType &key) {
+			return _valueMap.count(key);
+		}
 		
 		~LruCache()
 		{
