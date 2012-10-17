@@ -4,9 +4,13 @@
 //#include <boost/thread/locks.hpp>
 //#include <boost/thread/shared_mutex.hpp>
 
+//#include "../cache/lru_cache.hh"
+
 #include "../common/metadata.hh"
 #include "../common/enums.hh"
 #include "../common/objectdata.hh"
+
+//#include <memory>
 
 class FileDataCache {
 	public:
@@ -17,6 +21,7 @@ class FileDataCache {
 
 		~FileDataCache ();
 	private:
+		bool _clean;
 		uint64_t _objectSize;
 		uint32_t _lastObjectCount;
 		uint64_t _fileSize;
@@ -25,6 +30,7 @@ class FileDataCache {
 		vector<struct ObjectData> _objectDataList;
 		vector<ObjectDataStatus> _objectStatusList;
 		vector<uint32_t> _primaryList;
+		//LruCache<uint64_t, shared_ptr<ObjectData> >* _objectCache;
 };
 
 #endif
