@@ -17,4 +17,4 @@ osd_object2/
 osd_segment2/
 *.out
 abc*
-fuse/
+fusedir/

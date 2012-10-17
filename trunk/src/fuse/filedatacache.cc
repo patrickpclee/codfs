@@ -31,10 +31,12 @@ FileDataCache::FileDataCache (struct FileMetaData fileMetaData, uint64_t objectS
 	_primaryList = fileMetaData._primaryList;
 	//_objectCount = fileMetaData._objectList.size();
 	_lastObjectCount = 0;
+	_clean = true;
 }
 
 int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 {
+	_clean = false;
 	uint32_t firstObjectToWrite = offset / _objectSize;
 	uint32_t lastObjectToWrite = (offset + size) / _objectSize;
 	if(((offset + size) % _objectSize) == 0)
@@ -85,6 +87,8 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 FileDataCache::~FileDataCache ()
 {
 	debug("%s\n","Delete");
+	if(_clean)
+		return ;
 	struct ObjectData objectData;
 	uint32_t primary;
 	uint32_t osdSockfd;
@@ -102,6 +106,7 @@ FileDataCache::~FileDataCache ()
 		
 		MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
 		_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
+		MemoryPool::getInstance().poolFree(objectData.buf);
 		_objectStatusList[i] = CLEAN;
 	}
 	objectData = _objectDataList[_lastObjectCount];
@@ -115,4 +120,6 @@ FileDataCache::~FileDataCache ()
 	_clientCommunicator->saveObjectList(_clientId, _fileId, objectList);
 	MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
 	_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
+	MemoryPool::getInstance().poolFree(objectData.buf);
+	_objectStatusList[_lastObjectCount] = CLEAN;
 }
