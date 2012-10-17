@@ -178,6 +178,10 @@ struct ObjectTransferCache ClientStorageModule::getObjectCache(uint64_t objectId
 void ClientStorageModule::closeObject(uint64_t objectId) {
 
 	// close cache
+	if(_objectCache.count(objectId) == 0){
+		debug_yellow("Object Cache Not Found for %" PRIu64 "\n", objectId);
+		return;
+	}
 	struct ObjectTransferCache objectCache = getObjectCache(objectId);
 	MemoryPool::getInstance().poolFree(objectCache.buf);
 
