@@ -44,6 +44,16 @@ public:
 
 //	void FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId);
 
+	/**
+	 * @brief	Handle File Upload Request From Client
+	 *
+	 * @param	requestId	Request ID
+	 * @param	conenctionId	Connection ID
+	 * @param	clientId	ID of the client
+	 * @param	fileId	File ID
+	 * @param	path	File Path
+	 */
+	void deleteFileProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, const string &path);
 
 	/**
 	 * @brief	Handle Upload Object Acknowledgement from Primary

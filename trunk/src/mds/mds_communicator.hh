@@ -22,7 +22,7 @@ public:
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
-	 * @param	fileId	ID of the File
+	 * @param	fileId	File ID
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
 	 */
@@ -35,9 +35,10 @@ public:
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
-	 * @param	fileId	ID of the File
+	 * @param	fileId	File ID
 	 * @param	filePath	File Path
 	 * @param	fileSize	Size of the File
+	 * @param	fileType	File Type
 	 * @param	checksum	Checksum of the File
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
@@ -46,8 +47,15 @@ public:
 
 	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId,
 			uint32_t fileId, string filePath, uint64_t fileSize,
-			string checksum, vector<uint64_t> objectList,
+			const FileType& fileType, string checksum, vector<uint64_t> objectList,
 			vector<uint32_t> primaryList);
+
+	/**
+	 * @brief	Reply Delete File
+	 * 
+	 * @param	fileId	File Id
+	 */
+	void replyDeleteFile(uint32_t requestId, uint32_t connectionId, uint32_t fileId);
 
 	/**
 	 * @brief	Reply Object ID List
@@ -74,6 +82,15 @@ public:
 	void replyObjectInfo(uint32_t requestId, uint32_t connectionId,
 			uint64_t objectId, uint32_t objectSize, vector<uint32_t> nodeList,
 			CodingScheme codingScheme, string codingSetting);
+
+	/**
+	 * @brief	Reply Save Object List Request
+	 *
+	 * @param	requestId	Request ID
+	 * @param	connectionId	Connection ID
+	 * @param	fileId	File ID
+	 */
+	void replySaveObjectList(uint32_t rquestId, uint32_t connectionId, uint32_t fileId);
 
 	/**
 	 * @brief	Reply With Folder Data

@@ -45,6 +45,14 @@ public:
 	 * @param	path	Path to the Folder
 	 */
 	vector<FileMetaData> listFolder (uint32_t clientId, const string &inpath);
+
+	/**
+	 * @brief	Delete File
+	 *
+	 * @param	clientId	ID of the Client
+	 * @param	path	File Path
+	 */
+	void deleteFile (uint32_t clientId, const string& path);
 private:
 	/**
 	 * @brief	Covert Path to Real One

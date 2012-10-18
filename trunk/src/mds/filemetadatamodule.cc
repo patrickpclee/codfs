@@ -42,6 +42,14 @@ void FileMetaDataModule::createFile(uint32_t clientId, const string &path,
 }
 
 /**
+ * @brief	Delete a File
+ */
+void FileMetaDataModule::deleteFile(uint32_t fileId) {
+	BSONObj queryObject = BSON ("id" << fileId);
+	_fileMetaDataStorage->remove(queryObject);
+}
+
+/**
  * @brief	Lookup the File ID with file Path
  */
 uint32_t FileMetaDataModule::lookupFileId(const string &path)
