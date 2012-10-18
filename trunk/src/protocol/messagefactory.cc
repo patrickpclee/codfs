@@ -11,6 +11,8 @@
 #include "metadata/listdirectoryreply.hh"
 #include "metadata/uploadfilerequest.hh"
 #include "metadata/uploadfilereply.hh"
+#include "metadata/deletefilerequest.hh"
+#include "metadata/deletefilereply.hh"
 #include "metadata/uploadobjectack.hh"
 #include "metadata/getobjectidlistrequest.hh"
 #include "metadata/getobjectidlistreply.hh"
@@ -19,6 +21,7 @@
 #include "metadata/getobjectinforequest.hh"
 #include "metadata/getobjectinforeply.hh"
 #include "metadata/saveobjectlistrequest.hh"
+#include "metadata/saveobjectlistreply.hh"
 #include "metadata/setfilesizerequest.hh"
 /*
 #include "metadata/iwantfilesize.hh"
@@ -93,6 +96,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (UPLOAD_FILE_REPLY):
 		return new UploadFileReplyMsg(communicator);
 		break;
+	case (DELETE_FILE_REQUEST):
+		return new DeleteFileRequestMsg(communicator);
+		break;
+	case (DELETE_FILE_REPLY):
+		return new DeleteFileReplyMsg(communicator);
+		break;
 	case (UPLOAD_OBJECT_ACK):
 		return new UploadObjectAckMsg(communicator);
 		break;
@@ -116,6 +125,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (SAVE_OBJECT_LIST_REQUEST):
 		return new SaveObjectListRequestMsg(communicator);
+		break;
+	case (SAVE_OBJECT_LIST_REPLY):
+		return new SaveObjectListReplyMsg(communicator);
 		break;
 	case (SET_FILE_SIZE_REQUEST):
 		return new SetFileSizeRequestMsg(communicator);

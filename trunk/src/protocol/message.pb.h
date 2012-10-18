@@ -37,6 +37,7 @@ class HandshakeReplyPro;
 class IWantFileSizeMsgPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
+class DeleteFileRequestPro;
 class DownloadFileRequestPro;
 class SaveObjectListRequestPro;
 class SetFileSizeRequestPro;
@@ -52,6 +53,8 @@ class ListDirectoryReplyPro;
 class FileInfoPro;
 class SegmentLocationPro;
 class UploadFileReplyPro;
+class DeleteFileReplyPro;
+class SaveObjectListReplyPro;
 class DownloadFileReplyPro;
 class GetObjectIdListReplyPro;
 class GetObjectInfoReplyPro;
@@ -123,6 +126,26 @@ inline bool PutObjectInitRequestPro_CodingScheme_Parse(
     const ::std::string& name, PutObjectInitRequestPro_CodingScheme* value) {
   return ::google::protobuf::internal::ParseNamedEnum<PutObjectInitRequestPro_CodingScheme>(
     PutObjectInitRequestPro_CodingScheme_descriptor(), name, value);
+}
+enum DownloadFileReplyPro_FileType {
+  DownloadFileReplyPro_FileType_NEWFILE = 1,
+  DownloadFileReplyPro_FileType_NORMAL = 2,
+  DownloadFileReplyPro_FileType_FOLDER = 3
+};
+bool DownloadFileReplyPro_FileType_IsValid(int value);
+const DownloadFileReplyPro_FileType DownloadFileReplyPro_FileType_FileType_MIN = DownloadFileReplyPro_FileType_NEWFILE;
+const DownloadFileReplyPro_FileType DownloadFileReplyPro_FileType_FileType_MAX = DownloadFileReplyPro_FileType_FOLDER;
+const int DownloadFileReplyPro_FileType_FileType_ARRAYSIZE = DownloadFileReplyPro_FileType_FileType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* DownloadFileReplyPro_FileType_descriptor();
+inline const ::std::string& DownloadFileReplyPro_FileType_Name(DownloadFileReplyPro_FileType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    DownloadFileReplyPro_FileType_descriptor(), value);
+}
+inline bool DownloadFileReplyPro_FileType_Parse(
+    const ::std::string& name, DownloadFileReplyPro_FileType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<DownloadFileReplyPro_FileType>(
+    DownloadFileReplyPro_FileType_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -661,6 +684,112 @@ class UploadFileRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static UploadFileRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DeleteFileRequestPro : public ::google::protobuf::Message {
+ public:
+  DeleteFileRequestPro();
+  virtual ~DeleteFileRequestPro();
+  
+  DeleteFileRequestPro(const DeleteFileRequestPro& from);
+  
+  inline DeleteFileRequestPro& operator=(const DeleteFileRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DeleteFileRequestPro& default_instance();
+  
+  void Swap(DeleteFileRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  DeleteFileRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DeleteFileRequestPro& from);
+  void MergeFrom(const DeleteFileRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 fileId = 2;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // optional string path = 3;
+  inline bool has_path() const;
+  inline void clear_path();
+  static const int kPathFieldNumber = 3;
+  inline const ::std::string& path() const;
+  inline void set_path(const ::std::string& value);
+  inline void set_path(const char* value);
+  inline void set_path(const char* value, size_t size);
+  inline ::std::string* mutable_path();
+  inline ::std::string* release_path();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.DeleteFileRequestPro)
+ private:
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  inline void set_has_path();
+  inline void clear_has_path();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 clientid_;
+  ::google::protobuf::uint32 fileid_;
+  ::std::string* path_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static DeleteFileRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -2159,6 +2288,184 @@ class UploadFileReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class DeleteFileReplyPro : public ::google::protobuf::Message {
+ public:
+  DeleteFileReplyPro();
+  virtual ~DeleteFileReplyPro();
+  
+  DeleteFileReplyPro(const DeleteFileReplyPro& from);
+  
+  inline DeleteFileReplyPro& operator=(const DeleteFileReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DeleteFileReplyPro& default_instance();
+  
+  void Swap(DeleteFileReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  DeleteFileReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DeleteFileReplyPro& from);
+  void MergeFrom(const DeleteFileReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 fileId = 1;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // optional string path = 2;
+  inline bool has_path() const;
+  inline void clear_path();
+  static const int kPathFieldNumber = 2;
+  inline const ::std::string& path() const;
+  inline void set_path(const ::std::string& value);
+  inline void set_path(const char* value);
+  inline void set_path(const char* value, size_t size);
+  inline ::std::string* mutable_path();
+  inline ::std::string* release_path();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.DeleteFileReplyPro)
+ private:
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  inline void set_has_path();
+  inline void clear_has_path();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::std::string* path_;
+  ::google::protobuf::uint32 fileid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static DeleteFileReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class SaveObjectListReplyPro : public ::google::protobuf::Message {
+ public:
+  SaveObjectListReplyPro();
+  virtual ~SaveObjectListReplyPro();
+  
+  SaveObjectListReplyPro(const SaveObjectListReplyPro& from);
+  
+  inline SaveObjectListReplyPro& operator=(const SaveObjectListReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SaveObjectListReplyPro& default_instance();
+  
+  void Swap(SaveObjectListReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  SaveObjectListReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SaveObjectListReplyPro& from);
+  void MergeFrom(const SaveObjectListReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 fileId = 1;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.SaveObjectListReplyPro)
+ private:
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 fileid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static SaveObjectListReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class DownloadFileReplyPro : public ::google::protobuf::Message {
  public:
   DownloadFileReplyPro();
@@ -2211,6 +2518,31 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   
   // nested types ----------------------------------------------------
   
+  typedef DownloadFileReplyPro_FileType FileType;
+  static const FileType NEWFILE = DownloadFileReplyPro_FileType_NEWFILE;
+  static const FileType NORMAL = DownloadFileReplyPro_FileType_NORMAL;
+  static const FileType FOLDER = DownloadFileReplyPro_FileType_FOLDER;
+  static inline bool FileType_IsValid(int value) {
+    return DownloadFileReplyPro_FileType_IsValid(value);
+  }
+  static const FileType FileType_MIN =
+    DownloadFileReplyPro_FileType_FileType_MIN;
+  static const FileType FileType_MAX =
+    DownloadFileReplyPro_FileType_FileType_MAX;
+  static const int FileType_ARRAYSIZE =
+    DownloadFileReplyPro_FileType_FileType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  FileType_descriptor() {
+    return DownloadFileReplyPro_FileType_descriptor();
+  }
+  static inline const ::std::string& FileType_Name(FileType value) {
+    return DownloadFileReplyPro_FileType_Name(value);
+  }
+  static inline bool FileType_Parse(const ::std::string& name,
+      FileType* value) {
+    return DownloadFileReplyPro_FileType_Parse(name, value);
+  }
+  
   // accessors -------------------------------------------------------
   
   // optional fixed32 fileId = 2;
@@ -2238,10 +2570,17 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 filesize() const;
   inline void set_filesize(::google::protobuf::uint64 value);
   
-  // optional string checksum = 5;
+  // optional .ncvfs.DownloadFileReplyPro.FileType fileType = 5;
+  inline bool has_filetype() const;
+  inline void clear_filetype();
+  static const int kFileTypeFieldNumber = 5;
+  inline ::ncvfs::DownloadFileReplyPro_FileType filetype() const;
+  inline void set_filetype(::ncvfs::DownloadFileReplyPro_FileType value);
+  
+  // optional string checksum = 6;
   inline bool has_checksum() const;
   inline void clear_checksum();
-  static const int kChecksumFieldNumber = 5;
+  static const int kChecksumFieldNumber = 6;
   inline const ::std::string& checksum() const;
   inline void set_checksum(const ::std::string& value);
   inline void set_checksum(const char* value);
@@ -2249,10 +2588,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_checksum();
   inline ::std::string* release_checksum();
   
-  // repeated fixed64 objectList = 6;
+  // repeated fixed64 objectList = 7;
   inline int objectlist_size() const;
   inline void clear_objectlist();
-  static const int kObjectListFieldNumber = 6;
+  static const int kObjectListFieldNumber = 7;
   inline ::google::protobuf::uint64 objectlist(int index) const;
   inline void set_objectlist(int index, ::google::protobuf::uint64 value);
   inline void add_objectlist(::google::protobuf::uint64 value);
@@ -2261,10 +2600,10 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
       mutable_objectlist();
   
-  // repeated fixed32 primaryList = 7;
+  // repeated fixed32 primaryList = 8;
   inline int primarylist_size() const;
   inline void clear_primarylist();
-  static const int kPrimaryListFieldNumber = 7;
+  static const int kPrimaryListFieldNumber = 8;
   inline ::google::protobuf::uint32 primarylist(int index) const;
   inline void set_primarylist(int index, ::google::protobuf::uint32 value);
   inline void add_primarylist(::google::protobuf::uint32 value);
@@ -2281,20 +2620,23 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline void clear_has_filepath();
   inline void set_has_filesize();
   inline void clear_has_filesize();
+  inline void set_has_filetype();
+  inline void clear_has_filetype();
   inline void set_has_checksum();
   inline void clear_has_checksum();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::std::string* filepath_;
+  ::google::protobuf::uint32 fileid_;
+  int filetype_;
   ::google::protobuf::uint64 filesize_;
   ::std::string* checksum_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > objectlist_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
-  ::google::protobuf::uint32 fileid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -5373,6 +5715,112 @@ inline ::std::string* UploadFileRequestPro::release_codingsetting() {
 
 // -------------------------------------------------------------------
 
+// DeleteFileRequestPro
+
+// optional fixed32 clientId = 1;
+inline bool DeleteFileRequestPro::has_clientid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DeleteFileRequestPro::set_has_clientid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DeleteFileRequestPro::clear_has_clientid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DeleteFileRequestPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
+}
+inline ::google::protobuf::uint32 DeleteFileRequestPro::clientid() const {
+  return clientid_;
+}
+inline void DeleteFileRequestPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
+}
+
+// optional fixed32 fileId = 2;
+inline bool DeleteFileRequestPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void DeleteFileRequestPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void DeleteFileRequestPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void DeleteFileRequestPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 DeleteFileRequestPro::fileid() const {
+  return fileid_;
+}
+inline void DeleteFileRequestPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// optional string path = 3;
+inline bool DeleteFileRequestPro::has_path() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void DeleteFileRequestPro::set_has_path() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void DeleteFileRequestPro::clear_has_path() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void DeleteFileRequestPro::clear_path() {
+  if (path_ != &::google::protobuf::internal::kEmptyString) {
+    path_->clear();
+  }
+  clear_has_path();
+}
+inline const ::std::string& DeleteFileRequestPro::path() const {
+  return *path_;
+}
+inline void DeleteFileRequestPro::set_path(const ::std::string& value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void DeleteFileRequestPro::set_path(const char* value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void DeleteFileRequestPro::set_path(const char* value, size_t size) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* DeleteFileRequestPro::mutable_path() {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  return path_;
+}
+inline ::std::string* DeleteFileRequestPro::release_path() {
+  clear_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = path_;
+    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// -------------------------------------------------------------------
+
 // DownloadFileRequestPro
 
 // optional fixed32 clientId = 1;
@@ -6382,6 +6830,116 @@ UploadFileReplyPro::mutable_primarylist() {
 
 // -------------------------------------------------------------------
 
+// DeleteFileReplyPro
+
+// optional fixed32 fileId = 1;
+inline bool DeleteFileReplyPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DeleteFileReplyPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DeleteFileReplyPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DeleteFileReplyPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 DeleteFileReplyPro::fileid() const {
+  return fileid_;
+}
+inline void DeleteFileReplyPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// optional string path = 2;
+inline bool DeleteFileReplyPro::has_path() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void DeleteFileReplyPro::set_has_path() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void DeleteFileReplyPro::clear_has_path() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void DeleteFileReplyPro::clear_path() {
+  if (path_ != &::google::protobuf::internal::kEmptyString) {
+    path_->clear();
+  }
+  clear_has_path();
+}
+inline const ::std::string& DeleteFileReplyPro::path() const {
+  return *path_;
+}
+inline void DeleteFileReplyPro::set_path(const ::std::string& value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void DeleteFileReplyPro::set_path(const char* value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void DeleteFileReplyPro::set_path(const char* value, size_t size) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* DeleteFileReplyPro::mutable_path() {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  return path_;
+}
+inline ::std::string* DeleteFileReplyPro::release_path() {
+  clear_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = path_;
+    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// -------------------------------------------------------------------
+
+// SaveObjectListReplyPro
+
+// optional fixed32 fileId = 1;
+inline bool SaveObjectListReplyPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SaveObjectListReplyPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SaveObjectListReplyPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SaveObjectListReplyPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 SaveObjectListReplyPro::fileid() const {
+  return fileid_;
+}
+inline void SaveObjectListReplyPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // DownloadFileReplyPro
 
 // optional fixed32 fileId = 2;
@@ -6486,15 +7044,38 @@ inline void DownloadFileReplyPro::set_filesize(::google::protobuf::uint64 value)
   filesize_ = value;
 }
 
-// optional string checksum = 5;
-inline bool DownloadFileReplyPro::has_checksum() const {
+// optional .ncvfs.DownloadFileReplyPro.FileType fileType = 5;
+inline bool DownloadFileReplyPro::has_filetype() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void DownloadFileReplyPro::set_has_checksum() {
+inline void DownloadFileReplyPro::set_has_filetype() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void DownloadFileReplyPro::clear_has_checksum() {
+inline void DownloadFileReplyPro::clear_has_filetype() {
   _has_bits_[0] &= ~0x00000008u;
+}
+inline void DownloadFileReplyPro::clear_filetype() {
+  filetype_ = 1;
+  clear_has_filetype();
+}
+inline ::ncvfs::DownloadFileReplyPro_FileType DownloadFileReplyPro::filetype() const {
+  return static_cast< ::ncvfs::DownloadFileReplyPro_FileType >(filetype_);
+}
+inline void DownloadFileReplyPro::set_filetype(::ncvfs::DownloadFileReplyPro_FileType value) {
+  GOOGLE_DCHECK(::ncvfs::DownloadFileReplyPro_FileType_IsValid(value));
+  set_has_filetype();
+  filetype_ = value;
+}
+
+// optional string checksum = 6;
+inline bool DownloadFileReplyPro::has_checksum() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void DownloadFileReplyPro::set_has_checksum() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void DownloadFileReplyPro::clear_has_checksum() {
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void DownloadFileReplyPro::clear_checksum() {
   if (checksum_ != &::google::protobuf::internal::kEmptyString) {
@@ -6544,7 +7125,7 @@ inline ::std::string* DownloadFileReplyPro::release_checksum() {
   }
 }
 
-// repeated fixed64 objectList = 6;
+// repeated fixed64 objectList = 7;
 inline int DownloadFileReplyPro::objectlist_size() const {
   return objectlist_.size();
 }
@@ -6569,7 +7150,7 @@ DownloadFileReplyPro::mutable_objectlist() {
   return &objectlist_;
 }
 
-// repeated fixed32 primaryList = 7;
+// repeated fixed32 primaryList = 8;
 inline int DownloadFileReplyPro::primarylist_size() const {
   return primarylist_.size();
 }
@@ -8266,6 +8847,10 @@ inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::HandshakeRequestPro_Com
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::PutObjectInitRequestPro_CodingScheme>() {
   return ::ncvfs::PutObjectInitRequestPro_CodingScheme_descriptor();
+}
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::DownloadFileReplyPro_FileType>() {
+  return ::ncvfs::DownloadFileReplyPro_FileType_descriptor();
 }
 
 }  // namespace google

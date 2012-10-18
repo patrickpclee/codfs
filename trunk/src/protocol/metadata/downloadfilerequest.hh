@@ -93,12 +93,15 @@ public:
 	string getFilePath ();
 	void setSize (uint64_t size);
 	uint32_t getSize();
+	void setFileType (FileType fileType);
+	FileType getFileType ();
 
 private:
 	uint32_t _clientId;
 	uint32_t _fileId;
 	uint64_t _size;
 	string _filePath;
+	FileType _fileType;
 	vector<uint64_t> _objectList;
 	vector<uint32_t> _primaryList;
 };
