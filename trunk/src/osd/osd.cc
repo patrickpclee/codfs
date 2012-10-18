@@ -534,6 +534,6 @@ void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
 	}
 
 	// failure simulation
-	secondaryOsdStatus[0] = false;
-	secondaryOsdStatus[1] = false;
+	//secondaryOsdStatus[0] = false;
+	//secondaryOsdStatus[1] = false;
 }

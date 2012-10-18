@@ -32,10 +32,18 @@ public:
 	 * @param codingSetting Coding Setting
 	 * @return FileMetaData structure
 	 */
-
 	struct FileMetaData uploadFile(uint32_t clientId, string path,
 			uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme,
 			string codingSetting);
+
+	/**
+	 * @brief	Delete a File
+	 *
+	 * @param	clientId	Client ID
+	 * @param	path	File Path
+	 * @param	fileId	File ID
+	 */
+	void deleteFile(uint32_t clientId, string path, uint32_t fileId);
 
 	/**
 	 * @brief	Get Download Info

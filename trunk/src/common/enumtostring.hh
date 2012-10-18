@@ -33,6 +33,8 @@ public:
   static const char * toString( MsgType en ) {
     switch( en ) {
       case DEFAULT: return "DEFAULT";
+      case DELETE_FILE_REPLY: return "DELETE_FILE_REPLY";
+      case DELETE_FILE_REQUEST: return "DELETE_FILE_REQUEST";
       case DOWNLOAD_FILE_REPLY: return "DOWNLOAD_FILE_REPLY";
       case DOWNLOAD_FILE_REQUEST: return "DOWNLOAD_FILE_REQUEST";
       case GET_OBJECT_ID_LIST_REPLY: return "GET_OBJECT_ID_LIST_REPLY";
@@ -65,6 +67,7 @@ public:
       case PUT_OBJECT_INIT_REQUEST: return "PUT_OBJECT_INIT_REQUEST";
       case PUT_SEGMENT_INIT_REPLY: return "PUT_SEGMENT_INIT_REPLY";
       case PUT_SEGMENT_INIT_REQUEST: return "PUT_SEGMENT_INIT_REQUEST";
+      case SAVE_OBJECT_LIST_REPLY: return "SAVE_OBJECT_LIST_REPLY";
       case SAVE_OBJECT_LIST_REQUEST: return "SAVE_OBJECT_LIST_REQUEST";
       case SEGMENT_DATA: return "SEGMENT_DATA";
       case SEGMENT_TRANSFER_END_REPLY: return "SEGMENT_TRANSFER_END_REPLY";
@@ -101,6 +104,7 @@ public:
     switch( en ) {
       case FOLDER: return "FOLDER";
       case NORMAL: return "NORMAL";
+      case NOTFOUND: return "NOTFOUND";
     }
     return "???";
   }

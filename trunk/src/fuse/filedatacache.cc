@@ -1,6 +1,7 @@
 #include "filedatacache.hh"
 
 #include <openssl/md5.h>
+#include "string.h"
 
 #include "../client/client_communicator.hh"
 
@@ -116,10 +117,10 @@ FileDataCache::~FileDataCache ()
 		objectData.info.objectSize = _objectSize;
 	primary = _primaryList[_lastObjectCount];
 	osdSockfd = _clientCommunicator->getSockfdFromId(primary);
-	_clientCommunicator->saveFileSize(_clientId, _fileId, _fileSize); 
-	_clientCommunicator->saveObjectList(_clientId, _fileId, objectList);
 	MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
 	_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
 	MemoryPool::getInstance().poolFree(objectData.buf);
 	_objectStatusList[_lastObjectCount] = CLEAN;
+	_clientCommunicator->saveFileSize(_clientId, _fileId, _fileSize); 
+	_clientCommunicator->saveObjectList(_clientId, _fileId, objectList);
 }

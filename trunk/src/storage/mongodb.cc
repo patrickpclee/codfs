@@ -197,6 +197,5 @@ void MongoDB::remove (Query queryObject)
 	_conn->done();
 
 	return ;
-
 }
 

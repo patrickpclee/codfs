@@ -8,6 +8,7 @@
 #include "../common/memorypool.hh"
 #include "../protocol/metadata/listdirectoryrequest.hh"
 #include "../protocol/metadata/uploadfilerequest.hh"
+#include "../protocol/metadata/deletefilerequest.hh"
 #include "../protocol/metadata/downloadfilerequest.hh"
 #include "../protocol/metadata/saveobjectlistrequest.hh"
 #include "../protocol/metadata/setfilesizerequest.hh"
@@ -79,6 +80,22 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 		exit(-1);
 	}
 	return {};
+}
+
+void ClientCommunicator::deleteFile(uint32_t clientId, string path, uint32_t fileId) {
+	uint32_t mdsSockFd = getMdsSockfd();
+	DeleteFileRequestMsg* deleteFileRequestMsg = new DeleteFileRequestMsg(this, mdsSockFd, clientId, fileId, path);
+	deleteFileRequestMsg->prepareProtocolMsg();
+	addMessage(deleteFileRequestMsg, true);
+	MessageStatus status = deleteFileRequestMsg->waitForStatusChange();
+
+	if (status == READY){
+		return ;
+	} else {
+		debug_yellow("Delete File Request Failed %s [%" PRIu32 "]\n", path.c_str(), fileId);
+		exit(-1);
+	}
+	return ;
 }
 
 struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
@@ -160,8 +177,16 @@ void ClientCommunicator::saveObjectList(uint32_t clientId, uint32_t fileId,
 					objectList);
 	saveObjectListRequestMsg->prepareProtocolMsg();
 
-	addMessage(saveObjectListRequestMsg);
+	addMessage(saveObjectListRequestMsg, true);
 
+	MessageStatus status = saveObjectListRequestMsg->waitForStatusChange();
+
+	if (status == READY) {
+		return ;
+	} else {
+		debug("Save Object List Request Failed [%" PRIu32 "]\n",fileId);
+		exit(-1);
+	}
 	return;
 }
 

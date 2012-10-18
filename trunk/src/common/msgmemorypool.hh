@@ -2,7 +2,6 @@
 #define __MSGMEMORYPOOL_HH__
 
 #include "memorypool.hh"
-
 #ifdef USE_MEMORY_POOL
 const apr_size_t MSG_POOL_MAX_FREE_SIZE = 1 * 1024 * 1024;
 #endif
