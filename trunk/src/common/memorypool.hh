@@ -6,7 +6,7 @@
 #define __MEMORYPOOL_HH__
 
 // if commented, use malloc / free
-#define USE_MEMORY_POOL
+//#define USE_MEMORY_POOL
 
 #include <stdint.h>
 #include <stdio.h>

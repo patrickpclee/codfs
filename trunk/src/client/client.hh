@@ -32,9 +32,23 @@ public:
 	 * @param codingScheme Coding Scheme specified
 	 * @return 0 if success, -1 if failure
 	 */
-
 	uint32_t uploadFileRequest(string path, CodingScheme codingScheme,
 			string codingSetting);
+
+	/**
+	 * @brief	Request to Delete a File
+	 *
+	 * @param	path	Path of the File;
+	 * @param	fileId	ID of the File;
+	 */
+	void deleteFileRequest(string path, uint32_t fileId);
+
+	/**
+	 * @brief	Requset to Truncate a File
+	 *
+	 * @param	fileId	ID of the File
+	 */
+	void truncateFileRequest(uint32_t fileId);
 
 	/**
 	 * @brief	Get the Client Communicator

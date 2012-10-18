@@ -29,7 +29,7 @@ ConfigLayer* configLayer;
 
 ClientCommunicator* _clientCommunicator;
 
-string _fuseFolder = "./fuse";
+string _fuseFolder = "./fusedir";
 string _mountDir = "./mount";
 
 CodingScheme codingScheme = RAID1_CODING;
@@ -62,6 +62,8 @@ struct FileMetaData getAndCacheFileInfo(string filePath) {
 	if (_fileIdCache.count(filePath) == 0) {
 //	if (_fileInfoCache.count(fileId) == 0) { // if file not found in cache
 		fileMetaData = _clientCommunicator->getFileInfo(_clientId, filePath);
+		if(fileMetaData._fileType == NOTFOUND)
+			return fileMetaData;
 		_fileIdCache[filePath] = fileMetaData._id;
 		_fileInfoCache[fileMetaData._id] = fileMetaData;
 		fileId = fileMetaData._id;
@@ -78,12 +80,13 @@ struct FileMetaData getAndCacheFileInfo(uint32_t fileId) {
 	lock_guard<mutex> lk(fileInfoCacheMutex);
 	if (_fileInfoCache.count(fileId) == 0) {
 		fileMetaData = _clientCommunicator->getFileInfo(_clientId, fileId);
+		if(fileMetaData._fileType == NOTFOUND)
+			return fileMetaData;
 		_fileIdCache[fileMetaData._path] = fileId;
 		_fileInfoCache[fileId] = fileMetaData;
 	}
 	debug("File Info Cache Found [%" PRIu32 "]\n", fileId);
 	return _fileInfoCache[fileId];
-
 }
 
 void startGarbageCollectionThread() {
@@ -128,7 +131,8 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 	int retstat = 0;
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 
-	debug ("fpath = %s\n", fpath);
+	//debug ("fpath = %s\n", fpath);
+	printf("%s\n",fpath);
 
 	if (strcmp(path, "/") == 0) {
 		stbuf->st_mode = S_IFDIR | 0755;
@@ -195,6 +199,7 @@ static int ncvfs_create(const char * path, mode_t mode,
 			* 1024;
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
 			_clientId, path, 0, objectCount, codingScheme, codingSetting);
+	fileMetaData._fileType = NORMAL;
 	_fileIdCache[path] = fileMetaData._id;
 	_fileInfoCache[fileMetaData._id] = fileMetaData;
 	_fileDataCache[fileMetaData._id] = new FileDataCache(fileMetaData,
@@ -249,6 +254,12 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 
 //	if(strcmp(path, "/") != 0)
 //		return -ENOENT;
+	
+	if (_fileDataCache.count(fi->fh) == 0) {
+		struct FileMetaData fileMetaData = _fileInfoCache[fi->fh];
+		uint32_t objectSize = configLayer->getConfigInt("Storage>ObjectSize") * 1024;
+		_fileDataCache[fi->fh] = new FileDataCache(fileMetaData, objectSize);
+	}
 
 	_fileDataCache[fi->fh]->write(buf, size, offset);
 
@@ -258,8 +269,14 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 	debug("Release %s [%" PRIu32 "]\n", path, (uint32_t)fi->fh);
-	delete _fileDataCache[fi->fh];
-	_fileDataCache.erase(fi->fh);
+	ClientStorageModule* storageModule = client->getStorageModule();
+	if(_fileDataCache.count(fi->fh)){
+		delete _fileDataCache[fi->fh];
+		_fileDataCache.erase(fi->fh);
+	}
+	struct FileMetaData fileMetaData= _fileInfoCache[fi->fh];
+	for(uint32_t i = 0; i < fileMetaData._objectList.size(); ++i)
+		storageModule->closeObject(fileMetaData._objectList[i]);
 	_fileInfoCache.erase(fi->fh);
 	_fileIdCache.erase(path);
 	return 0;
@@ -397,6 +414,7 @@ int ncvfs_mkdir(const char *path, mode_t mode) {
 
 int ncvfs_unlink(const char *path) {
 	debug_cyan("%s\n", "not implemented");
+	client->deleteFileRequest(path,0);
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 	remove (fpath);
 	return 0;
@@ -437,7 +455,8 @@ int ncvfs_symlink(const char *path, const char *link) {
 }
 
 int ncvfs_rename(const char *path, const char *newpath) {
-	//debug_cyan ("%s\n", "not implemented");
+	debug_cyan ("%s\n", "not implemented");
+	/*
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
 	const char* fpath = (_fuseFolder + string(path)).c_str();
@@ -448,7 +467,8 @@ int ncvfs_rename(const char *path, const char *newpath) {
 		retstat = ncvfs_error("ncfs_rename rename");
 
 	return retstat;
-
+	*/
+	return 0;
 }
 
 // not required
@@ -459,10 +479,11 @@ int ncvfs_link(const char *path, const char *newpath) {
 }
 
 int ncvfs_truncate(const char *path, off_t newsize) {
-	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 
-	// TODO: return 0 for now, need contact MDS
+	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
+	uint32_t fileId = fileMetaData._id;
+	client->truncateFileRequest(fileId);
 	return 0;
 
 	/*
@@ -640,7 +661,7 @@ int ncvfs_access(const char *path, int mask) {
 int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 
-	// TODO: return 0 for now, need contact MDS
+	client->truncateFileRequest(fi->fh);
 	return 0;
 
 	/*

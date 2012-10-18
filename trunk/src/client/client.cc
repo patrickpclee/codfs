@@ -189,6 +189,15 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	return fileMetaData._id;
 }
 
+void Client::deleteFileRequest(string path, uint32_t fileId) {
+	_clientCommunicator->deleteFile(_clientId, path, fileId);
+}
+
+void Client::truncateFileRequest(uint32_t fileId) {
+	_clientCommunicator->saveFileSize(_clientId, fileId, 0);
+	_clientCommunicator->saveObjectList(_clientId, fileId, {});
+}
+
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 	const uint64_t objectSize = _storageModule->getObjectSize();
