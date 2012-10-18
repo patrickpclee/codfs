@@ -47,6 +47,12 @@ message UploadFileRequestPro {
 	optional string codingSetting = 6;
 }
 
+message DeleteFileRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	optional string path = 3;
+}
+
 message DownloadFileRequestPro {
 	optional fixed32 clientId = 1;
 	optional fixed32 fileId = 2;
@@ -154,14 +160,29 @@ message UploadFileReplyPro {
 	repeated fixed32 primaryList = 3;
 }
 
+message DeleteFileReplyPro {
+	optional fixed32 fileId = 1;
+	optional string path = 2;
+}
+
+message SaveObjectListReplyPro {
+	optional fixed32 fileId = 1;
+}
+
 message DownloadFileReplyPro {
 //	optional fixed32 clientId = 1;
 	optional fixed32 fileId = 2;
 	optional string filePath = 3;
 	optional fixed64 fileSize = 4;
-	optional string checksum = 5;
-	repeated fixed64 objectList = 6;
-	repeated fixed32 primaryList = 7;
+	enum FileType {
+		NEWFILE = 1;
+		NORMAL = 2;
+		FOLDER = 3;
+	}
+	optional FileType fileType = 5;
+	optional string checksum = 6;
+	repeated fixed64 objectList = 7;
+	repeated fixed32 primaryList = 8;
 }
 
 message GetObjectIdListReplyPro {

@@ -140,3 +140,11 @@ void DownloadFileRequestMsg::setSize (uint64_t size) {
 uint32_t DownloadFileRequestMsg::getSize() {
 	return _size;
 }
+
+void DownloadFileRequestMsg::setFileType (FileType fileType) {
+	_fileType = fileType;
+}
+
+FileType DownloadFileRequestMsg::getFileType() {
+	return _fileType;
+}
