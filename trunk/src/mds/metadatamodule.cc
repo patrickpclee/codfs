@@ -26,8 +26,12 @@ uint32_t MetaDataModule::createFile(uint32_t clientId, const string &path,
 /**
  * @brief	Open a File
  */
-void MetaDataModule::openFile(uint32_t clientId, uint32_t filieId) {
+void MetaDataModule::openFile(uint32_t clientId, uint32_t fileId) {
 	return;
+}
+
+void MetaDataModule::deleteFile(uint32_t clientId, uint32_t fileId) {
+	_fileMetaDataModule->deleteFile(fileId);
 }
 
 /**

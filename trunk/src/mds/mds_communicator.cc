@@ -5,6 +5,8 @@
 #include "../config/config.hh"
 #include "../protocol/metadata/listdirectoryreply.hh"
 #include "../protocol/metadata/uploadfilereply.hh"
+#include "../protocol/metadata/saveobjectlistreply.hh"
+#include "../protocol/metadata/deletefilereply.hh"
 #include "../protocol/nodelist/getprimarylistrequest.hh"
 #include "../protocol/metadata/getobjectinforeply.hh"
 #include "../protocol/metadata/downloadfilereply.hh"
@@ -67,6 +69,13 @@ vector<uint32_t> MdsCommunicator::getPrimaryList(uint32_t sockfd,
 	return {};
 }
 
+void MdsCommunicator::replyDeleteFile(uint32_t requestId, uint32_t connectionId, uint32_t fileId) {
+	DeleteFileReplyMsg* deleteFileReplyMsg = new DeleteFileReplyMsg(this, requestId, connectionId, fileId);
+	deleteFileReplyMsg->prepareProtocolMsg();
+	addMessage(deleteFileReplyMsg);
+	return ;
+}
+
 void MdsCommunicator::display() {
 	return;
 }
@@ -86,6 +95,16 @@ void MdsCommunicator::replyObjectInfo(uint32_t requestId, uint32_t connectionId,
 
 	addMessage(getObjectInfoReplyMsg);
 	return;
+}
+
+/**
+ * @brief	Reply Save Object List Request
+ */
+void MdsCommunicator::replySaveObjectList(uint32_t requestId, uint32_t connectionId, uint32_t fileId) {
+	SaveObjectListReplyMsg* saveObjectListReplyMsg = new SaveObjectListReplyMsg(this, requestId, connectionId, fileId);
+	saveObjectListReplyMsg->prepareProtocolMsg();
+	addMessage(saveObjectListReplyMsg);
+	return ;
 }
 
 /**
@@ -109,10 +128,10 @@ void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId,
  */
 void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
 		uint32_t connectionId, uint32_t fileId, string filePath, uint64_t fileSize,
-		string checksum, vector<uint64_t> objectList,
+		const FileType& fileType, string checksum, vector<uint64_t> objectList,
 		vector<uint32_t> primaryList) {
 	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this,
-			requestId, connectionId, fileId, filePath, fileSize, checksum, objectList,
+			requestId, connectionId, fileId, filePath, fileSize, fileType, checksum, objectList,
 			primaryList);
 
 	debug ("FILESIZE = %" PRIu64 "\n", fileSize);

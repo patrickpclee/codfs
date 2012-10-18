@@ -39,6 +39,14 @@ public:
 	void openFile(uint32_t clientId, uint32_t filieId);
 
 	/**
+	 * @brief	Delete a File
+	 *
+	 * @param	clientId	ID of the Client
+	 * @param	fileId	File ID
+	 */
+	void deleteFile(uint32_t clientId, uint32_t fileId);
+
+	/**
 	 *	@brief	Set File Size of a File
 	 *
 	 *	@param	fileId	ID of the File

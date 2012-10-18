@@ -88,6 +88,11 @@ uint32_t NameSpaceModule::openFile(uint32_t clientId, const string &path)
 	return 0;
 }
 
+void NameSpaceModule::deleteFile (uint32_t clientId, const string &path)
+{
+	
+}
+
 /**
  * @brief	Covert Path to Real One
  */

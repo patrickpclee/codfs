@@ -76,6 +76,20 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 	return fileId;
 }
 
+void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, const string &path){
+
+	string tmpPath = path;
+	if(fileId != 0)
+		tmpPath = _metaDataModule->lookupFilePath(fileId);
+	else
+		fileId = _metaDataModule->lookupFileId(tmpPath);
+
+	debug("Delete File %s [%" PRIu32 "]\n",tmpPath.c_str(),fileId);
+	_nameSpaceModule->deleteFile(clientId, tmpPath);
+	_metaDataModule->deleteFile(clientId, fileId);
+	_mdsCommunicator->replyDeleteFile(requestId,connectionId,fileId);
+}
+
 /**
  * @brief	Handle Upload Object Acknowledgement from Primary
  *
@@ -142,6 +156,7 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	vector<uint32_t> primaryList;
 	uint64_t fileSize = 0;
 	string checksum = "";
+	FileType fileType = NORMAL;
 
 	_nameSpaceModule->openFile(clientId, path);
 	_metaDataModule->openFile(clientId, fileId);
@@ -153,18 +168,25 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		uint32_t primaryId;
 		for (it = objectList.begin(); it < objectList.end(); ++it) {
 			debug("Read primary list %" PRIu64 "\n", *it);
+			try {
 			primaryId = _metaDataModule->getPrimary(*it);
+			} catch (...) {
+				debug_yellow("%s\n","No Primary Found");
+				continue;
+			}
 			primaryList.push_back(primaryId);
 		}
+		objectList.resize(primaryList.size());
 
 		fileSize = _metaDataModule->readFileSize(fileId);
 		checksum = _metaDataModule->readChecksum(fileId);
 
-		debug ("FILESIZE = %" PRIu64 "\n", fileSize);\
+		debug ("FILESIZE = %" PRIu64 "\n", fileSize);
+	} else
+		fileType = NOTFOUND;
 
-	}
 	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path,
-			fileSize, checksum, objectList, primaryList);
+			fileSize, fileType, checksum, objectList, primaryList);
 
 	return;
 }
@@ -302,6 +324,7 @@ void Mds::nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
 void Mds::saveObjectListProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, uint32_t fileId, const vector<uint64_t> &objectList) {
 	_metaDataModule->saveObjectList(fileId, objectList);
+	_mdsCommunicator->replySaveObjectList(requestId, connectionId, fileId);
 	return;
 }
 

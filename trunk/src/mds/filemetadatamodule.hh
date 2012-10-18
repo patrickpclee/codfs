@@ -31,6 +31,13 @@ public:
 			uint32_t fileId, CodingScheme codingScheme, const string &codingSetting);
 
 	/**
+	 * @brief	Delete a File
+	 *
+	 * @param	fileId	File Id
+	 */
+	void deleteFile(uint32_t fileId);
+
+	/**
 	 * @brief	Lookup the File ID with file Path
 	 *
 	 * @param	path	Path to the File
