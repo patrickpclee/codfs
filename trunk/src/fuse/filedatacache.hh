@@ -21,6 +21,7 @@ class FileDataCache {
 
 		~FileDataCache ();
 	private:
+		void writeBack(uint32_t index);
 		bool _clean;
 		uint64_t _objectSize;
 		uint32_t _lastObjectCount;

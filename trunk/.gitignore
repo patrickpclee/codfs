@@ -4,6 +4,7 @@ MDS
 MONITOR
 testfile
 CLIENT_FUSE
+BENCHMARK
 *.d
 *.la
 *.o

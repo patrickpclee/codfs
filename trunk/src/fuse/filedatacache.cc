@@ -18,6 +18,7 @@ FileDataCache::FileDataCache (struct FileMetaData fileMetaData, uint64_t objectS
 	: _objectSize(objectSize),
 	_metaData(fileMetaData)
 {
+	debug_cyan("File ID %"PRIu32" Object Size %" PRIu64,fileMetaData._id,objectSize);
 	for(uint32_t i = 0; i < fileMetaData._objectList.size(); ++i)
 	{
 		struct ObjectData tempObjectData;
@@ -59,6 +60,9 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 		}
 	}
 
+	if(firstObjectToWrite > 0)
+		writeBack(firstObjectToWrite - 1);
+
 	for(uint32_t i = firstObjectToWrite; i <= lastObjectToWrite; ++i)
 	{
 		objectWriteOffset = (offset + byteWritten) - (i * _objectSize);
@@ -98,29 +102,53 @@ FileDataCache::~FileDataCache ()
 	unsigned char checksum[MD5_DIGEST_LENGTH];
 	for (uint32_t i = 0; i < _lastObjectCount; ++i)
 	{
-		if(_objectStatusList[i] != DIRTY)
-			continue;
+		//if(_objectStatusList[i] != DIRTY)
+		//	continue;
+
+		writeBack(i);
+		objectList.push_back(_objectDataList[i].info.objectId);
+		/*
 		objectData = _objectDataList[i];
 		objectList.push_back(objectData.info.objectId);
 		primary = _primaryList[i];
 		osdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		
 		MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+		debug_cyan("Send Object %" PRIu64 " Size %" PRIu64"\n",objectData.info.objectId,objectData.info.objectSize);
 		_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
 		MemoryPool::getInstance().poolFree(objectData.buf);
 		_objectStatusList[i] = CLEAN;
+		*/
 	}
 	objectData = _objectDataList[_lastObjectCount];
 	objectList.push_back(objectData.info.objectId);
 	objectData.info.objectSize = _fileSize % _objectSize;
+	debug_cyan("Send Object 1 %" PRIu64 " Size %" PRIu32" File Size %"PRIu64" Object Size %"PRIu64"\n",objectData.info.objectId,objectData.info.objectSize,_fileSize,_objectSize);
 	if((_fileSize != 0) && (objectData.info.objectSize == 0))
 		objectData.info.objectSize = _objectSize;
+	debug_cyan("Send Object 2 %" PRIu64 " Size %" PRIu32"\n",objectData.info.objectId,objectData.info.objectSize);
 	primary = _primaryList[_lastObjectCount];
 	osdSockfd = _clientCommunicator->getSockfdFromId(primary);
 	MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+	debug_cyan("Send Object 3 %" PRIu64 " Size %" PRIu32"\n",objectData.info.objectId,objectData.info.objectSize);
 	_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
 	MemoryPool::getInstance().poolFree(objectData.buf);
 	_objectStatusList[_lastObjectCount] = CLEAN;
 	_clientCommunicator->saveFileSize(_clientId, _fileId, _fileSize); 
 	_clientCommunicator->saveObjectList(_clientId, _fileId, objectList);
+}
+
+void FileDataCache::writeBack(uint32_t index) {
+	debug("Write Back Object at Index %" PRIu32 " [%" PRIu64 "]\n",index,_objectDataList[index].info.objectId);
+	if(_objectStatusList[index] != DIRTY)
+		return;
+	struct ObjectData objectData = _objectDataList[index];
+	uint32_t primary = _primaryList[index];
+	uint32_t osdSockfd = _clientCommunicator->getSockfdFromId(primary);
+	unsigned char checksum[MD5_DIGEST_LENGTH];
+	MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+	debug_cyan("Send Object %" PRIu64 " Size %" PRIu32"\n",objectData.info.objectId,objectData.info.objectSize);
+	_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
+	MemoryPool::getInstance().poolFree(objectData.buf);
+	_objectStatusList[index] = CLEAN;
 }
