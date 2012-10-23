@@ -7,6 +7,7 @@ FUSE_DIR=			${SRC}/fuse
 MDS_DIR=			${SRC}/mds
 COMMON_DIR=			${SRC}/common
 PROTOCOL_DIR=		${SRC}/protocol
+BENCHMARK_DIR=		${SRC}/benchmark
 
 
 all:
@@ -36,6 +37,9 @@ enum:
 
 protocol:
 	cd ${PROTOCOL_DIR}; make
+
+benchmark:
+	cd ${BENCHMARK_DIR}; make -j3
 
 clean:
 	cd ${OSD_DIR}; make clean

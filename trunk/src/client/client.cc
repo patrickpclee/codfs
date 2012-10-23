@@ -165,7 +165,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
-	double duration = ms.count() / 1024.0;
+	double duration = ms.count() / 1000.0;
 
 	// allow time for messages to go out
 	usleep(10000);
@@ -245,7 +245,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
-	double duration = ms.count() / 1024.0;
+	double duration = ms.count() / 1000.0;
 
 	// allow time for messages to go out
 	usleep(10000);

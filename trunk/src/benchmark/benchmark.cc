@@ -5,6 +5,7 @@
 #include <boost/thread/thread.hpp>
 
 #include "../client/client.hh"
+#include "../client/client_storagemodule.hh"
 
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
@@ -32,6 +33,8 @@ Client* client;
 
 ClientCommunicator* _clientCommunicator;
 
+ClientStorageModule* _storageModule;
+
 /// Config Layer
 ConfigLayer* configLayer;
 
@@ -56,6 +59,11 @@ void startBenchUploadThread(uint32_t clientId, uint32_t sockfd,
 			codingScheme, codingSetting, checksum);
 }
 
+void startBenchDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId) {
+	client->getObject(clientId, sockfd, objectId);
+	_storageModule->closeObject(objectId);
+}
+
 boost::threadpool::pool _tp;
 #endif
 
@@ -64,19 +72,22 @@ void parseOption(int argc, char* argv[]){
 	
 	if(strcmp(argv[2], "download") == 0){
 		download = true;
-		fileId = atoi(argv[5]); 
+		fileId = atoi(argv[3]); 
+		debug("Downloading File %"PRIu32"\n", fileId);
+	} else {
+
+		fileName = time(NULL);
+
+		fileSize = stringToByte(argv[3]);
+		objectSize = stringToByte(argv[4]);
+		numberOfObject = fileSize / objectSize;
+
+		debug("Testing %s with File Size %" PRIu64 " Object Size %"PRIu32"\n",argv[2],fileSize,objectSize);
+
+		codingScheme = RAID1_CODING;
+		codingSetting = Raid1Coding::generateSetting(1);
 	}
 
-	fileName = time(NULL);
-
-	fileSize = stringToByte(argv[3]);
-	objectSize = stringToByte(argv[4]);
-	numberOfObject = fileSize / objectSize;
-
-	debug("Testing %s with File Size %" PRIu64 " Object Size %"PRIu32"\n",argv[2],fileSize,objectSize);
-
-	codingScheme = RAID1_CODING;
-	codingSetting = Raid1Coding::generateSetting(1);
 
 #ifdef PARALLEL_TRANSFER
 	uint32_t _numClientThreads = configLayer->getConfigInt(
@@ -96,7 +107,40 @@ void prepareData(){
 }
 
 void testDownload() {
+	typedef chrono::high_resolution_clock Clock;
+	typedef chrono::milliseconds milliseconds;
+	Clock::time_point t0 = Clock::now();
+	struct FileMetaData fileMetaData = _clientCommunicator->downloadFile(clientId, fileId);
+	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n", fileMetaData._id, fileMetaData._size);
 
+	for(uint32_t i = 0; i < fileMetaData._objectList.size(); ++i) {
+		uint32_t primary = fileMetaData._primaryList[i];
+		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
+		uint64_t objectId = fileMetaData._objectList[i];
+#ifdef PARALLEL_TRANSFER
+		_tp.schedule(boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd, objectId));
+#else
+		client->getObject(clientId, sockfd, objectId);
+		_storageModule->closeObject(objectId);
+#endif
+	}
+
+#ifdef PARALLEL_TRANSFER
+	_tp.wait();
+#endif
+
+	Clock::time_point t1 = Clock::now();
+	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
+	double duration = ms.count() / 1000.0;
+
+	// allow time for messages to go out
+	usleep(10000);
+
+	cout << fixed;
+	cout << setprecision(2);
+	cout << formatSize(fileMetaData._size) << " transferred in " << duration
+			<< " secs, Rate = " << formatSize(fileMetaData._size / duration)
+			<< "/s" << endl;
 }
 
 void testUpload() {
@@ -127,7 +171,7 @@ void testUpload() {
 
 	Clock::time_point t1 = Clock::now();
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
-	double duration = ms.count() / 1024.0;
+	double duration = ms.count() / 1000.0;
 
 	// allow time for messages to go out
 	usleep(10000);
@@ -157,9 +201,9 @@ void startReceiveThread(Communicator* _clientCommunicator) {
 
 int main(int argc, char *argv[]) {
 
-	if (argc < 5) {
+	if (argc < 4) {
 		cout << "Upload: ./BENCHMARK [ID] upload [FILESIZE] [OBJECTSIZE]" << endl;
-		cout << "Download: ./BENCHMARK [ID] download [FILESIZE] [OBJECTSIZE] [FILEID]" << endl;
+		cout << "Download: ./BENCHMARK [ID] download [FILEID]" << endl;
 		exit(-1);
 	}
 	// handle signal for profiler
@@ -168,6 +212,7 @@ int main(int argc, char *argv[]) {
 	configLayer = new ConfigLayer("clientconfig.xml");
 	client = new Client(clientId);
 	_clientCommunicator = client->getCommunicator();
+	_storageModule = client->getStorageModule();
 
 	parseOption(argc, argv);
 	prepareData();
