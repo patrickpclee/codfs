@@ -116,7 +116,7 @@ vector<BSONObj> MongoDB::read (Query queryObject)
 	vector<BSONObj> result;
 	BSONObj tempObj;
 	while( cursor->more() ) {
-		tempObj = cursor->next();
+		tempObj = cursor->next().copy();
 		result.push_back(tempObj);
 	}
 	_conn->done();
