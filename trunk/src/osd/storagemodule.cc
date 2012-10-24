@@ -277,6 +277,7 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteToRead, offsetInSegment);
 
+	closeFile(segmentPath);
 	return segmentData;
 }
 
@@ -327,6 +328,7 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 			objectId, segmentId, byteWritten, offsetInSegment);
 
 	updateSegmentFreespace(length);
+	closeFile(filepath);
 
 	return byteWritten;
 }
