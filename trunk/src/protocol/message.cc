@@ -30,7 +30,7 @@ Message::Message(Communicator* communicator) {
 	_expectReply = false;
 	_deletable = false;
 	_communicator = communicator; // needed by communicator->findWaitReplyMessage()
-	_threadPoolSize = 1; // default thread pool size
+	_threadPoolSize = 4; // default thread pool size
 }
 
 #ifdef USE_MESSAGE_MEMORY_POOL

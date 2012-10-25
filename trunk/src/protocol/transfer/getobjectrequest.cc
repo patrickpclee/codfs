@@ -20,7 +20,6 @@ GetObjectRequestMsg::GetObjectRequestMsg(Communicator* communicator,
 
 	_sockfd = dstSockfd;
 	_objectId = objectId;
-	_threadPoolSize = 2;
 }
 
 void GetObjectRequestMsg::prepareProtocolMsg() {
