@@ -14,8 +14,13 @@ all:
 	make mds;
 	make client;
 	make osd;
-	#cp ./OSD ../osd_test
 	make monitor;
+
+optimized:
+	make mds_o3;
+	make client_o3;
+	make osd_o3;
+	make monitor_o3;
 
 mds:
 	cd ${MDS_DIR}; make -j3
@@ -26,11 +31,23 @@ client:
 osd:
 	cd ${OSD_DIR}; make -j3
 
-clientfuse:
-	cd ${FUSE_DIR}; make -j3
-
 monitor:
 	cd ${MONITOR_DIR}; make -j3
+
+mds_o3:
+	cd ${MDS_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
+
+client_o3:
+	cd ${CLIENT_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
+
+osd_o3:
+	cd ${OSD_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
+
+monitor_o3:
+	cd ${MONITOR_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
+
+clientfuse:
+	cd ${FUSE_DIR}; make -j3
 
 enum:
 	cd ${COMMON_DIR}; make
