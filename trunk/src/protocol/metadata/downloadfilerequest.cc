@@ -137,7 +137,7 @@ void DownloadFileRequestMsg::setSize (uint64_t size) {
 	_size = size;
 }
 
-uint32_t DownloadFileRequestMsg::getSize() {
+uint64_t DownloadFileRequestMsg::getSize() {
 	return _size;
 }
 

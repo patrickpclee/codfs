@@ -92,7 +92,7 @@ public:
 	void setFilePath (string filePath);
 	string getFilePath ();
 	void setSize (uint64_t size);
-	uint32_t getSize();
+	uint64_t getSize();
 	void setFileType (FileType fileType);
 	FileType getFileType ();
 

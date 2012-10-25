@@ -18,6 +18,8 @@
 #include "../common/debug.hh"
 #include "../common/convertor.hh"
 
+//#define USE_OBJECT_CACHE
+
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
@@ -201,6 +203,11 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 }
 
 bool StorageModule::isObjectCached(uint64_t objectId) {
+
+#ifndef USE_OBJECT_CACHE
+	return false;
+#endif
+
 	lock_guard<mutex> lk(lruCacheMutex);
 	if (_objectDiskCacheMap.count(objectId)) {
 
@@ -277,6 +284,7 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteToRead, offsetInSegment);
 
+	closeFile(segmentPath);
 	return segmentData;
 }
 
@@ -327,6 +335,7 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 			objectId, segmentId, byteWritten, offsetInSegment);
 
 	updateSegmentFreespace(length);
+	closeFile(filepath);
 
 	return byteWritten;
 }
@@ -676,8 +685,13 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 
 	// write cache to disk
 	createAndOpenObjectFile(objectId, objectCache.length);
+
+#ifdef USE_OBJECT_CACHE
 	uint64_t byteWritten = writeObjectFile(objectId, objectCache.buf, 0,
 			objectCache.length);
+#else
+	uint64_t byteWritten = objectCache.length;
+#endif
 
 	if (byteWritten != objectCache.length) {
 		perror("Cannot saveObjectToDisk");
