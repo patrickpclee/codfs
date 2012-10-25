@@ -18,6 +18,8 @@
 #include "../common/debug.hh"
 #include "../common/convertor.hh"
 
+//#define USE_OBJECT_CACHE
+
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
@@ -201,6 +203,11 @@ void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 }
 
 bool StorageModule::isObjectCached(uint64_t objectId) {
+
+#ifndef USE_OBJECT_CACHE
+	return false;
+#endif
+
 	lock_guard<mutex> lk(lruCacheMutex);
 	if (_objectDiskCacheMap.count(objectId)) {
 
@@ -678,8 +685,11 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 
 	// write cache to disk
 	createAndOpenObjectFile(objectId, objectCache.length);
+
+#ifdef USE_OBJECT_CACHE
 	uint64_t byteWritten = writeObjectFile(objectId, objectCache.buf, 0,
 			objectCache.length);
+#endif
 
 	if (byteWritten != objectCache.length) {
 		perror("Cannot saveObjectToDisk");
