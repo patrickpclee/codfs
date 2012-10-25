@@ -689,6 +689,8 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 #ifdef USE_OBJECT_CACHE
 	uint64_t byteWritten = writeObjectFile(objectId, objectCache.buf, 0,
 			objectCache.length);
+#else
+	uint64_t byteWritten = objectCache.length;
 #endif
 
 	if (byteWritten != objectCache.length) {
