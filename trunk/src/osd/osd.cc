@@ -106,6 +106,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 					debug(
 							"Not enough segments available to rebuild Object ID %" PRIu64 "\n",
 							objectId);
+					cout << "Not Enough Segment " << objectId << endl;
 					exit(-1);
 				}
 
@@ -274,6 +275,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			// compare md5 with saved one
 			if (_checksumMap.get(objectId) != md5ToHex(checksum)) {
 				debug("MD5 of Object ID = %" PRIu64 " mismatch!\n", objectId);
+				cout << "MDS Mismatch " << objectId << endl;
 				exit(-1);
 			} else {
 				debug("MD5 of Object ID = %" PRIu64 " match\n", objectId);

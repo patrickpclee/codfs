@@ -218,6 +218,7 @@ void OsdCommunicator::putSegmentInit(uint32_t sockfd, uint64_t objectId,
 		return;
 	} else {
 		debug("%s\n", "Put Segment Init Failed");
+		cout << "Put Segment Init Failed " << objectId << "." << segmentId << endl;
 		exit(-1);
 	}
 
@@ -252,7 +253,8 @@ void OsdCommunicator::putSegmentEnd(uint32_t sockfd, uint64_t objectId,
 		waitAndDelete(segmentTransferEndRequestMsg);
 		return;
 	} else {
-		debug("%s\n", "Put Segment Init Failed");
+		debug("%s\n", "Segment Transfer End Failed");
+		cout << "Segment Transfer End Failed " << objectId << "." << segmentId << endl;
 		exit(-1);
 	}
 }
@@ -307,6 +309,7 @@ struct ObjectTransferOsdInfo OsdCommunicator::getObjectInfoRequest(
 		waitAndDelete(getObjectInfoRequestMsg);
 	} else {
 		debug("%s\n", "Get Object Info Request Failed");
+		cout << "Get Object Info Request Failed " << objectId << endl;
 		exit(-1);
 	}
 
