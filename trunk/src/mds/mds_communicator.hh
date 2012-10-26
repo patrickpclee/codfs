@@ -43,19 +43,18 @@ public:
 	 * @param	objectList	Object List
 	 * @param	primaryList	Primary List
 	 */
-//	void replyFileSize(uint32_t requestId, uint32_t connectionId, uint32_t fileId, uint64_t fileSize);
-
 	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId,
 			uint32_t fileId, string filePath, uint64_t fileSize,
-			const FileType& fileType, string checksum, vector<uint64_t> objectList,
-			vector<uint32_t> primaryList);
+			const FileType& fileType, string checksum,
+			vector<uint64_t> objectList, vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Delete File
 	 * 
 	 * @param	fileId	File Id
 	 */
-	void replyDeleteFile(uint32_t requestId, uint32_t connectionId, uint32_t fileId);
+	void replyDeleteFile(uint32_t requestId, uint32_t connectionId,
+			uint32_t fileId);
 
 	/**
 	 * @brief	Reply Object ID List
@@ -90,7 +89,8 @@ public:
 	 * @param	connectionId	Connection ID
 	 * @param	fileId	File ID
 	 */
-	void replySaveObjectList(uint32_t rquestId, uint32_t connectionId, uint32_t fileId);
+	void replySaveObjectList(uint32_t rquestId, uint32_t connectionId,
+			uint32_t fileId);
 
 	/**
 	 * @brief	Reply With Folder Data
@@ -147,6 +147,14 @@ public:
 	vector<uint32_t> askPrimaryList(uint32_t numOfObjs);
 
 	vector<uint32_t> getPrimaryList(uint32_t sockfd, uint32_t numOfObjs);
+
+	/**
+	 * Request the status of OSD from MONITOR
+	 * @param osdIdList List of OSD ID to request
+	 * @return boolean array storing OSD health
+	 */
+
+	vector<bool> getOsdStatusRequest(vector<uint32_t> osdIdList);
 
 private:
 };

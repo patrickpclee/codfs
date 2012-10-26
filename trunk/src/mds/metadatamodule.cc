@@ -15,10 +15,12 @@ MetaDataModule::MetaDataModule() {
  * @brief	Create Meta Data Entry for a New File
  */
 uint32_t MetaDataModule::createFile(uint32_t clientId, const string &path,
-		uint64_t fileSize, CodingScheme codingScheme, const string &codingSetting) {
+		uint64_t fileSize, CodingScheme codingScheme,
+		const string &codingSetting) {
 	uint32_t fileId = _fileMetaDataModule->generateFileId();
 
-	_fileMetaDataModule->createFile(clientId, path, fileSize, fileId, codingScheme, codingSetting);
+	_fileMetaDataModule->createFile(clientId, path, fileSize, fileId,
+			codingScheme, codingSetting);
 
 	return fileId;
 }
@@ -37,17 +39,15 @@ void MetaDataModule::deleteFile(uint32_t clientId, uint32_t fileId) {
 /**
  *	@brief	Set File Size of a File
  */
-void MetaDataModule::setFileSize(uint32_t fileId, uint64_t fileSize)
-{
+void MetaDataModule::setFileSize(uint32_t fileId, uint64_t fileSize) {
 	_fileMetaDataModule->setFileSize(fileId, fileSize);
-	return ;
+	return;
 }
 
 /**
  * @brief	Read File Size of a File
  */
-uint64_t MetaDataModule::readFileSize(uint32_t fileId)
-{
+uint64_t MetaDataModule::readFileSize(uint32_t fileId) {
 	return _fileMetaDataModule->readFileSize(fileId);
 }
 
@@ -89,11 +89,11 @@ string MetaDataModule::readChecksum(uint32_t fileId) {
 /**
  * @brief	Save Object Info
  */
-void MetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo)
-{
+void MetaDataModule::saveObjectInfo(uint64_t objectId,
+		struct ObjectMetaData objectInfo) {
 	_objectMetaDataModule->saveObjectInfo(objectId, objectInfo);
 
-	return ;
+	return;
 }
 
 /**
@@ -103,8 +103,7 @@ void MetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaData obj
  *
  * @return	Info of the Object
  */
-struct ObjectMetaData MetaDataModule::readObjectInfo(uint64_t objectId)
-{
+struct ObjectMetaData MetaDataModule::readObjectInfo(uint64_t objectId) {
 	return _objectMetaDataModule->readObjectInfo(objectId);
 }
 
@@ -116,8 +115,28 @@ void MetaDataModule::setPrimary(uint64_t objectId, uint32_t primaryOsdId) {
 	return;
 }
 
-uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId,
-		uint32_t exclude) {
+uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId, vector<uint32_t> nodeList,
+		vector<bool> nodeStatus) {
+
+	int failedOsdCount = (int) count(nodeStatus.begin(),
+			nodeStatus.end(), false);
+
+	if (failedOsdCount == nodeStatus.size()) {
+		debug_yellow ("All OSD has died for objectId = %" PRIu64 "\n", objectId);
+		exit (-1);
+	}
+
+	srand(time(NULL));
+
+	// random until a healthy OSD is found
+	while (true) {
+		int newPrimary = rand() % nodeStatus.size();
+		if (nodeStatus[newPrimary] == true) {
+			setPrimary (objectId, nodeList[newPrimary]);
+			return nodeList[newPrimary];
+		}
+	}
+
 	return 0;
 }
 
