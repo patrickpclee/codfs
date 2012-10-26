@@ -4,6 +4,8 @@
 
 #include <thread>
 #include <mutex>
+#include <iostream>
+using namespace std;
 #include "codingmodule.hh"
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
@@ -60,6 +62,7 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 
 	if (!_codingWorker.count(codingScheme)) {
 		debug("%s\n", "Wrong coding scheme!");
+		cout << "Invalid Coding Scheme" << endl;
 		exit(-1);
 	}
 

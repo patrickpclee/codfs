@@ -18,7 +18,7 @@
 #include "../common/debug.hh"
 #include "../common/convertor.hh"
 
-#define USE_OBJECT_CACHE
+//#define USE_OBJECT_CACHE
 
 // global variable defined in each component
 extern ConfigLayer* configLayer;
@@ -298,6 +298,7 @@ uint32_t StorageModule::writeObjectCache(uint64_t objectId, char* buf,
 		lock_guard<mutex> lk(cacheMutex);
 		if (!_objectCache.count(objectId)) {
 			debug("%s\n", "cannot find cache for object");
+			cout << "writeObjectCache Object Cache Not Found " << objectId << endl;
 			exit(-1);
 		}
 		recvCache = _objectCache[objectId].buf;
@@ -422,6 +423,7 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot read");
+		perror("open");
 		exit(-1);
 	}
 
@@ -431,6 +433,7 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 	if (byteRead != length) {
 		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
 				length, byteRead);
+		perror("pread()");
 		exit(-1);
 	}
 
@@ -447,6 +450,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 
 	if (file == NULL) { // cannot open file
 		debug("%s\n", "Cannot write");
+		perror("open");
 		exit(-1);
 	}
 
@@ -455,6 +459,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 
 	if (byteWritten != length) {
 		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
+		perror("pwrite()");
 		exit(-1);
 	}
 
@@ -567,6 +572,7 @@ struct ObjectTransferCache StorageModule::getObjectCache(uint64_t objectId) {
 	lock_guard<mutex> lk(cacheMutex);
 	if (!_objectCache.count(objectId)) {
 		debug("%s\n", "object cache not found");
+		cout << "GetObjectCache Object Cache Not Found " << objectId << endl;
 		exit(-1);
 	}
 	return _objectCache[objectId];
