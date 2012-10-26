@@ -10,7 +10,7 @@
 #include "../common/debug.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/netfunc.hh"
-
+#include "../protocol/status/getosdstatusrequestmsg.hh"
 /// Osd Object
 Osd* osd;
 
@@ -110,20 +110,9 @@ int main(int argc, char* argv[]) {
 	printf("Port = %hu\n",selfPort);
 
 	//communicator->connectAllComponents();
-	printf("1\n");
 	communicator->connectToMds();
-	printf("2j\n");
 	communicator->connectToMonitor();
-	printf("3\n");
 	communicator->registerToMonitor(selfAddr, selfPort);
-	printf("4\n");
-
-	debug("%s\n", "starting test thread");
-	sleep(5);
-
-	if (osd->getOsdId() == 52000) {
-//		osd->getObjectRequestProcessor(0, 0, 83937998);
-	}
 
 	//thread testThread(startTestThread, communicator);
 	// TODO: pause before connect for now
