@@ -54,6 +54,14 @@ public:
 	void replyOsdList(uint32_t requestId, uint32_t sockfd, 
 		vector<struct OnlineOsd>& osdList);
 
+	/**
+	 * Action to reply a request from CLIENT for online OSD list
+	 * @param requestId Request ID
+	 * @param sockfd Socket ID between the connection
+	 * @param osdStatus boolean list of osd status
+	 */
+	void replyGetOsdStatus(uint32_t requestId, uint32_t sockfd,
+		vector<bool>& osdStatusRef);
 
 	/**
 	 * Action to send current online OSDs to the newly start one

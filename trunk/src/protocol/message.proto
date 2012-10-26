@@ -357,6 +357,14 @@ message OnlineOsdListPro {
 	repeated OnlineOsdPro onlineOsdList = 1;
 }
 
+message GetOsdStatusRequestPro {
+	repeated fixed32 osdIds = 1;
+}
+
+message GetOsdStatusReplyPro {
+	repeated bool osdStatus = 1;
+}
+
 //
 // MONITOR -> MDS
 //
