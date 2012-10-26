@@ -42,6 +42,7 @@ class DownloadFileRequestPro;
 class SaveObjectListRequestPro;
 class SetFileSizeRequestPro;
 class GetObjectIdListRequestPro;
+class SwitchPrimaryOsdRequestPro;
 class PutObjectInitRequestPro;
 class ObjectDataPro;
 class GetObjectRequestPro;
@@ -57,6 +58,7 @@ class DeleteFileReplyPro;
 class SaveObjectListReplyPro;
 class DownloadFileReplyPro;
 class GetObjectIdListReplyPro;
+class SwitchPrimaryOsdReplyPro;
 class GetObjectInfoReplyPro;
 class GetPrimaryListRequestPro;
 class UploadObjectAckPro;
@@ -1197,6 +1199,88 @@ class GetObjectIdListRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static GetObjectIdListRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class SwitchPrimaryOsdRequestPro : public ::google::protobuf::Message {
+ public:
+  SwitchPrimaryOsdRequestPro();
+  virtual ~SwitchPrimaryOsdRequestPro();
+  
+  SwitchPrimaryOsdRequestPro(const SwitchPrimaryOsdRequestPro& from);
+  
+  inline SwitchPrimaryOsdRequestPro& operator=(const SwitchPrimaryOsdRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SwitchPrimaryOsdRequestPro& default_instance();
+  
+  void Swap(SwitchPrimaryOsdRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  SwitchPrimaryOsdRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SwitchPrimaryOsdRequestPro& from);
+  void MergeFrom(const SwitchPrimaryOsdRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.SwitchPrimaryOsdRequestPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static SwitchPrimaryOsdRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -2744,6 +2828,88 @@ class GetObjectIdListReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static GetObjectIdListReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class SwitchPrimaryOsdReplyPro : public ::google::protobuf::Message {
+ public:
+  SwitchPrimaryOsdReplyPro();
+  virtual ~SwitchPrimaryOsdReplyPro();
+  
+  SwitchPrimaryOsdReplyPro(const SwitchPrimaryOsdReplyPro& from);
+  
+  inline SwitchPrimaryOsdReplyPro& operator=(const SwitchPrimaryOsdReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SwitchPrimaryOsdReplyPro& default_instance();
+  
+  void Swap(SwitchPrimaryOsdReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  SwitchPrimaryOsdReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SwitchPrimaryOsdReplyPro& from);
+  void MergeFrom(const SwitchPrimaryOsdReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 newPrimaryOsdId = 1;
+  inline bool has_newprimaryosdid() const;
+  inline void clear_newprimaryosdid();
+  static const int kNewPrimaryOsdIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 newprimaryosdid() const;
+  inline void set_newprimaryosdid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.SwitchPrimaryOsdReplyPro)
+ private:
+  inline void set_has_newprimaryosdid();
+  inline void clear_has_newprimaryosdid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 newprimaryosdid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static SwitchPrimaryOsdReplyPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -6290,6 +6456,32 @@ inline void GetObjectIdListRequestPro::set_numofobjs(::google::protobuf::uint32 
 
 // -------------------------------------------------------------------
 
+// SwitchPrimaryOsdRequestPro
+
+// optional fixed64 objectId = 1;
+inline bool SwitchPrimaryOsdRequestPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SwitchPrimaryOsdRequestPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SwitchPrimaryOsdRequestPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SwitchPrimaryOsdRequestPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 SwitchPrimaryOsdRequestPro::objectid() const {
+  return objectid_;
+}
+inline void SwitchPrimaryOsdRequestPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // PutObjectInitRequestPro
 
 // optional fixed64 objectId = 1;
@@ -7399,6 +7591,32 @@ GetObjectIdListReplyPro::primarylist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
 GetObjectIdListReplyPro::mutable_primarylist() {
   return &primarylist_;
+}
+
+// -------------------------------------------------------------------
+
+// SwitchPrimaryOsdReplyPro
+
+// optional fixed32 newPrimaryOsdId = 1;
+inline bool SwitchPrimaryOsdReplyPro::has_newprimaryosdid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SwitchPrimaryOsdReplyPro::set_has_newprimaryosdid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SwitchPrimaryOsdReplyPro::clear_has_newprimaryosdid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SwitchPrimaryOsdReplyPro::clear_newprimaryosdid() {
+  newprimaryosdid_ = 0u;
+  clear_has_newprimaryosdid();
+}
+inline ::google::protobuf::uint32 SwitchPrimaryOsdReplyPro::newprimaryosdid() const {
+  return newprimaryosdid_;
+}
+inline void SwitchPrimaryOsdReplyPro::set_newprimaryosdid(::google::protobuf::uint32 value) {
+  set_has_newprimaryosdid();
+  newprimaryosdid_ = value;
 }
 
 // -------------------------------------------------------------------
