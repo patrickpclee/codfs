@@ -116,7 +116,8 @@ public:
 	 */
 	void setPrimary(uint64_t objectId, uint32_t primaryOsdId);
 
-	uint32_t selectActingPrimary(uint64_t objectId, uint32_t exclude);
+	uint32_t selectActingPrimary(uint64_t objectId, vector<uint32_t> nodeList,
+		vector<bool> nodeStatus);
 
 	/**
 	 * @brief	Get Primary of a Object

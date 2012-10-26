@@ -169,3 +169,22 @@ void MdsCommunicator::reportFailure(uint32_t osdId, FailureReason reason) {
 	return;
 }
 
+vector<bool> MdsCommunicator::getOsdStatusRequest(vector<uint32_t> osdIdList) {
+
+	GetOsdStatusRequestMsg* getOsdStatusRequestMsg =
+			new GetOsdStatusRequestMsg(this, getMonitorSockfd(),
+					osdIdList);
+	getOsdStatusRequestMsg->prepareProtocolMsg();
+
+	addMessage(getOsdStatusRequestMsg, true);
+	MessageStatus status = getOsdStatusRequestMsg->waitForStatusChange();
+
+	if (status == READY) {
+		vector<bool> osdStatusList =
+				getOsdStatusRequestMsg->getOsdStatus();
+		return osdStatusList;
+	}
+
+	return {};
+}
+
