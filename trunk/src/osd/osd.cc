@@ -302,6 +302,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			vector<uint32_t> nodeList;
 			uint32_t i = 0;
+			segmentLocationList[0].osdId = _osdId;
 			for (const auto segmentData : segmentDataList) {
 
 				// if destination is myself
