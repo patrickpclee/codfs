@@ -81,6 +81,8 @@ class GetSecondaryListReplyPro;
 class NewOsdRegisterPro;
 class OnlineOsdPro;
 class OnlineOsdListPro;
+class GetOsdStatusRequestPro;
+class GetOsdStatusReplyPro;
 class GetPrimaryListReplyPro;
 class GetOsdListReplyPro;
 
@@ -5103,6 +5105,176 @@ class OnlineOsdListPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class GetOsdStatusRequestPro : public ::google::protobuf::Message {
+ public:
+  GetOsdStatusRequestPro();
+  virtual ~GetOsdStatusRequestPro();
+  
+  GetOsdStatusRequestPro(const GetOsdStatusRequestPro& from);
+  
+  inline GetOsdStatusRequestPro& operator=(const GetOsdStatusRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetOsdStatusRequestPro& default_instance();
+  
+  void Swap(GetOsdStatusRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  GetOsdStatusRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetOsdStatusRequestPro& from);
+  void MergeFrom(const GetOsdStatusRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated fixed32 osdIds = 1;
+  inline int osdids_size() const;
+  inline void clear_osdids();
+  static const int kOsdIdsFieldNumber = 1;
+  inline ::google::protobuf::uint32 osdids(int index) const;
+  inline void set_osdids(int index, ::google::protobuf::uint32 value);
+  inline void add_osdids(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      osdids() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_osdids();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.GetOsdStatusRequestPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > osdids_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static GetOsdStatusRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class GetOsdStatusReplyPro : public ::google::protobuf::Message {
+ public:
+  GetOsdStatusReplyPro();
+  virtual ~GetOsdStatusReplyPro();
+  
+  GetOsdStatusReplyPro(const GetOsdStatusReplyPro& from);
+  
+  inline GetOsdStatusReplyPro& operator=(const GetOsdStatusReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const GetOsdStatusReplyPro& default_instance();
+  
+  void Swap(GetOsdStatusReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  GetOsdStatusReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const GetOsdStatusReplyPro& from);
+  void MergeFrom(const GetOsdStatusReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated bool osdStatus = 1;
+  inline int osdstatus_size() const;
+  inline void clear_osdstatus();
+  static const int kOsdStatusFieldNumber = 1;
+  inline bool osdstatus(int index) const;
+  inline void set_osdstatus(int index, bool value);
+  inline void add_osdstatus(bool value);
+  inline const ::google::protobuf::RepeatedField< bool >&
+      osdstatus() const;
+  inline ::google::protobuf::RepeatedField< bool >*
+      mutable_osdstatus();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.GetOsdStatusReplyPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedField< bool > osdstatus_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static GetOsdStatusReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class GetPrimaryListReplyPro : public ::google::protobuf::Message {
  public:
   GetPrimaryListReplyPro();
@@ -8771,6 +8943,64 @@ OnlineOsdListPro::onlineosdlist() const {
 inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OnlineOsdPro >*
 OnlineOsdListPro::mutable_onlineosdlist() {
   return &onlineosdlist_;
+}
+
+// -------------------------------------------------------------------
+
+// GetOsdStatusRequestPro
+
+// repeated fixed32 osdIds = 1;
+inline int GetOsdStatusRequestPro::osdids_size() const {
+  return osdids_.size();
+}
+inline void GetOsdStatusRequestPro::clear_osdids() {
+  osdids_.Clear();
+}
+inline ::google::protobuf::uint32 GetOsdStatusRequestPro::osdids(int index) const {
+  return osdids_.Get(index);
+}
+inline void GetOsdStatusRequestPro::set_osdids(int index, ::google::protobuf::uint32 value) {
+  osdids_.Set(index, value);
+}
+inline void GetOsdStatusRequestPro::add_osdids(::google::protobuf::uint32 value) {
+  osdids_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+GetOsdStatusRequestPro::osdids() const {
+  return osdids_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+GetOsdStatusRequestPro::mutable_osdids() {
+  return &osdids_;
+}
+
+// -------------------------------------------------------------------
+
+// GetOsdStatusReplyPro
+
+// repeated bool osdStatus = 1;
+inline int GetOsdStatusReplyPro::osdstatus_size() const {
+  return osdstatus_.size();
+}
+inline void GetOsdStatusReplyPro::clear_osdstatus() {
+  osdstatus_.Clear();
+}
+inline bool GetOsdStatusReplyPro::osdstatus(int index) const {
+  return osdstatus_.Get(index);
+}
+inline void GetOsdStatusReplyPro::set_osdstatus(int index, bool value) {
+  osdstatus_.Set(index, value);
+}
+inline void GetOsdStatusReplyPro::add_osdstatus(bool value) {
+  osdstatus_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< bool >&
+GetOsdStatusReplyPro::osdstatus() const {
+  return osdstatus_;
+}
+inline ::google::protobuf::RepeatedField< bool >*
+GetOsdStatusReplyPro::mutable_osdstatus() {
+  return &osdstatus_;
 }
 
 // -------------------------------------------------------------------

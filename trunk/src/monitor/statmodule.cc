@@ -121,3 +121,22 @@ void StatModule::broadcastNewOsd(Communicator* communicator,
 		}
 	}
 }
+
+
+void StatModule::getOsdStatus(vector<uint32_t>& osdListRef, 
+	vector<bool>& osdStatusRef) {
+
+	osdStatusRef.clear();
+	lock_guard<mutex> lk(osdStatMapMutex);
+	for (uint32_t id: osdListRef) {
+		map<uint32_t, struct OsdStat>::iterator it = _osdStatMap.find(id);
+		if (it != _osdStatMap.end()) {
+			if (it->second.osdHealth == ONLINE)
+				osdStatusRef.push_back(true);
+			else 
+				osdStatusRef.push_back(false);
+		} else {
+			osdStatusRef.push_back(false);
+		}
+	}
+}

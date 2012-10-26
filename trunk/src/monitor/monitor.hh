@@ -108,6 +108,15 @@ public:
 	 * @param sockfd Socket descriptor of message source
 	 */
 	void getOsdListProcessor (uint32_t requestId, uint32_t sockfd);
+
+	/**
+	 * Action when a CLIENT request current ONLIE OSDs for connection
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param osdListRef request osd id list reference 
+	 */
+	void getOsdStatusRequestProcessor (uint32_t requestId, uint32_t sockfd,
+		vector<uint32_t>& osdListRef);
 	
 
 private:

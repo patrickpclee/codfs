@@ -54,6 +54,9 @@
 #include "nodelist/getosdlistrequest.hh"
 #include "nodelist/getosdlistreply.hh"
 
+#include "status/getosdstatusrequestmsg.hh"
+#include "status/getosdstatusreplymsg.hh"
+
 MessageFactory::MessageFactory() {
 
 }
@@ -189,6 +192,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (ONLINE_OSD_LIST):
 		return new OnlineOsdListMsg(communicator);
+		break;
+	case (GET_OSD_STATUS_REQUEST):
+		return new GetOsdStatusRequestMsg(communicator);
+		break;
+	case (GET_OSD_STATUS_REPLY):
+		return new GetOsdStatusReplyMsg(communicator);
 		break;
 
 	//NODELIST
