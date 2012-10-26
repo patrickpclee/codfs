@@ -274,7 +274,7 @@ private:
 	 * @param osdListStatus Bool array representing OSD status (true = up, false = down)
 	 */
 
-	void setOsdListStatus (vector<bool> &secondaryOsdStatus);
+//	void setOsdListStatus (vector<bool> &secondaryOsdStatus);
 
 	/**
 	 * Retrieve a segment from the storage

@@ -223,6 +223,10 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		uint32_t dstComponentId = fileMetaData._primaryList[i];
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
+
+		if (dstSockfd == (uint32_t) -1) 
+			dstSockfd = _clientCommunicator->switchPrimaryRequest(_clientId, objectId);		
+
 		const uint64_t offset = objectSize * i;
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(

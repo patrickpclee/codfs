@@ -21,6 +21,7 @@
 #include "../protocol/transfer/getobjectrequest.hh"
 #include "../protocol/nodelist/getosdlistrequest.hh"
 #include "../protocol/nodelist/getosdlistreply.hh"
+#include "../protocol/status/switchprimaryosdrequestmsg.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
@@ -274,4 +275,19 @@ void ClientCommunicator::getOsdListAndConnect() {
 			connectToOsd(onlineList[i].osdIp, onlineList[i].osdPort);
 	}
 	
+}
+
+uint32_t ClientCommunicator::switchPrimaryRequest(uint32_t clientId, uint64_t objectId) {
+	uint32_t dstSockfd = -1;
+	while (dstSockfd == (uint32_t) -1) {
+		SwitchPrimaryOsdRequestMsg* msg = new
+		SwitchPrimaryOsdRequestMsg(this, getMdsSockfd(), clientId, objectId);
+
+		msg->prepareProtocolMsg();
+		addMessage(msg, true);
+		msg->waitForStatusChange();
+
+		dstSockfd = getSockfdFromId(msg->getNewPrimaryOsdId());
+	}
+	return dstSockfd;
 }

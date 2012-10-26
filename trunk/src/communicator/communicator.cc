@@ -728,7 +728,8 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 	if (!_componentIdMap.count(componentId)) {
 		debug("SOCKFD for Component ID = %" PRIu32 " not found!\n",
 				componentId);
-		exit(-1);
+		return -1;
+		//exit(-1);
 	}
 	return _componentIdMap.get(componentId);
 }

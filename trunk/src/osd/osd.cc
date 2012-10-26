@@ -90,11 +90,10 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				const string codingSetting = objectInfo._codingSetting;
 				const uint32_t objectSize = objectInfo._size;
 
-				// initialize a bool array to store sdListStatus
-				vector<bool> secondaryOsdStatus(objectInfo._osdList.size());
-
-				// check other osd status (from cache or from monitor)
-				setOsdListStatus(secondaryOsdStatus);
+				// bool array to store osdStatus
+				vector<bool> secondaryOsdStatus =
+						_osdCommunicator->getOsdStatusRequest(
+								objectInfo._osdList);
 
 				// check which segments are needed to request
 				uint32_t totalNumOfSegments = objectInfo._osdList.size();
@@ -532,6 +531,7 @@ uint32_t Osd::getOsdId() {
 	return _osdId;
 }
 
+/*
 void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
 	for (auto osdStatus : secondaryOsdStatus) {
 		osdStatus = true;
@@ -541,3 +541,4 @@ void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
 	//secondaryOsdStatus[0] = false;
 	//secondaryOsdStatus[1] = false;
 }
+*/

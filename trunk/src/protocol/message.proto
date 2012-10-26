@@ -76,6 +76,11 @@ message GetObjectIdListRequestPro {
 	optional fixed32 numOfObjs = 2;
 }
 
+message SwitchPrimaryOsdRequestPro {
+	optional fixed64 objectId = 1;
+}
+
+
 //
 // CLIENT -> OSD
 //
@@ -189,6 +194,11 @@ message GetObjectIdListReplyPro {
 	repeated fixed64 objectIdList = 1;
 	repeated fixed32 primaryList = 2;
 }
+
+message SwitchPrimaryOsdReplyPro {
+	optional fixed32 newPrimaryOsdId = 1;	
+}
+
 
 //
 // MDS -> OSD
