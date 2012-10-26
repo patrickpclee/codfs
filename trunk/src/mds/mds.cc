@@ -49,7 +49,8 @@ Mds::~Mds() {
  */
 uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, const string &dstPath, uint64_t fileSize,
-		uint32_t numOfObjs, CodingScheme codingScheme, const string &codingSetting) {
+		uint32_t numOfObjs, CodingScheme codingScheme,
+		const string &codingSetting) {
 
 	vector<uint64_t> objectList(numOfObjs);
 	vector<uint32_t> primaryList(numOfObjs);
@@ -76,18 +77,19 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 	return fileId;
 }
 
-void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId, uint32_t clientId, uint32_t fileId, const string &path){
+void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t clientId, uint32_t fileId, const string &path) {
 
 	string tmpPath = path;
-	if(fileId != 0)
+	if (fileId != 0)
 		tmpPath = _metaDataModule->lookupFilePath(fileId);
 	else
 		fileId = _metaDataModule->lookupFileId(tmpPath);
 
-	debug("Delete File %s [%" PRIu32 "]\n",tmpPath.c_str(),fileId);
+	debug("Delete File %s [%" PRIu32 "]\n", tmpPath.c_str(), fileId);
 	_nameSpaceModule->deleteFile(clientId, tmpPath);
 	_metaDataModule->deleteFile(clientId, fileId);
-	_mdsCommunicator->replyDeleteFile(requestId,connectionId,fileId);
+	_mdsCommunicator->replyDeleteFile(requestId, connectionId, fileId);
 }
 
 /**
@@ -97,15 +99,16 @@ void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId, uint32_
  * 2. Set the Primary for the object
  */
 /*
-void Mds::FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId){
-	uint64_t fileSize = _metaDataModule->readFileSize(fileId);
-	_mdsCommunicator->replyFileSize(requestId, connectionId, fileId, fileSize);
-}
-*/
+ void Mds::FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId){
+ uint64_t fileSize = _metaDataModule->readFileSize(fileId);
+ _mdsCommunicator->replyFileSize(requestId, connectionId, fileId, fileSize);
+ }
+ */
 
 void Mds::uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme, const string &codingSetting,
-		const vector<uint32_t> &objectNodeList, const string &checksum) {
+		uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme,
+		const string &codingSetting, const vector<uint32_t> &objectNodeList,
+		const string &checksum) {
 	struct ObjectMetaData objectMetaData;
 	objectMetaData._id = objectId;
 	objectMetaData._nodeList = objectNodeList;
@@ -169,9 +172,9 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		for (it = objectList.begin(); it < objectList.end(); ++it) {
 			debug("Read primary list %" PRIu64 "\n", *it);
 			try {
-			primaryId = _metaDataModule->getPrimary(*it);
+				primaryId = _metaDataModule->getPrimary(*it);
 			} catch (...) {
-				debug_yellow("%s\n","No Primary Found");
+				debug_yellow("%s\n", "No Primary Found");
 				continue;
 			}
 			primaryList.push_back(primaryId);
@@ -181,7 +184,7 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		fileSize = _metaDataModule->readFileSize(fileId);
 		checksum = _metaDataModule->readChecksum(fileId);
 
-		debug ("FILESIZE = %" PRIu64 "\n", fileSize);
+		debug("FILESIZE = %" PRIu64 "\n", fileSize);
 	} else
 		fileType = NOTFOUND;
 
@@ -256,9 +259,17 @@ void Mds::listFolderProcessor(uint32_t requestId, uint32_t connectionId,
  */
 void Mds::primaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t osdId, uint64_t objectId, FailureReason reason) {
+
+	// get the node list of an object and their status
+	vector<uint32_t> nodeList = _metaDataModule->readNodeList(objectId);
+	vector<bool> nodeStatus = _mdsCommunicator->getOsdStatusRequest(nodeList);
+
+	// select new primary OSD and write to DB
 	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(objectId,
-			osdId);
-	_mdsCommunicator->reportFailure(osdId, reason);
+			nodeList, nodeStatus);
+
+//	_mdsCommunicator->reportFailure(osdId, reason);
+
 	_mdsCommunicator->replyPrimary(requestId, connectionId, objectId,
 			actingPrimary);
 
@@ -322,7 +333,8 @@ void Mds::nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
  * @brief	Handle Object List Save Request
  */
 void Mds::saveObjectListProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, uint32_t fileId, const vector<uint64_t> &objectList) {
+		uint32_t clientId, uint32_t fileId,
+		const vector<uint64_t> &objectList) {
 	_metaDataModule->saveObjectList(fileId, objectList);
 	_mdsCommunicator->replySaveObjectList(requestId, connectionId, fileId);
 	return;
