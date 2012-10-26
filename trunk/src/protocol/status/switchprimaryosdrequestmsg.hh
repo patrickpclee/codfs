@@ -16,7 +16,7 @@ public:
 	SwitchPrimaryOsdRequestMsg(Communicator* communicator);
 
 	SwitchPrimaryOsdRequestMsg(Communicator* communicator, uint32_t dstSockfd,
-			uint64_t objectId);
+			uint32_t clientId, uint64_t objectId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -52,6 +52,7 @@ public:
 	void setNewPrimaryOsdId(uint32_t osdId);
 
 private:
+	uint32_t _clientId;
 	uint64_t _objectId;
 	uint32_t _newPrimaryOsdId;
 };

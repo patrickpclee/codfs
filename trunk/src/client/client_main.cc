@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
 	 */
 
 	// RAID 1
-	const uint32_t raid1_n = 1;
+	const uint32_t raid1_n = 3;
 	CodingScheme codingScheme = RAID1_CODING;
 	string codingSetting = Raid1Coding::generateSetting(raid1_n);
 

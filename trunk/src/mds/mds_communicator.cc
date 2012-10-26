@@ -1,6 +1,5 @@
 #include <iostream>
 #include "mds_communicator.hh"
-
 #include "../common/debug.hh"
 #include "../config/config.hh"
 #include "../protocol/metadata/listdirectoryreply.hh"
@@ -11,6 +10,8 @@
 #include "../protocol/metadata/getobjectinforeply.hh"
 #include "../protocol/metadata/downloadfilereply.hh"
 #include "../protocol/metadata/getobjectidlistreply.hh"
+#include "../protocol/status/switchprimaryosdreplymsg.hh"
+#include "../protocol/status/getosdstatusrequestmsg.hh"
 //#include "../protocol/metadata/heresfilesize.hh"
 
 extern ConfigLayer* configLayer;
@@ -144,6 +145,11 @@ void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
 
 void MdsCommunicator::replyPrimary(uint32_t requestId, uint32_t connectionId,
 		uint64_t objectId, uint32_t osdId) {
+
+	SwitchPrimaryOsdReplyMsg* reply = new SwitchPrimaryOsdReplyMsg(this,
+		requestId, connectionId, osdId);
+	reply->prepareProtocolMsg();
+	addMessage(reply);
 	return;
 }
 

@@ -17,9 +17,10 @@ SwitchPrimaryOsdRequestMsg::SwitchPrimaryOsdRequestMsg(Communicator* communicato
 }
 
 SwitchPrimaryOsdRequestMsg::SwitchPrimaryOsdRequestMsg(Communicator* communicator, uint32_t sockfd,
-		uint64_t objectId) :
+		uint32_t clientId, uint64_t objectId) :
 		Message(communicator) {
 
+	_clientId = clientId;
 	_sockfd = sockfd;
 	_objectId = objectId;
 }
@@ -55,6 +56,8 @@ void SwitchPrimaryOsdRequestMsg::parse(char* buf) {
 
 void SwitchPrimaryOsdRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
+	mds->primaryFailureProcessor(_msgHeader.requestId, _sockfd, _clientId,
+	_objectId, UNREACHABLE);
 #endif
 }
 

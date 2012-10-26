@@ -132,8 +132,8 @@ uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId, vector<uint32_t>
 	while (true) {
 		int newPrimary = rand() % nodeStatus.size();
 		if (nodeStatus[newPrimary] == true) {
-			setPrimary (objectId, newPrimary);
-			return newPrimary;
+			setPrimary (objectId, nodeList[newPrimary]);
+			return nodeList[newPrimary];
 		}
 	}
 
