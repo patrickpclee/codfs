@@ -76,6 +76,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// case 1: if object exists in cache
 				debug("Object ID = %" PRIu64 " exists in cache", objectId);
 				objectData = _storageModule->getObjectFromDiskCache(objectId);
+				_storageModule->closeObjectFile(objectId);
 			} else {
 				// case 2: if object does not exist in cache
 
@@ -343,6 +344,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			// close file and free cache
 			_storageModule->closeObjectCache(objectId);
+
+			_storageModule->closeObjectFile(objectId);
 
 			break;
 		} else {
