@@ -25,6 +25,7 @@
 #include "../protocol/transfer/segmentdatamsg.hh"
 #include "../protocol/nodelist/getsecondarylistrequest.hh"
 #include "../protocol/status/osdstartupmsg.hh"
+#include "../protocol/status/getosdstatusrequestmsg.hh"
 
 using namespace std;
 
@@ -169,34 +170,25 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 	}
 
 	return {};
-	/* 
-	 srand(time(NULL));
+}
 
-	 // TODO: request to MONITOR (HARDCODE FOR NOW)
+vector<bool> OsdCommunicator::getOsdStatusRequest(vector<uint32_t> osdIdList) {
 
-	 for (uint32_t i = 0; i < segmentCount; i++) {
-	 struct SegmentLocation segmentLocation;
+	GetOsdStatusRequestMsg* getOsdStatusRequestMsg =
+			new GetOsdStatusRequestMsg(this, getMonitorSockfd(),
+					osdIdList);
+	getOsdStatusRequestMsg->prepareProtocolMsg();
 
-	 // DEBUG 1: random assignment
-	 segmentLocation.osdId = rand() % 2 + 52000;
+	addMessage(getOsdStatusRequestMsg, true);
+	MessageStatus status = getOsdStatusRequestMsg->waitForStatusChange();
 
-	 // DEBUG 2: must be local
-	 //segmentLocation.osdId = _componentId;
+	if (status == READY) {
+		vector<bool> osdStatusList =
+				getOsdStatusRequestMsg->getOsdStatus();
+		return osdStatusList;
+	}
 
-	 // DEBUG 3: must be foreign
-	 if (_componentId == 52000) {
-	 segmentLocation.osdId = 52001;
-	 } else {
-	 segmentLocation.osdId = 52000;
-	 }
-
-	 segmentLocation.segmentId = 0;
-	 osdList.push_back(segmentLocation);
-	 }
-
-	 return osdList;
-	 */
-
+	return {};
 }
 
 uint32_t OsdCommunicator::sendSegmentAck(uint64_t objectId, uint32_t segmentId,

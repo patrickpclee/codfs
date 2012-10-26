@@ -145,7 +145,23 @@ public:
 			CodingScheme codingScheme, string codingSetting,
 			vector<uint32_t> nodeList, string checksum);
 
+	/**
+	 * Register myself to the MONITOR
+	 * @param selfIp My IP
+	 * @param selfPort My Port
+	 */
+
 	void registerToMonitor(uint32_t selfIp, uint16_t selfPort);
+
+	/**
+	 * Request the status of OSD from MONITOR
+	 * @param osdIdList List of OSD ID to request
+	 * @return boolean array storing OSD health
+	 */
+
+	vector<bool> getOsdStatusRequest(
+			vector<uint32_t> osdIdList);
+
 private:
 
 	/**
