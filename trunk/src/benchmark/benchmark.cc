@@ -274,6 +274,9 @@ int main(int argc, char *argv[]) {
 	}
 	*/
 
+	cout << "Now Sleep 5 Seconds then Exit" << endl;
+	sleep(5);
+	exit(0);
 	garbageCollectionThread.join();
 	receiveThread.join();
 	sendThread.join();
