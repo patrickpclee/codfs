@@ -10,6 +10,7 @@
 #include "../protocol/nodelist/getsecondarylistreply.hh"
 #include "../protocol/status/onlineosdlistmsg.hh"
 #include "../protocol/nodelist/getosdlistreply.hh"
+#include "../protocol/status/getosdstatusreplymsg.hh"
 
 using namespace std;
 
@@ -60,4 +61,12 @@ void MonitorCommunicator::replyOsdList(uint32_t requestId, uint32_t clientSockfd
 		clientSockfd, onlineOsdList);
 	getOsdListReplyMsg->prepareProtocolMsg();
 	addMessage(getOsdListReplyMsg);
+}
+
+void MonitorCommunicator::replyGetOsdStatus(uint32_t requestId, uint32_t clientSockfd, 
+		vector<bool>& osdStatRef) {
+	GetOsdStatusReplyMsg* getOsdStatusReplyMsg = new GetOsdStatusReplyMsg(this, requestId, 
+		clientSockfd, osdStatRef);
+	getOsdStatusReplyMsg->prepareProtocolMsg();
+	addMessage(getOsdStatusReplyMsg);
 }

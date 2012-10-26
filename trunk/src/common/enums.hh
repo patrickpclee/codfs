@@ -84,6 +84,10 @@ enum MsgType {
 	NEW_OSD_REGISTER,
 	ONLINE_OSD_LIST,
 
+	// Newly Added For degraded read
+	GET_OSD_STATUS_REQUEST,
+	GET_OSD_STATUS_REPLY,
+
 	// END
 	MSGTYPE_END
 };

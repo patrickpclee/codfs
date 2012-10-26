@@ -167,6 +167,12 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* OnlineOsdListPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   OnlineOsdListPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* GetOsdStatusRequestPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  GetOsdStatusRequestPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* GetOsdStatusReplyPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  GetOsdStatusReplyPro_reflection_ = NULL;
 const ::google::protobuf::Descriptor* GetPrimaryListReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   GetPrimaryListReplyPro_reflection_ = NULL;
@@ -997,7 +1003,37 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OnlineOsdListPro));
-  GetPrimaryListReplyPro_descriptor_ = file->message_type(49);
+  GetOsdStatusRequestPro_descriptor_ = file->message_type(49);
+  static const int GetOsdStatusRequestPro_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusRequestPro, osdids_),
+  };
+  GetOsdStatusRequestPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      GetOsdStatusRequestPro_descriptor_,
+      GetOsdStatusRequestPro::default_instance_,
+      GetOsdStatusRequestPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusRequestPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusRequestPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(GetOsdStatusRequestPro));
+  GetOsdStatusReplyPro_descriptor_ = file->message_type(50);
+  static const int GetOsdStatusReplyPro_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusReplyPro, osdstatus_),
+  };
+  GetOsdStatusReplyPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      GetOsdStatusReplyPro_descriptor_,
+      GetOsdStatusReplyPro::default_instance_,
+      GetOsdStatusReplyPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusReplyPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusReplyPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(GetOsdStatusReplyPro));
+  GetPrimaryListReplyPro_descriptor_ = file->message_type(51);
   static const int GetPrimaryListReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListReplyPro, primarylist_),
   };
@@ -1012,7 +1048,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrimaryListReplyPro));
-  GetOsdListReplyPro_descriptor_ = file->message_type(50);
+  GetOsdListReplyPro_descriptor_ = file->message_type(52);
   static const int GetOsdListReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdListReplyPro, onlineosdlist_),
   };
@@ -1138,6 +1174,10 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     OnlineOsdListPro_descriptor_, &OnlineOsdListPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    GetOsdStatusRequestPro_descriptor_, &GetOsdStatusRequestPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    GetOsdStatusReplyPro_descriptor_, &GetOsdStatusReplyPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     GetPrimaryListReplyPro_descriptor_, &GetPrimaryListReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     GetOsdListReplyPro_descriptor_, &GetOsdListReplyPro::default_instance());
@@ -1244,6 +1284,10 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete OnlineOsdPro_reflection_;
   delete OnlineOsdListPro::default_instance_;
   delete OnlineOsdListPro_reflection_;
+  delete GetOsdStatusRequestPro::default_instance_;
+  delete GetOsdStatusRequestPro_reflection_;
+  delete GetOsdStatusReplyPro::default_instance_;
+  delete GetOsdStatusReplyPro_reflection_;
   delete GetPrimaryListReplyPro::default_instance_;
   delete GetPrimaryListReplyPro_reflection_;
   delete GetOsdListReplyPro::default_instance_;
@@ -1360,10 +1404,12 @@ void protobuf_AddDesc_message_2eproto() {
     " \001(\007\022\017\n\007osdPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n"
     "\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003"
     " \001(\007\">\n\020OnlineOsdListPro\022*\n\ronlineOsdLis"
-    "t\030\001 \003(\0132\023.ncvfs.OnlineOsdPro\"-\n\026GetPrima"
-    "ryListReplyPro\022\023\n\013primaryList\030\001 \003(\007\"@\n\022G"
-    "etOsdListReplyPro\022*\n\ronlineOsdList\030\001 \003(\013"
-    "2\023.ncvfs.OnlineOsdProB\002H\001", 4265);
+    "t\030\001 \003(\0132\023.ncvfs.OnlineOsdPro\"(\n\026GetOsdSt"
+    "atusRequestPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetOsd"
+    "StatusReplyPro\022\021\n\tosdStatus\030\001 \003(\010\"-\n\026Get"
+    "PrimaryListReplyPro\022\023\n\013primaryList\030\001 \003(\007"
+    "\"@\n\022GetOsdListReplyPro\022*\n\ronlineOsdList\030"
+    "\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 4350);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -1415,6 +1461,8 @@ void protobuf_AddDesc_message_2eproto() {
   NewOsdRegisterPro::default_instance_ = new NewOsdRegisterPro();
   OnlineOsdPro::default_instance_ = new OnlineOsdPro();
   OnlineOsdListPro::default_instance_ = new OnlineOsdListPro();
+  GetOsdStatusRequestPro::default_instance_ = new GetOsdStatusRequestPro();
+  GetOsdStatusReplyPro::default_instance_ = new GetOsdStatusReplyPro();
   GetPrimaryListReplyPro::default_instance_ = new GetPrimaryListReplyPro();
   GetOsdListReplyPro::default_instance_ = new GetOsdListReplyPro();
   HandshakeRequestPro::default_instance_->InitAsDefaultInstance();
@@ -1466,6 +1514,8 @@ void protobuf_AddDesc_message_2eproto() {
   NewOsdRegisterPro::default_instance_->InitAsDefaultInstance();
   OnlineOsdPro::default_instance_->InitAsDefaultInstance();
   OnlineOsdListPro::default_instance_->InitAsDefaultInstance();
+  GetOsdStatusRequestPro::default_instance_->InitAsDefaultInstance();
+  GetOsdStatusReplyPro::default_instance_->InitAsDefaultInstance();
   GetPrimaryListReplyPro::default_instance_->InitAsDefaultInstance();
   GetOsdListReplyPro::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_message_2eproto);
@@ -14839,6 +14889,420 @@ void OnlineOsdListPro::Swap(OnlineOsdListPro* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = OnlineOsdListPro_descriptor_;
   metadata.reflection = OnlineOsdListPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int GetOsdStatusRequestPro::kOsdIdsFieldNumber;
+#endif  // !_MSC_VER
+
+GetOsdStatusRequestPro::GetOsdStatusRequestPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void GetOsdStatusRequestPro::InitAsDefaultInstance() {
+}
+
+GetOsdStatusRequestPro::GetOsdStatusRequestPro(const GetOsdStatusRequestPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void GetOsdStatusRequestPro::SharedCtor() {
+  _cached_size_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+GetOsdStatusRequestPro::~GetOsdStatusRequestPro() {
+  SharedDtor();
+}
+
+void GetOsdStatusRequestPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void GetOsdStatusRequestPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* GetOsdStatusRequestPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return GetOsdStatusRequestPro_descriptor_;
+}
+
+const GetOsdStatusRequestPro& GetOsdStatusRequestPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+GetOsdStatusRequestPro* GetOsdStatusRequestPro::default_instance_ = NULL;
+
+GetOsdStatusRequestPro* GetOsdStatusRequestPro::New() const {
+  return new GetOsdStatusRequestPro;
+}
+
+void GetOsdStatusRequestPro::Clear() {
+  osdids_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool GetOsdStatusRequestPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated fixed32 osdIds = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdIds:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 1, 13, input, this->mutable_osdids())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_LENGTH_DELIMITED) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, this->mutable_osdids())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(13)) goto parse_osdIds;
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void GetOsdStatusRequestPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // repeated fixed32 osdIds = 1;
+  for (int i = 0; i < this->osdids_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(
+      1, this->osdids(i), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* GetOsdStatusRequestPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // repeated fixed32 osdIds = 1;
+  for (int i = 0; i < this->osdids_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteFixed32ToArray(1, this->osdids(i), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int GetOsdStatusRequestPro::ByteSize() const {
+  int total_size = 0;
+  
+  // repeated fixed32 osdIds = 1;
+  {
+    int data_size = 0;
+    data_size = 4 * this->osdids_size();
+    total_size += 1 * this->osdids_size() + data_size;
+  }
+  
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void GetOsdStatusRequestPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const GetOsdStatusRequestPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const GetOsdStatusRequestPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void GetOsdStatusRequestPro::MergeFrom(const GetOsdStatusRequestPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  osdids_.MergeFrom(from.osdids_);
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void GetOsdStatusRequestPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GetOsdStatusRequestPro::CopyFrom(const GetOsdStatusRequestPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GetOsdStatusRequestPro::IsInitialized() const {
+  
+  return true;
+}
+
+void GetOsdStatusRequestPro::Swap(GetOsdStatusRequestPro* other) {
+  if (other != this) {
+    osdids_.Swap(&other->osdids_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata GetOsdStatusRequestPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = GetOsdStatusRequestPro_descriptor_;
+  metadata.reflection = GetOsdStatusRequestPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int GetOsdStatusReplyPro::kOsdStatusFieldNumber;
+#endif  // !_MSC_VER
+
+GetOsdStatusReplyPro::GetOsdStatusReplyPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void GetOsdStatusReplyPro::InitAsDefaultInstance() {
+}
+
+GetOsdStatusReplyPro::GetOsdStatusReplyPro(const GetOsdStatusReplyPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void GetOsdStatusReplyPro::SharedCtor() {
+  _cached_size_ = 0;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+GetOsdStatusReplyPro::~GetOsdStatusReplyPro() {
+  SharedDtor();
+}
+
+void GetOsdStatusReplyPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void GetOsdStatusReplyPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* GetOsdStatusReplyPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return GetOsdStatusReplyPro_descriptor_;
+}
+
+const GetOsdStatusReplyPro& GetOsdStatusReplyPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+GetOsdStatusReplyPro* GetOsdStatusReplyPro::default_instance_ = NULL;
+
+GetOsdStatusReplyPro* GetOsdStatusReplyPro::New() const {
+  return new GetOsdStatusReplyPro;
+}
+
+void GetOsdStatusReplyPro::Clear() {
+  osdstatus_.Clear();
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool GetOsdStatusReplyPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // repeated bool osdStatus = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_osdStatus:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 1, 8, input, this->mutable_osdstatus())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_LENGTH_DELIMITED) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, this->mutable_osdstatus())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(8)) goto parse_osdStatus;
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void GetOsdStatusReplyPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // repeated bool osdStatus = 1;
+  for (int i = 0; i < this->osdstatus_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(
+      1, this->osdstatus(i), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* GetOsdStatusReplyPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // repeated bool osdStatus = 1;
+  for (int i = 0; i < this->osdstatus_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteBoolToArray(1, this->osdstatus(i), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int GetOsdStatusReplyPro::ByteSize() const {
+  int total_size = 0;
+  
+  // repeated bool osdStatus = 1;
+  {
+    int data_size = 0;
+    data_size = 1 * this->osdstatus_size();
+    total_size += 1 * this->osdstatus_size() + data_size;
+  }
+  
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void GetOsdStatusReplyPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const GetOsdStatusReplyPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const GetOsdStatusReplyPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void GetOsdStatusReplyPro::MergeFrom(const GetOsdStatusReplyPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  osdstatus_.MergeFrom(from.osdstatus_);
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void GetOsdStatusReplyPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void GetOsdStatusReplyPro::CopyFrom(const GetOsdStatusReplyPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool GetOsdStatusReplyPro::IsInitialized() const {
+  
+  return true;
+}
+
+void GetOsdStatusReplyPro::Swap(GetOsdStatusReplyPro* other) {
+  if (other != this) {
+    osdstatus_.Swap(&other->osdstatus_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata GetOsdStatusReplyPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = GetOsdStatusReplyPro_descriptor_;
+  metadata.reflection = GetOsdStatusReplyPro_reflection_;
   return metadata;
 }
 

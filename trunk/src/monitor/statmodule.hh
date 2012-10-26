@@ -77,6 +77,13 @@ public:
 	void broadcastNewOsd(Communicator* communicator, uint32_t osdId, 
 		uint32_t ip, uint32_t port);
 
+	/**
+	 * When a get osd status request for degraded read
+	 * @param osdListRef request reference of osd list
+	 * @param osdStatusRef return reference
+	 */
+	void getOsdStatus(vector<uint32_t>& osdListRef, vector<bool>& osdStatusRef);
+
 private:
 
 	/**

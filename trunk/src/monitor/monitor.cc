@@ -103,6 +103,13 @@ void Monitor::getOsdListProcessor (uint32_t requestId, uint32_t sockfd) {
 	_monitorCommunicator->replyOsdList(requestId, sockfd, osdList);
 }
 
+void Monitor::getOsdStatusRequestProcessor (uint32_t requestId, uint32_t sockfd,
+	vector<uint32_t>& osdListRef) {
+	vector<bool> osdStatus;
+	_statModule->getOsdStatus(osdListRef, osdStatus);
+	_monitorCommunicator->replyGetOsdStatus(requestId, sockfd, osdStatus);
+}
+
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
 }
