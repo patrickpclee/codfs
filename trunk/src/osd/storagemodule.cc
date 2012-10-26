@@ -18,7 +18,7 @@
 #include "../common/debug.hh"
 #include "../common/convertor.hh"
 
-//#define USE_OBJECT_CACHE
+#define USE_OBJECT_CACHE
 
 // global variable defined in each component
 extern ConfigLayer* configLayer;
