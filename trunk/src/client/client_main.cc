@@ -85,26 +85,27 @@ int main(int argc, char *argv[]) {
 
 	// TEST PUT OBJECT
 
-	/*
 
+	/*
 	// RAID 0
 	const uint32_t raid0_n = 3;
 	CodingScheme codingScheme = RAID0_CODING;
 	string codingSetting = Raid0Coding::generateSetting(raid0_n);
-*/
+	 */
 
 	// RAID 1
 	const uint32_t raid1_n = 1;
 	CodingScheme codingScheme = RAID1_CODING;
 	string codingSetting = Raid1Coding::generateSetting(raid1_n);
 
-/*
+	/*
 	// RAID 5
 	const uint32_t raid5_n = 3;
 	CodingScheme codingScheme = RAID5_CODING;
 	string codingSetting = Raid5Coding::generateSetting(raid5_n);
+	*/
 
-
+	/*
 	// RS
 	const uint32_t rs_k = 6, rs_m = 2, rs_w = 8;
 	CodingScheme codingScheme = RS_CODING;
