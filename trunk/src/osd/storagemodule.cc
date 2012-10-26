@@ -152,6 +152,7 @@ uint64_t StorageModule::getFilesize(string filepath) {
 
 	if (!in) {
 		debug("ERROR: Cannot open file: %s\n", filepath.c_str());
+		perror("ifstream");
 		exit(-1);
 	}
 
@@ -529,13 +530,14 @@ FILE* StorageModule::openFile(string filepath) {
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "rb+");
 
-	// set buffer to zero to avoid memory leak
-	setvbuf(filePtr, NULL, _IONBF, 0);
-
 	if (filePtr == NULL) {
 		debug("Unable to open file at %s\n", filepath.c_str());
+		perror("fopen()");
 		return NULL;
 	}
+
+	// set buffer to zero to avoid memory leak
+	setvbuf(filePtr, NULL, _IONBF, 0);
 
 	// add file pointer to map
 
