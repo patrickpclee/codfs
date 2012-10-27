@@ -342,13 +342,11 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			// if all chunks have arrived, send ack
 			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
-			// after ack, write object cache to disk
+			// after ack, write object cache to disk (and close file)
 			_storageModule->saveObjectToDisk(objectId, objectCache);
 
 			// close file and free cache
 			_storageModule->closeObjectCache(objectId);
-
-			_storageModule->closeObjectFile(objectId);
 
 			break;
 		} else {
