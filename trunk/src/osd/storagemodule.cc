@@ -24,12 +24,12 @@ extern ConfigLayer* configLayer;
 
 mutex fileMutex;
 mutex openedFileMutex;
-mutex cacheMutex;
-mutex lruCacheMutex;
-mutex verifyAndUpdateSpaceMutex;
+mutex transferCacheMutex;
+mutex diskCacheMutex;
+mutex diskSpaceMutex;
 
 StorageModule::StorageModule() {
-	_objectCache = {};
+	_objectTransferCache = {};
 	_objectFolder = configLayer->getConfigString("Storage>ObjectCacheLocation");
 	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
 
@@ -109,7 +109,7 @@ void StorageModule::initializeStorageStatus() {
 		objectDiskCache.filepath = _objectFolder + dent->d_name;
 
 		{
-			lock_guard<mutex> lk(lruCacheMutex);
+			lock_guard<mutex> lk(diskCacheMutex);
 			_objectDiskCacheMap.set(objectId, objectDiskCache);
 			_objectCacheQueue.push_back(objectId);
 		}
@@ -181,24 +181,24 @@ uint64_t StorageModule::getFilesize(string filepath) {
 
 }
 
-void StorageModule::createObjectCache(uint64_t objectId, uint32_t length) {
+void StorageModule::createObjectTransferCache(uint64_t objectId, uint32_t length) {
 
 	// create cache
-	struct ObjectTransferCache objectCache;
-	objectCache.length = length;
-	objectCache.buf = MemoryPool::getInstance().poolMalloc(length);
+	struct ObjectTransferCache objectTransferCache;
+	objectTransferCache.length = length;
+	objectTransferCache.buf = MemoryPool::getInstance().poolMalloc(length);
 
 	// save cache to map
 	{
-		lock_guard<mutex> lk(cacheMutex);
-		_objectCache[objectId] = objectCache;
+		lock_guard<mutex> lk(transferCacheMutex);
+		_objectTransferCache[objectId] = objectTransferCache;
 	}
 
 	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 "\n",
 			objectId, length);
 }
 
-void StorageModule::createObjectFile(uint64_t objectId, uint32_t length) {
+void StorageModule::createObjectDiskCache(uint64_t objectId, uint32_t length) {
 	// create object
 	createAndOpenObjectFile(objectId, length);
 
@@ -224,7 +224,7 @@ bool StorageModule::isObjectCached(uint64_t objectId) {
 	return false;
 #endif
 
-	lock_guard<mutex> lk(lruCacheMutex);
+	lock_guard<mutex> lk(diskCacheMutex);
 	if (_objectDiskCacheMap.count(objectId)) {
 
 		_objectDiskCacheMap.get(objectId).lastAccessedTime = {time(NULL), 0};
@@ -304,20 +304,20 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 	return segmentData;
 }
 
-uint32_t StorageModule::writeObjectCache(uint64_t objectId, char* buf,
+uint32_t StorageModule::writeObjectTransferCache(uint64_t objectId, char* buf,
 		uint64_t offsetInObject, uint32_t length) {
 
 	char* recvCache;
 
 	{
-		lock_guard<mutex> lk(cacheMutex);
-		if (!_objectCache.count(objectId)) {
+		lock_guard<mutex> lk(transferCacheMutex);
+		if (!_objectTransferCache.count(objectId)) {
 			debug("%s\n", "cannot find cache for object");
 			cout << "writeObjectCache Object Cache Not Found " << objectId
 					<< endl;
 			exit(-1);
 		}
-		recvCache = _objectCache[objectId].buf;
+		recvCache = _objectTransferCache[objectId].buf;
 	}
 
 	memcpy(recvCache + offsetInObject, buf, length);
@@ -325,7 +325,7 @@ uint32_t StorageModule::writeObjectCache(uint64_t objectId, char* buf,
 	return length;
 }
 
-uint32_t StorageModule::writeObjectFile(uint64_t objectId, char* buf,
+uint32_t StorageModule::writeObjectDiskCache(uint64_t objectId, char* buf,
 		uint64_t offsetInObject, uint32_t length) {
 
 	uint32_t byteWritten;
@@ -376,20 +376,20 @@ FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
 	return createFile(filepath);
 }
 
-void StorageModule::closeObjectCache(uint64_t objectId) {
+void StorageModule::closeObjectTransferCache(uint64_t objectId) {
 	// close cache
-	struct ObjectTransferCache objectCache = getObjectCache(objectId);
+	struct ObjectTransferCache objectCache = getObjectTransferCache(objectId);
 	MemoryPool::getInstance().poolFree(objectCache.buf);
 
 	{
-		lock_guard<mutex> lk(cacheMutex);
-		_objectCache.erase(objectId);
+		lock_guard<mutex> lk(transferCacheMutex);
+		_objectTransferCache.erase(objectId);
 	}
 
 	debug("Object Cache ID = %" PRIu64 " closed\n", objectId);
 }
 
-void StorageModule::closeObjectFile(uint64_t objectId) {
+void StorageModule::closeObjectDiskCache(uint64_t objectId) {
 	// close file
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	closeFile(filepath);
@@ -578,18 +578,18 @@ void StorageModule::closeFile(string filepath) {
 
 	openedFileMutex.lock();
 	_openedFile.erase(filepath);
-	fclose(filePtr);
 	openedFileMutex.unlock();
+	fclose(filePtr);
 }
 
-struct ObjectTransferCache StorageModule::getObjectCache(uint64_t objectId) {
-	lock_guard<mutex> lk(cacheMutex);
-	if (!_objectCache.count(objectId)) {
+struct ObjectTransferCache StorageModule::getObjectTransferCache(uint64_t objectId) {
+	lock_guard<mutex> lk(transferCacheMutex);
+	if (!_objectTransferCache.count(objectId)) {
 		debug("%s\n", "object cache not found");
 		cout << "GetObjectCache Object Cache Not Found " << objectId << endl;
 		exit(-1);
 	}
-	return _objectCache[objectId];
+	return _objectTransferCache[objectId];
 }
 
 void StorageModule::setMaxSegmentCapacity(uint32_t max_segment) {
@@ -654,7 +654,7 @@ int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
 		struct ObjectDiskCache objectCache;
 
 		{
-			lock_guard<mutex> lk(lruCacheMutex);
+			lock_guard<mutex> lk(diskCacheMutex);
 			objectId = _objectCacheQueue.front();
 			objectCache = _objectDiskCacheMap.get(objectId);
 		}
@@ -667,7 +667,7 @@ int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
 
 		// remove from queue and map
 		{
-			lock_guard<mutex> lk(lruCacheMutex);
+			lock_guard<mutex> lk(diskCacheMutex);
 			_objectCacheQueue.remove(objectId);
 			_objectDiskCacheMap.erase(objectId);
 		}
@@ -677,7 +677,7 @@ int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
 
 }
 
-void StorageModule::saveObjectToDisk(uint64_t objectId,
+void StorageModule::putObjectToDiskCache(uint64_t objectId,
 		ObjectTransferCache objectCache) {
 
 	debug("Before saving object ID = %" PRIu64 ", cache = %s\n",
@@ -687,7 +687,7 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 
 	{
 
-		lock_guard<mutex> lk(verifyAndUpdateSpaceMutex);
+		lock_guard<mutex> lk(diskSpaceMutex);
 
 		if (!verifyObjectSpace(objectSize)) {
 			// clear cache if space is not available
@@ -709,7 +709,7 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	createAndOpenObjectFile(objectId, objectCache.length);
 
 #ifdef USE_OBJECT_CACHE
-	uint64_t byteWritten = writeObjectFile(objectId, objectCache.buf, 0,
+	uint64_t byteWritten = writeObjectDiskCache(objectId, objectCache.buf, 0,
 			objectCache.length);
 #else
 	uint64_t byteWritten = objectCache.length;
@@ -719,7 +719,7 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 		perror("Cannot saveObjectToDisk");
 		exit(-1);
 	}
-	closeObjectFile(objectId);
+	closeObjectDiskCache(objectId);
 
 	_currentObjectUsage += objectSize;
 	_freeObjectSpace -= objectSize;
@@ -731,7 +731,7 @@ void StorageModule::saveObjectToDisk(uint64_t objectId,
 	objectDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
 
 	{
-		lock_guard<mutex> lk(lruCacheMutex);
+		lock_guard<mutex> lk(diskCacheMutex);
 		_objectDiskCacheMap.set(objectId, objectDiskCache);
 		_objectCacheQueue.push_back(objectId);
 	}
@@ -745,7 +745,7 @@ struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
 	struct ObjectData objectData;
 	struct ObjectDiskCache objectDiskCache;
 	{
-		lock_guard<mutex> lk(lruCacheMutex);
+		lock_guard<mutex> lk(diskCacheMutex);
 		objectDiskCache = _objectDiskCacheMap.get(objectId);
 	}
 	objectData = readObject(objectId, 0, objectDiskCache.length);
@@ -759,7 +759,7 @@ void StorageModule::clearObjectDiskCache() {
 	}
 
 	{
-		lock_guard<mutex> lk(lruCacheMutex);
+		lock_guard<mutex> lk(diskCacheMutex);
 		_objectCacheQueue.clear();
 		_objectDiskCacheMap.clear();
 	}

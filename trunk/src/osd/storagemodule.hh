@@ -62,7 +62,7 @@ public:
 	 * @param length Length of object
 	 */
 
-	void createObjectCache(uint64_t objectId, uint32_t length);
+	void createObjectTransferCache(uint64_t objectId, uint32_t length);
 
 	/**
 	 * Create and open the file for storing the object on disk
@@ -70,7 +70,7 @@ public:
 	 * @param length Length of object
 	 */
 
-	void createObjectFile(uint64_t objectId, uint32_t length);
+	void createObjectDiskCache(uint64_t objectId, uint32_t length);
 
 	/**
 	 * Create and open the file for storing the segment on disk
@@ -113,7 +113,7 @@ public:
 	 * @return Number of bytes written
 	 */
 
-	uint32_t writeObjectFile(uint64_t objectId, char* buf,
+	uint32_t writeObjectDiskCache(uint64_t objectId, char* buf,
 			uint64_t offsetInObject, uint32_t length);
 
 	/**
@@ -125,7 +125,7 @@ public:
 	 * @return No of bytes written
 	 */
 
-	uint32_t writeObjectCache(uint64_t objectId, char* buf,
+	uint32_t writeObjectTransferCache(uint64_t objectId, char* buf,
 			uint64_t offsetInObject, uint32_t length);
 
 	/**
@@ -164,14 +164,14 @@ public:
 	 * @param objectId Object ID
 	 */
 
-	void closeObjectCache(uint64_t objectId);
+	void closeObjectTransferCache(uint64_t objectId);
 
 	/**
 	 * Close the object file
 	 * @param objectId Object ID
 	 */
 
-	void closeObjectFile(uint64_t objectId);
+	void closeObjectDiskCache(uint64_t objectId);
 
 	/**
 	 * Close the segment after the transfer is finished
@@ -188,7 +188,7 @@ public:
 	 * @return ObjectTransferCache  Object Cache
 	 */
 
-	struct ObjectTransferCache getObjectCache(uint64_t objectId);
+	struct ObjectTransferCache getObjectTransferCache(uint64_t objectId);
 
 	/**
 	 * Set the Capacity of OSD
@@ -270,7 +270,7 @@ public:
 	 * @param objectCache 	the object cache to be saved
 	 */
 
-	void saveObjectToDisk(uint64_t objectId, ObjectTransferCache objectCache);
+	void putObjectToDiskCache(uint64_t objectId, ObjectTransferCache objectCache);
 
 	/**
 	 * Read object cache from the disk
@@ -428,7 +428,7 @@ private:
 
 	//LruCache <string, FILE*> _openedFile;
 	map<string, FILE*> _openedFile;
-	map<uint64_t, struct ObjectTransferCache> _objectCache;
+	map<uint64_t, struct ObjectTransferCache> _objectTransferCache;
 	string _objectFolder;
 	string _segmentFolder;
 	uint64_t _maxSegmentCapacity;
