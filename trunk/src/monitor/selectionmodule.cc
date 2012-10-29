@@ -33,17 +33,28 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
 	return primaryList;
 }
 
-vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSegs){
-	//Just random choose secondary
+vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSegs, 
+	uint32_t primaryId) {
+
 	vector<struct SegmentLocation> secondaryList;
+
+	// Push the primary osd as the first secondary
+	struct SegmentLocation primary;
+	primary.osdId = primaryId;
+	primary.segmentId = 0;
+	secondaryList.push_back(primary);
+
+	//Just random choose secondary
 	{
 		set<uint32_t> selected;
 		lock_guard<mutex> lk(osdStatMapMutex);
-		while (numOfSegs>0) {
+		while (numOfSegs > 1) {
 			for(auto& entry: _osdStatMap) {
-				bool isAllOsdUsed = selected.size() >= _osdStatMap.size();
-				if (entry.second.osdHealth == ONLINE && (isAllOsdUsed ||
-							(!isAllOsdUsed && !selected.count(entry.first))) && (rand()&1)) {
+				// isFull -1 for the primary
+				bool isAllOsdUsed = selected.size() >= _osdStatMap.size() - 1;
+				if (entry.second.osdHealth == ONLINE && entry.first != primaryId 
+						&& (isAllOsdUsed ||	(!isAllOsdUsed && !selected.count(entry.first)))
+						&& (rand()&1)) {
 					// choose this as a secondary
 					struct SegmentLocation segmentLocation;
 					segmentLocation.osdId = entry.first;
@@ -56,5 +67,6 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 			}
 		}
 	}
+
 	return secondaryList;
 }

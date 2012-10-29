@@ -100,7 +100,8 @@ public:
 	 * @param sockfd Socket descriptor of message source
 	 * @param numOfSegs Number of OSDs required for coding
 	 */
-	void getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfSegs);
+	void getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t
+		 numOfSegs, uint32_t primaryId);
 
 	/**
 	 * Action when a CLIENT request current ONLIE OSDs for connection

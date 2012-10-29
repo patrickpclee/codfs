@@ -948,7 +948,7 @@ void protobuf_AssignDesc_message_2eproto() {
   GetSecondaryListRequestPro_descriptor_ = file->message_type(45);
   static const int GetSecondaryListRequestPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, numofsegs_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, secondarylist_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, primaryid_),
   };
   GetSecondaryListRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1441,22 +1441,21 @@ void protobuf_AddDesc_message_2eproto() {
     "\017\n\007osdPort\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005os"
     "dId\030\001 \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005os"
     "dId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoa"
-    "ding\030\003 \001(\007\"a\n\032GetSecondaryListRequestPro"
-    "\022\021\n\tnumOfSegs\030\001 \001(\007\0220\n\rsecondaryList\030\002 \003"
-    "(\0132\031.ncvfs.SegmentLocationPro\"\031\n\027OsdStat"
-    "UpdateRequestPro\"L\n\030GetSecondaryListRepl"
-    "yPro\0220\n\rsecondaryList\030\001 \003(\0132\031.ncvfs.Segm"
-    "entLocationPro\"B\n\021NewOsdRegisterPro\022\r\n\005o"
-    "sdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001"
-    "(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osd"
-    "Ip\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020OnlineOsdLi"
-    "stPro\022*\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs.Onl"
-    "ineOsdPro\"(\n\026GetOsdStatusRequestPro\022\016\n\006o"
-    "sdIds\030\001 \003(\007\")\n\024GetOsdStatusReplyPro\022\021\n\to"
-    "sdStatus\030\001 \003(\010\"-\n\026GetPrimaryListReplyPro"
-    "\022\023\n\013primaryList\030\001 \003(\007\"@\n\022GetOsdListReply"
-    "Pro\022*\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs.Onlin"
-    "eOsdProB\002H\001", 4451);
+    "ding\030\003 \001(\007\"B\n\032GetSecondaryListRequestPro"
+    "\022\021\n\tnumOfSegs\030\001 \001(\007\022\021\n\tprimaryId\030\002 \001(\007\"\031"
+    "\n\027OsdStatUpdateRequestPro\"L\n\030GetSecondar"
+    "yListReplyPro\0220\n\rsecondaryList\030\001 \003(\0132\031.n"
+    "cvfs.SegmentLocationPro\"B\n\021NewOsdRegiste"
+    "rPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007os"
+    "dPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 \001"
+    "(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020On"
+    "lineOsdListPro\022*\n\ronlineOsdList\030\001 \003(\0132\023."
+    "ncvfs.OnlineOsdPro\"(\n\026GetOsdStatusReques"
+    "tPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetOsdStatusRepl"
+    "yPro\022\021\n\tosdStatus\030\001 \003(\010\"-\n\026GetPrimaryLis"
+    "tReplyPro\022\023\n\013primaryList\030\001 \003(\007\"@\n\022GetOsd"
+    "ListReplyPro\022*\n\ronlineOsdList\030\001 \003(\0132\023.nc"
+    "vfs.OnlineOsdProB\002H\001", 4420);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -13992,7 +13991,7 @@ void OsdStatUpdateReplyPro::Swap(OsdStatUpdateReplyPro* other) {
 
 #ifndef _MSC_VER
 const int GetSecondaryListRequestPro::kNumOfSegsFieldNumber;
-const int GetSecondaryListRequestPro::kSecondaryListFieldNumber;
+const int GetSecondaryListRequestPro::kPrimaryIdFieldNumber;
 #endif  // !_MSC_VER
 
 GetSecondaryListRequestPro::GetSecondaryListRequestPro()
@@ -14012,6 +14011,7 @@ GetSecondaryListRequestPro::GetSecondaryListRequestPro(const GetSecondaryListReq
 void GetSecondaryListRequestPro::SharedCtor() {
   _cached_size_ = 0;
   numofsegs_ = 0u;
+  primaryid_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -14047,8 +14047,8 @@ GetSecondaryListRequestPro* GetSecondaryListRequestPro::New() const {
 void GetSecondaryListRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     numofsegs_ = 0u;
+    primaryid_ = 0u;
   }
-  secondarylist_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -14070,21 +14070,22 @@ bool GetSecondaryListRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(18)) goto parse_secondaryList;
+        if (input->ExpectTag(21)) goto parse_primaryId;
         break;
       }
       
-      // repeated .ncvfs.SegmentLocationPro secondaryList = 2;
+      // optional fixed32 primaryId = 2;
       case 2: {
         if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
-            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
-         parse_secondaryList:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
-                input, add_secondarylist()));
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_primaryId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &primaryid_)));
+          set_has_primaryid();
         } else {
           goto handle_uninterpreted;
         }
-        if (input->ExpectTag(18)) goto parse_secondaryList;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -14112,10 +14113,9 @@ void GetSecondaryListRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(1, this->numofsegs(), output);
   }
   
-  // repeated .ncvfs.SegmentLocationPro secondaryList = 2;
-  for (int i = 0; i < this->secondarylist_size(); i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->secondarylist(i), output);
+  // optional fixed32 primaryId = 2;
+  if (has_primaryid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->primaryid(), output);
   }
   
   if (!unknown_fields().empty()) {
@@ -14131,11 +14131,9 @@ void GetSecondaryListRequestPro::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(1, this->numofsegs(), target);
   }
   
-  // repeated .ncvfs.SegmentLocationPro secondaryList = 2;
-  for (int i = 0; i < this->secondarylist_size(); i++) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteMessageNoVirtualToArray(
-        2, this->secondarylist(i), target);
+  // optional fixed32 primaryId = 2;
+  if (has_primaryid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->primaryid(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -14154,15 +14152,12 @@ int GetSecondaryListRequestPro::ByteSize() const {
       total_size += 1 + 4;
     }
     
+    // optional fixed32 primaryId = 2;
+    if (has_primaryid()) {
+      total_size += 1 + 4;
+    }
+    
   }
-  // repeated .ncvfs.SegmentLocationPro secondaryList = 2;
-  total_size += 1 * this->secondarylist_size();
-  for (int i = 0; i < this->secondarylist_size(); i++) {
-    total_size +=
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        this->secondarylist(i));
-  }
-  
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -14188,10 +14183,12 @@ void GetSecondaryListRequestPro::MergeFrom(const ::google::protobuf::Message& fr
 
 void GetSecondaryListRequestPro::MergeFrom(const GetSecondaryListRequestPro& from) {
   GOOGLE_CHECK_NE(&from, this);
-  secondarylist_.MergeFrom(from.secondarylist_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_numofsegs()) {
       set_numofsegs(from.numofsegs());
+    }
+    if (from.has_primaryid()) {
+      set_primaryid(from.primaryid());
     }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
@@ -14217,7 +14214,7 @@ bool GetSecondaryListRequestPro::IsInitialized() const {
 void GetSecondaryListRequestPro::Swap(GetSecondaryListRequestPro* other) {
   if (other != this) {
     std::swap(numofsegs_, other->numofsegs_);
-    secondarylist_.Swap(&other->secondarylist_);
+    std::swap(primaryid_, other->primaryid_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
