@@ -335,7 +335,7 @@ message OsdStatUpdateReplyPro {
 
 message GetSecondaryListRequestPro{
 	optional fixed32 numOfSegs = 1;
-	repeated SegmentLocationPro secondaryList = 2;
+	optional fixed32 primaryId = 2;
 }
 
 ///////////////// FROM MONITOR /////////////////

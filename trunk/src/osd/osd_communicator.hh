@@ -110,7 +110,8 @@ public:
 	 */
 
 	vector<struct SegmentLocation> getOsdListRequest(uint64_t objectId,
-			ComponentType dstComponent, uint32_t segmentCount = 0);
+			ComponentType dstComponent, uint32_t segmentCount, uint32_t
+			primaryId);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored
