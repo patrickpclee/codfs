@@ -7,11 +7,6 @@ using namespace std;
 #include "../../common/segmentlocation.hh"
 #include "getsecondarylistrequest.hh"
 
-#ifdef COMPILE_FOR_OSD
-#include "../../osd/osd.hh"
-extern Osd* osd;
-#endif
-
 #ifdef COMPILE_FOR_MONITOR
 #include "../../monitor/monitor.hh"
 extern Monitor* monitor;
@@ -23,11 +18,12 @@ GetSecondaryListRequestMsg::GetSecondaryListRequestMsg(Communicator* communicato
 }
 
 GetSecondaryListRequestMsg::GetSecondaryListRequestMsg(Communicator* communicator,
-		uint32_t mdsSockfd, uint32_t numOfSegs) :
+		uint32_t mdsSockfd, uint32_t numOfSegs, uint32_t primaryId) :
 		Message(communicator) {
 
 	_sockfd = mdsSockfd;
 	_numOfSegs = numOfSegs;
+	_primaryId = primaryId;
 	
 }
 
@@ -37,6 +33,7 @@ void GetSecondaryListRequestMsg::prepareProtocolMsg() {
 
 	ncvfs::GetSecondaryListRequestPro getSecondaryListRequestPro;
 	getSecondaryListRequestPro.set_numofsegs(_numOfSegs);
+	getSecondaryListRequestPro.set_primaryid(_primaryId);
 
 	if (!getSecondaryListRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -60,6 +57,7 @@ void GetSecondaryListRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_numOfSegs = getSecondaryListRequestPro.numofsegs();
+	_primaryId = getSecondaryListRequestPro.primaryid();
 
 
 }
@@ -67,25 +65,22 @@ void GetSecondaryListRequestMsg::parse(char* buf) {
 void GetSecondaryListRequestMsg::doHandle() {
 
 #ifdef COMPILE_FOR_MONITOR
-	monitor->getSecondaryListProcessor (_msgHeader.requestId, _sockfd, _numOfSegs);
+	monitor->getSecondaryListProcessor (_msgHeader.requestId, _sockfd, _numOfSegs, _primaryId);
 #endif
 
 }
 
 void GetSecondaryListRequestMsg::printProtocol() {
-	debug("[GET_SECONDARY_LIST_REQUEST] NUMBER OF SEGS = %" PRIu32 "\n",_numOfSegs);
+	debug("[GET_SECONDARY_LIST_REQUEST] NUMBER OF SEGS = %" PRIu32 " PRIMARY ID = %" PRIu32 "\n",
+	_numOfSegs, _primaryId);
 }
 
 void GetSecondaryListRequestMsg::setSecondaryList(vector<struct SegmentLocation> secondaryList) {
-
 	_secondaryList = secondaryList;
 	return;
-
 }
+
 vector<struct SegmentLocation> GetSecondaryListRequestMsg::getSecondaryList() {
-
-
 	return _secondaryList;
-
 }
 

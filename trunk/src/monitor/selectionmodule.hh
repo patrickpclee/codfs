@@ -32,7 +32,8 @@ public:
 	 * @param numOfSegs Number of OSDs going to be selected
 	 * @return a list of selected osd IDs  
 	 */
-	vector<struct SegmentLocation> ChooseSecondary(uint32_t numOfSegs);
+	vector<struct SegmentLocation> ChooseSecondary(uint32_t numOfSegs, uint32_t
+		primary);
 
 private:
 
