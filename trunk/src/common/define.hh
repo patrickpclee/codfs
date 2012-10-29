@@ -2,7 +2,7 @@
 #define __DEFINE_HH__
 
 // osd/storagemodule.hh
-#define MAX_OPENED_FILES 1000
+#define MAX_OPEN_FILES 100
 
 // benchmark/benchmark.cc
 // client/client.cc
@@ -36,7 +36,7 @@
 #define DISK_PATH "/"
 
 // osd/storagemodule.cc
-//#define USE_OBJECT_CACHE
+//#define USE_OBJECT_DISK_CACHE
 
 // protocol/message.hh
 #define USE_MESSAGE_MEMORY_POOL
