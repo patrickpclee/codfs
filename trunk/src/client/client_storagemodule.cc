@@ -16,7 +16,7 @@ extern ConfigLayer* configLayer;
 
 // Global Mutex for locking file during read / write
 mutex fileMutex;
-mutex cacheMutex;
+mutex transferCacheMutex;
 mutex openedFileMutex;
 
 ClientStorageModule::ClientStorageModule() {
@@ -135,7 +135,7 @@ void ClientStorageModule::createObjectCache(uint64_t objectId,
 
 	// save cache to map
 	{
-		lock_guard<mutex> lk(cacheMutex);
+		lock_guard<mutex> lk(transferCacheMutex);
 		_objectCache[objectId] = objectCache;
 	}
 
@@ -149,7 +149,7 @@ uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf,
 	char* recvCache;
 
 	{
-		lock_guard<mutex> lk(cacheMutex);
+		lock_guard<mutex> lk(transferCacheMutex);
 		if (!_objectCache.count(objectId)) {
 			debug("%s\n", "cannot find cache for object");
 			exit(-1);
@@ -167,7 +167,7 @@ bool ClientStorageModule::locateObjectCache(uint64_t objectId){
 }
 
 struct ObjectTransferCache ClientStorageModule::getObjectCache(uint64_t objectId) {
-	lock_guard<mutex> lk(cacheMutex);
+	lock_guard<mutex> lk(transferCacheMutex);
 	if (!_objectCache.count(objectId)) {
 		debug("object cache not found for %" PRIu64 "\n", objectId);
 		exit(-1);
@@ -186,7 +186,7 @@ void ClientStorageModule::closeObject(uint64_t objectId) {
 	MemoryPool::getInstance().poolFree(objectCache.buf);
 
 	{
-		lock_guard<mutex> lk(cacheMutex);
+		lock_guard<mutex> lk(transferCacheMutex);
 		_objectCache.erase(objectId);
 	}
 
