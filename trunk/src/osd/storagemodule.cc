@@ -200,19 +200,18 @@ void StorageModule::createObjectTransferCache(uint64_t objectId, uint32_t length
 }
 
 void StorageModule::createObjectDiskCache(uint64_t objectId, uint32_t length) {
-	// create object
-	createAndOpenObjectFile(objectId, length);
+	const string filepath = generateObjectPath(objectId, _objectFolder);
+	createFile(filepath);
 
 	// write info
-	string filepath = generateObjectPath(objectId, _objectFolder);
 	writeObjectInfo(objectId, length, filepath);
 }
 
 void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
 		uint32_t length) {
-	createAndOpenSegment(objectId, segmentId, length);
 
-	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
+	const string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
+	createFile(filepath);
 
 	debug(
 			"Segment created ObjID = %" PRIu64 " SegmentID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
@@ -359,24 +358,6 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 	return byteWritten;
 }
 
-FILE* StorageModule::createAndOpenObjectFile(uint64_t objectId,
-		uint32_t length) {
-
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	return createFile(filepath);
-}
-
-FILE* StorageModule::createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
-		uint32_t length) {
-
-	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
-
-	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " created\n",
-			objectId, segmentId);
-
-	return createFile(filepath);
-}
-
 void StorageModule::closeObjectTransferCache(uint64_t objectId) {
 	// close cache
 	struct ObjectTransferCache objectCache = getObjectTransferCache(objectId);
@@ -391,19 +372,23 @@ void StorageModule::closeObjectTransferCache(uint64_t objectId) {
 }
 
 void StorageModule::closeObjectDiskCache(uint64_t objectId) {
+	/*
 	// close file
 	string filepath = generateObjectPath(objectId, _objectFolder);
 	closeFile(filepath);
 
 	debug("Object ID = %" PRIu64 " closed\n", objectId);
+	*/
 }
 
 void StorageModule::closeSegment(uint64_t objectId, uint32_t segmentId) {
+	/*
 	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
 	closeFile(filepath);
 
 	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " closed\n",
 			objectId, segmentId);
+	*/
 }
 
 //
@@ -703,7 +688,8 @@ void StorageModule::putObjectToDiskCache(uint64_t objectId,
 			objectId, formatSize(_freeObjectSpace).c_str());
 
 	// write cache to disk
-	createAndOpenObjectFile(objectId, objectCache.length);
+	const string filepath = generateObjectPath(objectId, _objectFolder);
+	createFile(filepath);
 
 #ifdef USE_OBJECT_CACHE
 	uint64_t byteWritten = writeObjectDiskCache(objectId, objectCache.buf, 0,

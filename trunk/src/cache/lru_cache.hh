@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <thread>
+#include "../common/debug.hh"
 
 using namespace std;
 
@@ -68,8 +69,6 @@ public:
 		_accessTimeList.clear();
 	}
 	;
-
-protected:
 
 	void pop_back() {
 		typename valueMapType::iterator it = _valueMap.find(
