@@ -10,6 +10,7 @@
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 #include "../common/convertor.hh"
+#include "../common/define.hh"
 
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
@@ -18,14 +19,14 @@
 
 #include "../../lib/threadpool/threadpool.hpp"
 
-#define PARALLEL_TRANSFER
-
 using namespace std;
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
-	if (signum == SIGINT)
+	if (signum == SIGINT) {
+		debug_yellow ("%s\n", "SIGINT received\n");
 		exit(42);
+	}
 }
 
 /// Client Object

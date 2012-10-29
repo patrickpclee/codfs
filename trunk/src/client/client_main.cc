@@ -13,8 +13,10 @@ using namespace std;
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
-	if (signum == SIGINT)
+	if (signum == SIGINT) {
+		debug_yellow ("%s\n", "SIGINT received\n");
 		exit(42);
+	}
 }
 
 /// Client Object

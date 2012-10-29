@@ -14,12 +14,11 @@
 #include "../protocol/messagefactory.hh"
 #include "../protocol/message.hh"
 #include "../common/enums.hh"
+#include "../common/define.hh"
 #include "../datastructure/concurrentmap.hh"
 #include "socket.hh"
 #include "component.hh"
 #include "connection.hh"
-
-//#define USE_LOWLOCK_QUEUE
 
 #ifdef USE_LOWLOCK_QUEUE
 #include "../datastructure/lowlockqueue.hh"

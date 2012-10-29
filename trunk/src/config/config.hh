@@ -1,10 +1,8 @@
 #ifndef __CONFIG_HH__
 #define __CONFIG_HH__
 #include "tinyxml.hh"
+#include "../common/define.hh"
 
-#define DEFAULT_CONFIG_PATH	"config.xml"
-#define DEFAUTT_COMMON_CONFIG "common.xml"
-#define XML_ROOT_NODE "NcvfsConfig"
 
 class ConfigLayer{
 	public:
