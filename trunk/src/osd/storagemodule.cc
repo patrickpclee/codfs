@@ -313,7 +313,8 @@ uint32_t StorageModule::writeObjectCache(uint64_t objectId, char* buf,
 		lock_guard<mutex> lk(cacheMutex);
 		if (!_objectCache.count(objectId)) {
 			debug("%s\n", "cannot find cache for object");
-			cout << "writeObjectCache Object Cache Not Found " << objectId << endl;
+			cout << "writeObjectCache Object Cache Not Found " << objectId
+					<< endl;
 			exit(-1);
 		}
 		recvCache = _objectCache[objectId].buf;
@@ -514,13 +515,13 @@ FILE* StorageModule::createFile(string filepath) {
 	FILE* filePtr;
 	filePtr = fopen(filepath.c_str(), "wb+");
 
-	// set buffer to zero to avoid memory leak
-	setvbuf(filePtr, NULL, _IONBF, 0);
-
 	if (filePtr == NULL) {
 		debug("%s\n", "Unable to create file!");
 		return NULL;
 	}
+
+	// set buffer to zero to avoid memory leak
+	setvbuf(filePtr, NULL, _IONBF, 0);
 
 	// add file pointer to map
 	openedFileMutex.lock();
@@ -756,7 +757,7 @@ struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
 void StorageModule::clearObjectDiskCache() {
 
 	for (auto object : _objectCacheQueue) {
-		remove (string(_objectFolder + to_string(object)).c_str());
+		remove(string(_objectFolder + to_string(object)).c_str());
 	}
 
 	{
