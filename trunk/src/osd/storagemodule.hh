@@ -12,7 +12,7 @@
 #include "../common/segmentdata.hh"
 #include "../common/objectdata.hh"
 #include "../datastructure/concurrentmap.hh"
-#include "../cache/lru_cache.hh"
+#include "filelrucache.hh"
 using namespace std;
 
 /**
@@ -426,8 +426,8 @@ private:
 	ConcurrentMap<uint64_t, struct ObjectDiskCache> _objectDiskCacheMap;
 	list<uint64_t> _objectCacheQueue;
 
-	//LruCache <string, FILE*> _openedFile;
-	map<string, FILE*> _openedFile;
+	FileLruCache <string, FILE*>* _openedFile;
+	//map<string, FILE*> _openedFile;
 	map<uint64_t, struct ObjectTransferCache> _objectTransferCache;
 	string _objectFolder;
 	string _segmentFolder;

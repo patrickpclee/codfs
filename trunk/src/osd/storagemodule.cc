@@ -29,6 +29,7 @@ mutex diskCacheMutex;
 mutex diskSpaceMutex;
 
 StorageModule::StorageModule() {
+	_openedFile = new FileLruCache <string, FILE*> (MAX_OPEN_FILES);
 	_objectTransferCache = {};
 	_objectFolder = configLayer->getConfigString("Storage>ObjectCacheLocation");
 	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
@@ -353,7 +354,7 @@ uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
 			objectId, segmentId, byteWritten, offsetInSegment);
 
 	updateSegmentFreespace(length);
-	closeFile(filepath);
+//	closeFile(filepath);
 
 	return byteWritten;
 }
@@ -524,9 +525,13 @@ FILE* StorageModule::createFile(string filepath) {
 	setvbuf(filePtr, NULL, _IONBF, 0);
 
 	// add file pointer to map
+	_openedFile->insert(filepath, filePtr);
+
+	/*
 	openedFileMutex.lock();
 	_openedFile[filepath] = filePtr;
 	openedFileMutex.unlock();
+	*/
 
 	return filePtr;
 }
@@ -537,34 +542,24 @@ FILE* StorageModule::createFile(string filepath) {
 
 FILE* StorageModule::openFile(string filepath) {
 
-	openedFileMutex.lock();
+	FILE* filePtr = NULL;
+	try {
+		filePtr = _openedFile->get (filepath);
+	} catch (out_of_range& oor) { // file pointer not found in cache
+		filePtr = fopen(filepath.c_str(), "rb+");
 
-	// find file in map
-	if (_openedFile.count(filepath)) {
-		FILE* openedFile = _openedFile[filepath];
-		openedFileMutex.unlock();
-		return openedFile;
+		if (filePtr == NULL) {
+			debug("Unable to open file at %s\n", filepath.c_str());
+			perror("fopen()");
+			return NULL;
+		}
+
+		// set buffer to zero to avoid memory leak
+		setvbuf(filePtr, NULL, _IONBF, 0);
+
+		// add file pointer to map
+		_openedFile->insert(filepath, filePtr);
 	}
-
-	openedFileMutex.unlock();
-
-	FILE* filePtr;
-	filePtr = fopen(filepath.c_str(), "rb+");
-
-	if (filePtr == NULL) {
-		debug("Unable to open file at %s\n", filepath.c_str());
-		perror("fopen()");
-		return NULL;
-	}
-
-	// set buffer to zero to avoid memory leak
-	setvbuf(filePtr, NULL, _IONBF, 0);
-
-	// add file pointer to map
-
-	openedFileMutex.lock();
-	_openedFile[filepath] = filePtr;
-	openedFileMutex.unlock();
 
 	return filePtr;
 }
@@ -574,12 +569,14 @@ FILE* StorageModule::openFile(string filepath) {
  */
 
 void StorageModule::closeFile(string filepath) {
+	/*
 	FILE* filePtr = openFile(filepath);
 
 	openedFileMutex.lock();
 	_openedFile.erase(filepath);
-	openedFileMutex.unlock();
 	fclose(filePtr);
+	openedFileMutex.unlock();
+	*/
 }
 
 struct ObjectTransferCache StorageModule::getObjectTransferCache(uint64_t objectId) {
