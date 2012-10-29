@@ -574,14 +574,12 @@ FILE* StorageModule::openFile(string filepath) {
  */
 
 void StorageModule::closeFile(string filepath) {
-
 	FILE* filePtr = openFile(filepath);
 
 	openedFileMutex.lock();
 	_openedFile.erase(filepath);
-	openedFileMutex.unlock();
-
 	fclose(filePtr);
+	openedFileMutex.unlock();
 }
 
 struct ObjectTransferCache StorageModule::getObjectCache(uint64_t objectId) {
