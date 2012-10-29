@@ -269,7 +269,7 @@ online to handle requests.
 
 NCVFS maintains a cluster of \osds to store objects while exposing just a single
 file system interface to the processes. As NCVFS needs to handle simultaneous
-requests from a large number of clients, a central storage server will likely to
+requests from a large number of clients, a central storage server will likely 
 be
 a bottleneck. By maintaining a cluster of \osds , NCVFS tackles this problem
 in two ways. First, the \osds can lessen the burden of the \mds and \monitor as
@@ -294,7 +294,7 @@ to decode in the future.
 A key feature of NCVFS is that we allow different objects in a file to employ different 
 coding schemes. This allows the clients to select the coding schemes strategically 
 according to the target workload. For example, if a client predicts that the first part 
-of a files is more frequently read, a more decode-friendly coding scheme such as replication
+of a file is more frequently read, a more decode-friendly coding scheme such as replication
 should be chosen for those objects to optimize read performance. 
 In contrast, for some parts that are rarely read, more computation intensive 
 coding schemes such as Reed-solomon could be used to optimize the storage space used.
@@ -319,9 +319,9 @@ layer.
 
 Both cached objects and segments are represented as physical files in the storage layer. 
 Cached objects are named by the \texttt{objectId} which is a 64-bit integer while segments
-are name by the \texttt{objectId} appended by its 32-bit integer \texttt{segmentId}. 
-Since the \texttt{objectId} acts the unique identifier of an object in the
-sytem, the \osd can locate a deterministic file path of any cached objects or
+are named by the \texttt{objectId} appended by its 32-bit integer \texttt{segmentId}. 
+Since the \texttt{objectId} acts as the unique identifier of an object in the
+system, the \osd can locate a deterministic file path of any cached objects or
 segments, eliminating the needs of saving the actual file path of objects and
 segments in either the \osd or the \mds .
 
@@ -344,12 +344,12 @@ major modules to serve the purpose above, i.e. \textit{Statistics Module},
 \subsubsection{Statistics Module}
 The \textit{Statistics Module} maintains the health status of 
 each \osd and assists \osds to establish connection with each
-other. Two typical workflows of this module is described below.
+other. Two typical workflows of this module are described below.
 \begin{itemize}
 	\item When an \osd starts up, it registers to \monitor with its
 		connection information as well as its health status. \monitor records
 		the new \osd in its list and marks it \texttt{online}. \monitor then
-		broadcasts the new \osd to all other online \osds. And also \monitor
+		broadcasts the new \osd to all other online \osds. Also \monitor
 		tells the new \osd with all other \osds information for them 
 		to connect with each other. 
 	\item \monitor periodically requests \osds in its list to update their
@@ -423,25 +423,25 @@ them in the \texttt{MDS}.
 \subsubsection{Communication Module}
 
 The Communication Module facilitates interaction among all the components. The Google Protocol Buffers 
-provides very effective serialization and deserialization methods and are used to support communication 
+provides very effective serialization and deserialization methods and is used to support communication 
 of control messages among components.
 
 In our design, for each control message, a \textit{prepare} function and a \textit{handle} function are implemented.
-A message consists of a message header, 
+Each message consists of a message header. 
 To send a control message, the communication module of the corresponding component first prepares a 
 message header which stores the massage type, the protocol message size and the payload size. The 
 communication module obtains an object from the \textit{MessageFactory} by specifying the type of 
 message. By executing the \textit{prepare} function of the object, the information that the component 
 passed into the object is serialized into a binary byte stream. 
-The message header, serialized protocol message and the payload is sent via TCP socket to the target component. 
+The message header, serialized protocol message and the payload are sent via TCP socket to the target component. 
 The receiver of this message can then 
-retrieve the information stored by parsing the binary byte stream. Handler for the obtained information are
+retrieve the information stored by parsing the binary byte stream. The handlers for the obtained information are
 then executed by calling the \textit{handle} function defined in the corresponding message class.
 
 \subsubsection{Memory Pool}
 
 In NCVFS, the \textit{Communication Module} requires frequent memory allocation and deallocation. 
-This introduce two performance issues in our system. First, frequent calls to malloc and free 
+This introduces two performance issues in our system. First, frequent calls to malloc and free 
 can introduce significant performance overhead. In our design, we tackle this problem with the
 help of a memory pool. The memory pool obtains a large chunk of memory from the system at a time. 
 When a component calls malloc, the memory is obtained from the pool. When a piece of memory is freed,
@@ -453,9 +453,9 @@ allocated for each message created.
 
 In NCVFS, we use Apache APR Memory Pools to handle the memory allocations. 
 The APR Pools are a fundamental building block of Apache, and are the basis for all resource management. 
-They serve to allocate memory, either directly (in a malloc-like manner) or indirectly (e.g. in string manipulation), and, crucially, 
+They serve to allocate memory, either directly (in a malloc-like manner) or indirectly (e.g. in string manipulation), and, more crucially, 
 ensure the memory is freed at the appropriate time. 
-But they extend much further, to ensure that other resources such as files or mutexes can be allocated and will always be properly cleaned up. 
+But they are extended much further, to ensure that other resources such as files or mutexes can be allocated and will always be properly cleaned up. 
 They can even deal with resources managed opaquely by third-party libraries.
 
 \subsubsection{LRU Cache}
