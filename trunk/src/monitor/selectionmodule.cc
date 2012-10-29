@@ -52,8 +52,8 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 			for(auto& entry: _osdStatMap) {
 				// isFull -1 for the primary
 				bool isAllOsdUsed = selected.size() >= _osdStatMap.size() - 1;
-				if (entry.second.osdHealth == ONLINE && entry.first != primaryId 
-						&& (isAllOsdUsed ||	(!isAllOsdUsed && !selected.count(entry.first)))
+				if (entry.second.osdHealth == ONLINE  
+						&& (isAllOsdUsed ||	(!isAllOsdUsed && entry.first != primaryId && !selected.count(entry.first)))
 						&& (rand()&1)) {
 					// choose this as a secondary
 					struct SegmentLocation segmentLocation;
