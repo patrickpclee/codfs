@@ -90,9 +90,11 @@ void Monitor::getPrimaryListProcessor (uint32_t requestId, uint32_t sockfd, uint
 	return;
 }
 
-void Monitor::getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfSegs){
+void Monitor::getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, 
+	uint32_t numOfSegs, uint32_t primaryId) {
+
 	vector<struct SegmentLocation> secondaryList;
-	secondaryList = _selectionModule->ChooseSecondary(numOfSegs);
+	secondaryList = _selectionModule->ChooseSecondary(numOfSegs, primaryId);
 	_monitorCommunicator->replySecondaryList(requestId, sockfd, secondaryList);
 	return;
 }

@@ -37,7 +37,8 @@ public:
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
-	GetSecondaryListRequestMsg (Communicator* communicator, uint32_t osdSockfd, uint32_t numOfSegs);
+	GetSecondaryListRequestMsg (Communicator* communicator, uint32_t osdSockfd, 
+		uint32_t numOfSegs, uint32_t primaryId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -74,6 +75,7 @@ public:
 
 private:
 	uint32_t _numOfSegs;
+	uint32_t _primaryId;
 	vector<struct SegmentLocation> _secondaryList;
 };
 
