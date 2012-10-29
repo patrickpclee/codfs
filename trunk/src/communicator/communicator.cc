@@ -18,6 +18,7 @@
 #include "../common/enums.hh"
 #include "../common/enumtostring.hh"
 #include "../common/debug.hh"
+#include "../common/define.hh"
 #include "../common/convertor.hh"
 #include "../common/objectdata.hh"
 #include "../protocol/message.pb.h"
@@ -35,8 +36,6 @@ extern Monitor* monitor;
 #endif
 
 using namespace std;
-
-#define USE_THREAD_POOL
 
 #ifdef USE_THREAD_POOL
 

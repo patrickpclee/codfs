@@ -1,11 +1,11 @@
 #ifndef __DEBUG_HH__
 #define __DEBUG_HH__
 
-#define DEBUG 1
 
 // for PRIu64, PRIu32, etc
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
+#include "../common/define.hh"
 
 // for color
 #define RESET   "\033[0m"

@@ -1,4 +1,4 @@
-#define FUSE_USE_VERSION 26
+#include "../common/define.hh"
 
 #include <fuse.h>
 #include <errno.h>

@@ -1,7 +1,7 @@
 #ifndef __MONGO_DB_HH__
 #define __MONGO_DB_HH__
 
-//#define COLLECTION "ncvfs"
+#include "../common/define.hh"
 
 //#include "mongo/db/jsobj.h"
 #include "mongo/client/dbclient.h"
