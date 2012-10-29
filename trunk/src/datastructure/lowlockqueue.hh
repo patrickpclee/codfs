@@ -7,8 +7,7 @@
 #define LOWLOCKQUEUE_HH_
 
 #include <thread>
-
-#define CACHE_LINE_SIZE 64
+#include "../common/define.hh"
 
 using namespace std;
 

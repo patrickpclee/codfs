@@ -5,13 +5,12 @@
 #ifndef __MEMORYPOOL_HH__
 #define __MEMORYPOOL_HH__
 
-// if commented, use malloc / free
-#define USE_MEMORY_POOL
-
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+
+#include "../common/define.hh"
 
 #ifdef USE_MEMORY_POOL
 #include <thread>
