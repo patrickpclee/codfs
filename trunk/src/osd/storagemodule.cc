@@ -33,6 +33,23 @@ StorageModule::StorageModule() {
 	_objectFolder = configLayer->getConfigString("Storage>ObjectCacheLocation");
 	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
 
+	// create folder if not exist
+	struct stat st;
+	if(stat(_objectFolder.c_str(),&st) != 0) {
+		debug ("%s does not exist, make directory automatically\n", _objectFolder.c_str());
+		if (mkdir (_objectFolder.c_str(), S_IRWXU | S_IRGRP | S_IROTH) < 0) {
+			perror ("mkdir");
+			exit (-1);
+		}
+	}
+	if(stat(_segmentFolder.c_str(),&st) != 0) {
+		debug ("%s does not exist, make directory automatically\n", _segmentFolder.c_str());
+		if (mkdir (_segmentFolder.c_str(), S_IRWXU | S_IRGRP | S_IROTH) < 0) {
+			perror ("mkdir");
+			exit (-1);
+		}
+	}
+
 	// Unit in StorageModule: Bytes
 	_maxObjectCache = stringToByte(configLayer->getConfigString("Storage>ObjectCacheCapacity"));
 	_maxSegmentCapacity = stringToByte(configLayer->getConfigString("Storage>SegmentCapacity"));
