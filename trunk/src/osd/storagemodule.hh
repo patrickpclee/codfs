@@ -142,24 +142,6 @@ public:
 			uint64_t offsetInSegment, uint32_t length);
 
 	/**
-	 * Create and prepare an object in the storage before writing
-	 * @param objectId Object ID
-	 * @param length Number of bytes the object will take
-	 */
-
-	FILE* createAndOpenObjectFile(uint64_t objectId, uint32_t length);
-
-	/**
-	 * Create an prepare a segment in the storage before writing
-	 * @param objectId Object ID
-	 * @param segmentId Segment ID
-	 * @param length Number of bytes the segment will take
-	 */
-
-	FILE* createAndOpenSegment(uint64_t objectId, uint32_t segmentId,
-			uint32_t length);
-
-	/**
 	 * Close and remove the object cache after the transfer is finished
 	 * @param objectId Object ID
 	 */

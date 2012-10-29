@@ -1,7 +1,7 @@
 #ifndef __DEFINE_HH__
 #define __DEFINE_HH__
 
-// osd/storagemodule.hh
+// osd/storagemodule.cc
 #define MAX_OPEN_FILES 100
 
 // benchmark/benchmark.cc
