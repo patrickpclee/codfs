@@ -10,7 +10,6 @@ BENCHMARK
 *.o
 *.log
 *.swp
-*test*
 core
 osd_object/
 osd_segment/
