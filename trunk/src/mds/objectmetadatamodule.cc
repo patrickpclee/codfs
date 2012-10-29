@@ -2,6 +2,8 @@
 
 #include "../config/config.hh"
 
+#include "../common/debug.hh"
+
 #include "../storage/mongodb.hh"
 
 extern ConfigLayer *configLayer;
@@ -70,12 +72,15 @@ struct ObjectMetaData ObjectMetaDataModule::readObjectInfo(uint64_t objectId)
  */
 void ObjectMetaDataModule::saveNodeList (uint64_t objectId, const vector<uint32_t> &objectNodeList)
 {
+	debug("Save Node List For %" PRIu64,objectId);
 	vector<uint32_t>::const_iterator it;
 	BSONObj queryObject = BSON ("id" << (long long int)objectId);
 	BSONArrayBuilder arrb;
 	for(it = objectNodeList.begin(); it < objectNodeList.end(); ++it) {
+		debug(" - %" PRIu32,*it);
 		arrb.append(*it);
 	}
+	debug("%s","\n");
 	BSONArray arr = arrb.arr();
 	BSONObj updateObject = BSON ("$set" << BSON ("nodeList" << arr));
 	_objectMetaDataStorage->update(queryObject,updateObject);

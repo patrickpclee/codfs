@@ -77,7 +77,7 @@ void parseOption(int argc, char* argv[]){
 		debug("Downloading File %"PRIu32"\n", fileId);
 	} else {
 
-		fileName = time(NULL);
+		fileName = to_string(time(NULL));
 
 		fileSize = stringToByte(argv[3]);
 		objectSize = stringToByte(argv[4]);

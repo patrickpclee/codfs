@@ -177,7 +177,7 @@ BSONObj MongoDB::findAndModify (BSONObj queryObject, BSONObj updateObject)
 	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << queryObject << "update" << updateObject), result);
 	_conn->done();
 
-	return result.getObjectField("value");
+	return result.getObjectField("value").copy();
 };
 
 void MongoDB::removeField (Query queryObject, string field)
