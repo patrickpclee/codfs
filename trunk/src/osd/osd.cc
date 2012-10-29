@@ -75,7 +75,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// case 1: if object exists in cache
 				debug("Object ID = %" PRIu64 " exists in cache", objectId);
 				objectData = _storageModule->getObjectFromDiskCache(objectId);
-				_storageModule->closeObjectFile(objectId);
+				_storageModule->closeObjectDiskCache(objectId);
 			} else {
 				// case 2: if object does not exist in cache
 
@@ -206,7 +206,7 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			objectTransferCache.length = objectData.info.objectSize;
 
 			if (!_storageModule->isObjectCached(objectId)) {
-				_storageModule->saveObjectToDisk(objectId, objectTransferCache);
+				_storageModule->putObjectToDiskCache(objectId, objectTransferCache);
 			}
 
 			// free objectData
@@ -246,7 +246,7 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_codingSettingMap.set(objectId, codingSetting);
 
 	// create object and cache
-	_storageModule->createObjectCache(objectId, length);
+	_storageModule->createObjectTransferCache(objectId, length);
 	_osdCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
 
 	// save md5 to map
@@ -263,7 +263,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 		if (_pendingObjectChunk.get(objectId) == 0) {
 			// if all chunks have arrived
 			struct ObjectTransferCache objectCache =
-					_storageModule->getObjectCache(objectId);
+					_storageModule->getObjectTransferCache(objectId);
 
 			// compute md5 checksum
 			unsigned char checksum[MD5_DIGEST_LENGTH];
@@ -342,10 +342,10 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_osdCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
 
 			// after ack, write object cache to disk (and close file)
-			_storageModule->saveObjectToDisk(objectId, objectCache);
+			_storageModule->putObjectToDiskCache(objectId, objectCache);
 
 			// close file and free cache
-			_storageModule->closeObjectCache(objectId);
+			_storageModule->closeObjectTransferCache(objectId);
 
 			break;
 		} else {
@@ -381,7 +381,7 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
+	byteWritten = _storageModule->writeObjectTransferCache(objectId, buf, offset,
 			length);
 
 	_pendingObjectChunk.decrement(objectId);
