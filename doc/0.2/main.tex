@@ -25,75 +25,86 @@
 \maketitle
 
 \section{Introduction}
-\textit{Cloud Storage} has been playing an increasing significant
-role in data storage for either enterprises or individuals lately,
-for instance, \textit{Amazon S3, Windows Azure} are two successful
+\textit{Cloud Storage} has been playing an increasingly significant
+role in data storage for enterprises and individuals lately.
+For instance, \textit{Amazon S3} and \textit{Windows Azure} are two successful
 clould storage systems in real-life business.
-To achieve high data availability, \textit{Distributed storage system} 
+To achieve high data availability, a \textit{distributed storage system} 
 is the underlying system architecture adopted by clould storage systems,
-as it provides a reliable platform for storing
+as it provides a reliable platform for storing a
 massive amount of data over a set of distributed storage nodes over a 
-network. A significant number of distributed storage systems apply 
-\textit{data replication} technique to maintain their data
-reliability. Each piece of data in the system is replicated several 
-times and each replica is distributed to different storage node. 
+network. Current distributed storage systems mainly apply 
+\textit{data replication} to maintain data
+reliability, such as \textit{HDFS} and \textit{GFS}. 
+Each piece of data in the system is replicated several 
+times and each replica is distributed to different storage nodes. 
 The \textit{replication factor} determines the number of times each 
 piece of data being replicated and therefore, 
 data availability is positively related with
 the \textit{replication factor} of the entire system. 
 
-However, the major drawback of data replication is that it requires 
-relatively large amount of storage resources in order to achieve a 
-high availablitly, compared with employing \textit{erasure coding scheme} on
-each piece of data. 
+However, one major drawback of data replication is that it requires 
+relatively large amount of storage resources in order to achieve  
+high availability, compared with employing \textit{erasure coding} on
+data. 
 Moreover, given the similar network bandwith and storage resources, 
-systems employing erasure coding has better performance 
+systems employing erasure coding has better availability and durability
 than systems employing data replication~\cite{Weatherspoon:2002:ECV:646334.687814}.
-Under such circumstance, cloud storage systems like \textit{Windows Azure},
-\textit{Hadoop Distributed File System} are swithching their storage scheme
+Under such circumstance, cloud storage systems like \textit{Windows Azure}
+and 
+\textit{Hadoop Distributed File System} are switching their storage scheme
 from replication to erasure coding~\cite{Huang:2012:ECW:2342821.2342823,
 hdfs:raid}.
 
-Data repliacation scheme may not fully utilize the parallism benefit of
+Data repliacation may not fully utilize the parallelism benefit of
 distributed storage system if the size of data to be replicated is large. 
-Hence, pervious researches~\cite{Mesnier03object-basedstorage,Wang04obfs:a} 
+Hence, previous researches~\cite{Mesnier03object-basedstorage,Wang04obfs:a} 
 have proposed \textit{object-based} storage
-systems to handle this issue. In general, object-based storage system splits 
-each file to be stored into equal size pieces, called \textit{objects}, 
+systems to handle this issue. In general, an 
+object-based storage system splits 
+each file to be stored into equal size pieces called \textit{objects}, 
 and assigns different storage
-nodes to work on each object, either perform replication or coding. It can
-be found that object-based storage system benefit more than file-based storage
+nodes to perform replication or coding on the objects. It can
+be found that object-based storage systems benefit more than 
+file-based storage
 systems in a distributed environment due to the parallel processing.
 
-The above-mentioned issues motivated us to design a brand new distributed storage
-system which could combine the advantages of both erasure coding and object-based
+The above-mentioned issues motivate us to design a brand new distributed 
+storage
+system which could combine the advantages of both erasure coding and 
+object-based
 stroage techniques to achieve high availability and performance. 
 % TODO: May need something between network coding and erasure coding
 Hence, in this paper, we present our design and implementation of a 
-network-coding-based distributed video file system, called NCVFS.  And 
-the main features of NCVFS are summarized as follows:
+network-coding-based distributed video file system, called NCVFS.  
+The main features of NCVFS are summarized as follows:
 
 \begin{itemize}
 
 	\item NCVFS is an object-based distributed file system targeting 
 		large video files. It supports general read and write operations 
-		in a distributed storage setting and optimizes the read operation based
-		on the write-once-read-many feature of video files.
+		in a distributed storage setting and optimizes the read operation 
+		based on the write-once-read-many feature of video files.
 
-	\item NCVFS is not limited by erasure coding storage schemes, but can extends
-		to other coding schemes like network coding. Moreover, since NCVFS adopts
-		object-based storage, it enables multiple coding schemes performed on a 
-		single file without changing the entire system logic.
+	\item NCVFS is not limited by erasure coding storage schemes, but can 
+		be extended	to other coding schemes like network coding. 
+		Moreover, since NCVFS adopts object-based storage, it enables 
+		multiple coding schemes performed on a single file without 
+		changing the entire system logic.
 
-	\item NCVFS excludes metadata management from the critical path for
+	\item NCVFS excludes metadata management from the critical path for the
 		read/write process to eliminate the bottleneck of metadata operations 
 		and utilizes a centralized monitor to balance the workload of each
 		storage node.
 
-	\item NCVFS implements a distributed light-weight recovery scheme to handle
-		storage node failures. In brief, NCVFS adopts a time delay when recovery
-		is triggered for a storage node failure 
-		in order to save the overhead of temporary failures like network partition.
+	\item NCVFS implements a distributed light-weight recovery scheme to 
+		handle storage node failures. In brief, once a recovery process
+		is triggered for a particular storage node, NCVFS delays the
+		process for a few minutes to confirm the storage node is
+		dead permanently. Such delay saves the recovery operations
+		for temporary failures like network partition while data on 
+		the failed node can still be accessed via degraded read during
+		the delay.
 
 \end{itemize}
 
@@ -103,17 +114,26 @@ Version 0.2 (11 September 2012)
 \section{System Overview}
 
 \subsection{Architecture}
-NCVFS is an object-based distributed file system and is composed of four components: metadata storage,
-object storage, clients and monitors. A signle metadata server (\texttt{MDS}) is designed for NCVFS for the 
-sake of storing all file metadata as well as managing operations on file metadata. On top of that, 
-NCVFS contains multiple object stroage devices (\texttt{OSDs}) and each \osd stores file data objects with
+NCVFS is an object-based distributed file system and is composed of 
+four components: metadata storage,
+object storage, clients and monitors. A single metadata server (\texttt{MDS}) 
+is designed for NCVFS for 
+storing all file metadata as well as managing operations on file 
+metadata. On top of that, 
+NCVFS contains multiple object stroage devices (\texttt{OSDs}) 
+and each \osd stores file data objects with
 network coding. One
-key point of this architecture is that the \mds is not on the critical path when clients want to 
-read or write files,as the \mds is contacted by clients first before clients operate with \osds. Such
-architecture eliminates the bottleneck on the metadata side and enables parallel jobs on the object
-storage side. Finally, current architecture of NCVFS consists of a centralized monitor (\texttt{MONITOR})
-implementing \osd failure recovery functionality and load balancing among \osds. The detail of each component 
-is presentedin Section~\ref{design_and_impl}.
+key point of this architecture is that the \mds is not on the 
+critical path when clients want to 
+read or write files,as the \mds is contacted by clients first 
+before clients operate with \osds. Such
+design eliminates the bottleneck on the metadata side and enables 
+parallel jobs on the object
+storage side. Finally, current architecture of NCVFS consists of 
+a centralized monitor (\texttt{MONITOR})
+implementing \osd failure recovery functionality and load balancing among 
+\osds. The detail of each component 
+is presented in Section~\ref{design_and_impl}.
 
 \drawArch
 
@@ -153,7 +173,7 @@ The third-party libraries that are used in NCVFS are listed below.
 	\item \textbf {MongoDB}\\
 		Supports metadata storage in \mds
 	\item \textbf {Apache Runtime}\\
-		Provides memory pool to optimize memory allocation in different components
+		Provides a memory pool to optimize memory allocation in different components
 	\item \textbf {FUSE}\\
 		Allows implementation of a file system in user space
 	\item \textbf {OpenSSL}\\
@@ -170,12 +190,14 @@ The third-party libraries that are used in NCVFS are listed below.
 \section{Client Operation}
 \label{client_ops}
 
-We introduce the overall operation of NCVFS's components and their interations by describing client operations. 
-The NCVFS client runs on each host and applications can access files through a mounted file system via \fuse.
+We introduce the overall operation of NCVFS's components and their interations
+by describing client operations. 
+An NCVFS client runs on each host and applications can access files through a
+mounted file system via \fuse.
 
 \subsection{File Upload}
 
-When a process initiates a upload process, the client sends a request to the \mds containing the filename, the number of objects 
+When a process initiates an upload process, the client sends a request to the \mds containing the filename, the number of objects 
 to be uploaded and the desired coding scheme. In our setting, each object in NCVFS is 10MB. However, depending on 
 the nature of file, the client could freely adjust the object size. The \mds records the metadata by creating an 
 entry in the database and sends a request to the \monitor asking for a list of \textit{primary} \osds to handle this upload. 
