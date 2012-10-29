@@ -8,6 +8,7 @@
 #include "osd.hh"
 #include "../common/segmentlocation.hh"
 #include "../common/debug.hh"
+#include "../common/define.hh"
 #include "../common/metadata.hh"
 #include "../common/convertor.hh"
 #include "../config/config.hh"
@@ -22,8 +23,6 @@
 #include <string.h>
 #include <sys/statvfs.h>
 
-#define INF (1<<29)
-#define DISK_PATH "/"
 
 // Global Variables
 extern Osd* osd;

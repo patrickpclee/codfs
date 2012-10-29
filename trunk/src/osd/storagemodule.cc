@@ -16,9 +16,8 @@
 #include <dirent.h>
 #include "storagemodule.hh"
 #include "../common/debug.hh"
+#include "../common/define.hh"
 #include "../common/convertor.hh"
-
-//#define USE_OBJECT_CACHE
 
 // global variable defined in each component
 extern ConfigLayer* configLayer;
@@ -30,7 +29,6 @@ mutex lruCacheMutex;
 mutex verifyAndUpdateSpaceMutex;
 
 StorageModule::StorageModule() {
-	_openedFile = {};
 	_objectCache = {};
 	_objectFolder = configLayer->getConfigString("Storage>ObjectCacheLocation");
 	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");

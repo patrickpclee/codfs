@@ -21,6 +21,7 @@ ConfigLayer* configLayer;
 void sighandler(int signum) {
 	cout << "Signal" << signum << "received" << endl;
 	if (signum == SIGINT) {
+		debug_yellow ("%s\n", "SIGINT received\n");
 		exit(42);
 	} else if (signum == SIGUSR1) {
 		cout << "Clearing object disk cache...";

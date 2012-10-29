@@ -14,10 +14,9 @@
 #include "../common/segmentdata.hh"
 #include "../common/convertor.hh"
 #include "../../lib/logger.hh"
+#include "../common/define.hh"
 
 using namespace std;
-
-#define PARALLEL_TRANSFER
 
 extern Client* client;
 extern ConfigLayer* configLayer;

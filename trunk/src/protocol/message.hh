@@ -11,14 +11,12 @@
 #include <iostream>
 
 #include "../common/enums.hh"
-//#include "../common/memorypool.hh"
+#include "../common/define.hh"
 #include "../communicator/communicator.hh"
 
 class Communicator;
 
 using namespace std;
-
-#define USE_MESSAGE_MEMORY_POOL
 
 /**
  * struct for message Header
