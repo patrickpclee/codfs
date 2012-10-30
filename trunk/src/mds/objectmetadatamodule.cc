@@ -29,15 +29,22 @@ ObjectMetaDataModule::ObjectMetaDataModule(ConfigMetaDataModule* configMetaDataM
  */
 void ObjectMetaDataModule::saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo)
 {
+	vector<uint32_t>::const_iterator it;
+	BSONArrayBuilder arrb;
+	for(it = objectInfo._nodeList.begin(); it < objectInfo._nodeList.end(); ++it) {
+		arrb.append(*it);
+	}
+	BSONArray arr = arrb.arr();
 	BSONObj queryObject = BSON ("id" << (long long int)objectId);
 	BSONObj insertObject = BSON ("id" << (long long int)objectId
 							<< "primary" << objectInfo._primary
 							<< "checksum" << objectInfo._checksum
 							<< "size" << objectInfo._size
 							<< "codingScheme" << (int)objectInfo._codingScheme
-							<< "codingSetting" << objectInfo._codingSetting);
+							<< "codingSetting" << objectInfo._codingSetting
+							<< "nodeList" << arr);
 	_objectMetaDataStorage->update(queryObject, insertObject);
-	saveNodeList(objectId, objectInfo._nodeList);
+	//saveNodeList(objectId, objectInfo._nodeList);
 	return ;
 }
 
