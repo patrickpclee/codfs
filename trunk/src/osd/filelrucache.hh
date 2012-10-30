@@ -41,7 +41,10 @@ public:
 		typename valueMapType::iterator it = this->_valueMap.find(
 				this->_accessTimeList.front());
 
-		fclose((*it).second.first);
+		FILE* filePtr = (*it).second.first;
+		fflush (filePtr);
+		fsync (fileno (filePtr));
+		fclose(filePtr);
 
 		this->_valueMap.erase(it);
 		this->_accessTimeList.pop_front();

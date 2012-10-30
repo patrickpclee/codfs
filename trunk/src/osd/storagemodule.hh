@@ -153,7 +153,7 @@ public:
 	 * @param objectId Object ID
 	 */
 
-	void closeObjectDiskCache(uint64_t objectId);
+	void flushObjectDiskCache(uint64_t objectId);
 
 	/**
 	 * Close the segment after the transfer is finished
@@ -161,7 +161,7 @@ public:
 	 * @param segmentId Segment ID
 	 */
 
-	void closeSegment(uint64_t objectId, uint32_t segmentId);
+	void flushSegment(uint64_t objectId, uint32_t segmentId);
 
 	/**
 	 * Get back the ObjectCache from objectId
@@ -389,13 +389,6 @@ private:
 	 */
 
 	FILE* openFile(string filepath);
-
-	/**
-	 * Close the file and remove it from _openedFile map
-	 * @param filepath Path to the file on disk
-	 */
-
-	void closeFile(string filepath);
 
 	/**
 	 * Open the file and finds the size of it
