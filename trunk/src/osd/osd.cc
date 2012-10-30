@@ -75,7 +75,6 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// case 1: if object exists in cache
 				debug("Object ID = %" PRIu64 " exists in cache", objectId);
 				objectData = _storageModule->getObjectFromDiskCache(objectId);
-				_storageModule->closeObjectDiskCache(objectId);
 			} else {
 				// case 2: if object does not exist in cache
 
@@ -313,7 +312,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 					_storageModule->writeSegment(objectId,
 							segmentData.info.segmentId, segmentData.buf, 0,
 							segmentData.info.segmentSize);
-					_storageModule->closeSegment(objectId,
+					_storageModule->flushSegment(objectId,
 							segmentData.info.segmentId);
 				} else {
 					uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
@@ -448,7 +447,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (!isDownload) {
 			// close file and free cache
-			_storageModule->closeSegment(objectId, segmentId);
+			_storageModule->flushSegment(objectId, segmentId);
 		} else {
 			_downloadSegmentRemaining.decrement(objectId);
 			debug("all chunks for segment %" PRIu32 "is received\n", segmentId);

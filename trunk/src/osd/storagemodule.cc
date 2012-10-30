@@ -300,7 +300,6 @@ struct SegmentData StorageModule::readSegment(uint64_t objectId,
 			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
 			objectId, segmentId, byteToRead, offsetInSegment);
 
-	closeFile(segmentPath);
 	return segmentData;
 }
 
@@ -371,24 +370,31 @@ void StorageModule::closeObjectTransferCache(uint64_t objectId) {
 	debug("Object Cache ID = %" PRIu64 " closed\n", objectId);
 }
 
-void StorageModule::closeObjectDiskCache(uint64_t objectId) {
-	/*
-	// close file
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	closeFile(filepath);
+void StorageModule::flushObjectDiskCache(uint64_t objectId) {
 
-	debug("Object ID = %" PRIu64 " closed\n", objectId);
-	*/
+	FILE* filePtr = NULL;
+	try {
+		string filepath = generateObjectPath(objectId, _objectFolder);
+		filePtr = _openedFile->get (filepath);
+		fflush (filePtr);
+		fsync (fileno(filePtr));
+	} catch (out_of_range& oor) { // file pointer not found in cache
+		return;	// file already closed by cache, do nothing
+	}
+	
 }
 
-void StorageModule::closeSegment(uint64_t objectId, uint32_t segmentId) {
-	/*
-	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
-	closeFile(filepath);
+void StorageModule::flushSegment(uint64_t objectId, uint32_t segmentId) {
 
-	debug("Object ID = %" PRIu64 " Segment ID = %" PRIu32 " closed\n",
-			objectId, segmentId);
-	*/
+	FILE* filePtr = NULL;
+	try {
+		string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
+		filePtr = _openedFile->get (filepath);
+		fflush (filePtr);
+		fsync (fileno(filePtr));
+	} catch (out_of_range& oor) { // file pointer not found in cache
+		return;	// file already closed by cache, do nothing
+	}
 }
 
 //
@@ -553,17 +559,6 @@ FILE* StorageModule::openFile(string filepath) {
  * Close file, remove from map
  */
 
-void StorageModule::closeFile(string filepath) {
-	/*
-	FILE* filePtr = openFile(filepath);
-
-	openedFileMutex.lock();
-	_openedFile.erase(filepath);
-	fclose(filePtr);
-	openedFileMutex.unlock();
-	*/
-}
-
 struct ObjectTransferCache StorageModule::getObjectTransferCache(uint64_t objectId) {
 	lock_guard<mutex> lk(transferCacheMutex);
 	if (!_objectTransferCache.count(objectId)) {
@@ -702,7 +697,7 @@ void StorageModule::putObjectToDiskCache(uint64_t objectId,
 		perror("Cannot saveObjectToDisk");
 		exit(-1);
 	}
-	closeObjectDiskCache(objectId);
+	flushObjectDiskCache(objectId);
 
 	_currentObjectUsage += objectSize;
 	_freeObjectSpace -= objectSize;
