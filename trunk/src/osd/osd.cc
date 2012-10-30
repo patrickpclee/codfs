@@ -274,7 +274,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 				debug_error("MD5 of Object ID = %" PRIu64 " mismatch!\n", objectId);
 				exit(-1);
 			} else {
-				debug_error("MD5 of Object ID = %" PRIu64 " match\n", objectId);
+				debug("MD5 of Object ID = %" PRIu64 " match\n", objectId);
 				_checksumMap.erase(objectId);
 			}
 
