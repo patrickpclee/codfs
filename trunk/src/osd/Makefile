@@ -17,7 +17,7 @@ DEFS     := -DCOMPILE_FOR_OSD
 EXTRA_CFLAGS := -g -std=c++0x
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../../lib/jerasure
+SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../../lib/jerasure ../../lib/nedmalloc
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 

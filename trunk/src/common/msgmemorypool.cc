@@ -16,7 +16,9 @@ char* MsgMemoryPool::poolMalloc(uint32_t size) {
 	if (size > _maxMsgSize)
 		_maxMsgSize = size;
 
-#ifdef USE_MEMORY_POOL
+#ifdef USE_APR_MEMORY_POOL
+	return MemoryPool::poolMalloc(_maxMsgSize);
+#elif defined USE_NEDMALLOC
 	return MemoryPool::poolMalloc(_maxMsgSize);
 #else
 	return (char*)malloc (size);
