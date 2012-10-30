@@ -218,8 +218,7 @@ void OsdCommunicator::putSegmentInit(uint32_t sockfd, uint64_t objectId,
 		waitAndDelete(putSegmentInitRequestMsg);
 		return;
 	} else {
-		debug("%s\n", "Put Segment Init Failed");
-		cout << "Put Segment Init Failed " << objectId << "." << segmentId << endl;
+		debug_error("Put Segment Init Failed %" PRIu64 ".%" PRIu32 "\n", objectId, segmentId);
 		exit(-1);
 	}
 
@@ -254,8 +253,7 @@ void OsdCommunicator::putSegmentEnd(uint32_t sockfd, uint64_t objectId,
 		waitAndDelete(segmentTransferEndRequestMsg);
 		return;
 	} else {
-		debug("%s\n", "Segment Transfer End Failed");
-		cout << "Segment Transfer End Failed " << objectId << "." << segmentId << endl;
+		debug_error("Segment Transfer End Failed %" PRIu64 ".%" PRIu32 "\n", objectId, segmentId);
 		exit(-1);
 	}
 }
@@ -280,7 +278,7 @@ void OsdCommunicator::objectUploadAck(uint64_t objectId, uint32_t objectSize,
 	 waitAndDelete(objectUploadAckMsg);
 	 return ;
 	 } else {
-	 debug("Object Upload Ack Failed [%" PRIu64 "]\n", objectId);
+	 debug_error("Object Upload Ack Failed [%" PRIu64 "]\n", objectId);
 	 exit(-1);
 	 }
 	 */
@@ -309,8 +307,7 @@ struct ObjectTransferOsdInfo OsdCommunicator::getObjectInfoRequest(
 		objectInfo._osdList = getObjectInfoRequestMsg->getNodeList();
 		waitAndDelete(getObjectInfoRequestMsg);
 	} else {
-		debug("%s\n", "Get Object Info Request Failed");
-		cout << "Get Object Info Request Failed " << objectId << endl;
+		debug("Get Object Info Request Failed %" PRIu64 "\n", objectId);
 		exit(-1);
 	}
 

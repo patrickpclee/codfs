@@ -570,7 +570,7 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 				targetComponentId, sockfd);
 
 	} else {
-		debug("%s\n", "Handshake Request Failed");
+		debug_error("%s\n", "Handshake Request Failed");
 		exit(-1);
 	}
 }
@@ -725,7 +725,7 @@ void Communicator::connectAllComponents() {
 
 uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 	if (!_componentIdMap.count(componentId)) {
-		debug("SOCKFD for Component ID = %" PRIu32 " not found!\n",
+		debug_error("SOCKFD for Component ID = %" PRIu32 " not found!\n",
 				componentId);
 		return -1;
 		//exit(-1);
@@ -806,7 +806,7 @@ void Communicator::putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
 		waitAndDelete(putObjectInitRequestMsg);
 		return;
 	} else {
-		debug("%s\n", "Put Object Init Failed");
+		debug_error("Put Object Init Failed %" PRIu64 "\n", objectId);
 		exit(-1);
 	}
 
@@ -841,7 +841,7 @@ void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
 		waitAndDelete(putObjectEndRequestMsg);
 		return;
 	} else {
-		debug("%s\n", "Put Object End Failed");
+		debug_error("Put Object End Failed %" PRIu64 "\n", objectId);
 		exit(-1);
 	}
 }

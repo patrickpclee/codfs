@@ -167,7 +167,7 @@ uint64_t StorageModule::getFilesize(string filepath) {
 	ifstream in(filepath, ifstream::in | ifstream::binary);
 
 	if (!in) {
-		debug("ERROR: Cannot open file: %s\n", filepath.c_str());
+		debug_error("ERROR: Cannot open file: %s\n", filepath.c_str());
 		perror("ifstream");
 		exit(-1);
 	}
@@ -311,9 +311,7 @@ uint32_t StorageModule::writeObjectTransferCache(uint64_t objectId, char* buf,
 	{
 		lock_guard<mutex> lk(transferCacheMutex);
 		if (!_objectTransferCache.count(objectId)) {
-			debug("%s\n", "cannot find cache for object");
-			cout << "writeObjectCache Object Cache Not Found " << objectId
-					<< endl;
+			debug_error("Cannot find cache for object %" PRIu64 "\n", objectId);
 			exit(-1);
 		}
 		recvCache = _objectTransferCache[objectId].buf;
@@ -439,7 +437,7 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 	uint32_t byteRead = pread(fileno(file), buf, length, offset);
 
 	if (byteRead != length) {
-		debug("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
+		debug_error("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
 				length, byteRead);
 		perror("pread()");
 		exit(-1);
@@ -466,8 +464,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
 
 	if (byteWritten != length) {
-		debug("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
-		perror("pwrite()");
+		debug_error("ERROR: Length = %d, byteWritten = %d\n", length, byteWritten);
 		exit(-1);
 	}
 
@@ -562,8 +559,7 @@ FILE* StorageModule::openFile(string filepath) {
 struct ObjectTransferCache StorageModule::getObjectTransferCache(uint64_t objectId) {
 	lock_guard<mutex> lk(transferCacheMutex);
 	if (!_objectTransferCache.count(objectId)) {
-		debug("%s\n", "object cache not found");
-		cout << "GetObjectCache Object Cache Not Found " << objectId << endl;
+		debug_error("Object cache not found %" PRIu64 "\n", objectId);
 		exit(-1);
 	}
 	return _objectTransferCache[objectId];
