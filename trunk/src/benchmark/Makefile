@@ -18,7 +18,7 @@ DEFS     := -DCOMPILE_FOR_CLIENT
 EXTRA_CFLAGS := -O2 -g -std=c++0x
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../client
+SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../client ../../lib/nedmalloc
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = ../client/client_main.cc

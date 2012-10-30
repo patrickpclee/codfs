@@ -12,7 +12,7 @@
 
 #include "../common/define.hh"
 
-#ifdef USE_MEMORY_POOL
+#ifdef USE_APR_MEMORY_POOL
 #include <thread>
 #include <mutex>
 
@@ -22,6 +22,10 @@
 #include <apr-1.0/apr_pools.h>
 
 const apr_size_t POOL_MAX_FREE_SIZE = 20 * 1024 * 1024;
+#endif
+
+#ifdef USE_NEDMALLOC
+#include "../../lib/nedmalloc/nedmalloc.h"
 #endif
 
 /**
@@ -82,7 +86,7 @@ private:
 	MemoryPool(MemoryPool const&); // Don't Implement
 	void operator=(MemoryPool const&); // Don't implement
 
-#ifdef USE_MEMORY_POOL
+#ifdef USE_APR_MEMORY_POOL
 	apr_pool_t *pool;
 	apr_allocator_t* alloc;
 	apr_bucket_alloc_t* balloc;
