@@ -61,8 +61,7 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 	lock_guard<mutex> lk(codingMutex);
 
 	if (!_codingWorker.count(codingScheme)) {
-		debug("%s\n", "Wrong coding scheme!");
-		cout << "Invalid Coding Scheme" << endl;
+		debug_error("%s\n", "Wrong coding scheme!");
 		exit(-1);
 	}
 
