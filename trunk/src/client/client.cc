@@ -180,11 +180,6 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	FILE_LOG(logINFO) << "[UPLOAD]" << formatSize(fileSize) << " transferred in " << duration
 			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s " << "ID = " << fileMetaData._id;
 
-	/*
-	 int rtnval = system("./mid.sh");
-	 exit(42);
-	 */
-
 	return fileMetaData._id;
 }
 
