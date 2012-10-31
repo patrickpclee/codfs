@@ -1,3 +1,9 @@
+OPTIMIZE := -O2
+WARNINGS := -Wall 
+EXTRA_CFLAGS := -g -std=c++0x
+
+############################################
+
 CURRENT = $(CURDIR)
 SRC=				${CURRENT}/src
 OSD_DIR=			${SRC}/osd
@@ -16,35 +22,17 @@ all:
 	make osd;
 	make monitor;
 
-optimized:
-	make mds_o3;
-	make client_o3;
-	make osd_o3;
-	make monitor_o3;
-
 mds:
-	cd ${MDS_DIR}; make -j3
+	cd ${MDS_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 client:
-	cd ${CLIENT_DIR}; make -j3
+	cd ${CLIENT_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 osd:
-	cd ${OSD_DIR}; make -j3
+	cd ${OSD_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 monitor:
-	cd ${MONITOR_DIR}; make -j3
-
-mds_o3:
-	cd ${MDS_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
-
-client_o3:
-	cd ${CLIENT_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
-
-osd_o3:
-	cd ${OSD_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
-
-monitor_o3:
-	cd ${MONITOR_DIR}; make EXTRA_CFLAGS="-std=c++0x" OPTIMIZE="-O3" -j3
+	cd ${MONITOR_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 clientfuse:
 	cd ${FUSE_DIR}; make -j3
@@ -56,7 +44,7 @@ protocol:
 	cd ${PROTOCOL_DIR}; make
 
 benchmark:
-	cd ${BENCHMARK_DIR}; make -j3
+	cd ${BENCHMARK_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 clean:
 	cd ${OSD_DIR}; make clean

@@ -13,7 +13,7 @@
 
 // common/memorypool.hh
 //#define USE_APR_MEMORY_POOL
-#define USE_NEDMALLOC
+//#define USE_NEDMALLOC
 
 // communicator/communicator.cc
 #define USE_THREAD_POOL

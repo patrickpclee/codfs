@@ -14,11 +14,11 @@ CROSS_COMPILE =
 OPTIMIZE := 
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_CLIENT
-#EXTRA_CFLAGS := -O2 -pg -fno-inline -g -std=c++0x
 EXTRA_CFLAGS := -O2 -g -std=c++0x
+LIBS := `pkg-config --cflags --libs protobuf` -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lapr-1 -laprutil-1 -lcrypto -ltcmalloc
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../client ../../lib/nedmalloc
+SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../client
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = ../client/client_main.cc
@@ -104,7 +104,7 @@ $(TARGET): $(all_objs)
 else
 $(TARGET): LD = $(if $(strip $(src-cpp) $(src-cc) $(src-cxx)),$(G++),$(GCC))
 $(TARGET): $(all_objs)
-	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf` -lpthread  -lboost_thread -lboost_filesystem -lboost_system -lapr-1 -laprutil-1 -lcrypto
+	$(LD) $(LDFLAGS)  $(all_objs) -o $@ $(LIBS)
 endif
 
 .mkdir:
