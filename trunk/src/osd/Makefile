@@ -15,9 +15,10 @@ OPTIMIZE := -O2
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_OSD
 EXTRA_CFLAGS := -g -std=c++0x
+LIBS := `pkg-config --cflags --libs protobuf` -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lapr-1 -laprutil-1 -lcrypto -ltcmalloc
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../../lib/jerasure ../../lib/nedmalloc
+SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../../lib/jerasure 
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 
@@ -109,8 +110,7 @@ $(TARGET): $(all_objs)
 else
 $(TARGET): LD = $(if $(strip $(src-cpp) $(src-cc) $(src-cxx)),$(G++),$(GCC))
 $(TARGET): $(all_objs)
-	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf` -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lapr-1 -laprutil-1 -lcrypto
-
+	$(LD) $(LDFLAGS)  $(all_objs) -o $@ $(LIBS)
 endif
 
 .mkdir:

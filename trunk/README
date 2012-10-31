@@ -21,13 +21,27 @@ In Ubuntu, the following changes are needed
 
 -------------------------------
 
-3. Install Apache Runtime
-
-> apt-get install libaprutil1-dev libapr1-dev
-
-4. Install FUSE
+3. Install FUSE
 
 > apt-get install libfuse-dev
 
-5. Install OPENSSL
+-------------------------------
+
+4. Install OPENSSL
+
 > apt-get install libssl-dev
+
+-------------------------------
+
+5. Optional: Install Apache Runtime (For APR Memory Pool)
+
+> apt-get install libaprutil1-dev libapr1-dev
+
+-------------------------------
+
+6. Optional: Install tcmalloc (For replacing malloc with tcmalloc)
+
+(64-bit only) > sudo apt-get install libunwind7 libunwind7-dev
+> sudo apt-get install libgoogle-perftool-dev
+
+-------------------------------
