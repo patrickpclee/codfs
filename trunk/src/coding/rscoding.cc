@@ -33,7 +33,7 @@ vector<struct SegmentData> RSCoding::encode(struct ObjectData objectData,
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
-	const uint32_t size = roundTo(objectData.info.objectSize, k) / k;
+	const uint32_t size = roundTo((roundTo(objectData.info.objectSize, k) / k),4);
 
 	if (k <= 0 || m <= 0 || (w != 8 && w != 16 && w != 32)
 			|| (w <= 16 && k + m > (1 << w))) {
@@ -54,7 +54,12 @@ vector<struct SegmentData> RSCoding::encode(struct ObjectData objectData,
 
 		segmentData.buf = MemoryPool::getInstance().poolMalloc(size);
 		char* bufPos = objectData.buf + i * size;
-		memcpy(segmentData.buf, bufPos, size);
+		if(i == k-1){
+			//memset(segmentData.buf, 0, size);
+			memcpy(segmentData.buf, bufPos, objectData.info.objectSize - i*size);
+			memset(segmentData.buf + objectData.info.objectSize - i*size, 0, k*size - objectData.info.objectSize);
+		} else
+			memcpy(segmentData.buf, bufPos, size);
 
 		segmentDataList.push_back(segmentData);
 
@@ -103,7 +108,7 @@ struct ObjectData RSCoding::decode(vector<struct SegmentData> &segmentData,
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
-	const uint32_t size = roundTo(objectSize, k) / k;
+	const uint32_t size = roundTo(roundTo(objectSize, k) / k, 4);
 
 	if (requiredSegments.size() < k) {
 		cerr << "Not enough segments for decode " << requiredSegments.size()
@@ -182,11 +187,12 @@ struct ObjectData RSCoding::decode(vector<struct SegmentData> &segmentData,
 	}
 
 	uint64_t offset = 0;
-	for (uint32_t i = 0; i < k; i++) {
+	for (uint32_t i = 0; i < k - 1; i++) {
 		memcpy(objectData.buf + offset, segmentData[i].buf,
 				segmentData[i].info.segmentSize);
 		offset += segmentData[i].info.segmentSize;
 	}
+	memcpy(objectData.buf + offset, segmentData[k - 1].buf, objectSize - offset);
 
 	return objectData;
 }
