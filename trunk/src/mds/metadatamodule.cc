@@ -121,7 +121,7 @@ uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId, vector<uint32_t>
 	int failedOsdCount = (int) count(nodeStatus.begin(),
 			nodeStatus.end(), false);
 
-	if (failedOsdCount == nodeStatus.size()) {
+	if (failedOsdCount == (int)nodeStatus.size()) {
 		debug_yellow ("All OSD has died for objectId = %" PRIu64 "\n", objectId);
 		exit (-1);
 	}
