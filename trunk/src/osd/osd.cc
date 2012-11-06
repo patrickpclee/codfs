@@ -29,6 +29,22 @@ extern Osd* osd;
 extern ConfigLayer* configLayer;
 mutex objectRequestCountMutex;
 
+#include <atomic>
+#ifdef TIME_POINT
+#include <chrono>
+using namespace std;
+typedef chrono::high_resolution_clock Clock;
+typedef chrono::milliseconds milliseconds;
+mutex timeMutex;
+double lockObjectCountMutexTime = 0;
+double getObjectInfoTime = 0;
+double getOSDStatusTime = 0;
+double getSegmentTime = 0;
+double decodeObjectTime = 0;
+double sendObjectTime = 0;
+double cacheObjectTime = 0;
+#endif
+
 Osd::Osd(uint32_t selfId) {
 
 	configLayer = new ConfigLayer("osdconfig.xml", "common.xml");
@@ -53,6 +69,16 @@ Osd::~Osd() {
 void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId) {
 
+#ifdef TIME_POINT
+	Clock::time_point t0 = Clock::now();
+	Clock::time_point t1 = Clock::now();
+	Clock::time_point t2 = Clock::now();
+	Clock::time_point t3 = Clock::now();
+	Clock::time_point t4 = Clock::now();
+	Clock::time_point t5 = Clock::now();
+	Clock::time_point t6 = Clock::now();
+	Clock::time_point t7 = Clock::now();
+#endif
 	objectRequestCountMutex.lock();
 	if (!_objectRequestCount.count(objectId)) {
 		_objectRequestCount.set(objectId, 1);
@@ -65,6 +91,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 	struct ObjectData& objectData = _objectDataMap.get(objectId);
 	objectRequestCountMutex.unlock();
+#ifdef TIME_POINT
+	t1 = Clock::now();
+#endif
 
 	{
 		lock_guard<mutex> lk(*(_objectDownloadMutex.get(objectId)));
@@ -84,6 +113,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 				ObjectTransferOsdInfo objectInfo =
 						_osdCommunicator->getObjectInfoRequest(objectId);
+#ifdef TIME_POINT
+				t2 = Clock::now();
+#endif
 				const CodingScheme codingScheme = objectInfo._codingScheme;
 				const string codingSetting = objectInfo._codingSetting;
 				const uint32_t objectSize = objectInfo._size;
@@ -93,6 +125,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 						_osdCommunicator->getOsdStatusRequest(
 								objectInfo._osdList);
 
+#ifdef TIME_POINT
+				t3 = Clock::now();
+#endif
 				// check which segments are needed to request
 				uint32_t totalNumOfSegments = objectInfo._osdList.size();
 				vector<uint32_t> requiredSegments =
@@ -153,6 +188,10 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 				while (1) {
 					if (_downloadSegmentRemaining.get(objectId) == 0) {
+#ifdef TIME_POINT
+						t4 = Clock::now();
+#endif
+
 						// 5. decode segments
 
 						debug(
@@ -175,6 +214,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 									i, segmentDataList[i].info.segmentId);
 						}
 						_receivedSegmentData.erase(objectId);
+#ifdef TIME_PONT
+						t5 = Clock::now();
+#endif
 
 						break;
 					} else {
@@ -192,6 +234,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// 5. send object
 	_osdCommunicator->sendObject(_osdId, sockfd, objectData);
 
+#ifdef TIME_POINT
+	t6 = Clock::now();
+#endif
 	{
 		lock_guard<mutex> lk(objectRequestCountMutex);
 		_objectRequestCount.decrement(objectId);
@@ -217,6 +262,21 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			debug("%s\n", "[DOWNLOAD] Cleanup completed");
 		}
 	}
+#ifdef TIME_POINT
+	t7 = Clock::now();
+#endif
+
+#ifdef TIME_POINT
+	timeMutex.lock();
+	lockObjectCountMutexTime	+= chrono::duration_cast < milliseconds > (t1 - t0).count();
+	getObjectInfoTime			+= chrono::duration_cast < milliseconds > (t2 - t1).count();
+	getOSDStatusTime			+= chrono::duration_cast < milliseconds > (t3 - t2).count();
+	getSegmentTime				+= chrono::duration_cast < milliseconds > (t4 - t3).count();
+	decodeObjectTime			+= chrono::duration_cast < milliseconds > (t5 - t4).count();
+	sendObjectTime				+= chrono::duration_cast < milliseconds > (t6 - t5).count();
+	cacheObjectTime				+= chrono::duration_cast < milliseconds > (t7 - t6).count();
+	timeMutex.unlock();
+#endif
 
 }
 

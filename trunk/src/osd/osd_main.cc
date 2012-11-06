@@ -6,11 +6,26 @@
 #include <thread>
 #include <vector>
 #include "osd.hh"
+#include <iostream>
+#include <iomanip>
+using namespace std;
 #include "../common/segmentlocation.hh"
 #include "../common/debug.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/netfunc.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
+#include "../common/define.hh"
+
+#ifdef TIME_POINT
+extern double lockObjectCountMutexTime;
+extern double getObjectInfoTime;
+extern double getOSDStatusTime;
+extern double getSegmentTime;
+extern double decodeObjectTime;
+extern double sendObjectTime;
+extern double cacheObjectTime;
+#endif
+
 /// Osd Object
 Osd* osd;
 
@@ -22,6 +37,15 @@ void sighandler(int signum) {
 	cout << "Signal" << signum << "received" << endl;
 	if (signum == SIGINT) {
 		debug_yellow ("%s\n", "SIGINT received\n");
+		cout << fixed;
+		cout << setprecision(2);
+cout << "Lock Object Count Mutex: " << lockObjectCountMutexTime / 1000 << endl;
+cout << "Get Object Info: " << getObjectInfoTime / 1000 << endl;
+cout << "Get OSD Status: " << getOSDStatusTime / 1000 << endl;
+cout << "Get Segment: " << getSegmentTime / 1000 << endl;
+cout << "Decode Object: " << decodeObjectTime / 1000 << endl;
+cout << "Send Object: " << sendObjectTime / 1000 << endl;
+cout << "Cache Object: " << cacheObjectTime / 1000 << endl;
 		exit(42);
 	} else if (signum == SIGUSR1) {
 		cout << "Clearing object disk cache...";
