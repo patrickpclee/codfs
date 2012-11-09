@@ -23,10 +23,6 @@
 #include "metadata/saveobjectlistrequest.hh"
 #include "metadata/saveobjectlistreply.hh"
 #include "metadata/setfilesizerequest.hh"
-/*
-#include "metadata/iwantfilesize.hh"
-#include "metadata/heresfilesize.hh"
-*/
 #include "transfer/putobjectinitrequest.hh"
 #include "transfer/putobjectinitreply.hh"
 #include "transfer/segmenttransferendrequest.hh"
@@ -86,14 +82,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 
 	//METADATA
-/*
-	case (I_WANT_FILE_SIZE_MSG):
-		return new IWantFileSizeMsg(communicator);
-		break;
-	case (HERES_FILE_SIZE_MSG):
-		return new HeresFileSizeMsg(communicator);
-		break;
-*/
 	case (LIST_DIRECTORY_REQUEST):
 		return new ListDirectoryRequestMsg(communicator);
 		break;

@@ -61,6 +61,7 @@ void RecoveryTriggerRequestMsg::parse(char* buf) {
 
 void RecoveryTriggerRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
+	//mds->recoverTriggerProcessor (_msgHeader.requestId, _sockfd, _osdList);
 #endif
 }
 
