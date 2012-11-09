@@ -536,7 +536,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, vector<uint32_t> repairSegmentIdList,
+		uint64_t objectId, vector<uint32_t> repairSegmentList,
 		vector<uint32_t> repairSegmentOsdList) {
 
 	// execute download procedure to retrieve object
@@ -558,17 +558,22 @@ void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// perform encode
 	vector<struct SegmentData> segmentDataList =
-			_codingModule->encodeObjectToSegment(codingScheme,
-					objectId, objectData.buf, objectSize,
-					codingSetting);
+			_codingModule->encodeObjectToSegment(codingScheme, objectId,
+					objectData.buf, objectSize, codingSetting);
 
 	// send encoded segments to new OSD
-	for (int i = 0; i < repairSegmentIdList.size(); i++) {
+	for (int i = 0; i < repairSegmentList.size(); i++) {
 		// find sockfd of the new OSD
-		uint32_t sockfd = _osdCommunicator->getSockfdFromId(repairSegmentIdList[i]);
-		uint32_t segmentId = repairSegmentIdList[i];
+		uint32_t sockfd = _osdCommunicator->getSockfdFromId(
+				repairSegmentList[i]);
+		uint32_t segmentId = repairSegmentList[i];
 		_osdCommunicator->sendSegment(sockfd, segmentDataList[segmentId]);
 	}
+
+	// TODO: repairSegmentOsd fails at this point?
+	// send success message to MDS
+	_osdCommunicator->repairSegmentAck(objectId, repairSegmentList,
+			repairSegmentOsdList);
 
 }
 

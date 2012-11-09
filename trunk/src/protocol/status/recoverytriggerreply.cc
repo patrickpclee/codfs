@@ -65,7 +65,7 @@ void RecoveryTriggerReplyMsg::parse(char* buf) {
 
 void RecoveryTriggerReplyMsg::doHandle() {
 #ifdef COMPILE_FOR_MONITOR
-//	monitor->recoverTriggerProcessor (_msgHeader.requestId, _sockfd, _objectLocation);
+	//monitor->recoverTriggerProcessor (_msgHeader.requestId, _sockfd, _objectLocation);
 #endif
 }
 

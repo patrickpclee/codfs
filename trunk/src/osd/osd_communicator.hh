@@ -110,8 +110,8 @@ public:
 	 */
 
 	vector<struct SegmentLocation> getOsdListRequest(uint64_t objectId,
-			ComponentType dstComponent, uint32_t segmentCount, uint32_t
-			primaryId);
+			ComponentType dstComponent, uint32_t segmentCount,
+			uint32_t primaryId);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the segment is stored
@@ -160,9 +160,17 @@ public:
 	 * @return boolean array storing OSD health
 	 */
 
-	vector<bool> getOsdStatusRequest(
-			vector<uint32_t> osdIdList);
+	vector<bool> getOsdStatusRequest(vector<uint32_t> osdIdList);
 
+	/**
+	 * Acknowledge MDS for completing segment repair
+	 * @param objectId Object ID
+	 * @param repairSegmentList List of segments to repair
+	 * @param repairSegmentOsdList List of OSD to store the repaired segments
+	 */
+
+	void repairSegmentAck(uint64_t objectId, vector<uint32_t> repairSegmentList,
+			vector<uint32_t> repairSegmentOsdList);
 private:
 
 	/**
