@@ -86,6 +86,9 @@ class OnlineOsdListPro;
 class GetOsdStatusRequestPro;
 class GetOsdStatusReplyPro;
 class GetPrimaryListReplyPro;
+class RecoveryTriggerRequestPro;
+class OsdListPro;
+class RecoveryTriggerReplyPro;
 class GetOsdListReplyPro;
 
 enum HandshakeRequestPro_ComponentType {
@@ -5523,6 +5526,261 @@ class GetPrimaryListReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class RecoveryTriggerRequestPro : public ::google::protobuf::Message {
+ public:
+  RecoveryTriggerRequestPro();
+  virtual ~RecoveryTriggerRequestPro();
+  
+  RecoveryTriggerRequestPro(const RecoveryTriggerRequestPro& from);
+  
+  inline RecoveryTriggerRequestPro& operator=(const RecoveryTriggerRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RecoveryTriggerRequestPro& default_instance();
+  
+  void Swap(RecoveryTriggerRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  RecoveryTriggerRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RecoveryTriggerRequestPro& from);
+  void MergeFrom(const RecoveryTriggerRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated fixed32 osdList = 1;
+  inline int osdlist_size() const;
+  inline void clear_osdlist();
+  static const int kOsdListFieldNumber = 1;
+  inline ::google::protobuf::uint32 osdlist(int index) const;
+  inline void set_osdlist(int index, ::google::protobuf::uint32 value);
+  inline void add_osdlist(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      osdlist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_osdlist();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.RecoveryTriggerRequestPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > osdlist_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static RecoveryTriggerRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class OsdListPro : public ::google::protobuf::Message {
+ public:
+  OsdListPro();
+  virtual ~OsdListPro();
+  
+  OsdListPro(const OsdListPro& from);
+  
+  inline OsdListPro& operator=(const OsdListPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const OsdListPro& default_instance();
+  
+  void Swap(OsdListPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  OsdListPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const OsdListPro& from);
+  void MergeFrom(const OsdListPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated fixed32 osdList = 1;
+  inline int osdlist_size() const;
+  inline void clear_osdlist();
+  static const int kOsdListFieldNumber = 1;
+  inline ::google::protobuf::uint32 osdlist(int index) const;
+  inline void set_osdlist(int index, ::google::protobuf::uint32 value);
+  inline void add_osdlist(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      osdlist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_osdlist();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.OsdListPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > osdlist_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static OsdListPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class RecoveryTriggerReplyPro : public ::google::protobuf::Message {
+ public:
+  RecoveryTriggerReplyPro();
+  virtual ~RecoveryTriggerReplyPro();
+  
+  RecoveryTriggerReplyPro(const RecoveryTriggerReplyPro& from);
+  
+  inline RecoveryTriggerReplyPro& operator=(const RecoveryTriggerReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RecoveryTriggerReplyPro& default_instance();
+  
+  void Swap(RecoveryTriggerReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  RecoveryTriggerReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RecoveryTriggerReplyPro& from);
+  void MergeFrom(const RecoveryTriggerReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated .ncvfs.OsdListPro objectLocation = 1;
+  inline int objectlocation_size() const;
+  inline void clear_objectlocation();
+  static const int kObjectLocationFieldNumber = 1;
+  inline const ::ncvfs::OsdListPro& objectlocation(int index) const;
+  inline ::ncvfs::OsdListPro* mutable_objectlocation(int index);
+  inline ::ncvfs::OsdListPro* add_objectlocation();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OsdListPro >&
+      objectlocation() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OsdListPro >*
+      mutable_objectlocation();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.RecoveryTriggerReplyPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::OsdListPro > objectlocation_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static RecoveryTriggerReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class GetOsdListReplyPro : public ::google::protobuf::Message {
  public:
   GetOsdListReplyPro();
@@ -9242,6 +9500,93 @@ GetPrimaryListReplyPro::primarylist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
 GetPrimaryListReplyPro::mutable_primarylist() {
   return &primarylist_;
+}
+
+// -------------------------------------------------------------------
+
+// RecoveryTriggerRequestPro
+
+// repeated fixed32 osdList = 1;
+inline int RecoveryTriggerRequestPro::osdlist_size() const {
+  return osdlist_.size();
+}
+inline void RecoveryTriggerRequestPro::clear_osdlist() {
+  osdlist_.Clear();
+}
+inline ::google::protobuf::uint32 RecoveryTriggerRequestPro::osdlist(int index) const {
+  return osdlist_.Get(index);
+}
+inline void RecoveryTriggerRequestPro::set_osdlist(int index, ::google::protobuf::uint32 value) {
+  osdlist_.Set(index, value);
+}
+inline void RecoveryTriggerRequestPro::add_osdlist(::google::protobuf::uint32 value) {
+  osdlist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+RecoveryTriggerRequestPro::osdlist() const {
+  return osdlist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+RecoveryTriggerRequestPro::mutable_osdlist() {
+  return &osdlist_;
+}
+
+// -------------------------------------------------------------------
+
+// OsdListPro
+
+// repeated fixed32 osdList = 1;
+inline int OsdListPro::osdlist_size() const {
+  return osdlist_.size();
+}
+inline void OsdListPro::clear_osdlist() {
+  osdlist_.Clear();
+}
+inline ::google::protobuf::uint32 OsdListPro::osdlist(int index) const {
+  return osdlist_.Get(index);
+}
+inline void OsdListPro::set_osdlist(int index, ::google::protobuf::uint32 value) {
+  osdlist_.Set(index, value);
+}
+inline void OsdListPro::add_osdlist(::google::protobuf::uint32 value) {
+  osdlist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+OsdListPro::osdlist() const {
+  return osdlist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+OsdListPro::mutable_osdlist() {
+  return &osdlist_;
+}
+
+// -------------------------------------------------------------------
+
+// RecoveryTriggerReplyPro
+
+// repeated .ncvfs.OsdListPro objectLocation = 1;
+inline int RecoveryTriggerReplyPro::objectlocation_size() const {
+  return objectlocation_.size();
+}
+inline void RecoveryTriggerReplyPro::clear_objectlocation() {
+  objectlocation_.Clear();
+}
+inline const ::ncvfs::OsdListPro& RecoveryTriggerReplyPro::objectlocation(int index) const {
+  return objectlocation_.Get(index);
+}
+inline ::ncvfs::OsdListPro* RecoveryTriggerReplyPro::mutable_objectlocation(int index) {
+  return objectlocation_.Mutable(index);
+}
+inline ::ncvfs::OsdListPro* RecoveryTriggerReplyPro::add_objectlocation() {
+  return objectlocation_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OsdListPro >&
+RecoveryTriggerReplyPro::objectlocation() const {
+  return objectlocation_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OsdListPro >*
+RecoveryTriggerReplyPro::mutable_objectlocation() {
+  return &objectlocation_;
 }
 
 // -------------------------------------------------------------------
