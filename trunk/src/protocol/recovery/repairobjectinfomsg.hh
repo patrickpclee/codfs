@@ -2,8 +2,8 @@
  * repairobjectinfo.hh
  */
 
-#ifndef __REPAIR_OBJECT_INFO_HH_
-#define __REPAIR_OBJECT_INFO_HH__
+#ifndef _REPAIR_OBJECT_INFO_HH_
+#define _REPAIR_OBJECT_INFO_HH_
 
 #include <string>
 #include <vector>
