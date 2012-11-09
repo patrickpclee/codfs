@@ -79,7 +79,7 @@ vector<uint64_t> MetaDataModule::readObjectList(uint32_t fileId) {
 }
 
 vector<uint64_t> MetaDataModule::readOsdObjectList(uint32_t osdId) {
-	return {0};
+	return _objectMetaDataModule->findOsdObjects(osdId);
 }
 
 string MetaDataModule::readChecksum(uint32_t fileId) {

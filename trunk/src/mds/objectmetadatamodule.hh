@@ -42,8 +42,9 @@ public:
 	 * @param	objectId	ID of the Object
 	 * @param	objectNodeList	List of Node ID
 	 */
-	void saveNodeList (uint64_t objectId, const vector<uint32_t> &objectNodeList);
-	
+	void saveNodeList(uint64_t objectId,
+			const vector<uint32_t> &objectNodeList);
+
 	/**
 	 * @brief	Read Node List of a Object
 	 *
@@ -51,15 +52,22 @@ public:
 	 *
 	 * @return	List of Node ID
 	 */
-	vector<uint32_t> readNodeList (uint64_t objectId);
-	
+	vector<uint32_t> readNodeList(uint64_t objectId);
+
+	/**
+	 * @brief Find all objects owned by the osd
+	 * @param osdId Osd ID
+	 * @return
+	 */
+	vector<uint64_t> findOsdObjects(uint32_t osdId);
+
 	/**
 	 * @brief	Set Primary of a Object
 	 *
 	 * @param	objectId	ID of the Object
 	 * @param	primaryOsdId	ID of the Primary
 	 */
-	void setPrimary (uint64_t objectId, uint32_t primary);
+	void setPrimary(uint64_t objectId, uint32_t primary);
 
 	/**
 	 * @brief	Get Primary of a Object
@@ -68,7 +76,7 @@ public:
 	 *
 	 * @return	ID of the Primary
 	 */
-	uint32_t getPrimary (uint64_t objectId);
+	uint32_t getPrimary(uint64_t objectId);
 
 	/**
 	 * @brief	Generate a New Object ID
@@ -82,7 +90,7 @@ private:
 
 	/// Configuration Meta Data Module
 	ConfigMetaDataModule* _configMetaDataModule;
-	
+
 	/// Underlying Meta Data Storage
 	MongoDB* _objectMetaDataStorage;
 

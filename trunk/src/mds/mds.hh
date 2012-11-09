@@ -172,7 +172,7 @@ public:
 	 * @param	conenctionId	Connection ID
 	 * @param	osdId		ID of the failed Osd
 	 */
-	void recoveryProcessor(uint32_t requestId, uint32_t connectionId,
+	void recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 			uint32_t osdId);
 
 	/**

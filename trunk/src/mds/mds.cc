@@ -289,32 +289,29 @@ void Mds::secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
 /**
  * @brief	Handle Osd Recovery Initialized by Monitor
  *
- * 1. Read Object List of the Failed Osd \n
- * 2. For each Object, Read Current Primary and Node List \n
+ * 1. Read Object List of the Failed Osd
+ * 2. For each Object, Read Current Primary and Node List
  * 3. Reply with Object List, Primary List, and Node List of the Objects
  */
-void Mds::recoveryProcessor(uint32_t requestId, uint32_t connectionId,
+void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t osdId) {
-	vector<uint64_t> objectList;
-	vector<uint32_t> primaryList;
-	vector<vector<uint32_t> > objectNodeList;
 
-	_metaDataModule->readOsdObjectList(osdId);
+	vector<ObjectLocation> objectLocationList;
 
-	vector<uint64_t>::iterator it;
-	uint32_t primaryId;
+	ObjectLocation objectLocation;
 
-	for (it = objectList.begin(); it < objectList.end(); ++it) {
-		primaryId = _metaDataModule->getPrimary(*it);
-		primaryList.push_back(primaryId);
+	// get the list of objects owned by failed osd
+	vector<uint64_t> objectList = _metaDataModule->readOsdObjectList(osdId);
 
-		vector<uint32_t> nodeList;
-		nodeList = _metaDataModule->readNodeList(*it);
-		objectNodeList.push_back(nodeList);
+	for (auto objectId : objectList) {
+		objectLocation.objectId = objectId;
+		objectLocation.osdList = _metaDataModule->readNodeList(objectId);
+		objectLocation.primaryId = _metaDataModule->getPrimary(objectId);
+		objectLocationList.push_back(objectLocation);
 	}
 
-	_mdsCommunicator->replyRecoveryInfo(requestId, connectionId, osdId,
-			objectList, primaryList, objectNodeList);
+	_mdsCommunicator->replyRecoveryTrigger(requestId, connectionId, osdId,
+			objectLocationList);
 
 	return;
 }
