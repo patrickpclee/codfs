@@ -18,11 +18,11 @@ RecoveryTriggerReplyMsg::RecoveryTriggerReplyMsg(Communicator* communicator) :
 }
 
 RecoveryTriggerReplyMsg::RecoveryTriggerReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t mdsSockfd, const vector<vector<uint32_t>> &objectLocation) :
+		uint32_t requestId, uint32_t sockfd, const vector<struct ObjectLocation> &objectLocations) :
 		Message(communicator) {
 	_msgHeader.requestId = requestId;
-	_sockfd = mdsSockfd;
-	_objectLocation = objectLocation;
+	_sockfd = sockfd;
+	_objectLocations = objectLocations;
 
 }
 
@@ -32,6 +32,12 @@ void RecoveryTriggerReplyMsg::prepareProtocolMsg() {
 	ncvfs::RecoveryTriggerReplyPro recoveryTriggerReplyPro;
 
 	//TODO push object location list.
+	for (struct ObjectLocation ol: _objectLocations) {
+		ncvfs::ObjectLocationPro olp;
+		olp.set_objectid (ol.objectId);
+		olp.set_primaryId (ol.primaryId);
+
+	}
 
 	if (!recoveryTriggerReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -59,10 +65,10 @@ void RecoveryTriggerReplyMsg::parse(char* buf) {
 
 void RecoveryTriggerReplyMsg::doHandle() {
 #ifdef COMPILE_FOR_MONITOR
-	monitor->recoverTriggerProcessor (_msgHeader.requestId, _sockfd, _objectLocation);
+//	monitor->recoverTriggerProcessor (_msgHeader.requestId, _sockfd, _objectLocation);
 #endif
 }
 
 void RecoveryTriggerReplyMsg::printProtocol() {
-	debug("%s\n", "[RecoveryTriggerReplyMsg] GOT.");
+	debug("%s\n", "[RECOVERY_TRIGGER_REPLY] GOT.");
 }
