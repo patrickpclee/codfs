@@ -39,6 +39,7 @@ void sighandler(int signum) {
 		debug_yellow ("%s\n", "SIGINT received\n");
 		cout << fixed;
 		cout << setprecision(2);
+#ifdef TIME_POINT
 cout << "Lock Object Count Mutex: " << lockObjectCountMutexTime / 1000 << endl;
 cout << "Get Object Info: " << getObjectInfoTime / 1000 << endl;
 cout << "Get OSD Status: " << getOSDStatusTime / 1000 << endl;
@@ -46,6 +47,7 @@ cout << "Get Segment: " << getSegmentTime / 1000 << endl;
 cout << "Decode Object: " << decodeObjectTime / 1000 << endl;
 cout << "Send Object: " << sendObjectTime / 1000 << endl;
 cout << "Cache Object: " << cacheObjectTime / 1000 << endl;
+#endif
 		exit(42);
 	} else if (signum == SIGUSR1) {
 		cout << "Clearing object disk cache...";

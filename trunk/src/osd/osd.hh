@@ -80,10 +80,11 @@ public:
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param objectId 	ID of the object to send
+	 * @param localRetrieve (Optional) Return object directly for recovery
 	 */
 
-	void getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId);
+	ObjectData getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, bool localRetrieve = false);
 
 	/**
 	 * Action when a getSegmentRequest is received
@@ -183,9 +184,14 @@ public:
 	 * Action when a recovery request is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
+	 * @param objectId Object ID
+	 * @param repairSegmentId Segment ID to be repaired
+	 * @param repairSegmentOsd New OSDs to store the repaired segments
 	 */
 
-	void recoveryProcessor(uint32_t requestId, uint32_t sockfd);
+	void repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t objectId, vector<uint32_t> repairSegmentId,
+			vector<uint32_t> repairSegmentOsd);
 
 	/**
 	 * Action when a monitor requests a status update 
