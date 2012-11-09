@@ -60,6 +60,11 @@
 #include "status/switchprimaryosdrequestmsg.hh"
 #include "status/switchprimaryosdreplymsg.hh"
 
+
+/*  Recovery  */
+#include "recovery/repairobjectinfomsg.hh"
+
+
 MessageFactory::MessageFactory() {
 
 }
@@ -227,6 +232,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_OSD_LIST_REPLY):
 		return new GetOsdListReplyMsg(communicator);
+		break;
+	case (REPAIR_OBJECT_INFO):
+		return new RepairObjectInfoMsg(communicator);
 		break;
 
 	default:
