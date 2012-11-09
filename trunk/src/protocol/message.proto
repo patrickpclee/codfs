@@ -375,6 +375,13 @@ message GetOsdStatusReplyPro {
 	repeated bool osdStatus = 1;
 }
 
+
+message RepairObjectInfoPro {
+	optional fixed64 objectId = 1;
+	repeated fixed32 deadSegmentIds = 2;
+	repeated fixed32 newOsdIds = 3;	
+}
+
 //
 // MONITOR -> MDS
 //

@@ -85,6 +85,7 @@ class OnlineOsdPro;
 class OnlineOsdListPro;
 class GetOsdStatusRequestPro;
 class GetOsdStatusReplyPro;
+class RepairObjectInfoPro;
 class GetPrimaryListReplyPro;
 class GetOsdListReplyPro;
 
@@ -5438,6 +5439,114 @@ class GetOsdStatusReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class RepairObjectInfoPro : public ::google::protobuf::Message {
+ public:
+  RepairObjectInfoPro();
+  virtual ~RepairObjectInfoPro();
+  
+  RepairObjectInfoPro(const RepairObjectInfoPro& from);
+  
+  inline RepairObjectInfoPro& operator=(const RepairObjectInfoPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RepairObjectInfoPro& default_instance();
+  
+  void Swap(RepairObjectInfoPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  RepairObjectInfoPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RepairObjectInfoPro& from);
+  void MergeFrom(const RepairObjectInfoPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 objectId = 1;
+  inline bool has_objectid() const;
+  inline void clear_objectid();
+  static const int kObjectIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 objectid() const;
+  inline void set_objectid(::google::protobuf::uint64 value);
+  
+  // repeated fixed32 deadSegmentIds = 2;
+  inline int deadsegmentids_size() const;
+  inline void clear_deadsegmentids();
+  static const int kDeadSegmentIdsFieldNumber = 2;
+  inline ::google::protobuf::uint32 deadsegmentids(int index) const;
+  inline void set_deadsegmentids(int index, ::google::protobuf::uint32 value);
+  inline void add_deadsegmentids(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      deadsegmentids() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_deadsegmentids();
+  
+  // repeated fixed32 newOsdIds = 3;
+  inline int newosdids_size() const;
+  inline void clear_newosdids();
+  static const int kNewOsdIdsFieldNumber = 3;
+  inline ::google::protobuf::uint32 newosdids(int index) const;
+  inline void set_newosdids(int index, ::google::protobuf::uint32 value);
+  inline void add_newosdids(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      newosdids() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_newosdids();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.RepairObjectInfoPro)
+ private:
+  inline void set_has_objectid();
+  inline void clear_has_objectid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 objectid_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > deadsegmentids_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > newosdids_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static RepairObjectInfoPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class GetPrimaryListReplyPro : public ::google::protobuf::Message {
  public:
   GetPrimaryListReplyPro();
@@ -9213,6 +9322,82 @@ GetOsdStatusReplyPro::osdstatus() const {
 inline ::google::protobuf::RepeatedField< bool >*
 GetOsdStatusReplyPro::mutable_osdstatus() {
   return &osdstatus_;
+}
+
+// -------------------------------------------------------------------
+
+// RepairObjectInfoPro
+
+// optional fixed64 objectId = 1;
+inline bool RepairObjectInfoPro::has_objectid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RepairObjectInfoPro::set_has_objectid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RepairObjectInfoPro::clear_has_objectid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RepairObjectInfoPro::clear_objectid() {
+  objectid_ = GOOGLE_ULONGLONG(0);
+  clear_has_objectid();
+}
+inline ::google::protobuf::uint64 RepairObjectInfoPro::objectid() const {
+  return objectid_;
+}
+inline void RepairObjectInfoPro::set_objectid(::google::protobuf::uint64 value) {
+  set_has_objectid();
+  objectid_ = value;
+}
+
+// repeated fixed32 deadSegmentIds = 2;
+inline int RepairObjectInfoPro::deadsegmentids_size() const {
+  return deadsegmentids_.size();
+}
+inline void RepairObjectInfoPro::clear_deadsegmentids() {
+  deadsegmentids_.Clear();
+}
+inline ::google::protobuf::uint32 RepairObjectInfoPro::deadsegmentids(int index) const {
+  return deadsegmentids_.Get(index);
+}
+inline void RepairObjectInfoPro::set_deadsegmentids(int index, ::google::protobuf::uint32 value) {
+  deadsegmentids_.Set(index, value);
+}
+inline void RepairObjectInfoPro::add_deadsegmentids(::google::protobuf::uint32 value) {
+  deadsegmentids_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+RepairObjectInfoPro::deadsegmentids() const {
+  return deadsegmentids_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+RepairObjectInfoPro::mutable_deadsegmentids() {
+  return &deadsegmentids_;
+}
+
+// repeated fixed32 newOsdIds = 3;
+inline int RepairObjectInfoPro::newosdids_size() const {
+  return newosdids_.size();
+}
+inline void RepairObjectInfoPro::clear_newosdids() {
+  newosdids_.Clear();
+}
+inline ::google::protobuf::uint32 RepairObjectInfoPro::newosdids(int index) const {
+  return newosdids_.Get(index);
+}
+inline void RepairObjectInfoPro::set_newosdids(int index, ::google::protobuf::uint32 value) {
+  newosdids_.Set(index, value);
+}
+inline void RepairObjectInfoPro::add_newosdids(::google::protobuf::uint32 value) {
+  newosdids_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+RepairObjectInfoPro::newosdids() const {
+  return newosdids_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+RepairObjectInfoPro::mutable_newosdids() {
+  return &newosdids_;
 }
 
 // -------------------------------------------------------------------
