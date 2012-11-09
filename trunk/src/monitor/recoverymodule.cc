@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <mutex>
 #include <unistd.h>
+#include <vector>
 using namespace std;
 
 RecoveryModule::RecoveryModule(map<uint32_t, struct OsdStat>& mapRef):
