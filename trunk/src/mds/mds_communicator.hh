@@ -3,6 +3,7 @@
 
 #include "../common/metadata.hh"
 #include "../communicator/communicator.hh"
+#include "../common/objectlocation.hh"
 
 #include <stdint.h>
 #include <vector>
@@ -120,14 +121,11 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	osdId		ID of the Osd to be Recovered
-	 * @param	objectList	List of the Object Stored in the Osd
-	 * @param	primaryList	List of Primary Osd of the objects
-	 * @param	objectNodeList	List of Node List of the Objects
+	 * @param	objectLocationList	List of the Location of Object
 	 */
-	void replyRecoveryInfo(uint32_t requestId, uint32_t connectionId,
-			uint32_t osdId, vector<uint64_t> objectList,
-			vector<uint32_t> primaryList,
-			vector<vector<uint32_t> > objectNodeList);
+
+	void replyRecoveryTrigger(uint32_t requestId, uint32_t connectionId,
+			uint32_t osdId, vector<ObjectLocation> objectLocationList);
 
 	// Request to Other Nodes
 
