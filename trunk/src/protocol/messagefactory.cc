@@ -60,6 +60,9 @@
 #include "status/switchprimaryosdrequestmsg.hh"
 #include "status/switchprimaryosdreplymsg.hh"
 
+#include "recovery/recoverytriggerrequest.hh"
+#include "recovery/recoverytriggerreply.hh"
+
 MessageFactory::MessageFactory() {
 
 }
@@ -228,6 +231,16 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_OSD_LIST_REPLY):
 		return new GetOsdListReplyMsg(communicator);
 		break;
+
+
+	//RECOVERY
+	case (RECOVERY_TRIGGER_REQUEST):
+		return new RecoveryTriggerRequestMsg(communicator);
+		break;
+	case (RECOVERY_TRIGGER_REPLY):
+		return new RecoveryTriggerReplyMsg(communicator);
+		break;
+
 
 	default:
 		debug("Invalid message type : %s\n", EnumToString::toString(messageType));

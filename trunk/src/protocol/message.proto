@@ -383,6 +383,19 @@ message GetPrimaryListReplyPro{
 	repeated fixed32 primaryList = 1;
 }
 
+message RecoveryTriggerRequestPro{
+	repeated fixed32 osdList = 1;
+}
+
+message OsdListPro{
+	repeated fixed32 osdList = 1;
+}
+
+message RecoveryTriggerReplyPro{
+	repeated OsdListPro objectLocation = 1;
+}
+
+
 //
 // MONITOR -> CLIENT
 //
