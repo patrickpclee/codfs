@@ -1,4 +1,3 @@
-
 #ifndef __RECOVERY_TRIGGER_REPLY_HH__
 #define __RECOVERY_TRIGGER_REPLY_HH__
 
@@ -8,6 +7,7 @@
 
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
+#include "../../common/objectlocation.hh"
 
 using namespace std;
 
@@ -35,7 +35,8 @@ public:
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
-	RecoveryTriggerReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t osdSockfd, const vector<vector<uint32_t>> &objectLocation);
+	RecoveryTriggerReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd,
+		const vector<struct ObjectLocation> &objectLocations);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -68,7 +69,7 @@ public:
 
 
 private:
-	vector<vector<uint32_t>> _objectLocation;
+	vector<struct ObjectLocation> _objectLocations;
 };
 
 #endif

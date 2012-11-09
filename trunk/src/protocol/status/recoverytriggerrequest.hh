@@ -7,6 +7,7 @@
 
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
+#include "../../common/objectlocation.hh"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ public:
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
-	RecoveryTriggerRequestMsg (Communicator* communicator, uint32_t osdSockfd, const vector<uint32_t> &osdList);
+	RecoveryTriggerRequestMsg (Communicator* communicator, uint32_t sockfd, const vector<uint32_t> &osdList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -65,9 +66,13 @@ public:
 
 	void printProtocol ();
 
+	void setObjectLocations(vector<struct ObjectLocation> objLocs);
+
+	vector<struct ObjectLocation> getObjectLocations();
 
 private:
 	vector<uint32_t> _osdList;
+	vector<struct ObjectLocation> _objectLocations;
 };
 
 #endif

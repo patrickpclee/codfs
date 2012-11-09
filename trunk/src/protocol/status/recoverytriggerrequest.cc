@@ -61,11 +61,20 @@ void RecoveryTriggerRequestMsg::parse(char* buf) {
 
 void RecoveryTriggerRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->recoverTriggerProcessor (_msgHeader.requestId, _sockfd, _osdList);
 #endif
 }
 
+void RecoveryTriggerRequestMsg::setObjectLocations(
+	vector<struct ObjectLocation> objLocs) {
+	_objectLocations = objLocs;
+}
+
+vector<struct ObjectLocation> RecoveryTriggerRequestMsg::getObjectLocations() {
+	return _objectLocations;
+}
+
 void RecoveryTriggerRequestMsg::printProtocol() {
+	debug("%s\n", "GOT MESSAGE [RECOVERY_TRIGGER_REQUEST]");
 
 }
 

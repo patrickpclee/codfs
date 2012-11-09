@@ -221,6 +221,17 @@ message GetPrimaryListRequestPro{
 	repeated fixed32 primaryList = 2;
 }
 
+message ObjectLocationPro{
+	optional fixed64 objectId = 1;
+	optional fixed32 primaryId = 2;
+	repeated fixed32 osdList = 3;
+}
+
+message RecoveryTriggerReplyPro{
+	repeated ObjectLocationPro objectLocations = 1;
+}
+
+
 ///////////////// FROM OSD /////////////////
 
 //
@@ -392,14 +403,6 @@ message GetPrimaryListReplyPro{
 
 message RecoveryTriggerRequestPro{
 	repeated fixed32 osdList = 1;
-}
-
-message OsdListPro{
-	repeated fixed32 osdList = 1;
-}
-
-message RecoveryTriggerReplyPro{
-	repeated OsdListPro objectLocation = 1;
 }
 
 
