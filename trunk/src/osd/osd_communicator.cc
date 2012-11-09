@@ -26,6 +26,7 @@
 #include "../protocol/nodelist/getsecondarylistrequest.hh"
 #include "../protocol/status/osdstartupmsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
+#include "../protocol/status/repairobjectinfomsg.hh"
 
 using namespace std;
 
@@ -175,17 +176,15 @@ vector<struct SegmentLocation> OsdCommunicator::getOsdListRequest(
 
 vector<bool> OsdCommunicator::getOsdStatusRequest(vector<uint32_t> osdIdList) {
 
-	GetOsdStatusRequestMsg* getOsdStatusRequestMsg =
-			new GetOsdStatusRequestMsg(this, getMonitorSockfd(),
-					osdIdList);
+	GetOsdStatusRequestMsg* getOsdStatusRequestMsg = new GetOsdStatusRequestMsg(
+			this, getMonitorSockfd(), osdIdList);
 	getOsdStatusRequestMsg->prepareProtocolMsg();
 
 	addMessage(getOsdStatusRequestMsg, true);
 	MessageStatus status = getOsdStatusRequestMsg->waitForStatusChange();
 
 	if (status == READY) {
-		vector<bool> osdStatusList =
-				getOsdStatusRequestMsg->getOsdStatus();
+		vector<bool> osdStatusList = getOsdStatusRequestMsg->getOsdStatus();
 		return osdStatusList;
 	}
 
@@ -218,7 +217,8 @@ void OsdCommunicator::putSegmentInit(uint32_t sockfd, uint64_t objectId,
 		waitAndDelete(putSegmentInitRequestMsg);
 		return;
 	} else {
-		debug_error("Put Segment Init Failed %" PRIu64 ".%" PRIu32 "\n", objectId, segmentId);
+		debug_error("Put Segment Init Failed %" PRIu64 ".%" PRIu32 "\n",
+				objectId, segmentId);
 		exit(-1);
 	}
 
@@ -253,7 +253,8 @@ void OsdCommunicator::putSegmentEnd(uint32_t sockfd, uint64_t objectId,
 		waitAndDelete(segmentTransferEndRequestMsg);
 		return;
 	} else {
-		debug_error("Segment Transfer End Failed %" PRIu64 ".%" PRIu32 "\n", objectId, segmentId);
+		debug_error("Segment Transfer End Failed %" PRIu64 ".%" PRIu32 "\n",
+				objectId, segmentId);
 		exit(-1);
 	}
 }
@@ -320,4 +321,14 @@ void OsdCommunicator::registerToMonitor(uint32_t ip, uint16_t port) {
 			port);
 	startupMsg->prepareProtocolMsg();
 	addMessage(startupMsg);
+}
+
+void OsdCommunicator::repairSegmentAck(uint64_t objectId,
+		vector<uint32_t> repairSegmentList,
+		vector<uint32_t> repairSegmentOsdList) {
+
+	RepairObjectInfoMsg * repairObjectInfoMsg = new RepairObjectInfoMsg(this,
+			getMdsSockfd(), objectId, repairSegmentList, repairSegmentOsdList);
+	repairObjectInfoMsg->prepareProtocolMsg();
+	addMessage(repairObjectInfoMsg);
 }

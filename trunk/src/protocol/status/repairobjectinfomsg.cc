@@ -84,12 +84,13 @@ void RepairObjectInfoMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
 #endif
 #ifdef COMPILE_FOR_OSD
+	osd->repairObjectInfoProcessor(_msgHeader.requestId, _sockfd, _objectId, _deadSegmentIds, _newOsdIds);
 #endif
 }
 
 void RepairObjectInfoMsg::printProtocol() {
 	debug("[REPAIR_OBJECT_INFO]: %" PRIu64 "\n", _objectId);
-	for (int i = 0; i < _deadSegmentIds.size(); i++)
-		debug("[REPAIR_OBJECT_INFO]: (%" PRIu32 ", " PRIu32 ")\n", 
+	for (int i = 0; i < (int)_deadSegmentIds.size(); i++)
+		debug("[REPAIR_OBJECT_INFO]: (%" PRIu32 ", %" PRIu32 ")\n",
 			_deadSegmentIds[i], _newOsdIds[i]);
 }
