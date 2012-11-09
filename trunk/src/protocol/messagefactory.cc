@@ -60,14 +60,9 @@
 #include "status/switchprimaryosdrequestmsg.hh"
 #include "status/switchprimaryosdreplymsg.hh"
 
-<<<<<<< HEAD
-#include "recovery/recoverytriggerrequest.hh"
-#include "recovery/recoverytriggerreply.hh"
-#include "recovery/repairobjectinfomsg.hh"
-
-=======
+#include "status/recoverytriggerrequest.hh"
+#include "status/recoverytriggerreply.hh"
 #include "status/repairobjectinfomsg.hh"
->>>>>>> branch 'master' of ssh://git@projgw.cse.cuhk.edu.hk:2298/ncvfs.git
 
 MessageFactory::MessageFactory() {
 
