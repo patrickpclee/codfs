@@ -60,10 +60,7 @@
 #include "status/switchprimaryosdrequestmsg.hh"
 #include "status/switchprimaryosdreplymsg.hh"
 
-
-/*  Recovery  */
 #include "recovery/repairobjectinfomsg.hh"
-
 
 MessageFactory::MessageFactory() {
 

@@ -16,7 +16,7 @@ extern Osd* osd;
 extern Mds* mds;
 #endif
 
-RepairObjectInfoMsg::RepairObjectInfoMsg(Communicator* communicator) :
+RepairObjectInfoMsg::RepairObjectInfoMsg(Communicator* communicator):
 		Message(communicator) {
 
 }
