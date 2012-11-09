@@ -23,7 +23,6 @@
 #include <string.h>
 #include <sys/statvfs.h>
 
-
 // Global Variables
 extern Osd* osd;
 extern ConfigLayer* configLayer;
@@ -66,8 +65,12 @@ Osd::~Osd() {
  * Send the object to the target
  */
 
-void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId) {
+ObjectData Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, bool localRetrieve) {
+
+	if (localRetrieve) {
+		debug_yellow("Local retrieve for object ID = %" PRIu64 "\n", objectId);
+	}
 
 #ifdef TIME_POINT
 	Clock::time_point t0 = Clock::now();
@@ -232,7 +235,9 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	// 5. send object
-	_osdCommunicator->sendObject(_osdId, sockfd, objectData);
+	if (!localRetrieve) {
+		_osdCommunicator->sendObject(_osdId, sockfd, objectData);
+	}
 
 #ifdef TIME_POINT
 	t6 = Clock::now();
@@ -249,17 +254,21 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			objectTransferCache.length = objectData.info.objectSize;
 
 			if (!_storageModule->isObjectCached(objectId)) {
-				_storageModule->putObjectToDiskCache(objectId, objectTransferCache);
+				_storageModule->putObjectToDiskCache(objectId,
+						objectTransferCache);
 			}
 
-			// free objectData
-			debug("free object %" PRIu64 "\n", objectId);
-			MemoryPool::getInstance().poolFree(objectData.buf);
-			debug("object %" PRIu64 "free-d\n", objectId);
+			// if local retrieve, do not free for now
+			if (!localRetrieve) {
+				// free objectData
+				debug("free object %" PRIu64 "\n", objectId);
+				MemoryPool::getInstance().poolFree(objectData.buf);
+				debug("object %" PRIu64 "free-d\n", objectId);
 
-			_objectDataMap.erase(objectId);
+				_objectDataMap.erase(objectId);
 
-			debug("%s\n", "[DOWNLOAD] Cleanup completed");
+				debug("%s\n", "[DOWNLOAD] Cleanup completed");
+			}
 		}
 	}
 #ifdef TIME_POINT
@@ -268,16 +277,22 @@ void Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 #ifdef TIME_POINT
 	timeMutex.lock();
-	lockObjectCountMutexTime	+= chrono::duration_cast < milliseconds > (t1 - t0).count();
-	getObjectInfoTime			+= chrono::duration_cast < milliseconds > (t2 - t1).count();
-	getOSDStatusTime			+= chrono::duration_cast < milliseconds > (t3 - t2).count();
-	getSegmentTime				+= chrono::duration_cast < milliseconds > (t4 - t3).count();
-	decodeObjectTime			+= chrono::duration_cast < milliseconds > (t5 - t4).count();
-	sendObjectTime				+= chrono::duration_cast < milliseconds > (t6 - t5).count();
-	cacheObjectTime				+= chrono::duration_cast < milliseconds > (t7 - t6).count();
+	lockObjectCountMutexTime += chrono::duration_cast < milliseconds > (t1 - t0).count();
+	getObjectInfoTime += chrono::duration_cast < milliseconds > (t2 - t1).count();
+	getOSDStatusTime += chrono::duration_cast < milliseconds > (t3 - t2).count();
+	getSegmentTime += chrono::duration_cast < milliseconds > (t4 - t3).count();
+	decodeObjectTime += chrono::duration_cast < milliseconds > (t5 - t4).count();
+	sendObjectTime += chrono::duration_cast < milliseconds > (t6 - t5).count();
+	cacheObjectTime += chrono::duration_cast < milliseconds > (t7 - t6).count();
 	timeMutex.unlock();
 #endif
 
+	if (localRetrieve) {
+		return objectData;
+	}
+
+	// if local retrieve, return value is not used
+	return {};
 }
 
 void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
@@ -331,7 +346,8 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			// compare md5 with saved one
 			if (_checksumMap.get(objectId) != md5ToHex(checksum)) {
-				debug_error("MD5 of Object ID = %" PRIu64 " mismatch!\n", objectId);
+				debug_error("MD5 of Object ID = %" PRIu64 " mismatch!\n",
+						objectId);
 				exit(-1);
 			} else {
 				debug("MD5 of Object ID = %" PRIu64 " match\n", objectId);
@@ -438,8 +454,8 @@ uint32_t Osd::putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeObjectTransferCache(objectId, buf, offset,
-			length);
+	byteWritten = _storageModule->writeObjectTransferCache(objectId, buf,
+			offset, length);
 
 	_pendingObjectChunk.decrement(objectId);
 
@@ -519,8 +535,41 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	return byteWritten;
 }
 
-void Osd::recoveryProcessor(uint32_t requestId, uint32_t sockfd) {
-	// TODO: recovery to be implemented
+void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t objectId, vector<uint32_t> repairSegmentIdList,
+		vector<uint32_t> repairSegmentOsdList) {
+
+	// execute download procedure to retrieve object
+	// when an OSD fails, degraded read is executed automatically for download
+	ObjectData objectData = getObjectRequestProcessor(requestId, sockfd,
+			objectId, true);
+
+	// get coding information from MDS
+	// TODO: since it is hard to reuse that in getObjectRequestProcessor, do this for now
+	ObjectTransferOsdInfo objectInfo = _osdCommunicator->getObjectInfoRequest(
+			objectId);
+
+	const CodingScheme codingScheme = objectInfo._codingScheme;
+	const string codingSetting = objectInfo._codingSetting;
+	const uint32_t objectSize = objectInfo._size;
+
+	debug("Coding Scheme = %d setting = %s\n",
+			(int) codingScheme, codingSetting.c_str());
+
+	// perform encode
+	vector<struct SegmentData> segmentDataList =
+			_codingModule->encodeObjectToSegment(codingScheme,
+					objectId, objectData.buf, objectSize,
+					codingSetting);
+
+	// send encoded segments to new OSD
+	for (int i = 0; i < repairSegmentIdList.size(); i++) {
+		// find sockfd of the new OSD
+		uint32_t sockfd = _osdCommunicator->getSockfdFromId(repairSegmentIdList[i]);
+		uint32_t segmentId = repairSegmentIdList[i];
+		_osdCommunicator->sendSegment(sockfd, segmentDataList[segmentId]);
+	}
+
 }
 
 void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
@@ -588,13 +637,13 @@ uint32_t Osd::getOsdId() {
 }
 
 /*
-void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
-	for (auto osdStatus : secondaryOsdStatus) {
-		osdStatus = true;
-	}
+ void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
+ for (auto osdStatus : secondaryOsdStatus) {
+ osdStatus = true;
+ }
 
-	// failure simulation
-	//secondaryOsdStatus[0] = false;
-	//secondaryOsdStatus[1] = false;
-}
-*/
+ // failure simulation
+ //secondaryOsdStatus[0] = false;
+ //secondaryOsdStatus[1] = false;
+ }
+ */
