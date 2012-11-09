@@ -2,6 +2,7 @@
 using namespace std;
 
 #include "recoverytriggerreply.hh"
+#include "recoverytriggerrequest.hh"
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
@@ -33,10 +34,13 @@ void RecoveryTriggerReplyMsg::prepareProtocolMsg() {
 
 	//TODO push object location list.
 	for (struct ObjectLocation ol: _objectLocations) {
-		ncvfs::ObjectLocationPro olp;
-		olp.set_objectid (ol.objectId);
-		olp.set_primaryId (ol.primaryId);
-
+		ncvfs::ObjectLocationPro* olp =
+			recoveryTriggerReplyPro.add_objectlocations();
+		olp->set_objectid (ol.objectId);
+		olp->set_primaryid (ol.primaryId);
+		for (uint32_t osdId: ol.osdList) {
+			olp->add_osdlist (osdId);
+		}
 	}
 
 	if (!recoveryTriggerReplyPro.SerializeToString(&serializedString)) {
@@ -58,15 +62,27 @@ void RecoveryTriggerReplyMsg::parse(char* buf) {
 	recoveryTriggerReplyPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	//TODO parse object location list.
+	_objectLocations.clear();
+	for (int i = 0; i < recoveryTriggerReplyPro.objectlocations_size(); i++) {
+		ncvfs::ObjectLocationPro olp = recoveryTriggerReplyPro.objectlocations(i);
+		struct ObjectLocation ol;
+		ol.objectId = olp.objectid();
+		ol.primaryId = olp.primaryid();
+		ol.osdList.clear();
+		for (int j = 0; j < olp.osdlist_size(); j++)
+			ol.osdList.push_back(olp.osdlist(i));
+		_objectLocations.push_back(ol);
+	}
 
 	return;
 }
 
 void RecoveryTriggerReplyMsg::doHandle() {
-#ifdef COMPILE_FOR_MONITOR
-	//monitor->recoverTriggerProcessor (_msgHeader.requestId, _sockfd, _objectLocation);
-#endif
+	RecoveryTriggerRequestMsg* recoveryTriggerRequestMsg =
+			(RecoveryTriggerRequestMsg*) _communicator->popWaitReplyMessage(
+					_msgHeader.requestId);
+	recoveryTriggerRequestMsg->setObjectLocations(_objectLocations);
+	recoveryTriggerRequestMsg->setStatus(READY);
 }
 
 void RecoveryTriggerReplyMsg::printProtocol() {
