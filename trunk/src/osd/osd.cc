@@ -205,6 +205,14 @@ ObjectData Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 								requiredSegments, objectSize, codingSetting);
 
 						// clean up segment data
+						// free objectData
+						debug("free object %" PRIu64 "\n", objectId);
+						MemoryPool::getInstance().poolFree(objectData.buf);
+						debug("object %" PRIu64 "free-d\n", objectId);
+
+						_objectDataMap.erase(objectId);
+
+						debug("%s\n", "[DOWNLOAD] Cleanup completed");
 						_downloadSegmentRemaining.erase(objectId);
 
 						for (uint32_t i : requiredSegments) {
@@ -237,29 +245,26 @@ ObjectData Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// 5. send object
 	if (!localRetrieve) {
 		_osdCommunicator->sendObject(_osdId, sockfd, objectData);
-	}
 
 #ifdef TIME_POINT
-	t6 = Clock::now();
+		t6 = Clock::now();
 #endif
-	{
-		lock_guard<mutex> lk(objectRequestCountMutex);
-		_objectRequestCount.decrement(objectId);
-		if (_objectRequestCount.get(objectId) == 0) {
-			_objectRequestCount.erase(objectId);
+		{
+			lock_guard<mutex> lk(objectRequestCountMutex);
+			_objectRequestCount.decrement(objectId);
+			if (_objectRequestCount.get(objectId) == 0) {
+				_objectRequestCount.erase(objectId);
 
-			// cache objectData
-			struct ObjectTransferCache objectTransferCache;
-			objectTransferCache.buf = objectData.buf;
-			objectTransferCache.length = objectData.info.objectSize;
+				// cache objectData
+				struct ObjectTransferCache objectTransferCache;
+				objectTransferCache.buf = objectData.buf;
+				objectTransferCache.length = objectData.info.objectSize;
 
-			if (!_storageModule->isObjectCached(objectId)) {
-				_storageModule->putObjectToDiskCache(objectId,
-						objectTransferCache);
-			}
+				if (!_storageModule->isObjectCached(objectId)) {
+					_storageModule->putObjectToDiskCache(objectId,
+							objectTransferCache);
+				}
 
-			// if local retrieve, do not free for now
-			if (!localRetrieve) {
 				// free objectData
 				debug("free object %" PRIu64 "\n", objectId);
 				MemoryPool::getInstance().poolFree(objectData.buf);
@@ -270,6 +275,8 @@ ObjectData Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				debug("%s\n", "[DOWNLOAD] Cleanup completed");
 			}
 		}
+	} else {
+		return objectData;
 	}
 #ifdef TIME_POINT
 	t7 = Clock::now();
@@ -282,16 +289,14 @@ ObjectData Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	getOSDStatusTime += chrono::duration_cast < milliseconds > (t3 - t2).count();
 	getSegmentTime += chrono::duration_cast < milliseconds > (t4 - t3).count();
 	decodeObjectTime += chrono::duration_cast < milliseconds > (t5 - t4).count();
-	sendObjectTime += chrono::duration_cast < milliseconds > (t6 - t5).count();
-	cacheObjectTime += chrono::duration_cast < milliseconds > (t7 - t6).count();
+	if (!localRetrieve) {
+		sendObjectTime += chrono::duration_cast < milliseconds > (t6 - t5).count();
+		cacheObjectTime += chrono::duration_cast < milliseconds > (t7 - t6).count();
+	}
 	timeMutex.unlock();
 #endif
 
-	if (localRetrieve) {
-		return objectData;
-	}
-
-	// if local retrieve, return value is not used
+	// if not local retrieve, return value is not used
 	return {};
 }
 
@@ -562,7 +567,7 @@ void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
 					objectData.buf, objectSize, codingSetting);
 
 	// send encoded segments to new OSD
-	for (int i = 0; i < repairSegmentList.size(); i++) {
+	for (int i = 0; i < (int)repairSegmentList.size(); i++) {
 		// find sockfd of the new OSD
 		uint32_t sockfd = _osdCommunicator->getSockfdFromId(
 				repairSegmentList[i]);
@@ -575,6 +580,33 @@ void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	_osdCommunicator->repairSegmentAck(objectId, repairSegmentList,
 			repairSegmentOsdList);
 
+	// cleanup
+	{
+		lock_guard<mutex> lk(objectRequestCountMutex);
+		_objectRequestCount.decrement(objectId);
+		if (_objectRequestCount.get(objectId) == 0) {
+			_objectRequestCount.erase(objectId);
+
+			// cache objectData
+			struct ObjectTransferCache objectTransferCache;
+			objectTransferCache.buf = objectData.buf;
+			objectTransferCache.length = objectData.info.objectSize;
+
+			if (!_storageModule->isObjectCached(objectId)) {
+				_storageModule->putObjectToDiskCache(objectId,
+						objectTransferCache);
+			}
+
+			// free objectData
+			debug("free object %" PRIu64 "\n", objectId);
+			MemoryPool::getInstance().poolFree(objectData.buf);
+			debug("object %" PRIu64 "free-d\n", objectId);
+
+			_objectDataMap.erase(objectId);
+
+			debug("%s\n", "[RECOVERY] Cleanup completed");
+		}
+	}
 }
 
 void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
