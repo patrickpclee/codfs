@@ -545,6 +545,9 @@ int ncvfs_statfs(const char *path, struct statvfs *statv) {
 int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
+	if(_fileDataCache.count(fi->fh)) {
+		_fileDataCache[fi->fh]->flush();
+	}
 	int retstat = 0;
 
 	return retstat;
