@@ -18,7 +18,7 @@ enum FileType {
 };
 
 enum ObjectDataStatus {
-	NEW, UNFETCHED, CLEAN, DIRTY
+	NEW, UNFETCHED, PROCESSING, CLEAN, DIRTY
 };
 
 enum MsgType {
