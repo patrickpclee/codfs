@@ -252,7 +252,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 		}
 #ifdef FUSE_READ_AHEAD
 		for(uint32_t j = 0; j < FUSE_READ_AHEAD; ++j){
-			if( j + i  >= fileMetaData._objecList.size())
+			if( j + i  >= fileMetaData._objectList.size())
 				break;
 			uint64_t objectId = fileMetaData._objectList[i + j];
 			uint32_t componentId = fileMetaData._primaryList[i + j];

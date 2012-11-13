@@ -10,6 +10,8 @@
 #include "../common/enums.hh"
 #include "../common/objectdata.hh"
 
+#include <mutex>
+
 //#include <memory>
 
 class FileDataCache {
@@ -20,17 +22,19 @@ class FileDataCache {
 		int64_t write(const void* buf, uint32_t size, uint64_t offset);
 
 		~FileDataCache ();
-	private:
 		void writeBack(uint32_t index);
+	private:
 		bool _clean;
 		uint64_t _objectSize;
 		uint32_t _lastObjectCount;
 		uint64_t _fileSize;
 		uint32_t _fileId;
+		uint32_t _lastWriteBackPos;
 		struct FileMetaData _metaData;
 		vector<struct ObjectData> _objectDataList;
 		vector<ObjectDataStatus> _objectStatusList;
 		vector<uint32_t> _primaryList;
+		mutex _writeBackMutex;
 		//LruCache<uint64_t, shared_ptr<ObjectData> >* _objectCache;
 };
 

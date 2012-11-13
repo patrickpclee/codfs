@@ -14,8 +14,18 @@ extern string codingSetting;
 extern CodingScheme codingScheme;
 extern uint32_t _clientId;
 
-FileDataCache::FileDataCache (struct FileMetaData fileMetaData, uint64_t objectSize)
-	: _objectSize(objectSize),
+#ifdef PARALLEL_TRANSFER
+
+#include "../../lib/threadpool/threadpool.hpp"
+extern boost::threadpool::pool _tp;
+
+void writeBackThread(FileDataCache* fileDataCache, uint32_t index){
+	fileDataCache->writeBack(index);
+}
+#endif
+
+	FileDataCache::FileDataCache (struct FileMetaData fileMetaData, uint64_t objectSize)
+: _objectSize(objectSize),
 	_metaData(fileMetaData)
 {
 	debug_cyan("File ID %"PRIu32" Object Size %" PRIu64,fileMetaData._id,objectSize);
@@ -33,6 +43,7 @@ FileDataCache::FileDataCache (struct FileMetaData fileMetaData, uint64_t objectS
 	_primaryList = fileMetaData._primaryList;
 	//_objectCount = fileMetaData._objectList.size();
 	_lastObjectCount = 0;
+	_lastWriteBackPos = 0;
 	_clean = true;
 }
 
@@ -60,8 +71,14 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 		}
 	}
 
-	if(firstObjectToWrite > 0)
-		writeBack(firstObjectToWrite - 1);
+	if(firstObjectToWrite  > _lastWriteBackPos){
+#ifdef PARALLEL_TRANSFER
+		_tp.schedule(boost::bind(writeBackThread,this,_lastWriteBackPos));
+#else
+		writeBack(_lastWriteBackPos);
+#endif
+		++_lastWriteBackPos;
+	}
 
 	for(uint32_t i = firstObjectToWrite; i <= lastObjectToWrite; ++i)
 	{
@@ -83,9 +100,9 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 
 	//TODO: Ask For More Object ID if exceed Preallocated Number
 	//if(lastObjectToWrite >= _objectStatusList.size()){
-		//Ask For New
+	//Ask For New
 	//}
-	
+
 	return size;
 }
 
@@ -105,21 +122,28 @@ FileDataCache::~FileDataCache ()
 		//if(_objectStatusList[i] != DIRTY)
 		//	continue;
 
+#ifdef PARALLEL_TRANSFER
+		_tp.schedule(boost::bind(writeBackThread,this,i));
+#else
 		writeBack(i);
+#endif
 		objectList.push_back(_objectDataList[i].info.objectId);
 		/*
-		objectData = _objectDataList[i];
-		objectList.push_back(objectData.info.objectId);
-		primary = _primaryList[i];
-		osdSockfd = _clientCommunicator->getSockfdFromId(primary);
-		
-		MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
-		debug_cyan("Send Object %" PRIu64 " Size %" PRIu64"\n",objectData.info.objectId,objectData.info.objectSize);
-		_clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
-		MemoryPool::getInstance().poolFree(objectData.buf);
-		_objectStatusList[i] = CLEAN;
-		*/
+		   objectData = _objectDataList[i];
+		   objectList.push_back(objectData.info.objectId);
+		   primary = _primaryList[i];
+		   osdSockfd = _clientCommunicator->getSockfdFromId(primary);
+
+		   MD5((unsigned char*) objectData.buf, objectData.info.objectSize, checksum);
+		   debug_cyan("Send Object %" PRIu64 " Size %" PRIu64"\n",objectData.info.objectId,objectData.info.objectSize);
+		   _clientCommunicator->sendObject(_clientId, osdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
+		   MemoryPool::getInstance().poolFree(objectData.buf);
+		   _objectStatusList[i] = CLEAN;
+		 */
 	}
+#ifdef PARALLEL_TRANSFER
+	_tp.wait();
+#endif
 	objectData = _objectDataList[_lastObjectCount];
 	objectList.push_back(objectData.info.objectId);
 	objectData.info.objectSize = _fileSize % _objectSize;
@@ -139,9 +163,13 @@ FileDataCache::~FileDataCache ()
 }
 
 void FileDataCache::writeBack(uint32_t index) {
-	debug("Write Back Object at Index %" PRIu32 " [%" PRIu64 "]\n",index,_objectDataList[index].info.objectId);
-	if(_objectStatusList[index] != DIRTY)
-		return;
+	{
+		lock_guard<mutex> lk(_writeBackMutex);
+		if(_objectStatusList[index] != DIRTY)
+			return;
+		_objectStatusList[index] = PROCESSING;
+	}
+	debug_cyan("Write Back Object at Index %" PRIu32 " [%" PRIu64 "]\n",index,_objectDataList[index].info.objectId);
 	struct ObjectData objectData = _objectDataList[index];
 	uint32_t primary = _primaryList[index];
 	uint32_t osdSockfd = _clientCommunicator->getSockfdFromId(primary);

@@ -15,6 +15,7 @@ public:
       case CLEAN: return "CLEAN";
       case DIRTY: return "DIRTY";
       case NEW: return "NEW";
+      case PROCESSING: return "PROCESSING";
       case UNFETCHED: return "UNFETCHED";
     }
     return "???";
