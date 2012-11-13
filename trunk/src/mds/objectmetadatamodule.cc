@@ -146,3 +146,14 @@ vector<uint64_t> ObjectMetaDataModule::findOsdObjects(uint32_t osdId) {
 	}
 	return objectList;
 }
+
+vector<uint64_t> ObjectMetaDataModule::findOsdPrimaryObjects(uint32_t osdId) {
+	vector<uint64_t> objectList;
+	BSONObj queryObject = BSON ("primary" << (int) osdId);
+	vector<BSONObj> result = _objectMetaDataStorage->read(queryObject);
+	for (auto bson : result) {
+		uint64_t id = (uint64_t)bson.getField("id").numberLong();
+		objectList.push_back(id);
+	}
+	return objectList;
+}
