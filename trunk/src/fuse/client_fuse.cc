@@ -49,6 +49,16 @@ thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
 
+#ifdef PARALLEL_TRANSFER
+
+#include "../../lib/threadpool/threadpool.hpp"
+boost::threadpool::pool _tp;
+void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId){
+	client->getObject(clientId, sockfd, objectId);
+	debug("Object ID = %" PRIu64 " finished download\n", objectId);
+}
+#endif
+
 int ncvfs_error(const char *str) {
 	int ret = -errno;
 	printf("    ERROR %s: %s\n", str, strerror(errno));
@@ -123,6 +133,12 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 	_clientCommunicator->connectToMds();
 	_clientCommunicator->connectToMonitor();
 	_clientCommunicator->getOsdListAndConnect();
+
+#ifdef PARALLEL_TRANSFER
+	uint32_t _numClientThreads = configLayer->getConfigInt(
+			"Communication>NumClientThreads");
+	_tp.size_controller().resize(_numClientThreads);
+#endif
 	return NULL;
 }
 
@@ -234,6 +250,16 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 			lock_guard<mutex> lk(_objectProcessingMutex);
 			objectCache = client->getObject(_clientId, sockfd, objectId);
 		}
+#ifdef FUSE_READ_AHEAD
+		for(uint32_t j = 0; j < FUSE_READ_AHEAD; ++j){
+			if( j + i  >= fileMetaData._objecList.size())
+				break;
+			uint64_t objectId = fileMetaData._objectList[i + j];
+			uint32_t componentId = fileMetaData._primaryList[i + j];
+			uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
+			_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, objectId));
+		}
+#endif
 		uint64_t copySize = min(objectSize, size - byteWritten);
 		copySize = min(copySize, (i + 1) * objectSize - (offset + byteWritten));
 		uint64_t objectOffset = (offset + byteWritten) - i * objectSize;
