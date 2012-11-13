@@ -205,14 +205,6 @@ ObjectData Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 								requiredSegments, objectSize, codingSetting);
 
 						// clean up segment data
-						// free objectData
-						debug("free object %" PRIu64 "\n", objectId);
-						MemoryPool::getInstance().poolFree(objectData.buf);
-						debug("object %" PRIu64 "free-d\n", objectId);
-
-						_objectDataMap.erase(objectId);
-
-						debug("%s\n", "[DOWNLOAD] Cleanup completed");
 						_downloadSegmentRemaining.erase(objectId);
 
 						for (uint32_t i : requiredSegments) {
