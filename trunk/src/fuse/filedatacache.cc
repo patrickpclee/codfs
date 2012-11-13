@@ -71,7 +71,7 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 		}
 	}
 
-	if(firstObjectToWrite  > _lastWriteBackPos){
+	if(firstObjectToWrite  > _lastWriteBackPos + 1){
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(boost::bind(writeBackThread,this,_lastWriteBackPos));
 #else
@@ -108,7 +108,10 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 
 FileDataCache::~FileDataCache ()
 {
-	debug("%s\n","Delete");
+	flush();
+}
+
+void FileDataCache::flush(){
 	if(_clean)
 		return ;
 	struct ObjectData objectData;
@@ -160,6 +163,7 @@ FileDataCache::~FileDataCache ()
 	_objectStatusList[_lastObjectCount] = CLEAN;
 	_clientCommunicator->saveFileSize(_clientId, _fileId, _fileSize); 
 	_clientCommunicator->saveObjectList(_clientId, _fileId, objectList);
+	_clean = true;
 }
 
 void FileDataCache::writeBack(uint32_t index) {
