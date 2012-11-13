@@ -162,6 +162,7 @@ int main (void) {
 	// 5. Recovery Thread
 	thread recoveryThread(startRecoveryThread, communicator, recoverymodule);
 
+
 	// threads join
 	garbageCollectionThread.join();
 	receiveThread.join();
