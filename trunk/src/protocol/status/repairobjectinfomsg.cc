@@ -16,15 +16,15 @@ extern Osd* osd;
 extern Mds* mds;
 #endif
 
-RepairObjectInfoMsg::RepairObjectInfoMsg(Communicator* communicator):
+RepairObjectInfoMsg::RepairObjectInfoMsg(Communicator* communicator) :
 		Message(communicator) {
 
 }
 
-RepairObjectInfoMsg::RepairObjectInfoMsg (Communicator* communicator, 
-	uint32_t sockfd, uint64_t objectId, vector<uint32_t> deadSegmentIds, 
-	vector<uint32_t> newOsdIds):
-	Message(communicator) {
+RepairObjectInfoMsg::RepairObjectInfoMsg(Communicator* communicator,
+		uint32_t sockfd, uint64_t objectId, vector<uint32_t> deadSegmentIds,
+		vector<uint32_t> newOsdIds) :
+		Message(communicator) {
 
 	_sockfd = sockfd;
 	_objectId = objectId;
@@ -53,7 +53,7 @@ void RepairObjectInfoMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType (REPAIR_OBJECT_INFO);
+	setProtocolType(REPAIR_OBJECT_INFO);
 	setProtocolMsg(serializedString);
 
 }
@@ -90,7 +90,7 @@ void RepairObjectInfoMsg::doHandle() {
 
 void RepairObjectInfoMsg::printProtocol() {
 	debug("[REPAIR_OBJECT_INFO]: %" PRIu64 "\n", _objectId);
-	for (int i = 0; i < (int)_deadSegmentIds.size(); i++)
+	for (int i = 0; i < (int) _deadSegmentIds.size(); i++)
 		debug("[REPAIR_OBJECT_INFO]: (%" PRIu32 ", %" PRIu32 ")\n",
-			_deadSegmentIds[i], _newOsdIds[i]);
+				_deadSegmentIds[i], _newOsdIds[i]);
 }
