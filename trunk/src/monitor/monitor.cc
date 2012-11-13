@@ -22,10 +22,10 @@ Monitor::Monitor() {
 	_osdStatMap = {};
 
 	configLayer = new ConfigLayer("monitorconfig.xml");
-	_selectionModule = new SelectionModule(_osdStatMap);
-	_recoveryModule = new RecoveryModule(_osdStatMap);
-	_statModule = new StatModule(_osdStatMap);
 	_monitorCommunicator = new MonitorCommunicator();
+	_selectionModule = new SelectionModule(_osdStatMap);
+	_statModule = new StatModule(_osdStatMap);
+	_recoveryModule = new RecoveryModule(_osdStatMap, _monitorCommunicator);
 	_monitorId = configLayer->getConfigInt("MonitorId");
 }
 
@@ -129,7 +129,7 @@ void startUpdateThread(Communicator* communicator, StatModule* statmodule) {
 }
 
 void startRecoveryThread(Communicator* communicator, RecoveryModule* recoverymodule) {
-	recoverymodule->failureDetection(100,10);
+	recoverymodule->failureDetection(2,1);
 }
 
 int main (void) {
@@ -144,7 +144,6 @@ int main (void) {
 	// set up communicator
 	communicator->setId(monitor->getMonitorId());
 	communicator->setComponentType(MONITOR);
-
 	communicator->createServerSocket();
 
 	// 1. Garbage Collection Thread
@@ -161,6 +160,7 @@ int main (void) {
 	
 	// 5. Recovery Thread
 	thread recoveryThread(startRecoveryThread, communicator, recoverymodule);
+
 
 	// threads join
 	garbageCollectionThread.join();

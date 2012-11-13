@@ -77,7 +77,14 @@ public:
 	uint32_t getSockfd();
 
 	/**
-	 * Retrive the type of desintation component
+	 * Set the type of destination component
+	 * @param type Component Type
+	 */
+
+	void setConnectionType(ComponentType type);
+
+	/**
+	 * Retrive the type of destination component
 	 * @return Destination component type
 	 */
 

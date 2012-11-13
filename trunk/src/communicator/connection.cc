@@ -182,3 +182,7 @@ ComponentType Connection::getConnectionType() {
 Socket* Connection::getSocket() {
 	return &_socket;
 }
+
+void Connection::setConnectionType (ComponentType type){
+	_connectionType = type;
+}
