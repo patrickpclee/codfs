@@ -173,8 +173,7 @@ void MdsCommunicator::replyObjectIdList(uint32_t requestId,
 }
 
 void MdsCommunicator::replyRecoveryTrigger(uint32_t requestId,
-		uint32_t connectionId, uint32_t osdId,
-		vector<ObjectLocation> objectLocationList) {
+		uint32_t connectionId, vector<ObjectLocation> objectLocationList) {
 	RecoveryTriggerReplyMsg * recoveryTriggerReplyMsg =
 			new RecoveryTriggerReplyMsg(this, requestId, connectionId, objectLocationList);
 	recoveryTriggerReplyMsg->prepareProtocolMsg();
