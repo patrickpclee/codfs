@@ -78,9 +78,32 @@ public:
 	 * @param	fileId	ID of the File
 	 * @param	objectList	List of Object ID
 	 */
+
 	void saveObjectList(uint32_t fileId, const vector<uint64_t> &objectList);
+
+	/**
+	 * @brief	Read the list of objects which belong to the file
+	 * @param fileId File ID
+	 * @return list of the composing objects
+	 */
+
 	vector<uint64_t> readObjectList(uint32_t fileId);
+
+	/**
+	 * @brief	Read the list of objects stored by the OSD
+	 * @param osdId OSD ID
+	 * @return list of objectID owned by the OSD
+	 */
+
 	vector<uint64_t> readOsdObjectList(uint32_t osdId);
+
+	/**
+	 * @brief	Read the list of objects stored by the OSD as primary
+	 * @param osdId OSD ID
+	 * @return list of objectID owned by the OSD as primary
+	 */
+
+	vector<uint64_t> readOsdPrimaryObjectList(uint32_t osdId);
 
 	/**
 	 * @brief	Read Checksum of a File
@@ -115,6 +138,14 @@ public:
 	 * @param	primaryOsdId	ID of the Primary
 	 */
 	void setPrimary(uint64_t objectId, uint32_t primaryOsdId);
+
+	/**
+	 * @brief	Select an acting primary OSD for the object
+	 * @param objectId Object ID
+	 * @param nodeList list of nodes storing the segments for the object
+	 * @param nodeStatus status of the nodes storing the segments
+	 * @return Selected acting primary OSD ID
+	 */
 
 	uint32_t selectActingPrimary(uint64_t objectId, vector<uint32_t> nodeList,
 		vector<bool> nodeStatus);

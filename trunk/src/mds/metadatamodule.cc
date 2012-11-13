@@ -78,6 +78,10 @@ vector<uint64_t> MetaDataModule::readObjectList(uint32_t fileId) {
 	return _fileMetaDataModule->readObjectList(fileId);
 }
 
+vector<uint64_t> MetaDataModule::readOsdPrimaryObjectList(uint32_t osdId) {
+	return _objectMetaDataModule->findOsdPrimaryObjects(osdId);
+}
+
 vector<uint64_t> MetaDataModule::readOsdObjectList(uint32_t osdId) {
 	return _objectMetaDataModule->findOsdObjects(osdId);
 }
