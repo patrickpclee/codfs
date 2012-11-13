@@ -93,7 +93,7 @@ all: .mkdir $(TARGET)
 define cmd_o
 $$(obj-$1): $2%.o: %.$1  $(MAKEFILE_LIST)
 ifeq ($1,c)
-	$(GCC) $(inc_dir) -Wp,-MT,$$@ -Wp,-MMD,$$@.d $(GCCFLAGS) -c -o $$@ $$<
+	$(GCC) $(inc_dir) -Wp,-MT,$$@ -Wp,-MMD,$$@.d $(GCCFLAGS) -c -o $$@ $$< -Wno-format
 else 
 	$(G++) $(inc_dir) -Wp,-MT,$$@ -Wp,-MMD,$$@.d $(CFLAGS) -c -o $$@ $$<
 endif
