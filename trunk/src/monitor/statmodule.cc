@@ -13,8 +13,6 @@ StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
 
 void StatModule::updateOsdStatMap (Communicator* communicator) {
 	while (1) {
-		debug_yellow("MDS sockfd = %" PRIu32 "\n",
-		communicator->getMdsSockfd());
 		printf("-----------------10s start----------------\n");
 		{
 			lock_guard<mutex> lk(osdStatMapMutex);

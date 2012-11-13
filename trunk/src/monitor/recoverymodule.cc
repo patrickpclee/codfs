@@ -29,7 +29,18 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 	MessageStatus status = rtrm->waitForStatusChange();
 	if (status == READY) {
 		vector<struct ObjectLocation> ols = rtrm->getObjectLocations();
+		for (struct ObjectLocation ol: ols) {
+			// Print debug message
+			debug_cyan("Object Location id = %" PRIu64 " primary = %" PRIu32 " osdlist = [", ol.objectId, 
+				ol.primaryId);
 
+			
+
+
+		}
+
+	} else {
+		debug("%s\n", "Faided Recovery");
 	}
 
 }
@@ -52,7 +63,6 @@ void RecoveryModule::failureDetection(uint32_t deadPeriod, uint32_t sleepPeriod)
 				}
 			}
 		}
-		debug_yellow("Mds sockfd = %" PRIu32 "\n", _communicator->getMdsSockfd());
 		// If has dead Osd, start recovery
 		if (deadOsdList.size() > 0) {
 			thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList);

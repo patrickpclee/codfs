@@ -296,6 +296,7 @@ void Mds::secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
 void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 		vector<uint32_t> deadOsdList) {
 
+	debug_yellow("%s\n", "HAHA");
 	vector<struct ObjectLocation> objectLocationList;
 
 	struct ObjectLocation objectLocation;
@@ -305,6 +306,7 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 		vector<uint64_t> objectList = _metaDataModule->readOsdObjectList(osdId);
 
 		for (auto objectId : objectList) {
+			debug_cyan("Check objectid = %" PRIu64 "\n", objectId);
 			objectLocation.objectId = objectId;
 			objectLocation.osdList = _metaDataModule->readNodeList(objectId);
 			objectLocation.primaryId = _metaDataModule->getPrimary(objectId);

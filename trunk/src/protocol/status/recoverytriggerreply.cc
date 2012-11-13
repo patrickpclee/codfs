@@ -70,7 +70,7 @@ void RecoveryTriggerReplyMsg::parse(char* buf) {
 		ol.primaryId = olp.primaryid();
 		ol.osdList.clear();
 		for (int j = 0; j < olp.osdlist_size(); j++)
-			ol.osdList.push_back(olp.osdlist(i));
+			ol.osdList.push_back(olp.osdlist(j));
 		_objectLocations.push_back(ol);
 	}
 
