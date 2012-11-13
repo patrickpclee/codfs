@@ -3,23 +3,23 @@
 
 #include <stdint.h>
 #include "../common/osdstat.hh"
+#include "../common/debug.hh"
+#include "monitor_communicator.hh"
 #include <map>
 
 using namespace std;
 
 class RecoveryModule {
 public:
-	RecoveryModule(map<uint32_t, struct OsdStat>& mapRef);
+	RecoveryModule(map<uint32_t, struct OsdStat>& mapRef, MonitorCommunicator*
+		communicator);
 
 	void failureDetection(uint32_t deadPeriod, uint32_t sleelPeriod);
 
-	void reportOsdFailure (uint32_t osdId, uint32_t health);
-
-	uint32_t* getObjectIdList(uint32_t osdId);
-
-	uint32_t* doRecovery (struct ObjectOwnership* objectOwnershipList);
+	void executeRecovery(vector<uint32_t>& deadOsdList);
 
 private:
 	map<uint32_t, struct OsdStat>& _osdStatMap;
+	MonitorCommunicator* _communicator;
 };
 #endif
