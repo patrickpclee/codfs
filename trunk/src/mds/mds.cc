@@ -294,23 +294,25 @@ void Mds::secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
  * 3. Reply with Object List, Primary List, and Node List of the Objects
  */
 void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t osdId) {
+		vector<uint32_t> deadOsdList) {
 
-	vector<ObjectLocation> objectLocationList;
+	vector<struct ObjectLocation> objectLocationList;
 
-	ObjectLocation objectLocation;
+	struct ObjectLocation objectLocation;
 
-	// get the list of objects owned by failed osd
-	vector<uint64_t> objectList = _metaDataModule->readOsdObjectList(osdId);
+	for (uint32_t osdId: deadOsdList) {
+		// get the list of objects owned by failed osd
+		vector<uint64_t> objectList = _metaDataModule->readOsdObjectList(osdId);
 
-	for (auto objectId : objectList) {
-		objectLocation.objectId = objectId;
-		objectLocation.osdList = _metaDataModule->readNodeList(objectId);
-		objectLocation.primaryId = _metaDataModule->getPrimary(objectId);
-		objectLocationList.push_back(objectLocation);
+		for (auto objectId : objectList) {
+			objectLocation.objectId = objectId;
+			objectLocation.osdList = _metaDataModule->readNodeList(objectId);
+			objectLocation.primaryId = _metaDataModule->getPrimary(objectId);
+			objectLocationList.push_back(objectLocation);
+		}
 	}
 
-	_mdsCommunicator->replyRecoveryTrigger(requestId, connectionId, osdId,
+	_mdsCommunicator->replyRecoveryTrigger(requestId, connectionId,
 			objectLocationList);
 
 	return;

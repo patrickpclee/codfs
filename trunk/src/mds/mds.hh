@@ -173,7 +173,7 @@ public:
 	 * @param	osdId		ID of the failed Osd
 	 */
 	void recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t osdId);
+			vector<uint32_t> deadOsdList);
 
 	/**
 	 * @brief	Handle Object Node List Update from Osd

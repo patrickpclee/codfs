@@ -125,7 +125,7 @@ public:
 	 */
 
 	void replyRecoveryTrigger(uint32_t requestId, uint32_t connectionId,
-			uint32_t osdId, vector<ObjectLocation> objectLocationList);
+			vector<ObjectLocation> objectLocationList);
 
 	// Request to Other Nodes
 
