@@ -57,9 +57,17 @@ public:
 	/**
 	 * @brief Find all objects owned by the osd
 	 * @param osdId Osd ID
-	 * @return
+	 * @return list of objectId
 	 */
 	vector<uint64_t> findOsdObjects(uint32_t osdId);
+
+	/**
+	 * @brief Find all the objects owned by the osd as primary
+	 * @param osdId Osd ID
+	 * @return list of objectId
+	 */
+
+	vector<uint64_t> findOsdPrimaryObjects(uint32_t osdId);
 
 	/**
 	 * @brief	Set Primary of a Object

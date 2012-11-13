@@ -301,7 +301,8 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 
 	struct ObjectLocation objectLocation;
 
-	for (uint32_t osdId: deadOsdList) {
+	for (uint32_t osdId : deadOsdList) {
+
 		// get the list of objects owned by failed osd
 		vector<uint64_t> objectList = _metaDataModule->readOsdObjectList(osdId);
 
@@ -311,6 +312,21 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 			objectLocation.osdList = _metaDataModule->readNodeList(objectId);
 			objectLocation.primaryId = _metaDataModule->getPrimary(objectId);
 			objectLocationList.push_back(objectLocation);
+		}
+
+		// get the list of objects owned by the failed osd as primary
+		vector<uint64_t> primaryObjectList =
+				_metaDataModule->readOsdPrimaryObjectList(osdId);
+
+		for (auto objectId : primaryObjectList) {
+			// get the node list of an object and their status
+			vector<uint32_t> nodeList = _metaDataModule->readNodeList(objectId);
+			vector<bool> nodeStatus = _mdsCommunicator->getOsdStatusRequest(
+					nodeList);
+
+			// select new primary OSD and write to DB
+			_metaDataModule->selectActingPrimary(objectId, nodeList,
+					nodeStatus);
 		}
 	}
 
