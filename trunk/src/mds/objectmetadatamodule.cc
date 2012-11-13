@@ -139,9 +139,10 @@ uint64_t ObjectMetaDataModule::generateObjectId() {
 vector<uint64_t> ObjectMetaDataModule::findOsdObjects(uint32_t osdId) {
 	vector<uint64_t> objectList;
 	BSONObj queryObject = BSON ("nodeList" << (int) osdId);
-	BSONObj result = _objectMetaDataStorage->readOne(queryObject);
-	BSONForEach(it, result.getObjectField("nodeList")) {
-		objectList.push_back((uint64_t) it.numberLong());
+	vector<BSONObj> result = _objectMetaDataStorage->read(queryObject);
+	for (auto bson : result) {
+		uint64_t id = (uint64_t)bson.getField("id").numberLong();
+		objectList.push_back(id);
 	}
 	return objectList;
 }

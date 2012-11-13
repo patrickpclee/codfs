@@ -8,7 +8,7 @@ using namespace std;
 extern mutex osdStatMapMutex;
 
 enum OsdHealthStat{
-	ONLINE, OFFLINE
+	ONLINE, OFFLINE, RECOVERING
 };
 
 struct OsdStat {
@@ -23,7 +23,7 @@ struct OsdStat {
 		osdHealth(health), osdIp(ip), osdPort(port), timestamp(ts) { } 
 		
 	void out() {
-		printf("OSD[id=%d,ip=%d,port=%d,sockfd=%d],cap=%d load=%d\n",osdId, osdIp, osdPort, osdSockfd, osdCapacity, osdLoading);
+		printf("OSD[id=%d,ip=%d,port=%d,sockfd=%d],cap=%d load=%d health =%d\n",osdId, osdIp, osdPort, osdSockfd, osdCapacity, osdLoading, osdHealth);
 	}
 	uint32_t osdId;
 	uint32_t osdSockfd;

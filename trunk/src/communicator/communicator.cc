@@ -585,6 +585,9 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 			"[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
 			componentId, sockfd);
 
+	// save component type into connectionMap
+	_connectionMap[sockfd]->setConnectionType(componentType);
+
 	// prepare reply message
 	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this,
 			requestId, sockfd, _componentId, _componentType);

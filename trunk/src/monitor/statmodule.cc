@@ -40,15 +40,16 @@ void StatModule::removeStatById (uint32_t osdId) {
 }
 
 void StatModule::removeStatBySockfd (uint32_t sockfd) {
+	// Set to OFFLINE
 	lock_guard<mutex> lk(osdStatMapMutex);
-	debug_yellow("Try to delete sockfd = %" PRIu32 "\n", sockfd);
 	map<uint32_t, struct OsdStat>::iterator p;
 	p = _osdStatMap.begin();
 	while (p != _osdStatMap.end()) {
 		if (p->second.osdSockfd == sockfd)
-			_osdStatMap.erase(p++);
-		else
-			p++;
+			p->second.osdHealth = OFFLINE;
+			//_osdStatMap.erase(p++);
+			//else
+		p++;
 	}	
 	debug_yellow("Delete sockfd = %" PRIu32 "\n", sockfd);
 }
