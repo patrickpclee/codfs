@@ -73,7 +73,8 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 
 	if(firstObjectToWrite  > _lastWriteBackPos + 1){
 #ifdef PARALLEL_TRANSFER
-		_tp.schedule(boost::bind(writeBackThread,this,_lastWriteBackPos));
+		_tp.schedule(boost::bind(&FileDataCache::writeBack,this,_lastWriteBackPos));
+		//_tp.schedule(boost::bind(writeBackThread,this,_lastWriteBackPos));
 #else
 		writeBack(_lastWriteBackPos);
 #endif
