@@ -562,7 +562,7 @@ void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	for (int i = 0; i < (int)repairSegmentList.size(); i++) {
 		// find sockfd of the new OSD
 		uint32_t sockfd = _osdCommunicator->getSockfdFromId(
-				repairSegmentList[i]);
+				repairSegmentOsdList[i]);
 		uint32_t segmentId = repairSegmentList[i];
 		_osdCommunicator->sendSegment(sockfd, segmentDataList[segmentId]);
 	}
