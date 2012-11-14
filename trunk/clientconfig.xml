@@ -12,5 +12,6 @@
 	<Fuse>
 		<PreallocateObjectNumber>10</PreallocateObjectNumber>
 		<TempStorage>/tmp/</TempStorage>
+		<ReadAhead>20</ReadAhead>
 	</Fuse>
 </NcvfsConfig>
