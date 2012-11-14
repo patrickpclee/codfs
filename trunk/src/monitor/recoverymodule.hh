@@ -18,6 +18,8 @@ public:
 
 	void executeRecovery(vector<uint32_t>& deadOsdList);
 
+	void replaceFailedOsd(struct ObjectLocation& ol, struct ObjectRepairInfo& ret);
+
 private:
 	map<uint32_t, struct OsdStat>& _osdStatMap;
 	MonitorCommunicator* _communicator;
