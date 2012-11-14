@@ -95,19 +95,19 @@ int main(int argc, char *argv[]) {
 	string codingSetting = Raid0Coding::generateSetting(raid0_n);
 	 */
 
+	/*
 	// RAID 1
 	const uint32_t raid1_n = 1;
 	CodingScheme codingScheme = RAID1_CODING;
 	string codingSetting = Raid1Coding::generateSetting(raid1_n);
+	*/
 
-	/*
 
 	// RAID 5
 	const uint32_t raid5_n = 3;
 	CodingScheme codingScheme = RAID5_CODING;
 	string codingSetting = Raid5Coding::generateSetting(raid5_n);
 
-	*/
 
 	/*
 	// RS

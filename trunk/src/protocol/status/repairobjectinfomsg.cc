@@ -82,6 +82,7 @@ void RepairObjectInfoMsg::parse(char* buf) {
 
 void RepairObjectInfoMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
+	mds->repairObjectInfoProcessor(_msgHeader.requestId, _sockfd, _objectId, _deadSegmentIds, _newOsdIds);
 #endif
 #ifdef COMPILE_FOR_OSD
 	osd->repairObjectInfoProcessor(_msgHeader.requestId, _sockfd, _objectId, _deadSegmentIds, _newOsdIds);

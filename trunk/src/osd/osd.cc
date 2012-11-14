@@ -61,6 +61,27 @@ Osd::~Osd() {
 	delete _osdCommunicator;
 }
 
+void Osd::cacheObject (uint64_t objectId, ObjectData objectData) {
+	// cache objectData
+	struct ObjectTransferCache objectTransferCache;
+	objectTransferCache.buf = objectData.buf;
+	objectTransferCache.length = objectData.info.objectSize;
+
+	if (!_storageModule->isObjectCached(objectId)) {
+		_storageModule->putObjectToDiskCache(objectId,
+				objectTransferCache);
+	}
+}
+
+void Osd::freeObject(uint64_t objectId, ObjectData objectData) {
+	// free objectData
+	debug("free object %" PRIu64 "\n", objectId);
+	MemoryPool::getInstance().poolFree(objectData.buf);
+	debug("object %" PRIu64 "free-d\n", objectId);
+
+	_objectDataMap.erase(objectId);
+}
+
 /**
  * Send the object to the target
  */
@@ -247,22 +268,8 @@ ObjectData Osd::getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			if (_objectRequestCount.get(objectId) == 0) {
 				_objectRequestCount.erase(objectId);
 
-				// cache objectData
-				struct ObjectTransferCache objectTransferCache;
-				objectTransferCache.buf = objectData.buf;
-				objectTransferCache.length = objectData.info.objectSize;
-
-				if (!_storageModule->isObjectCached(objectId)) {
-					_storageModule->putObjectToDiskCache(objectId,
-							objectTransferCache);
-				}
-
-				// free objectData
-				debug("free object %" PRIu64 "\n", objectId);
-				MemoryPool::getInstance().poolFree(objectData.buf);
-				debug("object %" PRIu64 "free-d\n", objectId);
-
-				_objectDataMap.erase(objectId);
+				cacheObject(objectId, objectData);
+				freeObject(objectId, objectData);
 
 				debug("%s\n", "[DOWNLOAD] Cleanup completed");
 			}
@@ -579,24 +586,8 @@ void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
 		if (_objectRequestCount.get(objectId) == 0) {
 			_objectRequestCount.erase(objectId);
 
-			// cache objectData
-			struct ObjectTransferCache objectTransferCache;
-			objectTransferCache.buf = objectData.buf;
-			objectTransferCache.length = objectData.info.objectSize;
-
-			if (!_storageModule->isObjectCached(objectId)) {
-				_storageModule->putObjectToDiskCache(objectId,
-						objectTransferCache);
-			}
-
-			// free objectData
-			debug("free object %" PRIu64 "\n", objectId);
-			MemoryPool::getInstance().poolFree(objectData.buf);
-			debug("object %" PRIu64 "free-d\n", objectId);
-
-			_objectDataMap.erase(objectId);
-
-			debug("%s\n", "[RECOVERY] Cleanup completed");
+			cacheObject(objectId, objectData);
+			freeObject(objectId, objectData);
 		}
 	}
 }
