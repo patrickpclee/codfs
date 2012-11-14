@@ -25,20 +25,6 @@ Client* client;
 /// Config Layer
 ConfigLayer* configLayer;
 
-void startGarbageCollectionThread() {
-	GarbageCollector::getInstance().start();
-}
-
-void startSendThread() {
-	client->getCommunicator()->sendMessage();
-}
-
-void startReceiveThread(Communicator* communicator) {
-	// wait for message
-	communicator->waitForMessage();
-
-}
-
 int main(int argc, char *argv[]) {
 
 	if (argc < 4 || argc > 5) {
@@ -63,14 +49,14 @@ int main(int argc, char *argv[]) {
 	// start server
 	communicator->createServerSocket();
 
-	// 1. Garbage Collection Thread
-	thread garbageCollectionThread(startGarbageCollectionThread);
+	// 1. Garbage Collection Thread (lamba function hack for singleton)
+	thread garbageCollectionThread([&](){GarbageCollector::getInstance().start();});
 
 	// 2. Receive Thread
-	thread receiveThread(startReceiveThread, communicator);
+	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
-	thread sendThread(startSendThread);
+	thread sendThread(&Communicator::sendMessage, communicator);
 
 	communicator->setId(client->getClientId());
 	communicator->setComponentType(CLIENT);

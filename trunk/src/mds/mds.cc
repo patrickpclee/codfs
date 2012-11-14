@@ -375,10 +375,6 @@ MdsCommunicator* Mds::getCommunicator() {
 	return _mdsCommunicator;
 }
 
-void startGarbageCollectionThread() {
-	GarbageCollector::getInstance().start();
-}
-
 /**
  * @brief	Handle Set File Size Request
  */
@@ -438,8 +434,8 @@ int main(void) {
 	communicator->setId(50000);
 	communicator->setComponentType(MDS);
 
-	// 1. Garbage Collection Thread
-	thread garbageCollectionThread(startGarbageCollectionThread);
+	// 1. Garbage Collection Thread (lamba function hack for singleton)
+	thread garbageCollectionThread([&](){GarbageCollector::getInstance().start();});
 
 	// 2. Receive Thread
 	thread receiveThread(&Communicator::waitForMessage, communicator);
@@ -448,8 +444,6 @@ int main(void) {
 	thread sendThread(&Communicator::sendMessage, communicator);
 
 	communicator->connectToMonitor();
-
-	//mds->test();
 
 	garbageCollectionThread.join();
 	receiveThread.join();
