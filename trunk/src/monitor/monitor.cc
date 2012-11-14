@@ -27,6 +27,9 @@ Monitor::Monitor() {
 	_statModule = new StatModule(_osdStatMap);
 	_recoveryModule = new RecoveryModule(_osdStatMap, _monitorCommunicator);
 	_monitorId = configLayer->getConfigInt("MonitorId");
+	_sleepPeriod = configLayer->getConfigInt("SleepPeriod");
+	_deadPeriod = configLayer->getConfigInt("DeadPeriod");
+	_updatePeriod = configLayer->getConfigInt("UpdatePeriod");
 }
 
 /*	Monitor default desctructor
@@ -112,6 +115,18 @@ void Monitor::getOsdStatusRequestProcessor (uint32_t requestId, uint32_t sockfd,
 	_monitorCommunicator->replyGetOsdStatus(requestId, sockfd, osdStatus);
 }
 
+uint32_t Monitor::getDeadPeriod() {
+	return _deadPeriod;
+}
+
+uint32_t Monitor::getSleepPeriod() {
+	return _sleepPeriod;
+}
+
+uint32_t Monitor::getUpdatePeriod() {
+	return _updatePeriod;
+}
+
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
 }
@@ -125,11 +140,11 @@ void startReceiveThread(Communicator* communicator) {
 }
 
 void startUpdateThread(Communicator* communicator, StatModule* statmodule) {
-	statmodule->updateOsdStatMap(communicator);
+	statmodule->updateOsdStatMap(communicator, monitor->getUpdatePeriod());
 }
 
 void startRecoveryThread(Communicator* communicator, RecoveryModule* recoverymodule) {
-	recoverymodule->failureDetection(2,1);
+	recoverymodule->failureDetection(monitor->getDeadPeriod(), monitor->getSleepPeriod());
 }
 
 int main (void) {
