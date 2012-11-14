@@ -303,17 +303,6 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 
 	for (uint32_t osdId : deadOsdList) {
 
-		// get the list of objects owned by failed osd
-		vector<uint64_t> objectList = _metaDataModule->readOsdObjectList(osdId);
-
-		for (auto objectId : objectList) {
-			debug_cyan("Check objectid = %" PRIu64 "\n", objectId);
-			objectLocation.objectId = objectId;
-			objectLocation.osdList = _metaDataModule->readNodeList(objectId);
-			objectLocation.primaryId = _metaDataModule->getPrimary(objectId);
-			objectLocationList.push_back(objectLocation);
-		}
-
 		// get the list of objects owned by the failed osd as primary
 		vector<uint64_t> primaryObjectList =
 				_metaDataModule->readOsdPrimaryObjectList(osdId);
@@ -327,6 +316,17 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 			// select new primary OSD and write to DB
 			_metaDataModule->selectActingPrimary(objectId, nodeList,
 					nodeStatus);
+		}
+
+		// get the list of objects owned by failed osd
+		vector<uint64_t> objectList = _metaDataModule->readOsdObjectList(osdId);
+
+		for (auto objectId : objectList) {
+			debug_cyan("Check objectid = %" PRIu64 "\n", objectId);
+			objectLocation.objectId = objectId;
+			objectLocation.osdList = _metaDataModule->readNodeList(objectId);
+			objectLocation.primaryId = _metaDataModule->getPrimary(objectId);
+			objectLocationList.push_back(objectLocation);
 		}
 	}
 
@@ -377,15 +377,6 @@ MdsCommunicator* Mds::getCommunicator() {
 
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
-}
-
-void startSendThread() {
-	mds->getCommunicator()->sendMessage();
-}
-
-void startReceiveThread(Communicator* communicator) {
-	// wait for message
-	communicator->waitForMessage();
 }
 
 /**
@@ -451,10 +442,10 @@ int main(void) {
 	thread garbageCollectionThread(startGarbageCollectionThread);
 
 	// 2. Receive Thread
-	thread receiveThread(startReceiveThread, communicator);
+	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
-	thread sendThread(startSendThread);
+	thread sendThread(&Communicator::sendMessage, communicator);
 
 	communicator->connectToMonitor();
 
