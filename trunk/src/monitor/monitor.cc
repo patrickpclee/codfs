@@ -58,14 +58,15 @@ uint32_t Monitor::getMonitorId() {
 }
 
 void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
-	uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip, 
-	uint16_t port ) {
+		uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip,
+		uint16_t port) {
 
-
-	debug("OSD Startup Processor: on id = %" PRIu32 " ip = %" PRIu32 " port = %" PRIu32 "\n", osdId, ip, port);
+	debug(
+			"OSD Startup Processor: on id = %" PRIu32 " ip = %" PRIu32 " port = %" PRIu32 "\n",
+			osdId, ip, port);
 	// Send online osd list to the newly startup osd
 	vector<struct OnlineOsd> onlineOsdList;
-	
+
 	_statModule->getOnlineOsdList(onlineOsdList);
 	_monitorCommunicator->sendOnlineOsdList(sockfd, onlineOsdList);
 
@@ -73,28 +74,30 @@ void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 	_statModule->broadcastNewOsd(_monitorCommunicator, osdId, ip, port);
 
 	// Add the newly startup osd to the map
-	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE, ip, port);
+	_statModule->setStatById(osdId, sockfd, capacity, loading, ONLINE, ip,
+			port);
 }
 
 void Monitor::OsdStatUpdateReplyProcessor(uint32_t requestId, uint32_t sockfd,
-	uint32_t osdId, uint32_t capacity, uint32_t loading) {
-	_statModule->setStatById (osdId, sockfd, capacity, loading, ONLINE);
+		uint32_t osdId, uint32_t capacity, uint32_t loading) {
+	_statModule->setStatById(osdId, sockfd, capacity, loading, ONLINE);
 }
 
-void Monitor::OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd, 
-	uint32_t osdId) {
-	_statModule->removeStatById (osdId);
+void Monitor::OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd,
+		uint32_t osdId) {
+	_statModule->removeStatById(osdId);
 }
 
-void Monitor::getPrimaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t numOfObjs){
+void Monitor::getPrimaryListProcessor(uint32_t requestId, uint32_t sockfd,
+		uint32_t numOfObjs) {
 	vector<uint32_t> primaryList;
 	primaryList = _selectionModule->ChoosePrimary(numOfObjs);
 	_monitorCommunicator->replyPrimaryList(requestId, sockfd, primaryList);
 	return;
 }
 
-void Monitor::getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, 
-	uint32_t numOfSegs, uint32_t primaryId) {
+void Monitor::getSecondaryListProcessor(uint32_t requestId, uint32_t sockfd,
+		uint32_t numOfSegs, uint32_t primaryId) {
 
 	vector<struct SegmentLocation> secondaryList;
 	secondaryList = _selectionModule->ChooseSecondary(numOfSegs, primaryId);
@@ -102,14 +105,14 @@ void Monitor::getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd,
 	return;
 }
 
-void Monitor::getOsdListProcessor (uint32_t requestId, uint32_t sockfd) {
+void Monitor::getOsdListProcessor(uint32_t requestId, uint32_t sockfd) {
 	vector<struct OnlineOsd> osdList;
 	_statModule->getOnlineOsdList(osdList);
 	_monitorCommunicator->replyOsdList(requestId, sockfd, osdList);
 }
 
-void Monitor::getOsdStatusRequestProcessor (uint32_t requestId, uint32_t sockfd,
-	vector<uint32_t>& osdListRef) {
+void Monitor::getOsdStatusRequestProcessor(uint32_t requestId, uint32_t sockfd,
+		vector<uint32_t>& osdListRef) {
 	vector<bool> osdStatus;
 	_statModule->getOsdStatus(osdListRef, osdStatus);
 	_monitorCommunicator->replyGetOsdStatus(requestId, sockfd, osdStatus);
@@ -127,29 +130,9 @@ uint32_t Monitor::getUpdatePeriod() {
 	return _updatePeriod;
 }
 
-void startGarbageCollectionThread() {
-	GarbageCollector::getInstance().start();
-}
+int main(void) {
 
-void startSendThread(Communicator* communicator) {
-	communicator->sendMessage();
-}
-
-void startReceiveThread(Communicator* communicator) {
-	communicator->waitForMessage();
-}
-
-void startUpdateThread(Communicator* communicator, StatModule* statmodule) {
-	statmodule->updateOsdStatMap(communicator, monitor->getUpdatePeriod());
-}
-
-void startRecoveryThread(Communicator* communicator, RecoveryModule* recoverymodule) {
-	recoverymodule->failureDetection(monitor->getDeadPeriod(), monitor->getSleepPeriod());
-}
-
-int main (void) {
-	
-	printf ("MONITOR\n");
+	printf("MONITOR\n");
 
 	monitor = new Monitor();
 	MonitorCommunicator* communicator = monitor->getCommunicator();
@@ -161,21 +144,23 @@ int main (void) {
 	communicator->setComponentType(MONITOR);
 	communicator->createServerSocket();
 
-	// 1. Garbage Collection Thread
-	thread garbageCollectionThread(startGarbageCollectionThread);
+	// 1. Garbage Collection Thread (lamba function hack for singleton)
+	thread garbageCollectionThread(
+			[&]() {GarbageCollector::getInstance().start();});
 
 	// 2. Receive Thread
-	thread receiveThread(startReceiveThread, communicator);
+	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
-	thread sendThread(startSendThread, communicator);
+	thread sendThread(&Communicator::sendMessage, communicator);
 
 	// 4. Update Thread
-	thread updateThread(startUpdateThread, communicator, statmodule);
-	
-	// 5. Recovery Thread
-	thread recoveryThread(startRecoveryThread, communicator, recoverymodule);
+	thread updateThread(&StatModule::updateOsdStatMap, statmodule, communicator,
+			monitor->getUpdatePeriod());
 
+	// 5. Recovery Thread
+	thread recoveryThread(&RecoveryModule::failureDetection, recoverymodule,
+			monitor->getDeadPeriod(), monitor->getSleepPeriod());
 
 	// threads join
 	garbageCollectionThread.join();
