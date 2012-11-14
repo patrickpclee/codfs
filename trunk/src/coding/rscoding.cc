@@ -225,6 +225,20 @@ vector<uint32_t> RSCoding::getRequiredSegmentIds(string setting,
 	return requiredSegments;
 }
 
+vector<uint32_t> RSCoding::getRepairSrcSegmentIds(string setting,
+		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
+
+	return {};
+}
+
+vector<struct SegmentData> RSCoding::repairSegments(
+		vector<struct SegmentData> &repairSrcSegments,
+		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+		string setting) {
+
+	return {};
+}
+
 //
 // PRIVATE FUNCTION
 //

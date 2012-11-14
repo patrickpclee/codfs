@@ -6,7 +6,6 @@
 #include "../common/segmentdata.hh"
 #include "../common/memorypool.hh"
 
-
 class Coding {
 public:
 
@@ -22,6 +21,14 @@ public:
 	virtual vector<uint32_t> getRequiredSegmentIds(string setting,
 			vector<bool> secondaryOsdStatus) = 0;
 
+	virtual vector<uint32_t> getRepairSrcSegmentIds(string setting,
+			vector<uint32_t> failedSegments, vector<bool> segmentStatus) = 0;
+
+	virtual vector<struct SegmentData> repairSegments(
+			vector<struct SegmentData> &repairSrcSegments,
+			vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+			string setting) = 0;
+
 	uint32_t roundTo(uint32_t numToRound, uint32_t multiple);
 	static void bitwiseXor(char* result, char* srcA, char* srcB,
 			uint32_t length);
@@ -30,11 +37,12 @@ public:
 
 	template<class T, class V>
 	T* talloc(V num) {
-		return (T*) MemoryPool::getInstance().poolMalloc((uint32_t)(sizeof(T)*(num)));
+		return (T*) MemoryPool::getInstance().poolMalloc(
+				(uint32_t) (sizeof(T) * (num)));
 	}
 
 	void tfree(void* ptr) {
-		MemoryPool::getInstance().poolFree((char*)ptr);
+		MemoryPool::getInstance().poolFree((char*) ptr);
 	}
 };
 

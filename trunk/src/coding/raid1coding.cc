@@ -82,3 +82,17 @@ vector<uint32_t> Raid1Coding::getRequiredSegmentIds(string setting,
 	uint32_t offset = it - secondaryOsdStatus.begin();
 	return {offset};
 }
+
+vector<uint32_t> Raid1Coding::getRepairSrcSegmentIds(string setting,
+		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
+
+	return {};
+}
+
+vector<struct SegmentData> Raid1Coding::repairSegments(
+		vector<struct SegmentData> &repairSrcSegments,
+		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+		string setting) {
+
+	return {};
+}
