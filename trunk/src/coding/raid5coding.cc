@@ -223,3 +223,17 @@ uint32_t Raid5Coding::getParameters(string setting) {
 	istringstream(setting) >> raid5_n;
 	return raid5_n;
 }
+
+vector<uint32_t> Raid5Coding::getRepairSrcSegmentIds(string setting,
+		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
+
+	return {};
+}
+
+vector<struct SegmentData> Raid5Coding::repairSegments(
+		vector<struct SegmentData> &repairSrcSegments,
+		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+		string setting) {
+
+	return {};
+}

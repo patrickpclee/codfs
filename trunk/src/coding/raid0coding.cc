@@ -26,8 +26,8 @@ vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
 	const uint32_t raid0_n = getParameters(setting);
 
 	// calculate size of each strip
-	const uint32_t stripSize = Coding::roundTo(objectData.info.objectSize, raid0_n)
-			/ raid0_n;
+	const uint32_t stripSize = Coding::roundTo(objectData.info.objectSize,
+			raid0_n) / raid0_n;
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
 
@@ -57,7 +57,8 @@ vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
 }
 
 struct ObjectData Raid0Coding::decode(vector<struct SegmentData> &segmentData,
-		vector<uint32_t> &requiredSegments,  uint32_t objectSize, string setting) {
+		vector<uint32_t> &requiredSegments, uint32_t objectSize,
+		string setting) {
 
 	// for raid 0, requiredSegments is not used as all segments are required to decode
 
@@ -102,4 +103,18 @@ vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting,
 		requiredSegments[i] = i;
 	}
 	return requiredSegments;
+}
+
+vector<uint32_t> Raid0Coding::getRepairSrcSegmentIds(string setting,
+		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
+
+	return {};
+}
+
+vector<struct SegmentData> Raid0Coding::repairSegments(
+		vector<struct SegmentData> &repairSrcSegments,
+		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+		string setting) {
+
+	return {};
 }
