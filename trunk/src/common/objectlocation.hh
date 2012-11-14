@@ -1,6 +1,7 @@
 #ifndef _OBJECTLOCATION_HH_ 
 #define _OBJECTLOCATION_HH_ 
 
+#include "../common/debug.hh"
 #include <vector>
 using namespace std;
 
@@ -16,12 +17,12 @@ struct ObjectRepairInfo {
 	vector<uint32_t> repOsd;
 	void out() {
 		printf("+--------ObjectRepairInfo----------\n");
-		printf("| objectid | %24lld|\n", objectId);
+		printf("| objectid | %24" PRIu64 "|\n", objectId);
 		printf("| repPos = [");
-		for (uint32_t i:repPos) printf("%d, ", i);
+		for (uint32_t i:repPos) printf("%" PRIu32 ", ", i);
 		printf("|\n");
 		printf("| repOsd = [");
-		for (uint32_t i:repOsd) printf("%d, ", i);
+		for (uint32_t i:repOsd) printf("%" PRIu32 ", ", i);
 		printf("|\n");
 		printf("+----------------------------------\n");
 	}
