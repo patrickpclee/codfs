@@ -137,6 +137,7 @@ int main(int argc, char* argv[]) {
 	printf("Port = %hu\n",selfPort);
 
 	//communicator->connectAllComponents();
+	communicator->connectToMyself(Ipv4Int2Str(selfAddr), selfPort, OSD);
 	communicator->connectToMds();
 	communicator->connectToMonitor();
 	communicator->registerToMonitor(selfAddr, selfPort);

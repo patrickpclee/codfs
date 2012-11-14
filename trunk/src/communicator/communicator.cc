@@ -681,6 +681,12 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 	}
 }
 
+void Communicator::connectToMyself(string ip, uint16_t port, ComponentType
+	type) {
+	uint32_t sockfd = connectAndAdd(ip, port, type);
+	requestHandshake(sockfd, _componentId, _componentType);
+}
+
 void Communicator::connectToMonitor() {
 	vector<Component> monitorList = parseConfigFile("MONITOR");
 	printComponents("MONITOR", monitorList);
