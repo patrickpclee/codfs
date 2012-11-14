@@ -212,6 +212,19 @@ public:
 			uint32_t clientId, uint32_t fileId, uint64_t fileSize);
 
 	/**
+	 * @brief Handle Ack from OSD after object is recovered
+	 * @param requestId Request ID
+	 * @param connectionId Connection ID
+	 * @param objectId Object ID
+	 * @param repairSegmentList List of repaired segments
+	 * @param repairSegmentOsdList List of OSDs storing repaired segments
+	 */
+
+	void repairObjectInfoProcessor(uint32_t requestId, uint32_t connectionId,
+			uint64_t objectId, vector<uint32_t> repairSegmentList,
+			vector<uint32_t> repairSegmentOsdList);
+
+	/**
 	 * @brief	Get the MDS Communicator
 	 *
 	 * @return	Pointer to the MDS Communicator Module

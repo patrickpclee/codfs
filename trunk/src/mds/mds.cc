@@ -357,6 +357,20 @@ void Mds::saveObjectListProcessor(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
+void Mds::repairObjectInfoProcessor(uint32_t requestId, uint32_t connectionId,
+		uint64_t objectId, vector<uint32_t> repairSegmentList,
+		vector<uint32_t> repairSegmentOsdList) {
+
+	struct ObjectMetaData objectMetaData = _metaDataModule->readObjectInfo(
+			objectId);
+
+	for (int i = 0; i < (int) repairSegmentList.size(); i++) {
+		objectMetaData._nodeList[repairSegmentList[i]] = repairSegmentOsdList[i];
+	}
+
+	_metaDataModule->saveNodeList(objectId, objectMetaData._nodeList);
+}
+
 MdsCommunicator* Mds::getCommunicator() {
 	return _mdsCommunicator;
 }
