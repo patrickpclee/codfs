@@ -36,7 +36,9 @@ CodingScheme codingScheme = RAID1_CODING;
 string codingSetting = Raid1Coding::generateSetting(1);
 
 uint32_t _clientId = 51000;
+#ifdef FUSE_READ_AHEAD
 uint32_t _readAhead = 5;
+#endif
 
 mutex fileInfoCacheMutex;
 mutex _objectProcessingMutex;
@@ -57,6 +59,8 @@ thread sendThread;
 
 #include "../../lib/threadpool/threadpool.hpp"
 boost::threadpool::pool _tp;
+boost::threadpool::pool _writetp;
+uint32_t _writePoolLimit = 20;
 
 void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId, uint32_t fileId, uint32_t objectIndex){
 	client->getObject(clientId, sockfd, objectId);
@@ -148,6 +152,8 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 	uint32_t _numClientThreads = configLayer->getConfigInt(
 			"Communication>NumClientThreads");
 	_tp.size_controller().resize(_numClientThreads);
+	_writetp.size_controller().resize(_numClientThreads);
+	_writePoolLimit = configLayer->getConfigInt("Fuse>WritePoolLimit");
 #endif
 	return NULL;
 }

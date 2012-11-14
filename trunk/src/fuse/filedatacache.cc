@@ -17,7 +17,8 @@ extern uint32_t _clientId;
 #ifdef PARALLEL_TRANSFER
 
 #include "../../lib/threadpool/threadpool.hpp"
-extern boost::threadpool::pool _tp;
+extern boost::threadpool::pool _writetp;
+extern uint32_t _writePoolLimit;
 
 void writeBackThread(FileDataCache* fileDataCache, uint32_t index){
 	fileDataCache->writeBack(index);
@@ -73,8 +74,9 @@ int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
 
 	if(firstObjectToWrite  > _lastWriteBackPos + 1){
 #ifdef PARALLEL_TRANSFER
-		_tp.schedule(boost::bind(&FileDataCache::writeBack,this,_lastWriteBackPos));
-		//_tp.schedule(boost::bind(writeBackThread,this,_lastWriteBackPos));
+		_writetp.wait(_writePoolLimit);
+		_writetp.schedule(boost::bind(&FileDataCache::writeBack,this,_lastWriteBackPos));
+		//_writetp.schedule(boost::bind(writeBackThread,this,_lastWriteBackPos));
 #else
 		writeBack(_lastWriteBackPos);
 #endif
@@ -127,7 +129,7 @@ void FileDataCache::flush(){
 		//	continue;
 
 #ifdef PARALLEL_TRANSFER
-		_tp.schedule(boost::bind(writeBackThread,this,i));
+		_writetp.schedule(boost::bind(writeBackThread,this,i));
 #else
 		writeBack(i);
 #endif
@@ -146,7 +148,7 @@ void FileDataCache::flush(){
 		 */
 	}
 #ifdef PARALLEL_TRANSFER
-	_tp.wait();
+	_writetp.wait();
 #endif
 	objectData = _objectDataList[_lastObjectCount];
 	objectList.push_back(objectData.info.objectId);
