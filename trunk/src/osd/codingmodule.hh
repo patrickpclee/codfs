@@ -54,7 +54,8 @@ public:
 
 	struct ObjectData decodeSegmentToObject(CodingScheme codingScheme,
 			uint64_t objectId, vector<struct SegmentData> &segmentData,
-			vector<uint32_t> &requiredSegments, uint32_t objectSize, string setting);
+			vector<uint32_t> &requiredSegments, uint32_t objectSize,
+			string setting);
 
 	/**
 	 * Get the list of segments required to do decode
@@ -84,12 +85,15 @@ public:
 
 	Coding* getCoding(CodingScheme codingScheme);
 
-	/**
-	 * Retrieve a segment from the storage module
-	 * @param objectId ID of the object that the segment is belonged to
-	 * @param segmentId ID of the segment to retrieve
-	 * @return a SegmentData structure
-	 */
+	vector<uint32_t> getRepairSrcSegmentIds(CodingScheme codingScheme,
+			string setting, vector<uint32_t> failedSegments,
+			vector<bool> segmentStatus);
+
+	vector<struct SegmentData> repairSegments(CodingScheme codingScheme,
+			vector<uint32_t> failedSegments,
+			vector<struct SegmentData> &repairSrcSegments,
+			vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+			string setting);
 
 private:
 //	Coding* _coding;
