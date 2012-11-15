@@ -88,8 +88,6 @@ vector<uint32_t> Raid1Coding::getRequiredSegmentIds(string setting,
 vector<uint32_t> Raid1Coding::getRepairSrcSegmentIds(string setting,
 		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
 
-	const uint32_t raid1_n = getParameters(setting);
-
 	// for Raid1 Coding, find the first running OSD
 	vector<bool>::iterator it;
 	it = find(segmentStatus.begin(), segmentStatus.end(), true);
@@ -115,7 +113,6 @@ vector<struct SegmentData> Raid1Coding::repairSegments(
 	vector<SegmentData> segmentDataList;
 	segmentDataList.reserve(failedSegments.size());
 
-	uint32_t i = 0;
 	for (uint32_t segmentId : failedSegments) {
 
 		struct SegmentData segmentData;
