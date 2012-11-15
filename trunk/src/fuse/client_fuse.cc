@@ -43,6 +43,7 @@ uint32_t _readAhead = 5;
 mutex fileInfoCacheMutex;
 mutex _objectProcessingMutex;
 mutex _readAheadCountMutex;
+mutex _objectReadCacheAccessTimeMutex;
 
 unordered_map<uint32_t, FileDataCache*> _fileDataCache;
 //unordered_map<uint64_t, unique_lock<mutex> > _objectProcessing;
@@ -50,6 +51,10 @@ unordered_map<uint32_t, struct FileMetaData> _fileInfoCache;
 unordered_map<string, uint32_t> _fileIdCache;
 unordered_map<uint32_t, uint32_t> _readAheadCount;
 unordered_map<uint32_t, vector<bool> > _objectProcessing;
+
+list<uint64_t> _objectReadCacheAccessTime;
+unordered_map<uint64_t, bool> _objectReadCacheBitMap;
+uint32_t _readCacheLimit = 20;
 
 thread garbageCollectionThread;
 thread receiveThread;
@@ -62,10 +67,26 @@ boost::threadpool::pool _tp;
 boost::threadpool::pool _writetp;
 uint32_t _writePoolLimit = 20;
 
+void addObjectReadCache(uint64_t objectId) {
+	lock_guard<mutex> lk(_objectReadCacheAccessTimeMutex);
+	if( _objectReadCacheBitMap.count(objectId) == 0) {
+		_objectReadCacheBitMap[objectId] = true;
+		if( _objectReadCacheAccessTime.size() == _readCacheLimit) {
+			uint64_t objectToClose = _objectReadCacheAccessTime.front();
+			_objectReadCacheAccessTime.pop_front();
+			client->getStorageModule()->closeObject(objectToClose);
+		}
+		_objectReadCacheAccessTime.push_back(objectId);	
+	} else {
+		// TODO: Update LRU
+	}
+}
+
 void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId, uint32_t fileId, uint32_t objectIndex){
 	client->getObject(clientId, sockfd, objectId);
 	debug("Object ID = %" PRIu64 " finished download\n", objectId);
 	_objectProcessing[fileId][objectIndex] = false;
+	addObjectReadCache(objectId);
 }
 #endif
 
@@ -154,6 +175,7 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 	_tp.size_controller().resize(_numClientThreads);
 	_writetp.size_controller().resize(_numClientThreads);
 	_writePoolLimit = configLayer->getConfigInt("Fuse>WritePoolLimit");
+	_readCacheLimit = configLayer->getConfigInt("Fuse>ReadCacheLimit");
 #endif
 	return NULL;
 }
@@ -267,6 +289,9 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 		struct ObjectTransferCache objectCache;
 		while(_objectProcessing[fi->fh][i]);
 		objectCache = client->getObject(_clientId, sockfd, objectId);
+
+		addObjectReadCache(objectId);
+
 		uint64_t copySize = min(objectSize, size - byteWritten);
 		copySize = min(copySize, (i + 1) * objectSize - (offset + byteWritten));
 		uint64_t objectOffset = (offset + byteWritten) - i * objectSize;
