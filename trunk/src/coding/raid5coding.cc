@@ -98,8 +98,8 @@ struct ObjectData Raid5Coding::decode(vector<struct SegmentData> &segmentData,
 	const uint32_t numDataSegment = raid5_n - 1;
 	const uint32_t lastDataIndex = raid5_n - 2;
 
-	const uint32_t stripeSize = Coding::roundTo(objectSize,
-			numDataSegment) / numDataSegment;
+	const uint32_t stripeSize = Coding::roundTo(objectSize, numDataSegment)
+			/ numDataSegment;
 
 	// copy objectID from first available segment
 	objectData.info.objectId = segmentData[requiredSegments[0]].info.objectId;
@@ -227,6 +227,11 @@ uint32_t Raid5Coding::getParameters(string setting) {
 vector<uint32_t> Raid5Coding::getRepairSrcSegmentIds(string setting,
 		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
 
+	// at a time only one segment can fail
+	if (failedSegments.size() > 1) {
+		return {};
+	}
+
 	// for RAID5, this is the same case as getRequiredSegmentIds
 	return getRequiredSegmentIds(setting, segmentStatus);
 }
@@ -236,4 +241,33 @@ vector<struct SegmentData> Raid5Coding::repairSegments(
 		vector<struct SegmentData> &repairSrcSegments,
 		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
 		string setting) {
+
+	const uint32_t raid5_n = getParameters(setting);
+	const uint32_t parityIndex = raid5_n - 1; // index starts from 0, last segment is parity
+	const uint32_t numDataSegment = raid5_n - 1;
+	const uint32_t lastDataIndex = raid5_n - 2;
+
+	const uint32_t stripeSize = Coding::roundTo(objectSize, numDataSegment)
+			/ numDataSegment;
+
+	struct SegmentData rebuildSegmentData;
+
+	rebuildSegmentData.buf = MemoryPool::getInstance().poolMalloc(stripeSize);
+
+	// rebuild
+	uint32_t i = 0;
+	for (uint32_t segmentId : repairSrcSegmentId) {
+		if (i == 0) {
+			// memcpy first segment
+			memcpy(rebuildSegmentData.buf, repairSrcSegments[segmentId].buf,
+					stripeSize);
+		} else {
+			// XOR second segment onwards
+			Coding::bitwiseXor(rebuildSegmentData.buf, rebuildSegmentData.buf,
+					repairSrcSegments[segmentId].buf, stripeSize);
+		}
+		i++;
+	}
+
+	return {rebuildSegmentData};
 }

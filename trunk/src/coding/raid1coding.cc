@@ -45,7 +45,8 @@ vector<struct SegmentData> Raid1Coding::encode(struct ObjectData objectData,
 }
 
 struct ObjectData Raid1Coding::decode(vector<struct SegmentData> &segmentData,
-		vector<uint32_t> &requiredSegments,  uint32_t objectSize, string setting) {
+		vector<uint32_t> &requiredSegments, uint32_t objectSize,
+		string setting) {
 
 	// for raid1, only use first required segment to decode
 	uint32_t segmentId = requiredSegments[0];
@@ -55,7 +56,8 @@ struct ObjectData Raid1Coding::decode(vector<struct SegmentData> &segmentData,
 	objectData.info.objectSize = objectSize;
 	objectData.buf = MemoryPool::getInstance().poolMalloc(
 			objectData.info.objectSize);
-	memcpy(objectData.buf, segmentData[segmentId].buf, objectData.info.objectSize);
+	memcpy(objectData.buf, segmentData[segmentId].buf,
+			objectData.info.objectSize);
 
 	return objectData;
 }
@@ -94,7 +96,7 @@ vector<uint32_t> Raid1Coding::getRepairSrcSegmentIds(string setting,
 
 	// not found (no OSD is running)
 	if (it == segmentStatus.end()) {
-		debug_error ("%s\n", "No more copies available to repair");
+		debug_error("%s\n", "No more copies available to repair");
 		return {};
 	}
 
@@ -107,8 +109,25 @@ vector<struct SegmentData> Raid1Coding::repairSegments(
 		vector<uint32_t> failedSegments,
 		vector<struct SegmentData> &repairSrcSegments,
 		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
-		string setting) {
+		string setting){
 
-	// for raid1, only use first required segment to repair
-	return {};
+	// for raid1, only use first required segment to decode
+	vector<SegmentData> segmentDataList;
+	segmentDataList.reserve(failedSegments.size());
+
+	uint32_t i = 0;
+	for (uint32_t segmentId : failedSegments) {
+
+		struct SegmentData segmentData;
+		segmentData.info.objectId = repairSrcSegments[repairSrcSegmentId[0]].info.objectId;
+		segmentData.info.segmentId = segmentId;
+		segmentData.info.segmentSize = repairSrcSegments[repairSrcSegmentId[0]].info.segmentSize;
+		segmentData.buf = MemoryPool::getInstance().poolMalloc(
+				segmentData.info.segmentSize);
+		memcpy(segmentData.buf, repairSrcSegments[repairSrcSegmentId[0]].buf,
+				segmentData.info.segmentSize);
+		segmentDataList.push_back(segmentData);
+	}
+
+	return segmentDataList;
 }
