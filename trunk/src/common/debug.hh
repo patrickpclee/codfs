@@ -5,6 +5,7 @@
 // for PRIu64, PRIu32, etc
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
+#include <string>
 #include "../common/define.hh"
 
 // for color

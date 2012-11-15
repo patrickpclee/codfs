@@ -31,7 +31,7 @@
 
 // fuse/client_fuse.cc
 #define FUSE_USE_VERSION 26
-#define FUSE_READ_AHEAD 2
+#define FUSE_READ_AHEAD
 
 // osd/osd.cc
 #define INF (1<<29)
