@@ -243,9 +243,7 @@ vector<struct SegmentData> Raid5Coding::repairSegments(
 		string setting) {
 
 	const uint32_t raid5_n = getParameters(setting);
-	const uint32_t parityIndex = raid5_n - 1; // index starts from 0, last segment is parity
 	const uint32_t numDataSegment = raid5_n - 1;
-	const uint32_t lastDataIndex = raid5_n - 2;
 
 	const uint32_t stripeSize = Coding::roundTo(objectSize, numDataSegment)
 			/ numDataSegment;
