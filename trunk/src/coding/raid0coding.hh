@@ -19,6 +19,15 @@ public:
 	vector<uint32_t> getRequiredSegmentIds(string setting,
 			vector<bool> secondaryOsdStatus);
 
+	vector<uint32_t> getRepairSrcSegmentIds(string setting,
+			vector<uint32_t> failedSegments, vector<bool> segmentStatus);
+
+	vector<struct SegmentData> repairSegments(
+			vector<uint32_t> failedSegments,
+			vector<struct SegmentData> &repairSrcSegments,
+			vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+			string setting);
+
 	static string generateSetting(int raid0_n) {
 		return to_string(raid0_n);
 	}
