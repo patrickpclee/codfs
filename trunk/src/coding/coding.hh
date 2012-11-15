@@ -24,6 +24,12 @@ public:
 	virtual vector<uint32_t> getRepairSrcSegmentIds(string setting,
 			vector<uint32_t> failedSegments, vector<bool> segmentStatus) = 0;
 
+	/*
+	 the vector size of repairSrcSegments should be the total number of segments for that objects
+	 that means some nodes in repairSrcSegments is NULL
+	 this design is more convenient as we can address the element by its segmentId
+	 */
+
 	virtual vector<struct SegmentData> repairSegments(
 			vector<uint32_t> failedSegments,
 			vector<struct SegmentData> &repairSrcSegments,
