@@ -19,16 +19,21 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
 	vector<uint32_t> primaryList;
 	{
 		lock_guard<mutex> lk(osdStatMapMutex);
-		while (numOfObjs>0) {
-			for(auto& entry: _osdStatMap) {
-				if (entry.second.osdHealth == ONLINE && (rand()&1)) {
-					// choose this as a primary
-					primaryList.push_back(entry.first);
-					--numOfObjs;
-					if (!numOfObjs) break;
-				}
+		for(auto& entry: _osdStatMap) {
+			if (entry.second.osdHealth == ONLINE) {
+				// choose this as a primary
+				primaryList.push_back(entry.first);
 			}
 		}
+	}
+	while (primaryList.size() < numOfObjs) {
+		primaryList.insert(primaryList.end(), primaryList.begin(), primaryList.end());
+	}
+	primaryList.resize(numOfObjs);
+	for (int i = 0; i < numOfObjs; i++) {
+		int a = rand()%numOfObjs;
+		int b = rand()%numOfObjs;
+		swap(primaryList[a], primaryList[b]);
 	}
 	return primaryList;
 }
