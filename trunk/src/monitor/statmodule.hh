@@ -21,8 +21,9 @@ public:
 	/**
 	 * Periodically update the osd stat map by communicate each osd
 	 * @param communicator Monitor communicator 
+	 * @param updatePeriod The sleep time between update requests
 	 */
-	void updateOsdStatMap (Communicator* communicator);
+	void updateOsdStatMap (Communicator* communicator, uint32_t updatePeriod);
 
 	/**  
 	 * Remove an osd status entry by its osdId 

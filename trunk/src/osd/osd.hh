@@ -309,6 +309,22 @@ private:
 	struct ObjectData degradedRead(uint64_t objectId);
 
 	/**
+	 * Cache object to disk cache
+	 * @param objectId Object ID
+	 * @param objectData Object Data structure
+	 */
+
+	void cacheObject (uint64_t objectId, ObjectData objectData);
+
+	/**
+	 * Free objectData
+	 * @param objectId Object ID
+	 * @param objectData Object Data structure
+	 */
+
+	void freeObject(uint64_t objectId, ObjectData objectData);
+
+	/**
 	 * Stores the list of OSDs that store a certain segment
 	 */
 

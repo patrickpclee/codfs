@@ -119,6 +119,11 @@ public:
 	void getOsdStatusRequestProcessor (uint32_t requestId, uint32_t sockfd,
 		vector<uint32_t>& osdListRef);
 	
+	uint32_t getDeadPeriod();
+
+	uint32_t getSleepPeriod();
+	
+	uint32_t getUpdatePeriod();
 
 private:
 	
@@ -152,6 +157,21 @@ private:
 	 * Unique ID for this monitor
 	 */
 	uint32_t _monitorId;
+	
+	/**
+	 * The period sleep time for recovery check
+	 */
+	uint32_t _sleepPeriod;
+
+	/**
+	 * The dead thershold
+	 */
+	uint32_t _deadPeriod;
+
+	/**
+	 * The period sleep time for stat update
+	 */
+	uint32_t _updatePeriod;
 };
 
 #endif

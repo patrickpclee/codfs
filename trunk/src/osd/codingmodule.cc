@@ -73,3 +73,22 @@ vector<uint32_t> CodingModule::getRequiredSegmentIds(CodingScheme codingScheme,
 	return getCoding(codingScheme)->getRequiredSegmentIds(setting,
 			secondaryOsdStatus);
 }
+
+vector<uint32_t> CodingModule::getRepairSrcSegmentIds(CodingScheme codingScheme,
+		string setting, vector<uint32_t> failedSegments,
+		vector<bool> segmentStatus) {
+	return getCoding(codingScheme)->getRepairSrcSegmentIds(setting,
+			failedSegments, segmentStatus);
+
+}
+
+vector<struct SegmentData> CodingModule::repairSegments(
+		CodingScheme codingScheme, vector<uint32_t> failedSegments,
+		vector<struct SegmentData> &repairSrcSegments,
+		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+		string setting) {
+
+	return getCoding(codingScheme)->repairSegments(failedSegments,
+			repairSrcSegments, repairSrcSegmentId, objectSize, setting);
+
+}

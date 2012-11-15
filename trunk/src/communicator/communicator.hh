@@ -208,6 +208,8 @@ public:
 	 */
 	void connectToMonitor();
 	void connectToMds();
+
+	void connectToMyself(string ip, uint16_t port, ComponentType type);
 //TODO: documentation
 
 	void connectToOsd(uint32_t ip, uint32_t port);
