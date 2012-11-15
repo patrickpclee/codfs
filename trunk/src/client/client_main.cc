@@ -27,20 +27,6 @@ Client* client;
 /// Config Layer
 ConfigLayer* configLayer;
 
-void startGarbageCollectionThread() {
-	GarbageCollector::getInstance().start();
-}
-
-void startSendThread() {
-	client->getCommunicator()->sendMessage();
-}
-
-void startReceiveThread(Communicator* communicator) {
-	// wait for message
-	communicator->waitForMessage();
-
-}
-
 int main(int argc, char *argv[]) {
 
 //	if (argc < 4 || argc > 5) {
@@ -65,14 +51,14 @@ int main(int argc, char *argv[]) {
 	// start server
 	communicator->createServerSocket();
 
-	// 1. Garbage Collection Thread
-	thread garbageCollectionThread(startGarbageCollectionThread);
+	// 1. Garbage Collection Thread (lamba function hack for singleton)
+	thread garbageCollectionThread([&](){GarbageCollector::getInstance().start();});
 
 	// 2. Receive Thread
-	thread receiveThread(startReceiveThread, communicator);
+	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
-	thread sendThread(startSendThread);
+	thread sendThread(&Communicator::sendMessage, communicator);
 
 	communicator->setId(client->getClientId());
 	communicator->setComponentType(CLIENT);
@@ -182,21 +168,17 @@ int main(int argc, char *argv[]) {
 	string codingSetting = Raid0Coding::generateSetting(raid0_n);
 	 */
 	  /*
+
+
+	/*
 	// RAID 1
-	const uint32_t raid1_n = 1;
+	const uint32_t raid1_n = 3;
 	CodingScheme codingScheme = RAID1_CODING;
 	string codingSetting = Raid1Coding::generateSetting(raid1_n);
+
 */
 	/*
 
-	// RAID 5
-	const uint32_t raid5_n = 3;
-	CodingScheme codingScheme = RAID5_CODING;
-	string codingSetting = Raid5Coding::generateSetting(raid5_n);
-
-	*/
-
-	/*
 	// RS
 	const uint32_t rs_k = 6, rs_m = 2, rs_w = 8;
 	CodingScheme codingScheme = RS_CODING;

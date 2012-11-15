@@ -11,7 +11,9 @@ StatModule::StatModule(map<uint32_t, struct OsdStat>& mapRef):
 
 }
 
-void StatModule::updateOsdStatMap (Communicator* communicator) {
+void StatModule::updateOsdStatMap (Communicator* communicator, uint32_t
+	updatePeriod) {
+
 	while (1) {
 		printf("-----------------10s start----------------\n");
 		{
@@ -28,7 +30,7 @@ void StatModule::updateOsdStatMap (Communicator* communicator) {
 				communicator -> addMessage (requestMsg);
 			}
 		}
-		sleep(10);
+		sleep(updatePeriod);
 		printf("-----------------10s finish--------------\n");
 	}
 

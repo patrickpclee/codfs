@@ -36,14 +36,20 @@ CodingScheme codingScheme = RAID1_CODING;
 string codingSetting = Raid1Coding::generateSetting(1);
 
 uint32_t _clientId = 51000;
+#ifdef FUSE_READ_AHEAD
+uint32_t _readAhead = 5;
+#endif
 
 mutex fileInfoCacheMutex;
 mutex _objectProcessingMutex;
+mutex _readAheadCountMutex;
 
 unordered_map<uint32_t, FileDataCache*> _fileDataCache;
-unordered_map<uint64_t, unique_lock<mutex> > _objectProcessing;
+//unordered_map<uint64_t, unique_lock<mutex> > _objectProcessing;
 unordered_map<uint32_t, struct FileMetaData> _fileInfoCache;
 unordered_map<string, uint32_t> _fileIdCache;
+unordered_map<uint32_t, uint32_t> _readAheadCount;
+unordered_map<uint32_t, vector<bool> > _objectProcessing;
 
 thread garbageCollectionThread;
 thread receiveThread;
@@ -53,9 +59,13 @@ thread sendThread;
 
 #include "../../lib/threadpool/threadpool.hpp"
 boost::threadpool::pool _tp;
-void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId){
+boost::threadpool::pool _writetp;
+uint32_t _writePoolLimit = 20;
+
+void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId, uint32_t fileId, uint32_t objectIndex){
 	client->getObject(clientId, sockfd, objectId);
 	debug("Object ID = %" PRIu64 " finished download\n", objectId);
+	_objectProcessing[fileId][objectIndex] = false;
 }
 #endif
 
@@ -134,10 +144,16 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 	_clientCommunicator->connectToMonitor();
 	_clientCommunicator->getOsdListAndConnect();
 
+#ifdef FUSE_READ_AHEAD
+	_readAhead = configLayer->getConfigInt("Fuse>ReadAhead");
+#endif
+
 #ifdef PARALLEL_TRANSFER
 	uint32_t _numClientThreads = configLayer->getConfigInt(
 			"Communication>NumClientThreads");
 	_tp.size_controller().resize(_numClientThreads);
+	_writetp.size_controller().resize(_numClientThreads);
+	_writePoolLimit = configLayer->getConfigInt("Fuse>WritePoolLimit");
 #endif
 	return NULL;
 }
@@ -198,6 +214,9 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 	fi->fh = fileMetaData._id;
+	vector<bool> objectProcessing (fileMetaData._objectList.size(),false);
+	_objectProcessing[fi->fh] = objectProcessing;
+	_readAheadCount[fi->fh] = 0;
 
 	return 0;
 }
@@ -246,20 +265,8 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 		uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
 
 		struct ObjectTransferCache objectCache;
-		{
-			lock_guard<mutex> lk(_objectProcessingMutex);
-			objectCache = client->getObject(_clientId, sockfd, objectId);
-		}
-#ifdef FUSE_READ_AHEAD
-		for(uint32_t j = 0; j < FUSE_READ_AHEAD; ++j){
-			if( j + i  >= fileMetaData._objectList.size())
-				break;
-			uint64_t objectId = fileMetaData._objectList[i + j];
-			uint32_t componentId = fileMetaData._primaryList[i + j];
-			uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
-			_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, objectId));
-		}
-#endif
+		while(_objectProcessing[fi->fh][i]);
+		objectCache = client->getObject(_clientId, sockfd, objectId);
 		uint64_t copySize = min(objectSize, size - byteWritten);
 		copySize = min(copySize, (i + 1) * objectSize - (offset + byteWritten));
 		uint64_t objectOffset = (offset + byteWritten) - i * objectSize;
@@ -268,6 +275,20 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 		//storageModule->closeObject(objectId);
 	}
 
+#ifdef FUSE_READ_AHEAD
+	for(uint32_t j = _readAheadCount[fi->fh]; j <= endObjectNum + _readAhead; ++j){
+		if( j >= fileMetaData._objectList.size())
+			break;
+		if( j <= _readAheadCount[fi->fh])
+			continue;
+		_readAheadCount[fi->fh] = j;
+		uint64_t objectId = fileMetaData._objectList[j];
+		uint32_t componentId = fileMetaData._primaryList[j];
+		uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
+		_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, objectId, fi->fh, j));
+		_objectProcessing[fi->fh][j] = true;
+	}
+#endif
 	return byteWritten;
 }
 

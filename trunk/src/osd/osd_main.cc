@@ -57,37 +57,6 @@ cout << "Cache Object: " << cacheObjectTime / 1000 << endl;
 	}
 }
 
-void startGarbageCollectionThread() {
-	GarbageCollector::getInstance().start();
-}
-
-void startSendThread() {
-	osd->getCommunicator()->sendMessage();
-}
-
-void startReceiveThread(Communicator* communicator) {
-	// wait for message
-	communicator->waitForMessage();
-
-}
-
-void startTestThread(Communicator* communicator) {
-	/*
-	 printf("HEHE\n");
-	 OsdStartupMsg* testmsg = new OsdStartupMsg(communicator,
-	 communicator->getMonitorSockfd(), osd->getOsdId(), osd->getFreespace(),
-	 osd->getCpuLoadavg(0));
-	 testmsg->prepareProtocolMsg();
-	 communicator->addMessage(testmsg);
-	 sleep(1200);
-	 OsdShutdownMsg* msg = new OsdShutdownMsg(communicator,
-	 communicator->getMonitorSockfd(), osd->getOsdId());
-	 msg->prepareProtocolMsg();
-	 communicator->addMessage(msg);
-	 printf("DONE\n");
-	 */
-}
-
 /**
  * Main function
  * @return 0 if success;
@@ -122,14 +91,14 @@ int main(int argc, char* argv[]) {
 	// create server
 	communicator->createServerSocket();
 
-	// 1. Garbage Collection Thread
-	thread garbageCollectionThread(startGarbageCollectionThread);
+	// 1. Garbage Collection Thread (lamba function hack for singleton)
+	thread garbageCollectionThread([&](){GarbageCollector::getInstance().start();});
 
 	// 2. Receive Thread
-	thread receiveThread(startReceiveThread, communicator);
+	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
-	thread sendThread(startSendThread);
+	thread sendThread(&Communicator::sendMessage, communicator);
 
 	uint32_t selfAddr = getInterfaceAddressV4(interfaceName);
 	uint16_t selfPort = communicator->getServerPort();
@@ -137,6 +106,7 @@ int main(int argc, char* argv[]) {
 	printf("Port = %hu\n",selfPort);
 
 	//communicator->connectAllComponents();
+	communicator->connectToMyself(Ipv4Int2Str(selfAddr), selfPort, OSD);
 	communicator->connectToMds();
 	communicator->connectToMonitor();
 	communicator->registerToMonitor(selfAddr, selfPort);
