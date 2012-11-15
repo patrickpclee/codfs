@@ -108,13 +108,18 @@ vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting,
 vector<uint32_t> Raid0Coding::getRepairSrcSegmentIds(string setting,
 		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
 
+	debug_error("%s\n", "Repair not supported in RAID0");
+
 	return {};
 }
 
 vector<struct SegmentData> Raid0Coding::repairSegments(
+		vector<uint32_t> failedSegments,
 		vector<struct SegmentData> &repairSrcSegments,
 		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
 		string setting) {
+
+	debug_error("%s\n", "Repair not supported in RAID0");
 
 	return {};
 }

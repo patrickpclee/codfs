@@ -86,13 +86,29 @@ vector<uint32_t> Raid1Coding::getRequiredSegmentIds(string setting,
 vector<uint32_t> Raid1Coding::getRepairSrcSegmentIds(string setting,
 		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
 
-	return {};
+	const uint32_t raid1_n = getParameters(setting);
+
+	// for Raid1 Coding, find the first running OSD
+	vector<bool>::iterator it;
+	it = find(segmentStatus.begin(), segmentStatus.end(), true);
+
+	// not found (no OSD is running)
+	if (it == segmentStatus.end()) {
+		debug_error ("%s\n", "No more copies available to repair");
+		return {};
+	}
+
+	// return the index
+	uint32_t offset = it - segmentStatus.begin();
+	return {offset};
 }
 
 vector<struct SegmentData> Raid1Coding::repairSegments(
+		vector<uint32_t> failedSegments,
 		vector<struct SegmentData> &repairSrcSegments,
 		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
 		string setting) {
 
+	// for raid1, only use first required segment to repair
 	return {};
 }

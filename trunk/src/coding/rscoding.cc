@@ -232,6 +232,7 @@ vector<uint32_t> RSCoding::getRepairSrcSegmentIds(string setting,
 }
 
 vector<struct SegmentData> RSCoding::repairSegments(
+		vector<uint32_t> failedSegments,
 		vector<struct SegmentData> &repairSrcSegments,
 		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
 		string setting) {

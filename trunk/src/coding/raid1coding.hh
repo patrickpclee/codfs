@@ -22,6 +22,7 @@ public:
 			vector<uint32_t> failedSegments, vector<bool> segmentStatus);
 
 	vector<struct SegmentData> repairSegments(
+			vector<uint32_t> failedSegments,
 			vector<struct SegmentData> &repairSrcSegments,
 			vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
 			string setting);
