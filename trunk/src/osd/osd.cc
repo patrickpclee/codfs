@@ -29,6 +29,14 @@ extern ConfigLayer* configLayer;
 mutex objectRequestCountMutex;
 
 #include <atomic>
+
+
+#ifdef PARALLEL_TRANSFER
+
+#include "../../lib/threadpool/threadpool.hpp"
+boost::threadpool::pool _segmenttp;
+#endif
+
 #ifdef TIME_POINT
 #include <chrono>
 using namespace std;
@@ -53,6 +61,12 @@ Osd::Osd(uint32_t selfId) {
 	_osdId = selfId;
 
 	srand(time(NULL)); //random test
+
+#ifdef PARALLEL_TRANSFER
+	uint32_t _numThreads = configLayer->getConfigInt(
+			"ThreadPool>NumThreads");
+	_segmenttp.size_controller().resize(_numThreads);
+#endif
 }
 
 Osd::~Osd() {
@@ -331,6 +345,29 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 }
 
+void Osd::distributeSegment(uint64_t objectId, const struct SegmentData& segmentData, const struct SegmentLocation& segmentLocation){
+	debug("Distribute Segment %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",objectId,segmentData.info.segmentId,segmentLocation.osdId);
+	// if destination is myself
+	if (segmentLocation.osdId == _osdId) {
+		_storageModule->createSegment(objectId,
+				segmentData.info.segmentId,
+				segmentData.info.segmentSize);
+		_storageModule->writeSegment(objectId,
+				segmentData.info.segmentId, segmentData.buf, 0,
+				segmentData.info.segmentSize);
+		_storageModule->flushSegment(objectId,
+				segmentData.info.segmentId);
+	} else {
+		uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
+				segmentLocation.osdId);
+		_osdCommunicator->sendSegment(dstSockfd, segmentData);
+	}
+
+	// free memory
+	MemoryPool::getInstance().poolFree(segmentData.buf);
+	debug("Completed Distributing Segment %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",objectId,segmentData.info.segmentId,segmentLocation.osdId);
+}
+
 void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t objectId) {
 
@@ -382,6 +419,7 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			//segmentLocationList[0].osdId = _osdId;
 			for (const auto segmentData : segmentDataList) {
 
+				/*
 				// if destination is myself
 				if (segmentLocationList[i].osdId == _osdId) {
 					_storageModule->createSegment(objectId,
@@ -398,14 +436,23 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 					_osdCommunicator->sendSegment(dstSockfd, segmentData);
 				}
 
-				nodeList.push_back(segmentLocationList[i].osdId);
-
 				// free memory
 				MemoryPool::getInstance().poolFree(segmentData.buf);
+				*/
+#ifdef PARALLEL_TRANSFER
+				debug("Thread Pool Status %d/%d/%d\n",_segmenttp.active(),_segmenttp.pending(),_segmenttp.size());
+				_segmenttp.schedule(boost::bind(&Osd::distributeSegment,this,objectId,segmentData,segmentLocationList[i]));
+#else
+	  			distributeSegment(objectId, segmentData,segmentLocationList[i]);
+#endif
+
+				nodeList.push_back(segmentLocationList[i].osdId);
 
 				i++;
 			}
-
+#ifdef PARALLEL_TRANSFER
+			_segmenttp.wait();
+#endif
 			_pendingObjectChunk.erase(objectId);
 
 			// Acknowledge MDS for Object Upload Completed
