@@ -149,6 +149,15 @@ public:
 	 * @param chunkCount No of trunks to receive
 	 */
 
+	/**
+	 * Distribute Segments to OSD
+	 *
+	 * @param	objectId		Object Id
+	 * @param	segmentData		Data Segment
+	 * @param	segmentLocation Location of Segment
+	 */
+	void distributeSegment(uint64_t objectId, const struct SegmentData& segmentData, const struct SegmentLocation& segmentLocation);
+
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t objectId, uint32_t segmentId, uint32_t length,
 			uint32_t chunkCount);
