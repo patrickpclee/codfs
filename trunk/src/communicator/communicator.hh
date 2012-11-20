@@ -325,8 +325,10 @@ protected:
 
 #ifdef USE_LOWLOCK_QUEUE
 	struct LowLockQueue <Message *> _outMessageQueue;
+	struct LowLockQueue <Message *> _outDataQueue;
 #else
 	ConcurrentQueue<Message *> _outMessageQueue;
+	ConcurrentQueue<Message *> _outDataQueue;
 #endif
 
 	atomic<uint32_t> _requestId; // atomic monotically increasing request ID

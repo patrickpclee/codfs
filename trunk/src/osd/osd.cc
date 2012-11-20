@@ -486,8 +486,24 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 	// TODO: check integrity of segment received
 	const string segmentKey = to_string(objectId) + "." + to_string(segmentId);
 
+	bool isDownload = _downloadSegmentRemaining.count(objectId);
+
 	while (1) {
 
+		if (_pendingSegmentChunk.get(segmentKey) == 0) {
+
+			if (!isDownload) {
+				// close file and free cache
+				_storageModule->flushSegment(objectId, segmentId);
+			} else {
+				_downloadSegmentRemaining.decrement(objectId);
+				debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
+			}
+
+			// remove from map
+			_pendingSegmentChunk.erase(segmentKey);
+
+		}
 		// if all chunks have arrived, send ack
 		if (!_pendingSegmentChunk.count(segmentKey)) {
 			_osdCommunicator->replyPutSegmentEnd(requestId, sockfd, objectId,
@@ -567,6 +583,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 	_pendingSegmentChunk.decrement(segmentKey);
 
+	/*
 	// if all chunks have arrived
 	if (_pendingSegmentChunk.get(segmentKey) == 0) {
 
@@ -582,7 +599,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 		_pendingSegmentChunk.erase(segmentKey);
 
 	}
-
+	*/
 	return byteWritten;
 }
 
