@@ -1,0 +1,27 @@
+<CodingTesterConfig>
+
+	<ObjectFolder>./object</ObjectFolder>
+	<SegmentFolder>./segment</SegmentFolder>
+
+	<SelectedCodingScheme>RAID5</SelectedCodingScheme>
+
+	<CodingSetting>
+		<RAID0>
+			<n>3</n>
+		</RAID0>
+		<RAID1>
+			<n>3</n>
+		</RAID1>
+		<RAID5>
+			<n>8</n>
+		</RAID5>
+		<RS>
+			<k>6</k>
+			<m>2</m>
+			<w>8</w>
+		</RS>
+	</CodingSetting>
+
+	<NumFailedOsd>1</NumFailedOsd>
+    
+</CodingTesterConfig>

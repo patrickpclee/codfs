@@ -14,6 +14,7 @@ MDS_DIR=			${SRC}/mds
 COMMON_DIR=			${SRC}/common
 PROTOCOL_DIR=		${SRC}/protocol
 BENCHMARK_DIR=		${SRC}/benchmark
+CODING_TESTER_DIR=		${SRC}/coding_tester
 
 
 all:
@@ -33,6 +34,9 @@ osd:
 
 monitor:
 	cd ${MONITOR_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
+
+codingtester:
+	cd ${CODING_TESTER_DIR}; make -j3
 
 clientfuse:
 	cd ${FUSE_DIR}; make -j3
