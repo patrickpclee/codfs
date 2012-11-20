@@ -108,7 +108,7 @@ void doEncode(std::string srcObjectPath) {
 	printResult(tStart, tRead, tCode, tWrite);
 
 	cout << endl << "Command for Decoding: " << endl
-			<< "./coding_tester decode " << objectId << " " << filesize
+			<< "./CODING_TESTER decode " << objectId << " " << filesize
 			<< " ./decoded_file" << endl;
 
 }

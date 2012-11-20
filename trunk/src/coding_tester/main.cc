@@ -110,8 +110,8 @@ int main(int argc, char* argv[]) {
 	}
 
 	// read config file
-	configLayer = new ConfigLayer("config.xml");
-	uint32_t numSegments = readConfig("config.xml");
+	configLayer = new ConfigLayer("coding_tester_config.xml");
+	uint32_t numSegments = readConfig("coding_tester_config.xml");
 
 	if (string(argv[1]) == "encode") {
 
