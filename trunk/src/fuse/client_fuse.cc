@@ -134,16 +134,6 @@ void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
 }
 
-void startSendThread() {
-	client->getCommunicator()->sendMessage();
-}
-
-void startReceiveThread(Communicator* _clientCommunicator) {
-	// wait for message
-	_clientCommunicator->waitForMessage();
-
-}
-
 void* ncvfs_init(struct fuse_conn_info *conn) {
 	debug_cyan ("%s\n", "implemented");
 	_clientCommunicator->createServerSocket();
@@ -152,10 +142,13 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 	garbageCollectionThread = thread(startGarbageCollectionThread);
 
 	// 2. Receive Thread
-	receiveThread = thread(startReceiveThread, _clientCommunicator);
+	receiveThread = thread(&Communicator::waitForMessage, _clientCommunicator);
 
 	// 3. Send Thread
-	sendThread = thread(startSendThread);
+#ifdef USE_MULTIPLE_QUEUE
+#else
+	sendThread = thread(&Communicator::sendMessage, _clientCommunicator);
+#endif
 
 	_clientCommunicator->setId(client->getClientId());
 	_clientCommunicator->setComponentType(CLIENT);

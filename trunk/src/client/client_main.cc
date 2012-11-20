@@ -58,7 +58,10 @@ int main(int argc, char *argv[]) {
 	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	thread sendThread(&Communicator::sendMessage, communicator);
+#endif
 
 	communicator->setId(client->getClientId());
 	communicator->setComponentType(CLIENT);
@@ -207,7 +210,10 @@ int main(int argc, char *argv[]) {
 
 	garbageCollectionThread.join();
 	receiveThread.join();
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	sendThread.join();
+#endif
 
 	return 0;
 }
