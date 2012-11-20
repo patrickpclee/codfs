@@ -68,10 +68,10 @@ int main(int argc, char *argv[]) {
 	communicator->setComponentType(CLIENT);
 
 	//communicator->connectAllComponents();
-	/*	communicator->connectToMds();
-	 communicator->connectToMonitor();
-	 communicator->getOsdListAndConnect();
-	 */
+	communicator->connectToMds();
+	communicator->connectToMonitor();
+	communicator->getOsdListAndConnect();
+
 	try {
 		namespace po = boost::program_options;
 		po::options_description desc("Options");
