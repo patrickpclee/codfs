@@ -243,6 +243,7 @@ void Communicator::waitForMessage() {
 						threadPools[msgType].schedule(
 								boost::bind(&Communicator::dispatch, this, buf,
 										p->first, 0));
+						debug("Add Thread Pool [%s] %d/%d/%d\n",EnumToString::toString(msgType),threadPools[msgType].active(),threadPools[msgType].pending(),threadPools[msgType].size());
 
 #else
 						dispatch(buf, p->first);
@@ -284,11 +285,22 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	}
 
 	// add message to outMessageQueue
+	switch(message->getMsgHeader().protocolMsgType) {
+		case OBJECT_DATA:
+		case SEGMENT_DATA:
 #ifdef USE_LOWLOCK_QUEUE
-	_outMessageQueue.push(message); // must be at the end of function
+			_outDataQueue.push(message);
 #else
-	_outMessageQueue.push(message); // must be at the end of function
+			_outDataQueue.push(message);
 #endif
+			break;
+		default:
+#ifdef USE_LOWLOCK_QUEUE
+			_outMessageQueue.push(message); // must be at the end of function
+#else
+			_outMessageQueue.push(message); // must be at the end of function
+#endif
+	}
 
 }
 
@@ -523,8 +535,10 @@ Message* Communicator::popMessage() {
 #ifdef USE_LOWLOCK_QUEUE
 	if (_outMessageQueue.pop(message) != false) {
 		return message;
-	}
-	return NULL;
+	} else if (_outDataQueue.pop(message) != false) {
+		return message;
+	} else
+		return NULL;
 #else
 	_outMessageQueue.wait_and_pop(message);
 	return message;
