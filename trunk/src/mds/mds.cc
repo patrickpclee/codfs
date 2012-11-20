@@ -441,13 +441,19 @@ int main(void) {
 	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	thread sendThread(&Communicator::sendMessage, communicator);
+#endif
 
 	communicator->connectToMonitor();
 
 	garbageCollectionThread.join();
 	receiveThread.join();
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	sendThread.join();
+#endif
 
 	delete mds;
 	delete configLayer;
