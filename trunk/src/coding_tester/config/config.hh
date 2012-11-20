@@ -2,8 +2,6 @@
 #define __CONFIG_HH__
 #include "tinyxml.hh"
 
-#define DEFAULT_CONFIG_PATH	"config.xml"
-
 class ConfigLayer{
 	public:
 		ConfigLayer();

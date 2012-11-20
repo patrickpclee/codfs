@@ -1,10 +1,6 @@
 #include "config.hh"
 #include <string.h>
 
-ConfigLayer::ConfigLayer(){	
-	init(DEFAULT_CONFIG_PATH);
-}
-
 ConfigLayer::ConfigLayer(const char* configPath){
 	init(configPath);
 }
