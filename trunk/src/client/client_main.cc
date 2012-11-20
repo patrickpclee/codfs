@@ -10,13 +10,12 @@
 #include "../../lib/logger.hh"
 #include "boost/program_options.hpp"
 
-
 using namespace std;
 
 // handle ctrl-C for profiler
 void sighandler(int signum) {
 	if (signum == SIGINT) {
-		debug_yellow ("%s\n", "SIGINT received\n");
+		debug_yellow("%s\n", "SIGINT received\n");
 		exit(42);
 	}
 }
@@ -35,7 +34,7 @@ int main(int argc, char *argv[]) {
 //		exit(-1);
 //	}
 
-	// handle signal for profiler
+// handle signal for profiler
 	signal(SIGINT, sighandler);
 
 	configLayer = new ConfigLayer("clientconfig.xml");
@@ -44,7 +43,8 @@ int main(int argc, char *argv[]) {
 
 	// setup log
 	FILELog::ReportingLevel() = logDEBUG3;
-	std::string logFileName = "client_" + to_string(client->getClientId()) + ".log";
+	std::string logFileName = "client_" + to_string(client->getClientId())
+			+ ".log";
 	FILE* log_fd = fopen(logFileName.c_str(), "a");
 	Output2FILE::Stream() = log_fd;
 
@@ -52,7 +52,8 @@ int main(int argc, char *argv[]) {
 	communicator->createServerSocket();
 
 	// 1. Garbage Collection Thread (lamba function hack for singleton)
-	thread garbageCollectionThread([&](){GarbageCollector::getInstance().start();});
+	thread garbageCollectionThread(
+			[&]() {GarbageCollector::getInstance().start();});
 
 	// 2. Receive Thread
 	thread receiveThread(&Communicator::waitForMessage, communicator);
@@ -65,148 +66,93 @@ int main(int argc, char *argv[]) {
 
 	communicator->setId(client->getClientId());
 	communicator->setComponentType(CLIENT);
-	
+
 	//communicator->connectAllComponents();
-/*	communicator->connectToMds();
-	communicator->connectToMonitor();
-	communicator->getOsdListAndConnect();
-*/
-	try{
-	    namespace po = boost::program_options;
-	    po::options_description desc("Options");
-	    desc.add_options()
-	      ("help", "Print help messages")
-	      ("upload", "file upload")
-	      ("download", "file download")
-	      ("raid0", "raid0 coding")
-	      ("raid1", "raid0 coding")
-	      ("raid5", "raid0 coding")
-	      ("rs", "RS coding")
-	      ("n", po::value<int>(), "number of replications")
-	    ("k", po::value<int>(), "number of rs_k")
-	    ("m", po::value<int>(), "number of rs_m")
-	    ("w", po::value<int>(), "number of rs_w")
-	    ("i",po::value<int>(), "file ID")
-	    ("d",po::value<string>(), "destination file path")
-	    ("f",po::value<string>(), "file path");
+	/*	communicator->connectToMds();
+	 communicator->connectToMonitor();
+	 communicator->getOsdListAndConnect();
+	 */
+	try {
+		namespace po = boost::program_options;
+		po::options_description desc("Options");
+		desc.add_options()
+				("help", "Print help messages")
+				("upload", "file upload")
+				("download", "file download")
+				("raid0", "raid0 coding")
+				("raid1", "raid0 coding")
+				("raid5", "raid0 coding")
+				("rs", "RS coding")
+				("n", po::value<int>(), "number of replications")
+				("k", po::value<int>(), "number of rs_k")
+				("m", po::value<int>(), "number of rs_m")
+				("w", po::value<int>(), "number of rs_w")
+				("i", po::value<int>(), "file ID")
+				("d", po::value<string>(), "destination file path")
+				("f", po::value<string>(), "file path");
 
-	    po::variables_map vm;
-	    try
-	    {
-	      po::store(po::parse_command_line(argc, argv, desc), vm); // can throw
+		po::variables_map vm;
+		try {
+			po::store(po::parse_command_line(argc, argv, desc), vm); // can throw
 
-	      /** --help option
-	       */
-	      if ( vm.count("help")  )
-	      {
-	        std::cout << "Basic Command Line Parameter App" << std::endl
-	                  << desc << std::endl;
-	      }
+			/** --help option
+			 */
+			if (vm.count("help")) {
+				std::cout << "Basic Command Line Parameter App" << std::endl
+						<< desc << std::endl;
+			}
 
-	      if ( vm.count("upload")  )
-	      {
+			if (vm.count("upload")) {
 
-	    	  	  	  CodingScheme codingScheme;
-	    	  	  	  string codingSetting;
-	    	  	  	 if(vm.count("raid0") ){
-	    	  	  		    	  	  		  	  codingScheme = RAID0_CODING;
-	    	  	  		    	  	  		std::cout << vm["n"].as<int>() << std::endl;
+				CodingScheme codingScheme;
+				string codingSetting;
+				if (vm.count("raid0")) {
+					codingScheme = RAID0_CODING;
+					std::cout << vm["n"].as<int>() << std::endl;
 //	    	  	  		    	  	  		  S	codingSetting = Raid0Coding::generateSetting(vm["n"].as<uint32_t>());
-	    	  	  		    	  	  	  }
+				}
 
-	    	  	  	  if(vm.count("raid1") ){
-	    	  	  		  	  codingScheme = RAID1_CODING;
-	    	  	  		  	codingSetting = Raid1Coding::generateSetting(vm["n"].as<int>());
-	    	  	  	  }
-	    	  	  	 if(vm.count("raid5") ){
-	    	  	  		    	  	  		  	  codingScheme = RAID5_CODING;
-	    	  	  		    	  	  		  	codingSetting = Raid5Coding::generateSetting(vm["n"].as<int>());
-	    	  	  		    	  	  	  }
+				if (vm.count("raid1")) {
+					codingScheme = RAID1_CODING;
+					codingSetting = Raid1Coding::generateSetting(
+							vm["n"].as<int>());
+				}
+				if (vm.count("raid5")) {
+					codingScheme = RAID5_CODING;
+					codingSetting = Raid5Coding::generateSetting(
+							vm["n"].as<int>());
+				}
 
-	    	  	  	 if(vm.count("rs") ){
-	    	  	  		    	  	  		  	  codingScheme = RS_CODING;
-	    	  	  		    	  	  		  	codingSetting = RSCoding::generateSetting(vm["k"].as<int>(),vm["m"].as<int>(),vm["w"].as<int>());
-	    	  	  		    	  	  	  }
+				if (vm.count("rs")) {
+					codingScheme = RS_CODING;
+					codingSetting = RSCoding::generateSetting(vm["k"].as<int>(),
+							vm["m"].as<int>(), vm["w"].as<int>());
+				}
 
-	    	  	  	  client->uploadFileRequest(vm["f"].as<string>(), codingScheme, codingSetting);
+				client->uploadFileRequest(vm["f"].as<string>(), codingScheme,
+						codingSetting);
 
-	      	      }
+			}
 
-	      if ( vm.count("download")  )
-	      	      {
-	    	  	  	  client->downloadFileRequest(vm["i"].as<int>(), vm["d"].as<string>());
+			if (vm.count("download")) {
+				client->downloadFileRequest(vm["i"].as<int>(),
+						vm["d"].as<string>());
 
-	      	      }
-	      po::notify(vm);
-	       // throws on error, so do after help in case
-	                      // there are any problems
-	    }
-	    catch(po::error& e)
-	    {
-	      std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
-	      std::cerr << desc << std::endl;
-	      return 1;
-	    }
-	  }
-	  catch(std::exception& e)
-	  {
-	    std::cerr << "Unhandled Exception reached the top of main: "
-	              << e.what() << ", application will now exit" << std::endl;
-	    return 2;
+			}
+			po::notify(vm);
+			// throws on error, so do after help in case
+			// there are any problems
+		} catch (po::error& e) {
+			std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+			std::cerr << desc << std::endl;
+			return 1;
+		}
+	} catch (std::exception& e) {
+		std::cerr << "Unhandled Exception reached the top of main: " << e.what()
+				<< ", application will now exit" << std::endl;
+		return 2;
 
-	  }
-
-
-	////////////////////// TEST FUNCTIONS ////////////////////////////
-
-	// TEST LOGGING
-
-	// TEST PUT OBJECT
-
-
-	/*
-	// RAID 0
-	const uint32_t raid0_n = 3;
-	CodingScheme codingScheme = RAID0_CODING;
-	string codingSetting = Raid0Coding::generateSetting(raid0_n);
-	 */
-	  /*
-
-
-	/*
-	// RAID 1
-	const uint32_t raid1_n = 3;
-	CodingScheme codingScheme = RAID1_CODING;
-	string codingSetting = Raid1Coding::generateSetting(raid1_n);
-
-*/
-	/*
-
-	// RS
-	const uint32_t rs_k = 6, rs_m = 2, rs_w = 8;
-	CodingScheme codingScheme = RS_CODING;
-	string codingSetting = RSCoding::generateSetting(rs_k, rs_m, rs_w);
-	*/
-
-//	if (strncmp(argv[2], "upload", 6) == 0) {
-//		client->uploadFileRequest(argv[3], codingScheme, codingSetting);
-//	} else {
-//		client->downloadFileRequest(atoi(argv[3]), argv[4]);
-//	}
-
-	/*
-
-	 // TEST LIST FOLDER
-	 vector<FileMetaData> folderData;
-	 folderData = communicator->listFolderData(1, ".");
-
-	 // TODO: when to delete listFolderDataRequest and listFolderDataReply?
-
-	 vector<FileMetaData>::iterator it;
-	 for (it = folderData.begin(); it < folderData.end(); ++it) {
-	 debug("name: %s size: %d\n", ((*it)._path).c_str(), (int)(*it)._size);
-	 }
-	 */
+	}
 
 	garbageCollectionThread.join();
 	receiveThread.join();
