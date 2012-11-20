@@ -250,7 +250,8 @@ void Communicator::waitForMessage() {
 						threadPools[msgType].schedule(
 								boost::bind(&Communicator::dispatch, this, buf,
 										p->first, 0));
-						debug("Add Thread Pool [%s] %d/%d/%d\n",EnumToString::toString(msgType),threadPools[msgType].active(),threadPools[msgType].pending(),threadPools[msgType].size());
+						debug("Add Thread Pool [%s] %d/%d/%d\n",
+								EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
 
 #else
 						dispatch(buf, p->first);
@@ -458,7 +459,7 @@ void Communicator::disconnectAndRemove(uint32_t sockfd) {
 		debug("Connection erased for sockfd = %" PRIu32 "\n", sockfd);
 	} else {
 		cerr << "Connection not found, cannot remove connection" << endl;
-		exit (-1);
+		exit(-1);
 	}
 
 }
@@ -746,8 +747,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 	}
 }
 
-void Communicator::connectToMyself(string ip, uint16_t port, ComponentType
-	type) {
+void Communicator::connectToMyself(string ip, uint16_t port,
+		ComponentType type) {
 	uint32_t sockfd = connectAndAdd(ip, port, type);
 	requestHandshake(sockfd, _componentId, _componentType);
 }

@@ -30,7 +30,7 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
 		primaryList.insert(primaryList.end(), primaryList.begin(), primaryList.end());
 	}
 	primaryList.resize(numOfObjs);
-	for (int i = 0; i < numOfObjs; i++) {
+	for (int i = 0; i < (int)numOfObjs; i++) {
 		int a = rand()%numOfObjs;
 		int b = rand()%numOfObjs;
 		swap(primaryList[a], primaryList[b]);
