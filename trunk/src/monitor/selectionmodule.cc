@@ -28,14 +28,15 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
 			}
 		}
 	}
-	int n = allOnlineList.size();
+	uint32_t n = allOnlineList.size();
 	set<uint32_t> selected;
-	for (int i = 0; i < numOfObjs; i++) {
+	while (numOfObjs) {
 		int idx = rand() % n;
 		if (selected.size() == n || 
 			selected.find(allOnlineList[idx]) == selected.end()) {
 			primaryList.push_back(allOnlineList[idx]);
 			selected.insert(allOnlineList[idx]);
+			numOfObjs --;
 		}
 	}
 	return primaryList;
@@ -64,8 +65,9 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 	}
 	set<uint32_t> selected;
 	selected.insert(primaryId);
-	int n = allOnlineList.size();
-	for (int i = 1; i < numOfSegs; i++) {
+	uint32_t n = allOnlineList.size();
+	numOfSegs--;
+	while (numOfSegs) {
 		int idx = rand() % n;
 		if (selected.size() == n || 
 			selected.find(allOnlineList[idx]) == selected.end()) {
@@ -74,6 +76,7 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 			tmp.segmentId = 0;
 			secondaryList.push_back(tmp);
 			selected.insert(allOnlineList[idx]);
+			numOfSegs--;
 		}
 	}
 	return secondaryList;
