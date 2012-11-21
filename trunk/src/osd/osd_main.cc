@@ -98,7 +98,10 @@ int main(int argc, char* argv[]) {
 	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	thread sendThread(&Communicator::sendMessage, communicator);
+#endif
 
 	uint32_t selfAddr = getInterfaceAddressV4(interfaceName);
 	uint16_t selfPort = communicator->getServerPort();
@@ -117,7 +120,10 @@ int main(int argc, char* argv[]) {
 
 	garbageCollectionThread.join();
 	receiveThread.join();
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	sendThread.join();
+#endif
 	//testThread.join();
 
 	// cleanup

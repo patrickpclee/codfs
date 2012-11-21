@@ -69,11 +69,15 @@ public:
 
 	void addMessage(Message* message, bool expectReply = false);
 
+#ifdef USE_MULTIPLE_QUEUE
+	void sendMessage(uint32_t fd);
+#else
 	/**
 	 * Check the Message queue, when there is Message pending, dequeue and send
 	 */
 
 	void sendMessage();
+#endif
 
 	/**
 	 * Create a server socket at the specified port
@@ -272,12 +276,16 @@ protected:
 
 	void dispatch(char* buf, uint32_t sockfd, uint32_t threadPoolLevel);
 
+#ifdef USE_MULTIPLE_QUEUE
+	Message* popMessage(uint32_t fd);
+#else
 	/**
 	 * Get the first message in the queue
 	 * @return Pointer to message if not empty, NULL otherwise
 	 */
 
 	Message* popMessage();
+#endif
 
 	/**
 	 * Delete the message when it is deletable
@@ -323,14 +331,24 @@ protected:
 	// DEBUG
 	void listThreadPool();
 
-#ifdef USE_LOWLOCK_QUEUE
-	struct LowLockQueue <Message *> _outMessageQueue;
-	struct LowLockQueue <Message *> _outDataQueue;
+#ifdef USE_MULTIPLE_QUEUE
+	map<uint32_t, thread> _sendThread; 
+	#ifdef USE_LOWLOCK_QUEUE
+		map<uint32_t, struct LowLockQueue <Message *>* > _outMessageQueue;
+		map<uint32_t, struct LowLockQueue <Message *>* > _outDataQueue;
+	#else
+		map<uint32_t, ConcurrentQueue<Message *>* > _outMessageQueue;
+		map<uint32_t, ConcurrentQueue<Message *>* > _outDataQueue;
+	#endif
 #else
-	ConcurrentQueue<Message *> _outMessageQueue;
-	ConcurrentQueue<Message *> _outDataQueue;
+	#ifdef USE_LOWLOCK_QUEUE
+		struct LowLockQueue <Message *> _outMessageQueue;
+		struct LowLockQueue <Message *> _outDataQueue;
+	#else
+		ConcurrentQueue<Message *> _outMessageQueue;
+		ConcurrentQueue<Message *> _outDataQueue;
+	#endif
 #endif
-
 	atomic<uint32_t> _requestId; // atomic monotically increasing request ID
 
 	uint16_t _serverPort; // listening port for incoming connections

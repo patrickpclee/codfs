@@ -30,7 +30,6 @@ mutex objectRequestCountMutex;
 
 #include <atomic>
 
-
 #ifdef PARALLEL_TRANSFER
 
 #include "../../lib/threadpool/threadpool.hpp"
@@ -63,8 +62,7 @@ Osd::Osd(uint32_t selfId) {
 	srand(time(NULL)); //random test
 
 #ifdef PARALLEL_TRANSFER
-	uint32_t _numThreads = configLayer->getConfigInt(
-			"ThreadPool>NumThreads");
+	uint32_t _numThreads = configLayer->getConfigInt("ThreadPool>NumThreads");
 	_segmenttp.size_controller().resize(_numThreads);
 #endif
 }
@@ -75,15 +73,14 @@ Osd::~Osd() {
 	delete _osdCommunicator;
 }
 
-void Osd::cacheObject (uint64_t objectId, ObjectData objectData) {
+void Osd::cacheObject(uint64_t objectId, ObjectData objectData) {
 	// cache objectData
 	struct ObjectTransferCache objectTransferCache;
 	objectTransferCache.buf = objectData.buf;
 	objectTransferCache.length = objectData.info.objectSize;
 
 	if (!_storageModule->isObjectCached(objectId)) {
-		_storageModule->putObjectToDiskCache(objectId,
-				objectTransferCache);
+		_storageModule->putObjectToDiskCache(objectId, objectTransferCache);
 	}
 }
 
@@ -345,18 +342,18 @@ void Osd::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 }
 
-void Osd::distributeSegment(uint64_t objectId, const struct SegmentData& segmentData, const struct SegmentLocation& segmentLocation){
-	debug("Distribute Segment %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",objectId,segmentData.info.segmentId,segmentLocation.osdId);
+void Osd::distributeSegment(uint64_t objectId,
+		const struct SegmentData& segmentData,
+		const struct SegmentLocation& segmentLocation) {
+	debug("Distribute Segment %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
+			objectId, segmentData.info.segmentId, segmentLocation.osdId);
 	// if destination is myself
 	if (segmentLocation.osdId == _osdId) {
-		_storageModule->createSegment(objectId,
-				segmentData.info.segmentId,
+		_storageModule->createSegment(objectId, segmentData.info.segmentId,
 				segmentData.info.segmentSize);
-		_storageModule->writeSegment(objectId,
-				segmentData.info.segmentId, segmentData.buf, 0,
-				segmentData.info.segmentSize);
-		_storageModule->flushSegment(objectId,
-				segmentData.info.segmentId);
+		_storageModule->writeSegment(objectId, segmentData.info.segmentId,
+				segmentData.buf, 0, segmentData.info.segmentSize);
+		_storageModule->flushSegment(objectId, segmentData.info.segmentId);
 	} else {
 		uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 				segmentLocation.osdId);
@@ -365,7 +362,9 @@ void Osd::distributeSegment(uint64_t objectId, const struct SegmentData& segment
 
 	// free memory
 	MemoryPool::getInstance().poolFree(segmentData.buf);
-	debug("Completed Distributing Segment %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",objectId,segmentData.info.segmentId,segmentLocation.osdId);
+	debug(
+			"Completed Distributing Segment %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
+			objectId, segmentData.info.segmentId, segmentLocation.osdId);
 }
 
 void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
@@ -420,30 +419,33 @@ void Osd::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 			for (const auto segmentData : segmentDataList) {
 
 				/*
-				// if destination is myself
-				if (segmentLocationList[i].osdId == _osdId) {
-					_storageModule->createSegment(objectId,
-							segmentData.info.segmentId,
-							segmentData.info.segmentSize);
-					_storageModule->writeSegment(objectId,
-							segmentData.info.segmentId, segmentData.buf, 0,
-							segmentData.info.segmentSize);
-					_storageModule->flushSegment(objectId,
-							segmentData.info.segmentId);
-				} else {
-					uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
-							segmentLocationList[i].osdId);
-					_osdCommunicator->sendSegment(dstSockfd, segmentData);
-				}
+				 // if destination is myself
+				 if (segmentLocationList[i].osdId == _osdId) {
+				 _storageModule->createSegment(objectId,
+				 segmentData.info.segmentId,
+				 segmentData.info.segmentSize);
+				 _storageModule->writeSegment(objectId,
+				 segmentData.info.segmentId, segmentData.buf, 0,
+				 segmentData.info.segmentSize);
+				 _storageModule->flushSegment(objectId,
+				 segmentData.info.segmentId);
+				 } else {
+				 uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
+				 segmentLocationList[i].osdId);
+				 _osdCommunicator->sendSegment(dstSockfd, segmentData);
+				 }
 
-				// free memory
-				MemoryPool::getInstance().poolFree(segmentData.buf);
-				*/
+				 // free memory
+				 MemoryPool::getInstance().poolFree(segmentData.buf);
+				 */
 #ifdef PARALLEL_TRANSFER
-				debug("Thread Pool Status %d/%d/%d\n",_segmenttp.active(),_segmenttp.pending(),_segmenttp.size());
-				_segmenttp.schedule(boost::bind(&Osd::distributeSegment,this,objectId,segmentData,segmentLocationList[i]));
+				debug("Thread Pool Status %d/%d/%d\n",
+						(int)_segmenttp.active(), (int)_segmenttp.pending(), (int)_segmenttp.size());
+				_segmenttp.schedule(
+						boost::bind(&Osd::distributeSegment, this, objectId,
+								segmentData, segmentLocationList[i]));
 #else
-	  			distributeSegment(objectId, segmentData,segmentLocationList[i]);
+				distributeSegment(objectId, segmentData,segmentLocationList[i]);
 #endif
 
 				nodeList.push_back(segmentLocationList[i].osdId);
@@ -497,7 +499,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 				_storageModule->flushSegment(objectId, segmentId);
 			} else {
 				_downloadSegmentRemaining.decrement(objectId);
-				debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
+				debug("all chunks for segment %" PRIu32 "is received\n",
+						segmentId);
 			}
 
 			// remove from map
@@ -584,22 +587,22 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 	_pendingSegmentChunk.decrement(segmentKey);
 
 	/*
-	// if all chunks have arrived
-	if (_pendingSegmentChunk.get(segmentKey) == 0) {
+	 // if all chunks have arrived
+	 if (_pendingSegmentChunk.get(segmentKey) == 0) {
 
-		if (!isDownload) {
-			// close file and free cache
-			_storageModule->flushSegment(objectId, segmentId);
-		} else {
-			_downloadSegmentRemaining.decrement(objectId);
-			debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
-		}
+	 if (!isDownload) {
+	 // close file and free cache
+	 _storageModule->flushSegment(objectId, segmentId);
+	 } else {
+	 _downloadSegmentRemaining.decrement(objectId);
+	 debug("all chunks for segment %" PRIu32 "is received\n", segmentId);
+	 }
 
-		// remove from map
-		_pendingSegmentChunk.erase(segmentKey);
+	 // remove from map
+	 _pendingSegmentChunk.erase(segmentKey);
 
-	}
-	*/
+	 }
+	 */
 	return byteWritten;
 }
 
@@ -630,7 +633,7 @@ void Osd::repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
 					objectData.buf, objectSize, codingSetting);
 
 	// send encoded segments to new OSD
-	for (int i = 0; i < (int)repairSegmentList.size(); i++) {
+	for (int i = 0; i < (int) repairSegmentList.size(); i++) {
 		// find sockfd of the new OSD
 		uint32_t sockfd = _osdCommunicator->getSockfdFromId(
 				repairSegmentOsdList[i]);

@@ -20,6 +20,7 @@
 
 // communicator/communicator.hh
 #define USE_LOWLOCK_QUEUE
+#define USE_MULTIPLE_QUEUE
 
 // config/config.hh
 #define DEFAULT_CONFIG_PATH	"config.xml"
