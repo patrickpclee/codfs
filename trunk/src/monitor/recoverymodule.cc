@@ -47,7 +47,7 @@ void RecoveryModule::replaceFailedOsd(struct ObjectLocation& ol, struct ObjectRe
 		ret.objectId = ol.objectId;
 
 		vector<uint32_t>& ref = ol.osdList;
-		for (int pos = 0; pos < ref.size(); ++pos) {
+		for (int pos = 0; pos < (int)ref.size(); ++pos) {
 			if (_osdStatMap[ref[pos]].osdHealth != ONLINE) {
 				if (it == avail.end() || it == all.end()) it = all.begin();
 				if (it != avail.end() && it != all.end()) {

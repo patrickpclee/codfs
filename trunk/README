@@ -41,7 +41,7 @@ In Ubuntu, the following changes are needed
 
 6. Optional: Install tcmalloc (For replacing malloc with tcmalloc)
 
-(64-bit only) > sudo apt-get install libunwind7 libunwind7-dev
-> sudo apt-get install libgoogle-perftool-dev
+(only required for 64-bit OS) > sudo apt-get install libunwind7 libunwind7-dev
+> sudo apt-get install libgoogle-perftools-dev
 
 -------------------------------
