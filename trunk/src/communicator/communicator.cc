@@ -194,6 +194,7 @@ void Communicator::waitForMessage() {
 				//thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
 				_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
 				_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+				_dataMutex[conn->getSockfd()] = new mutex();
 				_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
 #endif
 			}
@@ -431,6 +432,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 	//	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
 		_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
 		_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+		_dataMutex[conn->getSockfd()] = new mutex();
 		_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
 #endif
 	}
@@ -827,6 +829,7 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 			codingScheme, codingSetting, checksum);
 	debug("%s\n", "Put Object Init ACK-ed");
 
+	lockDataQueue(sockfd);
 	// Step 2 : Send data chunk by chunk
 
 	uint64_t byteToSend = 0;
@@ -849,6 +852,7 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 	}
 
 	// Step 3: Send End message
+	unlockDataQueue(sockfd);
 
 	putObjectEnd(componentId, sockfd, objectId);
 
@@ -858,6 +862,14 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 
 }
 
+void Communicator::lockDataQueue(uint32_t sockfd){
+	_dataMutex[sockfd]->lock();
+}
+
+
+void Communicator::unlockDataQueue(uint32_t sockfd){
+	_dataMutex[sockfd]->unlock();
+}
 //
 // PRIVATE FUNCTIONS
 //
@@ -884,7 +896,6 @@ void Communicator::putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
 		debug_error("Put Object Init Failed %" PRIu64 "\n", objectId);
 		exit(-1);
 	}
-
 }
 
 void Communicator::putObjectData(uint32_t componentID, uint32_t dstOsdSockfd,

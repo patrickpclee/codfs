@@ -207,6 +207,9 @@ public:
 			struct ObjectData objectData, CodingScheme codingScheme =
 					DEFAULT_CODING, string codingSetting = "", string checksum = "");
 
+	void lockDataQueue(uint32_t sockfd);
+	void unlockDataQueue(uint32_t sockfd);
+
 	/**
 	 * Connect to monitor (test)
 	 */
@@ -333,6 +336,7 @@ protected:
 
 #ifdef USE_MULTIPLE_QUEUE
 	map<uint32_t, thread> _sendThread; 
+	map<uint32_t, mutex*> _dataMutex;
 	#ifdef USE_LOWLOCK_QUEUE
 		map<uint32_t, struct LowLockQueue <Message *>* > _outMessageQueue;
 		map<uint32_t, struct LowLockQueue <Message *>* > _outDataQueue;
