@@ -15,7 +15,7 @@ extern Client* client;
 #endif
 ObjectTransferEndRequestMsg::ObjectTransferEndRequestMsg(Communicator* communicator) :
 		Message(communicator) {
-
+	_threadPoolSize = 10;
 }
 
 ObjectTransferEndRequestMsg::ObjectTransferEndRequestMsg(Communicator* communicator,
@@ -24,7 +24,6 @@ ObjectTransferEndRequestMsg::ObjectTransferEndRequestMsg(Communicator* communica
 
 	_sockfd = osdSockfd;
 	_objectId = objectId;
-	_threadPoolSize = 5;
 }
 
 void ObjectTransferEndRequestMsg::prepareProtocolMsg() {
