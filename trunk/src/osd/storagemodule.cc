@@ -510,7 +510,7 @@ FILE* StorageModule::createFile(string filepath) {
 	}
 
 	// set buffer to zero to avoid memory leak
-	setvbuf(filePtr, NULL, _IONBF, 0);
+	//setvbuf(filePtr, NULL, _IONBF, 0);
 
 	// add file pointer to map
 	_openedFile->insert(filepath, filePtr);
