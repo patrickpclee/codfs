@@ -11,8 +11,20 @@ using namespace std;
 
 extern ConfigLayer* configLayer;
 
+#ifdef RR_DISTRIBUTE
+mutex RRprimaryMutex;
+uint32_t RRprimaryCount;
+mutex RRsecondaryMutex;
+uint32_t RRsecondaryCount;
+
+#endif
+
 SelectionModule::SelectionModule(map<uint32_t, struct OsdStat>& mapRef):
 	_osdStatMap(mapRef) { 
+#ifdef RR_DISTRIBUTE
+	RRprimaryCount = 0;
+	RRsecondaryCount = 0;
+#endif
 }
 
 vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
@@ -31,7 +43,14 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
 	uint32_t n = allOnlineList.size();
 	set<uint32_t> selected;
 	while (numOfObjs) {
+#ifdef RR_DISTRIBUTE
+		RRprimaryMutex.lock();
+		int idx = RRprimaryCount;
+		RRprimaryCount = (RRprimaryCount + 1) % n;
+		RRprimaryMutex.unlock();
+#else
 		int idx = rand() % n;
+#endif
 		if (selected.size() == n || 
 			selected.find(allOnlineList[idx]) == selected.end()) {
 			primaryList.push_back(allOnlineList[idx]);
@@ -68,7 +87,14 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 	uint32_t n = allOnlineList.size();
 	numOfSegs--;
 	while (numOfSegs) {
+#ifdef RR_DISTRIBUTE
+		RRsecondaryMutex.lock();
+		int idx = RRsecondaryCount;
+		RRsecondaryCount = (RRsecondaryCount + 1) % n;
+		RRsecondaryMutex.unlock();
+#else
 		int idx = rand() % n;
+#endif
 		if (selected.size() == n || 
 			selected.find(allOnlineList[idx]) == selected.end()) {
 			struct SegmentLocation tmp;

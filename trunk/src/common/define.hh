@@ -17,6 +17,7 @@
 
 // communicator/communicator.cc
 #define USE_THREAD_POOL
+#define SERIALIZE_DATA_QUEUE
 
 // communicator/communicator.hh
 #define USE_LOWLOCK_QUEUE
@@ -46,5 +47,8 @@
 
 // storage/mongodb.hh
 //#define COLLECTION "ncvfs"
+
+// monitor/selectionmodule.cc
+#define RR_DISTRIBUTE
 
 #endif

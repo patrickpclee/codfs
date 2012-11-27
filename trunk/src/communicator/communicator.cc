@@ -829,7 +829,9 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 			codingScheme, codingSetting, checksum);
 	debug("%s\n", "Put Object Init ACK-ed");
 
+#ifdef SERIALIZE_DATA_QUEUE
 	lockDataQueue(sockfd);
+#endif
 	// Step 2 : Send data chunk by chunk
 
 	uint64_t byteToSend = 0;
@@ -852,7 +854,9 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 	}
 
 	// Step 3: Send End message
+#ifdef SERIALIZE_DATA_QUEUE
 	unlockDataQueue(sockfd);
+#endif
 
 	putObjectEnd(componentId, sockfd, objectId);
 
