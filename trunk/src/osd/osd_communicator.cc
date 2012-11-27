@@ -110,7 +110,9 @@ uint32_t OsdCommunicator::sendSegment(uint32_t sockfd,
 	putSegmentInit(sockfd, objectId, segmentId, length, chunkCount);
 	debug("Put Segment Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
 
+#ifdef SERIALIZE_DATA_QUEUE
 	lockDataQueue(sockfd);
+#endif
 	// step 2: send data
 
 	uint64_t byteToSend = 0;
@@ -131,7 +133,9 @@ uint32_t OsdCommunicator::sendSegment(uint32_t sockfd,
 		byteRemaining -= byteToSend;
 
 	}
+#ifdef SERIALIZE_DATA_QUEUE
 	unlockDataQueue(sockfd);
+#endif
 
 	// Step 3: Send End message
 
