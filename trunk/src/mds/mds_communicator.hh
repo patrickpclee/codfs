@@ -52,10 +52,22 @@ public:
 	/**
 	 * @brief	Reply Delete File
 	 * 
+	 * @param	requestId	Request ID
+	 * @param	connectionId	Connection ID
 	 * @param	fileId	File Id
 	 */
 	void replyDeleteFile(uint32_t requestId, uint32_t connectionId,
 			uint32_t fileId);
+
+	/**
+	 * @brief	Reply Rename File
+	 *
+	 * @param	requestId	Request ID
+	 * @param	connectionId	Connection ID
+	 * @param	fileId	File Id
+	 * @param	path	File Path
+	 */
+	void replyRenameFile(uint32_t requestId, uint32_t connectionId, uint32_t fileId, const string& path);
 
 	/**
 	 * @brief	Reply Object ID List

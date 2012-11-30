@@ -86,7 +86,7 @@ void parseOption(int argc, char* argv[]){
 		debug("Testing %s with File Size %" PRIu64 " Object Size %"PRIu32"\n",argv[2],fileSize,objectSize);
 
 		codingScheme = RAID1_CODING;
-		codingSetting = Raid1Coding::generateSetting(2);
+		codingSetting = Raid1Coding::generateSetting(1);
 	}
 
 

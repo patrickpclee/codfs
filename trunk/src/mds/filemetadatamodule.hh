@@ -38,6 +38,14 @@ public:
 	void deleteFile(uint32_t fileId);
 
 	/**
+	 * @brief	Rename a File
+	 *
+	 * @param	fileId	File ID
+	 * @param	newPath	New File Path
+	 */
+	void renameFile(uint32_t fileId, const string& newPath);
+
+	/**
 	 * @brief	Lookup the File ID with file Path
 	 *
 	 * @param	path	Path to the File

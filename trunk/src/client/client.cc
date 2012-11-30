@@ -187,6 +187,14 @@ void Client::deleteFileRequest(string path, uint32_t fileId) {
 	_clientCommunicator->deleteFile(_clientId, path, fileId);
 }
 
+void Client::renameFileRequest(uint32_t fileId, const string& newPath) {
+	_clientCommunicator->renameFile(_clientId, fileId, "", newPath);
+}
+
+void Client::renameFileRequest(const string& path, const string& newPath) {
+	_clientCommunicator->renameFile(_clientId, 0, path, newPath);
+}
+
 void Client::truncateFileRequest(uint32_t fileId) {
 	_clientCommunicator->saveFileSize(_clientId, fileId, 0);
 	_clientCommunicator->saveObjectList(_clientId, fileId, {});

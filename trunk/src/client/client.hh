@@ -44,6 +44,22 @@ public:
 	void deleteFileRequest(string path, uint32_t fileId);
 
 	/**
+	 * @brief	Request to Rename a File
+	 *
+	 * @param	fileId	File ID
+	 * @param	newPath	New File Path
+	 */
+	void renameFileRequest(uint32_t fileId, const string& newPath);
+
+	/**
+	 * @brief	Request to Rename a File
+	 *
+	 * @param	path	File Path
+	 * @param	newPath	New File Path
+	 */
+	void renameFileRequest(const string& path, const string& newPath);
+
+	/**
 	 * @brief	Requset to Truncate a File
 	 *
 	 * @param	fileId	ID of the File
