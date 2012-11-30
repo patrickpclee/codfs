@@ -482,6 +482,7 @@ int ncvfs_unlink(const char *path) {
 	client->deleteFileRequest(path,0);
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 	remove (fpath);
+	// TODO: Clear File Meta Data Cache
 	return 0;
 }
 
@@ -520,20 +521,20 @@ int ncvfs_symlink(const char *path, const char *link) {
 }
 
 int ncvfs_rename(const char *path, const char *newpath) {
-	debug_cyan ("%s\n", "not implemented");
-	/*
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	const char* fpath = (_fuseFolder + string(path)).c_str();
-	const char* fnewpath = (_fuseFolder + string(newpath)).c_str();
+	string fpath = (_fuseFolder + string(path));
+	string fnewpath = (_fuseFolder + string(newpath));
 
-	retstat = rename(fpath, fnewpath);
+	retstat = rename(fpath.c_str(), fnewpath.c_str());
+	debug("%s %s\n",fpath.c_str(), fnewpath.c_str());
 	if (retstat < 0)
-		retstat = ncvfs_error("ncfs_rename rename");
+		retstat = ncvfs_error("ncfs_rename rename\n");
 
+	_fileIdCache.erase(path);
+
+	client->renameFileRequest(path, newpath);
 	return retstat;
-	*/
-	return 0;
 }
 
 // not required

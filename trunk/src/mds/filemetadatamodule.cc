@@ -50,6 +50,15 @@ void FileMetaDataModule::deleteFile(uint32_t fileId) {
 }
 
 /**
+ * @brief	Rename a File
+ */
+void FileMetaDataModule::renameFile(uint32_t fileId, const string& newPath) {
+	BSONObj queryObject = BSON ("id" << fileId);
+	BSONObj updateObject = BSON ("$set" << BSON ("path" << newPath));
+	_fileMetaDataStorage->update(queryObject, updateObject);
+}
+
+/**
  * @brief	Lookup the File ID with file Path
  */
 uint32_t FileMetaDataModule::lookupFileId(const string &path)
@@ -75,7 +84,6 @@ void FileMetaDataModule::setFileSize(uint32_t fileId, uint64_t fileSize)
 	BSONObj queryObject = BSON ("id" << fileId);
 	BSONObj updateObject = BSON ("$set" << BSON ("fileSize" << (long long int)fileSize));
 	_fileMetaDataStorage->update(queryObject, updateObject);
-
 	return ;
 }
 

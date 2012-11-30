@@ -49,6 +49,6 @@
 //#define COLLECTION "ncvfs"
 
 // monitor/selectionmodule.cc
-#define RR_DISTRIBUTE
+//#define RR_DISTRIBUTE
 
 #endif

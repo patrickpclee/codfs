@@ -36,6 +36,10 @@ void MetaDataModule::deleteFile(uint32_t clientId, uint32_t fileId) {
 	_fileMetaDataModule->deleteFile(fileId);
 }
 
+void MetaDataModule::renameFile(uint32_t clientId, uint32_t fileId, const string& newPath) {
+	_fileMetaDataModule->renameFile(fileId, newPath);
+}
+
 /**
  *	@brief	Set File Size of a File
  */

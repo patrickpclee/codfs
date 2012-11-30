@@ -12,6 +12,7 @@
 #include "../protocol/metadata/downloadfilerequest.hh"
 #include "../protocol/metadata/saveobjectlistrequest.hh"
 #include "../protocol/metadata/setfilesizerequest.hh"
+#include "../protocol/metadata/renamefilerequest.hh"
 #include "../protocol/transfer/putobjectinitrequest.hh"
 #include "../protocol/transfer/putobjectinitreply.hh"
 #include "../protocol/transfer/objecttransferendrequest.hh"
@@ -149,6 +150,23 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 		exit(-1);
 	}
 	return {};
+}
+
+void ClientCommunicator::renameFile(uint32_t clientId, uint32_t fileId, const string& path, const string& newPath) {
+	uint32_t mdsSockFd = getMdsSockfd();
+	RenameFileRequestMsg* renameFileRequestMsg = new RenameFileRequestMsg(this, mdsSockFd, clientId, fileId, path, newPath);
+	renameFileRequestMsg->prepareProtocolMsg();
+
+	addMessage(renameFileRequestMsg, true);
+	MessageStatus status = renameFileRequestMsg->waitForStatusChange();
+
+	if(status == READY) {
+		return ;
+	} else {
+		debug_error("Rename File Failed %s[%" PRIu32 "] %s\n",path.c_str(),fileId,newPath.c_str());
+		exit (-1);
+	}
+	return ;
 }
 
 /**

@@ -23,6 +23,8 @@
 #include "metadata/saveobjectlistrequest.hh"
 #include "metadata/saveobjectlistreply.hh"
 #include "metadata/setfilesizerequest.hh"
+#include "metadata/renamefilerequest.hh"
+#include "metadata/renamefilereply.hh"
 #include "transfer/putobjectinitrequest.hh"
 #include "transfer/putobjectinitreply.hh"
 #include "transfer/segmenttransferendrequest.hh"
@@ -129,6 +131,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (SET_FILE_SIZE_REQUEST):
 		return new SetFileSizeRequestMsg(communicator);
+		break;
+	case (RENAME_FILE_REQUEST):
+		return new RenameFileRequestMsg(communicator);
+		break;
+	case (RENAME_FILE_REPLY):
+		return new RenameFileReplyMsg(communicator);
 		break;
 
 	//TRANSFER
