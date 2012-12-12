@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
 	        std::cout << "Basic Command Line Parameter App" << std::endl
 	                  << desc << std::endl;
 	      }
-
+	      po::notify(vm);
 	      if ( vm.count("upload")  )
 	      {
 
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 	    	  	  		    	  	  		  	  codingScheme = RS_CODING;
 	    	  	  		    	  	  		  	codingSetting = RSCoding::generateSetting(vm["k"].as<int>(),vm["m"].as<int>(),vm["w"].as<int>());
 	    	  	  		    	  	  	  }
-
+	    	  	  	 printf("!!!!!!AAAAA\n");
 	    	  	  	  client->uploadFileRequest(vm["f"].as<string>(), codingScheme, codingSetting);
 
 	      	      }
@@ -134,9 +134,6 @@ int main(int argc, char *argv[]) {
 	    	  	  	  client->downloadFileRequest(vm["i"].as<int>(), vm["d"].as<string>());
 
 	      	      }
-	      po::notify(vm);
-	       // throws on error, so do after help in case
-	                      // there are any problems
 	    }
 	    catch(po::error& e)
 	    {
