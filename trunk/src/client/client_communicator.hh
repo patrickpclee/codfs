@@ -46,6 +46,16 @@ public:
 	void deleteFile(uint32_t clientId, string path, uint32_t fileId);
 
 	/**
+	 * @brief	Rename a File
+	 *
+	 * @param	clientId	ClientID
+	 * @param	fileId	File ID
+	 * @param	path	File Path
+	 * @param	newPath	New File Path
+	 */
+	void renameFile(uint32_t clientId, uint32_t fileId, const string& path, const string &newPath);
+
+	/**
 	 * @brief	Get Download Info
 	 * @param clientId Client ID
 	 * @param fileId File ID

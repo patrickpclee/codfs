@@ -134,16 +134,6 @@ void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
 }
 
-void startSendThread() {
-	client->getCommunicator()->sendMessage();
-}
-
-void startReceiveThread(Communicator* _clientCommunicator) {
-	// wait for message
-	_clientCommunicator->waitForMessage();
-
-}
-
 void* ncvfs_init(struct fuse_conn_info *conn) {
 	debug_cyan ("%s\n", "implemented");
 	_clientCommunicator->createServerSocket();
@@ -152,10 +142,13 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 	garbageCollectionThread = thread(startGarbageCollectionThread);
 
 	// 2. Receive Thread
-	receiveThread = thread(startReceiveThread, _clientCommunicator);
+	receiveThread = thread(&Communicator::waitForMessage, _clientCommunicator);
 
 	// 3. Send Thread
-	sendThread = thread(startSendThread);
+#ifdef USE_MULTIPLE_QUEUE
+#else
+	sendThread = thread(&Communicator::sendMessage, _clientCommunicator);
+#endif
 
 	_clientCommunicator->setId(client->getClientId());
 	_clientCommunicator->setComponentType(CLIENT);
@@ -270,8 +263,11 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 	debug_cyan ("%s\n", "implemented");
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(fi->fh);
 
-	if ((offset + size) > fileMetaData._size)
+	if (offset >= (size_t)fileMetaData._size)
 		return 0;
+	if ((offset + size) > fileMetaData._size){
+		size = fileMetaData._size - offset;
+	}
 
 	ClientStorageModule* storageModule = client->getStorageModule();
 
@@ -489,6 +485,7 @@ int ncvfs_unlink(const char *path) {
 	client->deleteFileRequest(path,0);
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 	remove (fpath);
+	// TODO: Clear File Meta Data Cache
 	return 0;
 }
 
@@ -527,20 +524,20 @@ int ncvfs_symlink(const char *path, const char *link) {
 }
 
 int ncvfs_rename(const char *path, const char *newpath) {
-	debug_cyan ("%s\n", "not implemented");
-	/*
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	const char* fpath = (_fuseFolder + string(path)).c_str();
-	const char* fnewpath = (_fuseFolder + string(newpath)).c_str();
+	string fpath = (_fuseFolder + string(path));
+	string fnewpath = (_fuseFolder + string(newpath));
 
-	retstat = rename(fpath, fnewpath);
+	retstat = rename(fpath.c_str(), fnewpath.c_str());
+	debug("%s %s\n",fpath.c_str(), fnewpath.c_str());
 	if (retstat < 0)
-		retstat = ncvfs_error("ncfs_rename rename");
+		retstat = ncvfs_error("ncfs_rename rename\n");
 
+	_fileIdCache.erase(path);
+
+	client->renameFileRequest(path, newpath);
 	return retstat;
-	*/
-	return 0;
 }
 
 // not required

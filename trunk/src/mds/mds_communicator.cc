@@ -10,6 +10,7 @@
 #include "../protocol/metadata/getobjectinforeply.hh"
 #include "../protocol/metadata/downloadfilereply.hh"
 #include "../protocol/metadata/getobjectidlistreply.hh"
+#include "../protocol/metadata/renamefilereply.hh"
 #include "../protocol/status/switchprimaryosdreplymsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/recoverytriggerreply.hh"
@@ -78,6 +79,21 @@ void MdsCommunicator::replyDeleteFile(uint32_t requestId, uint32_t connectionId,
 	deleteFileReplyMsg->prepareProtocolMsg();
 	addMessage(deleteFileReplyMsg);
 	return;
+}
+
+/**
+ * @brief	Reply Rename File
+ *
+ * @param	requestId	Request ID
+ * @param	connectionId	Connection ID
+ * @param	fileId	File Id
+ * @param	path	File Path
+ */
+void MdsCommunicator::replyRenameFile(uint32_t requestId, uint32_t connectionId, uint32_t fileId, const string& path) {
+	RenameFileReplyMsg* renameFileReplyMsg = new RenameFileReplyMsg(this, requestId, connectionId, fileId);
+	renameFileReplyMsg->prepareProtocolMsg();
+	addMessage(renameFileReplyMsg);
+	return ;
 }
 
 void MdsCommunicator::display() {

@@ -90,7 +90,13 @@ uint32_t NameSpaceModule::openFile(uint32_t clientId, const string &path)
 
 void NameSpaceModule::deleteFile (uint32_t clientId, const string &path)
 {
-	
+	return ;	
+}
+
+
+void NameSpaceModule::renameFile (uint32_t clientId, const string &path, const string &newPath)
+{
+	return ;
 }
 
 /**

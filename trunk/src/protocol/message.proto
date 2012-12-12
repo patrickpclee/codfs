@@ -53,6 +53,13 @@ message DeleteFileRequestPro {
 	optional string path = 3;
 }
 
+message RenameFileRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed32 fileId = 2;
+	optional string path = 3;
+	optional string newPath = 4;
+}
+
 message DownloadFileRequestPro {
 	optional fixed32 clientId = 1;
 	optional fixed32 fileId = 2;
@@ -168,6 +175,10 @@ message UploadFileReplyPro {
 message DeleteFileReplyPro {
 	optional fixed32 fileId = 1;
 	optional string path = 2;
+}
+
+message RenameFileReplyPro {
+	optional fixed32 fileId = 1;
 }
 
 message SaveObjectListReplyPro {

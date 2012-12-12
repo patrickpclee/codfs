@@ -2,6 +2,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <set>
+#include <iterator>
 #include "../config/config.hh"
 #include "../common/debug.hh"
 #include "selectionmodule.hh"
@@ -10,30 +11,52 @@ using namespace std;
 
 extern ConfigLayer* configLayer;
 
+#ifdef RR_DISTRIBUTE
+mutex RRprimaryMutex;
+uint32_t RRprimaryCount;
+mutex RRsecondaryMutex;
+uint32_t RRsecondaryCount;
+
+#endif
+
 SelectionModule::SelectionModule(map<uint32_t, struct OsdStat>& mapRef):
 	_osdStatMap(mapRef) { 
+#ifdef RR_DISTRIBUTE
+	RRprimaryCount = 0;
+	RRsecondaryCount = 0;
+#endif
 }
 
 vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
 	//Just random choose primary
 	vector<uint32_t> primaryList;
+	vector<uint32_t> allOnlineList;
 	{
 		lock_guard<mutex> lk(osdStatMapMutex);
 		for(auto& entry: _osdStatMap) {
 			if (entry.second.osdHealth == ONLINE) {
 				// choose this as a primary
-				primaryList.push_back(entry.first);
+				allOnlineList.push_back(entry.first);
 			}
 		}
 	}
-	while (primaryList.size() < numOfObjs) {
-		primaryList.insert(primaryList.end(), primaryList.begin(), primaryList.end());
-	}
-	primaryList.resize(numOfObjs);
-	for (int i = 0; i < numOfObjs; i++) {
-		int a = rand()%numOfObjs;
-		int b = rand()%numOfObjs;
-		swap(primaryList[a], primaryList[b]);
+	uint32_t n = allOnlineList.size();
+	set<uint32_t> selected;
+	while (numOfObjs) {
+#ifdef RR_DISTRIBUTE
+		RRprimaryMutex.lock();
+		int idx = RRprimaryCount;
+		RRprimaryCount = (RRprimaryCount + 1) % n;
+		RRprimaryMutex.unlock();
+#else
+		int idx = rand() % n;
+#endif
+		if (selected.size() == n || 
+			selected.find(allOnlineList[idx]) == selected.end()) {
+			primaryList.push_back(allOnlineList[idx]);
+			selected.insert(allOnlineList[idx]);
+			numOfObjs --;
+		}
 	}
 	return primaryList;
 }
@@ -49,29 +72,38 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 	primary.segmentId = 0;
 	secondaryList.push_back(primary);
 
-	//Just random choose secondary
+	vector<uint32_t> allOnlineList;
 	{
-		set<uint32_t> selected;
 		lock_guard<mutex> lk(osdStatMapMutex);
-		while (numOfSegs > 1) {
-			for(auto& entry: _osdStatMap) {
-				// isFull -1 for the primary
-				bool isAllOsdUsed = selected.size() >= _osdStatMap.size() - 1;
-				if (entry.second.osdHealth == ONLINE  
-						&& (isAllOsdUsed ||	(!isAllOsdUsed && entry.first != primaryId && !selected.count(entry.first)))
-						&& (rand()&1)) {
-					// choose this as a secondary
-					struct SegmentLocation segmentLocation;
-					segmentLocation.osdId = entry.first;
-					segmentLocation.segmentId = 0;	// segmentId will be set by OSD
-					secondaryList.push_back(segmentLocation);
-					selected.insert(entry.first);
-					--numOfSegs;
-					if (!numOfSegs) break;
-				}
+		for(auto& entry: _osdStatMap) {
+			if (entry.second.osdHealth == ONLINE) {
+				// choose this as a primary
+				allOnlineList.push_back(entry.first);
 			}
 		}
 	}
-
+	set<uint32_t> selected;
+	selected.insert(primaryId);
+	uint32_t n = allOnlineList.size();
+	numOfSegs--;
+	while (numOfSegs) {
+#ifdef RR_DISTRIBUTE
+		RRsecondaryMutex.lock();
+		int idx = RRsecondaryCount;
+		RRsecondaryCount = (RRsecondaryCount + 1) % n;
+		RRsecondaryMutex.unlock();
+#else
+		int idx = rand() % n;
+#endif
+		if (selected.size() == n || 
+			selected.find(allOnlineList[idx]) == selected.end()) {
+			struct SegmentLocation tmp;
+			tmp.osdId = allOnlineList[idx];
+			tmp.segmentId = 0;
+			secondaryList.push_back(tmp);
+			selected.insert(allOnlineList[idx]);
+			numOfSegs--;
+		}
+	}
 	return secondaryList;
 }
