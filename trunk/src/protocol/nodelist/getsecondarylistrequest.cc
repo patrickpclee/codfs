@@ -4,7 +4,7 @@ using namespace std;
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
 #include "../../common/memorypool.hh"
-#include "../../common/segmentlocation.hh"
+#include "../../common/blocklocation.hh"
 #include "getsecondarylistrequest.hh"
 
 #ifdef COMPILE_FOR_MONITOR
@@ -75,12 +75,12 @@ void GetSecondaryListRequestMsg::printProtocol() {
 	_numOfSegs, _primaryId);
 }
 
-void GetSecondaryListRequestMsg::setSecondaryList(vector<struct SegmentLocation> secondaryList) {
+void GetSecondaryListRequestMsg::setSecondaryList(vector<struct BlockLocation> secondaryList) {
 	_secondaryList = secondaryList;
 	return;
 }
 
-vector<struct SegmentLocation> GetSecondaryListRequestMsg::getSecondaryList() {
+vector<struct BlockLocation> GetSecondaryListRequestMsg::getSecondaryList() {
 	return _secondaryList;
 }
 

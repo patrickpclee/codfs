@@ -17,19 +17,19 @@ SwitchPrimaryOsdRequestMsg::SwitchPrimaryOsdRequestMsg(Communicator* communicato
 }
 
 SwitchPrimaryOsdRequestMsg::SwitchPrimaryOsdRequestMsg(Communicator* communicator, uint32_t sockfd,
-		uint32_t clientId, uint64_t objectId) :
+		uint32_t clientId, uint64_t segmentId) :
 		Message(communicator) {
 
 	_clientId = clientId;
 	_sockfd = sockfd;
-	_objectId = objectId;
+	_segmentId = segmentId;
 }
 
 void SwitchPrimaryOsdRequestMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::SwitchPrimaryOsdRequestPro switchPrimaryOsdRequestPro;
-	switchPrimaryOsdRequestPro.set_objectid(_objectId);
+	switchPrimaryOsdRequestPro.set_segmentid(_segmentId);
 
 	if (!switchPrimaryOsdRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -50,20 +50,20 @@ void SwitchPrimaryOsdRequestMsg::parse(char* buf) {
 	switchPrimaryOsdRequestPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	_objectId = switchPrimaryOsdRequestPro.objectid();
+	_segmentId = switchPrimaryOsdRequestPro.segmentid();
 
 }
 
 void SwitchPrimaryOsdRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
 	mds->primaryFailureProcessor(_msgHeader.requestId, _sockfd, _clientId,
-	_objectId, UNREACHABLE);
+	_segmentId, UNREACHABLE);
 #endif
 }
 
 void SwitchPrimaryOsdRequestMsg::printProtocol() {
-	debug("[SWITCH PRIMARY OSD REQUEST] Object ID = %" PRIu64 "\n",
-			_objectId);
+	debug("[SWITCH PRIMARY OSD REQUEST] Segment ID = %" PRIu64 "\n",
+			_segmentId);
 }
 
 void SwitchPrimaryOsdRequestMsg::setNewPrimaryOsdId(uint32_t id) {

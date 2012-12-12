@@ -38,7 +38,7 @@ public:
 	 * @param	communicator	Communicator the Message belongs to
 	 * @param	mdsSockfd	Socket descriptor of MDS
 	 */
-	UploadFileReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, uint32_t fileId, const vector<uint64_t> &objectList, const vector<uint32_t> &primaryList);
+	UploadFileReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, uint32_t fileId, const vector<uint64_t> &segmentList, const vector<uint32_t> &primaryList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -71,7 +71,7 @@ public:
 
 private:
 	uint32_t _fileId;
-	vector<uint64_t> _objectList;
+	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;
 };
 

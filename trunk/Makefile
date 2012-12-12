@@ -57,3 +57,4 @@ clean:
 	cd $(FUSE_DIR); make clean
 	cd ${MDS_DIR}; make clean
 	cd ${CODING_TESTER_DIR}; make clean
+	cd ${BENCHMARK_DIR}; make clean

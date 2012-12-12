@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
     <Storage>
-    	<ObjectCacheLocation>./osd_object/</ObjectCacheLocation>
-    	<SegmentLocation>./osd_segment/</SegmentLocation>
+    	<SegmentCacheLocation>./osd_segment/</SegmentCacheLocation>
+    	<BlockLocation>./osd_block/</BlockLocation>
     	
-    	<SegmentCapacity>10G</SegmentCapacity>
-    	<ObjectCacheCapacity>100M</ObjectCacheCapacity>
+    	<BlockCapacity>10G</BlockCapacity>
+    	<SegmentCacheCapacity>100M</SegmentCacheCapacity>
     </Storage>
 	<ThreadPool>
 		<NumThreads>10</NumThreads>

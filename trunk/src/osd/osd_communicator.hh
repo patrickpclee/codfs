@@ -8,7 +8,7 @@
 #include <iostream>
 #include <stdint.h>
 #include "../common/metadata.hh"
-#include "../common/segmentlocation.hh"
+#include "../common/blocklocation.hh"
 #include "../communicator/communicator.hh"
 
 using namespace std;
@@ -34,35 +34,35 @@ public:
 	~OsdCommunicator();
 
 	/**
-	 * Reply PutObjectInitRequest
-	 * @param requestId Request ID
-	 * @param connectionId Connection ID
-	 * @param objectId Object ID
-	 */
-
-	void replyPutObjectInit(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId);
-
-	/**
 	 * Reply PutSegmentInitRequest
 	 * @param requestId Request ID
 	 * @param connectionId Connection ID
-	 * @param objectId Object ID
 	 * @param segmentId Segment ID
 	 */
 
 	void replyPutSegmentInit(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, uint32_t segmentId);
+			uint64_t segmentId);
 
 	/**
-	 * Reply PutObjectEndRequest
+	 * Reply PutBlockInitRequest
 	 * @param requestId Request ID
 	 * @param connectionId Connection ID
-	 * @param objectId Object ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
 	 */
 
-	void replyPutObjectEnd(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId);
+	void replyPutBlockInit(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId, uint32_t blockId);
+
+	/**
+	 * Reply PutSegmentEndRequest
+	 * @param requestId Request ID
+	 * @param connectionId Connection ID
+	 * @param segmentId Segment ID
+	 */
+
+	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId);
 
 	/**
 	 * Send a failure report to MDS / Monitor
@@ -70,8 +70,8 @@ public:
 	 * @return 0 if success, -1 if failure
 	 */
 
-	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, uint32_t segmentId);
+	void replyPutBlockEnd(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId, uint32_t blockId);
 
 	/**
 	 * (to be implemented)
@@ -83,66 +83,66 @@ public:
 	uint32_t reportOsdFailure(uint32_t osdId);
 
 	/**
-	 * Send a segment to another OSD
+	 * Send a block to another OSD
 	 * @param sockfd Socket Descriptor of the destination
-	 * @param segmentData SegmentData structure
+	 * @param blockData BlockData structure
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendSegment(uint32_t sockfd, struct SegmentData segmentData);
+	uint32_t sendBlock(uint32_t sockfd, struct BlockData blockData);
 
 	/**
-	 * Send a request to get a segment to other OSD
+	 * Send a request to get a block to other OSD
 	 * @param connectionId ID of the target component connection
-	 * @param objectId ID of the object that the segment is belonged to
-	 * @param segmentId
+	 * @param segmentId ID of the segment that the block is belonged to
+	 * @param blockId
 	 */
 
-	void getSegmentRequest(uint32_t osdId, uint64_t objectId,
-			uint32_t segmentId);
+	void getBlockRequest(uint32_t osdId, uint64_t segmentId,
+			uint32_t blockId);
 
 	/**
-	 * Send a request to get the secondary OSD list of an object from MDS/Monitor
-	 * @param objectId Object ID for query
+	 * Send a request to get the secondary OSD list of an segment from MDS/Monitor
+	 * @param segmentId Segment ID for query
 	 * @param dstComponent Type of the component to request (MDS / MONITOR)
-	 * @param segmentCount (optional) Request a specific number of OSD to hold data
-	 * @return List of OSD ID that should contain the object
+	 * @param blockCount (optional) Request a specific number of OSD to hold data
+	 * @return List of OSD ID that should contain the segment
 	 */
 
-	vector<struct SegmentLocation> getOsdListRequest(uint64_t objectId,
-			ComponentType dstComponent, uint32_t segmentCount,
+	vector<struct BlockLocation> getOsdListRequest(uint64_t segmentId,
+			ComponentType dstComponent, uint32_t blockCount,
 			uint32_t primaryId);
 
 	/**
-	 * Send an acknowledgement to inform the dstComponent that the segment is stored
-	 * @param objectId ID of the object that the segment is belonged to
-	 * @param segmentId ID of the segment received and stored
+	 * Send an acknowledgement to inform the dstComponent that the block is stored
+	 * @param segmentId ID of the segment that the block is belonged to
+	 * @param blockId ID of the block received and stored
 	 * @param dstComponent Type of the component to ACK
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendSegmentAck(uint64_t objectId, uint32_t segmentId,
+	uint32_t sendBlockAck(uint64_t segmentId, uint32_t blockId,
 			ComponentType dstComponent);
 
 	/**
-	 * Obtain the information about an object from the MDS
-	 * @param objectId Object ID
-	 * @return ObjectTransferOsdInfo struct
+	 * Obtain the information about an segment from the MDS
+	 * @param segmentId Segment ID
+	 * @return SegmentTransferOsdInfo struct
 	 */
 
-	ObjectTransferOsdInfo getObjectInfoRequest(uint64_t objectId);
+	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId);
 
 	/**
 	 * Send acknowledgement to MDS when upload is complete
-	 * @param objectId Object ID
-	 * @param objectSize Object Size
+	 * @param segmentId Segment ID
+	 * @param segmentSize Segment Size
 	 * @param codingScheme Coding Scheme
 	 * @param codingSetting Coding Setting
-	 * @param nodeList List of OSD that saved segments for the object
-	 * @param checksum Checksum of the object
+	 * @param nodeList List of OSD that saved blocks for the segment
+	 * @param checksum Checksum of the segment
 	 */
 
-	void objectUploadAck(uint64_t objectId, uint32_t objectSize,
+	void segmentUploadAck(uint64_t segmentId, uint32_t segmentSize,
 			CodingScheme codingScheme, string codingSetting,
 			vector<uint32_t> nodeList, string checksum);
 
@@ -163,49 +163,49 @@ public:
 	vector<bool> getOsdStatusRequest(vector<uint32_t> osdIdList);
 
 	/**
-	 * Acknowledge MDS for completing segment repair
-	 * @param objectId Object ID
-	 * @param repairSegmentList List of segments to repair
-	 * @param repairSegmentOsdList List of OSD to store the repaired segments
+	 * Acknowledge MDS for completing block repair
+	 * @param segmentId Segment ID
+	 * @param repairBlockList List of blocks to repair
+	 * @param repairBlockOsdList List of OSD to store the repaired blocks
 	 */
 
-	void repairSegmentAck(uint64_t objectId, vector<uint32_t> repairSegmentList,
-			vector<uint32_t> repairSegmentOsdList);
+	void repairBlockAck(uint64_t segmentId, vector<uint32_t> repairBlockList,
+			vector<uint32_t> repairBlockOsdList);
 private:
 
 	/**
 	 * Initiate upload process to OSD (Step 1)
 	 * @param sockfd Destination OSD Socket Descriptor
-	 * @param objectId Object ID
 	 * @param segmentId Segment ID
-	 * @param length Size of the object
+	 * @param blockId Block ID
+	 * @param length Size of the segment
 	 * @param chunkCount Number of chunks that will be sent
 	 */
 
-	void putSegmentInit(uint32_t sockfd, uint64_t objectId, uint32_t segmentId,
+	void putBlockInit(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
 			uint32_t length, uint32_t chunkCount);
 
 	/**
-	 * Send an object chunk to OSD (Step 2)
+	 * Send an segment chunk to OSD (Step 2)
 	 * @param sockfd Destination OSD Socket Descriptor
-	 * @param objectId Object ID
 	 * @param segmentId Segment ID
-	 * @param buf Buffer containing the object
+	 * @param blockId Block ID
+	 * @param buf Buffer containing the segment
 	 * @param offset Offset of the chunk inside the buffer
 	 * @param length Length of the chunk
 	 */
 
-	void putSegmentData(uint32_t sockfd, uint64_t objectId, uint32_t segmentId,
+	void putBlockData(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
 			char* buf, uint64_t offset, uint32_t length);
 
 	/**
 	 * Finalise upload process to OSD (Step 3)
 	 * @param sockfd Destination OSD Socket Descriptor
-	 * @param objectId Object ID
 	 * @param segmentId Segment ID
+	 * @param blockId Block ID
 	 */
 
-	void putSegmentEnd(uint32_t sockfd, uint64_t objectId, uint32_t segmentId);
+	void putBlockEnd(uint32_t sockfd, uint64_t segmentId, uint32_t blockId);
 };
 
 #endif

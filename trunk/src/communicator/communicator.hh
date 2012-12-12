@@ -193,18 +193,18 @@ public:
 	uint32_t getSockfdFromId(uint32_t componentId);
 
 	/**
-	 * Send an object to a socket descriptor
+	 * Send an segment to a socket descriptor
 	 * @param componentId My Component ID
 	 * @param sockfd Destination Socket Descriptor
-	 * @param objectData ObjectData structure
+	 * @param segmentData SegmentData structure
 	 * @param codingScheme (Optional) Coding Scheme
 	 * @param codingSetting (Optional) Coding Setting
 	 * @param checksum (Optional) Checksum
 	 * @return Number of bytes sent
 	 */
 
-	uint32_t sendObject(uint32_t componentId, uint32_t sockfd,
-			struct ObjectData objectData, CodingScheme codingScheme =
+	uint32_t sendSegment(uint32_t componentId, uint32_t sockfd,
+			struct SegmentData segmentData, CodingScheme codingScheme =
 					DEFAULT_CODING, string codingSetting = "", string checksum = "");
 
 	void lockDataQueue(uint32_t sockfd);
@@ -228,38 +228,38 @@ protected:
 	 * Initiate upload process to OSD (Step 1)
 	 * @param componentId My Component ID
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
-	 * @param objectId Object ID
-	 * @param length Size of the object
+	 * @param segmentId Segment ID
+	 * @param length Size of the segment
 	 * @param chunkCount Number of chunks that will be sent
-	 * @param checksum Checksum of Object
+	 * @param checksum Checksum of Segment
 	 */
 
-	void putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
-			uint64_t objectId, uint32_t length, uint32_t chunkCount,
+	void putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
+			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
 			CodingScheme codingScheme, string codingSetting, string checksum);
 
 	/**
-	 * Send an object chunk to OSD (Step 2)
+	 * Send an segment chunk to OSD (Step 2)
 	 * @param componentId Component ID
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
-	 * @param objectId Object ID
-	 * @param buf Buffer containing the object
+	 * @param segmentId Segment ID
+	 * @param buf Buffer containing the segment
 	 * @param offset Offset of the chunk inside the buffer
 	 * @param length Length of the chunk
 	 */
 
-	void putObjectData(uint32_t componentID, uint32_t dstOsdSockfd,
-			uint64_t objectId, char* buf, uint64_t offset, uint32_t length);
+	void putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
+			uint64_t segmentId, char* buf, uint64_t offset, uint32_t length);
 
 	/**
 	 * Finalise upload process to OSD (Step 3)
 	 * @param componentId Component ID
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
-	 * @param objectId Object ID
+	 * @param segmentId Segment ID
 	 */
 
-	void putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
-			uint64_t objectId);
+	void putSegmentEnd(uint32_t componentId, uint32_t dstOsdSockfd,
+			uint64_t segmentId);
 
 	/**
 	 * Runs in a separate detached thread
@@ -270,7 +270,7 @@ protected:
 	static void handleThread(Message* message);
 
 	/**
-	 * Get the MsgType from raw buffer and get a Message object from the MessageFactory
+	 * Get the MsgType from raw buffer and get a Message segment from the MessageFactory
 	 * Execute message.handle() in a separate thread
 	 * @param buf Pointer to the buffer holding the Message
 	 * @param sockfd Socket Descriptor of incoming connection

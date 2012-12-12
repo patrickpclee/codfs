@@ -41,19 +41,19 @@ uint32_t _readAhead = 5;
 #endif
 
 mutex fileInfoCacheMutex;
-mutex _objectProcessingMutex;
+mutex _segmentProcessingMutex;
 mutex _readAheadCountMutex;
-mutex _objectReadCacheAccessTimeMutex;
+mutex _segmentReadCacheAccessTimeMutex;
 
 unordered_map<uint32_t, FileDataCache*> _fileDataCache;
-//unordered_map<uint64_t, unique_lock<mutex> > _objectProcessing;
+//unordered_map<uint64_t, unique_lock<mutex> > _segmentProcessing;
 unordered_map<uint32_t, struct FileMetaData> _fileInfoCache;
 unordered_map<string, uint32_t> _fileIdCache;
 unordered_map<uint32_t, uint32_t> _readAheadCount;
-unordered_map<uint32_t, vector<bool> > _objectProcessing;
+unordered_map<uint32_t, vector<bool> > _segmentProcessing;
 
-list<uint64_t> _objectReadCacheAccessTime;
-unordered_map<uint64_t, bool> _objectReadCacheBitMap;
+list<uint64_t> _segmentReadCacheAccessTime;
+unordered_map<uint64_t, bool> _segmentReadCacheBitMap;
 uint32_t _readCacheLimit = 20;
 
 thread garbageCollectionThread;
@@ -67,26 +67,26 @@ boost::threadpool::pool _tp;
 boost::threadpool::pool _writetp;
 uint32_t _writePoolLimit = 20;
 
-void addObjectReadCache(uint64_t objectId) {
-	lock_guard<mutex> lk(_objectReadCacheAccessTimeMutex);
-	if( _objectReadCacheBitMap.count(objectId) == 0) {
-		_objectReadCacheBitMap[objectId] = true;
-		if( _objectReadCacheAccessTime.size() == _readCacheLimit) {
-			uint64_t objectToClose = _objectReadCacheAccessTime.front();
-			_objectReadCacheAccessTime.pop_front();
-			client->getStorageModule()->closeObject(objectToClose);
+void addSegmentReadCache(uint64_t segmentId) {
+	lock_guard<mutex> lk(_segmentReadCacheAccessTimeMutex);
+	if( _segmentReadCacheBitMap.count(segmentId) == 0) {
+		_segmentReadCacheBitMap[segmentId] = true;
+		if( _segmentReadCacheAccessTime.size() == _readCacheLimit) {
+			uint64_t segmentToClose = _segmentReadCacheAccessTime.front();
+			_segmentReadCacheAccessTime.pop_front();
+			client->getStorageModule()->closeSegment(segmentToClose);
 		}
-		_objectReadCacheAccessTime.push_back(objectId);	
+		_segmentReadCacheAccessTime.push_back(segmentId);	
 	} else {
 		// TODO: Update LRU
 	}
 }
 
-void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId, uint32_t fileId, uint32_t objectIndex){
-	client->getObject(clientId, sockfd, objectId);
-	debug("Object ID = %" PRIu64 " finished download\n", objectId);
-	_objectProcessing[fileId][objectIndex] = false;
-	addObjectReadCache(objectId);
+void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t segmentId, uint32_t fileId, uint32_t segmentIndex){
+	client->getSegment(clientId, sockfd, segmentId);
+	debug("Segment ID = %" PRIu64 " finished download\n", segmentId);
+	_segmentProcessing[fileId][segmentIndex] = false;
+	addSegmentReadCache(segmentId);
 }
 #endif
 
@@ -229,8 +229,8 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 	fi->fh = fileMetaData._id;
-	vector<bool> objectProcessing (fileMetaData._objectList.size(),false);
-	_objectProcessing[fi->fh] = objectProcessing;
+	vector<bool> segmentProcessing (fileMetaData._segmentList.size(),false);
+	_segmentProcessing[fi->fh] = segmentProcessing;
 	_readAheadCount[fi->fh] = 0;
 
 	return 0;
@@ -243,17 +243,17 @@ static int ncvfs_create(const char * path, mode_t mode,
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 	creat(fpath, mode);
 
-	uint32_t objectCount = configLayer->getConfigInt(
-			"Fuse>PreallocateObjectNumber");
-	uint32_t objectSize = configLayer->getConfigInt("Storage>ObjectSize")
+	uint32_t segmentCount = configLayer->getConfigInt(
+			"Fuse>PreallocateSegmentNumber");
+	uint32_t segmentSize = configLayer->getConfigInt("Storage>SegmentSize")
 			* 1024;
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
-			_clientId, path, 0, objectCount, codingScheme, codingSetting);
+			_clientId, path, 0, segmentCount, codingScheme, codingSetting);
 	fileMetaData._fileType = NORMAL;
 	_fileIdCache[path] = fileMetaData._id;
 	_fileInfoCache[fileMetaData._id] = fileMetaData;
 	_fileDataCache[fileMetaData._id] = new FileDataCache(fileMetaData,
-			objectSize);
+			segmentSize);
 	fi->fh = fileMetaData._id;
 	return 0;
 }
@@ -271,43 +271,43 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 
 	ClientStorageModule* storageModule = client->getStorageModule();
 
-	uint64_t objectSize = storageModule->getObjectSize();
-	uint32_t startObjectNum = offset / objectSize;
-	uint32_t endObjectNum = (offset + size) / objectSize;
-	if (((offset + size) % objectSize) == 0)
-		--endObjectNum;
+	uint64_t segmentSize = storageModule->getSegmentSize();
+	uint32_t startSegmentNum = offset / segmentSize;
+	uint32_t endSegmentNum = (offset + size) / segmentSize;
+	if (((offset + size) % segmentSize) == 0)
+		--endSegmentNum;
 	uint64_t byteWritten = 0;
-	for (uint32_t i = startObjectNum; i <= endObjectNum; ++i) {
-		uint64_t objectId = fileMetaData._objectList[i];
+	for (uint32_t i = startSegmentNum; i <= endSegmentNum; ++i) {
+		uint64_t segmentId = fileMetaData._segmentList[i];
 		uint32_t componentId = fileMetaData._primaryList[i];
 		uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
 
-		struct ObjectTransferCache objectCache;
-		while(_objectProcessing[fi->fh][i]);
-		objectCache = client->getObject(_clientId, sockfd, objectId);
+		struct SegmentTransferCache segmentCache;
+		while(_segmentProcessing[fi->fh][i]);
+		segmentCache = client->getSegment(_clientId, sockfd, segmentId);
 
-		addObjectReadCache(objectId);
+		addSegmentReadCache(segmentId);
 
-		uint64_t copySize = min(objectSize, size - byteWritten);
-		copySize = min(copySize, (i + 1) * objectSize - (offset + byteWritten));
-		uint64_t objectOffset = (offset + byteWritten) - i * objectSize;
-		memcpy(buf + byteWritten, objectCache.buf + objectOffset, copySize);
+		uint64_t copySize = min(segmentSize, size - byteWritten);
+		copySize = min(copySize, (i + 1) * segmentSize - (offset + byteWritten));
+		uint64_t segmentOffset = (offset + byteWritten) - i * segmentSize;
+		memcpy(buf + byteWritten, segmentCache.buf + segmentOffset, copySize);
 		byteWritten += copySize;
-		//storageModule->closeObject(objectId);
+		//storageModule->closeSegment(segmentId);
 	}
 
 #ifdef FUSE_READ_AHEAD
-	for(uint32_t j = _readAheadCount[fi->fh]; j <= endObjectNum + _readAhead; ++j){
-		if( j >= fileMetaData._objectList.size())
+	for(uint32_t j = _readAheadCount[fi->fh]; j <= endSegmentNum + _readAhead; ++j){
+		if( j >= fileMetaData._segmentList.size())
 			break;
 		if( j <= _readAheadCount[fi->fh])
 			continue;
 		_readAheadCount[fi->fh] = j;
-		uint64_t objectId = fileMetaData._objectList[j];
+		uint64_t segmentId = fileMetaData._segmentList[j];
 		uint32_t componentId = fileMetaData._primaryList[j];
 		uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
-		_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, objectId, fi->fh, j));
-		_objectProcessing[fi->fh][j] = true;
+		_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, segmentId, fi->fh, j));
+		_segmentProcessing[fi->fh][j] = true;
 	}
 #endif
 	return byteWritten;
@@ -325,8 +325,8 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 	
 	if (_fileDataCache.count(fi->fh) == 0) {
 		struct FileMetaData fileMetaData = _fileInfoCache[fi->fh];
-		uint32_t objectSize = configLayer->getConfigInt("Storage>ObjectSize") * 1024;
-		_fileDataCache[fi->fh] = new FileDataCache(fileMetaData, objectSize);
+		uint32_t segmentSize = configLayer->getConfigInt("Storage>SegmentSize") * 1024;
+		_fileDataCache[fi->fh] = new FileDataCache(fileMetaData, segmentSize);
 	}
 
 	_fileDataCache[fi->fh]->write(buf, size, offset);
@@ -343,8 +343,8 @@ static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
 		_fileDataCache.erase(fi->fh);
 	}
 	struct FileMetaData fileMetaData= _fileInfoCache[fi->fh];
-	for(uint32_t i = 0; i < fileMetaData._objectList.size(); ++i)
-		storageModule->closeObject(fileMetaData._objectList[i]);
+	for(uint32_t i = 0; i < fileMetaData._segmentList.size(); ++i)
+		storageModule->closeSegment(fileMetaData._segmentList[i]);
 	_fileInfoCache.erase(fi->fh);
 	_fileIdCache.erase(path);
 	return 0;

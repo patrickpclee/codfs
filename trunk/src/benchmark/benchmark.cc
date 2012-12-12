@@ -29,7 +29,7 @@ void sighandler(int signum) {
 	}
 }
 
-/// Client Object
+/// Client Segment
 Client* client;
 
 ClientCommunicator* _clientCommunicator;
@@ -45,8 +45,8 @@ uint32_t fileId;
 CodingScheme codingScheme;
 string codingSetting;
 uint64_t fileSize;
-uint32_t objectSize;
-uint32_t numberOfObject;
+uint32_t segmentSize;
+uint32_t numberOfSegment;
 char* databuf;
 unsigned char* checksum;
 
@@ -54,15 +54,15 @@ bool download;
 
 #ifdef PARALLEL_TRANSFER
 void startBenchUploadThread(uint32_t clientId, uint32_t sockfd,
-		struct ObjectData objectData, CodingScheme codingScheme,
+		struct SegmentData segmentData, CodingScheme codingScheme,
 		string codingSetting, string checksum) {
-	_clientCommunicator->sendObject(clientId, sockfd, objectData,
+	_clientCommunicator->sendSegment(clientId, sockfd, segmentData,
 			codingScheme, codingSetting, checksum);
 }
 
-void startBenchDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId) {
-	client->getObject(clientId, sockfd, objectId);
-	_storageModule->closeObject(objectId);
+void startBenchDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t segmentId) {
+	client->getSegment(clientId, sockfd, segmentId);
+	_storageModule->closeSegment(segmentId);
 }
 
 boost::threadpool::pool _tp;
@@ -80,10 +80,10 @@ void parseOption(int argc, char* argv[]){
 		fileName = to_string(time(NULL));
 
 		fileSize = stringToByte(argv[3]);
-		objectSize = stringToByte(argv[4]);
-		numberOfObject = fileSize / objectSize;
+		segmentSize = stringToByte(argv[4]);
+		numberOfSegment = fileSize / segmentSize;
 
-		debug("Testing %s with File Size %" PRIu64 " Object Size %"PRIu32"\n",argv[2],fileSize,objectSize);
+		debug("Testing %s with File Size %" PRIu64 " Segment Size %"PRIu32"\n",argv[2],fileSize,segmentSize);
 
 		codingScheme = RAID1_CODING;
 		codingSetting = Raid1Coding::generateSetting(1);
@@ -98,13 +98,13 @@ void parseOption(int argc, char* argv[]){
 }
 
 void prepareData(){
-	databuf = (char*)calloc(objectSize,1);
+	databuf = (char*)calloc(segmentSize,1);
 	checksum = (unsigned char*)calloc(MD5_DIGEST_LENGTH,1);
 	int* intptr = (int*)databuf;
-	for(uint32_t i = 0; i < objectSize / 4; ++i) {
+	for(uint32_t i = 0; i < segmentSize / 4; ++i) {
 		intptr[i] = rand();
 	}
-	MD5((unsigned char*) databuf, objectSize, checksum);
+	MD5((unsigned char*) databuf, segmentSize, checksum);
 }
 
 void testDownload() {
@@ -114,15 +114,15 @@ void testDownload() {
 	struct FileMetaData fileMetaData = _clientCommunicator->downloadFile(clientId, fileId);
 	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n", fileMetaData._id, fileMetaData._size);
 
-	for(uint32_t i = 0; i < fileMetaData._objectList.size(); ++i) {
+	for(uint32_t i = 0; i < fileMetaData._segmentList.size(); ++i) {
 		uint32_t primary = fileMetaData._primaryList[i];
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
-		uint64_t objectId = fileMetaData._objectList[i];
+		uint64_t segmentId = fileMetaData._segmentList[i];
 #ifdef PARALLEL_TRANSFER
-		_tp.schedule(boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd, objectId));
+		_tp.schedule(boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd, segmentId));
 #else
-		client->getObject(clientId, sockfd, objectId);
-		_storageModule->closeObject(objectId);
+		client->getSegment(clientId, sockfd, segmentId);
+		_storageModule->closeSegment(segmentId);
 #endif
 	}
 
@@ -149,16 +149,16 @@ void testUpload() {
 	typedef chrono::milliseconds milliseconds;
 	Clock::time_point t0 = Clock::now();
 
-	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(clientId, fileName, fileSize, numberOfObject, codingScheme, codingSetting);
+	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(clientId, fileName, fileSize, numberOfSegment, codingScheme, codingSetting);
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
 	map<uint32_t, uint32_t> OSDLoadCount;
-	for(uint32_t i = 0; i < numberOfObject; ++i){
-		struct ObjectData objectData;
-		objectData.buf = databuf;
-		objectData.info.objectId = fileMetaData._objectList[i];
-		objectData.info.objectSize = objectSize;
+	for(uint32_t i = 0; i < numberOfSegment; ++i){
+		struct SegmentData segmentData;
+		segmentData.buf = databuf;
+		segmentData.info.segmentId = fileMetaData._segmentList[i];
+		segmentData.info.segmentSize = segmentSize;
 		uint32_t primary = fileMetaData._primaryList[i];
 
 		if(OSDLoadCount.count(primary) == 0)
@@ -168,9 +168,9 @@ void testUpload() {
 
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 #ifdef PARALLEL_TRANSFER
-		_tp.schedule(boost::bind(startBenchUploadThread, clientId, dstOsdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum)));
+		_tp.schedule(boost::bind(startBenchUploadThread, clientId, dstOsdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum)));
 #else
-		_clientCommunicator->sendObject(clientId, dstOsdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum));
+		_clientCommunicator->sendSegment(clientId, dstOsdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum));
 #endif
 	}
 #ifdef PARALLEL_TRANSFER
@@ -212,7 +212,7 @@ void startReceiveThread(Communicator* _clientCommunicator) {
 int main(int argc, char *argv[]) {
 
 	if (argc < 4) {
-		cout << "Upload: ./BENCHMARK [ID] upload [FILESIZE] [OBJECTSIZE]" << endl;
+		cout << "Upload: ./BENCHMARK [ID] upload [FILESIZE] [SEGMENTSIZE]" << endl;
 		cout << "Download: ./BENCHMARK [ID] download [FILEID]" << endl;
 		exit(-1);
 	}

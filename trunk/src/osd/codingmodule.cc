@@ -26,34 +26,34 @@ CodingModule::CodingModule() {
 	}
 }
 
-vector<struct SegmentData> CodingModule::encodeObjectToSegment(
-		CodingScheme codingScheme, struct ObjectData objectData,
+vector<struct BlockData> CodingModule::encodeSegmentToBlock(
+		CodingScheme codingScheme, struct SegmentData segmentData,
 		string setting) {
 
-	return getCoding(codingScheme)->encode(objectData, setting);
+	return getCoding(codingScheme)->encode(segmentData, setting);
 }
 
-vector<struct SegmentData> CodingModule::encodeObjectToSegment(
-		CodingScheme codingScheme, uint64_t objectId, char* buf,
+vector<struct BlockData> CodingModule::encodeSegmentToBlock(
+		CodingScheme codingScheme, uint64_t segmentId, char* buf,
 		uint64_t length, string setting) {
 
-	struct ObjectData objectData;
-	objectData.buf = buf;
-	objectData.info.objectId = objectId;
-	objectData.info.objectSize = length;
-	return getCoding(codingScheme)->encode(objectData, setting);
+	struct SegmentData segmentData;
+	segmentData.buf = buf;
+	segmentData.info.segmentId = segmentId;
+	segmentData.info.segmentSize = length;
+	return getCoding(codingScheme)->encode(segmentData, setting);
 }
 
-struct ObjectData CodingModule::decodeSegmentToObject(CodingScheme codingScheme,
-		uint64_t objectId, vector<struct SegmentData> &segmentData,
-		vector<uint32_t> &requiredSegments, uint32_t objectSize,
+struct SegmentData CodingModule::decodeBlockToSegment(CodingScheme codingScheme,
+		uint64_t segmentId, vector<struct BlockData> &blockData,
+		vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
 		string setting) {
 
 	Coding* coding = getCoding(codingScheme);
-	struct ObjectData objectData = coding->decode(segmentData, requiredSegments,
-			objectSize, setting);
+	struct SegmentData segmentData = coding->decode(blockData, requiredBlocks,
+			segmentSize, setting);
 
-	return objectData;
+	return segmentData;
 }
 
 Coding* CodingModule::getCoding(CodingScheme codingScheme) {
@@ -68,27 +68,27 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 	return _codingWorker[codingScheme];
 }
 
-vector<uint32_t> CodingModule::getRequiredSegmentIds(CodingScheme codingScheme,
+vector<uint32_t> CodingModule::getRequiredBlockIds(CodingScheme codingScheme,
 		string setting, vector<bool> secondaryOsdStatus) {
-	return getCoding(codingScheme)->getRequiredSegmentIds(setting,
+	return getCoding(codingScheme)->getRequiredBlockIds(setting,
 			secondaryOsdStatus);
 }
 
-vector<uint32_t> CodingModule::getRepairSrcSegmentIds(CodingScheme codingScheme,
-		string setting, vector<uint32_t> failedSegments,
-		vector<bool> segmentStatus) {
-	return getCoding(codingScheme)->getRepairSrcSegmentIds(setting,
-			failedSegments, segmentStatus);
+vector<uint32_t> CodingModule::getRepairSrcBlockIds(CodingScheme codingScheme,
+		string setting, vector<uint32_t> failedBlocks,
+		vector<bool> blockStatus) {
+	return getCoding(codingScheme)->getRepairSrcBlockIds(setting,
+			failedBlocks, blockStatus);
 
 }
 
-vector<struct SegmentData> CodingModule::repairSegments(
-		CodingScheme codingScheme, vector<uint32_t> failedSegments,
-		vector<struct SegmentData> &repairSrcSegments,
-		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+vector<struct BlockData> CodingModule::repairBlocks(
+		CodingScheme codingScheme, vector<uint32_t> failedBlocks,
+		vector<struct BlockData> &repairSrcBlocks,
+		vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
 		string setting) {
 
-	return getCoding(codingScheme)->repairSegments(failedSegments,
-			repairSrcSegments, repairSrcSegmentId, objectSize, setting);
+	return getCoding(codingScheme)->repairBlocks(failedBlocks,
+			repairSrcBlocks, repairSrcBlockId, segmentSize, setting);
 
 }

@@ -7,7 +7,7 @@
 
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
-#include "../../common/objectlocation.hh"
+#include "../../common/segmentlocation.hh"
 
 using namespace std;
 
@@ -31,12 +31,12 @@ public:
 	 * Constructor - Save parameters in private variables
 	 *
 	 * @param	communicator	Communicator the Message belongs to
-	 * @param	numOfObjs	number of Objects
+	 * @param	numOfObjs	number of Segments
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
 	RecoveryTriggerReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd,
-		const vector<struct ObjectLocation> &objectLocations);
+		const vector<struct SegmentLocation> &segmentLocations);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -69,7 +69,7 @@ public:
 
 
 private:
-	vector<struct ObjectLocation> _objectLocations;
+	vector<struct SegmentLocation> _segmentLocations;
 };
 
 #endif

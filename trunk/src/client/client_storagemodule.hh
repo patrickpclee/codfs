@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <vector>
 #include <fstream>
-#include "../common/objectdata.hh"
+#include "../common/segmentdata.hh"
 #include "../osd/storagemodule.hh"
 
 using namespace std;
@@ -30,64 +30,64 @@ public:
 	uint64_t getFilesize (string filepath);
 
 	/**
-	 * get the number of objects of a file
+	 * get the number of segments of a file
 	 * @param filepath 	Path of the file on storage
-	 * @return Number of objects
+	 * @return Number of segments
 	 */
-	uint32_t getObjectCount (string filepath);
+	uint32_t getSegmentCount (string filepath);
 
 	/**
-	 * get the particular object of a file when given an index.
+	 * get the particular segment of a file when given an index.
 	 * @param filepath 		Path of the file on storage
-	 * @param objectIndex 	the index of the object
-	 * @return the ObjectData of the object
+	 * @param segmentIndex 	the index of the segment
+	 * @return the SegmentData of the segment
 	 */
-	struct ObjectData readObjectFromFile (string filepath, uint32_t objectIndex);
+	struct SegmentData readSegmentFromFile (string filepath, uint32_t segmentIndex);
 
 	/**
-	 * get the Size of an object
+	 * get the Size of an segment
 	 *
-	 * @return Size of one object
+	 * @return Size of one segment
 	 */
-	uint64_t getObjectSize ();
+	uint64_t getSegmentSize ();
 
 	/**
-	 * Create cache of a object
-	 * @param objectId 	object ID
+	 * Create cache of a segment
+	 * @param segmentId 	segment ID
 	 * @param length 	length of the data
 	 */
-	void createObjectCache(uint64_t objectId, uint32_t length);
+	void createSegmentCache(uint64_t segmentId, uint32_t length);
 
 	/**
-	 * write cache of a object
-	 * @param objectId 			object ID
+	 * write cache of a segment
+	 * @param segmentId 			segment ID
 	 * @param buf				buffer contains the data
-	 * @param offsetInObject	offset of the Object
+	 * @param offsetInSegment	offset of the Segment
 	 * @param length 			length of the data
 	 */
-	uint32_t writeObjectCache (uint64_t objectId, char* buf, uint64_t offsetInObject, uint32_t length);
+	uint32_t writeSegmentCache (uint64_t segmentId, char* buf, uint64_t offsetInSegment, uint32_t length);
 
 	/**
-	 * test whether cache of an object exist
-	 * @param objectId 			object ID
+	 * test whether cache of an segment exist
+	 * @param segmentId 			segment ID
 	 *
 	 * @return true/false
 	 */
-	bool locateObjectCache(uint64_t objectId);
+	bool locateSegmentCache(uint64_t segmentId);
 
 	/**
-	 * Close and remove the cache of an object
-	 * @param objectId object ID
+	 * Close and remove the cache of an segment
+	 * @param segmentId segment ID
 	 */
-	void closeObject(uint64_t objectId);
+	void closeSegment(uint64_t segmentId);
 
 	/**
-	 * get the Object Cache
-	 * @param objectId object ID
+	 * get the Segment Cache
+	 * @param segmentId segment ID
 	 *
-	 * @return struct ObjectCache contains the object info.
+	 * @return struct SegmentCache contains the segment info.
 	 */
-	struct ObjectTransferCache getObjectCache(uint64_t objectId);
+	struct SegmentTransferCache getSegmentCache(uint64_t segmentId);
 
 
 	/**
@@ -115,9 +115,9 @@ public:
 	void closeFile (FILE* filePtr);
 
 private:
-	uint64_t _objectSize;
-	map <uint64_t, struct ObjectTransferCache> _objectCache;
-	string _objectFolder;
+	uint64_t _segmentSize;
+	map <uint64_t, struct SegmentTransferCache> _segmentCache;
+	string _segmentFolder;
 };
 
 #endif

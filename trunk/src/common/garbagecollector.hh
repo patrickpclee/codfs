@@ -11,7 +11,7 @@ public:
 
 	/**
 	 * static method for Singleton implementation
-	 * @return reference to instance of singleton object
+	 * @return reference to instance of singleton segment
 	 */
 
 	static GarbageCollector& getInstance() {
@@ -34,7 +34,7 @@ public:
 
 	/**
 	 * Obtain a piece of memory
-	 * @param ptr Pointer to object to delete
+	 * @param ptr Pointer to segment to delete
 	 */
 
 	void addToDeleteList(Message* ptr);

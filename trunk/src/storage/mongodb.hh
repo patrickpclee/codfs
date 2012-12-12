@@ -45,62 +45,62 @@ public:
 	/**
 	 * @brief	Read from the MongoDB
 	 *
-	 * @param	queryObject	Query
+	 * @param	querySegment	Query
 	 *
 	 * @return	List of Result
 	 */
-	vector<mongo::BSONObj> read (mongo::Query queryObject);
+	vector<mongo::BSONObj> read (mongo::Query querySegment);
 
 	/**
 	 * @brief	Read One Result from the MongoDB
 	 *
-	 * @param	queryObject	Query
+	 * @param	querySegment	Query
 	 *
 	 * @return	Result (First if Multiple)
 	 */
-	mongo::BSONObj readOne (mongo::Query queryObject);
+	mongo::BSONObj readOne (mongo::Query querySegment);
 
 	/**
 	 * @brief	Insert to the MongoDB
 	 *
-	 * @param	insertObject	BSON to Insert
+	 * @param	insertSegment	BSON to Insert
 	 */
-	void insert (mongo::BSONObj insertObject);
+	void insert (mongo::BSONObj insertSegment);
 	
 	/**
 	 * @brief	Update Record in MongoDB
 	 *
-	 * @param	queryObject	Query to Specify Record to Update
-	 * @param	updateObject	Object to Update
+	 * @param	querySegment	Query to Specify Record to Update
+	 * @param	updateSegment	Segment to Update
 	 */
-	void update (mongo::Query queryObject, mongo::BSONObj updateObject);
+	void update (mongo::Query querySegment, mongo::BSONObj updateSegment);
 
 	/**
 	 * @brief	Push Value to a Field of a Record
 	 *
-	 * @param	queryObject	Query to Specify Field and Record to Update
-	 * @param	pushObject	Object to Push
+	 * @param	querySegment	Query to Specify Field and Record to Update
+	 * @param	pushSegment	Segment to Push
 	 */
-	void push (mongo::Query queryObject, mongo::BSONObj pushObject);
+	void push (mongo::Query querySegment, mongo::BSONObj pushSegment);
 
 	/**
 	 * @brief	Find a Record and Update It
 	 *
-	 * @param	queryObject	Query to Specify Record to Update
-	 * @param	updateObject	Object to Update
+	 * @param	querySegment	Query to Specify Record to Update
+	 * @param	updateSegment	Segment to Update
 	 *
 	 * @return	Result
 	 */
-	mongo::BSONObj findAndModify (mongo::BSONObj queryObject, mongo::BSONObj updateObject);
+	mongo::BSONObj findAndModify (mongo::BSONObj querySegment, mongo::BSONObj updateSegment);
 
-	void removeField (mongo::Query queryObject, string field);
+	void removeField (mongo::Query querySegment, string field);
 
 	/**
 	 * @brief	Remove a Record
 	 *
-	 * @param	queryObject	Query to Specify Record to Remove
+	 * @param	querySegment	Query to Specify Record to Remove
 	 */
-	void remove (mongo::Query queryObject);
+	void remove (mongo::Query querySegment);
 
 private:
 	/// User

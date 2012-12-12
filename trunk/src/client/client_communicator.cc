@@ -4,22 +4,22 @@
 #include "client.hh"
 
 #include "../common/debug.hh"
-#include "../common/objectdata.hh"
+#include "../common/segmentdata.hh"
 #include "../common/memorypool.hh"
 #include "../protocol/metadata/listdirectoryrequest.hh"
 #include "../protocol/metadata/uploadfilerequest.hh"
 #include "../protocol/metadata/deletefilerequest.hh"
 #include "../protocol/metadata/downloadfilerequest.hh"
-#include "../protocol/metadata/saveobjectlistrequest.hh"
+#include "../protocol/metadata/savesegmentlistrequest.hh"
 #include "../protocol/metadata/setfilesizerequest.hh"
 #include "../protocol/metadata/renamefilerequest.hh"
-#include "../protocol/transfer/putobjectinitrequest.hh"
-#include "../protocol/transfer/putobjectinitreply.hh"
-#include "../protocol/transfer/objecttransferendrequest.hh"
-#include "../protocol/transfer/objecttransferendreply.hh"
-#include "../protocol/transfer/objectdatamsg.hh"
-#include "../protocol/metadata/getobjectidlistrequest.hh"
-#include "../protocol/transfer/getobjectrequest.hh"
+#include "../protocol/transfer/putsegmentinitrequest.hh"
+#include "../protocol/transfer/putsegmentinitreply.hh"
+#include "../protocol/transfer/segmenttransferendrequest.hh"
+#include "../protocol/transfer/segmenttransferendreply.hh"
+#include "../protocol/transfer/segmentdatamsg.hh"
+#include "../protocol/metadata/getsegmentidlistrequest.hh"
+#include "../protocol/transfer/getsegmentrequest.hh"
 #include "../protocol/nodelist/getosdlistrequest.hh"
 #include "../protocol/nodelist/getosdlistreply.hh"
 #include "../protocol/status/switchprimaryosdrequestmsg.hh"
@@ -73,7 +73,7 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 	if (status == READY) {
 		struct FileMetaData fileMetaData { };
 		fileMetaData._id = uploadFileRequestMsg->getFileId();
-		fileMetaData._objectList = uploadFileRequestMsg->getObjectList();
+		fileMetaData._segmentList = uploadFileRequestMsg->getSegmentList();
 		fileMetaData._primaryList = uploadFileRequestMsg->getPrimaryList();
 		waitAndDelete(uploadFileRequestMsg);
 		return fileMetaData;
@@ -115,7 +115,7 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 		fileMetaData._id = downloadFileRequestMsg->getFileId();
 		fileMetaData._path = downloadFileRequestMsg->getFilePath();
 		fileMetaData._size = downloadFileRequestMsg->getSize();
-		fileMetaData._objectList = downloadFileRequestMsg->getObjectList();
+		fileMetaData._segmentList = downloadFileRequestMsg->getSegmentList();
 		fileMetaData._primaryList = downloadFileRequestMsg->getPrimaryList();
 		waitAndDelete(downloadFileRequestMsg);
 		return fileMetaData;
@@ -141,7 +141,7 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 		fileMetaData._id = downloadFileRequestMsg->getFileId();
 		fileMetaData._path = downloadFileRequestMsg->getFilePath();
 		fileMetaData._size = downloadFileRequestMsg->getSize();
-		fileMetaData._objectList = downloadFileRequestMsg->getObjectList();
+		fileMetaData._segmentList = downloadFileRequestMsg->getSegmentList();
 		fileMetaData._primaryList = downloadFileRequestMsg->getPrimaryList();
 		waitAndDelete(downloadFileRequestMsg);
 		return fileMetaData;
@@ -188,51 +188,51 @@ struct FileMetaData ClientCommunicator::getFileInfo(uint32_t clientId,
 	return downloadFile(clientId, filePath);
 }
 
-void ClientCommunicator::saveObjectList(uint32_t clientId, uint32_t fileId,
-		vector<uint64_t> objectList) {
+void ClientCommunicator::saveSegmentList(uint32_t clientId, uint32_t fileId,
+		vector<uint64_t> segmentList) {
 	uint32_t mdsSockfd = getMdsSockfd();
-	SaveObjectListRequestMsg* saveObjectListRequestMsg =
-			new SaveObjectListRequestMsg(this, mdsSockfd, clientId, fileId,
-					objectList);
-	saveObjectListRequestMsg->prepareProtocolMsg();
+	SaveSegmentListRequestMsg* saveSegmentListRequestMsg =
+			new SaveSegmentListRequestMsg(this, mdsSockfd, clientId, fileId,
+					segmentList);
+	saveSegmentListRequestMsg->prepareProtocolMsg();
 
-	addMessage(saveObjectListRequestMsg, true);
+	addMessage(saveSegmentListRequestMsg, true);
 
-	MessageStatus status = saveObjectListRequestMsg->waitForStatusChange();
+	MessageStatus status = saveSegmentListRequestMsg->waitForStatusChange();
 
 	if (status == READY) {
 		return ;
 	} else {
-		debug("Save Object List Request Failed [%" PRIu32 "]\n",fileId);
+		debug("Save Segment List Request Failed [%" PRIu32 "]\n",fileId);
 		exit(-1);
 	}
 	return;
 }
 
-vector<struct ObjectMetaData> ClientCommunicator::getNewObjectList (uint32_t clientId, uint32_t numOfObjs)
+vector<struct SegmentMetaData> ClientCommunicator::getNewSegmentList (uint32_t clientId, uint32_t numOfObjs)
 {
 	uint32_t mdsSockfd = getMdsSockfd();
-	debug("Requesting New Object Id, Number of Objects %" PRIu32 "\n", numOfObjs);
-	GetObjectIdListRequestMsg* getObjectIdListRequestMsg = new GetObjectIdListRequestMsg(this, mdsSockfd, clientId, numOfObjs);
-	getObjectIdListRequestMsg->prepareProtocolMsg();
+	debug("Requesting New Segment Id, Number of Segments %" PRIu32 "\n", numOfObjs);
+	GetSegmentIdListRequestMsg* getSegmentIdListRequestMsg = new GetSegmentIdListRequestMsg(this, mdsSockfd, clientId, numOfObjs);
+	getSegmentIdListRequestMsg->prepareProtocolMsg();
 
-	addMessage(getObjectIdListRequestMsg,true);
+	addMessage(getSegmentIdListRequestMsg,true);
 
-	MessageStatus status = getObjectIdListRequestMsg->waitForStatusChange();
+	MessageStatus status = getSegmentIdListRequestMsg->waitForStatusChange();
 
 	if(status == READY) {
-		vector<struct ObjectMetaData> objectMetaDataList;
-		vector<uint32_t> primaryList = getObjectIdListRequestMsg->getPrimaryList();
-		vector<uint64_t> objectList = getObjectIdListRequestMsg->getObjectIdList();
+		vector<struct SegmentMetaData> segmentMetaDataList;
+		vector<uint32_t> primaryList = getSegmentIdListRequestMsg->getPrimaryList();
+		vector<uint64_t> segmentList = getSegmentIdListRequestMsg->getSegmentIdList();
 		for(uint32_t i = 0; i < primaryList.size(); ++i){
-			struct ObjectMetaData tempObjectMetaData;
-			tempObjectMetaData._id =  objectList[i];
-			tempObjectMetaData._primary = primaryList[i];
-			objectMetaDataList.push_back(tempObjectMetaData);
+			struct SegmentMetaData tempSegmentMetaData;
+			tempSegmentMetaData._id =  segmentList[i];
+			tempSegmentMetaData._primary = primaryList[i];
+			segmentMetaDataList.push_back(tempSegmentMetaData);
 		}
-		return objectMetaDataList;
+		return segmentMetaDataList;
 	} else {
-		debug("%s\n","Get New Object List Failed");
+		debug("%s\n","Get New Segment List Failed");
 		exit(-1);
 	}
 
@@ -249,34 +249,34 @@ void ClientCommunicator::saveFileSize(uint32_t clientId, uint32_t fileId, uint64
 	return ;
 }
 
-void ClientCommunicator::replyPutObjectInit(uint32_t requestId,
-		uint32_t connectionId, uint64_t objectId) {
+void ClientCommunicator::replyPutSegmentInit(uint32_t requestId,
+		uint32_t connectionId, uint64_t segmentId) {
 
-	PutObjectInitReplyMsg* putObjectInitReplyMsg = new PutObjectInitReplyMsg(
-			this, requestId, connectionId, objectId);
-	putObjectInitReplyMsg->prepareProtocolMsg();
+	PutSegmentInitReplyMsg* putSegmentInitReplyMsg = new PutSegmentInitReplyMsg(
+			this, requestId, connectionId, segmentId);
+	putSegmentInitReplyMsg->prepareProtocolMsg();
 
-	addMessage(putObjectInitReplyMsg);
+	addMessage(putSegmentInitReplyMsg);
 }
 
-void ClientCommunicator::replyPutObjectEnd(uint32_t requestId,
-		uint32_t connectionId, uint64_t objectId) {
+void ClientCommunicator::replyPutSegmentEnd(uint32_t requestId,
+		uint32_t connectionId, uint64_t segmentId) {
 
-	ObjectTransferEndReplyMsg* putObjectEndReplyMsg =
-			new ObjectTransferEndReplyMsg(this, requestId, connectionId,
-					objectId);
-	putObjectEndReplyMsg->prepareProtocolMsg();
+	SegmentTransferEndReplyMsg* putSegmentEndReplyMsg =
+			new SegmentTransferEndReplyMsg(this, requestId, connectionId,
+					segmentId);
+	putSegmentEndReplyMsg->prepareProtocolMsg();
 
-	debug("Reply put object end for ID: %" PRIu64 "\n", objectId);
-	addMessage(putObjectEndReplyMsg);
+	debug("Reply put segment end for ID: %" PRIu64 "\n", segmentId);
+	addMessage(putSegmentEndReplyMsg);
 }
 
-void ClientCommunicator::requestObject(uint32_t dstSockfd, uint64_t objectId) {
-	GetObjectRequestMsg* getObjectRequestMsg = new GetObjectRequestMsg(this,
-			dstSockfd, objectId);
+void ClientCommunicator::requestSegment(uint32_t dstSockfd, uint64_t segmentId) {
+	GetSegmentRequestMsg* getSegmentRequestMsg = new GetSegmentRequestMsg(this,
+			dstSockfd, segmentId);
 
-	getObjectRequestMsg->prepareProtocolMsg();
-	addMessage(getObjectRequestMsg);
+	getSegmentRequestMsg->prepareProtocolMsg();
+	addMessage(getSegmentRequestMsg);
 }
 
 void ClientCommunicator::getOsdListAndConnect() {
@@ -295,11 +295,11 @@ void ClientCommunicator::getOsdListAndConnect() {
 	
 }
 
-uint32_t ClientCommunicator::switchPrimaryRequest(uint32_t clientId, uint64_t objectId) {
+uint32_t ClientCommunicator::switchPrimaryRequest(uint32_t clientId, uint64_t segmentId) {
 	uint32_t dstSockfd = -1;
 	while (dstSockfd == (uint32_t) -1) {
 		SwitchPrimaryOsdRequestMsg* msg = new
-		SwitchPrimaryOsdRequestMsg(this, getMdsSockfd(), clientId, objectId);
+		SwitchPrimaryOsdRequestMsg(this, getMdsSockfd(), clientId, segmentId);
 
 		msg->prepareProtocolMsg();
 		addMessage(msg, true);

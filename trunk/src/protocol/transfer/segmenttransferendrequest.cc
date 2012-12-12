@@ -9,26 +9,27 @@
 extern Osd* osd;
 #endif
 
+#ifdef COMPILE_FOR_CLIENT
+#include "../../client/client.hh"
+extern Client* client;
+#endif
 SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(Communicator* communicator) :
 		Message(communicator) {
-
+	_threadPoolSize = 10;
 }
 
 SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(Communicator* communicator,
-		uint32_t osdSockfd, uint64_t objectId, uint32_t segmentId) :
+		uint32_t osdSockfd, uint64_t segmentId) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
-	_objectId = objectId;
 	_segmentId = segmentId;
-	
 }
 
 void SegmentTransferEndRequestMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::SegmentTransferEndRequestPro segmentTransferEndRequestPro;
-	segmentTransferEndRequestPro.set_objectid(_objectId);
 	segmentTransferEndRequestPro.set_segmentid(_segmentId);
 
 	if (!segmentTransferEndRequestPro.SerializeToString(&serializedString)) {
@@ -50,17 +51,22 @@ void SegmentTransferEndRequestMsg::parse(char* buf) {
 	segmentTransferEndRequestPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	_objectId = segmentTransferEndRequestPro.objectid();
 	_segmentId = segmentTransferEndRequestPro.segmentid();
 
 }
 
 void SegmentTransferEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putSegmentEndProcessor (_msgHeader.requestId, _sockfd, _objectId, _segmentId);
+	osd->putSegmentEndProcessor (_msgHeader.requestId, _sockfd, _segmentId);
+#endif
+
+#ifdef COMPILE_FOR_CLIENT
+	debug ("Start Processor for segment ID = %" PRIu64 "\n", _segmentId);
+	client->putSegmentEndProcessor (_msgHeader.requestId, _sockfd, _segmentId);
+	debug ("End Processor for segment ID = %" PRIu64 "\n", _segmentId);
 #endif
 }
 
 void SegmentTransferEndRequestMsg::printProtocol() {
-	debug("[SEGMENT_TRANSFER_END_REQUEST] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 "\n", _objectId, _segmentId);
+	debug("[SEGMENT_TRANSFER_END_REQUEST] Segment ID = %" PRIu64 "\n", _segmentId);
 }

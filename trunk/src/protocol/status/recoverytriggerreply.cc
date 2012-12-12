@@ -19,11 +19,11 @@ RecoveryTriggerReplyMsg::RecoveryTriggerReplyMsg(Communicator* communicator) :
 }
 
 RecoveryTriggerReplyMsg::RecoveryTriggerReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t sockfd, const vector<struct ObjectLocation> &objectLocations) :
+		uint32_t requestId, uint32_t sockfd, const vector<struct SegmentLocation> &segmentLocations) :
 		Message(communicator) {
 	_msgHeader.requestId = requestId;
 	_sockfd = sockfd;
-	_objectLocations = objectLocations;
+	_segmentLocations = segmentLocations;
 
 }
 
@@ -32,11 +32,11 @@ void RecoveryTriggerReplyMsg::prepareProtocolMsg() {
 
 	ncvfs::RecoveryTriggerReplyPro recoveryTriggerReplyPro;
 
-	//TODO push object location list.
-	for (struct ObjectLocation ol: _objectLocations) {
-		ncvfs::ObjectLocationPro* olp =
-			recoveryTriggerReplyPro.add_objectlocations();
-		olp->set_objectid (ol.objectId);
+	//TODO push segment location list.
+	for (struct SegmentLocation ol: _segmentLocations) {
+		ncvfs::SegmentLocationPro* olp =
+			recoveryTriggerReplyPro.add_segmentlocations();
+		olp->set_segmentid (ol.segmentId);
 		olp->set_primaryid (ol.primaryId);
 		for (uint32_t osdId: ol.osdList) {
 			olp->add_osdlist (osdId);
@@ -62,16 +62,16 @@ void RecoveryTriggerReplyMsg::parse(char* buf) {
 	recoveryTriggerReplyPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	_objectLocations.clear();
-	for (int i = 0; i < recoveryTriggerReplyPro.objectlocations_size(); i++) {
-		ncvfs::ObjectLocationPro olp = recoveryTriggerReplyPro.objectlocations(i);
-		struct ObjectLocation ol;
-		ol.objectId = olp.objectid();
+	_segmentLocations.clear();
+	for (int i = 0; i < recoveryTriggerReplyPro.segmentlocations_size(); i++) {
+		ncvfs::SegmentLocationPro olp = recoveryTriggerReplyPro.segmentlocations(i);
+		struct SegmentLocation ol;
+		ol.segmentId = olp.segmentid();
 		ol.primaryId = olp.primaryid();
 		ol.osdList.clear();
 		for (int j = 0; j < olp.osdlist_size(); j++)
 			ol.osdList.push_back(olp.osdlist(j));
-		_objectLocations.push_back(ol);
+		_segmentLocations.push_back(ol);
 	}
 
 	return;
@@ -81,7 +81,7 @@ void RecoveryTriggerReplyMsg::doHandle() {
 	RecoveryTriggerRequestMsg* recoveryTriggerRequestMsg =
 			(RecoveryTriggerRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
-	recoveryTriggerRequestMsg->setObjectLocations(_objectLocations);
+	recoveryTriggerRequestMsg->setSegmentLocations(_segmentLocations);
 	recoveryTriggerRequestMsg->setStatus(READY);
 }
 

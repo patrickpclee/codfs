@@ -12,16 +12,16 @@
 #include "storage.hh"
 #include "../coding/coding.hh"
 #include "../common/debug.hh"
-#include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
+#include "../common/blockdata.hh"
 #include "../common/memorypool.hh"
 
 using namespace std;
 
 extern Coding* coding;
 extern string codingSetting;
+extern string blockFolder;
 extern string segmentFolder;
-extern string objectFolder;
 
 typedef chrono::high_resolution_clock Clock;
 typedef chrono::milliseconds milliseconds;
@@ -51,55 +51,55 @@ void printResult(Clock::time_point tStart, Clock::time_point tRead,
 
 }
 
-void doEncode(std::string srcObjectPath) {
+void doEncode(std::string srcSegmentPath) {
 
 	// start timer
 	Clock::time_point tStart = Clock::now();
 
-	ObjectData objectData;
+	SegmentData segmentData;
 
 	uint32_t filesize; // set by reference in readFile
-	objectData.buf = readFile(srcObjectPath, filesize); // read object
+	segmentData.buf = readFile(srcSegmentPath, filesize); // read segment
 
-	// fill in object information
-	uint64_t objectId = (uint64_t) time(NULL); // time is used as objectID in testing program only
-	objectData.info.objectSize = filesize;
-	objectData.info.objectId = objectId;
-	objectData.info.objectPath = srcObjectPath;
+	// fill in segment information
+	uint64_t segmentId = (uint64_t) time(NULL); // time is used as segmentID in testing program only
+	segmentData.info.segmentSize = filesize;
+	segmentData.info.segmentId = segmentId;
+	segmentData.info.segmentPath = srcSegmentPath;
 
-	cout << "Object ID: " << objectId << " Size: " << formatSize(filesize)
+	cout << "Segment ID: " << segmentId << " Size: " << formatSize(filesize)
 			<< endl;
 
-	// take time for reading objects
+	// take time for reading segments
 	Clock::time_point tRead = Clock::now();
 
 	// perform coding
-	vector<SegmentData> segmentDataList = coding->encode(objectData,
+	vector<BlockData> blockDataList = coding->encode(segmentData,
 			codingSetting);
 
-	// take time for coding objects
+	// take time for coding segments
 	Clock::time_point tCode = Clock::now();
 
-	// write object to storage
-	const string objectPath = objectFolder + "/" + to_string(objectId);
-	writeFile(objectPath, objectData.buf, objectData.info.objectSize);
-
 	// write segment to storage
-	cout << endl << "Writing Segments: " << endl;
-	for (auto segment : segmentDataList) {
-		const string segmentPath = segmentFolder + "/" + to_string(objectId)
-				+ "." + to_string(segment.info.segmentId);
+	const string segmentPath = segmentFolder + "/" + to_string(segmentId);
+	writeFile(segmentPath, segmentData.buf, segmentData.info.segmentSize);
 
-		writeFile(segmentPath, segment.buf, segment.info.segmentSize);
+	// write block to storage
+	cout << endl << "Writing Blocks: " << endl;
+	for (auto block : blockDataList) {
+		const string blockPath = blockFolder + "/" + to_string(segmentId)
+				+ "." + to_string(block.info.blockId);
 
-		cout << segment.info.segmentId << ": " << segmentPath << endl;
+		writeFile(blockPath, block.buf, block.info.blockSize);
 
-		// free segments
-		MemoryPool::getInstance().poolFree(segment.buf);
+		cout << block.info.blockId << ": " << blockPath << endl;
+
+		// free blocks
+		MemoryPool::getInstance().poolFree(block.buf);
 	}
 
-	// free object
-	MemoryPool::getInstance().poolFree(objectData.buf);
+	// free segment
+	MemoryPool::getInstance().poolFree(segmentData.buf);
 
 	// take time for writing and clean up
 	Clock::time_point tWrite = Clock::now();
@@ -108,68 +108,68 @@ void doEncode(std::string srcObjectPath) {
 	printResult(tStart, tRead, tCode, tWrite);
 
 	cout << endl << "Command for Decoding: " << endl
-			<< "./CODING_TESTER decode " << objectId << " " << filesize
+			<< "./CODING_TESTER decode " << segmentId << " " << filesize
 			<< " ./decoded_file" << endl;
 
 }
 
-void doDecode(uint64_t objectId, uint64_t objectSize, std::string dstObjectPath,
-		uint32_t numSegments, vector<bool> secondaryOsdStatus) {
+void doDecode(uint64_t segmentId, uint64_t segmentSize, std::string dstSegmentPath,
+		uint32_t numBlocks, vector<bool> secondaryOsdStatus) {
 
 	// start timer
 	Clock::time_point tStart = Clock::now();
 
-	vector<SegmentData> segmentDataList(numSegments);
+	vector<BlockData> blockDataList(numBlocks);
 
-	// find required segments
-	vector<uint32_t> requiredSegments = coding->getRequiredSegmentIds(
+	// find required blocks
+	vector<uint32_t> requiredBlocks = coding->getRequiredBlockIds(
 			codingSetting, secondaryOsdStatus);
 
-	if (requiredSegments.size() == 0) {
-		cerr << "Not enough segments to reconstruct file" << endl;
+	if (requiredBlocks.size() == 0) {
+		cerr << "Not enough blocks to reconstruct file" << endl;
 		return;
 	}
 
-	// read segments from files
-	cout << "Reading Segments: " << endl;
-	for (uint32_t i : requiredSegments) {
-		const string segmentPath = segmentFolder + "/" + to_string(objectId)
+	// read blocks from files
+	cout << "Reading Blocks: " << endl;
+	for (uint32_t i : requiredBlocks) {
+		const string blockPath = blockFolder + "/" + to_string(segmentId)
 				+ "." + to_string(i);
 
-		SegmentData segmentData;
+		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
-		segmentData.buf = readFile(segmentPath, filesize); // read segment
+		blockData.buf = readFile(blockPath, filesize); // read block
 
-		// fill in segment information
-		segmentData.info.objectId = objectId;
-		segmentData.info.segmentId = i;
-		segmentData.info.segmentSize = filesize;
+		// fill in block information
+		blockData.info.segmentId = segmentId;
+		blockData.info.blockId = i;
+		blockData.info.blockSize = filesize;
 
-		cout << i << ": " << segmentPath << " size = " << filesize << endl;
+		cout << i << ": " << blockPath << " size = " << filesize << endl;
 
-		segmentDataList[i] = segmentData;
+		blockDataList[i] = blockData;
 	}
 
-	// take time for reading objects
+	// take time for reading segments
 	Clock::time_point tRead = Clock::now();
 
 	// perform decoding
-	ObjectData objectData = coding->decode(segmentDataList, requiredSegments,
-			objectSize, codingSetting);
+	SegmentData segmentData = coding->decode(blockDataList, requiredBlocks,
+			segmentSize, codingSetting);
 
-	// take time for coding objects
+	// take time for coding segments
 	Clock::time_point tCode = Clock::now();
 
-	// write object to dstObjectPath
-	writeFile(dstObjectPath, objectData.buf, objectData.info.objectSize);
+	// write segment to dstSegmentPath
+	writeFile(dstSegmentPath, segmentData.buf, segmentData.info.segmentSize);
 
-	// free object
-	MemoryPool::getInstance().poolFree(objectData.buf);
+	// free segment
+	MemoryPool::getInstance().poolFree(segmentData.buf);
 
-	// free segments
-	for (uint32_t i : requiredSegments) {
-	//	cout << "Free-ing segment " << i << endl;
-		MemoryPool::getInstance().poolFree(segmentDataList[i].buf);
+	// free blocks
+	for (uint32_t i : requiredBlocks) {
+	//	cout << "Free-ing block " << i << endl;
+		MemoryPool::getInstance().poolFree(blockDataList[i].buf);
 	}
 
 	// take time for writing and clean up
@@ -178,7 +178,7 @@ void doDecode(uint64_t objectId, uint64_t objectSize, std::string dstObjectPath,
 	// print timing result
 	printResult(tStart, tRead, tCode, tWrite);
 
-	cout << "Decoded object written to " << dstObjectPath << endl;
+	cout << "Decoded segment written to " << dstSegmentPath << endl;
 
 }
 

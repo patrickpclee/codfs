@@ -10,14 +10,14 @@
 using namespace std;
 
 // use in client
-struct ObjectTransferClientInfo {
+struct SegmentTransferClientInfo {
 	uint64_t _id;
 	uint32_t _size;
 	uint32_t _chunkCount;
 };
 
 // use in OSD
-struct ObjectTransferOsdInfo {
+struct SegmentTransferOsdInfo {
 	uint64_t _id;
 	uint32_t _size;
 	vector <uint32_t> _osdList;
@@ -30,19 +30,19 @@ struct FileMetaData {
 	string _path;
 	uint32_t _id;
 	uint64_t _size;
-	vector<uint64_t> _objectList;
+	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;
 
 	string _checksum;
-	//uint64_t* _objectList[];
+	//uint64_t* _segmentList[];
 	FileType _fileType;	
 };
 
-struct ObjectMetaData {
+struct SegmentMetaData {
 	uint64_t _id;
 	uint32_t _size;
-	//uint32_t _segmentCount;
-	//uint32_t* _segmentList;
+	//uint32_t _blockCount;
+	//uint32_t* _blockList;
 	//uint32_t _offsetInFile;
 	vector<uint32_t> _nodeList;
 	uint32_t _primary;
@@ -51,9 +51,9 @@ struct ObjectMetaData {
 	string _codingSetting;
 };
 
-struct SegmentMetaData {
+struct BlockMetaData {
 	uint32_t _id;
-	uint32_t _offsetInObject;
+	uint32_t _offsetInSegment;
 	unsigned char* _checksum;
 };
 

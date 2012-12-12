@@ -3,7 +3,7 @@
 
 #include "../common/metadata.hh"
 #include "../communicator/communicator.hh"
-#include "../common/objectlocation.hh"
+#include "../common/segmentlocation.hh"
 
 #include <stdint.h>
 #include <vector>
@@ -19,16 +19,16 @@ public:
 	// Reply to Request
 
 	/**
-	 * @brief	Reply Object and Primary List to Client
+	 * @brief	Reply Segment and Primary List to Client
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	fileId	File ID
-	 * @param	objectList	Object List
+	 * @param	segmentList	Segment List
 	 * @param	primaryList	Primary List
 	 */
-	void replyObjectandPrimaryList(uint32_t requestId, uint32_t connectionId,
-			uint32_t fileId, vector<uint64_t> objectList,
+	void replySegmentandPrimaryList(uint32_t requestId, uint32_t connectionId,
+			uint32_t fileId, vector<uint64_t> segmentList,
 			vector<uint32_t> primaryList);
 
 	/**
@@ -41,13 +41,13 @@ public:
 	 * @param	fileSize	Size of the File
 	 * @param	fileType	File Type
 	 * @param	checksum	Checksum of the File
-	 * @param	objectList	Object List
+	 * @param	segmentList	Segment List
 	 * @param	primaryList	Primary List
 	 */
 	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId,
 			uint32_t fileId, string filePath, uint64_t fileSize,
 			const FileType& fileType, string checksum,
-			vector<uint64_t> objectList, vector<uint32_t> primaryList);
+			vector<uint64_t> segmentList, vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Delete File
@@ -70,39 +70,39 @@ public:
 	void replyRenameFile(uint32_t requestId, uint32_t connectionId, uint32_t fileId, const string& path);
 
 	/**
-	 * @brief	Reply Object ID List
+	 * @brief	Reply Segment ID List
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
-	 * @param	objectList	Object ID List
+	 * @param	segmentList	Segment ID List
 	 * @parma	primaryList	Primary List
 	 */
-	void replyObjectIdList(uint32_t requestId, uint32_t connectionId,
-			vector<uint64_t> objectList, vector<uint32_t> primaryList);
+	void replySegmentIdList(uint32_t requestId, uint32_t connectionId,
+			vector<uint64_t> segmentList, vector<uint32_t> primaryList);
 
 	/**
-	 * @brief	Reply Object Information to Osd
+	 * @brief	Reply Segment Information to Osd
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
-	 * @param	objectId	ID of the Object
-	 * @param 	objectSize	Object Size
+	 * @param	segmentId	ID of the Segment
+	 * @param 	segmentSize	Segment Size
 	 * @param	nodeList	Node List
 	 * @param	codingScheme	Coding Scheme for the file
 	 * @param 	codingSetting	Coding Scheme Setting
 	 */
-	void replyObjectInfo(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, uint32_t objectSize, vector<uint32_t> nodeList,
+	void replySegmentInfo(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId, uint32_t segmentSize, vector<uint32_t> nodeList,
 			CodingScheme codingScheme, string codingSetting);
 
 	/**
-	 * @brief	Reply Save Object List Request
+	 * @brief	Reply Save Segment List Request
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	fileId	File ID
 	 */
-	void replySaveObjectList(uint32_t rquestId, uint32_t connectionId,
+	void replySaveSegmentList(uint32_t rquestId, uint32_t connectionId,
 			uint32_t fileId);
 
 	/**
@@ -117,27 +117,27 @@ public:
 			vector<FileMetaData> folderData);
 
 	/**
-	 * @brief	Reply Current Primary of an object
+	 * @brief	Reply Current Primary of an segment
 	 *
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
-	 * @param	objectId	ID of the Object
+	 * @param	segmentId	ID of the Segment
 	 * @oarm	osdId		ID of the Primary Osd
 	 */
 	void replyPrimary(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, uint32_t osdId);
+			uint64_t segmentId, uint32_t osdId);
 
 	/**
-	 * @brief	Reply the Recovery Information (Object List and Associated Node List
+	 * @brief	Reply the Recovery Information (Segment List and Associated Node List
 	 * 
 	 * @param	requestId	Request ID
 	 * @param	connectionId	Connection ID
 	 * @param	osdId		ID of the Osd to be Recovered
-	 * @param	objectLocationList	List of the Location of Object
+	 * @param	segmentLocationList	List of the Location of Segment
 	 */
 
 	void replyRecoveryTrigger(uint32_t requestId, uint32_t connectionId,
-			vector<ObjectLocation> objectLocationList);
+			vector<SegmentLocation> segmentLocationList);
 
 	// Request to Other Nodes
 
@@ -152,7 +152,7 @@ public:
 	/**
 	 * @brief	Ask Monitor for Primary List
 	 *
-	 * @param	numOfObjs	Number of Objects
+	 * @param	numOfObjs	Number of Segments
 	 */
 	vector<uint32_t> askPrimaryList(uint32_t numOfObjs);
 

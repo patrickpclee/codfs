@@ -2,8 +2,8 @@
 #define __CODING_HH__
 
 #include <vector>
-#include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
+#include "../common/blockdata.hh"
 #include "../common/memorypool.hh"
 
 class Coding {
@@ -12,28 +12,28 @@ public:
 	Coding();
 	virtual ~Coding();
 
-	virtual vector<struct SegmentData> encode(struct ObjectData objectData,
+	virtual vector<struct BlockData> encode(struct SegmentData segmentData,
 			string setting) = 0;
-	virtual struct ObjectData decode(vector<struct SegmentData> &segmentData,
-			vector<uint32_t> &requiredSegments, uint32_t objectSize,
+	virtual struct SegmentData decode(vector<struct BlockData> &blockData,
+			vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
 			string setting) = 0;
 
-	virtual vector<uint32_t> getRequiredSegmentIds(string setting,
+	virtual vector<uint32_t> getRequiredBlockIds(string setting,
 			vector<bool> secondaryOsdStatus) = 0;
 
-	virtual vector<uint32_t> getRepairSrcSegmentIds(string setting,
-			vector<uint32_t> failedSegments, vector<bool> segmentStatus) = 0;
+	virtual vector<uint32_t> getRepairSrcBlockIds(string setting,
+			vector<uint32_t> failedBlocks, vector<bool> blockStatus) = 0;
 
 	/*
-	 the vector size of repairSrcSegments should be the total number of segments for that objects
-	 that means some nodes in repairSrcSegments is NULL
-	 this design is more convenient as we can address the element by its segmentId
+	 the vector size of repairSrcBlocks should be the total number of blocks for that segments
+	 that means some nodes in repairSrcBlocks is NULL
+	 this design is more convenient as we can address the element by its blockId
 	 */
 
-	virtual vector<struct SegmentData> repairSegments(
-			vector<uint32_t> failedSegments,
-			vector<struct SegmentData> &repairSrcSegments,
-			vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+	virtual vector<struct BlockData> repairBlocks(
+			vector<uint32_t> failedBlocks,
+			vector<struct BlockData> &repairSrcBlocks,
+			vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
 			string setting) = 0;
 
 	uint32_t roundTo(uint32_t numToRound, uint32_t multiple);

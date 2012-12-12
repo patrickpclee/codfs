@@ -5,8 +5,8 @@
 #include "coding.hh"
 #include "raid0coding.hh"
 #include "../common/debug.hh"
+#include "../common/blockdata.hh"
 #include "../common/segmentdata.hh"
-#include "../common/objectdata.hh"
 #include "../common/memorypool.hh"
 
 using namespace std;
@@ -19,64 +19,64 @@ Raid0Coding::~Raid0Coding() {
 
 }
 
-vector<struct SegmentData> Raid0Coding::encode(struct ObjectData objectData,
+vector<struct BlockData> Raid0Coding::encode(struct SegmentData segmentData,
 		string setting) {
 
-	vector<struct SegmentData> segmentDataList;
+	vector<struct BlockData> blockDataList;
 	const uint32_t raid0_n = getParameters(setting);
 
 	// calculate size of each strip
-	const uint32_t stripSize = Coding::roundTo(objectData.info.objectSize,
+	const uint32_t stripSize = Coding::roundTo(segmentData.info.segmentSize,
 			raid0_n) / raid0_n;
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
 
-		struct SegmentData segmentData;
-		segmentData.info.objectId = objectData.info.objectId;
-		segmentData.info.segmentId = i;
+		struct BlockData blockData;
+		blockData.info.segmentId = segmentData.info.segmentId;
+		blockData.info.blockId = i;
 
-		if (i == raid0_n - 1) { // last segment
-			segmentData.info.segmentSize = objectData.info.objectSize
+		if (i == raid0_n - 1) { // last block
+			blockData.info.blockSize = segmentData.info.segmentSize
 					- i * stripSize;
 
 		} else {
-			segmentData.info.segmentSize = stripSize;
+			blockData.info.blockSize = stripSize;
 		}
 
 		// TODO: free
-		segmentData.buf = MemoryPool::getInstance().poolMalloc(stripSize);
+		blockData.buf = MemoryPool::getInstance().poolMalloc(stripSize);
 
-		char* bufPos = objectData.buf + i * stripSize;
+		char* bufPos = segmentData.buf + i * stripSize;
 
-		memcpy(segmentData.buf, bufPos, segmentData.info.segmentSize);
+		memcpy(blockData.buf, bufPos, blockData.info.blockSize);
 
-		segmentDataList.push_back(segmentData);
+		blockDataList.push_back(blockData);
 	}
 
-	return segmentDataList;
+	return blockDataList;
 }
 
-struct ObjectData Raid0Coding::decode(vector<struct SegmentData> &segmentData,
-		vector<uint32_t> &requiredSegments, uint32_t objectSize,
+struct SegmentData Raid0Coding::decode(vector<struct BlockData> &blockData,
+		vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
 		string setting) {
 
-	// for raid 0, requiredSegments is not used as all segments are required to decode
+	// for raid 0, requiredBlocks is not used as all blocks are required to decode
 
-	struct ObjectData objectData;
+	struct SegmentData segmentData;
 
-	// copy objectID from first segment
-	objectData.info.objectId = segmentData[0].info.objectId;
-	objectData.info.objectSize = objectSize;
+	// copy segmentID from first block
+	segmentData.info.segmentId = blockData[0].info.segmentId;
+	segmentData.info.segmentSize = segmentSize;
 
-	objectData.buf = MemoryPool::getInstance().poolMalloc(objectSize);
+	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	uint64_t offset = 0;
-	for (struct SegmentData segment : segmentData) {
-		memcpy(objectData.buf + offset, segment.buf, segment.info.segmentSize);
-		offset += segment.info.segmentSize;
+	for (struct BlockData block : blockData) {
+		memcpy(segmentData.buf + offset, block.buf, block.info.blockSize);
+		offset += block.info.blockSize;
 	}
 
-	return objectData;
+	return segmentData;
 }
 
 uint32_t Raid0Coding::getParameters(string setting) {
@@ -85,7 +85,7 @@ uint32_t Raid0Coding::getParameters(string setting) {
 	return raid0_n;
 }
 
-vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting,
+vector<uint32_t> Raid0Coding::getRequiredBlockIds(string setting,
 		vector<bool> secondaryOsdStatus) {
 
 	// if any one in secondaryOsdStatus is false, return {} (error)
@@ -96,27 +96,27 @@ vector<uint32_t> Raid0Coding::getRequiredSegmentIds(string setting,
 		return {};
 	}
 
-	// for Raid0 Coding, require all segments for decode
+	// for Raid0 Coding, require all blocks for decode
 	const uint32_t raid0_n = getParameters(setting);
-	vector<uint32_t> requiredSegments(raid0_n);
+	vector<uint32_t> requiredBlocks(raid0_n);
 	for (uint32_t i = 0; i < raid0_n; i++) {
-		requiredSegments[i] = i;
+		requiredBlocks[i] = i;
 	}
-	return requiredSegments;
+	return requiredBlocks;
 }
 
-vector<uint32_t> Raid0Coding::getRepairSrcSegmentIds(string setting,
-		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
+vector<uint32_t> Raid0Coding::getRepairSrcBlockIds(string setting,
+		vector<uint32_t> failedBlocks, vector<bool> blockStatus) {
 
 	debug_error("%s\n", "Repair not supported in RAID0");
 
 	return {};
 }
 
-vector<struct SegmentData> Raid0Coding::repairSegments(
-		vector<uint32_t> failedSegments,
-		vector<struct SegmentData> &repairSrcSegments,
-		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+vector<struct BlockData> Raid0Coding::repairBlocks(
+		vector<uint32_t> failedBlocks,
+		vector<struct BlockData> &repairSrcBlocks,
+		vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
 		string setting) {
 
 	debug_error("%s\n", "Repair not supported in RAID0");

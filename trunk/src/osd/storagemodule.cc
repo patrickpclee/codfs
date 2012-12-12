@@ -30,19 +30,12 @@ mutex diskSpaceMutex;
 
 StorageModule::StorageModule() {
 	_openedFile = new FileLruCache <string, FILE*> (MAX_OPEN_FILES);
-	_objectTransferCache = {};
-	_objectFolder = configLayer->getConfigString("Storage>ObjectCacheLocation");
-	_segmentFolder = configLayer->getConfigString("Storage>SegmentLocation");
+	_segmentTransferCache = {};
+	_segmentFolder = configLayer->getConfigString("Storage>SegmentCacheLocation");
+	_blockFolder = configLayer->getConfigString("Storage>BlockLocation");
 
 	// create folder if not exist
 	struct stat st;
-	if(stat(_objectFolder.c_str(),&st) != 0) {
-		debug ("%s does not exist, make directory automatically\n", _objectFolder.c_str());
-		if (mkdir (_objectFolder.c_str(), S_IRWXU | S_IRGRP | S_IROTH) < 0) {
-			perror ("mkdir");
-			exit (-1);
-		}
-	}
 	if(stat(_segmentFolder.c_str(),&st) != 0) {
 		debug ("%s does not exist, make directory automatically\n", _segmentFolder.c_str());
 		if (mkdir (_segmentFolder.c_str(), S_IRWXU | S_IRGRP | S_IROTH) < 0) {
@@ -50,16 +43,23 @@ StorageModule::StorageModule() {
 			exit (-1);
 		}
 	}
+	if(stat(_blockFolder.c_str(),&st) != 0) {
+		debug ("%s does not exist, make directory automatically\n", _blockFolder.c_str());
+		if (mkdir (_blockFolder.c_str(), S_IRWXU | S_IRGRP | S_IROTH) < 0) {
+			perror ("mkdir");
+			exit (-1);
+		}
+	}
 
 	// Unit in StorageModule: Bytes
-	_maxObjectCache = stringToByte(configLayer->getConfigString("Storage>ObjectCacheCapacity"));
-	_maxSegmentCapacity = stringToByte(configLayer->getConfigString("Storage>SegmentCapacity"));
+	_maxSegmentCache = stringToByte(configLayer->getConfigString("Storage>SegmentCacheCapacity"));
+	_maxBlockCapacity = stringToByte(configLayer->getConfigString("Storage>BlockCapacity"));
 
 	cout << "=== STORAGE ===" << endl;
-	cout << "Object Cache Location = " << _objectFolder << " Size = "
-	<< formatSize(_maxObjectCache) << endl;
-	cout << "Segment Storage Location = " << _segmentFolder << " Size = "
-	<< formatSize(_maxSegmentCapacity) << endl;
+	cout << "Segment Cache Location = " << _segmentFolder << " Size = "
+	<< formatSize(_maxSegmentCache) << endl;
+	cout << "Block Storage Location = " << _blockFolder << " Size = "
+	<< formatSize(_maxBlockCapacity) << endl;
 	cout << "===============" << endl;
 
 	initializeStorageStatus();
@@ -72,18 +72,18 @@ StorageModule::~StorageModule() {
 void StorageModule::initializeStorageStatus() {
 
 	//
-	// initialize objects
+	// initialize segments
 	//
 
-	_freeObjectSpace = _maxObjectCache;
-	_freeSegmentSpace = _maxSegmentCapacity;
-	_currentObjectUsage = 0;
+	_freeSegmentSpace = _maxSegmentCache;
+	_freeBlockSpace = _maxBlockCapacity;
 	_currentSegmentUsage = 0;
+	_currentBlockUsage = 0;
 
 	struct dirent* dent;
 	DIR* srcdir;
 
-	srcdir = opendir(_objectFolder.c_str());
+	srcdir = opendir(_segmentFolder.c_str());
 	if (srcdir == NULL) {
 		perror("opendir");
 		exit(-1);
@@ -103,23 +103,23 @@ void StorageModule::initializeStorageStatus() {
 		}
 
 		// save file info
-		struct ObjectDiskCache objectDiskCache;
-		uint64_t objectId = boost::lexical_cast<uint64_t>(dent->d_name);
-		objectDiskCache.length = st.st_size;
-		objectDiskCache.lastAccessedTime = st.st_atim;
-		objectDiskCache.filepath = _objectFolder + dent->d_name;
+		struct SegmentDiskCache segmentDiskCache;
+		uint64_t segmentId = boost::lexical_cast<uint64_t>(dent->d_name);
+		segmentDiskCache.length = st.st_size;
+		segmentDiskCache.lastAccessedTime = st.st_atim;
+		segmentDiskCache.filepath = _segmentFolder + dent->d_name;
 
 		{
 			lock_guard<mutex> lk(diskCacheMutex);
-			_objectDiskCacheMap.set(objectId, objectDiskCache);
-			_objectCacheQueue.push_back(objectId);
+			_segmentDiskCacheMap.set(segmentId, segmentDiskCache);
+			_segmentCacheQueue.push_back(segmentId);
 		}
 
-		_freeObjectSpace -= st.st_size;
-		_currentObjectUsage += st.st_size;
+		_freeSegmentSpace -= st.st_size;
+		_currentSegmentUsage += st.st_size;
 
-		cout << "ID: " << objectId << "\tLength: " << objectDiskCache.length
-				<< "\t Modified: " << objectDiskCache.lastAccessedTime.tv_sec
+		cout << "ID: " << segmentId << "\tLength: " << segmentDiskCache.length
+				<< "\t Modified: " << segmentDiskCache.lastAccessedTime.tv_sec
 				<< endl;
 
 	}
@@ -127,14 +127,14 @@ void StorageModule::initializeStorageStatus() {
 
 	cout << "=======================" << endl;
 
-	cout << "Object Cache Usage: " << formatSize(_currentObjectUsage) << "/"
-			<< formatSize(_maxObjectCache) << endl;
+	cout << "Segment Cache Usage: " << formatSize(_currentSegmentUsage) << "/"
+			<< formatSize(_maxSegmentCache) << endl;
 
 	//
-	// initialize segments
+	// initialize blocks
 	//
 
-	srcdir = opendir(_segmentFolder.c_str());
+	srcdir = opendir(_blockFolder.c_str());
 	if (srcdir == NULL) {
 		perror("opendir");
 		exit(-1);
@@ -152,13 +152,13 @@ void StorageModule::initializeStorageStatus() {
 		}
 
 		// save file info
-		_freeSegmentSpace -= st.st_size;
-		_currentSegmentUsage += st.st_size;
+		_freeBlockSpace -= st.st_size;
+		_currentBlockUsage += st.st_size;
 	}
 	closedir(srcdir);
 
-	cout << "Segment Storage Usage: " << formatSize(_currentSegmentUsage) << "/"
-			<< formatSize(_maxSegmentCapacity) << endl;
+	cout << "Block Storage Usage: " << formatSize(_currentBlockUsage) << "/"
+			<< formatSize(_maxBlockCapacity) << endl;
 
 }
 
@@ -182,55 +182,55 @@ uint64_t StorageModule::getFilesize(string filepath) {
 
 }
 
-void StorageModule::createObjectTransferCache(uint64_t objectId, uint32_t length) {
+void StorageModule::createSegmentTransferCache(uint64_t segmentId, uint32_t length) {
 
 	// create cache
-	struct ObjectTransferCache objectTransferCache;
-	objectTransferCache.length = length;
-	objectTransferCache.buf = MemoryPool::getInstance().poolMalloc(length);
+	struct SegmentTransferCache segmentTransferCache;
+	segmentTransferCache.length = length;
+	segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(length);
 
 	// save cache to map
 	{
 		lock_guard<mutex> lk(transferCacheMutex);
-		_objectTransferCache[objectId] = objectTransferCache;
+		_segmentTransferCache[segmentId] = segmentTransferCache;
 	}
 
-	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 "\n",
-			objectId, length);
+	debug("Segment created ID = %" PRIu64 " Length = %" PRIu32 "\n",
+			segmentId, length);
 }
 
-void StorageModule::createObjectDiskCache(uint64_t objectId, uint32_t length) {
-	const string filepath = generateObjectPath(objectId, _objectFolder);
+void StorageModule::createSegmentDiskCache(uint64_t segmentId, uint32_t length) {
+	const string filepath = generateSegmentPath(segmentId, _segmentFolder);
 	createFile(filepath);
 
 	// write info
-	writeObjectInfo(objectId, length, filepath);
+	writeSegmentInfo(segmentId, length, filepath);
 }
 
-void StorageModule::createSegment(uint64_t objectId, uint32_t segmentId,
+void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
 		uint32_t length) {
 
-	const string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
+	const string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
 	createFile(filepath);
 
 	debug(
-			"Segment created ObjID = %" PRIu64 " SegmentID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
-			objectId, segmentId, length, filepath.c_str());
+			"Block created ObjID = %" PRIu64 " BlockID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
+			segmentId, blockId, length, filepath.c_str());
 }
 
-bool StorageModule::isObjectCached(uint64_t objectId) {
+bool StorageModule::isSegmentCached(uint64_t segmentId) {
 
-#ifndef USE_OBJECT_CACHE
+#ifndef USE_SEGMENT_CACHE
 	return false;
 #endif
 
 	lock_guard<mutex> lk(diskCacheMutex);
-	if (_objectDiskCacheMap.count(objectId)) {
+	if (_segmentDiskCacheMap.count(segmentId)) {
 
-		_objectDiskCacheMap.get(objectId).lastAccessedTime = {time(NULL), 0};
+		_segmentDiskCacheMap.get(segmentId).lastAccessedTime = {time(NULL), 0};
 
-		_objectCacheQueue.remove(objectId);
-		_objectCacheQueue.push_back(objectId);
+		_segmentCacheQueue.remove(segmentId);
+		_segmentCacheQueue.push_back(segmentId);
 
 		return true;
 	}
@@ -238,141 +238,141 @@ bool StorageModule::isObjectCached(uint64_t objectId) {
 }
 
 /**
- * Default length = 0 (read whole object)
+ * Default length = 0 (read whole segment)
  */
 
-struct ObjectData StorageModule::readObject(uint64_t objectId,
-		uint64_t offsetInObject, uint32_t length) {
-
-	struct ObjectData objectData;
-	objectData.info = readObjectInfo(objectId);
-
-	// check num of bytes to read
-	// if length = 0, read whole object
-	uint32_t byteToRead;
-	if (length == 0) {
-		byteToRead = objectData.info.objectSize;
-	} else {
-		byteToRead = length;
-	}
-
-	// TODO: check maximum malloc size
-	// poolFree in osd_communicator::sendObject
-	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
-
-	readFile(objectData.info.objectPath, objectData.buf, offsetInObject,
-			byteToRead);
-
-	debug(
-			"Object ID = %" PRIu64 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
-			objectId, byteToRead, offsetInObject);
-
-	return objectData;
-
-}
-
-struct SegmentData StorageModule::readSegment(uint64_t objectId,
-		uint32_t segmentId, uint64_t offsetInSegment, uint32_t length) {
+struct SegmentData StorageModule::readSegment(uint64_t segmentId,
+		uint64_t offsetInSegment, uint32_t length) {
 
 	struct SegmentData segmentData;
-	string segmentPath = generateSegmentPath(objectId, segmentId,
-			_segmentFolder);
-	segmentData.info.objectId = objectId;
-	segmentData.info.segmentId = segmentId;
+	segmentData.info = readSegmentInfo(segmentId);
 
 	// check num of bytes to read
 	// if length = 0, read whole segment
 	uint32_t byteToRead;
 	if (length == 0) {
-		const uint32_t filesize = getFilesize(segmentPath);
+		byteToRead = segmentData.info.segmentSize;
+	} else {
+		byteToRead = length;
+	}
+
+	// TODO: check maximum malloc size
+	// poolFree in osd_communicator::sendSegment
+	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
+
+	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,
+			byteToRead);
+
+	debug(
+			"Segment ID = %" PRIu64 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
+			segmentId, byteToRead, offsetInSegment);
+
+	return segmentData;
+
+}
+
+struct BlockData StorageModule::readBlock(uint64_t segmentId,
+		uint32_t blockId, uint64_t offsetInBlock, uint32_t length) {
+
+	struct BlockData blockData;
+	string blockPath = generateBlockPath(segmentId, blockId,
+			_blockFolder);
+	blockData.info.segmentId = segmentId;
+	blockData.info.blockId = blockId;
+
+	// check num of bytes to read
+	// if length = 0, read whole block
+	uint32_t byteToRead;
+	if (length == 0) {
+		const uint32_t filesize = getFilesize(blockPath);
 		byteToRead = filesize;
 	} else {
 		byteToRead = length;
 	}
 
-	segmentData.info.segmentSize = byteToRead;
+	blockData.info.blockSize = byteToRead;
 
-	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
+	blockData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
-	readFile(segmentPath, segmentData.buf, offsetInSegment, byteToRead);
+	readFile(blockPath, blockData.buf, offsetInBlock, byteToRead);
 
 	debug(
-			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
-			objectId, segmentId, byteToRead, offsetInSegment);
+			"Segment ID = %" PRIu64 " Block ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
+			segmentId, blockId, byteToRead, offsetInBlock);
 
-	return segmentData;
+	return blockData;
 }
 
-uint32_t StorageModule::writeObjectTransferCache(uint64_t objectId, char* buf,
-		uint64_t offsetInObject, uint32_t length) {
+uint32_t StorageModule::writeSegmentTransferCache(uint64_t segmentId, char* buf,
+		uint64_t offsetInSegment, uint32_t length) {
 
 	char* recvCache;
 
 	{
 		lock_guard<mutex> lk(transferCacheMutex);
-		if (!_objectTransferCache.count(objectId)) {
-			debug_error("Cannot find cache for object %" PRIu64 "\n", objectId);
+		if (!_segmentTransferCache.count(segmentId)) {
+			debug_error("Cannot find cache for segment %" PRIu64 "\n", segmentId);
 			exit(-1);
 		}
-		recvCache = _objectTransferCache[objectId].buf;
+		recvCache = _segmentTransferCache[segmentId].buf;
 	}
 
-	memcpy(recvCache + offsetInObject, buf, length);
+	memcpy(recvCache + offsetInSegment, buf, length);
 
 	return length;
 }
 
-uint32_t StorageModule::writeObjectDiskCache(uint64_t objectId, char* buf,
-		uint64_t offsetInObject, uint32_t length) {
+uint32_t StorageModule::writeSegmentDiskCache(uint64_t segmentId, char* buf,
+		uint64_t offsetInSegment, uint32_t length) {
 
 	uint32_t byteWritten;
 
-	string filepath = generateObjectPath(objectId, _objectFolder);
-	byteWritten = writeFile(filepath, buf, offsetInObject, length);
+	string filepath = generateSegmentPath(segmentId, _segmentFolder);
+	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
 
 	debug(
-			"Object ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
-			objectId, byteWritten, offsetInObject);
+			"Segment ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
+			segmentId, byteWritten, offsetInSegment);
 
 	return byteWritten;
 }
 
-uint32_t StorageModule::writeSegment(uint64_t objectId, uint32_t segmentId,
-		char* buf, uint64_t offsetInSegment, uint32_t length) {
+uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
+		char* buf, uint64_t offsetInBlock, uint32_t length) {
 
 	uint32_t byteWritten = 0;
 
-	string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
-	byteWritten = writeFile(filepath, buf, offsetInSegment, length);
+	string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
+	byteWritten = writeFile(filepath, buf, offsetInBlock, length);
 
 	debug(
-			"Object ID = %" PRIu64 " Segment ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
-			objectId, segmentId, byteWritten, offsetInSegment);
+			"Segment ID = %" PRIu64 " Block ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
+			segmentId, blockId, byteWritten, offsetInBlock);
 
-	updateSegmentFreespace(length);
+	updateBlockFreespace(length);
 //	closeFile(filepath);
 
 	return byteWritten;
 }
 
-void StorageModule::closeObjectTransferCache(uint64_t objectId) {
+void StorageModule::closeSegmentTransferCache(uint64_t segmentId) {
 	// close cache
-	struct ObjectTransferCache objectCache = getObjectTransferCache(objectId);
-	MemoryPool::getInstance().poolFree(objectCache.buf);
+	struct SegmentTransferCache segmentCache = getSegmentTransferCache(segmentId);
+	MemoryPool::getInstance().poolFree(segmentCache.buf);
 
 	{
 		lock_guard<mutex> lk(transferCacheMutex);
-		_objectTransferCache.erase(objectId);
+		_segmentTransferCache.erase(segmentId);
 	}
 
-	debug("Object Cache ID = %" PRIu64 " closed\n", objectId);
+	debug("Segment Cache ID = %" PRIu64 " closed\n", segmentId);
 }
 
-void StorageModule::flushObjectDiskCache(uint64_t objectId) {
+void StorageModule::flushSegmentDiskCache(uint64_t segmentId) {
 
 	FILE* filePtr = NULL;
 	try {
-		string filepath = generateObjectPath(objectId, _objectFolder);
+		string filepath = generateSegmentPath(segmentId, _segmentFolder);
 		filePtr = _openedFile->get (filepath);
 		fflush (filePtr);
 		fsync (fileno(filePtr));
@@ -382,11 +382,11 @@ void StorageModule::flushObjectDiskCache(uint64_t objectId) {
 	
 }
 
-void StorageModule::flushSegment(uint64_t objectId, uint32_t segmentId) {
+void StorageModule::flushBlock(uint64_t segmentId, uint32_t blockId) {
 
 	FILE* filePtr = NULL;
 	try {
-		string filepath = generateSegmentPath(objectId, segmentId, _segmentFolder);
+		string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
 		filePtr = _openedFile->get (filepath);
 		fflush (filePtr);
 		fsync (fileno(filePtr));
@@ -399,22 +399,22 @@ void StorageModule::flushSegment(uint64_t objectId, uint32_t segmentId) {
 // PRIVATE METHODS
 //
 
-void StorageModule::writeObjectInfo(uint64_t objectId, uint32_t objectSize,
+void StorageModule::writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
 		string filepath) {
 
 	// TODO: Database to be implemented
 
 }
 
-struct ObjectInfo StorageModule::readObjectInfo(uint64_t objectId) {
+struct SegmentInfo StorageModule::readSegmentInfo(uint64_t segmentId) {
 	// TODO: Database to be implemented
-	struct ObjectInfo objectInfo;
+	struct SegmentInfo segmentInfo;
 
-	objectInfo.objectId = objectId;
-	objectInfo.objectPath = generateObjectPath(objectId, _objectFolder);
-	objectInfo.objectSize = getFilesize(objectInfo.objectPath);
+	segmentInfo.segmentId = segmentId;
+	segmentInfo.segmentPath = generateSegmentPath(segmentId, _segmentFolder);
+	segmentInfo.segmentSize = getFilesize(segmentInfo.segmentPath);
 
-	return objectInfo;
+	return segmentInfo;
 }
 
 uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
@@ -471,18 +471,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	return byteWritten;
 }
 
-string StorageModule::generateObjectPath(uint64_t objectId,
-		string objectFolder) {
-
-	// append a '/' if not present
-	if (objectFolder[objectFolder.length() - 1] != '/') {
-		objectFolder.append("/");
-	}
-
-	return objectFolder + to_string(objectId);
-}
-
-string StorageModule::generateSegmentPath(uint64_t objectId, uint32_t segmentId,
+string StorageModule::generateSegmentPath(uint64_t segmentId,
 		string segmentFolder) {
 
 	// append a '/' if not present
@@ -490,7 +479,18 @@ string StorageModule::generateSegmentPath(uint64_t objectId, uint32_t segmentId,
 		segmentFolder.append("/");
 	}
 
-	return segmentFolder + to_string(objectId) + "." + to_string(segmentId);
+	return segmentFolder + to_string(segmentId);
+}
+
+string StorageModule::generateBlockPath(uint64_t segmentId, uint32_t blockId,
+		string blockFolder) {
+
+	// append a '/' if not present
+	if (blockFolder[blockFolder.length() - 1] != '/') {
+		blockFolder.append("/");
+	}
+
+	return blockFolder + to_string(segmentId) + "." + to_string(blockId);
 }
 
 /**
@@ -556,93 +556,93 @@ FILE* StorageModule::openFile(string filepath) {
  * Close file, remove from map
  */
 
-struct ObjectTransferCache StorageModule::getObjectTransferCache(uint64_t objectId) {
+struct SegmentTransferCache StorageModule::getSegmentTransferCache(uint64_t segmentId) {
 	lock_guard<mutex> lk(transferCacheMutex);
-	if (!_objectTransferCache.count(objectId)) {
-		debug_error("Object cache not found %" PRIu64 "\n", objectId);
+	if (!_segmentTransferCache.count(segmentId)) {
+		debug_error("Segment cache not found %" PRIu64 "\n", segmentId);
 		exit(-1);
 	}
-	return _objectTransferCache[objectId];
+	return _segmentTransferCache[segmentId];
 }
 
-void StorageModule::setMaxSegmentCapacity(uint32_t max_segment) {
-	_maxSegmentCapacity = max_segment;
+void StorageModule::setMaxBlockCapacity(uint32_t max_block) {
+	_maxBlockCapacity = max_block;
 }
 
-void StorageModule::setMaxObjectCache(uint32_t max_object) {
-	_maxObjectCache = max_object;
+void StorageModule::setMaxSegmentCache(uint32_t max_segment) {
+	_maxSegmentCache = max_segment;
 }
 
-uint32_t StorageModule::getMaxSegmentCapacity() {
-	return _maxSegmentCapacity;
+uint32_t StorageModule::getMaxBlockCapacity() {
+	return _maxBlockCapacity;
 }
 
-uint32_t StorageModule::getMaxObjectCache() {
-	return _maxObjectCache;
+uint32_t StorageModule::getMaxSegmentCache() {
+	return _maxSegmentCache;
+}
+
+bool StorageModule::verifyBlockSpace(uint32_t size) {
+	return size <= _freeBlockSpace ? true : false;
 }
 
 bool StorageModule::verifySegmentSpace(uint32_t size) {
 	return size <= _freeSegmentSpace ? true : false;
 }
 
-bool StorageModule::verifyObjectSpace(uint32_t size) {
-	return size <= _freeObjectSpace ? true : false;
-}
-
-void StorageModule::updateSegmentFreespace(uint32_t new_segment_size) {
-	uint32_t update_space = new_segment_size;
-	if (verifySegmentSpace(update_space)) {
-		_currentSegmentUsage += update_space;
-		_freeSegmentSpace -= update_space;
+void StorageModule::updateBlockFreespace(uint32_t new_block_size) {
+	uint32_t update_space = new_block_size;
+	if (verifyBlockSpace(update_space)) {
+		_currentBlockUsage += update_space;
+		_freeBlockSpace -= update_space;
 	} else {
-		perror("segment free space not enough.\n");
+		perror("block free space not enough.\n");
 	}
 
 }
 
-uint32_t StorageModule::getCurrentSegmentCapacity() {
+uint32_t StorageModule::getCurrentBlockCapacity() {
+	return _currentBlockUsage;
+}
+
+uint32_t StorageModule::getCurrentSegmentCache() {
 	return _currentSegmentUsage;
 }
 
-uint32_t StorageModule::getCurrentObjectCache() {
-	return _currentObjectUsage;
+uint32_t StorageModule::getFreeBlockSpace() {
+	return _freeBlockSpace;
 }
 
 uint32_t StorageModule::getFreeSegmentSpace() {
 	return _freeSegmentSpace;
 }
 
-uint32_t StorageModule::getFreeObjectSpace() {
-	return _freeObjectSpace;
-}
+int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
 
-int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
-
-	if (_maxObjectCache < newObjectSize) {
-		return -1; // error: object size larger than cache
+	if (_maxSegmentCache < newSegmentSize) {
+		return -1; // error: segment size larger than cache
 	}
 
-	while (_freeObjectSpace < newObjectSize) {
-		uint64_t objectId = 0;
-		struct ObjectDiskCache objectCache;
+	while (_freeSegmentSpace < newSegmentSize) {
+		uint64_t segmentId = 0;
+		struct SegmentDiskCache segmentCache;
 
 		{
 			lock_guard<mutex> lk(diskCacheMutex);
-			objectId = _objectCacheQueue.front();
-			objectCache = _objectDiskCacheMap.get(objectId);
+			segmentId = _segmentCacheQueue.front();
+			segmentCache = _segmentDiskCacheMap.get(segmentId);
 		}
 
-		remove(objectCache.filepath.c_str());
+		remove(segmentCache.filepath.c_str());
 
 		// update size
-		_freeObjectSpace += objectCache.length;
-		_currentObjectUsage -= objectCache.length;
+		_freeSegmentSpace += segmentCache.length;
+		_currentSegmentUsage -= segmentCache.length;
 
 		// remove from queue and map
 		{
 			lock_guard<mutex> lk(diskCacheMutex);
-			_objectCacheQueue.remove(objectId);
-			_objectDiskCacheMap.erase(objectId);
+			_segmentCacheQueue.remove(segmentId);
+			_segmentDiskCacheMap.erase(segmentId);
 		}
 	}
 
@@ -650,94 +650,94 @@ int32_t StorageModule::spareObjectSpace(uint32_t newObjectSize) {
 
 }
 
-void StorageModule::putObjectToDiskCache(uint64_t objectId,
-		ObjectTransferCache objectCache) {
+void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
+		SegmentTransferCache segmentCache) {
 
-	debug("Before saving object ID = %" PRIu64 ", cache = %s\n",
-			objectId, formatSize(_freeObjectSpace).c_str());
+	debug("Before saving segment ID = %" PRIu64 ", cache = %s\n",
+			segmentId, formatSize(_freeSegmentSpace).c_str());
 
-	uint32_t objectSize = objectCache.length;
+	uint32_t segmentSize = segmentCache.length;
 
 	{
 
 		lock_guard<mutex> lk(diskSpaceMutex);
 
-		if (!verifyObjectSpace(objectSize)) {
+		if (!verifySegmentSpace(segmentSize)) {
 			// clear cache if space is not available
-			//updateObjectFreespace(spareObjectSpace(objectSize));
-			if (spareObjectSpace(objectSize) == -1) {
+			//updateSegmentFreespace(spareSegmentSpace(segmentSize));
+			if (spareSegmentSpace(segmentSize) == -1) {
 				debug(
-						"Not enough space to cache object! Object Size = %" PRIu32 "\n",
-						objectSize);
+						"Not enough space to cache segment! Segment Size = %" PRIu32 "\n",
+						segmentSize);
 				return;
 			}
 		}
 
 	}
 
-	debug("Spare space for saving object ID = %" PRIu64 ", cache = %s\n",
-			objectId, formatSize(_freeObjectSpace).c_str());
+	debug("Spare space for saving segment ID = %" PRIu64 ", cache = %s\n",
+			segmentId, formatSize(_freeSegmentSpace).c_str());
 
 	// write cache to disk
-	const string filepath = generateObjectPath(objectId, _objectFolder);
+	const string filepath = generateSegmentPath(segmentId, _segmentFolder);
 	createFile(filepath);
 
-#ifdef USE_OBJECT_CACHE
-	uint64_t byteWritten = writeObjectDiskCache(objectId, objectCache.buf, 0,
-			objectCache.length);
+#ifdef USE_SEGMENT_CACHE
+	uint64_t byteWritten = writeSegmentDiskCache(segmentId, segmentCache.buf, 0,
+			segmentCache.length);
 #else
-	uint64_t byteWritten = objectCache.length;
+	uint64_t byteWritten = segmentCache.length;
 #endif
 
-	if (byteWritten != objectCache.length) {
-		perror("Cannot saveObjectToDisk");
+	if (byteWritten != segmentCache.length) {
+		perror("Cannot saveSegmentToDisk");
 		exit(-1);
 	}
-	flushObjectDiskCache(objectId);
+	flushSegmentDiskCache(segmentId);
 
-	_currentObjectUsage += objectSize;
-	_freeObjectSpace -= objectSize;
+	_currentSegmentUsage += segmentSize;
+	_freeSegmentSpace -= segmentSize;
 
 	// save cache to map
-	struct ObjectDiskCache objectDiskCache;
-	objectDiskCache.filepath = generateObjectPath(objectId, _objectFolder);
-	objectDiskCache.length = objectCache.length;
-	objectDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
+	struct SegmentDiskCache segmentDiskCache;
+	segmentDiskCache.filepath = generateSegmentPath(segmentId, _segmentFolder);
+	segmentDiskCache.length = segmentCache.length;
+	segmentDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
 
 	{
 		lock_guard<mutex> lk(diskCacheMutex);
-		_objectDiskCacheMap.set(objectId, objectDiskCache);
-		_objectCacheQueue.push_back(objectId);
+		_segmentDiskCacheMap.set(segmentId, segmentDiskCache);
+		_segmentCacheQueue.push_back(segmentId);
 	}
 
-	debug("After saving object ID = %" PRIu64 ", cache = %s\n",
-			objectId, formatSize(_freeObjectSpace).c_str());
+	debug("After saving segment ID = %" PRIu64 ", cache = %s\n",
+			segmentId, formatSize(_freeSegmentSpace).c_str());
 
 }
 
-struct ObjectData StorageModule::getObjectFromDiskCache(uint64_t objectId) {
-	struct ObjectData objectData;
-	struct ObjectDiskCache objectDiskCache;
+struct SegmentData StorageModule::getSegmentFromDiskCache(uint64_t segmentId) {
+	struct SegmentData segmentData;
+	struct SegmentDiskCache segmentDiskCache;
 	{
 		lock_guard<mutex> lk(diskCacheMutex);
-		objectDiskCache = _objectDiskCacheMap.get(objectId);
+		segmentDiskCache = _segmentDiskCacheMap.get(segmentId);
 	}
-	objectData = readObject(objectId, 0, objectDiskCache.length);
-	return objectData;
+	segmentData = readSegment(segmentId, 0, segmentDiskCache.length);
+	return segmentData;
 }
 
-void StorageModule::clearObjectDiskCache() {
+void StorageModule::clearSegmentDiskCache() {
 
-	for (auto object : _objectCacheQueue) {
-		remove(string(_objectFolder + to_string(object)).c_str());
+	for (auto segment : _segmentCacheQueue) {
+		remove(string(_segmentFolder + to_string(segment)).c_str());
 	}
 
 	{
 		lock_guard<mutex> lk(diskCacheMutex);
-		_objectCacheQueue.clear();
-		_objectDiskCacheMap.clear();
+		_segmentCacheQueue.clear();
+		_segmentDiskCacheMap.clear();
 	}
 
-	_freeObjectSpace = _maxObjectCache;
-	_currentObjectUsage = 0;
+	_freeSegmentSpace = _maxSegmentCache;
+	_currentSegmentUsage = 0;
 }

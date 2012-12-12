@@ -72,21 +72,21 @@ public:
 	uint64_t readFileSize(uint32_t fileId);
 
 	/**
-	 * @brief	Save the Object List of a File
+	 * @brief	Save the Segment List of a File
 	 *
 	 * @param	fileId	ID of the File
-	 * @param	objectList	List of Object ID
+	 * @param	segmentList	List of Segment ID
 	 */
-	void saveObjectList (uint32_t fileId, const vector<uint64_t> &objectList);
+	void saveSegmentList (uint32_t fileId, const vector<uint64_t> &segmentList);
 
 	/**
-	 * @brief	Read the Object List of a File
+	 * @brief	Read the Segment List of a File
 	 *
 	 * @param	fileId ID of the File
 	 *
-	 * @raturn	List of Object ID
+	 * @raturn	List of Segment ID
 	 */
-	vector<uint64_t> readObjectList(uint32_t fileId);
+	vector<uint64_t> readSegmentList(uint32_t fileId);
 
 	/**
 	 * @brief	Generate a New File ID

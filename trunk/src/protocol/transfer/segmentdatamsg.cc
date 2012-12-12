@@ -2,6 +2,7 @@
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
+#include "../../common/memorypool.hh"
 
 #ifdef COMPILE_FOR_OSD
 #include "../../osd/osd.hh"
@@ -19,22 +20,19 @@ SegmentDataMsg::SegmentDataMsg(Communicator* communicator) :
 }
 
 SegmentDataMsg::SegmentDataMsg(Communicator* communicator, uint32_t osdSockfd,
-		uint64_t objectId, uint32_t segmentId, uint64_t offset, uint32_t length) :
+		uint64_t segmentId, uint64_t offset, uint32_t length) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
-	_objectId = objectId;
 	_segmentId = segmentId;
 	_offset = offset;
 	_length = length;
-	
 }
 
 void SegmentDataMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::SegmentDataPro segmentDataPro;
-	segmentDataPro.set_objectid(_objectId);
 	segmentDataPro.set_segmentid(_segmentId);
 	segmentDataPro.set_offset(_offset);
 	segmentDataPro.set_length(_length);
@@ -58,7 +56,6 @@ void SegmentDataMsg::parse(char* buf) {
 	segmentDataPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	_objectId = segmentDataPro.objectid();
 	_segmentId = segmentDataPro.segmentid();
 	_offset = segmentDataPro.offset();
 	_length = segmentDataPro.length();
@@ -67,11 +64,14 @@ void SegmentDataMsg::parse(char* buf) {
 
 void SegmentDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putSegmentDataProcessor(_msgHeader.requestId, _sockfd, _objectId, _segmentId, _offset, _length, _payload);
+	osd->putSegmentDataProcessor(_msgHeader.requestId, _sockfd, _segmentId, _offset, _length, _payload);
+#endif
+#ifdef COMPILE_FOR_CLIENT
+	client->SegmentDataProcessor(_msgHeader.requestId, _sockfd, _segmentId, _offset, _length, _payload);
 #endif
 }
 
 void SegmentDataMsg::printProtocol() {
-	debug("[SEGMENT_DATA] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 ", offset = %" PRIu64 ", length = %" PRIu32 "\n",
-			_objectId, _segmentId, _offset, _length);
+	debug("[SEGMENT_DATA] Segment ID = %" PRIu64 ", offset = %" PRIu64 ", length = %" PRIu32 "\n",
+			_segmentId, _offset, _length);
 }

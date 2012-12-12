@@ -9,25 +9,25 @@
 #include <atomic>
 #include "../config/config.hh"
 #include "../common/memorypool.hh"
+#include "../common/blockdata.hh"
 #include "../common/segmentdata.hh"
-#include "../common/objectdata.hh"
 #include "../datastructure/concurrentmap.hh"
 #include "filelrucache.hh"
 using namespace std;
 
 /**
- * For caching an object in memory during upload/download
+ * For caching an segment in memory during upload/download
  */
 
-struct ObjectTransferCache {
+struct SegmentTransferCache {
 	uint32_t length;
 	char* buf;
 };
 
 /**
- * For retrieving an object cache file from the disk
+ * For retrieving an segment cache file from the disk
  */
-struct ObjectDiskCache {
+struct SegmentDiskCache {
 	uint32_t length;
 	string filepath;
 	struct timespec lastAccessedTime;
@@ -49,184 +49,184 @@ public:
 	~StorageModule();
 
 	/**
-	 * Check if the object exists in the storage
-	 * @param objectId Object ID
-	 * @return true if object exists, false otherwise
+	 * Check if the segment exists in the storage
+	 * @param segmentId Segment ID
+	 * @return true if segment exists, false otherwise
 	 */
 
-	bool isObjectCached(uint64_t objectId);
+	bool isSegmentCached(uint64_t segmentId);
 
 	/**
-	 * Creates an ObjectCache for downloading the object
-	 * @param objectId Object ID
-	 * @param length Length of object
-	 */
-
-	void createObjectTransferCache(uint64_t objectId, uint32_t length);
-
-	/**
-	 * Create and open the file for storing the object on disk
-	 * @param objectId Object ID
-	 * @param length Length of object
-	 */
-
-	void createObjectDiskCache(uint64_t objectId, uint32_t length);
-
-	/**
-	 * Create and open the file for storing the segment on disk
-	 * @param objectId Object ID
+	 * Creates an SegmentCache for downloading the segment
 	 * @param segmentId Segment ID
 	 * @param length Length of segment
 	 */
 
-	void createSegment(uint64_t objectId, uint32_t segmentId, uint32_t length);
+	void createSegmentTransferCache(uint64_t segmentId, uint32_t length);
 
 	/**
-	 * Read a part of an object from the storage
-	 * @param objectId ObjectID
-	 * @param offsetInObject Number of bytes to skip (default 0)
-	 * @param length Number of bytes to read (read whole object if 0)
-	 * @return ObjectData structure
+	 * Create and open the file for storing the segment on disk
+	 * @param segmentId Segment ID
+	 * @param length Length of segment
 	 */
 
-	struct ObjectData readObject(uint64_t objectId, uint64_t offsetInObject = 0,
-			uint32_t length = 0);
+	void createSegmentDiskCache(uint64_t segmentId, uint32_t length);
 
 	/**
-	 * Read a part of a segment from the storage
-	 * @param objectId Object ID
+	 * Create and open the file for storing the block on disk
 	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param length Length of block
+	 */
+
+	void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
+
+	/**
+	 * Read a part of an segment from the storage
+	 * @param segmentId SegmentID
 	 * @param offsetInSegment Number of bytes to skip (default 0)
 	 * @param length Number of bytes to read (read whole segment if 0)
 	 * @return SegmentData structure
 	 */
 
-	struct SegmentData readSegment(uint64_t objectId, uint32_t segmentId,
-			uint64_t offsetInSegment = 0, uint32_t length = 0);
+	struct SegmentData readSegment(uint64_t segmentId, uint64_t offsetInSegment = 0,
+			uint32_t length = 0);
 
 	/**
-	 * Write a partial object to the storage
-	 * @param objectId Object ID
+	 * Read a part of a block from the storage
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param offsetInBlock Number of bytes to skip (default 0)
+	 * @param length Number of bytes to read (read whole block if 0)
+	 * @return BlockData structure
+	 */
+
+	struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
+			uint64_t offsetInBlock = 0, uint32_t length = 0);
+
+	/**
+	 * Write a partial segment to the storage
+	 * @param segmentId Segment ID
 	 * @param buf Pointer to buffer containing data
-	 * @param offsetInObject Offset of the trunk in the object
+	 * @param offsetInSegment Offset of the trunk in the segment
 	 * @param length Number of bytes of the trunk
 	 * @return Number of bytes written
 	 */
 
-	uint32_t writeObjectDiskCache(uint64_t objectId, char* buf,
-			uint64_t offsetInObject, uint32_t length);
+	uint32_t writeSegmentDiskCache(uint64_t segmentId, char* buf,
+			uint64_t offsetInSegment, uint32_t length);
 
 	/**
-	 * Write a buffer to the ObjectCache of the object
-	 * @param objectId Object ID
+	 * Write a buffer to the SegmentCache of the segment
+	 * @param segmentId Segment ID
 	 * @param buf Pointer to buffer
-	 * @param offsetInObject No of bytes to skip in the cache
+	 * @param offsetInSegment No of bytes to skip in the cache
 	 * @param length No of bytes to write to the cache
 	 * @return No of bytes written
 	 */
 
-	uint32_t writeObjectTransferCache(uint64_t objectId, char* buf,
-			uint64_t offsetInObject, uint32_t length);
+	uint32_t writeSegmentTransferCache(uint64_t segmentId, char* buf,
+			uint64_t offsetInSegment, uint32_t length);
 
 	/**
-	 * Write a partial Segment ID to the storage
-	 * @param objectId Object ID
+	 * Write a partial Block ID to the storage
 	 * @param segmentId Segment ID
+	 * @param blockId Block ID
 	 * @param buf Pointer to buffer containing data
-	 * @param offsetInObject Offset of the trunk in the segment
+	 * @param offsetInSegment Offset of the trunk in the block
 	 * @param length Number of bytes of the trunk
 	 * @return Number of bytes written
 	 */
 
-	uint32_t writeSegment(uint64_t objectId, uint32_t segmentId, char* buf,
-			uint64_t offsetInSegment, uint32_t length);
+	uint32_t writeBlock(uint64_t segmentId, uint32_t blockId, char* buf,
+			uint64_t offsetInBlock, uint32_t length);
 
 	/**
-	 * Close and remove the object cache after the transfer is finished
-	 * @param objectId Object ID
-	 */
-
-	void closeObjectTransferCache(uint64_t objectId);
-
-	/**
-	 * Close the object file
-	 * @param objectId Object ID
-	 */
-
-	void flushObjectDiskCache(uint64_t objectId);
-
-	/**
-	 * Close the segment after the transfer is finished
-	 * @param objectId Object ID
+	 * Close and remove the segment cache after the transfer is finished
 	 * @param segmentId Segment ID
 	 */
 
-	void flushSegment(uint64_t objectId, uint32_t segmentId);
+	void closeSegmentTransferCache(uint64_t segmentId);
 
 	/**
-	 * Get back the ObjectCache from objectId
-	 * @param objectId 				Object ID
-	 *
-	 * @return ObjectTransferCache  Object Cache
+	 * Close the segment file
+	 * @param segmentId Segment ID
 	 */
 
-	struct ObjectTransferCache getObjectTransferCache(uint64_t objectId);
+	void flushSegmentDiskCache(uint64_t segmentId);
+
+	/**
+	 * Close the block after the transfer is finished
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 */
+
+	void flushBlock(uint64_t segmentId, uint32_t blockId);
+
+	/**
+	 * Get back the SegmentCache from segmentId
+	 * @param segmentId 				Segment ID
+	 *
+	 * @return SegmentTransferCache  Segment Cache
+	 */
+
+	struct SegmentTransferCache getSegmentTransferCache(uint64_t segmentId);
 
 	/**
 	 * Set the Capacity of OSD
-	 * @param max_segment capacity of OSD
+	 * @param max_block capacity of OSD
 	 */
 
-	void setMaxSegmentCapacity(uint32_t max_segment);
+	void setMaxBlockCapacity(uint32_t max_block);
 
 	/**
-	 * Set the object cache space of OSD
-	 * @param max_object capacity of object cache
+	 * Set the segment cache space of OSD
+	 * @param max_segment capacity of segment cache
 	 */
 
-	void setMaxObjectCache(uint32_t max_object);
+	void setMaxSegmentCache(uint32_t max_segment);
 
 	/**
 	 * Get the Capacity of OSD
 	 * @return uint32_t Max capacity of OSD
 	 */
 
-	uint32_t getMaxSegmentCapacity();
+	uint32_t getMaxBlockCapacity();
 
 	/**
-	 * Get the Space of Object Cache
-	 * @return uint32_t Max space of object cache
+	 * Get the Space of Segment Cache
+	 * @return uint32_t Max space of segment cache
 	 */
 
-	uint32_t getMaxObjectCache();
+	uint32_t getMaxSegmentCache();
 
 	/**
 	 * Get the current Capacity of OSD
 	 * @return uint32_t current capacity of OSD
 	 */
 
-	uint32_t getCurrentSegmentCapacity();
+	uint32_t getCurrentBlockCapacity();
 
 	/**
-	 * Get the current usage of object cache
-	 * @return uint32_t current usage of object cache
+	 * Get the current usage of segment cache
+	 * @return uint32_t current usage of segment cache
 	 */
 
-	uint32_t getCurrentObjectCache();
+	uint32_t getCurrentSegmentCache();
 
 	/**
 	 * Get the free space of OSD
 	 * @return uint32_t current free space of OSD
 	 */
 
-	uint32_t getFreeSegmentSpace();
+	uint32_t getFreeBlockSpace();
 
 	/**
-	 * Get the free space of object cache
-	 * @return uint32_t current free space of object cache
+	 * Get the free space of segment cache
+	 * @return uint32_t current free space of segment cache
 	 */
 
-	uint32_t getFreeObjectSpace();
+	uint32_t getFreeSegmentSpace();
 
 	/**
 	 * Verify whether OSD has enough space
@@ -235,35 +235,35 @@ public:
 	 * @return boolean 	TRUE/FALSE
 	 */
 
-	bool verifySegmentSpace(uint32_t size);
+	bool verifyBlockSpace(uint32_t size);
 
 	/**
-	 * Verify whether object cache has enough space
+	 * Verify whether segment cache has enough space
 	 * @param size 		the required space size
 	 *
 	 * @return boolean 	TRUE/FALSE
 	 */
 
-	bool verifyObjectSpace(uint32_t size);
+	bool verifySegmentSpace(uint32_t size);
 
 	/**
-	 * Save object to object cache on the disk
-	 * @param objectId 		object ID
-	 * @param objectCache 	the object cache to be saved
+	 * Save segment to segment cache on the disk
+	 * @param segmentId 		segment ID
+	 * @param segmentCache 	the segment cache to be saved
 	 */
 
-	void putObjectToDiskCache(uint64_t objectId, ObjectTransferCache objectCache);
+	void putSegmentToDiskCache(uint64_t segmentId, SegmentTransferCache segmentCache);
 
 	/**
-	 * Read object cache from the disk
-	 * @param objectId 		object ID
+	 * Read segment cache from the disk
+	 * @param segmentId 		segment ID
 	 *
-	 * @return objectData 	the object data from the cache
+	 * @return segmentData 	the segment data from the cache
 	 */
 
-	struct ObjectData getObjectFromDiskCache(uint64_t objectId);
+	struct SegmentData getSegmentFromDiskCache(uint64_t segmentId);
 
-	void clearObjectDiskCache();
+	void clearSegmentDiskCache();
 
 private:
 
@@ -274,61 +274,61 @@ private:
 
 	/**
 	 * Calculate and update the free space and usage of OSD
-	 * @param new_segment_size	the size of the segment to be saved
+	 * @param new_block_size	the size of the block to be saved
+	 */
+	void updateBlockFreespace(uint32_t new_block_size);
+
+	/**
+	 * Calculate and update the free space and usage of segment cache
+	 * @param new_segment_size	the size of the segment cache to be saved
 	 */
 	void updateSegmentFreespace(uint32_t new_segment_size);
 
 	/**
-	 * Calculate and update the free space and usage of object cache
-	 * @param new_object_size	the size of the object cache to be saved
-	 */
-	void updateObjectFreespace(uint32_t new_object_size);
-
-	/**
-	 * Delete old entry in the object cache to make room for new one
-	 * @param new_object_size	the size of the object cache to be saved
+	 * Delete old entry in the segment cache to make room for new one
+	 * @param new_segment_size	the size of the segment cache to be saved
 	 *
-	 * @return int32_t 			the updated size of object cache after deletion
+	 * @return int32_t 			the updated size of segment cache after deletion
 	 */
-	int32_t spareObjectSpace(uint32_t new_object_size);
+	int32_t spareSegmentSpace(uint32_t new_segment_size);
 
 	/**
-	 * Write the information about an object to the database
-	 * @param objectId Object ID
-	 * @param objectSize Number of bytes the object takes
-	 * @param filepath Location of the object in the filesystem
-	 */
-
-	void writeObjectInfo(uint64_t objectId, uint32_t objectSize,
-			string filepath);
-
-	/**
-	 * Read the information about an object from the database
-	 * @param objectId Object ID
-	 * @return ObjectInfo structure
-	 */
-
-	struct ObjectInfo readObjectInfo(uint64_t objectId);
-
-	/**
-	 * Write the information about a segment to the database
-	 * @param objectId Object ID
+	 * Write the information about an segment to the database
 	 * @param segmentId Segment ID
 	 * @param segmentSize Number of bytes the segment takes
 	 * @param filepath Location of the segment in the filesystem
 	 */
 
-	void writeSegmentInfo(uint64_t objectId, uint32_t segmentId,
-			uint32_t segmentSize, string filepath);
+	void writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
+			string filepath);
 
 	/**
-	 * Read the information about a segment form the database
-	 * @param objectId Object ID
+	 * Read the information about an segment from the database
 	 * @param segmentId Segment ID
 	 * @return SegmentInfo structure
 	 */
 
-//	struct SegmentInfo readSegmentInfo(uint64_t objectId, uint32_t segmentId);
+	struct SegmentInfo readSegmentInfo(uint64_t segmentId);
+
+	/**
+	 * Write the information about a block to the database
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param blockSize Number of bytes the block takes
+	 * @param filepath Location of the block in the filesystem
+	 */
+
+	void writeBlockInfo(uint64_t segmentId, uint32_t blockId,
+			uint32_t blockSize, string filepath);
+
+	/**
+	 * Read the information about a block form the database
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @return BlockInfo structure
+	 */
+
+//	struct BlockInfo readBlockInfo(uint64_t segmentId, uint32_t blockId);
 	/**
 	 * Open a file and read data to buffer
 	 * @param filepath Path of the file in the storage
@@ -354,24 +354,24 @@ private:
 			uint32_t length);
 
 	/**
-	 * Return the object path given Object ID
-	 * @param objectId Object ID
-	 * @param objectFolder Location where objects are stored
-	 * @return filepath of the object in the filesystem
-	 */
-
-	string generateObjectPath(uint64_t objectId, string objectFolder);
-
-	/**
-	 * Return the segment path given Object ID and Segment ID
-	 * @param objectId Object ID
+	 * Return the segment path given Segment ID
 	 * @param segmentId Segment ID
 	 * @param segmentFolder Location where segments are stored
 	 * @return filepath of the segment in the filesystem
 	 */
 
-	string generateSegmentPath(uint64_t objectId, uint32_t segmentId,
-			string segmentFolder);
+	string generateSegmentPath(uint64_t segmentId, string segmentFolder);
+
+	/**
+	 * Return the block path given Segment ID and Block ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param blockFolder Location where blocks are stored
+	 * @return filepath of the block in the filesystem
+	 */
+
+	string generateBlockPath(uint64_t segmentId, uint32_t blockId,
+			string blockFolder);
 
 	/**
 	 * Create a file on disk and open it
@@ -398,20 +398,20 @@ private:
 	uint64_t getFilesize(string filepath);
 
 	// TODO: use more efficient data structure for LRU delete
-	ConcurrentMap<uint64_t, struct ObjectDiskCache> _objectDiskCacheMap;
-	list<uint64_t> _objectCacheQueue;
+	ConcurrentMap<uint64_t, struct SegmentDiskCache> _segmentDiskCacheMap;
+	list<uint64_t> _segmentCacheQueue;
 
 	FileLruCache <string, FILE*>* _openedFile;
 	//map<string, FILE*> _openedFile;
-	map<uint64_t, struct ObjectTransferCache> _objectTransferCache;
-	string _objectFolder;
+	map<uint64_t, struct SegmentTransferCache> _segmentTransferCache;
 	string _segmentFolder;
-	uint64_t _maxSegmentCapacity;
-	uint64_t _maxObjectCache;
+	string _blockFolder;
+	uint64_t _maxBlockCapacity;
+	uint64_t _maxSegmentCache;
+	atomic<uint64_t> _freeBlockSpace;
 	atomic<uint64_t> _freeSegmentSpace;
-	atomic<uint64_t> _freeObjectSpace;
+	atomic<uint32_t> _currentBlockUsage;
 	atomic<uint32_t> _currentSegmentUsage;
-	atomic<uint32_t> _currentObjectUsage;
 };
 
 #endif

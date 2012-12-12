@@ -7,7 +7,7 @@ using namespace std;
 
 /**
  * Extends the Message class
- * Initiate an object upload
+ * Initiate an segment upload
  */
 
 class PutSegmentInitReplyMsg: public Message {
@@ -16,7 +16,7 @@ public:
 	PutSegmentInitReplyMsg(Communicator* communicator);
 
 	PutSegmentInitReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t osdSockfd,
-			uint64_t objectId, uint32_t segmentId);
+			uint64_t segmentId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -48,8 +48,7 @@ public:
 	void printProtocol();
 
 private:
-	uint64_t _objectId;
-	uint32_t _segmentId;
+	uint64_t _segmentId;
 };
 
 #endif

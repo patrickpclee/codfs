@@ -11,12 +11,11 @@ SegmentTransferEndReplyMsg::SegmentTransferEndReplyMsg(Communicator* communicato
 }
 
 SegmentTransferEndReplyMsg::SegmentTransferEndReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t dstSockfd, uint64_t objectId, uint32_t segmentId) :
+		uint32_t requestId, uint32_t dstSockfd, uint64_t segmentId) :
 		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
 	_sockfd = dstSockfd;
-	_objectId = objectId;
 	_segmentId = segmentId;
 	
 }
@@ -25,7 +24,6 @@ void SegmentTransferEndReplyMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::SegmentTransferEndReplyPro segmentTransferEndReplyPro;
-	segmentTransferEndReplyPro.set_objectid(_objectId);
 	segmentTransferEndReplyPro.set_segmentid(_segmentId);
 
 	if (!segmentTransferEndReplyPro.SerializeToString(&serializedString)) {
@@ -47,7 +45,6 @@ void SegmentTransferEndReplyMsg::parse(char* buf) {
 	segmentTransferEndReplyPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	_objectId = segmentTransferEndReplyPro.objectid();
 	_segmentId = segmentTransferEndReplyPro.segmentid();
 
 }
@@ -60,5 +57,5 @@ void SegmentTransferEndReplyMsg::doHandle() {
 }
 
 void SegmentTransferEndReplyMsg::printProtocol() {
-	debug("[SEGMENT_TRANSFER_END_REPLY] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 "\n", _objectId, _segmentId);
+	debug("[SEGMENT_TRANSFER_END_REPLY] Segment ID = %" PRIu64 "\n", _segmentId);
 }

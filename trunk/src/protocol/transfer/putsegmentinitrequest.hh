@@ -1,17 +1,15 @@
 #ifndef __PUTSEGMENTINITREQUEST_HH__
 #define __PUTSEGMENTINITREQUEST_HH__
 
+#include "../../common/enums.hh"
 #include "../message.hh"
 
 using namespace std;
 
 /**
  * Extends the Message class
-<<<<<<< HEAD
- * Initiate an segment trasfer
+ * Initiate an segment upload
  */
-
-
 
 class PutSegmentInitRequestMsg: public Message {
 public:
@@ -19,7 +17,8 @@ public:
 	PutSegmentInitRequestMsg(Communicator* communicator);
 
 	PutSegmentInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t objectId, uint32_t segmentId, uint32_t segmentSize, uint32_t chunkCount);
+			uint64_t segmentId, uint32_t segmentSize, uint32_t chunkCount,
+			CodingScheme codingScheme, const string &codingSetting, const string &checksum);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -51,10 +50,12 @@ public:
 	void printProtocol();
 
 private:
-	uint64_t _objectId;
-	uint32_t _segmentId;
-	uint32_t _segmentSize;
+	uint64_t _segmentId;
+	uint64_t _segmentSize;
 	uint32_t _chunkCount;
+	CodingScheme _codingScheme;
+	string _codingSetting;
+	string _checksum;
 };
 
 #endif

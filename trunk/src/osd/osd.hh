@@ -10,9 +10,9 @@
 #include "storagemodule.hh"
 #include "codingmodule.hh"
 #include "../common/metadata.hh"
-#include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
-#include "../common/segmentlocation.hh"
+#include "../common/blockdata.hh"
+#include "../common/blocklocation.hh"
 #include "../common/onlineosd.hh"
 #include "../protocol/message.hh"
 #include "../datastructure/concurrentmap.hh"
@@ -20,30 +20,30 @@
 /**
  * Central class of OSD
  * All functions of OSD are invoked here
- * Objects and Segments can be divided into trunks for transportation
+ * Segments and Blocks can be divided into trunks for transportation
  */
 
 /**
  * Message Functions
  *
  * UPLOAD
- * 1. putObjectProcessor
- * 2. objectTrunkProcessor 	-> getOsdListRequest (MONITOR)
+ * 1. putSegmentProcessor
+ * 2. segmentTrunkProcessor 	-> getOsdListRequest (MONITOR)
  * 									-> osdListProcessor
- * 							-> sendSegmentToOsd
- * 3. (other OSD) putSegmentProcessor
- * 4. (other OSD) segmentTrunkProcessor
- * 5. sendSegmentAck (PRIMARY OSD, CLIENT, MDS)
+ * 							-> sendBlockToOsd
+ * 3. (other OSD) putBlockProcessor
+ * 4. (other OSD) blockTrunkProcessor
+ * 5. sendBlockAck (PRIMARY OSD, CLIENT, MDS)
  *
  * DOWNLOAD
- * 1. getObjectProcessor 	-> getOsdListRequest (MDS)
+ * 1. getSegmentProcessor 	-> getOsdListRequest (MDS)
  * 									-> osdListProcessor
- * 2. getSegmentRequest
- * 			-> (other OSD) getSegmentProcessor
- * 			-> (other OSD) sendSegmentToOsd
- * 			-> putSegmentProcessor
- * 			-> segmentTrunkProcessor
- * 	3. sendObjectToClient
+ * 2. getBlockRequest
+ * 			-> (other OSD) getBlockProcessor
+ * 			-> (other OSD) sendBlockToOsd
+ * 			-> putBlockProcessor
+ * 			-> blockTrunkProcessor
+ * 	3. sendSegmentToClient
  */
 
 class Osd {
@@ -65,108 +65,69 @@ public:
 	 * Action when an OSD list is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param objectId 	Object ID
+	 * @param segmentId 	Segment ID
 	 * @param osdList 	Secondary OSD List
 	 * @return Length of list if success, -1 if failure
 	 */
 
 	uint32_t osdListProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, vector<struct SegmentLocation> osdList);
+			uint64_t segmentId, vector<struct BlockLocation> osdList);
 
 	// DOWNLOAD
-
-	/**
-	 * Action when a getObjectRequest is received
-	 * @param requestId Request ID
-	 * @param sockfd Socket descriptor of message source
-	 * @param objectId 	ID of the object to send
-	 * @param localRetrieve (Optional) Return object directly for recovery
-	 */
-
-	ObjectData getObjectRequestProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, bool localRetrieve = false);
 
 	/**
 	 * Action when a getSegmentRequest is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param objectId 	ID of Object that the segment is belonged to
-	 * @param segmentId ID of the segment to send
+	 * @param segmentId 	ID of the segment to send
+	 * @param localRetrieve (Optional) Return segment directly for recovery
 	 */
 
-	void getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t segmentId);
+	SegmentData getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, bool localRetrieve = false);
 
 	/**
-	 * Action when a put object request is received
+	 * Action when a getBlockRequest is received
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param segmentId 	ID of Segment that the block is belonged to
+	 * @param blockId ID of the block to send
+	 */
+
+	void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t blockId);
+
+	/**
+	 * Action when a put segment request is received
 	 * A number of trunks are expected to receive afterwards
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param objectId Object ID
-	 * @param length Object size, equals the total length of all the trunks
+	 * @param segmentId Segment ID
+	 * @param length Segment size, equals the total length of all the trunks
 	 * @param chunkCount number of chunks that will be received
-	 * @param codingScheme Coding Scheme for the object
-	 * @param setting Coding setting for the object
-	 * @param checksum Checksum of the object
+	 * @param codingScheme Coding Scheme for the segment
+	 * @param setting Coding setting for the segment
+	 * @param checksum Checksum of the segment
 	 */
 
-	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t length, uint32_t chunkCount,
+	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
 			CodingScheme codingScheme, string setting, string checksum);
 
 	/**
-	 * Action when a put object end is received
+	 * Action when a put segment end is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param objectId Object ID
-	 */
-
-	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId);
-
-	/**
-	 * Action when an object trunk is received
-	 * @param requestId Request ID
-	 * @param sockfd Socket descriptor of message source
-	 * @param objectId Object ID
-	 * @param offset Offset of the trunk in the object
-	 * @param length Length of trunk
-	 * @param buf Pointer to buffer
-	 * @return Length of trunk if success, -1 if failure
-	 */
-
-	uint32_t putObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
-
-	/**
-	 * Action when a put object request is received
-	 * A number of trunks are expected to receive afterwards
-	 * @param requestId Request ID
-	 * @param sockfd Socket descriptor of message source
-	 * @param objectId Object ID
 	 * @param segmentId Segment ID
-	 * @param length Segment size, equals the total length of all the trunks
-	 * @param chunkCount No of trunks to receive
 	 */
 
-	/**
-	 * Distribute Segments to OSD
-	 *
-	 * @param	objectId		Object Id
-	 * @param	segmentData		Data Segment
-	 * @param	segmentLocation Location of Segment
-	 */
-	void distributeSegment(uint64_t objectId, const struct SegmentData& segmentData, const struct SegmentLocation& segmentLocation);
-
-	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t segmentId, uint32_t length,
-			uint32_t chunkCount);
+	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId);
 
 	/**
-	 * Action when a segment trunk is received
+	 * Action when an segment trunk is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param objectId Object ID
 	 * @param segmentId Segment ID
 	 * @param offset Offset of the trunk in the segment
 	 * @param length Length of trunk
@@ -175,32 +136,71 @@ public:
 	 */
 
 	uint32_t putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t segmentId, uint32_t offset,
+			uint64_t segmentId, uint64_t offset, uint32_t length, char* buf);
+
+	/**
+	 * Action when a put segment request is received
+	 * A number of trunks are expected to receive afterwards
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param length Block size, equals the total length of all the trunks
+	 * @param chunkCount No of trunks to receive
+	 */
+
+	/**
+	 * Distribute Blocks to OSD
+	 *
+	 * @param	segmentId		Segment Id
+	 * @param	blockData		Data Block
+	 * @param	blockLocation Location of Block
+	 */
+	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData, const struct BlockLocation& blockLocation);
+
+	void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t blockId, uint32_t length,
+			uint32_t chunkCount);
+
+	/**
+	 * Action when a block trunk is received
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param offset Offset of the trunk in the block
+	 * @param length Length of trunk
+	 * @param buf Pointer to buffer
+	 * @return Length of trunk if success, -1 if failure
+	 */
+
+	uint32_t putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t blockId, uint32_t offset,
 			uint32_t length, char* buf);
 
 	/**
-	 * Action when a put segment end is received
+	 * Action when a put block end is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param objectId Object ID
 	 * @param segmentId Segment ID
+	 * @param blockId Block ID
 	 */
 
-	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t segmentId);
+	void putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t blockId);
 
 	/**
 	 * Action when a recovery request is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param objectId Object ID
-	 * @param repairSegmentId Segment ID to be repaired
-	 * @param repairSegmentOsd New OSDs to store the repaired segments
+	 * @param segmentId Segment ID
+	 * @param repairBlockId Block ID to be repaired
+	 * @param repairBlockOsd New OSDs to store the repaired blocks
 	 */
 
-	void repairObjectInfoProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, vector<uint32_t> repairSegmentId,
-			vector<uint32_t> repairSegmentOsd);
+	void repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, vector<uint32_t> repairBlockId,
+			vector<uint32_t> repairBlockOsd);
 
 	/**
 	 * Action when a monitor requests a status update 
@@ -262,9 +262,9 @@ public:
 
 	/**
 	 * Get a reference of OSD Cache
-	 * @return Pointer to OSD segment location cache
+	 * @return Pointer to OSD block location cache
 	 */
-	//SegmentLocationCache* getSegmentLocationCache();
+	//BlockLocationCache* getBlockLocationCache();
 	/**
 	 * Get the ID
 	 * @return OSD ID
@@ -273,71 +273,71 @@ public:
 	uint32_t getOsdId();
 
 	/**
-	 * If segment is not requested, return false and set status to true
-	 * If segment is requested, return true
-	 * @param objectId Object ID
+	 * If block is not requested, return false and set status to true
+	 * If block is requested, return true
 	 * @param segmentId Segment ID
-	 * @return is segment requested
+	 * @param blockId Block ID
+	 * @return is block requested
 	 */
 
-	bool isSegmentRequested (uint64_t objectId, uint32_t segmentId);
+	bool isBlockRequested (uint64_t segmentId, uint32_t blockId);
 
 private:
 
 	/**
-	 * Set the bool array containing the status of the OSDs holding the segments
+	 * Set the bool array containing the status of the OSDs holding the blocks
 	 * @param osdListStatus Bool array representing OSD status (true = up, false = down)
 	 */
 
 //	void setOsdListStatus (vector<bool> &secondaryOsdStatus);
 
 	/**
-	 * Retrieve a segment from the storage
-	 * @param objectId ID of the object that the segment is belonged to
-	 * @param segmentId Target Segment ID
-	 * @return SegmentData structure
+	 * Retrieve a block from the storage
+	 * @param segmentId ID of the segment that the block is belonged to
+	 * @param blockId Target Block ID
+	 * @return BlockData structure
 	 */
 
-	struct SegmentData getSegmentFromStroage(uint64_t objectId,
-			uint32_t segmentId);
+	struct BlockData getBlockFromStroage(uint64_t segmentId,
+			uint32_t blockId);
 
 	/**
-	 * Save a segment to storage
-	 * @param segmentData a SegmentData structure
-	 * @return Length of segment if success, -1 if failure
+	 * Save a block to storage
+	 * @param blockData a BlockData structure
+	 * @return Length of block if success, -1 if failure
 	 */
 
-	uint32_t saveSegmentToStorage(SegmentData segmentData);
+	uint32_t saveBlockToStorage(BlockData blockData);
 
 	/**
-	 * Perform degraded read of an object
-	 * @param objectId ID of the object to read
-	 * @return an ObjectData structure
+	 * Perform degraded read of an segment
+	 * @param segmentId ID of the segment to read
+	 * @return an SegmentData structure
 	 */
 
-	struct ObjectData degradedRead(uint64_t objectId);
+	struct SegmentData degradedRead(uint64_t segmentId);
 
 	/**
-	 * Cache object to disk cache
-	 * @param objectId Object ID
-	 * @param objectData Object Data structure
+	 * Cache segment to disk cache
+	 * @param segmentId Segment ID
+	 * @param segmentData Segment Data structure
 	 */
 
-	void cacheObject (uint64_t objectId, ObjectData objectData);
+	void cacheSegment (uint64_t segmentId, SegmentData segmentData);
 
 	/**
-	 * Free objectData
-	 * @param objectId Object ID
-	 * @param objectData Object Data structure
+	 * Free segmentData
+	 * @param segmentId Segment ID
+	 * @param segmentData Segment Data structure
 	 */
 
-	void freeObject(uint64_t objectId, ObjectData objectData);
+	void freeSegment(uint64_t segmentId, SegmentData segmentData);
 
 	/**
-	 * Stores the list of OSDs that store a certain segment
+	 * Stores the list of OSDs that store a certain block
 	 */
 
-	//SegmentLocationCache* _segmentLocationCache;
+	//BlockLocationCache* _blockLocationCache;
 	/**
 	 * Handles communication with other components
 	 */
@@ -360,23 +360,23 @@ private:
 	uint32_t _osdId;
 
 	// upload
-	ConcurrentMap<uint64_t, uint32_t> _pendingObjectChunk;
+	ConcurrentMap<uint64_t, uint32_t> _pendingSegmentChunk;
 	ConcurrentMap<uint64_t, struct CodingSetting> _codingSettingMap;
 	ConcurrentMap<uint64_t, string> _checksumMap;
 
 	// download
 	/*
-	ConcurrentMap<uint64_t, vector<bool>> _requestedSegments;
+	ConcurrentMap<uint64_t, vector<bool>> _requestedBlocks;
 	*/
 
-	ConcurrentMap<uint64_t, vector<struct SegmentData>> _receivedSegmentData;
-	ConcurrentMap<uint64_t, uint32_t> _downloadSegmentRemaining;
-	ConcurrentMap<uint64_t, uint32_t> _objectRequestCount;
-	ConcurrentMap<uint64_t, mutex*> _objectDownloadMutex;
-	ConcurrentMap<uint64_t, ObjectData> _objectDataMap;
-	ConcurrentMap<uint64_t, bool> _isObjectDownloaded;
+	ConcurrentMap<uint64_t, vector<struct BlockData>> _receivedBlockData;
+	ConcurrentMap<uint64_t, uint32_t> _downloadBlockRemaining;
+	ConcurrentMap<uint64_t, uint32_t> _segmentRequestCount;
+	ConcurrentMap<uint64_t, mutex*> _segmentDownloadMutex;
+	ConcurrentMap<uint64_t, SegmentData> _segmentDataMap;
+	ConcurrentMap<uint64_t, bool> _isSegmentDownloaded;
 
 	// upload / download
-	ConcurrentMap<string, uint32_t> _pendingSegmentChunk;
+	ConcurrentMap<string, uint32_t> _pendingBlockChunk;
 };
 #endif

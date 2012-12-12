@@ -101,16 +101,16 @@ void DownloadFileRequestMsg::printProtocol() {
 			_clientId, _fileId, _filePath.c_str());
 }
 
-void DownloadFileRequestMsg::setObjectList(vector<uint64_t> objectList) {
-	_objectList = objectList;
+void DownloadFileRequestMsg::setSegmentList(vector<uint64_t> segmentList) {
+	_segmentList = segmentList;
 }
 
 void DownloadFileRequestMsg::setPrimaryList(vector<uint32_t> primaryList) {
 	_primaryList = primaryList;
 }
 
-vector<uint64_t> DownloadFileRequestMsg::getObjectList() {
-	return _objectList;
+vector<uint64_t> DownloadFileRequestMsg::getSegmentList() {
+	return _segmentList;
 }
 
 vector<uint32_t> DownloadFileRequestMsg::getPrimaryList() {

@@ -8,8 +8,8 @@
 #include <vector>
 #include <stdint.h>
 #include "../coding/coding.hh"
+#include "../common/blockdata.hh"
 #include "../common/segmentdata.hh"
-#include "../common/objectdata.hh"
 #include "../common/enums.hh"
 
 struct CodingSetting {
@@ -23,76 +23,76 @@ public:
 	CodingModule();
 
 	/**
-	 * Encode an object to a list of segments
-	 * @param objectData ObjectData structure
+	 * Encode an segment to a list of blocks
+	 * @param segmentData SegmentData structure
 	 * @param setting for the coding scheme
-	 * @return A list of SegmentData structure
+	 * @return A list of BlockData structure
 	 */
 
-	vector<struct SegmentData> encodeObjectToSegment(CodingScheme codingScheme,
-			struct ObjectData objectData, string setting);
+	vector<struct BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
+			struct SegmentData segmentData, string setting);
 
 	/**
-	 * Encode an object to a list of segments
-	 * @param objectId Object ID
-	 * @param buf Pointer to buffer holding object data
-	 * @param length length of the object
-	 * @return A list of SegmentData structure
+	 * Encode an segment to a list of blocks
+	 * @param segmentId Segment ID
+	 * @param buf Pointer to buffer holding segment data
+	 * @param length length of the segment
+	 * @return A list of BlockData structure
 	 */
 
-	vector<struct SegmentData> encodeObjectToSegment(CodingScheme codingScheme,
-			uint64_t objectId, char* buf, uint64_t length, string setting);
+	vector<struct BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
+			uint64_t segmentId, char* buf, uint64_t length, string setting);
 
 	/**
-	 * Decode a list of segments into an object
-	 * @param objectId Destination object ID
-	 * @param segmentData a list of SegmentData structure
-	 * @param requiredSegments IDs of segments that are required to do decode
-	 * @param objectSize Size of the original object
-	 * @return an ObjectData structure
+	 * Decode a list of blocks into an segment
+	 * @param segmentId Destination segment ID
+	 * @param blockData a list of BlockData structure
+	 * @param requiredBlocks IDs of blocks that are required to do decode
+	 * @param segmentSize Size of the original segment
+	 * @return an SegmentData structure
 	 */
 
-	struct ObjectData decodeSegmentToObject(CodingScheme codingScheme,
-			uint64_t objectId, vector<struct SegmentData> &segmentData,
-			vector<uint32_t> &requiredSegments, uint32_t objectSize,
+	struct SegmentData decodeBlockToSegment(CodingScheme codingScheme,
+			uint64_t segmentId, vector<struct BlockData> &blockData,
+			vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
 			string setting);
 
 	/**
-	 * Get the list of segments required to do decode
+	 * Get the list of blocks required to do decode
 	 * @param codingScheme Coding Scheme
 	 * @param setting Coding Setting
 	 * @param secondaryOsdStatus a bool array containing the status of the OSD
-	 * @return list of segment ID
+	 * @return list of block ID
 	 */
 
-	vector<uint32_t> getRequiredSegmentIds(CodingScheme codingScheme,
+	vector<uint32_t> getRequiredBlockIds(CodingScheme codingScheme,
 			string setting, vector<bool> secondaryOsdStatus);
 
 	/**
-	 * Get the number of segments that the scheme uses
+	 * Get the number of blocks that the scheme uses
 	 * @param codingScheme Coding Scheme
 	 * @param setting Coding Setting
-	 * @return number of segments
+	 * @return number of blocks
 	 */
 
-	uint32_t getNumberOfSegments(CodingScheme codingScheme, string setting);
+	uint32_t getNumberOfBlocks(CodingScheme codingScheme, string setting);
 
 	/**
-	 * Get the Coding object according to the codingScheme specified
+	 * Get the Coding segment according to the codingScheme specified
 	 * @param codingScheme Type of coding scheme
-	 * @return The Coding object
+	 * @return The Coding segment
 	 */
 
 	Coding* getCoding(CodingScheme codingScheme);
 
-	vector<uint32_t> getRepairSrcSegmentIds(CodingScheme codingScheme,
-			string setting, vector<uint32_t> failedSegments,
-			vector<bool> segmentStatus);
+	vector<uint32_t> getRepairSrcBlockIds(CodingScheme codingScheme,
+			string setting, vector<uint32_t> failedBlocks,
+			vector<bool> blockStatus);
 
-	vector<struct SegmentData> repairSegments(CodingScheme codingScheme,
-			vector<uint32_t> failedSegments,
-			vector<struct SegmentData> &repairSrcSegments,
-			vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+	vector<struct BlockData> repairBlocks(CodingScheme codingScheme,
+			vector<uint32_t> failedBlocks,
+			vector<struct BlockData> &repairSrcBlocks,
+			vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
 			string setting);
 
 private:

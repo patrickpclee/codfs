@@ -40,7 +40,7 @@ public:
 
 	/**
 	 * static method for Singleton implementation
-	 * @return reference to instance of singleton object
+	 * @return reference to instance of singleton segment
 	 */
 
 	static MemoryPool& getInstance() {

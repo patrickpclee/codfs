@@ -48,7 +48,7 @@ void UploadFileRequestMsg::prepareProtocolMsg() {
 	uploadFileRequestPro.set_filesize(_fileSize);
 	uploadFileRequestPro.set_numofobjs(_numOfObjs);
 	uploadFileRequestPro.set_codingscheme(
-			(ncvfs::PutObjectInitRequestPro_CodingScheme) _codingScheme);
+			(ncvfs::PutSegmentInitRequestPro_CodingScheme) _codingScheme);
 	uploadFileRequestPro.set_codingsetting(_codingSetting);
 
 	if (!uploadFileRequestPro.SerializeToString(&serializedString)) {
@@ -91,8 +91,8 @@ void UploadFileRequestMsg::printProtocol() {
 			_clientId, _path.c_str(), _codingScheme, _codingSetting.c_str());
 }
 
-void UploadFileRequestMsg::setObjectList(vector<uint64_t> objectList) {
-	_objectList = objectList;
+void UploadFileRequestMsg::setSegmentList(vector<uint64_t> segmentList) {
+	_segmentList = segmentList;
 
 	return;
 }
@@ -107,8 +107,8 @@ void UploadFileRequestMsg::setFileId(uint32_t fileId) {
 	return;
 }
 
-vector<uint64_t> UploadFileRequestMsg::getObjectList() {
-	return _objectList;
+vector<uint64_t> UploadFileRequestMsg::getSegmentList() {
+	return _segmentList;
 }
 
 vector<uint32_t> UploadFileRequestMsg::getPrimaryList() {

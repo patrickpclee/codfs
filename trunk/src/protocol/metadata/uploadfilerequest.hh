@@ -40,7 +40,7 @@ public:
 	 * @param	clientId	Client ID
 	 * @param	path	Requested directory path
 	 * @param	fileSize	Size of the File
-	 * @param	numOfObjs	Number of Objects
+	 * @param	numOfObjs	Number of Segments
 	 * @param	codingScheme 	Coding Scheme of the file
 	 * @param	codingSetting	Coding Scheme Setting
 	 */
@@ -79,15 +79,15 @@ public:
 	void printProtocol();
 
 	/**
-	 * @brief	Set the Object ID List
+	 * @brief	Set the Segment ID List
 	 *
-	 * @param	objectList	Vector of Object ID
+	 * @param	segmentList	Vector of Segment ID
 	 */
-	void setObjectList(vector<uint64_t> objectList);
+	void setSegmentList(vector<uint64_t> segmentList);
 	void setPrimaryList(vector<uint32_t> primaryList);
 	void setFileId(uint32_t fileId);
 
-	vector<uint64_t> getObjectList();
+	vector<uint64_t> getSegmentList();
 	vector<uint32_t> getPrimaryList();
 	uint32_t getFileId();
 
@@ -99,7 +99,7 @@ private:
 	CodingScheme _codingScheme;
 	string _codingSetting;
 
-	vector<uint64_t> _objectList;
+	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;
 	uint32_t _fileId;
 };

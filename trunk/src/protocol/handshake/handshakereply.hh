@@ -8,7 +8,7 @@ using namespace std;
 
 /**
  * Extends the Message class
- * Initiate an object upload
+ * Initiate an segment upload
  */
 
 class HandshakeReplyMsg: public Message {

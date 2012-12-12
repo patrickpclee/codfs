@@ -40,7 +40,7 @@
 #define DISK_PATH "/"
 
 // osd/storagemodule.cc
-//#define USE_OBJECT_DISK_CACHE
+//#define USE_SEGMENT_DISK_CACHE
 
 // protocol/message.hh
 #define USE_MESSAGE_MEMORY_POOL

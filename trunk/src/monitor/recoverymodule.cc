@@ -7,7 +7,7 @@
 #include <thread>
 #include "recoverymodule.hh"
 #include "../protocol/status/recoverytriggerrequest.hh"
-#include "../protocol/status/repairobjectinfomsg.hh"
+#include "../protocol/status/repairsegmentinfomsg.hh"
 using namespace std;
 
 RecoveryModule::RecoveryModule(map<uint32_t, struct OsdStat>& mapRef,
@@ -21,7 +21,7 @@ RecoveryModule::RecoveryModule(map<uint32_t, struct OsdStat>& mapRef,
 
 // Just sequentially choose one.
 // Can use different startegy later.
-void RecoveryModule::replaceFailedOsd(struct ObjectLocation& ol, struct ObjectRepairInfo& ret) {
+void RecoveryModule::replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret) {
 	set<uint32_t> used;
 	for (uint32_t osdid : ol.osdList) {
 		if (_osdStatMap[osdid].osdHealth == ONLINE) {
@@ -44,7 +44,7 @@ void RecoveryModule::replaceFailedOsd(struct ObjectLocation& ol, struct ObjectRe
 
 		set<uint32_t>::iterator it = avail.begin();
 
-		ret.objectId = ol.objectId;
+		ret.segmentId = ol.segmentId;
 
 		vector<uint32_t>& ref = ol.osdList;
 		for (int pos = 0; pos < (int)ref.size(); ++pos) {
@@ -77,10 +77,10 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 
 	MessageStatus status = rtrm->waitForStatusChange();
 	if (status == READY) {
-		vector<struct ObjectLocation> ols = rtrm->getObjectLocations();
-		for (struct ObjectLocation ol: ols) {
+		vector<struct SegmentLocation> ols = rtrm->getSegmentLocations();
+		for (struct SegmentLocation ol: ols) {
 			// Print debug message
-			debug_cyan("Object Location id = %" PRIu64 " primary = %" PRIu32 "\n", ol.objectId, 
+			debug_cyan("Segment Location id = %" PRIu64 " primary = %" PRIu32 "\n", ol.segmentId, 
 					ol.primaryId);
 			/*
 			   printf ("--------Original OSD----------------\n");
@@ -90,12 +90,12 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 			   for (uint32_t osdid : ol.osdList) printf("%d ", osdid);
 			   printf("\n------------------------------------\n");
 			 */
-			struct ObjectRepairInfo ori;
+			struct SegmentRepairInfo ori;
 			replaceFailedOsd (ol, ori);	
 			ori.out();
 
-			RepairObjectInfoMsg* roim = new RepairObjectInfoMsg(_communicator,
-					_communicator->getSockfdFromId(ol.primaryId), ori.objectId,
+			RepairSegmentInfoMsg* roim = new RepairSegmentInfoMsg(_communicator,
+					_communicator->getSockfdFromId(ol.primaryId), ori.segmentId,
 					ori.repPos, ori.repOsd);
 			roim->prepareProtocolMsg();
 			_communicator->addMessage(roim);

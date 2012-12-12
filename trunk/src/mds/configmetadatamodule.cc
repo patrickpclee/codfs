@@ -18,8 +18,8 @@ ConfigMetaDataModule::ConfigMetaDataModule(){
  */
 uint32_t ConfigMetaDataModule::getAndInc (const string &config)
 {
-	BSONObj queryObject = BSON ("id" << "config");
-	BSONObj updateObject = BSON ("$inc" << BSON (config << 1));
-	BSONObj result = _configMetaDataStorage->findAndModify(queryObject, updateObject);
+	BSONObj querySegment = BSON ("id" << "config");
+	BSONObj updateSegment = BSON ("$inc" << BSON (config << 1));
+	BSONObj result = _configMetaDataStorage->findAndModify(querySegment, updateSegment);
 	return (uint32_t)result.getField(config).numberInt();
 }
