@@ -20,14 +20,14 @@
 #include "../common/debug.hh"
 #include "../common/define.hh"
 #include "../common/convertor.hh"
-#include "../common/objectdata.hh"
+#include "../common/segmentdata.hh"
 #include "../protocol/message.pb.h"
 #include "../protocol/messagefactory.hh"
 #include "../protocol/handshake/handshakerequest.hh"
 #include "../protocol/handshake/handshakereply.hh"
-#include "../protocol/transfer/putobjectinitrequest.hh"
-#include "../protocol/transfer/objecttransferendrequest.hh"
-#include "../protocol/transfer/objectdatamsg.hh"
+#include "../protocol/transfer/putsegmentinitrequest.hh"
+#include "../protocol/transfer/segmenttransferendrequest.hh"
+#include "../protocol/transfer/segmentdatamsg.hh"
 #include "../common/netfunc.hh"
 
 #ifdef COMPILE_FOR_MONITOR
@@ -295,8 +295,8 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 
 	// add message to outMessageQueue
 	switch(message->getMsgHeader().protocolMsgType) {
-		case OBJECT_DATA:
 		case SEGMENT_DATA:
+		case BLOCK_DATA:
 #ifdef USE_MULTIPLE_QUEUE
 	#ifdef USE_LOWLOCK_QUEUE
 			_outDataQueue[message->getSockfd()]->push(message);
@@ -420,7 +420,7 @@ void Communicator::sendMessage() {
 uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 		ComponentType connectionType) {
 
-	// Construct a Connection object and connect to component
+	// Construct a Connection segment and connect to component
 	Connection* conn = new Connection();
 	const uint32_t sockfd = conn->doConnect(ip, port, connectionType);
 
@@ -527,7 +527,7 @@ void Communicator::sendThread(Communicator* communicator) {
 /**
  * 1. Get the MsgHeader from the receive buffer
  * 2. Get the MsgType from the MsgHeader
- * 3. Use the MessageFactory to obtain a new Message object
+ * 3. Use the MessageFactory to obtain a new Message segment
  * 4. Fill in the socket descriptor into the Message
  * 5. message->parse() and fill in payload pointer
  * 6. start new thread for message->handle()
@@ -810,24 +810,24 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 	return _componentIdMap.get(componentId);
 }
 
-uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
-		struct ObjectData objectData, CodingScheme codingScheme,
+uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
+		struct SegmentData segmentData, CodingScheme codingScheme,
 		string codingSetting, string checksum) {
 
-	debug("Send object ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
-			objectData.info.objectId, sockfd);
+	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
+			segmentData.info.segmentId, sockfd);
 
-	const uint64_t totalSize = objectData.info.objectSize;
-	const uint64_t objectId = objectData.info.objectId;
-	char* buf = objectData.buf;
+	const uint64_t totalSize = segmentData.info.segmentSize;
+	const uint64_t segmentId = segmentData.info.segmentId;
+	char* buf = segmentData.buf;
 
 	const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
 
 	// Step 1 : Send Init message (wait for reply)
 
-	putObjectInit(componentId, sockfd, objectId, totalSize, chunkCount,
+	putSegmentInit(componentId, sockfd, segmentId, totalSize, chunkCount,
 			codingScheme, codingSetting, checksum);
-	debug("%s\n", "Put Object Init ACK-ed");
+	debug("%s\n", "Put Segment Init ACK-ed");
 
 #ifdef SERIALIZE_DATA_QUEUE
 	lockDataQueue(sockfd);
@@ -846,7 +846,7 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 			byteToSend = byteRemaining;
 		}
 
-		putObjectData(componentId, sockfd, objectId, buf, byteProcessed,
+		putSegmentData(componentId, sockfd, segmentId, buf, byteProcessed,
 				byteToSend);
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
@@ -858,9 +858,9 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 	unlockDataQueue(sockfd);
 #endif
 
-	putObjectEnd(componentId, sockfd, objectId);
+	putSegmentEnd(componentId, sockfd, segmentId);
 
-	cout << "Put Object ID = " << objectId << " Finished" << endl;
+	cout << "Put Segment ID = " << segmentId << " Finished" << endl;
 
 	return byteProcessed;
 
@@ -879,59 +879,59 @@ void Communicator::unlockDataQueue(uint32_t sockfd){
 //
 
 // codingScheme (DEFAULT_CODING) and codingSetting ("") are optional
-void Communicator::putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
-		uint64_t objectId, uint32_t length, uint32_t chunkCount,
+void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
+		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
 		CodingScheme codingScheme, string codingSetting, string checksum) {
 
 	// Step 1 of the upload process
 
-	PutObjectInitRequestMsg* putObjectInitRequestMsg =
-			new PutObjectInitRequestMsg(this, dstOsdSockfd, objectId, length,
+	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
+			new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, length,
 					chunkCount, codingScheme, codingSetting, checksum);
 
-	putObjectInitRequestMsg->prepareProtocolMsg();
-	addMessage(putObjectInitRequestMsg, true);
+	putSegmentInitRequestMsg->prepareProtocolMsg();
+	addMessage(putSegmentInitRequestMsg, true);
 
-	MessageStatus status = putObjectInitRequestMsg->waitForStatusChange();
+	MessageStatus status = putSegmentInitRequestMsg->waitForStatusChange();
 	if (status == READY) {
-		waitAndDelete(putObjectInitRequestMsg);
+		waitAndDelete(putSegmentInitRequestMsg);
 		return;
 	} else {
-		debug_error("Put Object Init Failed %" PRIu64 "\n", objectId);
+		debug_error("Put Segment Init Failed %" PRIu64 "\n", segmentId);
 		exit(-1);
 	}
 }
 
-void Communicator::putObjectData(uint32_t componentID, uint32_t dstOsdSockfd,
-		uint64_t objectId, char* buf, uint64_t offset, uint32_t length) {
+void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
+		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length) {
 
 	// Step 2 of the upload process
-	ObjectDataMsg* objectDataMsg = new ObjectDataMsg(this, dstOsdSockfd,
-			objectId, offset, length);
+	SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, dstOsdSockfd,
+			segmentId, offset, length);
 
-	objectDataMsg->prepareProtocolMsg();
-	objectDataMsg->preparePayload(buf + offset, length);
+	segmentDataMsg->prepareProtocolMsg();
+	segmentDataMsg->preparePayload(buf + offset, length);
 
-	addMessage(objectDataMsg, false);
+	addMessage(segmentDataMsg, false);
 }
 
-void Communicator::putObjectEnd(uint32_t componentId, uint32_t dstOsdSockfd,
-		uint64_t objectId) {
+void Communicator::putSegmentEnd(uint32_t componentId, uint32_t dstOsdSockfd,
+		uint64_t segmentId) {
 
 	// Step 3 of the upload process
 
-	ObjectTransferEndRequestMsg* putObjectEndRequestMsg =
-			new ObjectTransferEndRequestMsg(this, dstOsdSockfd, objectId);
+	SegmentTransferEndRequestMsg* putSegmentEndRequestMsg =
+			new SegmentTransferEndRequestMsg(this, dstOsdSockfd, segmentId);
 
-	putObjectEndRequestMsg->prepareProtocolMsg();
-	addMessage(putObjectEndRequestMsg, true);
+	putSegmentEndRequestMsg->prepareProtocolMsg();
+	addMessage(putSegmentEndRequestMsg, true);
 
-	MessageStatus status = putObjectEndRequestMsg->waitForStatusChange();
+	MessageStatus status = putSegmentEndRequestMsg->waitForStatusChange();
 	if (status == READY) {
-		waitAndDelete(putObjectEndRequestMsg);
+		waitAndDelete(putSegmentEndRequestMsg);
 		return;
 	} else {
-		debug_error("Put Object End Failed %" PRIu64 "\n", objectId);
+		debug_error("Put Segment End Failed %" PRIu64 "\n", segmentId);
 		exit(-1);
 	}
 }

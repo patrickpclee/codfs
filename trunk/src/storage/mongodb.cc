@@ -106,13 +106,13 @@ void MongoDB::setCollection(string collection)
 /**
  * @brief	Read from the MongoDB
  */
-vector<BSONObj> MongoDB::read (Query queryObject)
+vector<BSONObj> MongoDB::read (Query querySegment)
 {
 
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	unique_ptr<DBClientCursor> cursor =
-		_connection->query(_database +"." + _collection, queryObject);
+		_connection->query(_database +"." + _collection, querySegment);
 	vector<BSONObj> result;
 	BSONObj tempObj;
 	while( cursor->more() ) {
@@ -127,19 +127,19 @@ vector<BSONObj> MongoDB::read (Query queryObject)
 /**
  * @brief	Read One Result from the MongoDB
  */
-BSONObj MongoDB::readOne (Query queryObject)
+BSONObj MongoDB::readOne (Query querySegment)
 {
-	return read(queryObject).at(0);
+	return read(querySegment).at(0);
 }
 
 /**
  * @brief	Insert to the MongoDB
  */
-void MongoDB::insert (BSONObj insertObject)
+void MongoDB::insert (BSONObj insertSegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
-	_connection->insert(_database + "." + _collection, insertObject);
+	_connection->insert(_database + "." + _collection, insertSegment);
 	_conn->done();
 
 	return ;
@@ -148,11 +148,11 @@ void MongoDB::insert (BSONObj insertObject)
 /**
  * @brief	Update Record in MongoDB
  */
-void MongoDB::update (Query queryObject, BSONObj updateObject)
+void MongoDB::update (Query querySegment, BSONObj updateSegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
-	_connection->update(_database + "." + _collection, queryObject, updateObject, true);
+	_connection->update(_database + "." + _collection, querySegment, updateSegment, true);
 	_conn->done();
 
 	return ;
@@ -161,39 +161,39 @@ void MongoDB::update (Query queryObject, BSONObj updateObject)
 /**
  * @brief	Push Value to a Field of a Record
  */
-void MongoDB::push (Query queryObject, BSONObj pushObject)
+void MongoDB::push (Query querySegment, BSONObj pushSegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
-	_connection->update(_database + "." + _collection, queryObject, pushObject, true);
+	_connection->update(_database + "." + _collection, querySegment, pushSegment, true);
 	_conn->done();
 }
 
-BSONObj MongoDB::findAndModify (BSONObj queryObject, BSONObj updateObject)
+BSONObj MongoDB::findAndModify (BSONObj querySegment, BSONObj updateSegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	BSONObj result;
-	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << queryObject << "update" << updateObject), result);
+	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << querySegment << "update" << updateSegment), result);
 	_conn->done();
 
 	return result.getObjectField("value").copy();
 };
 
-void MongoDB::removeField (Query queryObject, string field)
+void MongoDB::removeField (Query querySegment, string field)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
-	BSONObj unsetObject = BSON ("$unset" << BSON (field << "1"));
-	_connection->update(_database + "." + _collection, queryObject, unsetObject, true);
+	BSONObj unsetSegment = BSON ("$unset" << BSON (field << "1"));
+	_connection->update(_database + "." + _collection, querySegment, unsetSegment, true);
 	_conn->done();
 }
 
-void MongoDB::remove (Query queryObject)
+void MongoDB::remove (Query querySegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
-	_connection->remove(_database + "." + _collection, queryObject);
+	_connection->remove(_database + "." + _collection, querySegment);
 	_conn->done();
 
 	return ;

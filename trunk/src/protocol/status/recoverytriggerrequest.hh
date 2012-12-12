@@ -7,7 +7,7 @@
 
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
-#include "../../common/objectlocation.hh"
+#include "../../common/segmentlocation.hh"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ public:
 	 * Constructor - Save parameters in private variables
 	 *
 	 * @param	communicator	Communicator the Message belongs to
-	 * @param	numOfObjs	number of Objects
+	 * @param	numOfObjs	number of Segments
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
@@ -66,13 +66,13 @@ public:
 
 	void printProtocol ();
 
-	void setObjectLocations(vector<struct ObjectLocation> objLocs);
+	void setSegmentLocations(vector<struct SegmentLocation> objLocs);
 
-	vector<struct ObjectLocation> getObjectLocations();
+	vector<struct SegmentLocation> getSegmentLocations();
 
 private:
 	vector<uint32_t> _osdList;
-	vector<struct ObjectLocation> _objectLocations;
+	vector<struct SegmentLocation> _segmentLocations;
 };
 
 #endif

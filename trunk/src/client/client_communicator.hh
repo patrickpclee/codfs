@@ -10,7 +10,7 @@ class ClientCommunicator: public Communicator {
 public:
 	void display();
 	void osdIdListRequest();
-	void objectMessageHandler();
+	void segmentMessageHandler();
 
 	/**
 	 * @brief	Send List Folder Request to MDS (Blocking)
@@ -27,7 +27,7 @@ public:
 	 * @param clientId Client ID
 	 * @param path Destination Path
 	 * @param fileSize Size of file
-	 * @param numOfObjs Number of objects
+	 * @param numOfObjs Number of segments
 	 * @param codingScheme Coding Scheme
 	 * @param codingSetting Coding Setting
 	 * @return FileMetaData structure
@@ -95,25 +95,25 @@ public:
 	struct FileMetaData getFileInfo(uint32_t clientId, string filePath);
 
 	/**
-	 * @brief	Save ObjectList of a File
+	 * @brief	Save SegmentList of a File
 	 *
 	 * @param	clientId	Client ID
 	 * @param	fileId	ID of the File
-	 * @param	objectList	Object List of the File
+	 * @param	segmentList	Segment List of the File
 	 */
 
-	void saveObjectList (uint32_t clientId, uint32_t fileId, vector<uint64_t> objectList);
+	void saveSegmentList (uint32_t clientId, uint32_t fileId, vector<uint64_t> segmentList);
 
 	/**
-	 * @brief	Get New Object List
+	 * @brief	Get New Segment List
 	 *
 	 * @param	clientId	Client ID
-	 * @param	numOfObjs	Number of Objects
+	 * @param	numOfObjs	Number of Segments
 	 */
-	vector<struct ObjectMetaData> getNewObjectList (uint32_t clientId, uint32_t numOfObjs);
+	vector<struct SegmentMetaData> getNewSegmentList (uint32_t clientId, uint32_t numOfObjs);
 
 	/**
-	 * @brief	Save Object Size of a File
+	 * @brief	Save Segment Size of a File
 	 *
 	 * @param	clientId	Client ID
 	 * @param	fileId	ID of the File
@@ -122,12 +122,12 @@ public:
 	void saveFileSize (uint32_t clientId, uint32_t fileId, uint64_t fileSize);
 
 	/**
-	 * @brief	Send a request to OSD for the object
+	 * @brief	Send a request to OSD for the segment
 	 * @param dstSockfd OSD Socket Descriptor
-	 * @param objectId Object ID
+	 * @param segmentId Segment ID
 	 */
 
-	void requestObject (uint32_t dstSockfd, uint64_t objectId);
+	void requestSegment (uint32_t dstSockfd, uint64_t segmentId);
 
 	/**
 	 * 1. Send an init message
@@ -135,37 +135,37 @@ public:
 	 * 3. Send an end message
 	 * @param clientID Client ID
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
-	 * @param objectData ObjectData Structure
+	 * @param segmentData SegmentData Structure
 	 * @param codingScheme Coding Scheme specified
 	 * @param codingSetting Coding Scheme setting
 	 */
 
-	void putObject(uint32_t clientId, uint32_t dstOsdSockfd,
-			struct ObjectData objectData, CodingScheme codingScheme,
+	void putSegment(uint32_t clientId, uint32_t dstOsdSockfd,
+			struct SegmentData segmentData, CodingScheme codingScheme,
 			string codingSetting);
 
 	/**
-	 * Send an initiate message of a object data transfer.
+	 * Send an initiate message of a segment data transfer.
 	 * @param requestId 	Request ID
 	 * @param connectionId 	connection ID
-	 * @param objectId 		object ID
+	 * @param segmentId 		segment ID
 	 */
-	void replyPutObjectInit(uint32_t requestId, uint32_t connectionId, uint64_t objectId); // new version
+	void replyPutSegmentInit(uint32_t requestId, uint32_t connectionId, uint64_t segmentId); // new version
 
 	/**
-	 * Send an end message of an object data transfer.
+	 * Send an end message of an segment data transfer.
 	 * @param requestId 	Request ID
 	 * @param connectionId 	connection ID
-	 * @param objectId 		object ID
+	 * @param segmentId 		segment ID
 	 */
-	void replyPutObjectEnd(uint32_t requestId, uint32_t connectionId, uint64_t objectId); //new version
+	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId, uint64_t segmentId); //new version
 
 	/**
 	 * Send a request to monitor to get Osd List and connect 
 	 */
 	void getOsdListAndConnect();
 
-	uint32_t switchPrimaryRequest(uint32_t clientId, uint64_t objectId);
+	uint32_t switchPrimaryRequest(uint32_t clientId, uint64_t segmentId);
 
 private:
 

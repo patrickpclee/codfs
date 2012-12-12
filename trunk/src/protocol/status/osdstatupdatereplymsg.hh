@@ -7,7 +7,7 @@ using namespace std;
 
 /**
  * Extends the Message class
- * Initiate an object upload
+ * Initiate an segment upload
  */
 
 class OsdStatUpdateReplyMsg: public Message {

@@ -83,9 +83,9 @@ public:
 
 	void printProtocol();
 
-	void setObjectList(vector<uint64_t> objectList);
+	void setSegmentList(vector<uint64_t> segmentList);
 	void setPrimaryList(vector<uint32_t> primaryList);
-	vector<uint64_t> getObjectList();
+	vector<uint64_t> getSegmentList();
 	vector<uint32_t> getPrimaryList();
 	void setFileId (uint32_t fileId);
 	uint32_t getFileId ();
@@ -102,7 +102,7 @@ private:
 	uint64_t _size;
 	string _filePath;
 	FileType _fileType;
-	vector<uint64_t> _objectList;
+	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;
 };
 

@@ -8,7 +8,7 @@
 
 #include "../common/metadata.hh"
 #include "../common/enums.hh"
-#include "../common/objectdata.hh"
+#include "../common/segmentdata.hh"
 
 #include <mutex>
 
@@ -16,7 +16,7 @@
 
 class FileDataCache {
 	public:
-		FileDataCache (struct FileMetaData fileMetaData, uint64_t objectSize);
+		FileDataCache (struct FileMetaData fileMetaData, uint64_t segmentSize);
 
 		//int64_t read(void* buf, uint32_t size, uint64_t offset);
 		int64_t write(const void* buf, uint32_t size, uint64_t offset);
@@ -26,17 +26,17 @@ class FileDataCache {
 		void flush();
 	private:
 		bool _clean;
-		uint64_t _objectSize;
-		uint32_t _lastObjectCount;
+		uint64_t _segmentSize;
+		uint32_t _lastSegmentCount;
 		uint64_t _fileSize;
 		uint32_t _fileId;
 		uint32_t _lastWriteBackPos;
 		struct FileMetaData _metaData;
-		vector<struct ObjectData> _objectDataList;
-		vector<ObjectDataStatus> _objectStatusList;
+		vector<struct SegmentData> _segmentDataList;
+		vector<SegmentDataStatus> _segmentStatusList;
 		vector<uint32_t> _primaryList;
 		mutex _writeBackMutex;
-		//LruCache<uint64_t, shared_ptr<ObjectData> >* _objectCache;
+		//LruCache<uint64_t, shared_ptr<SegmentData> >* _segmentCache;
 };
 
 #endif

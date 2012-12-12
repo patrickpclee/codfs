@@ -30,7 +30,7 @@ public:
 	 * Constructor - Save parameters in private variables
 	 *
 	 * @param	communicator	Communicator the Message belongs to
-	 * @param	numOfObjs	number of Objects
+	 * @param	numOfObjs	number of Segments
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 

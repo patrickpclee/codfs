@@ -7,7 +7,7 @@ using namespace std;
 
 #include "configmetadatamodule.hh"
 #include "filemetadatamodule.hh"
-#include "objectmetadatamodule.hh"
+#include "segmentmetadatamodule.hh"
 #include "osdmetadatamodule.hh"
 
 #include "../common/metadata.hh"
@@ -73,46 +73,46 @@ public:
 	uint64_t readFileSize(uint32_t fileId);
 
 	/**
-	 * @brief	Generate List of Object ID
+	 * @brief	Generate List of Segment ID
 	 *
-	 * @param	numOfObjs	Number of Objects
+	 * @param	numOfObjs	Number of Segments
 	 *
-	 * @return	List of Object ID
+	 * @return	List of Segment ID
 	 */
-	vector<uint64_t> newObjectList(uint32_t numOfObjs);
+	vector<uint64_t> newSegmentList(uint32_t numOfObjs);
 
 	/**
-	 * @brief	Save Object List of a File
+	 * @brief	Save Segment List of a File
 	 *
 	 * @param	fileId	ID of the File
-	 * @param	objectList	List of Object ID
+	 * @param	segmentList	List of Segment ID
 	 */
 
-	void saveObjectList(uint32_t fileId, const vector<uint64_t> &objectList);
+	void saveSegmentList(uint32_t fileId, const vector<uint64_t> &segmentList);
 
 	/**
-	 * @brief	Read the list of objects which belong to the file
+	 * @brief	Read the list of segments which belong to the file
 	 * @param fileId File ID
-	 * @return list of the composing objects
+	 * @return list of the composing segments
 	 */
 
-	vector<uint64_t> readObjectList(uint32_t fileId);
+	vector<uint64_t> readSegmentList(uint32_t fileId);
 
 	/**
-	 * @brief	Read the list of objects stored by the OSD
+	 * @brief	Read the list of segments stored by the OSD
 	 * @param osdId OSD ID
-	 * @return list of objectID owned by the OSD
+	 * @return list of segmentID owned by the OSD
 	 */
 
-	vector<uint64_t> readOsdObjectList(uint32_t osdId);
+	vector<uint64_t> readOsdSegmentList(uint32_t osdId);
 
 	/**
-	 * @brief	Read the list of objects stored by the OSD as primary
+	 * @brief	Read the list of segments stored by the OSD as primary
 	 * @param osdId OSD ID
-	 * @return list of objectID owned by the OSD as primary
+	 * @return list of segmentID owned by the OSD as primary
 	 */
 
-	vector<uint64_t> readOsdPrimaryObjectList(uint32_t osdId);
+	vector<uint64_t> readOsdPrimarySegmentList(uint32_t osdId);
 
 	/**
 	 * @brief	Read Checksum of a File
@@ -124,66 +124,66 @@ public:
 	string readChecksum(uint32_t fileId);
 
 	/**
-	 * @brief	Save Object Info
+	 * @brief	Save Segment Info
 	 *
-	 * @param	objectId	ID of the Object
-	 * @param	objectInfo	Info of the Object
+	 * @param	segmentId	ID of the Segment
+	 * @param	segmentInfo	Info of the Segment
 	 */
-	void saveObjectInfo(uint64_t objectId, struct ObjectMetaData objectInfo);
+	void saveSegmentInfo(uint64_t segmentId, struct SegmentMetaData segmentInfo);
 	
 	/**
-	 * @brief	Read Object Info
+	 * @brief	Read Segment Info
 	 *
-	 * @param	objectId	ID of the Object
+	 * @param	segmentId	ID of the Segment
 	 *
-	 * @return	Info of the Object
+	 * @return	Info of the Segment
 	 */
-	struct ObjectMetaData readObjectInfo(uint64_t objectId);
+	struct SegmentMetaData readSegmentInfo(uint64_t segmentId);
 
 	/**
-	 * @brief	Set Primary of a Object
+	 * @brief	Set Primary of a Segment
 	 *
-	 * @param	objectId	ID of the Object
+	 * @param	segmentId	ID of the Segment
 	 * @param	primaryOsdId	ID of the Primary
 	 */
-	void setPrimary(uint64_t objectId, uint32_t primaryOsdId);
+	void setPrimary(uint64_t segmentId, uint32_t primaryOsdId);
 
 	/**
-	 * @brief	Select an acting primary OSD for the object
-	 * @param objectId Object ID
-	 * @param nodeList list of nodes storing the segments for the object
-	 * @param nodeStatus status of the nodes storing the segments
+	 * @brief	Select an acting primary OSD for the segment
+	 * @param segmentId Segment ID
+	 * @param nodeList list of nodes storing the blocks for the segment
+	 * @param nodeStatus status of the nodes storing the blocks
 	 * @return Selected acting primary OSD ID
 	 */
 
-	uint32_t selectActingPrimary(uint64_t objectId, vector<uint32_t> nodeList,
+	uint32_t selectActingPrimary(uint64_t segmentId, vector<uint32_t> nodeList,
 		vector<bool> nodeStatus);
 
 	/**
-	 * @brief	Get Primary of a Object
+	 * @brief	Get Primary of a Segment
 	 *
-	 * @param	objectId	ID of the Object
+	 * @param	segmentId	ID of the Segment
 	 *
 	 * @return	ID of the Primary
 	 */
-	uint32_t getPrimary(uint64_t objectId);
+	uint32_t getPrimary(uint64_t segmentId);
 
 	/**
-	 * @brief	Save Node List of a Object
+	 * @brief	Save Node List of a Segment
 	 *
-	 * @param	objectId	ID of the Object
-	 * @param	objectNodeList	List of Node ID
+	 * @param	segmentId	ID of the Segment
+	 * @param	segmentNodeList	List of Node ID
 	 */
-	void saveNodeList(uint64_t objectId, const vector<uint32_t> &objectNodeList);
+	void saveNodeList(uint64_t segmentId, const vector<uint32_t> &segmentNodeList);
 
 	/**
-	 * @brief	Read Node List of a Object
+	 * @brief	Read Node List of a Segment
 	 *
-	 * @param	objectId	ID of the Object
+	 * @param	segmentId	ID of the Segment
 	 *
 	 * @return	List of Node ID
 	 */
-	vector<uint32_t> readNodeList(uint64_t objectId);
+	vector<uint32_t> readNodeList(uint64_t segmentId);
 
 	/**
 	 * @brief	Lookup the File Path with File ID
@@ -207,7 +207,7 @@ private:
 
 	ConfigMetaDataModule* _configMetaDataStorage;
 	FileMetaDataModule* _fileMetaDataModule;
-	ObjectMetaDataModule* _objectMetaDataModule;
+	SegmentMetaDataModule* _segmentMetaDataModule;
 	OsdMetaDataModule* _osdMetaDataModule;
 };
 

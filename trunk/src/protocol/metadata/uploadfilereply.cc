@@ -12,12 +12,12 @@ UploadFileReplyMsg::UploadFileReplyMsg(Communicator* communicator) :
 	Message(communicator) {
 }
 
-UploadFileReplyMsg::UploadFileReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, uint32_t fileId, const vector<uint64_t> &objectList, const vector<uint32_t> &primaryList) :
+UploadFileReplyMsg::UploadFileReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, uint32_t fileId, const vector<uint64_t> &segmentList, const vector<uint32_t> &primaryList) :
 	Message(communicator) {
 	_sockfd = sockfd;
 	_msgHeader.requestId = requestId;
 	_fileId = fileId;
-	_objectList = objectList;
+	_segmentList = segmentList;
 	_primaryList = primaryList;
 	
 }
@@ -30,8 +30,8 @@ void UploadFileReplyMsg::prepareProtocolMsg()
 
 	vector<uint64_t>::iterator it;
 
-	for (it = _objectList.begin(); it < _objectList.end(); ++it) {
-		uploadFileReplyPro.add_objectlist(*it);
+	for (it = _segmentList.begin(); it < _segmentList.end(); ++it) {
+		uploadFileReplyPro.add_segmentlist(*it);
 	}
 
 	vector<uint32_t>::iterator it2;
@@ -64,8 +64,8 @@ void UploadFileReplyMsg::parse(char* buf) {
 
 	_fileId = uploadFileReplyPro.fileid();
 	
-	for(int i = 0; i < uploadFileReplyPro.objectlist_size(); ++i) {
-		_objectList.push_back(uploadFileReplyPro.objectlist(i));
+	for(int i = 0; i < uploadFileReplyPro.segmentlist_size(); ++i) {
+		_segmentList.push_back(uploadFileReplyPro.segmentlist(i));
 		_primaryList.push_back(uploadFileReplyPro.primarylist(i));
 	}
 
@@ -76,7 +76,7 @@ void UploadFileReplyMsg::doHandle() {
 	UploadFileRequestMsg* uploadFileRequestMsg = (UploadFileRequestMsg*) _communicator->popWaitReplyMessage(_msgHeader.requestId);
 
 	uploadFileRequestMsg->setFileId(_fileId);
-	uploadFileRequestMsg->setObjectList(_objectList);
+	uploadFileRequestMsg->setSegmentList(_segmentList);
 	uploadFileRequestMsg->setPrimaryList(_primaryList);
 	uploadFileRequestMsg->setStatus(READY);
 }

@@ -43,7 +43,7 @@ public:
 	 * @param secondaryList List of selected secondary osd IDs 
 	 */
 	void replySecondaryList(uint32_t requestId, uint32_t sockfd, 
-		vector<struct SegmentLocation> secondaryList);
+		vector<struct BlockLocation> secondaryList);
 
 	/**
 	 * Action to reply a request from CLIENT for online OSD list

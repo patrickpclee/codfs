@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 #include "../common/osdstat.hh"
-#include "../common/segmentlocation.hh"
+#include "../common/blocklocation.hh"
 #include "../protocol/status/osdstatupdaterequestmsg.hh"
 
 using namespace std;
@@ -28,11 +28,11 @@ public:
 	vector<uint32_t> ChoosePrimary(uint32_t numOfObjs);
 
 	/**
-	 * Choose secondary osds from the osd status map to store coded segments
+	 * Choose secondary osds from the osd status map to store coded blocks
 	 * @param numOfSegs Number of OSDs going to be selected
 	 * @return a list of selected osd IDs  
 	 */
-	vector<struct SegmentLocation> ChooseSecondary(uint32_t numOfSegs, uint32_t
+	vector<struct BlockLocation> ChooseSecondary(uint32_t numOfSegs, uint32_t
 		primary);
 
 private:

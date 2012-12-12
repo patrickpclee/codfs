@@ -10,8 +10,8 @@
 #include "client_storagemodule.hh"
 #include "../config/config.hh"
 #include "../common/debug.hh"
-#include "../common/objectdata.hh"
 #include "../common/segmentdata.hh"
+#include "../common/blockdata.hh"
 #include "../common/convertor.hh"
 #include "../../lib/logger.hh"
 #include "../common/define.hh"
@@ -48,62 +48,62 @@ ClientStorageModule* Client::getStorageModule() {
 #ifdef PARALLEL_TRANSFER
 
 void startUploadThread(uint32_t clientId, uint32_t sockfd,
-		struct ObjectData objectData, CodingScheme codingScheme,
+		struct SegmentData segmentData, CodingScheme codingScheme,
 		string codingSetting, string checksum) {
-	client->getCommunicator()->sendObject(clientId, sockfd, objectData,
+	client->getCommunicator()->sendSegment(clientId, sockfd, segmentData,
 			codingScheme, codingSetting, checksum);
-	MemoryPool::getInstance().poolFree(objectData.buf);
+	MemoryPool::getInstance().poolFree(segmentData.buf);
 }
 
-void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t objectId,
+void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t segmentId,
 		uint64_t offset, FILE* filePtr, string dstPath) {
-	client->getObject(clientId, sockfd, objectId, offset, filePtr, dstPath);
-	debug("Object ID = %" PRIu64 " finished download\n", objectId);
+	client->getSegment(clientId, sockfd, segmentId, offset, filePtr, dstPath);
+	debug("Segment ID = %" PRIu64 " finished download\n", segmentId);
 }
 
 #endif
 
-struct ObjectTransferCache Client::getObject(uint32_t clientId,
-		uint32_t dstSockfd, uint64_t objectId) {
-	struct ObjectTransferCache objectCache = { };
+struct SegmentTransferCache Client::getSegment(uint32_t clientId,
+		uint32_t dstSockfd, uint64_t segmentId) {
+	struct SegmentTransferCache segmentCache = { };
 
-	// get object from cache directly if possible
-	if (_storageModule->locateObjectCache(objectId)) {
-		objectCache = _storageModule->getObjectCache(objectId);
-		return objectCache;
+	// get segment from cache directly if possible
+	if (_storageModule->locateSegmentCache(segmentId)) {
+		segmentCache = _storageModule->getSegmentCache(segmentId);
+		return segmentCache;
 	}
 
 	// unknown number of chunks at this point
-	_pendingObjectChunk.set(objectId, -1);
+	_pendingSegmentChunk.set(segmentId, -1);
 
-	_clientCommunicator->requestObject(dstSockfd, objectId);
+	_clientCommunicator->requestSegment(dstSockfd, segmentId);
 
-	// wait until the object is fully downloaded
-	while (_pendingObjectChunk.count(objectId)) {
+	// wait until the segment is fully downloaded
+	while (_pendingSegmentChunk.count(segmentId)) {
 		usleep(10000);
 	}
 
-	// write object from cache to file
-	objectCache = _storageModule->getObjectCache(objectId);
+	// write segment from cache to file
+	segmentCache = _storageModule->getSegmentCache(segmentId);
 
-	return objectCache;
+	return segmentCache;
 }
 
-void Client::getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId,
+void Client::getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentId,
 		uint64_t offset, FILE* filePtr, string dstPath) {
 
-	struct ObjectTransferCache objectCache = { };
+	struct SegmentTransferCache segmentCache = { };
 
-	objectCache = getObject(clientId, dstSockfd, objectId);
+	segmentCache = getSegment(clientId, dstSockfd, segmentId);
 
-	_storageModule->writeFile(filePtr, dstPath, objectCache.buf, offset,
-			objectCache.length);
+	_storageModule->writeFile(filePtr, dstPath, segmentCache.buf, offset,
+			segmentCache.length);
 
 	debug(
-			"Write Object ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu32 " to %s\n",
-			objectId, offset, objectCache.length, dstPath.c_str());
+			"Write Segment ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu32 " to %s\n",
+			segmentId, offset, segmentCache.length, dstPath.c_str());
 
-	_storageModule->closeObject(objectId);
+	_storageModule->closeSegment(segmentId);
 
 }
 
@@ -115,44 +115,44 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	typedef chrono::milliseconds milliseconds;
 	Clock::time_point t0 = Clock::now();
 
-	const uint32_t objectCount = _storageModule->getObjectCount(path);
+	const uint32_t segmentCount = _storageModule->getSegmentCount(path);
 	const uint64_t fileSize = _storageModule->getFilesize(path);
 
-	debug("Object Count of %s: %" PRIu32 "\n", path.c_str(), objectCount);
+	debug("Segment Count of %s: %" PRIu32 "\n", path.c_str(), segmentCount);
 
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
-			_clientId, path, fileSize, objectCount, codingScheme,
+			_clientId, path, fileSize, segmentCount, codingScheme,
 			codingSetting);
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
 	for (uint32_t i = 0; i < fileMetaData._primaryList.size(); ++i) {
 		debug("%" PRIu64 "[%" PRIu32 "]\n",
-				fileMetaData._objectList[i], fileMetaData._primaryList[i]);
+				fileMetaData._segmentList[i], fileMetaData._primaryList[i]);
 	}
 
-	for (uint32_t i = 0; i < objectCount; ++i) {
-		struct ObjectData objectData = _storageModule->readObjectFromFile(path,
+	for (uint32_t i = 0; i < segmentCount; ++i) {
+		struct SegmentData segmentData = _storageModule->readSegmentFromFile(path,
 				i);
 		uint32_t primary = fileMetaData._primaryList[i];
 		debug("Send to Primary [%" PRIu32 "]\n", primary);
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
-		objectData.info.objectId = fileMetaData._objectList[i];
+		segmentData.info.segmentId = fileMetaData._segmentList[i];
 
 		// get checksum
 		unsigned char checksum[MD5_DIGEST_LENGTH];
-		MD5((unsigned char*) objectData.buf, objectData.info.objectSize,
+		MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize,
 				checksum);
 
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(
 				boost::bind(startUploadThread, _clientId, dstOsdSockfd,
-						objectData, codingScheme, codingSetting,
+						segmentData, codingScheme, codingSetting,
 						md5ToHex(checksum)));
 #else
-		_clientCommunicator->sendObject(_clientId, dstOsdSockfd, objectData,
+		_clientCommunicator->sendSegment(_clientId, dstOsdSockfd, segmentData,
 				codingScheme, codingSetting, md5ToHex(checksum));
-		MemoryPool::getInstance().poolFree(objectData.buf);
+		MemoryPool::getInstance().poolFree(segmentData.buf);
 #endif
 	}
 
@@ -197,12 +197,12 @@ void Client::renameFileRequest(const string& path, const string& newPath) {
 
 void Client::truncateFileRequest(uint32_t fileId) {
 	_clientCommunicator->saveFileSize(_clientId, fileId, 0);
-	_clientCommunicator->saveObjectList(_clientId, fileId, {});
+	_clientCommunicator->saveSegmentList(_clientId, fileId, {});
 }
 
 void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
-	const uint64_t objectSize = _storageModule->getObjectSize();
+	const uint64_t segmentSize = _storageModule->getSegmentSize();
 
 	// start timer
 	typedef chrono::high_resolution_clock Clock;
@@ -221,22 +221,22 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	// 2. Download file from OSD
 
 	uint32_t i = 0;
-	for (uint64_t objectId : fileMetaData._objectList) {
+	for (uint64_t segmentId : fileMetaData._segmentList) {
 		uint32_t dstComponentId = fileMetaData._primaryList[i];
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
 
 		if (dstSockfd == (uint32_t) -1) 
-			dstSockfd = _clientCommunicator->switchPrimaryRequest(_clientId, objectId);		
+			dstSockfd = _clientCommunicator->switchPrimaryRequest(_clientId, segmentId);		
 
-		const uint64_t offset = objectSize * i;
+		const uint64_t offset = segmentSize * i;
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(
-				boost::bind(startDownloadThread, _clientId, dstSockfd, objectId,
+				boost::bind(startDownloadThread, _clientId, dstSockfd, segmentId,
 						offset, filePtr, dstPath));
 #else
-		_clientCommunicator->getObjectAndWriteFile(_clientId, dstSockfd,
-				objectId, offset, filePtr, dstPath);
+		_clientCommunicator->getSegmentAndWriteFile(_clientId, dstSockfd,
+				segmentId, offset, filePtr, dstPath);
 #endif
 
 		i++;
@@ -273,37 +273,37 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 }
 
-void Client::putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint32_t length, uint32_t chunkCount,
+void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
 		string checksum) {
 
 	// initialize chunkCount value
-	_pendingObjectChunk.set(objectId, chunkCount);
+	_pendingSegmentChunk.set(segmentId, chunkCount);
 	debug("Init Chunkcount = %" PRIu32 "\n", chunkCount);
 
-	// create object and cache
-	if (!_storageModule->locateObjectCache(objectId))
-		_storageModule->createObjectCache(objectId, length);
-	_clientCommunicator->replyPutObjectInit(requestId, sockfd, objectId);
+	// create segment and cache
+	if (!_storageModule->locateSegmentCache(segmentId))
+		_storageModule->createSegmentCache(segmentId, length);
+	_clientCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 
 	// save md5 to map
-	_checksumMap.set(objectId, checksum);
+	_checksumMap.set(segmentId, checksum);
 
 }
 
-void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId) {
+void Client::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t segmentId) {
 
-	// TODO: check integrity of object received
+	// TODO: check integrity of segment received
 	bool chunkRemaining = false;
 
 	while (1) {
 
-		chunkRemaining = _pendingObjectChunk.count(objectId);
+		chunkRemaining = _pendingSegmentChunk.count(segmentId);
 
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
-			_clientCommunicator->replyPutObjectEnd(requestId, sockfd, objectId);
+			_clientCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId);
 			break;
 		} else {
 			usleep(10000); // sleep 0.1s
@@ -312,16 +312,16 @@ void Client::putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 }
 
-uint32_t Client::ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t objectId, uint64_t offset, uint32_t length, char* buf) {
+uint32_t Client::SegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t segmentId, uint64_t offset, uint32_t length, char* buf) {
 
 	uint32_t byteWritten;
-	byteWritten = _storageModule->writeObjectCache(objectId, buf, offset,
+	byteWritten = _storageModule->writeSegmentCache(segmentId, buf, offset,
 			length);
-	_pendingObjectChunk.decrement(objectId);
+	_pendingSegmentChunk.decrement(segmentId);
 
-	if (_pendingObjectChunk.get(objectId) == 0) {
-		_pendingObjectChunk.erase(objectId);
+	if (_pendingSegmentChunk.get(segmentId) == 0) {
+		_pendingSegmentChunk.erase(segmentId);
 	}
 	return byteWritten;
 }

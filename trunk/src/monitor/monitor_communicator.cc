@@ -40,7 +40,7 @@ void MonitorCommunicator::replyPrimaryList(uint32_t requestId, uint32_t sockfd, 
 	return;
 }
 
-void MonitorCommunicator::replySecondaryList(uint32_t requestId, uint32_t sockfd, vector<struct SegmentLocation> secondaryList){
+void MonitorCommunicator::replySecondaryList(uint32_t requestId, uint32_t sockfd, vector<struct BlockLocation> secondaryList){
 	GetSecondaryListReplyMsg* getSecondaryListReplyMsg = new GetSecondaryListReplyMsg(this, requestId, sockfd, secondaryList);
 	getSecondaryListReplyMsg->prepareProtocolMsg();
 

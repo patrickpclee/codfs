@@ -32,7 +32,7 @@ public:
 	 * @param	clientId	ID of the client
 	 * @param	dstPath		Target Path for the file uploaded
 	 * @param	fileSize	Size of the File
-	 * @param	numOfObjs	number of objects to be uploaded
+	 * @param	numOfObjs	number of segments to be uploaded
 	 * @param	codingScheme	Coding Scheme for the file
 	 * @param 	codingSetting	Coding Scheme Setting
 	 *
@@ -71,20 +71,20 @@ public:
 			uint32_t clientId, uint32_t fileId, const string &path, const string &newPath);
 
 	/**
-	 * @brief	Handle Upload Object Acknowledgement from Primary
+	 * @brief	Handle Upload Segment Acknowledgement from Primary
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
-	 * @param	objectId	ID of the object uploaded
-	 * @param 	objectSize	Size of object
+	 * @param	segmentId	ID of the segment uploaded
+	 * @param 	segmentSize	Size of segment
 	 * @param	codingScheme	Coding Scheme
 	 * @param 	codingSetting	Coding Scheme Setting
-	 * @param	objectNodeList	List of the Osd
+	 * @param	segmentNodeList	List of the Osd
 	 * @param	checksum	Checksum
 	 */
-	void uploadObjectAckProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, uint32_t objectSize, CodingScheme codingScheme,
-			const string &codingSetting, const vector<uint32_t> &objectNodeList,
+	void uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId, uint32_t segmentSize, CodingScheme codingScheme,
+			const string &codingSetting, const vector<uint32_t> &segmentNodeList,
 			const string &checksum);
 
 	/**
@@ -110,14 +110,14 @@ public:
 			uint32_t clientId, uint32_t fileId);
 
 	/**
-	 * @brief	Handle Get Object ID Lsit
+	 * @brief	Handle Get Segment ID Lsit
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	clientId	ID of the Client
-	 * @param	numOfObjs	Number of Objects
+	 * @param	numOfObjs	Number of Segments
 	 */
-	void getObjectIdListProcessor(uint32_t requestId, uint32_t connectionId,
+	void getSegmentIdListProcessor(uint32_t requestId, uint32_t connectionId,
 			uint32_t clientId, uint32_t numOfObjs);
 
 	/**
@@ -132,14 +132,14 @@ public:
 			uint32_t clientId, const string &path);
 
 	/**
-	 * @brief	Handle the Object Info Request from Osd
+	 * @brief	Handle the Segment Info Request from Osd
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
-	 * @param	objectID	ID of the Object
+	 * @param	segmentID	ID of the Segment
 	 */
-	void getObjectInfoProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId);
+	void getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId);
 
 	/**
 	 * @brief	Handle List Folder Request from Client
@@ -158,11 +158,11 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	osdId		ID of the Failed Osd
-	 * @param	objectId	ID of the Failed Object
+	 * @param	segmentId	ID of the Failed Segment
 	 * @param	reason		Reason of the Failure (Default to Node Failure)
 	 */
 	void primaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t osdId, uint64_t objectId, FailureReason reason =
+			uint32_t osdId, uint64_t segmentId, FailureReason reason =
 					UNREACHABLE);
 
 	/**
@@ -171,11 +171,11 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	osdId		ID of the Failed Osd
-	 * @param	objectId	ID of the Failed Object
+	 * @param	segmentId	ID of the Failed Segment
 	 * @param	reason		Reason of the Failure (Default to Node Failure)
 	 */
 	void secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t osdId, uint64_t objectId, FailureReason reason =
+			uint32_t osdId, uint64_t segmentId, FailureReason reason =
 					UNREACHABLE);
 
 	/**
@@ -189,28 +189,28 @@ public:
 			vector<uint32_t> deadOsdList);
 
 	/**
-	 * @brief	Handle Object Node List Update from Osd
+	 * @brief	Handle Segment Node List Update from Osd
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
-	 * @param	objectId	ID of the Object
-	 * @param	objectNodeList	Node List of the Object
+	 * @param	segmentId	ID of the Segment
+	 * @param	segmentNodeList	Node List of the Segment
 	 */
 	void nodeListUpdateProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, const vector<uint32_t> &objectNodeList);
+			uint64_t segmentId, const vector<uint32_t> &segmentNodeList);
 
 	/**
-	 * @brief	Handle Object List Save Request
+	 * @brief	Handle Segment List Save Request
 	 *
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	clientId	ID of the client Requesting
 	 * @param	fileId	ID of the File
-	 * @param	objectList	Object List of the File
+	 * @param	segmentList	Segment List of the File
 	 */
-	void saveObjectListProcessor(uint32_t requestId, uint32_t connectionId,
+	void saveSegmentListProcessor(uint32_t requestId, uint32_t connectionId,
 			uint32_t clientId, uint32_t fileId,
-			const vector<uint64_t> &objectList);
+			const vector<uint64_t> &segmentList);
 
 	/**
 	 * @brief	Handle Set File Size Request
@@ -225,17 +225,17 @@ public:
 			uint32_t clientId, uint32_t fileId, uint64_t fileSize);
 
 	/**
-	 * @brief Handle Ack from OSD after object is recovered
+	 * @brief Handle Ack from OSD after segment is recovered
 	 * @param requestId Request ID
 	 * @param connectionId Connection ID
-	 * @param objectId Object ID
-	 * @param repairSegmentList List of repaired segments
-	 * @param repairSegmentOsdList List of OSDs storing repaired segments
+	 * @param segmentId Segment ID
+	 * @param repairBlockList List of repaired blocks
+	 * @param repairBlockOsdList List of OSDs storing repaired blocks
 	 */
 
-	void repairObjectInfoProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t objectId, vector<uint32_t> repairSegmentList,
-			vector<uint32_t> repairSegmentOsdList);
+	void repairSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId, vector<uint32_t> repairBlockList,
+			vector<uint32_t> repairBlockOsdList);
 
 	/**
 	 * @brief	Get the MDS Communicator

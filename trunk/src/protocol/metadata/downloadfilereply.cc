@@ -27,7 +27,7 @@ DownloadFileReplyMsg::DownloadFileReplyMsg(Communicator* communicator) :
  * Constructor - Save parameters in private variables
  */
 DownloadFileReplyMsg::DownloadFileReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t sockfd, uint32_t fileId, const string &filePath, uint64_t fileSize, const FileType& fileType, const string &checksum, const vector<uint64_t> &objectList, const vector<uint32_t> &primaryList) :
+		uint32_t requestId, uint32_t sockfd, uint32_t fileId, const string &filePath, uint64_t fileSize, const FileType& fileType, const string &checksum, const vector<uint64_t> &segmentList, const vector<uint32_t> &primaryList) :
 		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
@@ -37,7 +37,7 @@ DownloadFileReplyMsg::DownloadFileReplyMsg(Communicator* communicator,
 	_fileSize = fileSize;
 	_fileType = fileType;
 	_checksum = checksum;
-	_objectList = objectList;
+	_segmentList = segmentList;
 	_primaryList = primaryList;
 	
 }
@@ -53,8 +53,8 @@ void DownloadFileReplyMsg::prepareProtocolMsg() {
 	downloadFileReplyPro.set_filetype((ncvfs::DownloadFileReplyPro_FileType)_fileType);
 	downloadFileReplyPro.set_checksum(_checksum);
 
-	for (auto objectID : _objectList) {
-		downloadFileReplyPro.add_objectlist(objectID);
+	for (auto segmentID : _segmentList) {
+		downloadFileReplyPro.add_segmentlist(segmentID);
 	}
 
 	for (auto primaryID : _primaryList) {
@@ -85,8 +85,8 @@ void DownloadFileReplyMsg::parse(char* buf) {
 	_fileType = (FileType)downloadFileReplyPro.filetype();
 	_checksum = downloadFileReplyPro.checksum();
 
-	for (int i = 0; i < downloadFileReplyPro.objectlist_size(); i++) {
-		_objectList.push_back(downloadFileReplyPro.objectlist(i));
+	for (int i = 0; i < downloadFileReplyPro.segmentlist_size(); i++) {
+		_segmentList.push_back(downloadFileReplyPro.segmentlist(i));
 	}
 
 	for (int i = 0; i < downloadFileReplyPro.primarylist_size(); i++) {
@@ -102,7 +102,7 @@ void DownloadFileReplyMsg::doHandle() {
 	downloadFileRequestMsg->setFileId(_fileId);
 	downloadFileRequestMsg->setFilePath(_filePath);
 	downloadFileRequestMsg->setSize(_fileSize);
-	downloadFileRequestMsg->setObjectList(_objectList);
+	downloadFileRequestMsg->setSegmentList(_segmentList);
 	downloadFileRequestMsg->setPrimaryList(_primaryList);
 	downloadFileRequestMsg->setStatus(READY);
 }

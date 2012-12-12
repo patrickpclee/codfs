@@ -20,9 +20,9 @@ FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModul
 	_fileMetaDataStorage->connect();
 	_fileMetaDataStorage->setCollection(_collection);
 
-	//BSONObj queryObject = BSON ("id" << "config");
-	//BSONObj updateObject = BSON ("$set" << BSON ("fileId" << 0));
-	//_fileMetaDataStorage->update(queryObject, updateObject);
+	//BSONObj querySegment = BSON ("id" << "config");
+	//BSONObj updateSegment = BSON ("$set" << BSON ("fileId" << 0));
+	//_fileMetaDataStorage->update(querySegment, updateSegment);
 
 }
 
@@ -32,11 +32,11 @@ FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModul
 void FileMetaDataModule::createFile(uint32_t clientId, const string &path,
 		uint64_t fileSize, uint32_t fileId, CodingScheme codingScheme,
 		const string &codingSetting) {
-	BSONObj insertObject =
+	BSONObj insertSegment =
 			BSON ("id" << fileId << "path" << path << "fileSize" << (long long int)fileSize
 					<< "clientId" << clientId << "codingScheme" << (int)codingScheme
 					<< "codingSetting" << codingSetting);
-	_fileMetaDataStorage->insert(insertObject);
+	_fileMetaDataStorage->insert(insertSegment);
 
 	return;
 }
@@ -45,17 +45,17 @@ void FileMetaDataModule::createFile(uint32_t clientId, const string &path,
  * @brief	Delete a File
  */
 void FileMetaDataModule::deleteFile(uint32_t fileId) {
-	BSONObj queryObject = BSON ("id" << fileId);
-	_fileMetaDataStorage->remove(queryObject);
+	BSONObj querySegment = BSON ("id" << fileId);
+	_fileMetaDataStorage->remove(querySegment);
 }
 
 /**
  * @brief	Rename a File
  */
 void FileMetaDataModule::renameFile(uint32_t fileId, const string& newPath) {
-	BSONObj queryObject = BSON ("id" << fileId);
-	BSONObj updateObject = BSON ("$set" << BSON ("path" << newPath));
-	_fileMetaDataStorage->update(queryObject, updateObject);
+	BSONObj querySegment = BSON ("id" << fileId);
+	BSONObj updateSegment = BSON ("$set" << BSON ("path" << newPath));
+	_fileMetaDataStorage->update(querySegment, updateSegment);
 }
 
 /**
@@ -63,10 +63,10 @@ void FileMetaDataModule::renameFile(uint32_t fileId, const string& newPath) {
  */
 uint32_t FileMetaDataModule::lookupFileId(const string &path)
 {
-	BSONObj queryObject = BSON ("path" << path);
+	BSONObj querySegment = BSON ("path" << path);
 	uint32_t fileId = 0;
 	try {
-		BSONObj result = _fileMetaDataStorage->readOne(queryObject);
+		BSONObj result = _fileMetaDataStorage->readOne(querySegment);
 		fileId = (uint32_t)result.getField("id").numberInt();
 	} catch (...) {
 	}
@@ -81,9 +81,9 @@ uint32_t FileMetaDataModule::lookupFileId(const string &path)
  */
 void FileMetaDataModule::setFileSize(uint32_t fileId, uint64_t fileSize)
 {
-	BSONObj queryObject = BSON ("id" << fileId);
-	BSONObj updateObject = BSON ("$set" << BSON ("fileSize" << (long long int)fileSize));
-	_fileMetaDataStorage->update(queryObject, updateObject);
+	BSONObj querySegment = BSON ("id" << fileId);
+	BSONObj updateSegment = BSON ("$set" << BSON ("fileSize" << (long long int)fileSize));
+	_fileMetaDataStorage->update(querySegment, updateSegment);
 	return ;
 }
 
@@ -96,39 +96,39 @@ void FileMetaDataModule::setFileSize(uint32_t fileId, uint64_t fileSize)
  */
 uint64_t FileMetaDataModule::readFileSize(uint32_t fileId)
 {
-	BSONObj queryObject = BSON ("id" << fileId);
-	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
+	BSONObj querySegment = BSON ("id" << fileId);
+	BSONObj result = _fileMetaDataStorage->readOne(querySegment);
 	return (uint64_t)result.getField("fileSize").numberLong();
 }
 
 /**
- * @brief	Save the Object List of a File
+ * @brief	Save the Segment List of a File
  */
-void FileMetaDataModule::saveObjectList(uint32_t fileId, const vector<uint64_t> &objectList) {
+void FileMetaDataModule::saveSegmentList(uint32_t fileId, const vector<uint64_t> &segmentList) {
 	vector<uint64_t>::const_iterator it;
-	BSONObj queryObject = BSON ("id" << fileId);
+	BSONObj querySegment = BSON ("id" << fileId);
 	BSONArrayBuilder arrb;
-	for(it = objectList.begin(); it < objectList.end(); ++it) {
+	for(it = segmentList.begin(); it < segmentList.end(); ++it) {
 		arrb.append((long long int) *it);
 	}
 	BSONArray arr = arrb.arr();
-	BSONObj updateObject = BSON ("$set" << BSON ("objectList" << arr));
-	_fileMetaDataStorage->update(queryObject,updateObject);
+	BSONObj updateSegment = BSON ("$set" << BSON ("segmentList" << arr));
+	_fileMetaDataStorage->update(querySegment,updateSegment);
 	return;
 }
 
 /**
- * @brief	Read the Object List of a File
+ * @brief	Read the Segment List of a File
  */
-vector<uint64_t> FileMetaDataModule::readObjectList(uint32_t fileId) {
-	vector<uint64_t> objectList;
-	BSONObj queryObject = BSON ("id" << fileId);
-	BSONObj result = _fileMetaDataStorage->readOne(queryObject);
-	BSONForEach(it, result.getObjectField("objectList")) {
-		objectList.push_back((uint64_t)it.numberLong());
-		debug("ObjectList %lld\n",it.numberLong());
+vector<uint64_t> FileMetaDataModule::readSegmentList(uint32_t fileId) {
+	vector<uint64_t> segmentList;
+	BSONObj querySegment = BSON ("id" << fileId);
+	BSONObj result = _fileMetaDataStorage->readOne(querySegment);
+	BSONForEach(it, result.getObjectField("segmentList")) {
+		segmentList.push_back((uint64_t)it.numberLong());
+		debug("SegmentList %lld\n",it.numberLong());
 	}
-	return objectList;
+	return segmentList;
 }
 
 /**

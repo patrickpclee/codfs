@@ -88,38 +88,38 @@ public:
 	void downloadFileRequest(uint32_t fileId, string dstPath);
 
 	/**
-	 * @brief	putObjectInitRequestMsg Handler: update chunkCount in pendingChunkMap
+	 * @brief	putSegmentInitRequestMsg Handler: update chunkCount in pendingChunkMap
 	 * @param	requestId	Request ID
 	 * @param   sockfd 		Socket file descriptor
-	 * @param	objectId	Object ID
+	 * @param	segmentId	Segment ID
 	 * @param	length		Data Length
 	 * @param 	chunkCount	Number of Chunks
-	 * @param	checksum	CheckSum of the Object
+	 * @param	checksum	CheckSum of the Segment
 	 */
-	void putObjectInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint32_t length, uint32_t chunkCount,
+	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
 			string checksum);
 
 	/**
-	 * @brief	ObjectDataMsg Handler: receive Object Data
+	 * @brief	SegmentDataMsg Handler: receive Segment Data
 	 * @param	requestId	Request ID
 	 * @param   sockfd 		Socket file descriptor
-	 * @param	objectId	Object ID
+	 * @param	segmentId	Segment ID
 	 * @param	offset		Offset in the file
 	 * @param	length		Data Length
 	 * @param 	buf			The Buffer contains the data
 	 */
-	uint32_t ObjectDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId, uint64_t offset, uint32_t length, char* buf);
+	uint32_t SegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint64_t offset, uint32_t length, char* buf);
 
 	/**
-	 * @brief	putObjectEndRequestMsg Handler: counting chunkCount in pendingChunkMap
+	 * @brief	putSegmentEndRequestMsg Handler: counting chunkCount in pendingChunkMap
 	 * @param	requestId	Request ID
 	 * @param   sockfd 		Socket file descriptor
-	 * @param	objectId	Object ID
+	 * @param	segmentId	Segment ID
 	 */
-	void putObjectEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t objectId);
+	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId);
 
 	/**
 	 * @brief	get the client ID
@@ -128,8 +128,8 @@ public:
 	 */
 	uint32_t getClientId();
 
-	struct ObjectTransferCache getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId);
-	void getObject(uint32_t clientId, uint32_t dstSockfd, uint64_t objectId,
+	struct SegmentTransferCache getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentId);
+	void getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentId,
 			uint64_t offset, FILE* filePtr, string dstPath);
 
 private:
@@ -141,7 +141,7 @@ private:
 	ClientCommunicator* _clientCommunicator;
 	ClientStorageModule* _storageModule;
 
-	ConcurrentMap<uint64_t, int> _pendingObjectChunk;
+	ConcurrentMap<uint64_t, int> _pendingSegmentChunk;
 	ConcurrentMap<uint64_t, string> _checksumMap;
 
 	// thread pool for upload

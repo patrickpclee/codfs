@@ -4,7 +4,7 @@
 #include <ctime>
 #include "monitor.hh"
 #include "../config/config.hh"
-#include "../common/segmentlocation.hh"
+#include "../common/blocklocation.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 
@@ -99,7 +99,7 @@ void Monitor::getPrimaryListProcessor(uint32_t requestId, uint32_t sockfd,
 void Monitor::getSecondaryListProcessor(uint32_t requestId, uint32_t sockfd,
 		uint32_t numOfSegs, uint32_t primaryId) {
 
-	vector<struct SegmentLocation> secondaryList;
+	vector<struct BlockLocation> secondaryList;
 	secondaryList = _selectionModule->ChooseSecondary(numOfSegs, primaryId);
 	_monitorCommunicator->replySecondaryList(requestId, sockfd, secondaryList);
 	return;

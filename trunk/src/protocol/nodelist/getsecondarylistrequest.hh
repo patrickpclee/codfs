@@ -33,7 +33,7 @@ public:
 	 * Constructor - Save parameters in private variables
 	 *
 	 * @param	communicator	Communicator the Message belongs to
-	 * @param	numOfObjs	number of Objects
+	 * @param	numOfObjs	number of Segments
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
@@ -69,14 +69,14 @@ public:
 
 	void printProtocol ();
 
-	void setSecondaryList(vector<struct SegmentLocation> secondaryList);
-	vector<SegmentLocation> getSecondaryList();
+	void setSecondaryList(vector<struct BlockLocation> secondaryList);
+	vector<BlockLocation> getSecondaryList();
 
 
 private:
 	uint32_t _numOfSegs;
 	uint32_t _primaryId;
-	vector<struct SegmentLocation> _secondaryList;
+	vector<struct BlockLocation> _secondaryList;
 };
 
 #endif

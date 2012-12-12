@@ -61,15 +61,15 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
 	return primaryList;
 }
 
-vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSegs, 
+vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t numOfSegs, 
 	uint32_t primaryId) {
 
-	vector<struct SegmentLocation> secondaryList;
+	vector<struct BlockLocation> secondaryList;
 
 	// Push the primary osd as the first secondary
-	struct SegmentLocation primary;
+	struct BlockLocation primary;
 	primary.osdId = primaryId;
-	primary.segmentId = 0;
+	primary.blockId = 0;
 	secondaryList.push_back(primary);
 
 	vector<uint32_t> allOnlineList;
@@ -97,9 +97,9 @@ vector<struct SegmentLocation> SelectionModule::ChooseSecondary(uint32_t numOfSe
 #endif
 		if (selected.size() == n || 
 			selected.find(allOnlineList[idx]) == selected.end()) {
-			struct SegmentLocation tmp;
+			struct BlockLocation tmp;
 			tmp.osdId = allOnlineList[idx];
-			tmp.segmentId = 0;
+			tmp.blockId = 0;
 			secondaryList.push_back(tmp);
 			selected.insert(allOnlineList[idx]);
 			numOfSegs--;

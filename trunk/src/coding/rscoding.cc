@@ -6,8 +6,8 @@
 #include "coding.hh"
 #include "rscoding.hh"
 #include "../common/debug.hh"
+#include "../common/blockdata.hh"
 #include "../common/segmentdata.hh"
-#include "../common/objectdata.hh"
 #include "../common/memorypool.hh"
 
 extern "C" {
@@ -25,15 +25,15 @@ RSCoding::~RSCoding() {
 
 }
 
-vector<struct SegmentData> RSCoding::encode(struct ObjectData objectData,
+vector<struct BlockData> RSCoding::encode(struct SegmentData segmentData,
 		string setting) {
 
-	vector<struct SegmentData> segmentDataList;
+	vector<struct BlockData> blockDataList;
 	vector<uint32_t> params = getParams(setting);
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
-	const uint32_t size = roundTo((roundTo(objectData.info.objectSize, k) / k),4);
+	const uint32_t size = roundTo((roundTo(segmentData.info.segmentSize, k) / k),4);
 
 	if (k <= 0 || m <= 0 || (w != 8 && w != 16 && w != 32)
 			|| (w <= 16 && k + m > (1 << w))) {
@@ -47,24 +47,24 @@ vector<struct SegmentData> RSCoding::encode(struct ObjectData objectData,
 	data = talloc<char*, uint32_t>(k);
 
 	for (uint32_t i = 0; i < k; i++) {
-		struct SegmentData segmentData;
-		segmentData.info.objectId = objectData.info.objectId;
-		segmentData.info.segmentId = i;
-		segmentData.info.segmentSize = size;
+		struct BlockData blockData;
+		blockData.info.segmentId = segmentData.info.segmentId;
+		blockData.info.blockId = i;
+		blockData.info.blockSize = size;
 
-		segmentData.buf = MemoryPool::getInstance().poolMalloc(size);
-		char* bufPos = objectData.buf + i * size;
+		blockData.buf = MemoryPool::getInstance().poolMalloc(size);
+		char* bufPos = segmentData.buf + i * size;
 		if(i == k-1){
-			//memset(segmentData.buf, 0, size);
-			memcpy(segmentData.buf, bufPos, objectData.info.objectSize - i*size);
-			memset(segmentData.buf + objectData.info.objectSize - i*size, 0, k*size - objectData.info.objectSize);
+			//memset(blockData.buf, 0, size);
+			memcpy(blockData.buf, bufPos, segmentData.info.segmentSize - i*size);
+			memset(blockData.buf + segmentData.info.segmentSize - i*size, 0, k*size - segmentData.info.segmentSize);
 		} else
-			memcpy(segmentData.buf, bufPos, size);
+			memcpy(blockData.buf, bufPos, size);
 
-		segmentDataList.push_back(segmentData);
+		blockDataList.push_back(blockData);
 
 		data[i] = talloc<char, uint32_t>(size);
-		memcpy(data[i], segmentData.buf, size);
+		memcpy(data[i], blockData.buf, size);
 	}
 
 	code = talloc<char*, uint32_t>(m);
@@ -75,15 +75,15 @@ vector<struct SegmentData> RSCoding::encode(struct ObjectData objectData,
 	jerasure_matrix_encode(k, m, w, matrix, data, code, size);
 
 	for (uint32_t i = 0; i < m; i++) {
-		struct SegmentData segmentData;
-		segmentData.info.objectId = objectData.info.objectId;
-		segmentData.info.segmentId = k + i;
-		segmentData.info.segmentSize = size;
+		struct BlockData blockData;
+		blockData.info.segmentId = segmentData.info.segmentId;
+		blockData.info.blockId = k + i;
+		blockData.info.blockSize = size;
 
-		segmentData.buf = MemoryPool::getInstance().poolMalloc(size);
-		memcpy(segmentData.buf, code[i], size);
+		blockData.buf = MemoryPool::getInstance().poolMalloc(size);
+		memcpy(blockData.buf, code[i], size);
 
-		segmentDataList.push_back(segmentData);
+		blockDataList.push_back(blockData);
 	}
 
 	// free memory
@@ -97,36 +97,36 @@ vector<struct SegmentData> RSCoding::encode(struct ObjectData objectData,
 	}
 	tfree(code);
 
-	return segmentDataList;
+	return blockDataList;
 }
 
-struct ObjectData RSCoding::decode(vector<struct SegmentData> &segmentData,
-		vector<uint32_t> &requiredSegments, uint32_t objectSize,
+struct SegmentData RSCoding::decode(vector<struct BlockData> &blockData,
+		vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
 		string setting) {
 
 	vector<uint32_t> params = getParams(setting);
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
-	const uint32_t size = roundTo(roundTo(objectSize, k) / k, 4);
+	const uint32_t size = roundTo(roundTo(segmentSize, k) / k, 4);
 
-	if (requiredSegments.size() < k) {
-		cerr << "Not enough segments for decode " << requiredSegments.size()
+	if (requiredBlocks.size() < k) {
+		cerr << "Not enough blocks for decode " << requiredBlocks.size()
 				<< endl;
 		exit(-1);
 	}
 
-	struct ObjectData objectData;
+	struct SegmentData segmentData;
 
-	// copy objectID from first available segment
-	objectData.info.objectId = segmentData[requiredSegments[0]].info.objectId;
-	objectData.info.objectSize = objectSize;
-	objectData.buf = MemoryPool::getInstance().poolMalloc(objectSize);
+	// copy segmentID from first available block
+	segmentData.info.segmentId = blockData[requiredBlocks[0]].info.segmentId;
+	segmentData.info.segmentSize = segmentSize;
+	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
-	set<uint32_t> requiredSegmentsSet(requiredSegments.begin(),
-			requiredSegments.end());
+	set<uint32_t> requiredBlocksSet(requiredBlocks.begin(),
+			requiredBlocks.end());
 
-	if (requiredSegments.size() != k + m) {
+	if (requiredBlocks.size() != k + m) {
 		int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
 		char **data, **code;
 		int *erasures;
@@ -134,14 +134,14 @@ struct ObjectData RSCoding::decode(vector<struct SegmentData> &segmentData,
 
 		data = talloc<char*, uint32_t>(k);
 		code = talloc<char*, uint32_t>(m);
-		erasures = talloc<int, uint32_t>(k + m - requiredSegments.size() + 1);
+		erasures = talloc<int, uint32_t>(k + m - requiredBlocks.size() + 1);
 
 		for (uint32_t i = 0; i < k + m; i++) {
 			i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
 							talloc<char, uint32_t>(size);
-			if (requiredSegmentsSet.count(i) > 0) {
-				i < k ? memcpy(data[i], segmentData[i].buf, size) : memcpy(
-								code[i - k], segmentData[i].buf, size);
+			if (requiredBlocksSet.count(i) > 0) {
+				i < k ? memcpy(data[i], blockData[i].buf, size) : memcpy(
+								code[i - k], blockData[i].buf, size);
 			} else {
 				erasures[j++] = i;
 			}
@@ -150,22 +150,22 @@ struct ObjectData RSCoding::decode(vector<struct SegmentData> &segmentData,
 
 		jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
 
-		for (uint32_t i = 0; i < k + m - requiredSegments.size(); i++) {
-			struct SegmentData temp;
-			temp.info.objectId = objectData.info.objectId;
-			temp.info.segmentId = erasures[i];
-			temp.info.segmentSize = size;
+		for (uint32_t i = 0; i < k + m - requiredBlocks.size(); i++) {
+			struct BlockData temp;
+			temp.info.segmentId = segmentData.info.segmentId;
+			temp.info.blockId = erasures[i];
+			temp.info.blockSize = size;
 
 			temp.buf = MemoryPool::getInstance().poolMalloc(size);
 			memcpy(temp.buf,
 					(uint32_t) erasures[i] < k ?
 							data[erasures[i]] : code[erasures[i] - k], size);
 
-			segmentData[erasures[i]] = temp;
+			blockData[erasures[i]] = temp;
 		}
 
 		for (uint32_t i = 0; i < m; i++) {
-			MemoryPool::getInstance().poolFree(segmentData[k + i].buf);
+			MemoryPool::getInstance().poolFree(blockData[k + i].buf);
 		}
 
 		// free memory
@@ -181,23 +181,23 @@ struct ObjectData RSCoding::decode(vector<struct SegmentData> &segmentData,
 
 	}
 
-	requiredSegments.clear();
+	requiredBlocks.clear();
 	for (uint32_t i = 0; i < k; i++) {
-		requiredSegments.push_back(i);
+		requiredBlocks.push_back(i);
 	}
 
 	uint64_t offset = 0;
 	for (uint32_t i = 0; i < k - 1; i++) {
-		memcpy(objectData.buf + offset, segmentData[i].buf,
-				segmentData[i].info.segmentSize);
-		offset += segmentData[i].info.segmentSize;
+		memcpy(segmentData.buf + offset, blockData[i].buf,
+				blockData[i].info.blockSize);
+		offset += blockData[i].info.blockSize;
 	}
-	memcpy(objectData.buf + offset, segmentData[k - 1].buf, objectSize - offset);
+	memcpy(segmentData.buf + offset, blockData[k - 1].buf, segmentSize - offset);
 
-	return objectData;
+	return segmentData;
 }
 
-vector<uint32_t> RSCoding::getRequiredSegmentIds(string setting,
+vector<uint32_t> RSCoding::getRequiredBlockIds(string setting,
 		vector<bool> secondaryOsdStatus) {
 
 	// if more than one in secondaryOsdStatus is false, return {} (error)
@@ -209,8 +209,8 @@ vector<uint32_t> RSCoding::getRequiredSegmentIds(string setting,
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t noOfDataStripes = k + m;
-	vector<uint32_t> requiredSegments;
-	requiredSegments.reserve(noOfDataStripes);
+	vector<uint32_t> requiredBlocks;
+	requiredBlocks.reserve(noOfDataStripes);
 
 	if ((uint32_t) failedOsdCount > m) {
 		return {};
@@ -218,23 +218,23 @@ vector<uint32_t> RSCoding::getRequiredSegmentIds(string setting,
 
 	for (uint32_t i = 0; i < noOfDataStripes; i++) {
 		if (secondaryOsdStatus[i] != false) {
-			requiredSegments.push_back(i);
+			requiredBlocks.push_back(i);
 		}
 	}
 
-	return requiredSegments;
+	return requiredBlocks;
 }
 
-vector<uint32_t> RSCoding::getRepairSrcSegmentIds(string setting,
-		vector<uint32_t> failedSegments, vector<bool> segmentStatus) {
+vector<uint32_t> RSCoding::getRepairSrcBlockIds(string setting,
+		vector<uint32_t> failedBlocks, vector<bool> blockStatus) {
 
 	return {};
 }
 
-vector<struct SegmentData> RSCoding::repairSegments(
-		vector<uint32_t> failedSegments,
-		vector<struct SegmentData> &repairSrcSegments,
-		vector<uint32_t> &repairSrcSegmentId, uint32_t objectSize,
+vector<struct BlockData> RSCoding::repairBlocks(
+		vector<uint32_t> failedBlocks,
+		vector<struct BlockData> &repairSrcBlocks,
+		vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
 		string setting) {
 
 	return {};

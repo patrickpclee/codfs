@@ -9,7 +9,7 @@
 #include <iostream>
 #include <iomanip>
 using namespace std;
-#include "../common/segmentlocation.hh"
+#include "../common/blocklocation.hh"
 #include "../common/debug.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/netfunc.hh"
@@ -17,19 +17,19 @@ using namespace std;
 #include "../common/define.hh"
 
 #ifdef TIME_POINT
-extern double lockObjectCountMutexTime;
-extern double getObjectInfoTime;
+extern double lockSegmentCountMutexTime;
+extern double getSegmentInfoTime;
 extern double getOSDStatusTime;
-extern double getSegmentTime;
-extern double decodeObjectTime;
-extern double sendObjectTime;
-extern double cacheObjectTime;
+extern double getBlockTime;
+extern double decodeSegmentTime;
+extern double sendSegmentTime;
+extern double cacheSegmentTime;
 #endif
 
-/// Osd Object
+/// Osd Segment
 Osd* osd;
 
-/// Config Object
+/// Config Segment
 ConfigLayer* configLayer;
 
 // handle ctrl-C for profiler
@@ -40,19 +40,19 @@ void sighandler(int signum) {
 		cout << fixed;
 		cout << setprecision(2);
 #ifdef TIME_POINT
-cout << "Lock Object Count Mutex: " << lockObjectCountMutexTime / 1000 << endl;
-cout << "Get Object Info: " << getObjectInfoTime / 1000 << endl;
+cout << "Lock Segment Count Mutex: " << lockSegmentCountMutexTime / 1000 << endl;
+cout << "Get Segment Info: " << getSegmentInfoTime / 1000 << endl;
 cout << "Get OSD Status: " << getOSDStatusTime / 1000 << endl;
-cout << "Get Segment: " << getSegmentTime / 1000 << endl;
-cout << "Decode Object: " << decodeObjectTime / 1000 << endl;
-cout << "Send Object: " << sendObjectTime / 1000 << endl;
-cout << "Cache Object: " << cacheObjectTime / 1000 << endl;
+cout << "Get Block: " << getBlockTime / 1000 << endl;
+cout << "Decode Segment: " << decodeSegmentTime / 1000 << endl;
+cout << "Send Segment: " << sendSegmentTime / 1000 << endl;
+cout << "Cache Segment: " << cacheSegmentTime / 1000 << endl;
 #endif
 		exit(42);
 	} else if (signum == SIGUSR1) {
-		cout << "Clearing object disk cache...";
+		cout << "Clearing segment disk cache...";
 		fflush (stdout);
-		osd->getStorageModule()->clearObjectDiskCache();
+		osd->getStorageModule()->clearSegmentDiskCache();
 		cout << "done" << endl;
 	}
 }
@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
 		interfaceName = argv[2];
 	}
 
-	// create new OSD object and communicator
+	// create new OSD segment and communicator
 	osd = new Osd(selfId);
 
 	// create new communicator

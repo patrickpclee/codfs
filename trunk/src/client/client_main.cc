@@ -20,7 +20,7 @@ void sighandler(int signum) {
 	}
 }
 
-/// Client Object
+/// Client Segment
 Client* client;
 
 /// Config Layer

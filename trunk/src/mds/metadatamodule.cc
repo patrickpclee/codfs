@@ -5,7 +5,7 @@
 MetaDataModule::MetaDataModule() {
 	_configMetaDataStorage = new ConfigMetaDataModule();
 	_fileMetaDataModule = new FileMetaDataModule(_configMetaDataStorage);
-	_objectMetaDataModule = new ObjectMetaDataModule(_configMetaDataStorage);
+	_segmentMetaDataModule = new SegmentMetaDataModule(_configMetaDataStorage);
 	_osdMetaDataModule = new OsdMetaDataModule();
 
 	srand(time(NULL));
@@ -56,38 +56,38 @@ uint64_t MetaDataModule::readFileSize(uint32_t fileId) {
 }
 
 /**
- * @brief	Generate List of Object ID
+ * @brief	Generate List of Segment ID
  */
-vector<uint64_t> MetaDataModule::newObjectList(uint32_t numOfObjs) {
-	vector<uint64_t> objectList(numOfObjs);
+vector<uint64_t> MetaDataModule::newSegmentList(uint32_t numOfObjs) {
+	vector<uint64_t> segmentList(numOfObjs);
 	for (uint32_t i = 0; i < numOfObjs; ++i) {
-		//objectList.push_back(newObjectId());
-		objectList[i] = _objectMetaDataModule->generateObjectId();
+		//segmentList.push_back(newSegmentId());
+		segmentList[i] = _segmentMetaDataModule->generateSegmentId();
 	}
-	return objectList;
+	return segmentList;
 }
 
 /**
- * @brief	Save Object List of a File
+ * @brief	Save Segment List of a File
  */
-void MetaDataModule::saveObjectList(uint32_t fileId,
-		const vector<uint64_t> &objectList) {
-	debug("Save %d %zu\n", fileId, objectList.size());
-	_fileMetaDataModule->saveObjectList(fileId, objectList);
+void MetaDataModule::saveSegmentList(uint32_t fileId,
+		const vector<uint64_t> &segmentList) {
+	debug("Save %d %zu\n", fileId, segmentList.size());
+	_fileMetaDataModule->saveSegmentList(fileId, segmentList);
 
 	return;
 }
 
-vector<uint64_t> MetaDataModule::readObjectList(uint32_t fileId) {
-	return _fileMetaDataModule->readObjectList(fileId);
+vector<uint64_t> MetaDataModule::readSegmentList(uint32_t fileId) {
+	return _fileMetaDataModule->readSegmentList(fileId);
 }
 
-vector<uint64_t> MetaDataModule::readOsdPrimaryObjectList(uint32_t osdId) {
-	return _objectMetaDataModule->findOsdPrimaryObjects(osdId);
+vector<uint64_t> MetaDataModule::readOsdPrimarySegmentList(uint32_t osdId) {
+	return _segmentMetaDataModule->findOsdPrimarySegments(osdId);
 }
 
-vector<uint64_t> MetaDataModule::readOsdObjectList(uint32_t osdId) {
-	return _objectMetaDataModule->findOsdObjects(osdId);
+vector<uint64_t> MetaDataModule::readOsdSegmentList(uint32_t osdId) {
+	return _segmentMetaDataModule->findOsdSegments(osdId);
 }
 
 string MetaDataModule::readChecksum(uint32_t fileId) {
@@ -95,42 +95,42 @@ string MetaDataModule::readChecksum(uint32_t fileId) {
 }
 
 /**
- * @brief	Save Object Info
+ * @brief	Save Segment Info
  */
-void MetaDataModule::saveObjectInfo(uint64_t objectId,
-		struct ObjectMetaData objectInfo) {
-	_objectMetaDataModule->saveObjectInfo(objectId, objectInfo);
+void MetaDataModule::saveSegmentInfo(uint64_t segmentId,
+		struct SegmentMetaData segmentInfo) {
+	_segmentMetaDataModule->saveSegmentInfo(segmentId, segmentInfo);
 
 	return;
 }
 
 /**
- * @brief	Read Object Info
+ * @brief	Read Segment Info
  *
- * @param	objectId	ID of the Object
+ * @param	segmentId	ID of the Segment
  *
- * @return	Info of the Object
+ * @return	Info of the Segment
  */
-struct ObjectMetaData MetaDataModule::readObjectInfo(uint64_t objectId) {
-	return _objectMetaDataModule->readObjectInfo(objectId);
+struct SegmentMetaData MetaDataModule::readSegmentInfo(uint64_t segmentId) {
+	return _segmentMetaDataModule->readSegmentInfo(segmentId);
 }
 
 /**
- * @brief	Set Primary of a Object
+ * @brief	Set Primary of a Segment
  */
-void MetaDataModule::setPrimary(uint64_t objectId, uint32_t primaryOsdId) {
-	_objectMetaDataModule->setPrimary(objectId, primaryOsdId);
+void MetaDataModule::setPrimary(uint64_t segmentId, uint32_t primaryOsdId) {
+	_segmentMetaDataModule->setPrimary(segmentId, primaryOsdId);
 	return;
 }
 
-uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId, vector<uint32_t> nodeList,
+uint32_t MetaDataModule::selectActingPrimary(uint64_t segmentId, vector<uint32_t> nodeList,
 		vector<bool> nodeStatus) {
 
 	int failedOsdCount = (int) count(nodeStatus.begin(),
 			nodeStatus.end(), false);
 
 	if (failedOsdCount == (int)nodeStatus.size()) {
-		debug_yellow ("All OSD has died for objectId = %" PRIu64 "\n", objectId);
+		debug_yellow ("All OSD has died for segmentId = %" PRIu64 "\n", segmentId);
 		exit (-1);
 	}
 
@@ -140,7 +140,7 @@ uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId, vector<uint32_t>
 	while (true) {
 		int newPrimary = rand() % nodeStatus.size();
 		if (nodeStatus[newPrimary] == true) {
-			setPrimary (objectId, nodeList[newPrimary]);
+			setPrimary (segmentId, nodeList[newPrimary]);
 			return nodeList[newPrimary];
 		}
 	}
@@ -149,26 +149,26 @@ uint32_t MetaDataModule::selectActingPrimary(uint64_t objectId, vector<uint32_t>
 }
 
 /**
- * @brief	Get Primary of a Object
+ * @brief	Get Primary of a Segment
  */
-uint32_t MetaDataModule::getPrimary(uint64_t objectId) {
-	return _objectMetaDataModule->getPrimary(objectId);
+uint32_t MetaDataModule::getPrimary(uint64_t segmentId) {
+	return _segmentMetaDataModule->getPrimary(segmentId);
 }
 
 /**
- * @brief	Save Node List of a Object
+ * @brief	Save Node List of a Segment
  */
-void MetaDataModule::saveNodeList(uint64_t objectId,
-		const vector<uint32_t> &objectNodeList) {
-	_objectMetaDataModule->saveNodeList(objectId, objectNodeList);
+void MetaDataModule::saveNodeList(uint64_t segmentId,
+		const vector<uint32_t> &segmentNodeList) {
+	_segmentMetaDataModule->saveNodeList(segmentId, segmentNodeList);
 	return;
 }
 
 /**
- * @brief	Read Node List of a Object
+ * @brief	Read Node List of a Segment
  */
-vector<uint32_t> MetaDataModule::readNodeList(uint64_t objectId) {
-	return _objectMetaDataModule->readNodeList(objectId);
+vector<uint32_t> MetaDataModule::readNodeList(uint64_t segmentId) {
+	return _segmentMetaDataModule->readNodeList(segmentId);
 }
 
 uint32_t MetaDataModule::lookupFileId(const string &path) {

@@ -56,8 +56,8 @@ public:
 	bool listen() const;
 
 	/**
-	 * Accept an incoming connection and save the sockfd in the Socket object
-	 * @param Pointer to a new socket object (for the new connection)
+	 * Accept an incoming connection and save the sockfd in the Socket segment
+	 * @param Pointer to a new socket segment (for the new connection)
 	 * @return true if success, false if error
 	 */
 

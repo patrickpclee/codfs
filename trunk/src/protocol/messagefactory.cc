@@ -13,30 +13,30 @@
 #include "metadata/uploadfilereply.hh"
 #include "metadata/deletefilerequest.hh"
 #include "metadata/deletefilereply.hh"
-#include "metadata/uploadobjectack.hh"
-#include "metadata/getobjectidlistrequest.hh"
-#include "metadata/getobjectidlistreply.hh"
+#include "metadata/uploadsegmentack.hh"
+#include "metadata/getsegmentidlistrequest.hh"
+#include "metadata/getsegmentidlistreply.hh"
 #include "metadata/downloadfilerequest.hh"
 #include "metadata/downloadfilereply.hh"
-#include "metadata/getobjectinforequest.hh"
-#include "metadata/getobjectinforeply.hh"
-#include "metadata/saveobjectlistrequest.hh"
-#include "metadata/saveobjectlistreply.hh"
+#include "metadata/getsegmentinforequest.hh"
+#include "metadata/getsegmentinforeply.hh"
+#include "metadata/savesegmentlistrequest.hh"
+#include "metadata/savesegmentlistreply.hh"
 #include "metadata/setfilesizerequest.hh"
 #include "metadata/renamefilerequest.hh"
 #include "metadata/renamefilereply.hh"
-#include "transfer/putobjectinitrequest.hh"
-#include "transfer/putobjectinitreply.hh"
-#include "transfer/segmenttransferendrequest.hh"
-#include "transfer/segmenttransferendreply.hh"
 #include "transfer/putsegmentinitrequest.hh"
 #include "transfer/putsegmentinitreply.hh"
-#include "transfer/objecttransferendreply.hh"
-#include "transfer/objecttransferendrequest.hh"
-#include "transfer/objectdatamsg.hh"
+#include "transfer/blocktransferendrequest.hh"
+#include "transfer/blocktransferendreply.hh"
+#include "transfer/putblockinitrequest.hh"
+#include "transfer/putblockinitreply.hh"
+#include "transfer/segmenttransferendreply.hh"
+#include "transfer/segmenttransferendrequest.hh"
 #include "transfer/segmentdatamsg.hh"
-#include "transfer/getsegmentinitrequest.hh"
-#include "transfer/getobjectrequest.hh"
+#include "transfer/blockdatamsg.hh"
+#include "transfer/getblockinitrequest.hh"
+#include "transfer/getsegmentrequest.hh"
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
 #include "status/osdstartupmsg.hh"
@@ -60,7 +60,7 @@
 
 #include "status/recoverytriggerrequest.hh"
 #include "status/recoverytriggerreply.hh"
-#include "status/repairobjectinfomsg.hh"
+#include "status/repairsegmentinfomsg.hh"
 
 MessageFactory::MessageFactory() {
 
@@ -102,14 +102,14 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (DELETE_FILE_REPLY):
 		return new DeleteFileReplyMsg(communicator);
 		break;
-	case (UPLOAD_OBJECT_ACK):
-		return new UploadObjectAckMsg(communicator);
+	case (UPLOAD_SEGMENT_ACK):
+		return new UploadSegmentAckMsg(communicator);
 		break;
-	case (GET_OBJECT_ID_LIST_REQUEST):
-		return new GetObjectIdListRequestMsg(communicator);
+	case (GET_SEGMENT_ID_LIST_REQUEST):
+		return new GetSegmentIdListRequestMsg(communicator);
 		break;
-	case (GET_OBJECT_ID_LIST_REPLY):
-		return new GetObjectIdListReplyMsg(communicator);
+	case (GET_SEGMENT_ID_LIST_REPLY):
+		return new GetSegmentIdListReplyMsg(communicator);
 		break;
 	case (DOWNLOAD_FILE_REQUEST):
 		return new DownloadFileRequestMsg(communicator);
@@ -117,17 +117,17 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (DOWNLOAD_FILE_REPLY):
 		return new DownloadFileReplyMsg(communicator);
 		break;
-	case (GET_OBJECT_INFO_REQUEST):
-		return new GetObjectInfoRequestMsg(communicator);
+	case (GET_SEGMENT_INFO_REQUEST):
+		return new GetSegmentInfoRequestMsg(communicator);
 		break;
-	case (GET_OBJECT_INFO_REPLY):
-		return new GetObjectInfoReplyMsg(communicator);
+	case (GET_SEGMENT_INFO_REPLY):
+		return new GetSegmentInfoReplyMsg(communicator);
 		break;
-	case (SAVE_OBJECT_LIST_REQUEST):
-		return new SaveObjectListRequestMsg(communicator);
+	case (SAVE_SEGMENT_LIST_REQUEST):
+		return new SaveSegmentListRequestMsg(communicator);
 		break;
-	case (SAVE_OBJECT_LIST_REPLY):
-		return new SaveObjectListReplyMsg(communicator);
+	case (SAVE_SEGMENT_LIST_REPLY):
+		return new SaveSegmentListReplyMsg(communicator);
 		break;
 	case (SET_FILE_SIZE_REQUEST):
 		return new SetFileSizeRequestMsg(communicator);
@@ -140,18 +140,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 
 	//TRANSFER
-	case (PUT_OBJECT_INIT_REQUEST):
-		return new PutObjectInitRequestMsg(communicator);
-		break;
-	case (PUT_OBJECT_INIT_REPLY):
-		return new PutObjectInitReplyMsg(communicator);
-		break;
-	case (OBJECT_TRANSFER_END_REQUEST):
-		return new ObjectTransferEndRequestMsg(communicator);
-		break;
-	case (OBJECT_TRANSFER_END_REPLY):
-		return new ObjectTransferEndReplyMsg(communicator);
-		break;
 	case (PUT_SEGMENT_INIT_REQUEST):
 		return new PutSegmentInitRequestMsg(communicator);
 		break;
@@ -164,17 +152,29 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (SEGMENT_TRANSFER_END_REPLY):
 		return new SegmentTransferEndReplyMsg(communicator);
 		break;
-	case (OBJECT_DATA):
-		return new ObjectDataMsg(communicator);
+	case (PUT_BLOCK_INIT_REQUEST):
+		return new PutBlockInitRequestMsg(communicator);
+		break;
+	case (PUT_BLOCK_INIT_REPLY):
+		return new PutBlockInitReplyMsg(communicator);
+		break;
+	case (BLOCK_TRANSFER_END_REQUEST):
+		return new BlockTransferEndRequestMsg(communicator);
+		break;
+	case (BLOCK_TRANSFER_END_REPLY):
+		return new BlockTransferEndReplyMsg(communicator);
 		break;
 	case (SEGMENT_DATA):
 		return new SegmentDataMsg(communicator);
 		break;
-	case (GET_OBJECT_REQUEST):
-		return new GetObjectRequestMsg(communicator);
+	case (BLOCK_DATA):
+		return new BlockDataMsg(communicator);
 		break;
-	case (GET_SEGMENT_INIT_REQUEST):
-		return new GetSegmentInitRequestMsg(communicator);
+	case (GET_SEGMENT_REQUEST):
+		return new GetSegmentRequestMsg(communicator);
+		break;
+	case (GET_BLOCK_INIT_REQUEST):
+		return new GetBlockInitRequestMsg(communicator);
 		break;
 
 	//STATUS
@@ -228,8 +228,8 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_OSD_LIST_REPLY):
 		return new GetOsdListReplyMsg(communicator);
 		break;
-	case (REPAIR_OBJECT_INFO):
-		return new RepairObjectInfoMsg(communicator);
+	case (REPAIR_SEGMENT_INFO):
+		return new RepairSegmentInfoMsg(communicator);
 		break;
 
 

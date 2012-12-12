@@ -65,13 +65,13 @@ void RecoveryTriggerRequestMsg::doHandle() {
 #endif
 }
 
-void RecoveryTriggerRequestMsg::setObjectLocations(
-	vector<struct ObjectLocation> objLocs) {
-	_objectLocations = objLocs;
+void RecoveryTriggerRequestMsg::setSegmentLocations(
+	vector<struct SegmentLocation> objLocs) {
+	_segmentLocations = objLocs;
 }
 
-vector<struct ObjectLocation> RecoveryTriggerRequestMsg::getObjectLocations() {
-	return _objectLocations;
+vector<struct SegmentLocation> RecoveryTriggerRequestMsg::getSegmentLocations() {
+	return _segmentLocations;
 }
 
 void RecoveryTriggerRequestMsg::printProtocol() {

@@ -4,12 +4,12 @@
 #include "../config/config.hh"
 #include "../protocol/metadata/listdirectoryreply.hh"
 #include "../protocol/metadata/uploadfilereply.hh"
-#include "../protocol/metadata/saveobjectlistreply.hh"
+#include "../protocol/metadata/savesegmentlistreply.hh"
 #include "../protocol/metadata/deletefilereply.hh"
 #include "../protocol/nodelist/getprimarylistrequest.hh"
-#include "../protocol/metadata/getobjectinforeply.hh"
+#include "../protocol/metadata/getsegmentinforeply.hh"
 #include "../protocol/metadata/downloadfilereply.hh"
-#include "../protocol/metadata/getobjectidlistreply.hh"
+#include "../protocol/metadata/getsegmentidlistreply.hh"
 #include "../protocol/metadata/renamefilereply.hh"
 #include "../protocol/status/switchprimaryosdreplymsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
@@ -100,43 +100,43 @@ void MdsCommunicator::display() {
 	return;
 }
 
-void MdsCommunicator::replyObjectInfo(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, uint32_t objectSize, vector<uint32_t> nodeList,
+void MdsCommunicator::replySegmentInfo(uint32_t requestId, uint32_t connectionId,
+		uint64_t segmentId, uint32_t segmentSize, vector<uint32_t> nodeList,
 		CodingScheme codingScheme, string codingSetting) {
-	GetObjectInfoReplyMsg* getObjectInfoReplyMsg = new GetObjectInfoReplyMsg(
-			this, requestId, connectionId, objectId, objectSize, nodeList,
+	GetSegmentInfoReplyMsg* getSegmentInfoReplyMsg = new GetSegmentInfoReplyMsg(
+			this, requestId, connectionId, segmentId, segmentSize, nodeList,
 			codingScheme, codingSetting);
-	getObjectInfoReplyMsg->prepareProtocolMsg();
+	getSegmentInfoReplyMsg->prepareProtocolMsg();
 
 	debug("%s\n", "======================");
-	getObjectInfoReplyMsg->printHeader();
-	getObjectInfoReplyMsg->printProtocol();
+	getSegmentInfoReplyMsg->printHeader();
+	getSegmentInfoReplyMsg->printProtocol();
 	debug("%s\n", "======================");
 
-	addMessage(getObjectInfoReplyMsg);
+	addMessage(getSegmentInfoReplyMsg);
 	return;
 }
 
 /**
- * @brief	Reply Save Object List Request
+ * @brief	Reply Save Segment List Request
  */
-void MdsCommunicator::replySaveObjectList(uint32_t requestId,
+void MdsCommunicator::replySaveSegmentList(uint32_t requestId,
 		uint32_t connectionId, uint32_t fileId) {
-	SaveObjectListReplyMsg* saveObjectListReplyMsg = new SaveObjectListReplyMsg(
+	SaveSegmentListReplyMsg* saveSegmentListReplyMsg = new SaveSegmentListReplyMsg(
 			this, requestId, connectionId, fileId);
-	saveObjectListReplyMsg->prepareProtocolMsg();
-	addMessage(saveObjectListReplyMsg);
+	saveSegmentListReplyMsg->prepareProtocolMsg();
+	addMessage(saveSegmentListReplyMsg);
 	return;
 }
 
 /**
- * @brief	Reply Object and Primary List to Client
+ * @brief	Reply Segment and Primary List to Client
  */
-void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId,
-		uint32_t connectionId, uint32_t fileId, vector<uint64_t> objectList,
+void MdsCommunicator::replySegmentandPrimaryList(uint32_t requestId,
+		uint32_t connectionId, uint32_t fileId, vector<uint64_t> segmentList,
 		vector<uint32_t> primaryList) {
 	UploadFileReplyMsg* uploadFileReplyMsg = new UploadFileReplyMsg(this,
-			requestId, connectionId, fileId, objectList, primaryList);
+			requestId, connectionId, fileId, segmentList, primaryList);
 	uploadFileReplyMsg->prepareProtocolMsg();
 
 	addMessage(uploadFileReplyMsg);
@@ -146,15 +146,15 @@ void MdsCommunicator::replyObjectandPrimaryList(uint32_t requestId,
 /**
  * @brief	Reply Download Information to Client
  *
- * File Size, Object List, Primary List, Checksum
+ * File Size, Segment List, Primary List, Checksum
  */
 void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
 		uint32_t connectionId, uint32_t fileId, string filePath,
 		uint64_t fileSize, const FileType& fileType, string checksum,
-		vector<uint64_t> objectList, vector<uint32_t> primaryList) {
+		vector<uint64_t> segmentList, vector<uint32_t> primaryList) {
 	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this,
 			requestId, connectionId, fileId, filePath, fileSize, fileType,
-			checksum, objectList, primaryList);
+			checksum, segmentList, primaryList);
 
 	debug("FILESIZE = %" PRIu64 "\n", fileSize);
 
@@ -165,7 +165,7 @@ void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
 }
 
 void MdsCommunicator::replyPrimary(uint32_t requestId, uint32_t connectionId,
-		uint64_t objectId, uint32_t osdId) {
+		uint64_t segmentId, uint32_t osdId) {
 
 	SwitchPrimaryOsdReplyMsg* reply = new SwitchPrimaryOsdReplyMsg(this,
 			requestId, connectionId, osdId);
@@ -175,23 +175,23 @@ void MdsCommunicator::replyPrimary(uint32_t requestId, uint32_t connectionId,
 }
 
 /**
- * @brief	Reply Object ID List
+ * @brief	Reply Segment ID List
  */
-void MdsCommunicator::replyObjectIdList(uint32_t requestId,
-		uint32_t connectionId, vector<uint64_t> objectList,
+void MdsCommunicator::replySegmentIdList(uint32_t requestId,
+		uint32_t connectionId, vector<uint64_t> segmentList,
 		vector<uint32_t> primaryList) {
-	GetObjectIdListReplyMsg* getObjectIdListReplyMsg =
-			new GetObjectIdListReplyMsg(this, requestId, connectionId,
-					objectList, primaryList);
-	getObjectIdListReplyMsg->prepareProtocolMsg();
-	addMessage(getObjectIdListReplyMsg);
+	GetSegmentIdListReplyMsg* getSegmentIdListReplyMsg =
+			new GetSegmentIdListReplyMsg(this, requestId, connectionId,
+					segmentList, primaryList);
+	getSegmentIdListReplyMsg->prepareProtocolMsg();
+	addMessage(getSegmentIdListReplyMsg);
 	return;
 }
 
 void MdsCommunicator::replyRecoveryTrigger(uint32_t requestId,
-		uint32_t connectionId, vector<ObjectLocation> objectLocationList) {
+		uint32_t connectionId, vector<SegmentLocation> segmentLocationList) {
 	RecoveryTriggerReplyMsg * recoveryTriggerReplyMsg =
-			new RecoveryTriggerReplyMsg(this, requestId, connectionId, objectLocationList);
+			new RecoveryTriggerReplyMsg(this, requestId, connectionId, segmentLocationList);
 	recoveryTriggerReplyMsg->prepareProtocolMsg();
 	addMessage(recoveryTriggerReplyMsg);
 }

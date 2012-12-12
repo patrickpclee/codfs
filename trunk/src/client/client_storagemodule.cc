@@ -22,9 +22,9 @@ mutex openedFileMutex;
 ClientStorageModule::ClientStorageModule() {
 	// read config value
 
-	_objectCache = {};
-	_objectSize = configLayer->getConfigLong("Storage>ObjectSize") * 1024;
-	debug("Config Object Size = %" PRIu64 " Bytes\n", _objectSize);
+	_segmentCache = {};
+	_segmentSize = configLayer->getConfigLong("Storage>SegmentSize") * 1024;
+	debug("Config Segment Size = %" PRIu64 " Bytes\n", _segmentSize);
 }
 
 uint64_t ClientStorageModule::getFilesize(string filepath) {
@@ -46,7 +46,7 @@ uint64_t ClientStorageModule::getFilesize(string filepath) {
 
 }
 
-uint32_t ClientStorageModule::getObjectCount(string filepath) {
+uint32_t ClientStorageModule::getSegmentCount(string filepath) {
 
 	const uint64_t filesize = getFilesize(filepath);
 
@@ -54,23 +54,23 @@ uint32_t ClientStorageModule::getObjectCount(string filepath) {
 		return 0;
 	}
 
-	uint32_t objectCount = (uint32_t) ((filesize - 1) / _objectSize + 1);
+	uint32_t segmentCount = (uint32_t) ((filesize - 1) / _segmentSize + 1);
 
-	return objectCount;
+	return segmentCount;
 }
 
-struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
-		uint32_t objectIndex) {
+struct SegmentData ClientStorageModule::readSegmentFromFile(string filepath,
+		uint32_t segmentIndex) {
 
 	// TODO: now assume that client only do one I/O function at a time
 	// lock file access function
 	lock_guard<mutex> lk(fileMutex);
 
-	struct ObjectData objectData;
+	struct SegmentData segmentData;
 	uint32_t byteToRead = 0;
 
 	// index starts from 0
-	const uint64_t offset = objectIndex * _objectSize;
+	const uint64_t offset = segmentIndex * _segmentSize;
 
 	FILE* file = fopen(filepath.c_str(), "rb");
 
@@ -94,15 +94,15 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 		exit(-1);
 	}
 
-	if (filesize - offset > _objectSize) {
-		byteToRead = _objectSize;
+	if (filesize - offset > _segmentSize) {
+		byteToRead = _segmentSize;
 	} else {
 		byteToRead = filesize - offset;
 	}
 
 	// Read file contents into buffer
-	objectData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
-	uint32_t byteRead = pread(fileno(file), objectData.buf, byteToRead, offset);
+	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
+	uint32_t byteRead = pread(fileno(file), segmentData.buf, byteToRead, offset);
 
 	// Release lock
 	if (flock(fileno(file), LOCK_UN) == -1) {
@@ -118,79 +118,79 @@ struct ObjectData ClientStorageModule::readObjectFromFile(string filepath,
 
 	fclose(file);
 
-	// fill in information about object
-	objectData.info.objectSize = byteToRead;
+	// fill in information about segment
+	segmentData.info.segmentSize = byteToRead;
 
-	return objectData;
+	return segmentData;
 
 }
 
-void ClientStorageModule::createObjectCache(uint64_t objectId,
+void ClientStorageModule::createSegmentCache(uint64_t segmentId,
 		uint32_t length) {
 
 	// create cache
-	struct ObjectTransferCache objectCache;
-	objectCache.length = length;
-	objectCache.buf = MemoryPool::getInstance().poolMalloc(length);
+	struct SegmentTransferCache segmentCache;
+	segmentCache.length = length;
+	segmentCache.buf = MemoryPool::getInstance().poolMalloc(length);
 
 	// save cache to map
 	{
 		lock_guard<mutex> lk(transferCacheMutex);
-		_objectCache[objectId] = objectCache;
+		_segmentCache[segmentId] = segmentCache;
 	}
 
-	debug("Object created ID = %" PRIu64 " Length = %" PRIu32 "\n",
-			objectId, length);
+	debug("Segment created ID = %" PRIu64 " Length = %" PRIu32 "\n",
+			segmentId, length);
 }
 
-uint32_t ClientStorageModule::writeObjectCache(uint64_t objectId, char* buf,
-		uint64_t offsetInObject, uint32_t length) {
+uint32_t ClientStorageModule::writeSegmentCache(uint64_t segmentId, char* buf,
+		uint64_t offsetInSegment, uint32_t length) {
 
 	char* recvCache;
 
 	{
 		lock_guard<mutex> lk(transferCacheMutex);
-		if (!_objectCache.count(objectId)) {
-			debug("%s\n", "cannot find cache for object");
+		if (!_segmentCache.count(segmentId)) {
+			debug("%s\n", "cannot find cache for segment");
 			exit(-1);
 		}
-		recvCache = _objectCache[objectId].buf;
+		recvCache = _segmentCache[segmentId].buf;
 	}
 
-	memcpy(recvCache + offsetInObject, buf, length);
+	memcpy(recvCache + offsetInSegment, buf, length);
 
 	return length;
 }
 
-bool ClientStorageModule::locateObjectCache(uint64_t objectId){
-	return _objectCache.count(objectId);
+bool ClientStorageModule::locateSegmentCache(uint64_t segmentId){
+	return _segmentCache.count(segmentId);
 }
 
-struct ObjectTransferCache ClientStorageModule::getObjectCache(uint64_t objectId) {
+struct SegmentTransferCache ClientStorageModule::getSegmentCache(uint64_t segmentId) {
 	lock_guard<mutex> lk(transferCacheMutex);
-	if (!_objectCache.count(objectId)) {
-		debug("object cache not found for %" PRIu64 "\n", objectId);
+	if (!_segmentCache.count(segmentId)) {
+		debug("segment cache not found for %" PRIu64 "\n", segmentId);
 		exit(-1);
 	}
-	return _objectCache[objectId];
+	return _segmentCache[segmentId];
 }
 
-void ClientStorageModule::closeObject(uint64_t objectId) {
+void ClientStorageModule::closeSegment(uint64_t segmentId) {
 
 	// close cache
-	if(_objectCache.count(objectId) == 0){
-		debug_yellow("Object Cache Not Found for %" PRIu64 "\n", objectId);
+	if(_segmentCache.count(segmentId) == 0){
+		debug_yellow("Segment Cache Not Found for %" PRIu64 "\n", segmentId);
 		return;
 	}
-	struct ObjectTransferCache objectCache = getObjectCache(objectId);
-	MemoryPool::getInstance().poolFree(objectCache.buf);
+	struct SegmentTransferCache segmentCache = getSegmentCache(segmentId);
+	MemoryPool::getInstance().poolFree(segmentCache.buf);
 
 	{
 		lock_guard<mutex> lk(transferCacheMutex);
-		_objectCache.erase(objectId);
+		_segmentCache.erase(segmentId);
 	}
 
-	debug("Object ID = %" PRIu64 " closed\n", objectId);
+	debug("Segment ID = %" PRIu64 " closed\n", segmentId);
 }
 
 FILE* ClientStorageModule::createAndOpenFile(string filepath) {
@@ -237,6 +237,6 @@ void ClientStorageModule::closeFile (FILE* filePtr) {
 	fclose (filePtr);
 }
 
-uint64_t ClientStorageModule::getObjectSize() {
-	return _objectSize;
+uint64_t ClientStorageModule::getSegmentSize() {
+	return _segmentSize;
 }

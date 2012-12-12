@@ -64,7 +64,7 @@ public:
 
 	/**
 	 * Retrive the underlying Socket
-	 * @return Socket object of the connection
+	 * @return Socket segment of the connection
 	 */
 
 	Socket* getSocket();

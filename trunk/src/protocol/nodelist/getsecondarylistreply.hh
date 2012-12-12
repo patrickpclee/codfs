@@ -11,7 +11,7 @@
 
 #include "../../common/enums.hh"
 #include "../../common/metadata.hh"
-#include "../../common/segmentlocation.hh"
+#include "../../common/blocklocation.hh"
 
 using namespace std;
 
@@ -35,11 +35,11 @@ public:
 	 * Constructor - Save parameters in private variables
 	 *
 	 * @param	communicator	Communicator the Message belongs to
-	 * @param	numOfObjs	number of Objects
+	 * @param	numOfObjs	number of Segments
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
-	GetSecondaryListReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, const vector<struct SegmentLocation> &secondaryList);
+	GetSecondaryListReplyMsg (Communicator* communicator, uint32_t requestId, uint32_t sockfd, const vector<struct BlockLocation> &secondaryList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -72,7 +72,7 @@ public:
 
 
 private:
-	vector<struct SegmentLocation> _secondaryList;
+	vector<struct BlockLocation> _secondaryList;
 };
 
 #endif

@@ -11,12 +11,11 @@ PutSegmentInitReplyMsg::PutSegmentInitReplyMsg(Communicator* communicator) :
 }
 
 PutSegmentInitReplyMsg::PutSegmentInitReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t osdSockfd, uint64_t objectId, uint32_t segmentId) :
+		uint32_t requestId, uint32_t osdSockfd, uint64_t segmentId) :
 		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
 	_sockfd = osdSockfd;
-	_objectId = objectId;
 	_segmentId = segmentId;
 	
 }
@@ -25,7 +24,7 @@ void PutSegmentInitReplyMsg::prepareProtocolMsg() {
 	string serializedString;
 
 	ncvfs::PutSegmentInitReplyPro putSegmentInitReplyPro;
-	putSegmentInitReplyPro.set_objectid(_objectId);
+	putSegmentInitReplyPro.set_segmentid(_segmentId);
 
 	if (!putSegmentInitReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -46,13 +45,11 @@ void PutSegmentInitReplyMsg::parse(char* buf) {
 	putSegmentInitReplyPro.ParseFromArray(buf + sizeof(struct MsgHeader),
 			_msgHeader.protocolMsgSize);
 
-	_objectId = putSegmentInitReplyPro.objectid();
 	_segmentId = putSegmentInitReplyPro.segmentid();
 
 }
 
 void PutSegmentInitReplyMsg::doHandle() {
-
 	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
 			(PutSegmentInitRequestMsg*) _communicator->popWaitReplyMessage(
 					_msgHeader.requestId);
@@ -60,5 +57,5 @@ void PutSegmentInitReplyMsg::doHandle() {
 }
 
 void PutSegmentInitReplyMsg::printProtocol() {
-	debug("[PUT_SEGMENT_INIT_REPLY] Object ID = %" PRIu64 ", Segment ID = %" PRIu32 "\n", _objectId, _segmentId);
+	debug("[PUT_SEGMENT_INIT_REPLY] Segment ID = %" PRIu64 "\n", _segmentId);
 }

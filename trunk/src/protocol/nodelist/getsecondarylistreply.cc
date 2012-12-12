@@ -23,7 +23,7 @@ GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator) :
 }
 
 GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t sockfd, const vector<struct SegmentLocation> &secondaryList) :
+		uint32_t requestId, uint32_t sockfd, const vector<struct BlockLocation> &secondaryList) :
 		Message(communicator) {
 	_msgHeader.requestId = requestId;
 	_sockfd = sockfd;
@@ -36,13 +36,13 @@ void GetSecondaryListReplyMsg::prepareProtocolMsg() {
 
 	ncvfs::GetSecondaryListReplyPro getSecondaryListReplyPro;
 
-	vector<SegmentLocation>::iterator it;
+	vector<BlockLocation>::iterator it;
 
 		for (it = _secondaryList.begin(); it < _secondaryList.end(); ++it) {
-			ncvfs::SegmentLocationPro* segmentLocationPro =
+			ncvfs::BlockLocationPro* blockLocationPro =
 					getSecondaryListReplyPro.add_secondarylist();
-			segmentLocationPro->set_osdid((*it).osdId);
-			segmentLocationPro->set_segmentid((*it).segmentId);
+			blockLocationPro->set_osdid((*it).osdId);
+			blockLocationPro->set_blockid((*it).blockId);
 		}
 
 	if (!getSecondaryListReplyPro.SerializeToString(&serializedString)) {
@@ -67,12 +67,12 @@ void GetSecondaryListReplyMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	for (int i = 0; i < getSecondaryListReplyPro.secondarylist_size(); ++i) {
-		struct SegmentLocation tempSegmentLocation;
+		struct BlockLocation tempBlockLocation;
 
-		tempSegmentLocation.osdId = getSecondaryListReplyPro.secondarylist(i).osdid();
-		tempSegmentLocation.segmentId = getSecondaryListReplyPro.secondarylist(i).segmentid();
+		tempBlockLocation.osdId = getSecondaryListReplyPro.secondarylist(i).osdid();
+		tempBlockLocation.blockId = getSecondaryListReplyPro.secondarylist(i).blockid();
 
-		_secondaryList.push_back(tempSegmentLocation);
+		_secondaryList.push_back(tempBlockLocation);
 	}
 	return;
 
