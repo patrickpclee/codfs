@@ -38,6 +38,7 @@ class IWantFileSizeMsgPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
 class DeleteFileRequestPro;
+class RenameFileRequestPro;
 class DownloadFileRequestPro;
 class SaveObjectListRequestPro;
 class SetFileSizeRequestPro;
@@ -55,6 +56,7 @@ class FileInfoPro;
 class SegmentLocationPro;
 class UploadFileReplyPro;
 class DeleteFileReplyPro;
+class RenameFileReplyPro;
 class SaveObjectListReplyPro;
 class DownloadFileReplyPro;
 class GetObjectIdListReplyPro;
@@ -798,6 +800,126 @@ class DeleteFileRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static DeleteFileRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class RenameFileRequestPro : public ::google::protobuf::Message {
+ public:
+  RenameFileRequestPro();
+  virtual ~RenameFileRequestPro();
+  
+  RenameFileRequestPro(const RenameFileRequestPro& from);
+  
+  inline RenameFileRequestPro& operator=(const RenameFileRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RenameFileRequestPro& default_instance();
+  
+  void Swap(RenameFileRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  RenameFileRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RenameFileRequestPro& from);
+  void MergeFrom(const RenameFileRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
+  
+  // optional fixed32 fileId = 2;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // optional string path = 3;
+  inline bool has_path() const;
+  inline void clear_path();
+  static const int kPathFieldNumber = 3;
+  inline const ::std::string& path() const;
+  inline void set_path(const ::std::string& value);
+  inline void set_path(const char* value);
+  inline void set_path(const char* value, size_t size);
+  inline ::std::string* mutable_path();
+  inline ::std::string* release_path();
+  
+  // optional string newPath = 4;
+  inline bool has_newpath() const;
+  inline void clear_newpath();
+  static const int kNewPathFieldNumber = 4;
+  inline const ::std::string& newpath() const;
+  inline void set_newpath(const ::std::string& value);
+  inline void set_newpath(const char* value);
+  inline void set_newpath(const char* value, size_t size);
+  inline ::std::string* mutable_newpath();
+  inline ::std::string* release_newpath();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.RenameFileRequestPro)
+ private:
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  inline void set_has_path();
+  inline void clear_has_path();
+  inline void set_has_newpath();
+  inline void clear_has_newpath();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 clientid_;
+  ::google::protobuf::uint32 fileid_;
+  ::std::string* path_;
+  ::std::string* newpath_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static RenameFileRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -2471,6 +2593,88 @@ class DeleteFileReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static DeleteFileReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class RenameFileReplyPro : public ::google::protobuf::Message {
+ public:
+  RenameFileReplyPro();
+  virtual ~RenameFileReplyPro();
+  
+  RenameFileReplyPro(const RenameFileReplyPro& from);
+  
+  inline RenameFileReplyPro& operator=(const RenameFileReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RenameFileReplyPro& default_instance();
+  
+  void Swap(RenameFileReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  RenameFileReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RenameFileReplyPro& from);
+  void MergeFrom(const RenameFileReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 fileId = 1;
+  inline bool has_fileid() const;
+  inline void clear_fileid();
+  static const int kFileIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 fileid() const;
+  inline void set_fileid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.RenameFileReplyPro)
+ private:
+  inline void set_has_fileid();
+  inline void clear_has_fileid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 fileid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static RenameFileReplyPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -6543,6 +6747,170 @@ inline ::std::string* DeleteFileRequestPro::release_path() {
 
 // -------------------------------------------------------------------
 
+// RenameFileRequestPro
+
+// optional fixed32 clientId = 1;
+inline bool RenameFileRequestPro::has_clientid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RenameFileRequestPro::set_has_clientid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RenameFileRequestPro::clear_has_clientid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RenameFileRequestPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
+}
+inline ::google::protobuf::uint32 RenameFileRequestPro::clientid() const {
+  return clientid_;
+}
+inline void RenameFileRequestPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
+}
+
+// optional fixed32 fileId = 2;
+inline bool RenameFileRequestPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RenameFileRequestPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RenameFileRequestPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RenameFileRequestPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 RenameFileRequestPro::fileid() const {
+  return fileid_;
+}
+inline void RenameFileRequestPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
+}
+
+// optional string path = 3;
+inline bool RenameFileRequestPro::has_path() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RenameFileRequestPro::set_has_path() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RenameFileRequestPro::clear_has_path() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RenameFileRequestPro::clear_path() {
+  if (path_ != &::google::protobuf::internal::kEmptyString) {
+    path_->clear();
+  }
+  clear_has_path();
+}
+inline const ::std::string& RenameFileRequestPro::path() const {
+  return *path_;
+}
+inline void RenameFileRequestPro::set_path(const ::std::string& value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void RenameFileRequestPro::set_path(const char* value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+}
+inline void RenameFileRequestPro::set_path(const char* value, size_t size) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  path_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RenameFileRequestPro::mutable_path() {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    path_ = new ::std::string;
+  }
+  return path_;
+}
+inline ::std::string* RenameFileRequestPro::release_path() {
+  clear_has_path();
+  if (path_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = path_;
+    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional string newPath = 4;
+inline bool RenameFileRequestPro::has_newpath() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RenameFileRequestPro::set_has_newpath() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RenameFileRequestPro::clear_has_newpath() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RenameFileRequestPro::clear_newpath() {
+  if (newpath_ != &::google::protobuf::internal::kEmptyString) {
+    newpath_->clear();
+  }
+  clear_has_newpath();
+}
+inline const ::std::string& RenameFileRequestPro::newpath() const {
+  return *newpath_;
+}
+inline void RenameFileRequestPro::set_newpath(const ::std::string& value) {
+  set_has_newpath();
+  if (newpath_ == &::google::protobuf::internal::kEmptyString) {
+    newpath_ = new ::std::string;
+  }
+  newpath_->assign(value);
+}
+inline void RenameFileRequestPro::set_newpath(const char* value) {
+  set_has_newpath();
+  if (newpath_ == &::google::protobuf::internal::kEmptyString) {
+    newpath_ = new ::std::string;
+  }
+  newpath_->assign(value);
+}
+inline void RenameFileRequestPro::set_newpath(const char* value, size_t size) {
+  set_has_newpath();
+  if (newpath_ == &::google::protobuf::internal::kEmptyString) {
+    newpath_ = new ::std::string;
+  }
+  newpath_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* RenameFileRequestPro::mutable_newpath() {
+  set_has_newpath();
+  if (newpath_ == &::google::protobuf::internal::kEmptyString) {
+    newpath_ = new ::std::string;
+  }
+  return newpath_;
+}
+inline ::std::string* RenameFileRequestPro::release_newpath() {
+  clear_has_newpath();
+  if (newpath_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = newpath_;
+    newpath_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// -------------------------------------------------------------------
+
 // DownloadFileRequestPro
 
 // optional fixed32 clientId = 1;
@@ -7658,6 +8026,32 @@ inline ::std::string* DeleteFileReplyPro::release_path() {
     path_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// -------------------------------------------------------------------
+
+// RenameFileReplyPro
+
+// optional fixed32 fileId = 1;
+inline bool RenameFileReplyPro::has_fileid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RenameFileReplyPro::set_has_fileid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RenameFileReplyPro::clear_has_fileid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RenameFileReplyPro::clear_fileid() {
+  fileid_ = 0u;
+  clear_has_fileid();
+}
+inline ::google::protobuf::uint32 RenameFileReplyPro::fileid() const {
+  return fileid_;
+}
+inline void RenameFileReplyPro::set_fileid(::google::protobuf::uint32 value) {
+  set_has_fileid();
+  fileid_ = value;
 }
 
 // -------------------------------------------------------------------

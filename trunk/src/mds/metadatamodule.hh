@@ -19,7 +19,7 @@ public:
 	/**
 	 * @brief	Create Meta Data Entry for a New File
 	 *
-	 * @param	cleintId	ID of the Client
+	 * @param	cleintId	Client ID
 	 * @param	path	Path to the File
 	 * @param	fileSize	Size of the File
 	 * @param 	codingScheme	Coding Scheme of the file
@@ -33,7 +33,7 @@ public:
 	/**
 	 * @brief	Open a File
 	 *
-	 * @param	clientId	ID of the Client
+	 * @param	clientId	Client ID
 	 * @param	fileId	ID of the File
 	 */
 	void openFile(uint32_t clientId, uint32_t filieId);
@@ -41,10 +41,19 @@ public:
 	/**
 	 * @brief	Delete a File
 	 *
-	 * @param	clientId	ID of the Client
+	 * @param	clientId	Client ID
 	 * @param	fileId	File ID
 	 */
 	void deleteFile(uint32_t clientId, uint32_t fileId);
+
+	/**
+	 * @brief	Rename a File
+	 *
+	 * @param	clientId	Client ID
+	 * @param	fileID	File ID
+	 * @param	newPath	New File Path
+	 */
+	void renameFile(uint32_t clientId, uint32_t fileId, const string& newPath);
 
 	/**
 	 *	@brief	Set File Size of a File

@@ -190,7 +190,15 @@ void Communicator::waitForMessage() {
 				boost::unique_lock<boost::shared_mutex> lock(
 						connectionMapMutex);
 				_connectionMap[conn->getSockfd()] = conn;
+#ifdef USE_MULTIPLE_QUEUE
+				//thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
+				_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+				_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+				_dataMutex[conn->getSockfd()] = new mutex();
+				_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
+#endif
 			}
+
 
 			debug("New connection sockfd = %" PRIu32 "\n", conn->getSockfd());
 
@@ -243,7 +251,8 @@ void Communicator::waitForMessage() {
 						threadPools[msgType].schedule(
 								boost::bind(&Communicator::dispatch, this, buf,
 										p->first, 0));
-						debug("Add Thread Pool [%s] %d/%d/%d\n",EnumToString::toString(msgType),threadPools[msgType].active(),threadPools[msgType].pending(),threadPools[msgType].size());
+						debug("Add Thread Pool [%s] %d/%d/%d\n",
+								EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
 
 #else
 						dispatch(buf, p->first);
@@ -288,17 +297,33 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	switch(message->getMsgHeader().protocolMsgType) {
 		case OBJECT_DATA:
 		case SEGMENT_DATA:
-#ifdef USE_LOWLOCK_QUEUE
-			_outDataQueue.push(message);
+#ifdef USE_MULTIPLE_QUEUE
+	#ifdef USE_LOWLOCK_QUEUE
+			_outDataQueue[message->getSockfd()]->push(message);
+	#else
+			_outDataQueue[message->getSockfd()]->push(message);
+	#endif
 #else
+	#ifdef USE_LOWLOCK_QUEUE
 			_outDataQueue.push(message);
+	#else
+			_outDataQueue.push(message);
+	#endif
 #endif
 			break;
 		default:
-#ifdef USE_LOWLOCK_QUEUE
-			_outMessageQueue.push(message); // must be at the end of function
+#ifdef USE_MULTIPLE_QUEUE
+	#ifdef USE_LOWLOCK_QUEUE
+			_outMessageQueue[message->getSockfd()]->push(message);
+	#else
+			_outMessageQueue[message->getSockfd()]->push(message);
+	#endif
 #else
-			_outMessageQueue.push(message); // must be at the end of function
+	#ifdef USE_LOWLOCK_QUEUE
+			_outMessageQueue.push(message);
+	#else
+			_outMessageQueue.push(message);
+	#endif
 #endif
 	}
 
@@ -318,14 +343,22 @@ Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 	return NULL;
 }
 
+#ifdef USE_MULTIPLE_QUEUE
+void Communicator::sendMessage(uint32_t fd){
+#else
 void Communicator::sendMessage() {
+#endif
 
 	while (1) {
 
 		Message* message;
 
 		// send all message in the outMessageQueue
+#ifdef USE_MULTIPLE_QUEUE
+		while ((message = popMessage(fd)) != NULL) {
+#else
 		while ((message = popMessage()) != NULL) {
+#endif
 
 			const uint32_t sockfd = message->getSockfd();
 
@@ -395,6 +428,13 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 	{
 		boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 		_connectionMap[sockfd] = conn;
+#ifdef USE_MULTIPLE_QUEUE
+	//	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
+		_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+		_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+		_dataMutex[conn->getSockfd()] = new mutex();
+		_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
+#endif
 	}
 
 	// adjust _maxFd
@@ -421,7 +461,7 @@ void Communicator::disconnectAndRemove(uint32_t sockfd) {
 		debug("Connection erased for sockfd = %" PRIu32 "\n", sockfd);
 	} else {
 		cerr << "Connection not found, cannot remove connection" << endl;
-		exit (-1);
+		exit(-1);
 	}
 
 }
@@ -478,7 +518,10 @@ void Communicator::handleThread(Message* message) {
 
 // static function
 void Communicator::sendThread(Communicator* communicator) {
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	communicator->sendMessage();
+#endif
 }
 
 /**
@@ -529,13 +572,25 @@ inline uint32_t Communicator::generateRequestId() {
 	return ++_requestId;
 }
 
+#ifdef USE_MULTIPLE_QUEUE
+Message* Communicator::popMessage(uint32_t fd) {
+#else
 Message* Communicator::popMessage() {
+#endif
 	Message* message = NULL;
 
 #ifdef USE_LOWLOCK_QUEUE
+#ifdef USE_MULTIPLE_QUEUE
+	if (_outMessageQueue[fd]->pop(message) != false) {
+#else
 	if (_outMessageQueue.pop(message) != false) {
+#endif
 		return message;
+#ifdef USE_MULTIPLE_QUEUE
+	} else if (_outDataQueue[fd]->pop(message) != false) {
+#else
 	} else if (_outDataQueue.pop(message) != false) {
+#endif
 		return message;
 	} else
 		return NULL;
@@ -543,7 +598,6 @@ Message* Communicator::popMessage() {
 	_outMessageQueue.wait_and_pop(message);
 	return message;
 #endif
-
 }
 
 void Communicator::waitAndDelete(Message* message) {
@@ -695,8 +749,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 	}
 }
 
-void Communicator::connectToMyself(string ip, uint16_t port, ComponentType
-	type) {
+void Communicator::connectToMyself(string ip, uint16_t port,
+		ComponentType type) {
 	uint32_t sockfd = connectAndAdd(ip, port, type);
 	requestHandshake(sockfd, _componentId, _componentType);
 }
@@ -775,6 +829,9 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 			codingScheme, codingSetting, checksum);
 	debug("%s\n", "Put Object Init ACK-ed");
 
+#ifdef SERIALIZE_DATA_QUEUE
+	lockDataQueue(sockfd);
+#endif
 	// Step 2 : Send data chunk by chunk
 
 	uint64_t byteToSend = 0;
@@ -797,6 +854,9 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 	}
 
 	// Step 3: Send End message
+#ifdef SERIALIZE_DATA_QUEUE
+	unlockDataQueue(sockfd);
+#endif
 
 	putObjectEnd(componentId, sockfd, objectId);
 
@@ -806,6 +866,14 @@ uint32_t Communicator::sendObject(uint32_t componentId, uint32_t sockfd,
 
 }
 
+void Communicator::lockDataQueue(uint32_t sockfd){
+	_dataMutex[sockfd]->lock();
+}
+
+
+void Communicator::unlockDataQueue(uint32_t sockfd){
+	_dataMutex[sockfd]->unlock();
+}
 //
 // PRIVATE FUNCTIONS
 //
@@ -832,7 +900,6 @@ void Communicator::putObjectInit(uint32_t componentId, uint32_t dstOsdSockfd,
 		debug_error("Put Object Init Failed %" PRIu64 "\n", objectId);
 		exit(-1);
 	}
-
 }
 
 void Communicator::putObjectData(uint32_t componentID, uint32_t dstOsdSockfd,

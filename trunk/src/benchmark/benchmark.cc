@@ -153,12 +153,19 @@ void testUpload() {
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
+	map<uint32_t, uint32_t> OSDLoadCount;
 	for(uint32_t i = 0; i < numberOfObject; ++i){
 		struct ObjectData objectData;
 		objectData.buf = databuf;
 		objectData.info.objectId = fileMetaData._objectList[i];
 		objectData.info.objectSize = objectSize;
 		uint32_t primary = fileMetaData._primaryList[i];
+
+		if(OSDLoadCount.count(primary) == 0)
+			OSDLoadCount[primary] = 1;
+		else
+			OSDLoadCount[primary] +=1;
+
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(boost::bind(startBenchUploadThread, clientId, dstOsdSockfd, objectData, codingScheme, codingSetting, md5ToHex(checksum)));
@@ -184,14 +191,16 @@ void testUpload() {
 	cout << formatSize(fileSize) << " transferred in " << duration
 			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s"
 			<< endl;
+
+	map<uint32_t,uint32_t>::iterator it;
+
+	for(it = OSDLoadCount.begin(); it!=OSDLoadCount.end(); ++it){
+		cout << (*it).first << ":" << (*it).second << endl;
+	}
 }
 
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
-}
-
-void startSendThread() {
-	client->getCommunicator()->sendMessage();
 }
 
 void startReceiveThread(Communicator* _clientCommunicator) {
@@ -225,10 +234,13 @@ int main(int argc, char *argv[]) {
 	thread garbageCollectionThread(startGarbageCollectionThread);
 
 	// 2. Receive Thread
-	thread receiveThread(startReceiveThread, _clientCommunicator);
+	thread receiveThread(&Communicator::waitForMessage, _clientCommunicator);
 
 	// 3. Send Thread
-	thread sendThread(startSendThread);
+#ifdef USE_MULTIPLE_QUEUE
+#else
+	thread sendThread(&Communicator::sendMessage, _clientCommunicator);
+#endif
 
 	_clientCommunicator->setId(client->getClientId());
 	_clientCommunicator->setComponentType(CLIENT);
@@ -280,7 +292,10 @@ int main(int argc, char *argv[]) {
 	exit(0);
 	garbageCollectionThread.join();
 	receiveThread.join();
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	sendThread.join();
+#endif
 
 	return 0;
 }

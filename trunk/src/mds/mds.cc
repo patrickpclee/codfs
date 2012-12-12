@@ -93,6 +93,23 @@ void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId,
 }
 
 /**
+ * @brief	Handle File Rename Request From Client
+ */
+void Mds::renameFileProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t clientId, uint32_t fileId, const string &path, const string &newPath){
+	
+	string tmpPath = path;
+	if (fileId != 0)
+		tmpPath = _metaDataModule->lookupFilePath(fileId);
+	else
+		fileId = _metaDataModule->lookupFileId(tmpPath);
+
+	_nameSpaceModule->renameFile(clientId, tmpPath, newPath);
+	_metaDataModule->renameFile(clientId, fileId, newPath);
+	_mdsCommunicator->replyRenameFile(requestId, connectionId, fileId, tmpPath);
+}
+
+/**
  * @brief	Handle Upload Object Acknowledgement from Primary
  *
  * 1. Save the Node List of the object \n
@@ -441,13 +458,19 @@ int main(void) {
 	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	// 3. Send Thread
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	thread sendThread(&Communicator::sendMessage, communicator);
+#endif
 
 	communicator->connectToMonitor();
 
 	garbageCollectionThread.join();
 	receiveThread.join();
+#ifdef USE_MULTIPLE_QUEUE
+#else
 	sendThread.join();
+#endif
 
 	delete mds;
 	delete configLayer;

@@ -8,6 +8,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include "../common/debug.hh"
+#include "../common/convertor.hh"
 
 using namespace std;
 
@@ -30,6 +31,11 @@ bool Socket::create() {
 
 	if (!is_valid())
 		return false;
+
+	int sndbuf_size = stringToByte("10M");
+	if (setsockopt(m_sock, SOL_SOCKET, SO_SNDBUF, &sndbuf_size, sizeof(sndbuf_size))){
+		debug("Failed to Set Send Buf Size to %d\n",sndbuf_size);				
+	}
 
 	// TIME_WAIT - argh
 	int on = 1;
