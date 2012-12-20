@@ -15,8 +15,7 @@ Raid1Coding::~Raid1Coding() {
 
 }
 
-vector<struct BlockData> Raid1Coding::encode(struct SegmentData segmentData,
-		string setting) {
+vector<BlockData> Raid1Coding::encode(SegmentData segmentData, string setting) {
 
 	const uint32_t raid1_n = getParameters(setting);
 	vector<struct BlockData> blockDataList;
@@ -44,19 +43,18 @@ vector<struct BlockData> Raid1Coding::encode(struct SegmentData segmentData,
 	return blockDataList;
 }
 
-struct SegmentData Raid1Coding::decode(vector<struct BlockData> &blockData,
-		vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
-		string setting) {
+SegmentData Raid1Coding::decode(vector<BlockData> &blockDataList,
+		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	// for raid1, only use first required block to decode
-	uint32_t blockId = requiredBlocks[0];
+	uint32_t blockId = symbolList[0].first;
 
 	struct SegmentData segmentData;
-	segmentData.info.segmentId = blockData[blockId].info.segmentId;
+	segmentData.info.segmentId = blockDataList[blockId].info.segmentId;
 	segmentData.info.segmentSize = segmentSize;
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(
 			segmentData.info.segmentSize);
-	memcpy(segmentData.buf, blockData[blockId].buf,
+	memcpy(segmentData.buf, blockDataList[blockId].buf,
 			segmentData.info.segmentSize);
 
 	return segmentData;
@@ -68,25 +66,8 @@ uint32_t Raid1Coding::getParameters(string setting) {
 	return raid1_n;
 }
 
-vector<uint32_t> Raid1Coding::getRequiredBlockIds(string setting,
-		vector<bool> secondaryOsdStatus) {
-
-	// for Raid1 Coding, find the first running OSD
-	vector<bool>::iterator it;
-	it = find(secondaryOsdStatus.begin(), secondaryOsdStatus.end(), true);
-
-	// not found (no OSD is running)
-	if (it == secondaryOsdStatus.end()) {
-		return {};
-	}
-
-	// return the index
-	uint32_t offset = it - secondaryOsdStatus.begin();
-	return {offset};
-}
-
-vector<uint32_t> Raid1Coding::getRepairSrcBlockIds(string setting,
-		vector<uint32_t> failedBlocks, vector<bool> blockStatus) {
+symbol_list_t Raid1Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
+		string setting) {
 
 	// for Raid1 Coding, find the first running OSD
 	vector<bool>::iterator it;
@@ -94,37 +75,41 @@ vector<uint32_t> Raid1Coding::getRepairSrcBlockIds(string setting,
 
 	// not found (no OSD is running)
 	if (it == blockStatus.end()) {
-		debug_error("%s\n", "No more copies available to repair");
 		return {};
 	}
 
 	// return the index
 	uint32_t offset = it - blockStatus.begin();
-	return {offset};
+	vector<uint32_t> symbols = {0};
+	block_symbols_t blockSymbols = make_pair(offset, symbols);
+	return {blockSymbols};
 }
 
-vector<struct BlockData> Raid1Coding::repairBlocks(
-		vector<uint32_t> failedBlocks,
-		vector<struct BlockData> &repairSrcBlocks,
-		vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
-		string setting){
+symbol_list_t Raid1Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+		vector<bool> blockStatus, string setting) {
+
+	// for RAID-1, repair is same as normal download
+	return getRequiredBlockSymbols(blockStatus, setting);
+}
+
+vector<BlockData> Raid1Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
+		vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
+		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	// for raid1, only use first required block to decode
-	vector<BlockData> blockDataList;
-	blockDataList.reserve(failedBlocks.size());
+	vector<BlockData> repairedBlockDataList;
+	repairedBlockDataList.reserve(repairBlockIdList.size());
 
-	for (uint32_t blockId : failedBlocks) {
-
-		struct BlockData blockData;
-		blockData.info.segmentId = repairSrcBlocks[repairSrcBlockId[0]].info.segmentId;
-		blockData.info.blockId = blockId;
-		blockData.info.blockSize = repairSrcBlocks[repairSrcBlockId[0]].info.blockSize;
-		blockData.buf = MemoryPool::getInstance().poolMalloc(
-				blockData.info.blockSize);
-		memcpy(blockData.buf, repairSrcBlocks[repairSrcBlockId[0]].buf,
-				blockData.info.blockSize);
-		blockDataList.push_back(blockData);
+	for (uint32_t blockId : repairBlockIdList) {
+		struct BlockData repairedBlock;
+		uint32_t blockSize = repairedBlock.info.blockSize;
+		repairedBlock.info.segmentId = blockData[blockIdList[0]].info.segmentId;
+		repairedBlock.info.blockId = blockId;
+		repairedBlock.info.blockSize = blockSize;
+		repairedBlock.buf = MemoryPool::getInstance().poolMalloc(blockSize);
+		memcpy(repairedBlock.buf, blockData[blockIdList[0]].buf, blockSize);
+		repairedBlockDataList.push_back(repairedBlock);
 	}
 
-	return blockDataList;
+	return repairedBlockDataList;
 }
