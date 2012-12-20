@@ -22,13 +22,11 @@ public:
 	 * @param	cleintId	Client ID
 	 * @param	path	Path to the File
 	 * @param	fileSize	Size of the File
-	 * @param 	codingScheme	Coding Scheme of the file
-	 * @param	codingSetting	Coding Scheme Setting
 	 *
 	 * @return	File ID
 	 */
-	uint32_t createFile(uint32_t clientId, const string &path, uint64_t fileSize,
-			CodingScheme codingScheme, const string &codingSetting);
+	uint32_t createFile(uint32_t clientId, const string &path,
+			uint64_t fileSize);
 
 	/**
 	 * @brief	Open a File
@@ -129,8 +127,9 @@ public:
 	 * @param	segmentId	ID of the Segment
 	 * @param	segmentInfo	Info of the Segment
 	 */
-	void saveSegmentInfo(uint64_t segmentId, struct SegmentMetaData segmentInfo);
-	
+	void saveSegmentInfo(uint64_t segmentId,
+			struct SegmentMetaData segmentInfo);
+
 	/**
 	 * @brief	Read Segment Info
 	 *
@@ -157,7 +156,7 @@ public:
 	 */
 
 	uint32_t selectActingPrimary(uint64_t segmentId, vector<uint32_t> nodeList,
-		vector<bool> nodeStatus);
+			vector<bool> nodeStatus);
 
 	/**
 	 * @brief	Get Primary of a Segment
@@ -174,7 +173,8 @@ public:
 	 * @param	segmentId	ID of the Segment
 	 * @param	segmentNodeList	List of Node ID
 	 */
-	void saveNodeList(uint64_t segmentId, const vector<uint32_t> &segmentNodeList);
+	void saveNodeList(uint64_t segmentId,
+			const vector<uint32_t> &segmentNodeList);
 
 	/**
 	 * @brief	Read Node List of a Segment

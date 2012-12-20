@@ -33,15 +33,12 @@ public:
 	 * @param	dstPath		Target Path for the file uploaded
 	 * @param	fileSize	Size of the File
 	 * @param	numOfObjs	number of segments to be uploaded
-	 * @param	codingScheme	Coding Scheme for the file
-	 * @param 	codingSetting	Coding Scheme Setting
 	 *
 	 * @return	File ID
 	 */
 	uint32_t uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 			uint32_t clientId, const string &dstPath, uint64_t fileSize,
-			uint32_t numOfObjs, CodingScheme codingScheme,
-			const string &codingSetting);
+			uint32_t numOfObjs);
 
 //	void FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId);
 

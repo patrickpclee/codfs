@@ -28,11 +28,6 @@ message HandshakeReplyPro {
 // CLIENT -> MDS
 //
 
-message IWantFileSizeMsgPro{
-	optional fixed32 fileId = 1;
-	optional fixed64 fileSize = 2;
-}
-
 message ListDirectoryRequestPro {
 	optional fixed32 osdId = 1;
 	optional string directoryPath = 2;
@@ -43,8 +38,6 @@ message UploadFileRequestPro {
 	optional fixed64 fileSize = 2;
 	optional fixed32 numOfObjs = 3;
 	optional string path = 4;
-	optional PutSegmentInitRequestPro.CodingScheme codingScheme = 5;	
-	optional string codingSetting = 6;
 }
 
 message DeleteFileRequestPro {
@@ -145,11 +138,6 @@ message GetOsdListRequestPro {
 //
 // MDS -> CLIENT
 //
-
-message HeresFileSizeMsgPro{
-	optional fixed32 fileId = 1;
-	optional fixed64 fileSize = 2;
-}
 
 message ListDirectoryReplyPro {
 	repeated FileInfoPro fileInfoPro = 1;

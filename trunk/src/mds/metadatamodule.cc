@@ -15,12 +15,10 @@ MetaDataModule::MetaDataModule() {
  * @brief	Create Meta Data Entry for a New File
  */
 uint32_t MetaDataModule::createFile(uint32_t clientId, const string &path,
-		uint64_t fileSize, CodingScheme codingScheme,
-		const string &codingSetting) {
+		uint64_t fileSize) {
 	uint32_t fileId = _fileMetaDataModule->generateFileId();
 
-	_fileMetaDataModule->createFile(clientId, path, fileSize, fileId,
-			codingScheme, codingSetting);
+	_fileMetaDataModule->createFile(clientId, path, fileSize, fileId);
 
 	return fileId;
 }

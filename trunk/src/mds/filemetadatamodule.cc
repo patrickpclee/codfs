@@ -30,12 +30,10 @@ FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModul
  * @brief	Create a File
  */
 void FileMetaDataModule::createFile(uint32_t clientId, const string &path,
-		uint64_t fileSize, uint32_t fileId, CodingScheme codingScheme,
-		const string &codingSetting) {
+		uint64_t fileSize, uint32_t fileId) {
 	BSONObj insertSegment =
 			BSON ("id" << fileId << "path" << path << "fileSize" << (long long int)fileSize
-					<< "clientId" << clientId << "codingScheme" << (int)codingScheme
-					<< "codingSetting" << codingSetting);
+					<< "clientId" << clientId);
 	_fileMetaDataStorage->insert(insertSegment);
 
 	return;
