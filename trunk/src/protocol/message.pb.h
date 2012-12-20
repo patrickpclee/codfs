@@ -5196,20 +5196,30 @@ class GetSecondaryListRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 primaryid() const;
   inline void set_primaryid(::google::protobuf::uint32 value);
   
+  // optional fixed64 blockSize = 3;
+  inline bool has_blocksize() const;
+  inline void clear_blocksize();
+  static const int kBlockSizeFieldNumber = 3;
+  inline ::google::protobuf::uint64 blocksize() const;
+  inline void set_blocksize(::google::protobuf::uint64 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetSecondaryListRequestPro)
  private:
   inline void set_has_numofsegs();
   inline void clear_has_numofsegs();
   inline void set_has_primaryid();
   inline void clear_has_primaryid();
+  inline void set_has_blocksize();
+  inline void clear_has_blocksize();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint32 numofsegs_;
   ::google::protobuf::uint32 primaryid_;
+  ::google::protobuf::uint64 blocksize_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -9836,6 +9846,28 @@ inline ::google::protobuf::uint32 GetSecondaryListRequestPro::primaryid() const 
 inline void GetSecondaryListRequestPro::set_primaryid(::google::protobuf::uint32 value) {
   set_has_primaryid();
   primaryid_ = value;
+}
+
+// optional fixed64 blockSize = 3;
+inline bool GetSecondaryListRequestPro::has_blocksize() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void GetSecondaryListRequestPro::set_has_blocksize() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void GetSecondaryListRequestPro::clear_has_blocksize() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void GetSecondaryListRequestPro::clear_blocksize() {
+  blocksize_ = GOOGLE_ULONGLONG(0);
+  clear_has_blocksize();
+}
+inline ::google::protobuf::uint64 GetSecondaryListRequestPro::blocksize() const {
+  return blocksize_;
+}
+inline void GetSecondaryListRequestPro::set_blocksize(::google::protobuf::uint64 value) {
+  set_has_blocksize();
+  blocksize_ = value;
 }
 
 // -------------------------------------------------------------------

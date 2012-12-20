@@ -417,7 +417,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			// request secondary OSD list
 			vector<struct BlockLocation> blockLocationList =
 					_osdCommunicator->getOsdListRequest(segmentId, MONITOR,
-							blockDataList.size(), _osdId);
+							blockDataList.size(), _osdId, 
+							blockDataList[0].info.blockSize);
 
 			vector<uint32_t> nodeList;
 			uint32_t i = 0;

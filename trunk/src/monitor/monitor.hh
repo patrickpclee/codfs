@@ -101,7 +101,7 @@ public:
 	 * @param numOfSegs Number of OSDs required for coding
 	 */
 	void getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t
-		 numOfSegs, uint32_t primaryId);
+		 numOfBlks, uint32_t primaryId, uint64_t blockSize);
 
 	/**
 	 * Action when a CLIENT request current ONLIE OSDs for connection
@@ -151,6 +151,11 @@ private:
 	 * the map used to store all the osd status
 	 */	
 	map<uint32_t, struct OsdStat> _osdStatMap;
+
+	/**
+	 * the map used in selection module for load balancing
+	 */	
+	map<uint32_t, struct OsdLBStat> _osdLBMap;
 
 
 	/**

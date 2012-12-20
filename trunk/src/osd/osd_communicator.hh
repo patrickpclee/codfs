@@ -111,7 +111,7 @@ public:
 
 	vector<struct BlockLocation> getOsdListRequest(uint64_t segmentId,
 			ComponentType dstComponent, uint32_t blockCount,
-			uint32_t primaryId);
+			uint32_t primaryId, uint64_t blockSize);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the block is stored
