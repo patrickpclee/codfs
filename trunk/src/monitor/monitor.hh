@@ -101,7 +101,7 @@ public:
 	 * @param numOfSegs Number of OSDs required for coding
 	 */
 	void getSecondaryListProcessor (uint32_t requestId, uint32_t sockfd, uint32_t
-		 numOfSegs, uint32_t primaryId);
+		 numOfBlks, uint32_t primaryId, uint64_t blockSize);
 
 	/**
 	 * Action when a CLIENT request current ONLIE OSDs for connection

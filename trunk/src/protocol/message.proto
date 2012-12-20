@@ -358,6 +358,7 @@ message OsdStatUpdateReplyPro {
 message GetSecondaryListRequestPro{
 	optional fixed32 numOfSegs = 1;
 	optional fixed32 primaryId = 2;
+	optional fixed64 blockSize = 3;
 }
 
 ///////////////// FROM MONITOR /////////////////

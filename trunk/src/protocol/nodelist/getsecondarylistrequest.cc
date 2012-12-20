@@ -18,22 +18,24 @@ GetSecondaryListRequestMsg::GetSecondaryListRequestMsg(Communicator* communicato
 }
 
 GetSecondaryListRequestMsg::GetSecondaryListRequestMsg(Communicator* communicator,
-		uint32_t mdsSockfd, uint32_t numOfSegs, uint32_t primaryId) :
+		uint32_t mdsSockfd, uint32_t numOfSegs, uint32_t primaryId, uint64_t
+		blockSize) :
 		Message(communicator) {
 
 	_sockfd = mdsSockfd;
 	_numOfSegs = numOfSegs;
 	_primaryId = primaryId;
+	_blockSize = blockSize;
 	
 }
 
 void GetSecondaryListRequestMsg::prepareProtocolMsg() {
 	string serializedString;
 
-
 	ncvfs::GetSecondaryListRequestPro getSecondaryListRequestPro;
 	getSecondaryListRequestPro.set_numofsegs(_numOfSegs);
 	getSecondaryListRequestPro.set_primaryid(_primaryId);
+	getSecondaryListRequestPro.set_blocksize(_blockSize);
 
 	if (!getSecondaryListRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -58,21 +60,22 @@ void GetSecondaryListRequestMsg::parse(char* buf) {
 
 	_numOfSegs = getSecondaryListRequestPro.numofsegs();
 	_primaryId = getSecondaryListRequestPro.primaryid();
-
+	_blockSize = getSecondaryListRequestPro.blocksize();
 
 }
 
 void GetSecondaryListRequestMsg::doHandle() {
 
 #ifdef COMPILE_FOR_MONITOR
-	monitor->getSecondaryListProcessor (_msgHeader.requestId, _sockfd, _numOfSegs, _primaryId);
+	monitor->getSecondaryListProcessor (_msgHeader.requestId, _sockfd, _numOfSegs, _primaryId, _blockSize);
 #endif
 
 }
 
 void GetSecondaryListRequestMsg::printProtocol() {
-	debug("[GET_SECONDARY_LIST_REQUEST] NUMBER OF SEGS = %" PRIu32 " PRIMARY ID = %" PRIu32 "\n",
-	_numOfSegs, _primaryId);
+	debug("[GET_SECONDARY_LIST_REQUEST] NUMBER OF SEGS = %" PRIu32 " PRIMARY ID = %" PRIu32 " BLOCK SIZE = %"
+	 PRIu64 "\n",
+	_numOfSegs, _primaryId, _blockSize);
 }
 
 void GetSecondaryListRequestMsg::setSecondaryList(vector<struct BlockLocation> secondaryList) {

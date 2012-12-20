@@ -26,15 +26,14 @@ class SelectionModule {
 		 * @param numOfObjs Number of OSDs going to be selected
 		 * @return a list of selected osd IDs  
 		 */
-		vector<uint32_t> ChoosePrimary(uint32_t numOfObjs);
+		vector<uint32_t> ChoosePrimaryOld(uint32_t numOfObjs);
 
 		/**
 		 * Choose primary osds from the osd status map
 		 * @param numOfSegs Number of OSDs going to be selected
-		 * @param segSize Number of OSDs going to be selected
 		 * @return a list of selected osd IDs  
 		 */
-		vector<uint32_t> ChoosePrimary(uint32_t numOfSegs, uint64_t blkSize);
+		vector<uint32_t> ChoosePrimary(uint32_t numOfSegs);
 
 
 		/**
