@@ -45,15 +45,38 @@ vector<struct BlockData> CodingModule::encodeSegmentToBlock(
 }
 
 struct SegmentData CodingModule::decodeBlockToSegment(CodingScheme codingScheme,
-		uint64_t segmentId, vector<struct BlockData> &blockData,
-		vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
-		string setting) {
+		vector<BlockData> &blockDataList, symbol_list_t &symbolList,
+		uint32_t segmentSize, string setting) {
 
 	Coding* coding = getCoding(codingScheme);
-	struct SegmentData segmentData = coding->decode(blockData, requiredBlocks,
+	struct SegmentData segmentData = coding->decode(blockDataList, symbolList,
 			segmentSize, setting);
 
 	return segmentData;
+}
+
+symbol_list_t CodingModule::getRequiredBlockSymbols(CodingScheme codingScheme,
+		vector<bool> blockStatus, string setting) {
+	return getCoding(codingScheme)->getRequiredBlockSymbols(blockStatus,
+			setting);
+}
+
+symbol_list_t CodingModule::getRepairBlockSymbols(CodingScheme codingScheme,
+		vector<uint32_t> failedBlocks, vector<bool> blockStatus,
+		string setting) {
+	return getCoding(codingScheme)->getRepairBlockSymbols(failedBlocks,
+			blockStatus, setting);
+
+}
+
+vector<BlockData> CodingModule::repairBlocks(CodingScheme codingScheme,
+		vector<uint32_t> repairBlockIdList, vector<BlockData> &blockData,
+		vector<uint32_t> &blockIdList, symbol_list_t &symbolList,
+		uint32_t segmentSize, string setting) {
+
+	return getCoding(codingScheme)->repairBlocks(repairBlockIdList, blockData,
+			blockIdList, symbolList, segmentSize, setting);
+
 }
 
 Coding* CodingModule::getCoding(CodingScheme codingScheme) {
@@ -66,29 +89,4 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 	}
 
 	return _codingWorker[codingScheme];
-}
-
-vector<uint32_t> CodingModule::getRequiredBlockIds(CodingScheme codingScheme,
-		string setting, vector<bool> secondaryOsdStatus) {
-	return getCoding(codingScheme)->getRequiredBlockIds(setting,
-			secondaryOsdStatus);
-}
-
-vector<uint32_t> CodingModule::getRepairSrcBlockIds(CodingScheme codingScheme,
-		string setting, vector<uint32_t> failedBlocks,
-		vector<bool> blockStatus) {
-	return getCoding(codingScheme)->getRepairSrcBlockIds(setting,
-			failedBlocks, blockStatus);
-
-}
-
-vector<struct BlockData> CodingModule::repairBlocks(
-		CodingScheme codingScheme, vector<uint32_t> failedBlocks,
-		vector<struct BlockData> &repairSrcBlocks,
-		vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
-		string setting) {
-
-	return getCoding(codingScheme)->repairBlocks(failedBlocks,
-			repairSrcBlocks, repairSrcBlockId, segmentSize, setting);
-
 }

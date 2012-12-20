@@ -1,6 +1,12 @@
 #ifndef __DEFINE_HH__
 #define __DEFINE_HH__
 
+#include <vector>
+#include <stdint.h>
+
+typedef std::pair<uint32_t, std::vector<uint32_t> > block_symbols_t;
+typedef std::vector<block_symbols_t> symbol_list_t ;
+
 // osd/storagemodule.cc
 #define MAX_OPEN_FILES 100
 

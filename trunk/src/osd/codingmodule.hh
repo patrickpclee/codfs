@@ -29,8 +29,8 @@ public:
 	 * @return A list of BlockData structure
 	 */
 
-	vector<struct BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
-			struct SegmentData segmentData, string setting);
+	vector< BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
+			 SegmentData segmentData, string setting);
 
 	/**
 	 * Encode an segment to a list of blocks
@@ -40,7 +40,7 @@ public:
 	 * @return A list of BlockData structure
 	 */
 
-	vector<struct BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
+	vector< BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
 			uint64_t segmentId, char* buf, uint64_t length, string setting);
 
 	/**
@@ -52,10 +52,10 @@ public:
 	 * @return an SegmentData structure
 	 */
 
-	struct SegmentData decodeBlockToSegment(CodingScheme codingScheme,
-			uint64_t segmentId, vector<struct BlockData> &blockData,
-			vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
-			string setting);
+	 SegmentData decodeBlockToSegment(CodingScheme codingScheme,
+			vector<BlockData> &blockDataList,
+			symbol_list_t &symbolList,
+			uint32_t segmentSize, string setting);
 
 	/**
 	 * Get the list of blocks required to do decode
@@ -65,8 +65,9 @@ public:
 	 * @return list of block ID
 	 */
 
-	vector<uint32_t> getRequiredBlockIds(CodingScheme codingScheme,
-			string setting, vector<bool> secondaryOsdStatus);
+	symbol_list_t getRequiredBlockSymbols(
+			CodingScheme codingScheme, vector<bool> blockStatus,
+			string setting);
 
 	/**
 	 * Get the number of blocks that the scheme uses
@@ -77,6 +78,16 @@ public:
 
 	uint32_t getNumberOfBlocks(CodingScheme codingScheme, string setting);
 
+	symbol_list_t getRepairBlockSymbols(
+			CodingScheme codingScheme, vector<uint32_t> failedBlocks,
+			vector<bool> blockStatus, string setting);
+
+	vector<BlockData> repairBlocks(CodingScheme codingScheme,
+			vector<uint32_t> repairBlockIdList, vector<BlockData> &blockData,
+			vector<uint32_t> &blockIdList,
+			symbol_list_t &symbolList,
+			uint32_t segmentSize, string setting);
+
 	/**
 	 * Get the Coding segment according to the codingScheme specified
 	 * @param codingScheme Type of coding scheme
@@ -85,18 +96,7 @@ public:
 
 	Coding* getCoding(CodingScheme codingScheme);
 
-	vector<uint32_t> getRepairSrcBlockIds(CodingScheme codingScheme,
-			string setting, vector<uint32_t> failedBlocks,
-			vector<bool> blockStatus);
-
-	vector<struct BlockData> repairBlocks(CodingScheme codingScheme,
-			vector<uint32_t> failedBlocks,
-			vector<struct BlockData> &repairSrcBlocks,
-			vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
-			string setting);
-
 private:
-//	Coding* _coding;
 	map<CodingScheme, Coding*> _codingWorker;
 };
 
