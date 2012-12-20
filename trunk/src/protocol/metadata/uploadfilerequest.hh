@@ -41,13 +41,11 @@ public:
 	 * @param	path	Requested directory path
 	 * @param	fileSize	Size of the File
 	 * @param	numOfObjs	Number of Segments
-	 * @param	codingScheme 	Coding Scheme of the file
-	 * @param	codingSetting	Coding Scheme Setting
 	 */
 
 	UploadFileRequestMsg(Communicator* communicator, uint32_t mdsSockfd,
 			uint32_t clientId, const string &path, uint64_t fileSize,
-			uint32_t numOfObjs, CodingScheme codingScheme, const string &codingSetting);
+			uint32_t numOfObjs);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -96,8 +94,6 @@ private:
 	string _path;
 	uint64_t _fileSize;
 	uint32_t _numOfObjs;
-	CodingScheme _codingScheme;
-	string _codingSetting;
 
 	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;

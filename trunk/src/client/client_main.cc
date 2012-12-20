@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 				("help", "Print help messages")
 				("action,a", po::value<string>(&action)->required(),
 						"Action: upload/download")
-				("coding,c", po::value<string>(&coding)->required(),
+				("coding,c", po::value<string>(&coding),
 						"Coding Scheme: raid0/raid1/raid5/rs")
 				("cid,i", po::value<int>(&clientId)->required(),"client ID")
 				("n,n", po::value<int>(&n),"number of stripes")
@@ -92,6 +92,10 @@ int main(int argc, char *argv[]) {
 
 
 		if (action == "upload") {
+			if (!vm.count("coding")) {
+				cout << "Please specify [coding]" << endl;
+				return 1;
+			}
 			coding = boost::to_lower_copy (coding);
 			if (coding == "raid0") {
 				codingScheme = RAID0_CODING;
@@ -131,7 +135,7 @@ int main(int argc, char *argv[]) {
 			}
 
 		} else { // download
-			if (!vm.count("fid,f")) {
+			if (!vm.count("fid")) {
 				cout << "Please specify [fileId]" << endl;
 				return 1;
 			}

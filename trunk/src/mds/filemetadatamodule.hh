@@ -24,11 +24,9 @@ public:
 	 * @param	clientId	ID of the Client
 	 * @param	path	Path of the File
 	 * @param	fileSize	Size of the File
-	 * @param	codingScheme	Coding Scheme
-	 * @param	codingSetting	Setting of Coding
 	 */
 	void createFile(uint32_t clientId, const string &path, uint64_t fileSize,
-			uint32_t fileId, CodingScheme codingScheme, const string &codingSetting);
+			uint32_t fileId);
 
 	/**
 	 * @brief	Delete a File

@@ -49,16 +49,14 @@ Mds::~Mds() {
  */
 uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, const string &dstPath, uint64_t fileSize,
-		uint32_t numOfObjs, CodingScheme codingScheme,
-		const string &codingSetting) {
+		uint32_t numOfObjs) {
 
 	vector<uint64_t> segmentList(numOfObjs);
 	vector<uint32_t> primaryList(numOfObjs);
 	uint32_t fileId = 0;
 
 	_nameSpaceModule->createFile(clientId, dstPath);
-	fileId = _metaDataModule->createFile(clientId, dstPath, fileSize,
-			codingScheme, codingSetting);
+	fileId = _metaDataModule->createFile(clientId, dstPath, fileSize);
 
 	segmentList = _metaDataModule->newSegmentList(numOfObjs);
 	_metaDataModule->saveSegmentList(fileId, segmentList);
@@ -71,8 +69,8 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 				i, primaryList[i]);
 	}
 
-	_mdsCommunicator->replySegmentandPrimaryList(requestId, connectionId, fileId,
-			segmentList, primaryList);
+	_mdsCommunicator->replySegmentandPrimaryList(requestId, connectionId,
+			fileId, segmentList, primaryList);
 
 	return fileId;
 }
@@ -96,8 +94,9 @@ void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId,
  * @brief	Handle File Rename Request From Client
  */
 void Mds::renameFileProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, uint32_t fileId, const string &path, const string &newPath){
-	
+		uint32_t clientId, uint32_t fileId, const string &path,
+		const string &newPath) {
+
 	string tmpPath = path;
 	if (fileId != 0)
 		tmpPath = _metaDataModule->lookupFilePath(fileId);
@@ -326,7 +325,8 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 
 		for (auto segmentId : primarySegmentList) {
 			// get the node list of an segment and their status
-			vector<uint32_t> nodeList = _metaDataModule->readNodeList(segmentId);
+			vector<uint32_t> nodeList = _metaDataModule->readNodeList(
+					segmentId);
 			vector<bool> nodeStatus = _mdsCommunicator->getOsdStatusRequest(
 					nodeList);
 
@@ -336,7 +336,8 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 		}
 
 		// get the list of segments owned by failed osd
-		vector<uint64_t> segmentList = _metaDataModule->readOsdSegmentList(osdId);
+		vector<uint64_t> segmentList = _metaDataModule->readOsdSegmentList(
+				osdId);
 
 		for (auto segmentId : segmentList) {
 			debug_cyan("Check segmentid = %" PRIu64 "\n", segmentId);
@@ -452,7 +453,8 @@ int main(void) {
 	communicator->setComponentType(MDS);
 
 	// 1. Garbage Collection Thread (lamba function hack for singleton)
-	thread garbageCollectionThread([&](){GarbageCollector::getInstance().start();});
+	thread garbageCollectionThread(
+			[&]() {GarbageCollector::getInstance().start();});
 
 	// 2. Receive Thread
 	thread receiveThread(&Communicator::waitForMessage, communicator);

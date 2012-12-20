@@ -28,13 +28,10 @@ public:
 	 * @param path Destination Path
 	 * @param fileSize Size of file
 	 * @param numOfObjs Number of segments
-	 * @param codingScheme Coding Scheme
-	 * @param codingSetting Coding Setting
 	 * @return FileMetaData structure
 	 */
 	struct FileMetaData uploadFile(uint32_t clientId, string path,
-			uint64_t fileSize, uint32_t numOfObjs, CodingScheme codingScheme,
-			string codingSetting);
+			uint64_t fileSize, uint32_t numOfObjs);
 
 	/**
 	 * @brief	Delete a File

@@ -27,15 +27,13 @@ UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator) :
  */
 UploadFileRequestMsg::UploadFileRequestMsg(Communicator* communicator,
 		uint32_t mdsSockfd, uint32_t clientId, const string &path, uint64_t fileSize,
-		uint32_t numOfObjs, CodingScheme codingScheme, const string &codingSetting) :
+		uint32_t numOfObjs) :
 		Message(communicator) {
 	_sockfd = mdsSockfd;
 	_clientId = clientId;
 	_path = path;
 	_fileSize = fileSize;
 	_numOfObjs = numOfObjs;
-	_codingScheme = codingScheme;
-	_codingSetting = codingSetting;
 }
 
 void UploadFileRequestMsg::prepareProtocolMsg() {
@@ -47,9 +45,6 @@ void UploadFileRequestMsg::prepareProtocolMsg() {
 	uploadFileRequestPro.set_path(_path);
 	uploadFileRequestPro.set_filesize(_fileSize);
 	uploadFileRequestPro.set_numofobjs(_numOfObjs);
-	uploadFileRequestPro.set_codingscheme(
-			(ncvfs::PutSegmentInitRequestPro_CodingScheme) _codingScheme);
-	uploadFileRequestPro.set_codingsetting(_codingSetting);
 
 	if (!uploadFileRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -73,22 +68,20 @@ void UploadFileRequestMsg::parse(char* buf) {
 	_path = uploadFileRequestPro.path();
 	_fileSize = uploadFileRequestPro.filesize();
 	_numOfObjs = uploadFileRequestPro.numofobjs();
-	_codingScheme = (CodingScheme) uploadFileRequestPro.codingscheme();
-	_codingSetting = uploadFileRequestPro.codingsetting();
 
 }
 
 void UploadFileRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
 	mds->uploadFileProcessor(_msgHeader.requestId, _sockfd, _clientId, _path,
-			_fileSize, _numOfObjs, _codingScheme, _codingSetting);
+			_fileSize, _numOfObjs);
 #endif
 }
 
 void UploadFileRequestMsg::printProtocol() {
 	debug(
-			"[UPLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", Path = %s, CodingScheme = %d, CodingSetting = %s\n",
-			_clientId, _path.c_str(), _codingScheme, _codingSetting.c_str());
+			"[UPLOAD_FILE_REQUEST] Client ID = %" PRIu32 ", Path = %s\n",
+			_clientId, _path.c_str());
 }
 
 void UploadFileRequestMsg::setSegmentList(vector<uint64_t> segmentList) {

@@ -121,8 +121,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	debug("Segment Count of %s: %" PRIu32 "\n", path.c_str(), segmentCount);
 
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
-			_clientId, path, fileSize, segmentCount, codingScheme,
-			codingSetting);
+			_clientId, path, fileSize, segmentCount);
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
