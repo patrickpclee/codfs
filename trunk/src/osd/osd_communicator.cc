@@ -161,11 +161,11 @@ void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
 
 vector<struct BlockLocation> OsdCommunicator::getOsdListRequest(
 		uint64_t segmentId, ComponentType dstComponent, uint32_t blockCount,
-		uint32_t primaryId) {
+		uint32_t primaryId, uint64_t blockSize) {
 
 	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
 			new GetSecondaryListRequestMsg(this, getMonitorSockfd(),
-					blockCount, primaryId);
+					blockCount, primaryId, blockSize);
 	getSecondaryListRequestMsg->prepareProtocolMsg();
 
 	addMessage(getSecondaryListRequestMsg, true);
