@@ -75,22 +75,15 @@ int main(int argc, char *argv[]) {
 	try {
 		namespace po = boost::program_options;
 		po::options_description desc("Options");
-		desc.add_options()
-				("help", "Print help messages")
-				("upload", "file upload")
-				("download", "file download")
-				("raid0", "raid0 coding")
-				("raid1", "raid0 coding")
-				("raid5", "raid0 coding")
-				("rs", "RS coding")
-				("n", po::value<int>(), "number of replications")
-				("k", po::value<int>(), "number of rs_k")
-				("m", po::value<int>(), "number of rs_m")
-				("w", po::value<int>(), "number of rs_w")
-				("i", po::value<int>(), "file ID")
-				("d", po::value<string>(), "destination file path")
-				("f", po::value<string>(), "file path");
-
+		desc.add_options()("help", "Print help messages")("upload",
+				"file upload")("download", "file download")("raid0",
+				"raid0 coding")("raid1", "raid0 coding")("raid5",
+				"raid0 coding")("rs", "RS coding")("n", po::value<int>(),
+				"number of replications")("k", po::value<int>(),
+				"number of rs_k")("m", po::value<int>(), "number of rs_m")("w",
+				po::value<int>(), "number of rs_w")("i", po::value<int>(),
+				"file ID")("d", po::value<string>(), "destination file path")(
+				"f", po::value<string>(), "file path");
 
 		po::variables_map vm;
 		try {
@@ -103,15 +96,14 @@ int main(int argc, char *argv[]) {
 						<< desc << std::endl;
 			}
 
-
 			if (vm.count("upload")) {
 
 				CodingScheme codingScheme;
 				string codingSetting;
 				if (vm.count("raid0")) {
 					codingScheme = RAID0_CODING;
-					std::cout << vm["n"].as<int>() << std::endl;
-//	    	  	  		    	  	  		  S	codingSetting = Raid0Coding::generateSetting(vm["n"].as<uint32_t>());
+					codingSetting = Raid0Coding::generateSetting(
+							vm["n"].as<int>());
 				}
 
 				if (vm.count("raid1")) {
@@ -125,7 +117,6 @@ int main(int argc, char *argv[]) {
 							vm["n"].as<int>());
 				}
 
-
 				if (vm.count("rs")) {
 					codingScheme = RS_CODING;
 					codingSetting = RSCoding::generateSetting(vm["k"].as<int>(),
@@ -135,13 +126,11 @@ int main(int argc, char *argv[]) {
 				client->uploadFileRequest(vm["f"].as<string>(), codingScheme,
 						codingSetting);
 
-
 			}
 
 			if (vm.count("download")) {
 				client->downloadFileRequest(vm["i"].as<int>(),
 						vm["d"].as<string>());
-
 
 			}
 			po::notify(vm);
@@ -156,7 +145,6 @@ int main(int argc, char *argv[]) {
 		std::cerr << "Unhandled Exception reached the top of main: " << e.what()
 				<< ", application will now exit" << std::endl;
 		return 2;
-
 
 	}
 
