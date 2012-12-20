@@ -101,10 +101,10 @@ void Monitor::getPrimaryListProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Monitor::getSecondaryListProcessor(uint32_t requestId, uint32_t sockfd,
-		uint32_t numOfSegs, uint32_t primaryId) {
+		uint32_t numOfBlks, uint32_t primaryId, uint64_t blockSize) {
 
 	vector<struct BlockLocation> secondaryList;
-	secondaryList = _selectionModule->ChooseSecondary(numOfSegs, primaryId);
+	secondaryList = _selectionModule->ChooseSecondary(numOfBlks, primaryId, blockSize);
 	_monitorCommunicator->replySecondaryList(requestId, sockfd, secondaryList);
 	return;
 }

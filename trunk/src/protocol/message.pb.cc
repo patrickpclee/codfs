@@ -1029,9 +1029,10 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OsdStatUpdateReplyPro));
   GetSecondaryListRequestPro_descriptor_ = file->message_type(49);
-  static const int GetSecondaryListRequestPro_offsets_[2] = {
+  static const int GetSecondaryListRequestPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, numofsegs_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, primaryid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, blocksize_),
   };
   GetSecondaryListRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1587,24 +1588,25 @@ void protobuf_AddDesc_message_2eproto() {
     "osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007\"\037\n\016OsdShutd"
     "ownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025OsdStatUpdateRe"
     "plyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001"
-    "(\007\022\022\n\nosdLoading\030\003 \001(\007\"B\n\032GetSecondaryLi"
+    "(\007\022\022\n\nosdLoading\030\003 \001(\007\"U\n\032GetSecondaryLi"
     "stRequestPro\022\021\n\tnumOfSegs\030\001 \001(\007\022\021\n\tprima"
-    "ryId\030\002 \001(\007\"\031\n\027OsdStatUpdateRequestPro\"J\n"
-    "\030GetSecondaryListReplyPro\022.\n\rsecondaryLi"
-    "st\030\001 \003(\0132\027.ncvfs.BlockLocationPro\"B\n\021New"
-    "OsdRegisterPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002"
-    " \001(\007\022\017\n\007osdPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n"
-    "\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003"
-    " \001(\007\">\n\020OnlineOsdListPro\022*\n\ronlineOsdLis"
-    "t\030\001 \003(\0132\023.ncvfs.OnlineOsdPro\"(\n\026GetOsdSt"
-    "atusRequestPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetOsd"
-    "StatusReplyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n\024Rep"
-    "airSegmentInfoPro\022\021\n\tsegmentId\030\001 \001(\006\022\024\n\014"
-    "deadBlockIds\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n"
-    "\026GetPrimaryListReplyPro\022\023\n\013primaryList\030\001"
-    " \003(\007\",\n\031RecoveryTriggerRequestPro\022\017\n\007osd"
-    "List\030\001 \003(\007\"@\n\022GetOsdListReplyPro\022*\n\ronli"
-    "neOsdList\030\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 4840);
+    "ryId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\006\"\031\n\027OsdStat"
+    "UpdateRequestPro\"J\n\030GetSecondaryListRepl"
+    "yPro\022.\n\rsecondaryList\030\001 \003(\0132\027.ncvfs.Bloc"
+    "kLocationPro\"B\n\021NewOsdRegisterPro\022\r\n\005osd"
+    "Id\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007"
+    "\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp"
+    "\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020OnlineOsdList"
+    "Pro\022*\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs.Onlin"
+    "eOsdPro\"(\n\026GetOsdStatusRequestPro\022\016\n\006osd"
+    "Ids\030\001 \003(\007\")\n\024GetOsdStatusReplyPro\022\021\n\tosd"
+    "Status\030\001 \003(\010\"R\n\024RepairSegmentInfoPro\022\021\n\t"
+    "segmentId\030\001 \001(\006\022\024\n\014deadBlockIds\030\002 \003(\007\022\021\n"
+    "\tnewOsdIds\030\003 \003(\007\"-\n\026GetPrimaryListReplyP"
+    "ro\022\023\n\013primaryList\030\001 \003(\007\",\n\031RecoveryTrigg"
+    "erRequestPro\022\017\n\007osdList\030\001 \003(\007\"@\n\022GetOsdL"
+    "istReplyPro\022*\n\ronlineOsdList\030\001 \003(\0132\023.ncv"
+    "fs.OnlineOsdProB\002H\001", 4859);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -15205,6 +15207,7 @@ void OsdStatUpdateReplyPro::Swap(OsdStatUpdateReplyPro* other) {
 #ifndef _MSC_VER
 const int GetSecondaryListRequestPro::kNumOfSegsFieldNumber;
 const int GetSecondaryListRequestPro::kPrimaryIdFieldNumber;
+const int GetSecondaryListRequestPro::kBlockSizeFieldNumber;
 #endif  // !_MSC_VER
 
 GetSecondaryListRequestPro::GetSecondaryListRequestPro()
@@ -15225,6 +15228,7 @@ void GetSecondaryListRequestPro::SharedCtor() {
   _cached_size_ = 0;
   numofsegs_ = 0u;
   primaryid_ = 0u;
+  blocksize_ = GOOGLE_ULONGLONG(0);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -15261,6 +15265,7 @@ void GetSecondaryListRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     numofsegs_ = 0u;
     primaryid_ = 0u;
+    blocksize_ = GOOGLE_ULONGLONG(0);
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -15299,6 +15304,22 @@ bool GetSecondaryListRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(25)) goto parse_blockSize;
+        break;
+      }
+      
+      // optional fixed64 blockSize = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+         parse_blockSize:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
+                 input, &blocksize_)));
+          set_has_blocksize();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -15331,6 +15352,11 @@ void GetSecondaryListRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->primaryid(), output);
   }
   
+  // optional fixed64 blockSize = 3;
+  if (has_blocksize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed64(3, this->blocksize(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -15347,6 +15373,11 @@ void GetSecondaryListRequestPro::SerializeWithCachedSizes(
   // optional fixed32 primaryId = 2;
   if (has_primaryid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->primaryid(), target);
+  }
+  
+  // optional fixed64 blockSize = 3;
+  if (has_blocksize()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(3, this->blocksize(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -15368,6 +15399,11 @@ int GetSecondaryListRequestPro::ByteSize() const {
     // optional fixed32 primaryId = 2;
     if (has_primaryid()) {
       total_size += 1 + 4;
+    }
+    
+    // optional fixed64 blockSize = 3;
+    if (has_blocksize()) {
+      total_size += 1 + 8;
     }
     
   }
@@ -15403,6 +15439,9 @@ void GetSecondaryListRequestPro::MergeFrom(const GetSecondaryListRequestPro& fro
     if (from.has_primaryid()) {
       set_primaryid(from.primaryid());
     }
+    if (from.has_blocksize()) {
+      set_blocksize(from.blocksize());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -15428,6 +15467,7 @@ void GetSecondaryListRequestPro::Swap(GetSecondaryListRequestPro* other) {
   if (other != this) {
     std::swap(numofsegs_, other->numofsegs_);
     std::swap(primaryid_, other->primaryid_);
+    std::swap(blocksize_, other->blocksize_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

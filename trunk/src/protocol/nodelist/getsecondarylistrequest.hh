@@ -38,7 +38,7 @@ public:
 	 */
 
 	GetSecondaryListRequestMsg (Communicator* communicator, uint32_t osdSockfd, 
-		uint32_t numOfSegs, uint32_t primaryId);
+		uint32_t numOfSegs, uint32_t primaryId, uint64_t blockSize);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -76,6 +76,7 @@ public:
 private:
 	uint32_t _numOfSegs;
 	uint32_t _primaryId;
+	uint64_t _blockSize;
 	vector<struct BlockLocation> _secondaryList;
 };
 

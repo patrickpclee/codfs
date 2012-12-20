@@ -30,7 +30,10 @@ SelectionModule::SelectionModule(map<uint32_t, struct OsdStat>& mapRef,
 #endif
 	}
 
-vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfObjs){
+////////////////////////////////////////////
+// 			OLD VERSION 				  //
+////////////////////////////////////////////
+vector<uint32_t> SelectionModule::ChoosePrimaryOld(uint32_t numOfObjs){
 	//Just random choose primary
 	vector<uint32_t> primaryList;
 	vector<uint32_t> allOnlineList;
@@ -115,8 +118,7 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t numOfSegs
 //       NEW IMPLEMENTATION OF GREEDY ALG      //
 /////////////////////////////////////////////////
 
-vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfSegs, 
-		uint64_t blkSize) {
+vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfSegs) {
 
 	// Get all online osd list
 	vector<uint32_t> allOnlineList;
