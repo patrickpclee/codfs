@@ -152,6 +152,11 @@ private:
 	 */	
 	map<uint32_t, struct OsdStat> _osdStatMap;
 
+	/**
+	 * the map used in selection module for load balancing
+	 */	
+	map<uint32_t, struct OsdLBStat> _osdLBMap;
+
 
 	/**
 	 * Unique ID for this monitor

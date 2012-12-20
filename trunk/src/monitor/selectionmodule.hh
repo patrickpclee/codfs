@@ -12,35 +12,62 @@ using namespace std;
 
 class SelectionModule {
 
-public:
+	public:
 
-	/**
-	 * Constructor
-	 * @param mapRef Reference of the osd status map in monitor class
-	 */
-	SelectionModule(map<uint32_t, struct OsdStat>& mapRef);
-	
-	/**
-	 * Choose primary osds from the osd status map
-	 * @param numOfObjs Number of OSDs going to be selected
-	 * @return a list of selected osd IDs  
-	 */
-	vector<uint32_t> ChoosePrimary(uint32_t numOfObjs);
+		/**
+		 * Constructor
+		 * @param mapRef Reference of the osd status map in monitor class
+		 */
+		SelectionModule(map<uint32_t, struct OsdStat>& mapRef, map<uint32_t, struct
+				OsdLBStat>& lbRef);
 
-	/**
-	 * Choose secondary osds from the osd status map to store coded blocks
-	 * @param numOfSegs Number of OSDs going to be selected
-	 * @return a list of selected osd IDs  
-	 */
-	vector<struct BlockLocation> ChooseSecondary(uint32_t numOfSegs, uint32_t
-		primary);
+		/**
+		 * Choose primary osds from the osd status map
+		 * @param numOfObjs Number of OSDs going to be selected
+		 * @return a list of selected osd IDs  
+		 */
+		vector<uint32_t> ChoosePrimary(uint32_t numOfObjs);
 
-private:
+		/**
+		 * Choose primary osds from the osd status map
+		 * @param numOfSegs Number of OSDs going to be selected
+		 * @param segSize Number of OSDs going to be selected
+		 * @return a list of selected osd IDs  
+		 */
+		vector<uint32_t> ChoosePrimary(uint32_t numOfSegs, uint64_t blkSize);
 
-	/**
-	 * Reference of the map defined in the monitor class 
-	 */
-	map<uint32_t, struct OsdStat>& _osdStatMap;
+
+		/**
+		 * Choose secondary osds from the osd status map to store coded blocks
+		 * @param numOfSegs Number of OSDs going to be selected
+		 * @return a list of selected osd IDs  
+		 */
+		vector<struct BlockLocation> ChooseSecondary(uint32_t numOfBlks, uint32_t
+				primary);
+
+		/**
+		 * Choose secondary osds from the osd status map to store coded blocks
+		 * @param numOfBlks Number of OSDs going to be selected
+		 * @param primary Primary OSD id for this segment
+		 * @param blkSize Each blk size of the encoded segment
+		 * @return a list of selected osd IDs  
+		 */
+		vector<struct BlockLocation> ChooseSecondary(uint32_t numOfBlks, uint32_t
+				primary, uint64_t blkSize);
+
+		/**
+		 * Add a newly startup osd to the load balancing map
+		 * @param osdId Newly startup Osd Id
+		 */
+		void addNewOsdToLBMap(uint32_t osdId);
+
+	private:
+
+		/**
+		 * References of the maps defined in the monitor class 
+		 */
+		map<uint32_t, struct OsdStat>& _osdStatMap;
+		map<uint32_t, struct OsdLBStat>& _osdLBMap;
 
 };
 

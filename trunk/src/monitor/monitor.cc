@@ -13,6 +13,7 @@ ConfigLayer* configLayer;
 Monitor* monitor;
 
 mutex osdStatMapMutex;
+mutex osdLBMapMutex;
 
 /*  Monitor default constructor
  */
@@ -23,7 +24,7 @@ Monitor::Monitor() {
 
 	configLayer = new ConfigLayer("monitorconfig.xml");
 	_monitorCommunicator = new MonitorCommunicator();
-	_selectionModule = new SelectionModule(_osdStatMap);
+	_selectionModule = new SelectionModule(_osdStatMap, _osdLBMap);
 	_statModule = new StatModule(_osdStatMap);
 	_recoveryModule = new RecoveryModule(_osdStatMap, _monitorCommunicator);
 	_monitorId = configLayer->getConfigInt("MonitorId");
@@ -76,6 +77,9 @@ void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 	// Add the newly startup osd to the map
 	_statModule->setStatById(osdId, sockfd, capacity, loading, ONLINE, ip,
 			port);
+
+	// Add the newly startup osd to load balancing map
+	_selectionModule->addNewOsdToLBMap(osdId);
 }
 
 void Monitor::OsdStatUpdateReplyProcessor(uint32_t requestId, uint32_t sockfd,
