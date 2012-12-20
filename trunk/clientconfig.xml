@@ -6,7 +6,7 @@
     
     <Storage>
     	<!-- KB -->
-    	<ObjectSize>10240</ObjectSize>
+    	<SegmentSize>10240</SegmentSize>
     </Storage>
 
 	<Fuse>
