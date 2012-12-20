@@ -87,8 +87,8 @@ void doEncode(std::string srcSegmentPath) {
 	// write block to storage
 	cout << endl << "Writing Blocks: " << endl;
 	for (auto block : blockDataList) {
-		const string blockPath = blockFolder + "/" + to_string(segmentId)
-				+ "." + to_string(block.info.blockId);
+		const string blockPath = blockFolder + "/" + to_string(segmentId) + "."
+				+ to_string(block.info.blockId);
 
 		writeFile(blockPath, block.buf, block.info.blockSize);
 
@@ -113,8 +113,9 @@ void doEncode(std::string srcSegmentPath) {
 
 }
 
-void doDecode(uint64_t segmentId, uint64_t segmentSize, std::string dstSegmentPath,
-		uint32_t numBlocks, vector<bool> secondaryOsdStatus) {
+void doDecode(uint64_t segmentId, uint64_t segmentSize,
+		std::string dstSegmentPath, uint32_t numBlocks,
+		vector<bool> blockStatus) {
 
 	// start timer
 	Clock::time_point tStart = Clock::now();
@@ -122,8 +123,13 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize, std::string dstSegmentPa
 	vector<BlockData> blockDataList(numBlocks);
 
 	// find required blocks
-	vector<uint32_t> requiredBlocks = coding->getRequiredBlockIds(
-			codingSetting, secondaryOsdStatus);
+	symbol_list_t requiredBlockSymbols = coding->getRequiredBlockSymbols(
+			blockStatus, codingSetting);
+
+	vector<uint32_t> requiredBlocks;
+	for (auto blockSymbol : requiredBlockSymbols) {
+		requiredBlocks.push_back(blockSymbol.first);
+	}
 
 	if (requiredBlocks.size() == 0) {
 		cerr << "Not enough blocks to reconstruct file" << endl;
@@ -133,8 +139,8 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize, std::string dstSegmentPa
 	// read blocks from files
 	cout << "Reading Blocks: " << endl;
 	for (uint32_t i : requiredBlocks) {
-		const string blockPath = blockFolder + "/" + to_string(segmentId)
-				+ "." + to_string(i);
+		const string blockPath = blockFolder + "/" + to_string(segmentId) + "."
+				+ to_string(i);
 
 		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
@@ -154,8 +160,8 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize, std::string dstSegmentPa
 	Clock::time_point tRead = Clock::now();
 
 	// perform decoding
-	SegmentData segmentData = coding->decode(blockDataList, requiredBlocks,
-			segmentSize, codingSetting);
+	SegmentData segmentData = coding->decode(blockDataList,
+			requiredBlockSymbols, segmentSize, codingSetting);
 
 	// take time for coding segments
 	Clock::time_point tCode = Clock::now();
@@ -168,7 +174,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize, std::string dstSegmentPa
 
 	// free blocks
 	for (uint32_t i : requiredBlocks) {
-	//	cout << "Free-ing block " << i << endl;
+		//	cout << "Free-ing block " << i << endl;
 		MemoryPool::getInstance().poolFree(blockDataList[i].buf);
 	}
 

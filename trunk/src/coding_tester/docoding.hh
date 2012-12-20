@@ -9,6 +9,6 @@
 
 void doEncode(std::string srcSegmentPath);
 void doDecode(uint64_t segmentId, uint64_t segmentSize, std::string dstSegmentPath,
-		uint32_t numBlocks, std::vector<bool> secondaryOsdStatus);
+		uint32_t numBlocks, std::vector<bool> blockStatus);
 
 #endif /* DOCODING_HH_ */
