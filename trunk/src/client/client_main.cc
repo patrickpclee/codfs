@@ -1,5 +1,7 @@
 #include <iostream>
 #include <signal.h>
+#include <boost/algorithm/string.hpp>
+#include <boost/program_options.hpp>
 #include "client.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
@@ -8,7 +10,6 @@
 #include "../coding/raid5coding.hh"
 #include "../coding/rscoding.hh"
 #include "../../lib/logger.hh"
-#include "boost/program_options.hpp"
 
 using namespace std;
 
@@ -33,6 +34,116 @@ int main(int argc, char *argv[]) {
 //		cout << "Download: ./CLIENT [CLIENT ID] download [FILEID] [DST]" << endl;
 //		exit(-1);
 //	}
+
+	int clientId;
+	int n, k, m, w;
+	int fileId;
+	string action, coding, file;
+	CodingScheme codingScheme = DEFAULT_CODING;
+	string codingSetting;
+
+	// START PROGRAM OPTIONS
+
+	try {
+		namespace po = boost::program_options;
+		po::options_description desc("Options");
+		desc.add_options()
+				("help", "Print help messages")
+				("action,a", po::value<string>(&action)->required(),
+						"Action: upload/download")
+				("coding,c", po::value<string>(&coding)->required(),
+						"Coding Scheme: raid0/raid1/raid5/rs")
+				("cid,i", po::value<int>(&clientId)->required(),"client ID")
+				("n,n", po::value<int>(&n),"number of stripes")
+				("k,k", po::value<int>(&k),"number of rs_k")
+				("m,m", po::value<int>(&m), "number of rs_m")
+				("w,w", po::value<int>(&w), "number of rs_w")
+				("fid,f", po::value<int>(&fileId), "file ID")
+				("src/dst file", po::value<string>(&file)->required(), "dst/src file");
+
+		po::positional_options_description positionalOptions;
+		    positionalOptions.add("src/dst file", 1);
+
+		po::variables_map vm;
+		try {
+			po::store(
+					po::command_line_parser(argc, argv).options(desc).positional(
+							positionalOptions).run(), vm);
+
+			/** --help option
+			 */
+			if (vm.count("help")) {
+				cout << endl << "UPLOAD: ./CLIENT -i [ID] -a upload -c [coding] -n [stripes] [SRC]" << endl;
+				cout << "DOWNLOAD: ./CLIENT -i [ID] -a download -f [file_ID] [DST]" << endl;
+				cout << "NCVFS Client Help" << endl << desc << endl;
+				return 0;
+			}
+
+			po::notify(vm);
+		} catch (boost::program_options::required_option& e) {
+			std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+			cout << "NCVFS Client Help" << endl << desc << endl;
+			return 1;
+		} catch (boost::program_options::error& e) {
+			std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
+			cout << "NCVFS Client Help" << endl << desc << endl;
+			return 1;
+		}
+
+
+		if (action == "upload") {
+			coding = boost::to_lower_copy (coding);
+			if (coding == "raid0") {
+				codingScheme = RAID0_CODING;
+				if (vm.count("n")) {
+					codingSetting = Raid0Coding::generateSetting(n);
+				} else {
+					cout << "Please specify [n]" << endl;
+					return 1;
+				}
+			}
+			else if (coding == "raid1") {
+				codingScheme = RAID1_CODING;
+				if (vm.count("n")) {
+					codingSetting = Raid1Coding::generateSetting(n);
+				} else {
+					cout << "Please specify [n]" << endl;
+					return 1;
+				}
+			}
+			else if (coding == "raid5") {
+				codingScheme = RAID5_CODING;
+				if (vm.count("n")) {
+					codingSetting = Raid5Coding::generateSetting(n);
+				} else {
+					cout << "Please specify [n]" << endl;
+					return 1;
+				}
+			}
+			else if (coding == "rs") {
+				codingScheme = RS_CODING;
+				if (vm.count("k") && vm.count("m") && vm.count("w")) {
+					codingSetting = RSCoding::generateSetting(k,m,w);
+				} else {
+					cout << "Please specify [n,k,m,w]" << endl;
+					return 1;
+				}
+			}
+
+		} else { // download
+			if (!vm.count("fid,f")) {
+				cout << "Please specify [fileId]" << endl;
+				return 1;
+			}
+		}
+
+	}  catch (std::exception& e) {
+		std::cerr << "Unhandled Exception reached the top of main: " << e.what()
+						<< ", application will now exit" << std::endl;
+		return -1;
+	}
+
+	// END PROGRAM OPTIONS
 
 // handle signal for profiler
 	signal(SIGINT, sighandler);
@@ -72,80 +183,10 @@ int main(int argc, char *argv[]) {
 	communicator->connectToMonitor();
 	communicator->getOsdListAndConnect();
 
-	try {
-		namespace po = boost::program_options;
-		po::options_description desc("Options");
-		desc.add_options()("help", "Print help messages")("upload",
-				"file upload")("download", "file download")("raid0",
-				"raid0 coding")("raid1", "raid0 coding")("raid5",
-				"raid0 coding")("rs", "RS coding")("n", po::value<int>(),
-				"number of replications")("k", po::value<int>(),
-				"number of rs_k")("m", po::value<int>(), "number of rs_m")("w",
-				po::value<int>(), "number of rs_w")("i", po::value<int>(),
-				"file ID")("d", po::value<string>(), "destination file path")(
-				"f", po::value<string>(), "file path");
-
-		po::variables_map vm;
-		try {
-			po::store(po::parse_command_line(argc, argv, desc), vm); // can throw
-
-			/** --help option
-			 */
-			if (vm.count("help")) {
-				std::cout << "Basic Command Line Parameter App" << std::endl
-						<< desc << std::endl;
-			}
-
-			if (vm.count("upload")) {
-
-				CodingScheme codingScheme;
-				string codingSetting;
-				if (vm.count("raid0")) {
-					codingScheme = RAID0_CODING;
-					codingSetting = Raid0Coding::generateSetting(
-							vm["n"].as<int>());
-				}
-
-				if (vm.count("raid1")) {
-					codingScheme = RAID1_CODING;
-					codingSetting = Raid1Coding::generateSetting(
-							vm["n"].as<int>());
-				}
-				if (vm.count("raid5")) {
-					codingScheme = RAID5_CODING;
-					codingSetting = Raid5Coding::generateSetting(
-							vm["n"].as<int>());
-				}
-
-				if (vm.count("rs")) {
-					codingScheme = RS_CODING;
-					codingSetting = RSCoding::generateSetting(vm["k"].as<int>(),
-							vm["m"].as<int>(), vm["w"].as<int>());
-				}
-
-				client->uploadFileRequest(vm["f"].as<string>(), codingScheme,
-						codingSetting);
-
-			}
-
-			if (vm.count("download")) {
-				client->downloadFileRequest(vm["i"].as<int>(),
-						vm["d"].as<string>());
-
-			}
-			po::notify(vm);
-			// throws on error, so do after help in case
-			// there are any problems
-		} catch (po::error& e) {
-			std::cerr << "ERROR: " << e.what() << std::endl << std::endl;
-			std::cerr << desc << std::endl;
-			return 1;
-		}
-	} catch (std::exception& e) {
-		std::cerr << "Unhandled Exception reached the top of main: " << e.what()
-				<< ", application will now exit" << std::endl;
-		return 2;
-
+	if (action == "upload") {
+		client->uploadFileRequest(file, codingScheme, codingSetting);
+	} else {
+		client->downloadFileRequest(fileId, file);
 	}
 
 	garbageCollectionThread.join();
