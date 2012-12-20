@@ -2,6 +2,7 @@
 #include <iostream>
 #include <algorithm>
 #include <string.h>
+#include <utility>
 #include "coding.hh"
 #include "raid0coding.hh"
 #include "../common/debug.hh"
@@ -19,10 +20,9 @@ Raid0Coding::~Raid0Coding() {
 
 }
 
-vector<struct BlockData> Raid0Coding::encode(struct SegmentData segmentData,
-		string setting) {
+vector<BlockData> Raid0Coding::encode(SegmentData segmentData, string setting) {
 
-	vector<struct BlockData> blockDataList;
+	vector<BlockData> blockDataList;
 	const uint32_t raid0_n = getParameters(setting);
 
 	// calculate size of each strip
@@ -31,7 +31,7 @@ vector<struct BlockData> Raid0Coding::encode(struct SegmentData segmentData,
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
 
-		struct BlockData blockData;
+		BlockData blockData;
 		blockData.info.segmentId = segmentData.info.segmentId;
 		blockData.info.blockId = i;
 
@@ -56,22 +56,21 @@ vector<struct BlockData> Raid0Coding::encode(struct SegmentData segmentData,
 	return blockDataList;
 }
 
-struct SegmentData Raid0Coding::decode(vector<struct BlockData> &blockData,
-		vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
-		string setting) {
+SegmentData Raid0Coding::decode(vector<BlockData> &blockDataList,
+		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
 
-	// for raid 0, requiredBlocks is not used as all blocks are required to decode
+	// for raid 0, symbolList is not used as all blocks are required to decode
 
-	struct SegmentData segmentData;
+	SegmentData segmentData;
 
 	// copy segmentID from first block
-	segmentData.info.segmentId = blockData[0].info.segmentId;
+	segmentData.info.segmentId = blockDataList[0].info.segmentId;
 	segmentData.info.segmentSize = segmentSize;
 
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	uint64_t offset = 0;
-	for (struct BlockData block : blockData) {
+	for (BlockData block : blockDataList) {
 		memcpy(segmentData.buf + offset, block.buf, block.info.blockSize);
 		offset += block.info.blockSize;
 	}
@@ -85,12 +84,12 @@ uint32_t Raid0Coding::getParameters(string setting) {
 	return raid0_n;
 }
 
-vector<uint32_t> Raid0Coding::getRequiredBlockIds(string setting,
-		vector<bool> secondaryOsdStatus) {
+symbol_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
+		string setting) {
 
 	// if any one in secondaryOsdStatus is false, return {} (error)
-	int failedOsdCount = (int) count(secondaryOsdStatus.begin(),
-			secondaryOsdStatus.end(), false);
+	int failedOsdCount = (int) count(blockStatus.begin(), blockStatus.end(),
+			false);
 
 	if (failedOsdCount > 0) {
 		return {};
@@ -98,15 +97,19 @@ vector<uint32_t> Raid0Coding::getRequiredBlockIds(string setting,
 
 	// for Raid0 Coding, require all blocks for decode
 	const uint32_t raid0_n = getParameters(setting);
-	vector<uint32_t> requiredBlocks(raid0_n);
+	symbol_list_t requiredBlockSymbols(raid0_n);
+
 	for (uint32_t i = 0; i < raid0_n; i++) {
-		requiredBlocks[i] = i;
+		pair<uint32_t, vector<uint32_t> > blockPair;
+		vector<uint32_t> symbolList = { 0 }; // each block only has one symbol
+
+		requiredBlockSymbols[i] = make_pair(i, symbolList);
 	}
-	return requiredBlocks;
+	return requiredBlockSymbols;
 }
 
-vector<uint32_t> Raid0Coding::getRepairSrcBlockIds(string setting,
-		vector<uint32_t> failedBlocks, vector<bool> blockStatus) {
+symbol_list_t Raid0Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+		vector<bool> blockStatus, string setting) {
 
 	debug_error("%s\n", "Repair not supported in RAID0");
 
@@ -114,12 +117,11 @@ vector<uint32_t> Raid0Coding::getRepairSrcBlockIds(string setting,
 }
 
 vector<struct BlockData> Raid0Coding::repairBlocks(
-		vector<uint32_t> failedBlocks,
-		vector<struct BlockData> &repairSrcBlocks,
-		vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
-		string setting) {
+		vector<uint32_t> repairBlockIdList, vector<struct BlockData> &blockData,
+		vector<uint32_t> &blockIdList, symbol_list_t &symbolList,
+		uint32_t segmentSize, string setting) {
 
-	debug_error("%s\n", "Repair not supported in RAID0");
+	debug_error("%s\n", "Decode Blocks not supported in RAID0");
 
 	return {};
 }

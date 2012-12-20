@@ -2,51 +2,127 @@
 #define __CODING_HH__
 
 #include <vector>
+#include <utility>
 #include "../common/segmentdata.hh"
 #include "../common/blockdata.hh"
 #include "../common/memorypool.hh"
+#include "../common/define.hh"
+
+using namespace std;
 
 class Coding {
 public:
 
+	/**
+	 * Constructor
+	 */
+
 	Coding();
+
+	/**
+	 * Destructor
+	 */
+
 	virtual ~Coding();
 
-	virtual vector<struct BlockData> encode(struct SegmentData segmentData,
+	/**
+	 * Encode a segment to a list of blocks
+	 * @param segmentData SegmentData structure
+	 * @param setting Coding setting
+	 * @return a list of BlockData structure
+	 */
+
+	virtual vector<BlockData> encode(struct SegmentData segmentData,
 			string setting) = 0;
-	virtual struct SegmentData decode(vector<struct BlockData> &blockData,
-			vector<uint32_t> &requiredBlocks, uint32_t segmentSize,
+
+	/**
+	 * Decode a list of blocks to a segment
+	 * @param blockData a list of BlockData structure
+	 * @param symbolList tuples returned by getRequiredBlockSymbols
+	 * @param segmentSize Original Segment Size
+	 * @param setting Coding setting
+	 * @return
+	 */
+
+	virtual SegmentData decode(vector<BlockData> &blockDataList,
+			symbol_list_t  &symbolList, uint32_t segmentSize,
 			string setting) = 0;
 
-	virtual vector<uint32_t> getRequiredBlockIds(string setting,
-			vector<bool> secondaryOsdStatus) = 0;
+	/**
+	 * Get the information about symbols required for decode
+	 * @param blockStatus True if block[i] is available, false otherwise
+	 * @param setting Coding Setting
+	 * @return vector <blockId, vector <offset, length>>
+	 */
 
-	virtual vector<uint32_t> getRepairSrcBlockIds(string setting,
-			vector<uint32_t> failedBlocks, vector<bool> blockStatus) = 0;
+	virtual symbol_list_t  getRequiredBlockSymbols(vector<bool> blockStatus,
+			string setting) = 0;
 
-	/*
-	 the vector size of repairSrcBlocks should be the total number of blocks for that segments
-	 that means some nodes in repairSrcBlocks is NULL
-	 this design is more convenient as we can address the element by its blockId
+	/**
+	 * Get the information about symbols required for repair
+	 * @param failedBlocks List of failed blocks
+	 * @param blockStatus True if block[i] is available, false otherwise
+	 * @param setting Coding Setting
+	 * @return vector <blockId, vector <symbol no> >
+	 */
+
+	virtual symbol_list_t  getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+			vector<bool> blockStatus, string setting) = 0;
+
+	/**
+	 * Repair blocks using other blocks
+	 * @param repairBlockIdList List of blocks to decode
+	 * @param blockData a list of BlockData structure  **contains NULL for not required elements**
+	 * @param blockIdList Block ID
+	 * @param symbolList tuples returned by getRequiredBlockSymbols
+	 * @param segmentSize Original Segment Size
+	 * @param setting Coding setting
+	 * @return List of decoded BlockData
 	 */
 
 	virtual vector<struct BlockData> repairBlocks(
-			vector<uint32_t> failedBlocks,
-			vector<struct BlockData> &repairSrcBlocks,
-			vector<uint32_t> &repairSrcBlockId, uint32_t segmentSize,
-			string setting) = 0;
+			vector<uint32_t> repairBlockIdList,
+			vector<struct BlockData> &blockData, vector<uint32_t> &blockIdList,
+			symbol_list_t &symbolList, uint32_t segmentSize, string setting) = 0;
+
+	/**
+	 * Round up a number to the nearest multiple
+	 * @param numToRound Number to round
+	 * @param multiple Multiple
+	 * @return Rounded number
+	 */
 
 	uint32_t roundTo(uint32_t numToRound, uint32_t multiple);
+
+	/**
+	 * Efficient XOR function
+	 * @param result XOR-ed result
+	 * @param srcA First number
+	 * @param srcB Second number
+	 * @param length Number of bytes to do XOR
+	 */
+
 	static void bitwiseXor(char* result, char* srcA, char* srcB,
 			uint32_t length);
 
 	// For using Memory Pool in Jerasure implementations
+
+	/**
+	 * Allocating memory in Jerasure
+	 * @param num Number of element V to allocate
+	 * @return Pointer to allocated memory
+	 */
 
 	template<class T, class V>
 	T* talloc(V num) {
 		return (T*) MemoryPool::getInstance().poolMalloc(
 				(uint32_t) (sizeof(T) * (num)));
 	}
+
+	/**
+	 * Free memory in Jerasure
+	 * @param ptr Pointer to allocated memory
+	 */
 
 	void tfree(void* ptr) {
 		MemoryPool::getInstance().poolFree((char*) ptr);

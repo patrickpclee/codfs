@@ -101,7 +101,8 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, bool localRetrieve) {
 
 	if (localRetrieve) {
-		debug_yellow("Local retrieve for segment ID = %" PRIu64 "\n", segmentId);
+		debug_yellow("Local retrieve for segment ID = %" PRIu64 "\n",
+				segmentId);
 	}
 
 #ifdef TIME_POINT
@@ -138,7 +139,8 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			if (_storageModule->isSegmentCached(segmentId)) {
 				// case 1: if segment exists in cache
 				debug("Segment ID = %" PRIu64 " exists in cache", segmentId);
-				segmentData = _storageModule->getSegmentFromDiskCache(segmentId);
+				segmentData = _storageModule->getSegmentFromDiskCache(
+						segmentId);
 			} else {
 				// case 2: if segment does not exist in cache
 
@@ -165,12 +167,12 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 #endif
 				// check which blocks are needed to request
 				uint32_t totalNumOfBlocks = segmentInfo._osdList.size();
-				vector<uint32_t> requiredBlocks =
-						_codingModule->getRequiredBlockIds(codingScheme,
-								codingSetting, secondaryOsdStatus);
+				symbol_list_t requiredBlockSymbols =
+						_codingModule->getRequiredBlockSymbols(codingScheme,
+								secondaryOsdStatus, codingSetting);
 
 				// error in finding required Blocks (not enough blocks to rebuild segment)
-				if (requiredBlocks.size() == 0) {
+				if (requiredBlockSymbols.size() == 0) {
 					debug_error(
 							"Not enough blocks available to rebuild Segment ID %" PRIu64 "\n",
 							segmentId);
@@ -179,7 +181,7 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 				// 2. initialize list and count
 
-				const uint32_t blockCount = requiredBlocks.size();
+				const uint32_t blockCount = requiredBlockSymbols.size();
 
 				_downloadBlockRemaining.set(segmentId, blockCount);
 				_receivedBlockData.set(segmentId,
@@ -194,14 +196,16 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// case 2: request from OSD
 				// case 3: already requested
 
-				for (uint32_t i : requiredBlocks) {
+				for (auto blockSymbols : requiredBlockSymbols) {
+
+					uint32_t i = blockSymbols.first;
 
 					uint32_t osdId = segmentInfo._osdList[i];
 
 					if (osdId == _osdId) {
 						// read block from disk
-						struct BlockData blockData =
-								_storageModule->readBlock(segmentId, i, 0);
+						struct BlockData blockData = _storageModule->readBlock(
+								segmentId, i, 0);
 
 						// blockDataList reserved space for "all blocks"
 						// only fill in data for "required blocks"
@@ -233,13 +237,15 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 								"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
 								(int)codingScheme, codingSetting.c_str());
 						segmentData = _codingModule->decodeBlockToSegment(
-								codingScheme, segmentId, blockDataList,
-								requiredBlocks, segmentSize, codingSetting);
+								codingScheme, blockDataList,
+								requiredBlockSymbols, segmentSize,
+								codingSetting);
 
 						// clean up block data
 						_downloadBlockRemaining.erase(segmentId);
 
-						for (uint32_t i : requiredBlocks) {
+						for (auto blockSymbols : requiredBlockSymbols) {
+							uint32_t i = blockSymbols.first;
 							debug(
 									"%" PRIu32 " free block %" PRIu32 " addr = %p\n",
 									i, blockDataList[i].info.blockId, blockDataList[i].buf);
@@ -312,8 +318,8 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId) {
-	struct BlockData blockData = _storageModule->readBlock(segmentId,
-			blockId, 0);
+	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
+			0);
 	_osdCommunicator->sendBlock(sockfd, blockData);
 	MemoryPool::getInstance().poolFree(blockData.buf);
 	debug("Block ID = %" PRIu32 " free-d\n", blockId);
@@ -342,8 +348,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 }
 
-void Osd::distributeBlock(uint64_t segmentId,
-		const struct BlockData& blockData,
+void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 		const struct BlockLocation& blockLocation) {
 	debug("Distribute Block %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
 			segmentId, blockData.info.blockId, blockLocation.osdId);
@@ -380,7 +385,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			// compute md5 checksum
 			unsigned char checksum[MD5_DIGEST_LENGTH];
-			MD5((unsigned char*) segmentCache.buf, segmentCache.length, checksum);
+			MD5((unsigned char*) segmentCache.buf, segmentCache.length,
+					checksum);
 			debug_cyan("md5 of segment ID %" PRIu64 " = %s\n",
 					segmentId, md5ToHex(checksum).c_str());
 
@@ -499,8 +505,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 				_storageModule->flushBlock(segmentId, blockId);
 			} else {
 				_downloadBlockRemaining.decrement(segmentId);
-				debug("all chunks for block %" PRIu32 "is received\n",
-						blockId);
+				debug("all chunks for block %" PRIu32 "is received\n", blockId);
 			}
 
 			// remove from map
@@ -546,8 +551,7 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_pendingBlockChunk.set(blockKey, chunkCount);
 
 	if (isDownload) {
-		struct BlockData& blockData =
-				_receivedBlockData.get(segmentId)[blockId];
+		struct BlockData& blockData = _receivedBlockData.get(segmentId)[blockId];
 
 		blockData.info.segmentId = segmentId;
 		blockData.info.blockId = blockId;
@@ -558,8 +562,7 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 		_storageModule->createBlock(segmentId, blockId, length);
 	}
 
-	_osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId,
-			blockId);
+	_osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId, blockId);
 
 }
 
@@ -574,8 +577,7 @@ uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// if the block received is for download process
 	if (isDownload) {
-		struct BlockData& blockData =
-				_receivedBlockData.get(segmentId)[blockId];
+		struct BlockData& blockData = _receivedBlockData.get(segmentId)[blockId];
 
 		debug("offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
 		memcpy(blockData.buf + offset, buf, length);
@@ -617,8 +619,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// get coding information from MDS
 	// TODO: since it is hard to reuse that in getSegmentRequestProcessor, do this for now
-	SegmentTransferOsdInfo segmentInfo = _osdCommunicator->getSegmentInfoRequest(
-			segmentId);
+	SegmentTransferOsdInfo segmentInfo =
+			_osdCommunicator->getSegmentInfoRequest(segmentId);
 
 	const CodingScheme codingScheme = segmentInfo._codingScheme;
 	const string codingSetting = segmentInfo._codingSetting;
