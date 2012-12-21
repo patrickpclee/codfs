@@ -208,7 +208,7 @@ symbol_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		blockRange = raid5_n;
 	}
 
-	for (uint32_t i = 0; i < noOfDataBlock; i++) {
+	for (uint32_t i = 0; i < blockRange; i++) {
 		// select only available blocks
 		if (blockStatus[i] != false) {
 			offset_length_t symbol = make_pair (0, segmentSize);
