@@ -60,18 +60,20 @@ public:
 	/**
 	 * Get the list of blocks required to do decode
 	 * @param codingScheme Coding Scheme
-	 * @param setting Coding Setting
 	 * @param secondaryOsdStatus a bool array containing the status of the OSD
+	 * @param segmentSize Segment Size
+	 * @param setting Coding Setting
 	 * @return list of block ID
 	 */
 
 	symbol_list_t getRequiredBlockSymbols(
-			CodingScheme codingScheme, vector<bool> blockStatus,
+			CodingScheme codingScheme, vector<bool> blockStatus,uint32_t segmentSize,
 			string setting);
 
 	/**
 	 * Get the number of blocks that the scheme uses
 	 * @param codingScheme Coding Scheme
+	 * @param segmentSize Segment Size
 	 * @param setting Coding Setting
 	 * @return number of blocks
 	 */
@@ -80,7 +82,7 @@ public:
 
 	symbol_list_t getRepairBlockSymbols(
 			CodingScheme codingScheme, vector<uint32_t> failedBlocks,
-			vector<bool> blockStatus, string setting);
+			vector<bool> blockStatus, uint32_t segmentSize, string setting);
 
 	vector<BlockData> repairBlocks(CodingScheme codingScheme,
 			vector<uint32_t> repairBlockIdList, vector<BlockData> &blockData,

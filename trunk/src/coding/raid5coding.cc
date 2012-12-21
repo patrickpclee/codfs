@@ -182,7 +182,7 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 }
 
 symbol_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
-		string setting) {
+		uint32_t segmentSize, string setting) {
 
 	// if more than one in secondaryOsdStatus is false, return {} (error)
 	int failedOsdCount = (int) count(blockStatus.begin(), blockStatus.end(),
@@ -199,22 +199,22 @@ symbol_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	requiredBlockSymbols.reserve(noOfDataBlock);
 
 	// no OSD failure / parity OSD failure
+	uint32_t blockRange = 0;
+
 	if (failedOsdCount == 0
 			|| (failedOsdCount == 1 && blockStatus.back() == false)) {
-		// select first n-1 blocks
-		for (uint32_t i = 0; i < noOfDataBlock; i++) {
-			vector<uint32_t> symbol = {0};
-			block_symbols_t blockSymbol = make_pair (i, symbol);
-			requiredBlockSymbols.push_back(blockSymbol);
-		}
+		blockRange = noOfDataBlock; // select first n-1 blocks
 	} else {
-		for (uint32_t i = 0; i < raid5_n; i++) {
-			// select only available blocks
-			if (blockStatus[i] != false) {
-				vector<uint32_t> symbol = {0};
-				block_symbols_t blockSymbol = make_pair (i, symbol);
-				requiredBlockSymbols.push_back(blockSymbol);
-			}
+		blockRange = raid5_n;
+	}
+
+	for (uint32_t i = 0; i < noOfDataBlock; i++) {
+		// select only available blocks
+		if (blockStatus[i] != false) {
+			offset_length_t symbol = make_pair (0, segmentSize);
+			vector<offset_length_t> symbolList = { symbol };
+			block_symbols_t blockSymbols = make_pair(i, symbolList);
+			requiredBlockSymbols.push_back(blockSymbols);
 		}
 	}
 
@@ -233,7 +233,7 @@ uint32_t Raid5Coding::getParameters(string setting) {
 }
 
 symbol_list_t Raid5Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
-		vector<bool> blockStatus, string setting) {
+		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	// at a time only one block can fail
 	if (failedBlocks.size() > 1) {
@@ -241,7 +241,7 @@ symbol_list_t Raid5Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 	}
 
 	// for RAID5, this is the same case as getRequiredBlockIds
-	return getRequiredBlockSymbols(blockStatus, setting);
+	return getRequiredBlockSymbols(blockStatus, segmentSize, setting);
 }
 
 vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,

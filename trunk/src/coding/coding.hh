@@ -45,29 +45,31 @@ public:
 	 */
 
 	virtual SegmentData decode(vector<BlockData> &blockDataList,
-			symbol_list_t  &symbolList, uint32_t segmentSize,
+			symbol_list_t &symbolList, uint32_t segmentSize,
 			string setting) = 0;
 
 	/**
 	 * Get the information about symbols required for decode
 	 * @param blockStatus True if block[i] is available, false otherwise
+	 * @param segmentSize Segment Size
 	 * @param setting Coding Setting
 	 * @return vector <blockId, vector <offset, length>>
 	 */
 
-	virtual symbol_list_t  getRequiredBlockSymbols(vector<bool> blockStatus,
-			string setting) = 0;
+	virtual symbol_list_t getRequiredBlockSymbols(vector<bool> blockStatus,
+			uint32_t segmentSize, string setting) = 0;
 
 	/**
 	 * Get the information about symbols required for repair
 	 * @param failedBlocks List of failed blocks
 	 * @param blockStatus True if block[i] is available, false otherwise
+	 * @param segmentSize Segment Size
 	 * @param setting Coding Setting
 	 * @return vector <blockId, vector <symbol no> >
 	 */
 
-	virtual symbol_list_t  getRepairBlockSymbols(vector<uint32_t> failedBlocks,
-			vector<bool> blockStatus, string setting) = 0;
+	virtual symbol_list_t getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+			vector<bool> blockStatus, uint32_t segmentSize, string setting) = 0;
 
 	/**
 	 * Repair blocks using other blocks
@@ -83,7 +85,8 @@ public:
 	virtual vector<struct BlockData> repairBlocks(
 			vector<uint32_t> repairBlockIdList,
 			vector<struct BlockData> &blockData, vector<uint32_t> &blockIdList,
-			symbol_list_t &symbolList, uint32_t segmentSize, string setting) = 0;
+			symbol_list_t &symbolList, uint32_t segmentSize,
+			string setting) = 0;
 
 	/**
 	 * Round up a number to the nearest multiple
