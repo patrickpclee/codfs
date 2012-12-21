@@ -103,7 +103,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 }
 
 SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
-		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
+		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	// transform symbolList to blockIdList
 	vector<uint32_t> blockIdList;
@@ -203,7 +203,7 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 	return segmentData;
 }
 
-symbol_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
+block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		uint32_t segmentSize, string setting) {
 
 	// if more than one in secondaryOsdStatus is false, return {} (error)
@@ -228,18 +228,18 @@ symbol_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		}
 	}
 
-	symbol_list_t requiredBlockSymbols;
+	block_list_t requiredBlockSymbols;
 	for (uint32_t i : requiredBlocks) {
 		offset_length_t symbol = make_pair (0, segmentSize);
 		vector<offset_length_t> symbolList = { symbol };
-		block_symbols_t blockSymbols = make_pair(i, symbolList);
+		symbol_list_t blockSymbols = make_pair(i, symbolList);
 		requiredBlockSymbols.push_back(blockSymbols);
 	}
 
 	return requiredBlockSymbols;
 }
 
-symbol_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+block_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	return {};
@@ -247,7 +247,7 @@ symbol_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 
 vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
-		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
+		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	return {};
 }

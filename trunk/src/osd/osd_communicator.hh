@@ -95,11 +95,11 @@ public:
 	 * Send a request to get a block to other OSD
 	 * @param connectionId ID of the target component connection
 	 * @param segmentId ID of the segment that the block is belonged to
-	 * @param blockId
+	 * @param blockId Block ID
 	 */
 
 	void getBlockRequest(uint32_t osdId, uint64_t segmentId,
-			uint32_t blockId);
+			uint32_t blockId, vector<offset_length_t> symbols);
 
 	/**
 	 * Send a request to get the secondary OSD list of an segment from MDS/Monitor

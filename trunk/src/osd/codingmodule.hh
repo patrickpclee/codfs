@@ -54,7 +54,7 @@ public:
 
 	 SegmentData decodeBlockToSegment(CodingScheme codingScheme,
 			vector<BlockData> &blockDataList,
-			symbol_list_t &symbolList,
+			block_list_t &symbolList,
 			uint32_t segmentSize, string setting);
 
 	/**
@@ -66,7 +66,7 @@ public:
 	 * @return list of block ID
 	 */
 
-	symbol_list_t getRequiredBlockSymbols(
+	block_list_t getRequiredBlockSymbols(
 			CodingScheme codingScheme, vector<bool> blockStatus,uint32_t segmentSize,
 			string setting);
 
@@ -80,14 +80,14 @@ public:
 
 	uint32_t getNumberOfBlocks(CodingScheme codingScheme, string setting);
 
-	symbol_list_t getRepairBlockSymbols(
+	block_list_t getRepairBlockSymbols(
 			CodingScheme codingScheme, vector<uint32_t> failedBlocks,
 			vector<bool> blockStatus, uint32_t segmentSize, string setting);
 
 	vector<BlockData> repairBlocks(CodingScheme codingScheme,
 			vector<uint32_t> repairBlockIdList, vector<BlockData> &blockData,
 			vector<uint32_t> &blockIdList,
-			symbol_list_t &symbolList,
+			block_list_t &symbolList,
 			uint32_t segmentSize, string setting);
 
 	/**

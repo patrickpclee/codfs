@@ -91,11 +91,12 @@ public:
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param segmentId 	ID of Segment that the block is belonged to
+	 * @param symbols	List of symbols to retrieve
 	 * @param blockId ID of the block to send
 	 */
 
 	void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t blockId);
+			uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols);
 
 	/**
 	 * Action when a put segment request is received

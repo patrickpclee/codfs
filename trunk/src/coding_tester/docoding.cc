@@ -123,7 +123,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 	vector<BlockData> blockDataList(numBlocks);
 
 	// find required blocks
-	symbol_list_t requiredBlockSymbols = coding->getRequiredBlockSymbols(
+	block_list_t requiredBlockSymbols = coding->getRequiredBlockSymbols(
 			blockStatus, segmentSize, codingSetting);
 
 	vector<uint32_t> requiredBlocks;

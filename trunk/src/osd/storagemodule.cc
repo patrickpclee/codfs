@@ -303,6 +303,37 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId,
 	return blockData;
 }
 
+struct BlockData StorageModule::readBlock(uint64_t segmentId,
+		uint32_t blockId, vector<offset_length_t> symbols) {
+
+	uint32_t combinedLength = 0;
+	for (auto offsetLengthPair : symbols) {
+		combinedLength += offsetLengthPair.second;
+	}
+
+	struct BlockData blockData;
+	string blockPath = generateBlockPath(segmentId, blockId,
+			_blockFolder);
+	blockData.info.segmentId = segmentId;
+	blockData.info.blockId = blockId;
+	blockData.info.blockSize = combinedLength;
+	blockData.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
+
+	uint32_t blockOffset = 0;
+	for (auto offsetLengthPair : symbols) {
+		uint32_t offset = offsetLengthPair.first;
+		uint32_t length = offsetLengthPair.second;
+		readFile(blockPath, blockData.buf, blockOffset, length);
+	}
+
+	debug(
+			"Segment ID = %" PRIu64 " Block ID = %" PRIu32 " read %zu symbols\n",
+			segmentId, blockId, symbols.size());
+
+	return blockData;
+
+}
+
 uint32_t StorageModule::writeSegmentTransferCache(uint64_t segmentId, char* buf,
 		uint64_t offsetInSegment, uint32_t length) {
 

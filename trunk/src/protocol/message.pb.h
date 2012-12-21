@@ -68,6 +68,7 @@ class GetSegmentInfoRequestPro;
 class PutSegmentInitReplyPro;
 class SegmentTransferEndReplyPro;
 class GetSegmentReplyPro;
+class OffsetLengthPro;
 class PutBlockInitRequestPro;
 class BlockDataPro;
 class BlockTransferEndRequestPro;
@@ -3816,6 +3817,98 @@ class GetSegmentReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class OffsetLengthPro : public ::google::protobuf::Message {
+ public:
+  OffsetLengthPro();
+  virtual ~OffsetLengthPro();
+  
+  OffsetLengthPro(const OffsetLengthPro& from);
+  
+  inline OffsetLengthPro& operator=(const OffsetLengthPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const OffsetLengthPro& default_instance();
+  
+  void Swap(OffsetLengthPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  OffsetLengthPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const OffsetLengthPro& from);
+  void MergeFrom(const OffsetLengthPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 offset = 1;
+  inline bool has_offset() const;
+  inline void clear_offset();
+  static const int kOffsetFieldNumber = 1;
+  inline ::google::protobuf::uint32 offset() const;
+  inline void set_offset(::google::protobuf::uint32 value);
+  
+  // optional fixed32 length = 2;
+  inline bool has_length() const;
+  inline void clear_length();
+  static const int kLengthFieldNumber = 2;
+  inline ::google::protobuf::uint32 length() const;
+  inline void set_length(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.OffsetLengthPro)
+ private:
+  inline void set_has_offset();
+  inline void clear_has_offset();
+  inline void set_has_length();
+  inline void clear_has_length();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 offset_;
+  ::google::protobuf::uint32 length_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static OffsetLengthPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class PutBlockInitRequestPro : public ::google::protobuf::Message {
  public:
   PutBlockInitRequestPro();
@@ -4384,6 +4477,18 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 blockid() const;
   inline void set_blockid(::google::protobuf::uint32 value);
   
+  // repeated .ncvfs.OffsetLengthPro offsetLength = 3;
+  inline int offsetlength_size() const;
+  inline void clear_offsetlength();
+  static const int kOffsetLengthFieldNumber = 3;
+  inline const ::ncvfs::OffsetLengthPro& offsetlength(int index) const;
+  inline ::ncvfs::OffsetLengthPro* mutable_offsetlength(int index);
+  inline ::ncvfs::OffsetLengthPro* add_offsetlength();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+      offsetlength() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+      mutable_offsetlength();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetBlockInitRequestPro)
  private:
   inline void set_has_segmentid();
@@ -4394,10 +4499,11 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   ::google::protobuf::uint32 blockid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -8689,6 +8795,54 @@ inline void GetSegmentReplyPro::set_chunkcount(::google::protobuf::uint32 value)
 
 // -------------------------------------------------------------------
 
+// OffsetLengthPro
+
+// optional fixed32 offset = 1;
+inline bool OffsetLengthPro::has_offset() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void OffsetLengthPro::set_has_offset() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void OffsetLengthPro::clear_has_offset() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void OffsetLengthPro::clear_offset() {
+  offset_ = 0u;
+  clear_has_offset();
+}
+inline ::google::protobuf::uint32 OffsetLengthPro::offset() const {
+  return offset_;
+}
+inline void OffsetLengthPro::set_offset(::google::protobuf::uint32 value) {
+  set_has_offset();
+  offset_ = value;
+}
+
+// optional fixed32 length = 2;
+inline bool OffsetLengthPro::has_length() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void OffsetLengthPro::set_has_length() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void OffsetLengthPro::clear_has_length() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void OffsetLengthPro::clear_length() {
+  length_ = 0u;
+  clear_has_length();
+}
+inline ::google::protobuf::uint32 OffsetLengthPro::length() const {
+  return length_;
+}
+inline void OffsetLengthPro::set_length(::google::protobuf::uint32 value) {
+  set_has_length();
+  length_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // PutBlockInitRequestPro
 
 // optional fixed64 segmentId = 1;
@@ -9061,6 +9215,31 @@ inline ::google::protobuf::uint32 GetBlockInitRequestPro::blockid() const {
 inline void GetBlockInitRequestPro::set_blockid(::google::protobuf::uint32 value) {
   set_has_blockid();
   blockid_ = value;
+}
+
+// repeated .ncvfs.OffsetLengthPro offsetLength = 3;
+inline int GetBlockInitRequestPro::offsetlength_size() const {
+  return offsetlength_.size();
+}
+inline void GetBlockInitRequestPro::clear_offsetlength() {
+  offsetlength_.Clear();
+}
+inline const ::ncvfs::OffsetLengthPro& GetBlockInitRequestPro::offsetlength(int index) const {
+  return offsetlength_.Get(index);
+}
+inline ::ncvfs::OffsetLengthPro* GetBlockInitRequestPro::mutable_offsetlength(int index) {
+  return offsetlength_.Mutable(index);
+}
+inline ::ncvfs::OffsetLengthPro* GetBlockInitRequestPro::add_offsetlength() {
+  return offsetlength_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+GetBlockInitRequestPro::offsetlength() const {
+  return offsetlength_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+GetBlockInitRequestPro::mutable_offsetlength() {
+  return &offsetlength_;
 }
 
 // -------------------------------------------------------------------

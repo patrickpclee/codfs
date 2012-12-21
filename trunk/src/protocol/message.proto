@@ -276,6 +276,11 @@ message GetSegmentReplyPro {
 // OSD -> OSD
 //
 
+message OffsetLengthPro {
+	optional fixed32 offset = 1;
+	optional fixed32 length = 2;
+}
+
 message PutBlockInitRequestPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
@@ -308,6 +313,7 @@ message BlockTransferEndReplyPro {
 message GetBlockInitRequestPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
+	repeated OffsetLengthPro offsetLength = 3;
 }
 
 message GetBlockInitReplyPro {
