@@ -67,7 +67,7 @@ uint32_t Raid1Coding::getParameters(string setting) {
 }
 
 symbol_list_t Raid1Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
-		string setting) {
+		uint32_t segmentSize, string setting) {
 
 	// for Raid1 Coding, find the first running OSD
 	vector<bool>::iterator it;
@@ -80,16 +80,17 @@ symbol_list_t Raid1Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 
 	// return the index
 	uint32_t offset = it - blockStatus.begin();
-	vector<uint32_t> symbols = {0};
-	block_symbols_t blockSymbols = make_pair(offset, symbols);
+	offset_length_t symbol = make_pair(0, segmentSize);
+	vector<offset_length_t> symbolList = { symbol };
+	block_symbols_t blockSymbols = make_pair(offset, symbolList);
 	return {blockSymbols};
 }
 
 symbol_list_t Raid1Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
-		vector<bool> blockStatus, string setting) {
+		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	// for RAID-1, repair is same as normal download
-	return getRequiredBlockSymbols(blockStatus, setting);
+	return getRequiredBlockSymbols(blockStatus, segmentSize, setting);
 }
 
 vector<BlockData> Raid1Coding::repairBlocks(vector<uint32_t> repairBlockIdList,

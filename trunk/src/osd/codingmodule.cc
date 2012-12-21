@@ -56,16 +56,16 @@ struct SegmentData CodingModule::decodeBlockToSegment(CodingScheme codingScheme,
 }
 
 symbol_list_t CodingModule::getRequiredBlockSymbols(CodingScheme codingScheme,
-		vector<bool> blockStatus, string setting) {
+		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 	return getCoding(codingScheme)->getRequiredBlockSymbols(blockStatus,
-			setting);
+			segmentSize, setting);
 }
 
 symbol_list_t CodingModule::getRepairBlockSymbols(CodingScheme codingScheme,
 		vector<uint32_t> failedBlocks, vector<bool> blockStatus,
-		string setting) {
+		uint32_t segmentSize, string setting) {
 	return getCoding(codingScheme)->getRepairBlockSymbols(failedBlocks,
-			blockStatus, setting);
+			blockStatus, segmentSize, setting);
 
 }
 

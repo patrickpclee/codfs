@@ -85,7 +85,7 @@ uint32_t Raid0Coding::getParameters(string setting) {
 }
 
 symbol_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
-		string setting) {
+		uint32_t segmentSize, string setting) {
 
 	// if any one in secondaryOsdStatus is false, return {} (error)
 	int failedOsdCount = (int) count(blockStatus.begin(), blockStatus.end(),
@@ -100,16 +100,17 @@ symbol_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	symbol_list_t requiredBlockSymbols(raid0_n);
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
-		pair<uint32_t, vector<uint32_t> > blockPair;
-		vector<uint32_t> symbolList = { 0 }; // each block only has one symbol
+		offset_length_t symbol = make_pair (0, segmentSize);
+		vector <offset_length_t> symbolList = {symbol};
+		block_symbols_t blockSymbolPair = make_pair (i, symbolList);
 
-		requiredBlockSymbols[i] = make_pair(i, symbolList);
+		requiredBlockSymbols[i] = blockSymbolPair;
 	}
 	return requiredBlockSymbols;
 }
 
 symbol_list_t Raid0Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
-		vector<bool> blockStatus, string setting) {
+			vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	debug_error("%s\n", "Repair not supported in RAID0");
 

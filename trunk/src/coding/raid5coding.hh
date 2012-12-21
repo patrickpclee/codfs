@@ -15,10 +15,10 @@ public:
 			symbol_list_t &symbolList, uint32_t segmentSize, string setting);
 
 	symbol_list_t getRequiredBlockSymbols(vector<bool> blockStatus,
-			string setting);
+			uint32_t segmentSize, string setting);
 
 	symbol_list_t getRepairBlockSymbols(vector<uint32_t> failedBlocks,
-			vector<bool> blockStatus, string setting);
+			vector<bool> blockStatus, uint32_t segmentSize, string setting);
 
 	vector<BlockData> repairBlocks(vector<uint32_t> repairBlockIdList,
 			vector<BlockData> &blockData, vector<uint32_t> &blockIdList,

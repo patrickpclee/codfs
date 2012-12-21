@@ -158,7 +158,7 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				const uint32_t segmentSize = segmentInfo._size;
 
 				// bool array to store osdStatus
-				vector<bool> secondaryOsdStatus =
+				vector<bool> blockStatus =
 						_osdCommunicator->getOsdStatusRequest(
 								segmentInfo._osdList);
 
@@ -169,7 +169,7 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				uint32_t totalNumOfBlocks = segmentInfo._osdList.size();
 				symbol_list_t requiredBlockSymbols =
 						_codingModule->getRequiredBlockSymbols(codingScheme,
-								secondaryOsdStatus, codingSetting);
+								blockStatus, segmentSize, codingSetting);
 
 				// error in finding required Blocks (not enough blocks to rebuild segment)
 				if (requiredBlockSymbols.size() == 0) {

@@ -102,17 +102,14 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 	return blockDataList;
 }
 
-int firstElement(const std::pair<uint32_t, vector<uint32_t> > &p) {
-	return p.first;
-}
-
 SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	// transform symbolList to blockIdList
 	vector<uint32_t> blockIdList;
-	transform(symbolList.begin(), symbolList.end(), back_inserter(blockIdList),
-			firstElement);
+	for (auto blockSymbol : symbolList) {
+		blockIdList.push_back(blockSymbol.first);
+	}
 
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t k = params[0];
@@ -207,7 +204,7 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 }
 
 symbol_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
-		string setting) {
+		uint32_t segmentSize, string setting) {
 
 	// if more than one in secondaryOsdStatus is false, return {} (error)
 	int failedOsdCount = (int) count(blockStatus.begin(), blockStatus.end(),
@@ -231,18 +228,19 @@ symbol_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		}
 	}
 
-	symbol_list_t symbolList;
-	vector<uint32_t> symbols = {0};
+	symbol_list_t requiredBlockSymbols;
 	for (uint32_t i : requiredBlocks) {
-		block_symbols_t blockSymbols = make_pair(i, symbols);
-		symbolList.push_back(blockSymbols);
+		offset_length_t symbol = make_pair (0, segmentSize);
+		vector<offset_length_t> symbolList = { symbol };
+		block_symbols_t blockSymbols = make_pair(i, symbolList);
+		requiredBlockSymbols.push_back(blockSymbols);
 	}
 
-	return symbolList;
+	return requiredBlockSymbols;
 }
 
 symbol_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
-		vector<bool> blockStatus, string setting) {
+		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	return {};
 }
