@@ -57,7 +57,7 @@ vector<BlockData> Raid0Coding::encode(SegmentData segmentData, string setting) {
 }
 
 SegmentData Raid0Coding::decode(vector<BlockData> &blockDataList,
-		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
+		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	// for raid 0, symbolList is not used as all blocks are required to decode
 
@@ -84,7 +84,7 @@ uint32_t Raid0Coding::getParameters(string setting) {
 	return raid0_n;
 }
 
-symbol_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
+block_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		uint32_t segmentSize, string setting) {
 
 	// if any one in secondaryOsdStatus is false, return {} (error)
@@ -97,19 +97,19 @@ symbol_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 
 	// for Raid0 Coding, require all blocks for decode
 	const uint32_t raid0_n = getParameters(setting);
-	symbol_list_t requiredBlockSymbols(raid0_n);
+	block_list_t requiredBlockSymbols(raid0_n);
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
 		offset_length_t symbol = make_pair (0, segmentSize);
 		vector <offset_length_t> symbolList = {symbol};
-		block_symbols_t blockSymbolPair = make_pair (i, symbolList);
+		symbol_list_t blockSymbolPair = make_pair (i, symbolList);
 
 		requiredBlockSymbols[i] = blockSymbolPair;
 	}
 	return requiredBlockSymbols;
 }
 
-symbol_list_t Raid0Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+block_list_t Raid0Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 			vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	debug_error("%s\n", "Repair not supported in RAID0");
@@ -119,7 +119,7 @@ symbol_list_t Raid0Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 
 vector<struct BlockData> Raid0Coding::repairBlocks(
 		vector<uint32_t> repairBlockIdList, vector<struct BlockData> &blockData,
-		vector<uint32_t> &blockIdList, symbol_list_t &symbolList,
+		vector<uint32_t> &blockIdList, block_list_t &symbolList,
 		uint32_t segmentSize, string setting) {
 
 	debug_error("%s\n", "Decode Blocks not supported in RAID0");

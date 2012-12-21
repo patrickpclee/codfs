@@ -5,8 +5,8 @@
 #include <stdint.h>
 
 typedef std::pair<uint32_t, uint32_t> offset_length_t;
-typedef std::pair<uint32_t, std::vector<offset_length_t> > block_symbols_t;
-typedef std::vector<block_symbols_t> symbol_list_t ;
+typedef std::pair<uint32_t, std::vector<offset_length_t> > symbol_list_t;
+typedef std::vector<symbol_list_t> block_list_t ;
 
 // osd/storagemodule.cc
 #define MAX_OPEN_FILES 100

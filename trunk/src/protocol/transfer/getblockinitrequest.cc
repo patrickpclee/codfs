@@ -14,13 +14,15 @@ GetBlockInitRequestMsg::GetBlockInitRequestMsg(Communicator* communicator) :
 }
 
 GetBlockInitRequestMsg::GetBlockInitRequestMsg(Communicator* communicator,
-		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId) :
+		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId,
+		vector<offset_length_t> symbols) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
 	_segmentId = segmentId;
 	_blockId = blockId;
-	
+	_symbols = symbols;
+
 }
 
 void GetBlockInitRequestMsg::prepareProtocolMsg() {
@@ -29,13 +31,22 @@ void GetBlockInitRequestMsg::prepareProtocolMsg() {
 	getBlockInitRequestPro.set_segmentid(_segmentId);
 	getBlockInitRequestPro.set_blockid(_blockId);
 
+	vector<offset_length_t>::iterator it;
+
+	for (it = _symbols.begin(); it < _symbols.end(); ++it) {
+		ncvfs::OffsetLengthPro* offsetLengthPro =
+				getBlockInitRequestPro.add_offsetlength();
+		offsetLengthPro->set_offset((*it).first);
+		offsetLengthPro->set_length((*it).second);
+	}
+
 	if (!getBlockInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
 		return;
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType (GET_BLOCK_INIT_REQUEST);
+	setProtocolType(GET_BLOCK_INIT_REQUEST);
 	setProtocolMsg(serializedString);
 
 }
@@ -50,11 +61,21 @@ void GetBlockInitRequestMsg::parse(char* buf) {
 
 	_segmentId = getBlockInitRequestPro.segmentid();
 	_blockId = getBlockInitRequestPro.blockid();
+
+	for (int i = 0; i < getBlockInitRequestPro.offsetlength_size(); ++i) {
+		offset_length_t tempOffsetLength;
+
+		uint32_t offset = getBlockInitRequestPro.offsetlength(i).offset();
+		uint32_t length = getBlockInitRequestPro.offsetlength(i).length();
+		tempOffsetLength = make_pair (offset, length);
+
+		_symbols.push_back(tempOffsetLength);
+	}
 }
 
 void GetBlockInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->getBlockRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId);
+	osd->getBlockRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols);
 #endif
 }
 
@@ -65,19 +86,19 @@ void GetBlockInitRequestMsg::printProtocol() {
 }
 
 /*
-void GetBlockInitRequestMsg::setBlockSize(uint32_t blockSize) {
-	_blockSize = blockSize;
-}
+ void GetBlockInitRequestMsg::setBlockSize(uint32_t blockSize) {
+ _blockSize = blockSize;
+ }
 
-uint32_t GetBlockInitRequestMsg::getBlockSize() {
-	return _blockSize;
-}
+ uint32_t GetBlockInitRequestMsg::getBlockSize() {
+ return _blockSize;
+ }
 
-void GetBlockInitRequestMsg::setChunkCount(uint32_t chunkCount) {
-	_chunkCount = chunkCount;
-}
+ void GetBlockInitRequestMsg::setChunkCount(uint32_t chunkCount) {
+ _chunkCount = chunkCount;
+ }
 
-uint32_t GetBlockInitRequestMsg::getChunkCount() {
-	return _chunkCount;
-}
-*/
+ uint32_t GetBlockInitRequestMsg::getChunkCount() {
+ return _chunkCount;
+ }
+ */

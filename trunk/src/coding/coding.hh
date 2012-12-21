@@ -45,7 +45,7 @@ public:
 	 */
 
 	virtual SegmentData decode(vector<BlockData> &blockDataList,
-			symbol_list_t &symbolList, uint32_t segmentSize,
+			block_list_t &symbolList, uint32_t segmentSize,
 			string setting) = 0;
 
 	/**
@@ -56,7 +56,7 @@ public:
 	 * @return vector <blockId, vector <offset, length>>
 	 */
 
-	virtual symbol_list_t getRequiredBlockSymbols(vector<bool> blockStatus,
+	virtual block_list_t getRequiredBlockSymbols(vector<bool> blockStatus,
 			uint32_t segmentSize, string setting) = 0;
 
 	/**
@@ -68,7 +68,7 @@ public:
 	 * @return vector <blockId, vector <symbol no> >
 	 */
 
-	virtual symbol_list_t getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+	virtual block_list_t getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 			vector<bool> blockStatus, uint32_t segmentSize, string setting) = 0;
 
 	/**
@@ -85,7 +85,7 @@ public:
 	virtual vector<struct BlockData> repairBlocks(
 			vector<uint32_t> repairBlockIdList,
 			vector<struct BlockData> &blockData, vector<uint32_t> &blockIdList,
-			symbol_list_t &symbolList, uint32_t segmentSize,
+			block_list_t &symbolList, uint32_t segmentSize,
 			string setting) = 0;
 
 	/**

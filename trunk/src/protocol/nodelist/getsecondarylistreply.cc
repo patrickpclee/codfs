@@ -23,7 +23,8 @@ GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator) :
 }
 
 GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t sockfd, const vector<struct BlockLocation> &secondaryList) :
+		uint32_t requestId, uint32_t sockfd,
+		const vector<struct BlockLocation> &secondaryList) :
 		Message(communicator) {
 	_msgHeader.requestId = requestId;
 	_sockfd = sockfd;
@@ -33,17 +34,16 @@ GetSecondaryListReplyMsg::GetSecondaryListReplyMsg(Communicator* communicator,
 void GetSecondaryListReplyMsg::prepareProtocolMsg() {
 	string serializedString;
 
-
 	ncvfs::GetSecondaryListReplyPro getSecondaryListReplyPro;
 
 	vector<BlockLocation>::iterator it;
 
-		for (it = _secondaryList.begin(); it < _secondaryList.end(); ++it) {
-			ncvfs::BlockLocationPro* blockLocationPro =
-					getSecondaryListReplyPro.add_secondarylist();
-			blockLocationPro->set_osdid((*it).osdId);
-			blockLocationPro->set_blockid((*it).blockId);
-		}
+	for (it = _secondaryList.begin(); it < _secondaryList.end(); ++it) {
+		ncvfs::BlockLocationPro* blockLocationPro =
+				getSecondaryListReplyPro.add_secondarylist();
+		blockLocationPro->set_osdid((*it).osdId);
+		blockLocationPro->set_blockid((*it).blockId);
+	}
 
 	if (!getSecondaryListReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -54,11 +54,9 @@ void GetSecondaryListReplyMsg::prepareProtocolMsg() {
 	setProtocolType(GET_SECONDARY_LIST_REPLY);
 	setProtocolMsg(serializedString);
 
-
 }
 
 void GetSecondaryListReplyMsg::parse(char* buf) {
-
 
 	memcpy(&_msgHeader, buf, sizeof(struct MsgHeader));
 
@@ -69,8 +67,10 @@ void GetSecondaryListReplyMsg::parse(char* buf) {
 	for (int i = 0; i < getSecondaryListReplyPro.secondarylist_size(); ++i) {
 		struct BlockLocation tempBlockLocation;
 
-		tempBlockLocation.osdId = getSecondaryListReplyPro.secondarylist(i).osdid();
-		tempBlockLocation.blockId = getSecondaryListReplyPro.secondarylist(i).blockid();
+		tempBlockLocation.osdId =
+				getSecondaryListReplyPro.secondarylist(i).osdid();
+		tempBlockLocation.blockId =
+				getSecondaryListReplyPro.secondarylist(i).blockid();
 
 		_secondaryList.push_back(tempBlockLocation);
 	}

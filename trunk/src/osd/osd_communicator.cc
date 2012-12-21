@@ -61,8 +61,8 @@ void OsdCommunicator::replyPutSegmentInit(uint32_t requestId,
 void OsdCommunicator::replyPutBlockInit(uint32_t requestId,
 		uint32_t connectionId, uint64_t segmentId, uint32_t blockId) {
 
-	PutBlockInitReplyMsg* putBlockInitReplyMsg = new PutBlockInitReplyMsg(
-			this, requestId, connectionId, segmentId, blockId);
+	PutBlockInitReplyMsg* putBlockInitReplyMsg = new PutBlockInitReplyMsg(this,
+			requestId, connectionId, segmentId, blockId);
 	putBlockInitReplyMsg->prepareProtocolMsg();
 
 	addMessage(putBlockInitReplyMsg);
@@ -148,11 +148,11 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 }
 
 void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
-		uint32_t blockId) {
+		uint32_t blockId, vector<offset_length_t> symbols) {
 
 	uint32_t dstSockfd = getSockfdFromId(osdId);
-	GetBlockInitRequestMsg* getBlockInitRequestMsg =
-			new GetBlockInitRequestMsg(this, dstSockfd, segmentId, blockId);
+	GetBlockInitRequestMsg* getBlockInitRequestMsg = new GetBlockInitRequestMsg(
+			this, dstSockfd, segmentId, blockId, symbols);
 	getBlockInitRequestMsg->prepareProtocolMsg();
 
 	addMessage(getBlockInitRequestMsg, false);
@@ -164,8 +164,8 @@ vector<struct BlockLocation> OsdCommunicator::getOsdListRequest(
 		uint32_t primaryId, uint64_t blockSize) {
 
 	GetSecondaryListRequestMsg* getSecondaryListRequestMsg =
-			new GetSecondaryListRequestMsg(this, getMonitorSockfd(),
-					blockCount, primaryId, blockSize);
+			new GetSecondaryListRequestMsg(this, getMonitorSockfd(), blockCount,
+					primaryId, blockSize);
 	getSecondaryListRequestMsg->prepareProtocolMsg();
 
 	addMessage(getSecondaryListRequestMsg, true);
@@ -211,9 +211,8 @@ void OsdCommunicator::putBlockInit(uint32_t sockfd, uint64_t segmentId,
 
 	// Step 1 of the upload process
 
-	PutBlockInitRequestMsg* putBlockInitRequestMsg =
-			new PutBlockInitRequestMsg(this, sockfd, segmentId, blockId,
-					length, chunkCount);
+	PutBlockInitRequestMsg* putBlockInitRequestMsg = new PutBlockInitRequestMsg(
+			this, sockfd, segmentId, blockId, length, chunkCount);
 
 	putBlockInitRequestMsg->prepareProtocolMsg();
 	addMessage(putBlockInitRequestMsg, true);
@@ -309,7 +308,8 @@ struct SegmentTransferOsdInfo OsdCommunicator::getSegmentInfoRequest(
 		segmentInfo._id = segmentId;
 		segmentInfo._size = getSegmentInfoRequestMsg->getSegmentSize();
 		segmentInfo._codingScheme = getSegmentInfoRequestMsg->getCodingScheme();
-		segmentInfo._codingSetting = getSegmentInfoRequestMsg->getCodingSetting();
+		segmentInfo._codingSetting =
+				getSegmentInfoRequestMsg->getCodingSetting();
 		segmentInfo._checksum = getSegmentInfoRequestMsg->getChecksum();
 		segmentInfo._osdList = getSegmentInfoRequestMsg->getNodeList();
 		waitAndDelete(getSegmentInfoRequestMsg);
@@ -330,8 +330,7 @@ void OsdCommunicator::registerToMonitor(uint32_t ip, uint16_t port) {
 }
 
 void OsdCommunicator::repairBlockAck(uint64_t segmentId,
-		vector<uint32_t> repairBlockList,
-		vector<uint32_t> repairBlockOsdList) {
+		vector<uint32_t> repairBlockList, vector<uint32_t> repairBlockOsdList) {
 
 	RepairSegmentInfoMsg * repairSegmentInfoMsg = new RepairSegmentInfoMsg(this,
 			getMdsSockfd(), segmentId, repairBlockList, repairBlockOsdList);

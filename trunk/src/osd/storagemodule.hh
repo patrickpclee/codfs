@@ -89,8 +89,8 @@ public:
 	 * @return SegmentData structure
 	 */
 
-	struct SegmentData readSegment(uint64_t segmentId, uint64_t offsetInSegment = 0,
-			uint32_t length = 0);
+	struct SegmentData readSegment(uint64_t segmentId,
+			uint64_t offsetInSegment = 0, uint32_t length = 0);
 
 	/**
 	 * Read a part of a block from the storage
@@ -103,6 +103,17 @@ public:
 
 	struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
 			uint64_t offsetInBlock = 0, uint32_t length = 0);
+
+	/**
+	 * Read symbols from a block
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param symbols A list of <offset, length> tuples
+	 * @return BlockData structure
+	 */
+
+	struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
+			vector<offset_length_t> symbols);
 
 	/**
 	 * Write a partial segment to the storage
@@ -252,7 +263,8 @@ public:
 	 * @param segmentCache 	the segment cache to be saved
 	 */
 
-	void putSegmentToDiskCache(uint64_t segmentId, SegmentTransferCache segmentCache);
+	void putSegmentToDiskCache(uint64_t segmentId,
+			SegmentTransferCache segmentCache);
 
 	/**
 	 * Read segment cache from the disk
@@ -401,7 +413,7 @@ private:
 	ConcurrentMap<uint64_t, struct SegmentDiskCache> _segmentDiskCacheMap;
 	list<uint64_t> _segmentCacheQueue;
 
-	FileLruCache <string, FILE*>* _openedFile;
+	FileLruCache<string, FILE*>* _openedFile;
 	//map<string, FILE*> _openedFile;
 	map<uint64_t, struct SegmentTransferCache> _segmentTransferCache;
 	string _segmentFolder;

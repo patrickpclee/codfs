@@ -167,7 +167,7 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 #endif
 				// check which blocks are needed to request
 				uint32_t totalNumOfBlocks = segmentInfo._osdList.size();
-				symbol_list_t requiredBlockSymbols =
+				block_list_t requiredBlockSymbols =
 						_codingModule->getRequiredBlockSymbols(codingScheme,
 								blockStatus, segmentSize, codingSetting);
 
@@ -205,7 +205,7 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 					if (osdId == _osdId) {
 						// read block from disk
 						struct BlockData blockData = _storageModule->readBlock(
-								segmentId, i, 0);
+								segmentId, i, blockSymbols.second);
 
 						// blockDataList reserved space for "all blocks"
 						// only fill in data for "required blocks"
@@ -219,7 +219,8 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 					} else {
 						// request block from other OSD
 						debug("sending request for block %" PRIu32 "\n", i);
-						_osdCommunicator->getBlockRequest(osdId, segmentId, i);
+						_osdCommunicator->getBlockRequest(osdId, segmentId, i,
+								blockSymbols.second);
 					}
 				}
 
@@ -317,9 +318,9 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t blockId) {
+		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
 	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
-			0);
+			symbols);
 	_osdCommunicator->sendBlock(sockfd, blockData);
 	MemoryPool::getInstance().poolFree(blockData.buf);
 	debug("Block ID = %" PRIu32 " free-d\n", blockId);

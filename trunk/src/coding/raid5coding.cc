@@ -83,7 +83,7 @@ vector<BlockData> Raid5Coding::encode(SegmentData segmentData, string setting) {
 }
 
 SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
-		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
+		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	if (symbolList.size() < 2) {
 		cerr << "At least 2 blocks are needed for RAID-5 decode" << endl;
@@ -181,7 +181,7 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 	return segmentData;
 }
 
-symbol_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
+block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		uint32_t segmentSize, string setting) {
 
 	// if more than one in secondaryOsdStatus is false, return {} (error)
@@ -195,7 +195,7 @@ symbol_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	// for raid 5, only requires n-1 stripes (raid5_n - 1) to decode
 	const uint32_t raid5_n = getParameters(setting);
 	const uint32_t noOfDataBlock = raid5_n - 1;
-	symbol_list_t requiredBlockSymbols;
+	block_list_t requiredBlockSymbols;
 	requiredBlockSymbols.reserve(noOfDataBlock);
 
 	// no OSD failure / parity OSD failure
@@ -213,7 +213,7 @@ symbol_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		if (blockStatus[i] != false) {
 			offset_length_t symbol = make_pair (0, segmentSize);
 			vector<offset_length_t> symbolList = { symbol };
-			block_symbols_t blockSymbols = make_pair(i, symbolList);
+			symbol_list_t blockSymbols = make_pair(i, symbolList);
 			requiredBlockSymbols.push_back(blockSymbols);
 		}
 	}
@@ -232,7 +232,7 @@ uint32_t Raid5Coding::getParameters(string setting) {
 	return raid5_n;
 }
 
-symbol_list_t Raid5Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+block_list_t Raid5Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	// at a time only one block can fail
@@ -246,7 +246,7 @@ symbol_list_t Raid5Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 
 vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
-		symbol_list_t &symbolList, uint32_t segmentSize, string setting) {
+		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	const uint32_t raid5_n = getParameters(setting);
 	const uint32_t numDataBlock = raid5_n - 1;
