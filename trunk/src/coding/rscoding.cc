@@ -210,7 +210,6 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	int failedOsdCount = (int) count(blockStatus.begin(), blockStatus.end(),
 			false);
 
-	// for raid 5, only requires n-1 stripes (noOfDataStripes) to decode
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
@@ -228,9 +227,10 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		}
 	}
 
+	uint32_t blockSize = roundTo (segmentSize, noOfDataStripes) / noOfDataStripes;
 	block_list_t requiredBlockSymbols;
 	for (uint32_t i : requiredBlocks) {
-		offset_length_t symbol = make_pair (0, segmentSize);
+		offset_length_t symbol = make_pair (0, blockSize);
 		vector<offset_length_t> symbolList = { symbol };
 		symbol_list_t blockSymbols = make_pair(i, symbolList);
 		requiredBlockSymbols.push_back(blockSymbols);

@@ -208,10 +208,12 @@ block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		blockRange = raid5_n;
 	}
 
+	uint32_t blockSize = roundTo (segmentSize, raid5_n) / raid5_n;
+
 	for (uint32_t i = 0; i < blockRange; i++) {
 		// select only available blocks
 		if (blockStatus[i] != false) {
-			offset_length_t symbol = make_pair (0, segmentSize);
+			offset_length_t symbol = make_pair (0, blockSize);
 			vector<offset_length_t> symbolList = { symbol };
 			symbol_list_t blockSymbols = make_pair(i, symbolList);
 			requiredBlockSymbols.push_back(blockSymbols);
