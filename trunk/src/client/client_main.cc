@@ -59,10 +59,10 @@ int main(int argc, char *argv[]) {
 				("m,m", po::value<int>(&m), "number of rs_m")
 				("w,w", po::value<int>(&w), "number of rs_w")
 				("fid,f", po::value<int>(&fileId), "file ID")
-				("src/dst file", po::value<string>(&file)->required(), "dst/src file");
+				("target,t", po::value<string>(&file)->required(), "dst/src file");
 
 		po::positional_options_description positionalOptions;
-		    positionalOptions.add("src/dst file", 1);
+		    positionalOptions.add("target", 1);
 
 		po::variables_map vm;
 		try {
