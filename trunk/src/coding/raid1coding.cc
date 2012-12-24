@@ -102,13 +102,15 @@ vector<BlockData> Raid1Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	repairedBlockDataList.reserve(repairBlockIdList.size());
 
 	for (uint32_t blockId : repairBlockIdList) {
-		struct BlockData repairedBlock;
-		uint32_t blockSize = repairedBlock.info.blockSize;
-		repairedBlock.info.segmentId = blockData[blockIdList[0]].info.segmentId;
+		BlockData srcBlock = blockData[blockIdList[0]];
+		BlockData repairedBlock;
+
+		uint32_t blockSize = srcBlock.info.blockSize;
+		repairedBlock.info.segmentId = srcBlock.info.segmentId;
 		repairedBlock.info.blockId = blockId;
 		repairedBlock.info.blockSize = blockSize;
 		repairedBlock.buf = MemoryPool::getInstance().poolMalloc(blockSize);
-		memcpy(repairedBlock.buf, blockData[blockIdList[0]].buf, blockSize);
+		memcpy(repairedBlock.buf, srcBlock.buf, blockSize);
 		repairedBlockDataList.push_back(repairedBlock);
 	}
 
