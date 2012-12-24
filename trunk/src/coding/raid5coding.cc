@@ -208,12 +208,12 @@ block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		blockRange = raid5_n;
 	}
 
-	uint32_t blockSize = roundTo (segmentSize, raid5_n) / raid5_n;
+	uint32_t blockSize = roundTo(segmentSize, raid5_n) / raid5_n;
 
 	for (uint32_t i = 0; i < blockRange; i++) {
 		// select only available blocks
 		if (blockStatus[i] != false) {
-			offset_length_t symbol = make_pair (0, blockSize);
+			offset_length_t symbol = make_pair(0, blockSize);
 			vector<offset_length_t> symbolList = { symbol };
 			symbol_list_t blockSymbols = make_pair(i, symbolList);
 			requiredBlockSymbols.push_back(blockSymbols);
@@ -250,29 +250,47 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
 		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
-	const uint32_t raid5_n = getParameters(setting);
-	const uint32_t numDataBlock = raid5_n - 1;
+	if (repairBlockIdList.size() > 1) {
+		debug_error(
+				"Raid5 only supports one rebuild max, rebuild size = %" PRIu32 "\n",
+				repairBlockIdList.size());
+	}
 
-	const uint32_t stripeSize = Coding::roundTo(segmentSize, numDataBlock)
-			/ numDataBlock;
+	const uint32_t raid5_n = getParameters(setting);
+	const uint32_t dataBlockCount = raid5_n - 1;
+	const uint32_t lastDataIndex = raid5_n - 2;
+
+	const uint32_t blockSize = Coding::roundTo(segmentSize, dataBlockCount)
+			/ dataBlockCount;
 
 	struct BlockData rebuildBlockData;
 
-	rebuildBlockData.buf = MemoryPool::getInstance().poolMalloc(stripeSize);
+	rebuildBlockData.buf = MemoryPool::getInstance().poolMalloc(blockSize);
 
 	// rebuild
 	uint32_t i = 0;
 	for (uint32_t blockId : blockIdList) {
 		if (i == 0) {
 			// memcpy first block
-			memcpy(rebuildBlockData.buf, blockData[blockId].buf, stripeSize);
+			memcpy(rebuildBlockData.buf, blockData[blockId].buf, blockSize);
 		} else {
 			// XOR second block onwards
 			Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
-					blockData[blockId].buf, stripeSize);
+					blockData[blockId].buf, blockSize);
 		}
 		i++;
 	}
 
+	rebuildBlockData.info.blockId = repairBlockIdList[0];
+	rebuildBlockData.info.segmentId = blockData[blockIdList[0]].info.segmentId;
+
+	uint32_t repairBlockId = repairBlockIdList[0];
+	if (repairBlockId == lastDataIndex) { // last data block
+		rebuildBlockData.info.blockSize = segmentSize - repairBlockId * blockSize;
+	} else {
+		rebuildBlockData.info.blockSize = blockSize;
+	}
+
+	// for raid5, there can be only one rebuildBlockData
 	return {rebuildBlockData};
 }
