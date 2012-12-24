@@ -98,9 +98,10 @@ block_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	// for Raid0 Coding, require all blocks for decode
 	const uint32_t raid0_n = getParameters(setting);
 	block_list_t requiredBlockSymbols(raid0_n);
+	uint32_t blockSize = roundTo (segmentSize, raid0_n) / raid0_n;
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
-		offset_length_t symbol = make_pair (0, segmentSize);
+		offset_length_t symbol = make_pair (0, blockSize);
 		vector <offset_length_t> symbolList = {symbol};
 		symbol_list_t blockSymbolPair = make_pair (i, symbolList);
 
