@@ -242,7 +242,8 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 block_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
-	return {};
+	// for raid-6, same as download
+	return getRequiredBlockSymbols(blockStatus, segmentSize, setting);
 }
 
 vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
