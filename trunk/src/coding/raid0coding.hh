@@ -21,8 +21,8 @@ public:
 			vector<bool> blockStatus, uint32_t segmentSize, string setting);
 
 	vector<BlockData> repairBlocks(vector<uint32_t> repairBlockIdList,
-			vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
-			block_list_t &symbolList, uint32_t segmentSize, string setting);
+			vector<BlockData> &blockData, block_list_t &symbolList,
+			uint32_t segmentSize, string setting);
 
 	static string generateSetting(int raid0_n) {
 		return to_string(raid0_n);

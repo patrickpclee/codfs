@@ -29,8 +29,8 @@ public:
 	 * @return A list of BlockData structure
 	 */
 
-	vector< BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
-			 SegmentData segmentData, string setting);
+	vector<BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
+			SegmentData segmentData, string setting);
 
 	/**
 	 * Encode an segment to a list of blocks
@@ -40,7 +40,7 @@ public:
 	 * @return A list of BlockData structure
 	 */
 
-	vector< BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
+	vector<BlockData> encodeSegmentToBlock(CodingScheme codingScheme,
 			uint64_t segmentId, char* buf, uint64_t length, string setting);
 
 	/**
@@ -52,9 +52,8 @@ public:
 	 * @return an SegmentData structure
 	 */
 
-	 SegmentData decodeBlockToSegment(CodingScheme codingScheme,
-			vector<BlockData> &blockDataList,
-			block_list_t &symbolList,
+	SegmentData decodeBlockToSegment(CodingScheme codingScheme,
+			vector<BlockData> &blockDataList, block_list_t &symbolList,
 			uint32_t segmentSize, string setting);
 
 	/**
@@ -66,9 +65,8 @@ public:
 	 * @return list of block ID
 	 */
 
-	block_list_t getRequiredBlockSymbols(
-			CodingScheme codingScheme, vector<bool> blockStatus,uint32_t segmentSize,
-			string setting);
+	block_list_t getRequiredBlockSymbols(CodingScheme codingScheme,
+			vector<bool> blockStatus, uint32_t segmentSize, string setting);
 
 	/**
 	 * Get the number of blocks that the scheme uses
@@ -80,15 +78,13 @@ public:
 
 	uint32_t getNumberOfBlocks(CodingScheme codingScheme, string setting);
 
-	block_list_t getRepairBlockSymbols(
-			CodingScheme codingScheme, vector<uint32_t> failedBlocks,
-			vector<bool> blockStatus, uint32_t segmentSize, string setting);
+	block_list_t getRepairBlockSymbols(CodingScheme codingScheme,
+			vector<uint32_t> failedBlocks, vector<bool> blockStatus,
+			uint32_t segmentSize, string setting);
 
 	vector<BlockData> repairBlocks(CodingScheme codingScheme,
 			vector<uint32_t> repairBlockIdList, vector<BlockData> &blockData,
-			vector<uint32_t> &blockIdList,
-			block_list_t &symbolList,
-			uint32_t segmentSize, string setting);
+			block_list_t &symbolList, uint32_t segmentSize, string setting);
 
 	/**
 	 * Get the Coding segment according to the codingScheme specified
