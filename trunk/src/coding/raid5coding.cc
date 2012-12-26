@@ -247,12 +247,12 @@ block_list_t Raid5Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 }
 
 vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
-		vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
-		block_list_t &symbolList, uint32_t segmentSize, string setting) {
+		vector<BlockData> &blockData, block_list_t &symbolList,
+		uint32_t segmentSize, string setting) {
 
 	if (repairBlockIdList.size() > 1) {
 		debug_error(
-				"Raid5 only supports one rebuild max, rebuild size = %" PRIu32 "\n",
+				"Raid5 only supports one rebuild max, rebuild size = %zu\n",
 				repairBlockIdList.size());
 	}
 
@@ -269,7 +269,8 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	// rebuild
 	uint32_t i = 0;
-	for (uint32_t blockId : blockIdList) {
+	for (auto block : symbolList) {
+		uint32_t blockId = block.first;
 		if (i == 0) {
 			// memcpy first block
 			memcpy(rebuildBlockData.buf, blockData[blockId].buf, blockSize);
@@ -282,11 +283,13 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	}
 
 	rebuildBlockData.info.blockId = repairBlockIdList[0];
-	rebuildBlockData.info.segmentId = blockData[blockIdList[0]].info.segmentId;
+	rebuildBlockData.info.segmentId =
+			blockData[symbolList[0].first].info.segmentId;
 
 	uint32_t repairBlockId = repairBlockIdList[0];
 	if (repairBlockId == lastDataIndex) { // last data block
-		rebuildBlockData.info.blockSize = segmentSize - repairBlockId * blockSize;
+		rebuildBlockData.info.blockSize = segmentSize
+				- repairBlockId * blockSize;
 	} else {
 		rebuildBlockData.info.blockSize = blockSize;
 	}
