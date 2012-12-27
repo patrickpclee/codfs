@@ -98,6 +98,10 @@ public:
 	void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols);
 
+	void getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t blockId,
+			vector<offset_length_t> symbols);
+
 	/**
 	 * Action when a put segment request is received
 	 * A number of trunks are expected to receive afterwards

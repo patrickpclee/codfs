@@ -23,6 +23,7 @@
 #include "../protocol/transfer/blocktransferendrequest.hh"
 #include "../protocol/transfer/blocktransferendreply.hh"
 #include "../protocol/transfer/blockdatamsg.hh"
+#include "../protocol/transfer/recoveryblockdatamsg.hh"
 #include "../protocol/nodelist/getsecondarylistrequest.hh"
 #include "../protocol/status/osdstartupmsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
@@ -89,7 +90,6 @@ void OsdCommunicator::replyPutBlockEnd(uint32_t requestId,
 
 	addMessage(blockTransferEndReplyMsg);
 
-//TODO
 }
 
 uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
@@ -147,6 +147,25 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 	return 0;
 }
 
+uint32_t OsdCommunicator::sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
+		struct BlockData blockData) {
+
+	uint64_t segmentId = blockData.info.segmentId;
+	uint32_t blockId = blockData.info.blockId;
+	uint32_t length = blockData.info.blockSize;
+	char* buf = blockData.buf;
+
+	RecoveryBlockDataMsg* recoveryBlockDataMsg = new RecoveryBlockDataMsg(this,
+			requestId, sockfd, segmentId, blockId, length);
+
+	recoveryBlockDataMsg->prepareProtocolMsg();
+	recoveryBlockDataMsg->preparePayload(buf, length);
+
+	addMessage(recoveryBlockDataMsg, false);
+
+	return 0;
+}
+
 void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
 		uint32_t blockId, vector<offset_length_t> symbols) {
 
@@ -165,15 +184,14 @@ BlockData OsdCommunicator::getRecoveryBlock(uint32_t osdId, uint64_t segmentId,
 	uint32_t dstSockfd = getSockfdFromId(osdId);
 	GetBlockInitRequestMsg* getRecoveryBlockRequestMsg =
 			new GetBlockInitRequestMsg(this, dstSockfd, segmentId, blockId,
-					symbols);
+					symbols, true); // is recovery
 	getRecoveryBlockRequestMsg->prepareProtocolMsg();
 
 	addMessage(getRecoveryBlockRequestMsg, true);
 	MessageStatus status = getRecoveryBlockRequestMsg->waitForStatusChange();
 
 	if (status == READY) {
-		BlockData recoveryBlock = {};
-		return recoveryBlock;
+		return getRecoveryBlockRequestMsg->getRecoveryBlockData();
 	}
 
 	return {};

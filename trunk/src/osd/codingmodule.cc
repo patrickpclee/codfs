@@ -64,9 +64,14 @@ block_list_t CodingModule::getRequiredBlockSymbols(CodingScheme codingScheme,
 block_list_t CodingModule::getRepairBlockSymbols(CodingScheme codingScheme,
 		vector<uint32_t> failedBlocks, vector<bool> blockStatus,
 		uint32_t segmentSize, string setting) {
-	return getCoding(codingScheme)->getRepairBlockSymbols(failedBlocks,
+
+	block_list_t blockSymbols = getCoding(codingScheme)->getRepairBlockSymbols(failedBlocks,
 			blockStatus, segmentSize, setting);
 
+	for (auto block : blockSymbols) {
+		debug_cyan ("[RECOVERY(CODING)] symbol %" PRIu32 "\n", block.first);
+	}
+	return blockSymbols;
 }
 
 vector<BlockData> CodingModule::repairBlocks(CodingScheme codingScheme,

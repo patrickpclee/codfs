@@ -326,6 +326,14 @@ void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	debug("Block ID = %" PRIu32 " free-d\n", blockId);
 }
 
+void Osd::getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
+	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
+			symbols);
+	_osdCommunicator->sendRecoveryBlock(requestId, sockfd, blockData);
+	MemoryPool::getInstance().poolFree(blockData.buf);
+}
+
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
 		CodingScheme codingScheme, string setting, string checksum) {
@@ -622,7 +630,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	const string codingSetting = segmentInfo._codingSetting;
 	const uint32_t segmentSize = segmentInfo._size;
 
-	debug("[RECOVERY] Coding Scheme = %d setting = %s\n",
+	debug_cyan("[RECOVERY] Coding Scheme = %d setting = %s\n",
 			(int) codingScheme, codingSetting.c_str());
 
 	// get block status
@@ -639,9 +647,14 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	uint32_t i = 0;
 	for (auto block : blockSymbols) {
 
-		uint32_t osdId = segmentInfo._osdList[i];
 		uint32_t blockId = block.first;
+		uint32_t osdId = segmentInfo._osdList[blockId];
+
 		vector<offset_length_t> offsetLength = block.second;
+
+		debug_cyan(
+				"[RECOVERY] Need to obtain %zu symbols in block %" PRIu32 " from OSD %" PRIu32 "\n",
+				offsetLength.size(), blockId, osdId);
 
 		if (osdId == _osdId) {
 			// read block from disk
@@ -651,15 +664,24 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			// TODO: use threads
 			repairBlockData[i] = _osdCommunicator->getRecoveryBlock(osdId,
 					segmentId, blockId, offsetLength);
+			debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
+					blockId);
 		}
 		i++;
 
 	}
 
+	debug_cyan("[RECOVERY] Performing Repair for Segment %" PRIu64 "\n",
+			segmentId);
+
 	// perform repair
 	vector<BlockData> repairedBlocks = _codingModule->repairBlocks(codingScheme,
 			repairBlockList, repairBlockData, blockSymbols, segmentSize,
 			codingSetting);
+
+	debug_cyan(
+			"[RECOVERY] Distributing repaired blocks for segment %" PRIu64 "\n",
+			segmentId);
 
 	// send repaired blocks to new OSD
 	uint32_t j = 0;

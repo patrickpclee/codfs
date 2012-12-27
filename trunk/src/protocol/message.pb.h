@@ -4090,20 +4090,30 @@ class RecoveryBlockDataPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 blockid() const;
   inline void set_blockid(::google::protobuf::uint32 value);
   
+  // optional fixed32 length = 4;
+  inline bool has_length() const;
+  inline void clear_length();
+  static const int kLengthFieldNumber = 4;
+  inline ::google::protobuf::uint32 length() const;
+  inline void set_length(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.RecoveryBlockDataPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
   inline void set_has_blockid();
   inline void clear_has_blockid();
+  inline void set_has_length();
+  inline void clear_has_length();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::uint32 blockid_;
+  ::google::protobuf::uint32 length_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4582,21 +4592,31 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
       mutable_offsetlength();
   
+  // optional bool isRecovery = 4;
+  inline bool has_isrecovery() const;
+  inline void clear_isrecovery();
+  static const int kIsRecoveryFieldNumber = 4;
+  inline bool isrecovery() const;
+  inline void set_isrecovery(bool value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetBlockInitRequestPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
   inline void set_has_blockid();
   inline void clear_has_blockid();
+  inline void set_has_isrecovery();
+  inline void clear_has_isrecovery();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   ::google::protobuf::uint32 blockid_;
+  bool isrecovery_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -9074,6 +9094,28 @@ inline void RecoveryBlockDataPro::set_blockid(::google::protobuf::uint32 value) 
   blockid_ = value;
 }
 
+// optional fixed32 length = 4;
+inline bool RecoveryBlockDataPro::has_length() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RecoveryBlockDataPro::set_has_length() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RecoveryBlockDataPro::clear_has_length() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RecoveryBlockDataPro::clear_length() {
+  length_ = 0u;
+  clear_has_length();
+}
+inline ::google::protobuf::uint32 RecoveryBlockDataPro::length() const {
+  return length_;
+}
+inline void RecoveryBlockDataPro::set_length(::google::protobuf::uint32 value) {
+  set_has_length();
+  length_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // BlockDataPro
@@ -9381,6 +9423,28 @@ GetBlockInitRequestPro::offsetlength() const {
 inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
 GetBlockInitRequestPro::mutable_offsetlength() {
   return &offsetlength_;
+}
+
+// optional bool isRecovery = 4;
+inline bool GetBlockInitRequestPro::has_isrecovery() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void GetBlockInitRequestPro::set_has_isrecovery() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void GetBlockInitRequestPro::clear_has_isrecovery() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void GetBlockInitRequestPro::clear_isrecovery() {
+  isrecovery_ = false;
+  clear_has_isrecovery();
+}
+inline bool GetBlockInitRequestPro::isrecovery() const {
+  return isrecovery_;
+}
+inline void GetBlockInitRequestPro::set_isrecovery(bool value) {
+  set_has_isrecovery();
+  isrecovery_ = value;
 }
 
 // -------------------------------------------------------------------

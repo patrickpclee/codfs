@@ -1,8 +1,8 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
 	<MonitorId>53000</MonitorId>
-	<SleepPeriod>15</SleepPeriod>
-	<DeadPeriod>40</DeadPeriod>
+    <SleepPeriod>10</SleepPeriod>
+    <DeadPeriod>20</DeadPeriod>
 	<UpdatePeriod>10</UpdatePeriod>
     <Communication>
     
