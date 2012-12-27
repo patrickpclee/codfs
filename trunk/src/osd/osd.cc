@@ -635,13 +635,25 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			codingSetting);
 
 	// obtain blocks from other OSD
-	vector<BlockData> repairBlockData;
+	vector<BlockData> repairBlockData(repairBlockList.size());
+	uint32_t i = 0;
 	for (auto block : blockSymbols) {
+
+		uint32_t osdId = segmentInfo._osdList[i];
 		uint32_t blockId = block.first;
 		vector<offset_length_t> offsetLength = block.second;
 
-		//TODO: use threads to obtain all blockSymbols
-		//BlockData = getBlock();
+		if (osdId == _osdId) {
+			// read block from disk
+			repairBlockData[i] = _storageModule->readBlock(segmentId, blockId,
+					offsetLength);
+		} else {
+			// TODO: use threads
+			repairBlockData[i] = _osdCommunicator->getRecoveryBlock(osdId,
+					segmentId, blockId, offsetLength);
+		}
+		i++;
+
 	}
 
 	// perform repair
@@ -650,17 +662,17 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			codingSetting);
 
 	// send repaired blocks to new OSD
-	uint32_t i = 0;
+	uint32_t j = 0;
 	for (auto repairedBlock : repairedBlocks) {
 
 		// find sockfd of the new OSD
 		uint32_t sockfd = _osdCommunicator->getSockfdFromId(
-				repairBlockOsdList[i]);
+				repairBlockOsdList[j]);
 
 		_osdCommunicator->sendBlock(sockfd, repairedBlock);
 
 		MemoryPool::getInstance().poolFree(repairedBlock.buf);
-		i++;
+		j++;
 	}
 
 	// TODO: repairBlockOsd fails at this point?
