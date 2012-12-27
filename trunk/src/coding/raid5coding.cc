@@ -1,11 +1,13 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include <openssl/md5.h>
 #include <set>
 #include <string.h>
 #include "coding.hh"
 #include "raid5coding.hh"
 #include "../common/debug.hh"
+#include "../common/convertor.hh"
 #include "../common/blockdata.hh"
 #include "../common/segmentdata.hh"
 #include "../common/memorypool.hh"
@@ -279,6 +281,12 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 			Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
 					blockData[blockId].buf, blockSize);
 		}
+
+		unsigned char checksum[MD5_DIGEST_LENGTH];
+		MD5((unsigned char*) blockData[blockId].buf, blockSize, checksum);
+		debug_yellow("MD5 of Block %" PRIu32 ": %s\n",
+				blockId, md5ToHex(checksum).c_str());
+
 		i++;
 	}
 

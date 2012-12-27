@@ -643,8 +643,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			codingSetting);
 
 	// obtain blocks from other OSD
-	vector<BlockData> repairBlockData(repairBlockList.size());
-	uint32_t i = 0;
+	vector<BlockData> repairBlockData(segmentInfo._osdList.size());
 	for (auto block : blockSymbols) {
 
 		uint32_t blockId = block.first;
@@ -658,16 +657,15 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (osdId == _osdId) {
 			// read block from disk
-			repairBlockData[i] = _storageModule->readBlock(segmentId, blockId,
+			repairBlockData[blockId] = _storageModule->readBlock(segmentId, blockId,
 					offsetLength);
 		} else {
 			// TODO: use threads
-			repairBlockData[i] = _osdCommunicator->getRecoveryBlock(osdId,
+			repairBlockData[blockId] = _osdCommunicator->getRecoveryBlock(osdId,
 					segmentId, blockId, offsetLength);
 			debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
 					blockId);
 		}
-		i++;
 
 	}
 
