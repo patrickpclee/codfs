@@ -45,8 +45,7 @@ public:
 	 */
 
 	virtual SegmentData decode(vector<BlockData> &blockDataList,
-			block_list_t &symbolList, uint32_t segmentSize,
-			string setting) = 0;
+			block_list_t &symbolList, uint32_t segmentSize, string setting) = 0;
 
 	/**
 	 * Get the information about symbols required for decode
@@ -84,9 +83,8 @@ public:
 
 	virtual vector<struct BlockData> repairBlocks(
 			vector<uint32_t> repairBlockIdList,
-			vector<struct BlockData> &blockData, vector<uint32_t> &blockIdList,
-			block_list_t &symbolList, uint32_t segmentSize,
-			string setting) = 0;
+			vector<struct BlockData> &blockData, block_list_t &symbolList,
+			uint32_t segmentSize, string setting) = 0;
 
 	/**
 	 * Round up a number to the nearest multiple
