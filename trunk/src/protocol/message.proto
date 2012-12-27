@@ -288,6 +288,11 @@ message PutBlockInitRequestPro {
 	optional fixed32 chunkCount = 4;
 }
 
+message RecoveryBlockDataPro {
+	optional fixed64 segmentId = 1;
+	optional fixed32 blockId = 2;
+}
+
 message BlockDataPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
