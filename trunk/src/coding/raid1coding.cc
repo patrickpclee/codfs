@@ -94,15 +94,15 @@ block_list_t Raid1Coding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 }
 
 vector<BlockData> Raid1Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
-		vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
-		block_list_t &symbolList, uint32_t segmentSize, string setting) {
+		vector<BlockData> &blockData, block_list_t &symbolList,
+		uint32_t segmentSize, string setting) {
 
 	// for raid1, only use first required block to decode
 	vector<BlockData> repairedBlockDataList;
 	repairedBlockDataList.reserve(repairBlockIdList.size());
 
 	for (uint32_t blockId : repairBlockIdList) {
-		BlockData srcBlock = blockData[blockIdList[0]];
+		BlockData srcBlock = blockData[symbolList[0].first];
 		BlockData repairedBlock;
 
 		uint32_t blockSize = srcBlock.info.blockSize;

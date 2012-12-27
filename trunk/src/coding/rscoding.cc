@@ -227,10 +227,11 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		}
 	}
 
-	uint32_t blockSize = roundTo (segmentSize, noOfDataStripes) / noOfDataStripes;
+	uint32_t blockSize = roundTo(segmentSize, noOfDataStripes)
+			/ noOfDataStripes;
 	block_list_t requiredBlockSymbols;
 	for (uint32_t i : requiredBlocks) {
-		offset_length_t symbol = make_pair (0, blockSize);
+		offset_length_t symbol = make_pair(0, blockSize);
 		vector<offset_length_t> symbolList = { symbol };
 		symbol_list_t blockSymbols = make_pair(i, symbolList);
 		requiredBlockSymbols.push_back(blockSymbols);
@@ -247,8 +248,8 @@ block_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 }
 
 vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
-		vector<BlockData> &blockData, vector<uint32_t> &blockIdList,
-		block_list_t &symbolList, uint32_t segmentSize, string setting) {
+		vector<BlockData> &blockData, block_list_t &symbolList,
+		uint32_t segmentSize, string setting) {
 
 	return {};
 }

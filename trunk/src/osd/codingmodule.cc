@@ -71,11 +71,10 @@ block_list_t CodingModule::getRepairBlockSymbols(CodingScheme codingScheme,
 
 vector<BlockData> CodingModule::repairBlocks(CodingScheme codingScheme,
 		vector<uint32_t> repairBlockIdList, vector<BlockData> &blockData,
-		vector<uint32_t> &blockIdList, block_list_t &symbolList,
-		uint32_t segmentSize, string setting) {
+		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	return getCoding(codingScheme)->repairBlocks(repairBlockIdList, blockData,
-			blockIdList, symbolList, segmentSize, setting);
+			symbolList, segmentSize, setting);
 
 }
 

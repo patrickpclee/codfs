@@ -614,13 +614,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, vector<uint32_t> repairBlockList,
 		vector<uint32_t> repairBlockOsdList) {
 
-	// execute download procedure to retrieve segment
-	// when an OSD fails, degraded read is executed automatically for download
-	SegmentData segmentData = getSegmentRequestProcessor(requestId, sockfd,
-			segmentId, true);
-
 	// get coding information from MDS
-	// TODO: since it is hard to reuse that in getSegmentRequestProcessor, do this for now
 	SegmentTransferOsdInfo segmentInfo =
 			_osdCommunicator->getSegmentInfoRequest(segmentId);
 
@@ -628,39 +622,51 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	const string codingSetting = segmentInfo._codingSetting;
 	const uint32_t segmentSize = segmentInfo._size;
 
-	debug("Coding Scheme = %d setting = %s\n",
+	debug("[RECOVERY] Coding Scheme = %d setting = %s\n",
 			(int) codingScheme, codingSetting.c_str());
 
-	// perform encode
-	vector<struct BlockData> blockDataList =
-			_codingModule->encodeSegmentToBlock(codingScheme, segmentId,
-					segmentData.buf, segmentSize, codingSetting);
+	// get block status
+	vector<bool> blockStatus = _osdCommunicator->getOsdStatusRequest(
+			segmentInfo._osdList);
 
-	// send encoded blocks to new OSD
-	for (int i = 0; i < (int) repairBlockList.size(); i++) {
+	// obtain required blockSymbols for repair
+	block_list_t blockSymbols = _codingModule->getRepairBlockSymbols(
+			codingScheme, repairBlockList, blockStatus, segmentSize,
+			codingSetting);
+
+	// obtain blocks from other OSD
+	vector<BlockData> repairBlockData;
+	for (auto block : blockSymbols) {
+		uint32_t blockId = block.first;
+		vector<offset_length_t> offsetLength = block.second;
+
+		//TODO: use threads to obtain all blockSymbols
+		//BlockData = getBlock();
+	}
+
+	// perform repair
+	vector<BlockData> repairedBlocks = _codingModule->repairBlocks(codingScheme,
+			repairBlockList, repairBlockData, blockSymbols, segmentSize,
+			codingSetting);
+
+	// send repaired blocks to new OSD
+	uint32_t i = 0;
+	for (auto repairedBlock : repairedBlocks) {
+
 		// find sockfd of the new OSD
 		uint32_t sockfd = _osdCommunicator->getSockfdFromId(
 				repairBlockOsdList[i]);
-		uint32_t blockId = repairBlockList[i];
-		_osdCommunicator->sendBlock(sockfd, blockDataList[blockId]);
+
+		_osdCommunicator->sendBlock(sockfd, repairedBlock);
+
+		MemoryPool::getInstance().poolFree(repairedBlock.buf);
+		i++;
 	}
 
 	// TODO: repairBlockOsd fails at this point?
 	// send success message to MDS
 	_osdCommunicator->repairBlockAck(segmentId, repairBlockList,
 			repairBlockOsdList);
-
-	// cleanup
-	{
-		lock_guard<mutex> lk(segmentRequestCountMutex);
-		_segmentRequestCount.decrement(segmentId);
-		if (_segmentRequestCount.get(segmentId) == 0) {
-			_segmentRequestCount.erase(segmentId);
-
-			cacheSegment(segmentId, segmentData);
-			freeSegment(segmentId, segmentData);
-		}
-	}
 }
 
 void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {
