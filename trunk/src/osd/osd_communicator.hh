@@ -101,6 +101,9 @@ public:
 	void getBlockRequest(uint32_t osdId, uint64_t segmentId,
 			uint32_t blockId, vector<offset_length_t> symbols);
 
+	BlockData getRecoveryBlock(uint32_t osdId, uint64_t segmentId,
+			uint32_t blockId, vector<offset_length_t> symbols);
+
 	/**
 	 * Send a request to get the secondary OSD list of an segment from MDS/Monitor
 	 * @param segmentId Segment ID for query
