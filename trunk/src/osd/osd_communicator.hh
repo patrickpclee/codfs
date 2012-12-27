@@ -90,6 +90,7 @@ public:
 	 */
 
 	uint32_t sendBlock(uint32_t sockfd, struct BlockData blockData);
+	uint32_t sendRecoveryBlock(uint32_t requestId, uint32_t sockfd, struct BlockData blockData);
 
 	/**
 	 * Send a request to get a block to other OSD

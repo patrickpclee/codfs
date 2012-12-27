@@ -37,6 +37,7 @@
 #include "transfer/blockdatamsg.hh"
 #include "transfer/getblockinitrequest.hh"
 #include "transfer/getsegmentrequest.hh"
+#include "transfer/recoveryblockdatamsg.hh"
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
 #include "status/osdstartupmsg.hh"
@@ -175,6 +176,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_BLOCK_INIT_REQUEST):
 		return new GetBlockInitRequestMsg(communicator);
+		break;
+	case (RECOVERY_BLOCK_DATA):
+		return new RecoveryBlockDataMsg(communicator);
 		break;
 
 	//STATUS

@@ -2,6 +2,7 @@
 #define __GETBLOCKINITREQUEST_HH__
 
 #include "../message.hh"
+#include "../../common/blockdata.hh"
 
 using namespace std;
 
@@ -11,7 +12,8 @@ public:
 	GetBlockInitRequestMsg(Communicator* communicator);
 
 	GetBlockInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols);
+			uint64_t segmentId, uint32_t blockId,
+			vector<offset_length_t> symbols, bool isRecovery = false);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -43,16 +45,20 @@ public:
 	void printProtocol();
 
 	/*
-	void setBlockSize(uint32_t blockSize);
-	uint32_t getBlockSize();
-	void setChunkCount(uint32_t chunkCount);
-	uint32_t getChunkCount();
-	*/
+	 void setBlockSize(uint32_t blockSize);
+	 uint32_t getBlockSize();
+	 void setChunkCount(uint32_t chunkCount);
+	 uint32_t getChunkCount();
+	 */
+
+	void setRecoveryBlockData(BlockData blockData);
+	BlockData getRecoveryBlockData ();
 
 private:
 	uint64_t _segmentId;
 	uint32_t _blockId;
-	vector <offset_length_t> _symbols;
+	vector<offset_length_t> _symbols;bool _isRecovery;
+	BlockData _recoveryBlockData;
 };
 
 #endif

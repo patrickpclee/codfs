@@ -291,6 +291,7 @@ message PutBlockInitRequestPro {
 message RecoveryBlockDataPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
+	optional fixed32 length = 4;
 }
 
 message BlockDataPro {
@@ -319,6 +320,7 @@ message GetBlockInitRequestPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
 	repeated OffsetLengthPro offsetLength = 3;
+	optional bool isRecovery = 4;
 }
 
 message GetBlockInitReplyPro {

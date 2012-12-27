@@ -15,13 +15,14 @@ GetBlockInitRequestMsg::GetBlockInitRequestMsg(Communicator* communicator) :
 
 GetBlockInitRequestMsg::GetBlockInitRequestMsg(Communicator* communicator,
 		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId,
-		vector<offset_length_t> symbols) :
+		vector<offset_length_t> symbols, bool isRecovery) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
 	_segmentId = segmentId;
 	_blockId = blockId;
 	_symbols = symbols;
+	_isRecovery = isRecovery;
 
 }
 
@@ -30,6 +31,7 @@ void GetBlockInitRequestMsg::prepareProtocolMsg() {
 	ncvfs::GetBlockInitRequestPro getBlockInitRequestPro;
 	getBlockInitRequestPro.set_segmentid(_segmentId);
 	getBlockInitRequestPro.set_blockid(_blockId);
+	getBlockInitRequestPro.set_isrecovery(_isRecovery);
 
 	vector<offset_length_t>::iterator it;
 
@@ -61,6 +63,7 @@ void GetBlockInitRequestMsg::parse(char* buf) {
 
 	_segmentId = getBlockInitRequestPro.segmentid();
 	_blockId = getBlockInitRequestPro.blockid();
+	_isRecovery = getBlockInitRequestPro.isrecovery();
 
 	for (int i = 0; i < getBlockInitRequestPro.offsetlength_size(); ++i) {
 		offset_length_t tempOffsetLength;
@@ -75,7 +78,11 @@ void GetBlockInitRequestMsg::parse(char* buf) {
 
 void GetBlockInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->getBlockRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols);
+	if (_isRecovery) {
+		osd->getRecoveryBlockProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols);
+	} else {
+		osd->getBlockRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols);
+	}
 #endif
 }
 
@@ -83,6 +90,14 @@ void GetBlockInitRequestMsg::printProtocol() {
 	debug(
 			"[GET_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 "\n",
 			_segmentId, _blockId);
+}
+
+void GetBlockInitRequestMsg::setRecoveryBlockData (BlockData blockData) {
+	_recoveryBlockData = blockData;
+}
+
+BlockData GetBlockInitRequestMsg::getRecoveryBlockData () {
+	return _recoveryBlockData;
 }
 
 /*
