@@ -96,11 +96,15 @@ public:
 	 */
 
 	void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols);
+			uint64_t segmentId, uint32_t blockId,
+			vector<offset_length_t> symbols);
 
 	void getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId,
 			vector<offset_length_t> symbols);
+
+	void recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf);
 
 	/**
 	 * Action when a put segment request is received
@@ -161,7 +165,8 @@ public:
 	 * @param	blockData		Data Block
 	 * @param	blockLocation Location of Block
 	 */
-	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData, const struct BlockLocation& blockLocation);
+	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
+			const struct BlockLocation& blockLocation);
 
 	void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t length,
@@ -222,9 +227,8 @@ public:
 	 * @param osdIp the ip addr of the newly startup osd
 	 * @param osdPort the port of the newly startup osd
 	 */
-	void NewOsdRegisterProcessor(uint32_t requestId, uint32_t sockfd, 
-		uint32_t osdId, uint32_t osdIp, uint32_t osdPort);
-
+	void NewOsdRegisterProcessor(uint32_t requestId, uint32_t sockfd,
+			uint32_t osdId, uint32_t osdIp, uint32_t osdPort);
 
 	/**
 	 * Action when a monitor flush the online list to a osd 
@@ -233,7 +237,7 @@ public:
 	 * @param onlineOsdList list reference contains all the online osd with its<ip, port, id>
 	 */
 	void OnlineOsdListProcessor(uint32_t requestId, uint32_t sockfd,
-		vector<struct OnlineOsd>& onlineOsdList);
+			vector<struct OnlineOsd>& onlineOsdList);
 
 	// getters
 
@@ -285,7 +289,7 @@ public:
 	 * @return is block requested
 	 */
 
-	bool isBlockRequested (uint64_t segmentId, uint32_t blockId);
+	bool isBlockRequested(uint64_t segmentId, uint32_t blockId);
 
 private:
 
@@ -295,7 +299,6 @@ private:
 	 */
 
 //	void setOsdListStatus (vector<bool> &secondaryOsdStatus);
-
 	/**
 	 * Retrieve a block from the storage
 	 * @param segmentId ID of the segment that the block is belonged to
@@ -303,8 +306,7 @@ private:
 	 * @return BlockData structure
 	 */
 
-	struct BlockData getBlockFromStroage(uint64_t segmentId,
-			uint32_t blockId);
+	struct BlockData getBlockFromStroage(uint64_t segmentId, uint32_t blockId);
 
 	/**
 	 * Save a block to storage
@@ -328,7 +330,7 @@ private:
 	 * @param segmentData Segment Data structure
 	 */
 
-	void cacheSegment (uint64_t segmentId, SegmentData segmentData);
+	void cacheSegment(uint64_t segmentId, SegmentData segmentData);
 
 	/**
 	 * Free segmentData
@@ -371,8 +373,8 @@ private:
 
 	// download
 	/*
-	ConcurrentMap<uint64_t, vector<bool>> _requestedBlocks;
-	*/
+	 ConcurrentMap<uint64_t, vector<bool>> _requestedBlocks;
+	 */
 
 	ConcurrentMap<uint64_t, vector<struct BlockData>> _receivedBlockData;
 	ConcurrentMap<uint64_t, uint32_t> _downloadBlockRemaining;

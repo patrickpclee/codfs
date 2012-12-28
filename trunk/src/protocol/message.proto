@@ -314,6 +314,7 @@ message PutBlockInitReplyPro {
 message BlockTransferEndReplyPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
+	optional bool isRecovery = 3;
 }
 
 message GetBlockInitRequestPro {

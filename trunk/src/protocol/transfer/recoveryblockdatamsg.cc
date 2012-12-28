@@ -2,7 +2,6 @@
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
-#include "getblockinitrequest.hh"
 
 #ifdef COMPILE_FOR_OSD
 #include "../../osd/osd.hh"
@@ -14,9 +13,9 @@ RecoveryBlockDataMsg::RecoveryBlockDataMsg(Communicator* communicator) :
 
 }
 
-RecoveryBlockDataMsg::RecoveryBlockDataMsg(Communicator* communicator,uint32_t requestId,
-		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId,
-		uint32_t length) :
+RecoveryBlockDataMsg::RecoveryBlockDataMsg(Communicator* communicator,
+		uint32_t requestId, uint32_t osdSockfd, uint64_t segmentId,
+		uint32_t blockId, uint32_t length) :
 		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
@@ -62,18 +61,7 @@ void RecoveryBlockDataMsg::parse(char* buf) {
 
 void RecoveryBlockDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	BlockData blockData;
-	blockData.info.segmentId = _segmentId;
-	blockData.info.blockSize = _length;
-	blockData.info.blockId = _blockId;
-	blockData.buf = MemoryPool::getInstance().poolMalloc(_length);
-
-	memcpy(blockData.buf, _payload, _length);
-	GetBlockInitRequestMsg* getBlockInitRequestMsg =
-			(GetBlockInitRequestMsg*) _communicator->popWaitReplyMessage(
-					_msgHeader.requestId);
-	getBlockInitRequestMsg->setRecoveryBlockData(blockData);
-	getBlockInitRequestMsg->setStatus(READY);
+	osd->recoveryBlockDataProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _length, _payload);
 #endif
 }
 

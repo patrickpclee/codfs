@@ -16,6 +16,7 @@
 #include "../protocol/status/osdshutdownmsg.hh"
 #include "../protocol/status/osdstatupdatereplymsg.hh"
 #include "../protocol/status/newosdregistermsg.hh"
+#include "../protocol/transfer/getblockinitrequest.hh"
 
 // for random srand() time() rand() getloadavg()
 #include <stdlib.h>
@@ -330,8 +331,38 @@ void Osd::getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
 	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
 			symbols);
+
+	unsigned char checksum[MD5_DIGEST_LENGTH];
+	MD5((unsigned char*) blockData.buf, symbols[0].second, checksum);
+	debug_yellow(
+			"[RECOVERY readBlock]MD5 of Block %" PRIu32 "(Offset = %" PRIu32 " Length = %" PRIu32 " Bytes) : %s\n",
+			blockId, symbols[0].first, symbols[0].second, md5ToHex(checksum).c_str());
+
 	_osdCommunicator->sendRecoveryBlock(requestId, sockfd, blockData);
 	MemoryPool::getInstance().poolFree(blockData.buf);
+}
+
+void Osd::recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t segmentId,
+		uint32_t blockId, uint32_t length, char* buf) {
+
+	// copy data
+	BlockData blockData;
+	blockData.info.segmentId = segmentId;
+	blockData.info.blockSize = length;
+	blockData.info.blockId = blockId;
+	blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+	memcpy(blockData.buf, buf, length);
+
+	// attach data to request
+	GetBlockInitRequestMsg* getBlockInitRequestMsg =
+			(GetBlockInitRequestMsg*) _osdCommunicator->popWaitReplyMessage(
+					requestId);
+	getBlockInitRequestMsg->setRecoveryBlockData(blockData);
+	getBlockInitRequestMsg->setStatus(READY);
+
+	// send reply
+	_osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId, blockId);
+
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
@@ -371,6 +402,13 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 	} else {
 		uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 				blockLocation.osdId);
+
+		unsigned char checksum[MD5_DIGEST_LENGTH];
+		MD5((unsigned char*) blockData.buf, blockData.info.blockSize, checksum);
+		debug_yellow(
+				"[distributeBlock]MD5 of Segment %" PRIu64 " Block %" PRIu32 ": %s\n",
+				blockData.info.segmentId, blockData.info.blockId, md5ToHex(checksum).c_str());
+
 		_osdCommunicator->sendBlock(dstSockfd, blockData);
 	}
 
@@ -657,8 +695,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (osdId == _osdId) {
 			// read block from disk
-			repairBlockData[blockId] = _storageModule->readBlock(segmentId, blockId,
-					offsetLength);
+			repairBlockData[blockId] = _storageModule->readBlock(segmentId,
+					blockId, offsetLength);
 		} else {
 			// TODO: use threads
 			repairBlockData[blockId] = _osdCommunicator->getRecoveryBlock(osdId,
@@ -666,6 +704,13 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
 					blockId);
 		}
+
+		unsigned char checksum[MD5_DIGEST_LENGTH];
+		MD5((unsigned char*) repairBlockData[blockId].buf,
+				offsetLength[0].second, checksum);
+		debug_yellow(
+				"[GET]MD5 of Block %" PRIu32 "(Offset = %" PRIu32 " Length = %" PRIu32 " Bytes) : %s\n",
+				blockId, offsetLength[0].first, offsetLength[0].second, md5ToHex(checksum).c_str());
 
 	}
 
@@ -681,19 +726,30 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			"[RECOVERY] Distributing repaired blocks for segment %" PRIu64 "\n",
 			segmentId);
 
-	// send repaired blocks to new OSD
 	uint32_t j = 0;
 	for (auto repairedBlock : repairedBlocks) {
-
-		// find sockfd of the new OSD
-		uint32_t sockfd = _osdCommunicator->getSockfdFromId(
-				repairBlockOsdList[j]);
-
-		_osdCommunicator->sendBlock(sockfd, repairedBlock);
-
-		MemoryPool::getInstance().poolFree(repairedBlock.buf);
+		BlockLocation blockLocation;
+		blockLocation.blockId = repairedBlock.info.blockId;
+		blockLocation.osdId = repairBlockOsdList[j];
+		distributeBlock(segmentId, repairedBlock, blockLocation);
 		j++;
 	}
+
+	/*
+	 // send repaired blocks to new OSD
+	 uint32_t j = 0;
+	 for (auto repairedBlock : repairedBlocks) {
+
+	 // find sockfd of the new OSD
+	 uint32_t sockfd = _osdCommunicator->getSockfdFromId(
+	 repairBlockOsdList[j]);
+
+	 _osdCommunicator->sendBlock(sockfd, repairedBlock);
+
+	 MemoryPool::getInstance().poolFree(repairedBlock.buf);
+	 j++;
+	 }
+	 */
 
 	// TODO: repairBlockOsd fails at this point?
 	// send success message to MDS
