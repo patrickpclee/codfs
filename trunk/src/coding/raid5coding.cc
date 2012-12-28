@@ -196,21 +196,21 @@ block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 
 	// for raid 5, only requires n-1 stripes (raid5_n - 1) to decode
 	const uint32_t raid5_n = getParameters(setting);
-	const uint32_t noOfDataBlock = raid5_n - 1;
+	const uint32_t dataBlockCount = raid5_n - 1;
 	block_list_t requiredBlockSymbols;
-	requiredBlockSymbols.reserve(noOfDataBlock);
+	requiredBlockSymbols.reserve(dataBlockCount);
 
 	// no OSD failure / parity OSD failure
 	uint32_t blockRange = 0;
 
 	if (failedOsdCount == 0
 			|| (failedOsdCount == 1 && blockStatus.back() == false)) {
-		blockRange = noOfDataBlock; // select first n-1 blocks
+		blockRange = dataBlockCount; // select first n-1 blocks
 	} else {
 		blockRange = raid5_n;
 	}
 
-	uint32_t blockSize = roundTo(segmentSize, raid5_n) / raid5_n;
+	uint32_t blockSize = roundTo(segmentSize, dataBlockCount) / dataBlockCount;
 
 	for (uint32_t i = 0; i < blockRange; i++) {
 		// select only available blocks
@@ -275,20 +275,27 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		uint32_t blockId = block.first;
 		if (i == 0) {
 			// memcpy first block
+			debug_yellow ("Memcpy block %" PRIu32 "\n", blockId);
 			memcpy(rebuildBlockData.buf, blockData[blockId].buf, blockSize);
 		} else {
 			// XOR second block onwards
+			debug_yellow ("XOR block %" PRIu32 "\n", blockId);
 			Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
 					blockData[blockId].buf, blockSize);
 		}
 
 		unsigned char checksum[MD5_DIGEST_LENGTH];
 		MD5((unsigned char*) blockData[blockId].buf, blockSize, checksum);
+		debug_yellow("BLOCK SIZE = %" PRIu32 "\n", blockSize);
 		debug_yellow("MD5 of Block %" PRIu32 ": %s\n",
 				blockId, md5ToHex(checksum).c_str());
 
 		i++;
 	}
+
+	unsigned char checksum[MD5_DIGEST_LENGTH];
+	MD5((unsigned char*) rebuildBlockData.buf, blockSize, checksum);
+	debug_yellow("MD5 of Repaired Block: %s\n", md5ToHex(checksum).c_str());
 
 	rebuildBlockData.info.blockId = repairBlockIdList[0];
 	rebuildBlockData.info.segmentId =

@@ -161,7 +161,12 @@ uint32_t OsdCommunicator::sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
 	recoveryBlockDataMsg->prepareProtocolMsg();
 	recoveryBlockDataMsg->preparePayload(buf, length);
 
-	addMessage(recoveryBlockDataMsg, false);
+	addMessage(recoveryBlockDataMsg, true);
+	MessageStatus status = recoveryBlockDataMsg->waitForStatusChange();
+
+	if (status == READY) {
+		return 0;
+	}
 
 	return 0;
 }
@@ -194,6 +199,9 @@ BlockData OsdCommunicator::getRecoveryBlock(uint32_t osdId, uint64_t segmentId,
 		return getRecoveryBlockRequestMsg->getRecoveryBlockData();
 	}
 
+	debug_error(
+			"ERROR: getRecoveryBlockData segmentId = %" PRIu64 " blockId = %" PRIu32 "\n",
+			segmentId, blockId);
 	return {};
 
 }

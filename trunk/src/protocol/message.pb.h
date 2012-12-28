@@ -4488,20 +4488,30 @@ class BlockTransferEndReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 blockid() const;
   inline void set_blockid(::google::protobuf::uint32 value);
   
+  // optional bool isRecovery = 3;
+  inline bool has_isrecovery() const;
+  inline void clear_isrecovery();
+  static const int kIsRecoveryFieldNumber = 3;
+  inline bool isrecovery() const;
+  inline void set_isrecovery(bool value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.BlockTransferEndReplyPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
   inline void set_has_blockid();
   inline void clear_has_blockid();
+  inline void set_has_isrecovery();
+  inline void clear_has_isrecovery();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::uint32 blockid_;
+  bool isrecovery_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -9350,6 +9360,28 @@ inline ::google::protobuf::uint32 BlockTransferEndReplyPro::blockid() const {
 inline void BlockTransferEndReplyPro::set_blockid(::google::protobuf::uint32 value) {
   set_has_blockid();
   blockid_ = value;
+}
+
+// optional bool isRecovery = 3;
+inline bool BlockTransferEndReplyPro::has_isrecovery() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void BlockTransferEndReplyPro::set_has_isrecovery() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void BlockTransferEndReplyPro::clear_has_isrecovery() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void BlockTransferEndReplyPro::clear_isrecovery() {
+  isrecovery_ = false;
+  clear_has_isrecovery();
+}
+inline bool BlockTransferEndReplyPro::isrecovery() const {
+  return isrecovery_;
+}
+inline void BlockTransferEndReplyPro::set_isrecovery(bool value) {
+  set_has_isrecovery();
+  isrecovery_ = value;
 }
 
 // -------------------------------------------------------------------

@@ -79,8 +79,10 @@ void GetBlockInitRequestMsg::parse(char* buf) {
 void GetBlockInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	if (_isRecovery) {
+		debug ("IS RECOVERY for segment %" PRIu64 " Block %" PRIu32 "\n", _segmentId, _blockId);
 		osd->getRecoveryBlockProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols);
 	} else {
+		debug ("NOT RECOVERY for segment %" PRIu64 " Block %" PRIu32 "\n", _segmentId, _blockId);
 		osd->getBlockRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols);
 	}
 #endif

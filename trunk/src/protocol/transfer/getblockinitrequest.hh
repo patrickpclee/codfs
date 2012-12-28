@@ -52,12 +52,13 @@ public:
 	 */
 
 	void setRecoveryBlockData(BlockData blockData);
-	BlockData getRecoveryBlockData ();
+	BlockData getRecoveryBlockData();
 
 private:
 	uint64_t _segmentId;
 	uint32_t _blockId;
-	vector<offset_length_t> _symbols;bool _isRecovery;
+	vector<offset_length_t> _symbols;
+	bool _isRecovery;
 	BlockData _recoveryBlockData;
 };
 
