@@ -332,12 +332,6 @@ void Osd::getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
 			symbols);
 
-	unsigned char checksum[MD5_DIGEST_LENGTH];
-	MD5((unsigned char*) blockData.buf, symbols[0].second, checksum);
-	debug_yellow(
-			"[RECOVERY readBlock]MD5 of Block %" PRIu32 "(Offset = %" PRIu32 " Length = %" PRIu32 " Bytes) : %s\n",
-			blockId, symbols[0].first, symbols[0].second, md5ToHex(checksum).c_str());
-
 	_osdCommunicator->sendRecoveryBlock(requestId, sockfd, blockData);
 	MemoryPool::getInstance().poolFree(blockData.buf);
 }
@@ -402,13 +396,6 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 	} else {
 		uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 				blockLocation.osdId);
-
-		unsigned char checksum[MD5_DIGEST_LENGTH];
-		MD5((unsigned char*) blockData.buf, blockData.info.blockSize, checksum);
-		debug_yellow(
-				"[distributeBlock]MD5 of Segment %" PRIu64 " Block %" PRIu32 ": %s\n",
-				blockData.info.segmentId, blockData.info.blockId, md5ToHex(checksum).c_str());
-
 		_osdCommunicator->sendBlock(dstSockfd, blockData);
 	}
 
@@ -704,14 +691,6 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
 					blockId);
 		}
-
-		unsigned char checksum[MD5_DIGEST_LENGTH];
-		MD5((unsigned char*) repairBlockData[blockId].buf,
-				offsetLength[0].second, checksum);
-		debug_yellow(
-				"[GET]MD5 of Block %" PRIu32 "(Offset = %" PRIu32 " Length = %" PRIu32 " Bytes) : %s\n",
-				blockId, offsetLength[0].first, offsetLength[0].second, md5ToHex(checksum).c_str());
-
 	}
 
 	debug_cyan("[RECOVERY] Performing Repair for Segment %" PRIu64 "\n",
@@ -734,22 +713,6 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 		distributeBlock(segmentId, repairedBlock, blockLocation);
 		j++;
 	}
-
-	/*
-	 // send repaired blocks to new OSD
-	 uint32_t j = 0;
-	 for (auto repairedBlock : repairedBlocks) {
-
-	 // find sockfd of the new OSD
-	 uint32_t sockfd = _osdCommunicator->getSockfdFromId(
-	 repairBlockOsdList[j]);
-
-	 _osdCommunicator->sendBlock(sockfd, repairedBlock);
-
-	 MemoryPool::getInstance().poolFree(repairedBlock.buf);
-	 j++;
-	 }
-	 */
 
 	// TODO: repairBlockOsd fails at this point?
 	// send success message to MDS
