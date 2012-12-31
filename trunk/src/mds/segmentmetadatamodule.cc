@@ -79,7 +79,7 @@ struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(uint64_t segmentId
  */
 void SegmentMetaDataModule::saveNodeList(uint64_t segmentId,
 		const vector<uint32_t> &segmentNodeList) {
-	debug("Save Node List For %" PRIu64, segmentId);
+	debug("Save Node List For %" PRIu64 "\n", segmentId);
 	vector<uint32_t>::const_iterator it;
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONArrayBuilder arrb;

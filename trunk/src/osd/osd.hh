@@ -170,7 +170,7 @@ public:
 	 * @param	blockLocation Location of Block
 	 */
 	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
-			const struct BlockLocation& blockLocation);
+			const struct BlockLocation& blockLocation, uint32_t blocktpRequestId = 0);
 
 	void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t length,
@@ -376,9 +376,7 @@ private:
 	ConcurrentMap<uint64_t, string> _checksumMap;
 
 	// download
-	/*
-	 ConcurrentMap<uint64_t, vector<bool>> _requestedBlocks;
-	 */
+	ConcurrentMap<uint32_t, uint32_t> _blocktpRequestCount;
 
 	ConcurrentMap<uint64_t, vector<struct BlockData>> _receivedBlockData;
 	ConcurrentMap<uint64_t, uint32_t> _downloadBlockRemaining;
@@ -388,7 +386,7 @@ private:
 	ConcurrentMap<uint64_t, bool> _isSegmentDownloaded;
     
     // recovery
-	ConcurrentMap<uint32_t, uint32_t> _recoveryBlockCount;
+	ConcurrentMap<uint32_t, uint32_t> _recoverytpRequestCount;
 
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingBlockChunk;

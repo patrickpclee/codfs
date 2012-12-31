@@ -357,7 +357,7 @@ void Osd::retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId,
 				blockId);
 	}
 
-	_recoveryBlockCount.decrement(requestId);
+	_recoverytpRequestCount.decrement(requestId);
 }
 
 void Osd::recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
@@ -413,7 +413,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
-		const struct BlockLocation& blockLocation) {
+		const struct BlockLocation& blockLocation, uint32_t blocktpRequestId) {
 	debug("Distribute Block %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
 			segmentId, blockData.info.blockId, blockLocation.osdId);
 	// if destination is myself
@@ -431,9 +431,15 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 
 	// free memory
 	MemoryPool::getInstance().poolFree(blockData.buf);
+
+	if (blocktpRequestId != 0) {
+		_blocktpRequestCount.decrement(blocktpRequestId);
+	}
+
 	debug(
 			"Completed Distributing Block %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
 			segmentId, blockData.info.blockId, blockLocation.osdId);
+
 }
 
 void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
@@ -486,35 +492,17 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			vector<uint32_t> nodeList;
 			uint32_t i = 0;
-			//blockLocationList[0].osdId = _osdId;
+
+			_blocktpRequestCount.set(requestId, blockDataList.size());
+
 			for (const auto blockData : blockDataList) {
 
-				/*
-				 // if destination is myself
-				 if (blockLocationList[i].osdId == _osdId) {
-				 _storageModule->createBlock(segmentId,
-				 blockData.info.blockId,
-				 blockData.info.blockSize);
-				 _storageModule->writeBlock(segmentId,
-				 blockData.info.blockId, blockData.buf, 0,
-				 blockData.info.blockSize);
-				 _storageModule->flushBlock(segmentId,
-				 blockData.info.blockId);
-				 } else {
-				 uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
-				 blockLocationList[i].osdId);
-				 _osdCommunicator->sendBlock(dstSockfd, blockData);
-				 }
-
-				 // free memory
-				 MemoryPool::getInstance().poolFree(blockData.buf);
-				 */
 #ifdef PARALLEL_TRANSFER
 				debug("Thread Pool Status %d/%d/%d\n",
 						(int)_blocktp.active(), (int)_blocktp.pending(), (int)_blocktp.size());
 				_blocktp.schedule(
 						boost::bind(&Osd::distributeBlock, this, segmentId,
-								blockData, blockLocationList[i]));
+								blockData, blockLocationList[i], requestId));
 #else
 				distributeBlock(segmentId, blockData,blockLocationList[i]);
 #endif
@@ -524,8 +512,12 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 				i++;
 			}
 #ifdef PARALLEL_TRANSFER
-			_blocktp.wait();
+			// block until all blocks retrieved
+			while (_blocktpRequestCount.get(requestId) > 0) {
+				usleep(10000);
+			}
 #endif
+			_blocktpRequestCount.erase(requestId);
 			_pendingSegmentChunk.erase(segmentId);
 
 			// Acknowledge MDS for Segment Upload Completed
@@ -704,7 +696,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			_codingModule->getNumberOfBlocks(codingScheme, codingSetting));
 
 	// initialize map for tracking recovery
-	_recoveryBlockCount.set(requestId, blockSymbols.size());
+	_recoverytpRequestCount.set(requestId, blockSymbols.size());
 
 	for (auto block : blockSymbols) {
 
@@ -725,10 +717,10 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	// block until all recovery blocks retrieved
-	while (_recoveryBlockCount.get(requestId) > 0) {
+	while (_recoverytpRequestCount.get(requestId) > 0) {
 		usleep(10000);
 	}
-	_recoveryBlockCount.erase(requestId);
+	_recoverytpRequestCount.erase(requestId);
 
 	debug_cyan("[RECOVERY] Performing Repair for Segment %" PRIu64 "\n",
 			segmentId);
