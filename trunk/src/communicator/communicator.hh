@@ -65,9 +65,10 @@ public:
 	 * Set a unique request ID if request ID = 0
 	 * @param message Message to send
 	 * @param expectReply Whether or not this message should wait for a reply
+     * @param waitOnRequestId Specify a requestId to wait on
 	 */
 
-	void addMessage(Message* message, bool expectReply = false);
+	void addMessage(Message* message, bool expectReply = false, uint32_t waitOnRequestId = 0);
 
 #ifdef USE_MULTIPLE_QUEUE
 	void sendMessage(uint32_t fd);
@@ -135,7 +136,9 @@ public:
 	 * @return Generated requestID
 	 */
 
-	uint32_t generateRequestId();
+    inline uint32_t generateRequestId() {
+        return ++_requestId;
+    }
 
 	/**
 	 * Retrieve the pointer to a sent message by its requestId

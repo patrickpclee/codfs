@@ -81,10 +81,17 @@ void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
 }
 
 void OsdCommunicator::replyPutBlockEnd(uint32_t requestId,
-		uint32_t connectionId, uint64_t segmentId, uint32_t blockId) {
+		uint32_t connectionId, uint64_t segmentId, uint32_t blockId, uint32_t waitOnRequestId) {
+
+    uint32_t msgRequestId = 0;
+    if (waitOnRequestId == 0) {
+        msgRequestId = requestId;
+    } else {
+        msgRequestId = waitOnRequestId;
+    }
 
 	BlockTransferEndReplyMsg* blockTransferEndReplyMsg =
-			new BlockTransferEndReplyMsg(this, requestId, connectionId,
+			new BlockTransferEndReplyMsg(this, msgRequestId, connectionId,
 					segmentId, blockId);
 	blockTransferEndReplyMsg->prepareProtocolMsg();
 
@@ -155,16 +162,19 @@ uint32_t OsdCommunicator::sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
 	uint32_t length = blockData.info.blockSize;
 	char* buf = blockData.buf;
 
+    uint32_t newRequestId = generateRequestId();
+
 	RecoveryBlockDataMsg* recoveryBlockDataMsg = new RecoveryBlockDataMsg(this,
-			requestId, sockfd, segmentId, blockId, length);
+			requestId, sockfd, segmentId, blockId, length, newRequestId);
 
 	recoveryBlockDataMsg->prepareProtocolMsg();
 	recoveryBlockDataMsg->preparePayload(buf, length);
 
-	addMessage(recoveryBlockDataMsg, true);
+	addMessage(recoveryBlockDataMsg, true, newRequestId);
 	MessageStatus status = recoveryBlockDataMsg->waitForStatusChange();
 
 	if (status == READY) {
+        debug ("sendRecoveryBlock wait on %" PRIu32 "READY\n", newRequestId);
 		return 0;
 	}
 

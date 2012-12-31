@@ -4097,6 +4097,13 @@ class RecoveryBlockDataPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 length() const;
   inline void set_length(::google::protobuf::uint32 value);
   
+  // optional fixed32 waitOnRequestId = 5;
+  inline bool has_waitonrequestid() const;
+  inline void clear_waitonrequestid();
+  static const int kWaitOnRequestIdFieldNumber = 5;
+  inline ::google::protobuf::uint32 waitonrequestid() const;
+  inline void set_waitonrequestid(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.RecoveryBlockDataPro)
  private:
   inline void set_has_segmentid();
@@ -4105,15 +4112,18 @@ class RecoveryBlockDataPro : public ::google::protobuf::Message {
   inline void clear_has_blockid();
   inline void set_has_length();
   inline void clear_has_length();
+  inline void set_has_waitonrequestid();
+  inline void clear_has_waitonrequestid();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::uint32 blockid_;
   ::google::protobuf::uint32 length_;
+  ::google::protobuf::uint32 waitonrequestid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -9124,6 +9134,28 @@ inline ::google::protobuf::uint32 RecoveryBlockDataPro::length() const {
 inline void RecoveryBlockDataPro::set_length(::google::protobuf::uint32 value) {
   set_has_length();
   length_ = value;
+}
+
+// optional fixed32 waitOnRequestId = 5;
+inline bool RecoveryBlockDataPro::has_waitonrequestid() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void RecoveryBlockDataPro::set_has_waitonrequestid() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void RecoveryBlockDataPro::clear_has_waitonrequestid() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void RecoveryBlockDataPro::clear_waitonrequestid() {
+  waitonrequestid_ = 0u;
+  clear_has_waitonrequestid();
+}
+inline ::google::protobuf::uint32 RecoveryBlockDataPro::waitonrequestid() const {
+  return waitonrequestid_;
+}
+inline void RecoveryBlockDataPro::set_waitonrequestid(::google::protobuf::uint32 value) {
+  set_has_waitonrequestid();
+  waitonrequestid_ = value;
 }
 
 // -------------------------------------------------------------------

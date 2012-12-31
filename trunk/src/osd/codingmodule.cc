@@ -94,3 +94,7 @@ Coding* CodingModule::getCoding(CodingScheme codingScheme) {
 
 	return _codingWorker[codingScheme];
 }
+
+uint32_t CodingModule::getNumberOfBlocks(CodingScheme codingScheme, string setting) {
+	return getCoding(codingScheme)->getBlockCountFromSetting(setting);
+}

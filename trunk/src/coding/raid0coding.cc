@@ -126,3 +126,7 @@ vector<struct BlockData> Raid0Coding::repairBlocks(
 
 	return {};
 }
+
+uint32_t Raid0Coding::getBlockCountFromSetting (string setting) {
+	return getParameters(setting);
+}

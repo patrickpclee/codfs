@@ -15,7 +15,7 @@ RecoveryBlockDataMsg::RecoveryBlockDataMsg(Communicator* communicator) :
 
 RecoveryBlockDataMsg::RecoveryBlockDataMsg(Communicator* communicator,
 		uint32_t requestId, uint32_t osdSockfd, uint64_t segmentId,
-		uint32_t blockId, uint32_t length) :
+		uint32_t blockId, uint32_t length, uint32_t waitOnRequestId) :
 		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
@@ -23,6 +23,7 @@ RecoveryBlockDataMsg::RecoveryBlockDataMsg(Communicator* communicator,
 	_segmentId = segmentId;
 	_blockId = blockId;
 	_length = length;
+    _waitOnRequestId = waitOnRequestId;
 
 }
 
@@ -33,6 +34,7 @@ void RecoveryBlockDataMsg::prepareProtocolMsg() {
 	recoveryRecoveryBlockDataPro.set_segmentid(_segmentId);
 	recoveryRecoveryBlockDataPro.set_blockid(_blockId);
 	recoveryRecoveryBlockDataPro.set_length(_length);
+    recoveryRecoveryBlockDataPro.set_waitonrequestid(_waitOnRequestId);
 
 	if (!recoveryRecoveryBlockDataPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -56,12 +58,13 @@ void RecoveryBlockDataMsg::parse(char* buf) {
 	_segmentId = recoveryRecoveryBlockDataPro.segmentid();
 	_blockId = recoveryRecoveryBlockDataPro.blockid();
 	_length = recoveryRecoveryBlockDataPro.length();
+    _waitOnRequestId = recoveryRecoveryBlockDataPro.waitonrequestid();
 
 }
 
 void RecoveryBlockDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->recoveryBlockDataProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _length, _payload);
+	osd->recoveryBlockDataProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _length, _payload, _waitOnRequestId);
 #endif
 }
 

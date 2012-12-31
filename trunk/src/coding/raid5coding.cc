@@ -275,11 +275,11 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		uint32_t blockId = block.first;
 		if (i == 0) {
 			// memcpy first block
-			debug_yellow ("Memcpy block %" PRIu32 "\n", blockId);
+//			debug_yellow ("Memcpy block %" PRIu32 " %p\n", blockId, blockData[blockId].buf);
 			memcpy(rebuildBlockData.buf, blockData[blockId].buf, blockSize);
 		} else {
 			// XOR second block onwards
-			debug_yellow ("XOR block %" PRIu32 "\n", blockId);
+//			debug_yellow ("XOR block %" PRIu32 "\n", blockId);
 			Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
 					blockData[blockId].buf, blockSize);
 		}
@@ -300,4 +300,8 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	// for raid5, there can be only one rebuildBlockData
 	return {rebuildBlockData};
+}
+
+uint32_t Raid5Coding::getBlockCountFromSetting (string setting) {
+	return getParameters(setting);
 }

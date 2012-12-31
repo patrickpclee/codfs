@@ -86,6 +86,8 @@ public:
 			vector<struct BlockData> &blockData, block_list_t &symbolList,
 			uint32_t segmentSize, string setting) = 0;
 
+	virtual uint32_t getBlockCountFromSetting (string setting) = 0;
+
 	/**
 	 * Round up a number to the nearest multiple
 	 * @param numToRound Number to round
