@@ -28,6 +28,8 @@ void printUsage() {
 	cout
 			<< "Decode: ./coding_tester decode [SEGMENT_ID] [SEGMENT_SIZE] [DST_SEGMENT_PATH]"
 			<< endl;
+	cout << "Repair: ./coding_tester repair [SEGMENT_ID] [SEGMENT_SIZE]"
+			<< endl;
 }
 
 void printOsdStatus(vector<bool> secondaryOsdStatus) {
@@ -71,7 +73,6 @@ uint32_t readConfig(const char* configFile) {
 		numBlocks = raid1_n;
 		cout << "Coding: RAID 1, n = " << raid1_n << endl;
 
-
 	} else if (selectedCoding == "RAID5") {
 
 		int raid5_n = configLayer->getConfigInt("CodingSetting>RAID5>n");
@@ -86,9 +87,11 @@ uint32_t readConfig(const char* configFile) {
 		int m = configLayer->getConfigInt("CodingSetting>RS>m");
 		int w = configLayer->getConfigInt("CodingSetting>RS>w");
 		coding = new RSCoding();
-		codingSetting = RSCoding::generateSetting((uint32_t)k,(uint32_t)m,(uint32_t)w);
-		numBlocks = k+m;
-		cout << "Coding: Reed Solomon, k = " << k <<" m = " << m << " w = " << w  << endl;
+		codingSetting = RSCoding::generateSetting((uint32_t) k, (uint32_t) m,
+				(uint32_t) w);
+		numBlocks = k + m;
+		cout << "Coding: Reed Solomon, k = " << k << " m = " << m << " w = "
+				<< w << endl;
 	} else {
 
 		cerr << "Wrong Coding Scheme Specified!" << endl;
@@ -125,8 +128,8 @@ int main(int argc, char* argv[]) {
 		const uint64_t segmentId = boost::lexical_cast<uint64_t>(argv[2]);
 		const uint64_t segmentSize = boost::lexical_cast<uint64_t>(argv[3]);
 		const string dstSegmentPath = argv[4];
-		cout << "Decoding Segment ID: " << segmentId << " size = " << segmentSize
-				<< " to " << dstSegmentPath << endl;
+		cout << "Decoding Segment ID: " << segmentId << " size = "
+				<< segmentSize << " to " << dstSegmentPath << endl;
 
 		// OSD status array, true = ONLINE, false = OFFLINE
 		vector<bool> secondaryOsdStatus(numBlocks, true);
@@ -155,7 +158,53 @@ int main(int argc, char* argv[]) {
 
 		printOsdStatus(secondaryOsdStatus);
 
-		doDecode(segmentId, segmentSize, dstSegmentPath, numBlocks, secondaryOsdStatus);
+		doDecode(segmentId, segmentSize, dstSegmentPath, numBlocks,
+				secondaryOsdStatus);
+
+	} else if (string(argv[1]) == "repair") {
+		const uint64_t segmentId = boost::lexical_cast<uint64_t>(argv[2]);
+		const uint64_t segmentSize = boost::lexical_cast<uint64_t>(argv[3]);
+
+		cout << "Decoding Segment ID: " << segmentId << " size = "
+				<< segmentSize << endl;
+
+		// OSD status array, true = ONLINE, false = OFFLINE
+		vector<bool> secondaryOsdStatus(numBlocks, true);
+
+		// get the number of failed OSD from config
+		numFailedOsd = configLayer->getConfigInt("NumFailedOsd");
+		if (numFailedOsd > numBlocks) {
+			cerr << "Number of Failed OSD > Number of Blocks" << endl;
+			exit(0);
+		}
+
+		// Simulate OSD Failure
+		vector<uint32_t> shuffleArray(numBlocks);
+		for (uint32_t i = 0; i < numBlocks; i++) {
+			shuffleArray[i] = i;
+		}
+
+		// randomly set the specified number of OSD to FAIL
+		srand(time(NULL));
+		random_shuffle(shuffleArray.begin(), shuffleArray.end());
+		for (uint32_t i = 0; i < numFailedOsd; i++) {
+			secondaryOsdStatus[shuffleArray[i]] = false;
+		}
+
+		cout << "Randomly failed " << numFailedOsd << " OSDs" << endl;
+
+		printOsdStatus(secondaryOsdStatus);
+
+		vector<string> dstBlockPaths;
+		string repairFolder = string(configLayer->getConfigString("RepairFolder"));
+		cout << "Repair Location: " << repairFolder << endl;
+
+		for (uint32_t i = 0; i < numFailedOsd; i++) {
+			dstBlockPaths.push_back (repairFolder + "/" + to_string(segmentId) + "." + to_string(shuffleArray[i]));
+		}
+
+		doRepair(segmentId, segmentSize, numBlocks, secondaryOsdStatus, dstBlockPaths);
+
 	}
 
 	return 0;

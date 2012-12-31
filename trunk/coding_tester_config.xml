@@ -1,7 +1,8 @@
 <CodingTesterConfig>
 
-	<ObjectFolder>./coding_tester_object</ObjectFolder>
 	<SegmentFolder>./coding_tester_segment</SegmentFolder>
+	<BlockFolder>./coding_tester_block</BlockFolder>
+    <RepairFolder>./coding_tester_repair</RepairFolder>
 
 	<SelectedCodingScheme>RAID5</SelectedCodingScheme>
 
