@@ -747,8 +747,14 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 		BlockLocation blockLocation;
 		blockLocation.blockId = repairedBlock.info.blockId;
 		blockLocation.osdId = repairBlockOsdList[j];
-		distributeBlock(segmentId, repairedBlock, blockLocation);
+		distributeBlock(segmentId, repairedBlock, blockLocation); // free-d here
 		j++;
+	}
+
+	// cleanup
+	for (auto block : blockSymbols) {
+		uint32_t blockId = block.first;
+		MemoryPool::getInstance().poolFree(repairBlockData[blockId].buf);
 	}
 
 	// TODO: repairBlockOsd fails at this point?
