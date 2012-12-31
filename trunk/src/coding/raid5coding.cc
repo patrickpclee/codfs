@@ -155,7 +155,7 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 					rebuildBlockData.info.blockSize = stripeSize;
 				}
 
-				// block does not exist
+				// block at i does not exist
 				blockDataList[i] = rebuildBlockData;
 
 				break; // for raid 5, at most one repair
@@ -164,10 +164,11 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 
 		// free parity block
 		MemoryPool::getInstance().poolFree(
-				blockDataList[symbolList.back().first].buf);
+				blockDataList[parityIndex].buf);
 
-		// replace parity in blockIdList with repaired block and sort
+		// replace parity in symbolList with repaired block and sort
 		symbolList.back().first = repairedBlockIndex;
+        symbolList.back().second = {make_pair(0, rebuildBlockData.info.blockSize)};
 		sort(symbolList.begin(), symbolList.end());
 	}
 
