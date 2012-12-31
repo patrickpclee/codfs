@@ -247,7 +247,7 @@ void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 		i++;
 	}
 
-	// free repairBlockData
+	 //free repairBlockData
 	for (auto block : blockSymbols) {
 		uint32_t blockId = block.first;
 		MemoryPool::getInstance().poolFree(repairBlockData[blockId].buf);
