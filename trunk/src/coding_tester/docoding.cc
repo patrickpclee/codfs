@@ -188,3 +188,78 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 
 }
 
+void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
+		vector<bool> blockStatus, vector<string> dstBlockPaths) {
+
+	// transform blockStatus to repairBlockList
+	vector<uint32_t> repairBlockList;
+	for (uint32_t i = 0; i < blockStatus.size(); i++) {
+		if (blockStatus[i] == false) {
+			repairBlockList.push_back(i);
+		}
+	}
+
+	// obtain required blockSymbols for repair
+	block_list_t blockSymbols = coding->getRepairBlockSymbols(repairBlockList,
+			blockStatus, segmentSize, codingSetting);
+
+	if (blockSymbols.size() == 0) {
+		cerr << "Not enough blocks to reconstruct file" << endl;
+		return;
+	}
+
+	vector<BlockData> repairBlockData(
+			coding->getBlockCountFromSetting(codingSetting));
+
+	for (auto block : blockSymbols) {
+
+		uint32_t blockId = block.first;
+
+		vector<offset_length_t> offsetLength = block.second;
+
+		const string blockPath = blockFolder + "/" + to_string(segmentId) + "."
+				+ to_string(blockId);
+
+		BlockData blockData;
+		uint32_t filesize; // set by reference in readFile
+		blockData.buf = readFile(blockPath, filesize); // read block
+
+		// fill in block information
+		blockData.info.segmentId = segmentId;
+		blockData.info.blockId = blockId;
+		blockData.info.blockSize = filesize;
+
+		cout << blockId << ": " << blockPath << " size = " << filesize << endl;
+
+		repairBlockData[blockId] = blockData;
+
+	}
+
+	// perform repair
+	vector<BlockData> repairedBlocks = coding->repairBlocks(repairBlockList,
+			repairBlockData, blockSymbols, segmentSize, codingSetting);
+
+	// write segment to dstBlockPaths
+	uint32_t i = 0;
+	for (auto repairedblock : repairedBlocks) {
+		writeFile(dstBlockPaths[i], repairedblock.buf,
+				repairedblock.info.blockSize);
+		i++;
+	}
+
+	// free repairBlockData
+	for (auto block : blockSymbols) {
+		uint32_t blockId = block.first;
+		MemoryPool::getInstance().poolFree(repairBlockData[blockId].buf);
+	}
+
+	// free repairedBlocks
+	for (auto block : repairedBlocks) {
+		MemoryPool::getInstance().poolFree(block.buf);
+	}
+
+	cout << "Repaired blocks:" << endl;
+	for (auto path : dstBlockPaths) {
+		cout << path << endl;
+	}
+}
