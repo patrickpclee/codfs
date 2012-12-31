@@ -259,7 +259,7 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	const uint32_t w = params[2];
 	const uint32_t size = roundTo(roundTo(segmentSize, k) / k, 4);
 
-	if (repairBlockIdList.size() < k) {
+	if (repairBlockIdList.size() > m) {
 		cerr << "Not enough blocks for decode " << repairBlockIdList.size()
 				<< endl;
 		exit(-1);
