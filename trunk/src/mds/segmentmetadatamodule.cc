@@ -84,7 +84,7 @@ void SegmentMetaDataModule::saveNodeList(uint64_t segmentId,
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONArrayBuilder arrb;
 	for (it = segmentNodeList.begin(); it < segmentNodeList.end(); ++it) {
-		debug(" - %" PRIu32, *it);
+		debug(" - %" PRIu32 "\n" , *it);
 		arrb.append(*it);
 	}
 	debug("%s", "\n");
