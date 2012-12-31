@@ -173,9 +173,8 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 	MemoryPool::getInstance().poolFree(segmentData.buf);
 
 	// free blocks
-	for (uint32_t i : requiredBlocks) {
-		//	cout << "Free-ing block " << i << endl;
-		MemoryPool::getInstance().poolFree(blockDataList[i].buf);
+	for (auto blockSymbol : requiredBlockSymbols) {
+		MemoryPool::getInstance().poolFree(blockDataList[blockSymbol.first].buf);
 	}
 
 	// take time for writing and clean up
