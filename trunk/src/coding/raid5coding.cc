@@ -198,6 +198,7 @@ block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	// for raid 5, only requires n-1 stripes (raid5_n - 1) to decode
 	const uint32_t raid5_n = getParameters(setting);
 	const uint32_t dataBlockCount = raid5_n - 1;
+	const uint32_t lastDataIndex = raid5_n - 2;
 	block_list_t requiredBlockSymbols;
 	requiredBlockSymbols.reserve(dataBlockCount);
 
@@ -217,6 +218,11 @@ block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		// select only available blocks
 		if (blockStatus[i] != false) {
 			offset_length_t symbol = make_pair(0, blockSize);
+
+            if (i == lastDataIndex) {
+                symbol.second = segmentSize - lastDataIndex * blockSize;
+            }
+
 			vector<offset_length_t> symbolList = { symbol };
 			symbol_list_t blockSymbols = make_pair(i, symbolList);
 			requiredBlockSymbols.push_back(blockSymbols);
