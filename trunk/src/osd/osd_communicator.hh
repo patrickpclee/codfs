@@ -70,8 +70,9 @@ public:
 	 * @return 0 if success, -1 if failure
 	 */
 
+    // waitOnRequestId (use a different request id from the request message -> for recovery)
 	void replyPutBlockEnd(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId, uint32_t blockId);
+			uint64_t segmentId, uint32_t blockId, uint32_t waitOnRequestId = 0);
 
 	/**
 	 * (to be implemented)
@@ -210,6 +211,8 @@ private:
 	 */
 
 	void putBlockEnd(uint32_t sockfd, uint64_t segmentId, uint32_t blockId);
+
+
 };
 
 #endif

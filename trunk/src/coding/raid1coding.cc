@@ -116,3 +116,7 @@ vector<BlockData> Raid1Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	return repairedBlockDataList;
 }
+
+uint32_t Raid1Coding::getBlockCountFromSetting (string setting) {
+	return getParameters(setting);
+}

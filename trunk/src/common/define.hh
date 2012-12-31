@@ -46,6 +46,7 @@ typedef std::vector<symbol_list_t> block_list_t ;
 // osd/osd.cc
 #define INF (1<<29)
 #define DISK_PATH "/"
+#define RECOVERY_THREADS 10
 
 // osd/storagemodule.cc
 //#define USE_SEGMENT_DISK_CACHE

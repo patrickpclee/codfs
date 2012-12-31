@@ -28,6 +28,7 @@
 extern Osd* osd;
 extern ConfigLayer* configLayer;
 mutex segmentRequestCountMutex;
+mutex recoveryMutex;
 
 #include <atomic>
 
@@ -35,6 +36,7 @@ mutex segmentRequestCountMutex;
 
 #include "../../lib/threadpool/threadpool.hpp"
 boost::threadpool::pool _blocktp;
+boost::threadpool::pool _recoverytp;
 #endif
 
 #ifdef TIME_POINT
@@ -65,7 +67,9 @@ Osd::Osd(uint32_t selfId) {
 #ifdef PARALLEL_TRANSFER
 	uint32_t _numThreads = configLayer->getConfigInt("ThreadPool>NumThreads");
 	_blocktp.size_controller().resize(_numThreads);
+	_recoverytp.size_controller().resize(RECOVERY_THREADS);
 #endif
+
 }
 
 Osd::~Osd() {
@@ -332,12 +336,33 @@ void Osd::getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
 			symbols);
 
+	// will block until reply is received
 	_osdCommunicator->sendRecoveryBlock(requestId, sockfd, blockData);
+
 	MemoryPool::getInstance().poolFree(blockData.buf);
 }
 
-void Osd::recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd, uint64_t segmentId,
-		uint32_t blockId, uint32_t length, char* buf) {
+void Osd::retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId,
+		uint64_t segmentId, uint32_t blockId,
+		vector<offset_length_t> &offsetLength, BlockData &repairedBlock) {
+
+	if (osdId == _osdId) {
+		// read block from disk
+		repairedBlock = _storageModule->readBlock(segmentId, blockId,
+				offsetLength);
+	} else {
+		repairedBlock = _osdCommunicator->getRecoveryBlock(osdId, segmentId,
+				blockId, offsetLength);
+		debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
+				blockId);
+	}
+
+	_recoveryBlockCount.decrement(requestId);
+}
+
+void Osd::recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
+		uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf,
+		uint32_t waitOnRequestId) {
 
 	// copy data
 	BlockData blockData;
@@ -354,8 +379,13 @@ void Osd::recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd, uint64
 	getBlockInitRequestMsg->setRecoveryBlockData(blockData);
 	getBlockInitRequestMsg->setStatus(READY);
 
+	debug_yellow(
+			"Recovery block for segment %" PRIu64 " ,Block %" PRIu32 ", requestId %" PRIu32 " arrived\n",
+			segmentId, blockId, requestId);
+
 	// send reply
-	_osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId, blockId);
+	_osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId, blockId,
+			waitOnRequestId);
 
 }
 
@@ -647,6 +677,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, vector<uint32_t> repairBlockList,
 		vector<uint32_t> repairBlockOsdList) {
 
+//    lock_guard<mutex> lk(recoveryMutex);
+
 	// get coding information from MDS
 	SegmentTransferOsdInfo segmentInfo =
 			_osdCommunicator->getSegmentInfoRequest(segmentId);
@@ -668,7 +700,12 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			codingSetting);
 
 	// obtain blocks from other OSD
-	vector<BlockData> repairBlockData(segmentInfo._osdList.size());
+	vector<BlockData> repairBlockData(
+			_codingModule->getNumberOfBlocks(codingScheme, codingSetting));
+
+	// initialize map for tracking recovery
+	_recoveryBlockCount.set(requestId, blockSymbols.size());
+
 	for (auto block : blockSymbols) {
 
 		uint32_t blockId = block.first;
@@ -680,18 +717,18 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 				"[RECOVERY] Need to obtain %zu symbols in block %" PRIu32 " from OSD %" PRIu32 "\n",
 				offsetLength.size(), blockId, osdId);
 
-		if (osdId == _osdId) {
-			// read block from disk
-			repairBlockData[blockId] = _storageModule->readBlock(segmentId,
-					blockId, offsetLength);
-		} else {
-			// TODO: use threads
-			repairBlockData[blockId] = _osdCommunicator->getRecoveryBlock(osdId,
-					segmentId, blockId, offsetLength);
-			debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
-					blockId);
-		}
+		_recoverytp.schedule(
+				boost::bind(&Osd::retrieveRecoveryBlock, this, requestId, osdId,
+						segmentId, blockId, offsetLength,
+						boost::ref(repairBlockData[blockId])));
+
 	}
+
+	// block until all recovery blocks retrieved
+	while (_recoveryBlockCount.get(requestId) > 0) {
+		usleep(10000);
+	}
+	_recoveryBlockCount.erase(requestId);
 
 	debug_cyan("[RECOVERY] Performing Repair for Segment %" PRIu64 "\n",
 			segmentId);

@@ -292,6 +292,7 @@ message RecoveryBlockDataPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
 	optional fixed32 length = 4;
+    optional fixed32 waitOnRequestId = 5;
 }
 
 message BlockDataPro {

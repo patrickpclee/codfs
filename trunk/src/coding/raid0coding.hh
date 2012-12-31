@@ -24,6 +24,8 @@ public:
 			vector<BlockData> &blockData, block_list_t &symbolList,
 			uint32_t segmentSize, string setting);
 
+	uint32_t getBlockCountFromSetting (string setting);
+
 	static string generateSetting(int raid0_n) {
 		return to_string(raid0_n);
 	}

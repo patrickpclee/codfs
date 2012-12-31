@@ -274,7 +274,7 @@ void Communicator::waitForMessage() {
  * 3. If need to wait for reply, add the message to waitReplyMessageMap
  */
 
-void Communicator::addMessage(Message* message, bool expectReply) {
+void Communicator::addMessage(Message* message, bool expectReply, uint32_t waitOnRequestId) {
 
 	// if requestID == 0, generate a new one
 	if (message->getMsgHeader().requestId == 0) {
@@ -285,7 +285,13 @@ void Communicator::addMessage(Message* message, bool expectReply) {
 	if (expectReply) {
 		message->setExpectReply(true);
 		{
-			const uint32_t requestId = message->getMsgHeader().requestId;
+            uint32_t requestId = 0;
+            if (waitOnRequestId == 0) { // if a requestId is not specified
+                requestId = message->getMsgHeader().requestId;
+            } else {
+                requestId = waitOnRequestId;
+            }
+
 			_waitReplyMessageMap.set(requestId, message);
 			debug(
 					"Message (ID: %" PRIu32 " Type = %d FD = %" PRIu32 ") added to waitReplyMessageMap\n",
@@ -568,9 +574,6 @@ void Communicator::dispatch(char* buf, uint32_t sockfd,
 
 }
 
-inline uint32_t Communicator::generateRequestId() {
-	return ++_requestId;
-}
 
 #ifdef USE_MULTIPLE_QUEUE
 Message* Communicator::popMessage(uint32_t fd) {

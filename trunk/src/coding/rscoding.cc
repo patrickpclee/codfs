@@ -254,84 +254,90 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	vector<BlockData> ret;
 	//decode(blockData, symbolList, segmentSize, setting);
 	vector<uint32_t> params = getParameters(setting);
-		const uint32_t k = params[0];
-		const uint32_t m = params[1];
-		const uint32_t w = params[2];
-		const uint32_t size = roundTo(roundTo(segmentSize, k) / k, 4);
+	const uint32_t k = params[0];
+	const uint32_t m = params[1];
+	const uint32_t w = params[2];
+	const uint32_t size = roundTo(roundTo(segmentSize, k) / k, 4);
 
-		if (repairBlockIdList.size() < k) {
-			cerr << "Not enough blocks for decode " << repairBlockIdList.size() << endl;
-			exit(-1);
+	if (repairBlockIdList.size() < k) {
+		cerr << "Not enough blocks for decode " << repairBlockIdList.size()
+				<< endl;
+		exit(-1);
+	}
+
+	struct SegmentData segmentData;
+
+	// copy segmentID from first available block
+	segmentData.info.segmentId = blockData[repairBlockIdList[0]].info.segmentId;
+	segmentData.info.segmentSize = segmentSize;
+	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
+
+	set<uint32_t> blockIdListSet(repairBlockIdList.begin(),
+			repairBlockIdList.end());
+
+	if (repairBlockIdList.size() != k + m) {
+		int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
+		char **data, **code;
+		int *erasures;
+		int j = 0;
+
+		data = talloc<char*, uint32_t>(k);
+		code = talloc<char*, uint32_t>(m);
+		erasures = talloc<int, uint32_t>(k + m - repairBlockIdList.size() + 1);
+
+		for (uint32_t i = 0; i < k + m; i++) {
+			i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
+							talloc<char, uint32_t>(size);
+			if (blockIdListSet.count(i) > 0) {
+				i < k ? memcpy(data[i], blockData[i].buf, size) : memcpy(
+								code[i - k], blockData[i].buf, size);
+			} else {
+				erasures[j++] = i;
+			}
 		}
+		erasures[j] = -1;
 
-		struct SegmentData segmentData;
+		jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
 
-		// copy segmentID from first available block
-		segmentData.info.segmentId = blockData[repairBlockIdList[0]].info.segmentId;
-		segmentData.info.segmentSize = segmentSize;
-		segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
+		for (uint32_t i = 0; i < k + m - repairBlockIdList.size(); i++) {
+			struct BlockData temp;
+			temp.info.segmentId = segmentData.info.segmentId;
+			temp.info.blockId = erasures[i];
+			temp.info.blockSize = size;
 
-		set<uint32_t> blockIdListSet(repairBlockIdList.begin(), repairBlockIdList.end());
+			temp.buf = MemoryPool::getInstance().poolMalloc(size);
+			memcpy(temp.buf,
+					(uint32_t) erasures[i] < k ?
+							data[erasures[i]] : code[erasures[i] - k], size);
 
-		if (repairBlockIdList.size() != k + m) {
-			int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
-			char **data, **code;
-			int *erasures;
-			int j = 0;
-
-			data = talloc<char*, uint32_t>(k);
-			code = talloc<char*, uint32_t>(m);
-			erasures = talloc<int, uint32_t>(k + m - repairBlockIdList.size() + 1);
-
-			for (uint32_t i = 0; i < k + m; i++) {
-				i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
-								talloc<char, uint32_t>(size);
-				if (blockIdListSet.count(i) > 0) {
-					i < k ? memcpy(data[i], blockData[i].buf, size) : memcpy(
-									code[i - k], blockData[i].buf, size);
-				} else {
-					erasures[j++] = i;
-				}
-			}
-			erasures[j] = -1;
-
-			jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
-
-			for (uint32_t i = 0; i < k + m - repairBlockIdList.size(); i++) {
-				struct BlockData temp;
-				temp.info.segmentId = segmentData.info.segmentId;
-				temp.info.blockId = erasures[i];
-				temp.info.blockSize = size;
-
-				temp.buf = MemoryPool::getInstance().poolMalloc(size);
-				memcpy(temp.buf,
-						(uint32_t) erasures[i] < k ?
-								data[erasures[i]] : code[erasures[i] - k], size);
-
-				ret.push_back(temp);
-			}
+			ret.push_back(temp);
+		}
 
 //			for (uint32_t i = 0; i < m; i++) {
 //				MemoryPool::getInstance().poolFree(blockDataList[k + i].buf);
 //			}
 
-			// free memory
-			for (uint32_t i = 0; i < k; i++) {
-				tfree(data[i]);
-			}
-			tfree(data);
-
-			for (uint32_t i = 0; i < m; i++) {
-				tfree(code[i]);
-			}
-			tfree(code);
-
+// free memory
+		for (uint32_t i = 0; i < k; i++) {
+			tfree(data[i]);
 		}
+		tfree(data);
 
+		for (uint32_t i = 0; i < m; i++) {
+			tfree(code[i]);
+		}
+		tfree(code);
 
-
+	}
 
 	return ret;
+}
+
+uint32_t RSCoding::getBlockCountFromSetting(string setting) {
+	vector<uint32_t> params = getParameters(setting);
+	const uint32_t k = params[0];
+	const uint32_t m = params[1];
+	return k + m;
 }
 
 //

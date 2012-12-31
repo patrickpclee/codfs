@@ -26,7 +26,7 @@ public:
 
 	RecoveryBlockDataMsg(Communicator* communicator, uint32_t requestId,
 			uint32_t dstSockfd, uint64_t segmentId, uint32_t blockId,
-			uint32_t length);
+			uint32_t length, uint32_t waitOnRequestId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -61,6 +61,7 @@ private:
 	uint64_t _segmentId;
 	uint32_t _blockId;
 	uint32_t _length;
+    uint32_t _waitOnRequestId;
 };
 
 #endif

@@ -104,7 +104,11 @@ public:
 			vector<offset_length_t> symbols);
 
 	void recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf);
+			uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf, uint32_t waitOnRequestId);
+
+	void retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId, uint64_t segmentId,
+			uint32_t blockId, vector<offset_length_t> &offsetLength,
+			BlockData &repairedBlock);
 
 	/**
 	 * Action when a put segment request is received
@@ -382,6 +386,9 @@ private:
 	ConcurrentMap<uint64_t, mutex*> _segmentDownloadMutex;
 	ConcurrentMap<uint64_t, SegmentData> _segmentDataMap;
 	ConcurrentMap<uint64_t, bool> _isSegmentDownloaded;
+    
+    // recovery
+	ConcurrentMap<uint32_t, uint32_t> _recoveryBlockCount;
 
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingBlockChunk;
