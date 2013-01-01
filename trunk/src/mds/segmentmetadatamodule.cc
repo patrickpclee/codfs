@@ -83,11 +83,14 @@ void SegmentMetaDataModule::saveNodeList(uint64_t segmentId,
 	vector<uint32_t>::const_iterator it;
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONArrayBuilder arrb;
+    
+    string newNodeList;
 	for (it = segmentNodeList.begin(); it < segmentNodeList.end(); ++it) {
-		debug(" - %" PRIu32 "\n" , *it);
+        newNodeList += to_string(*it) + " ";
 		arrb.append(*it);
 	}
-	debug("%s", "\n");
+	debug("New Node List for Segment ID %" PRIu64 " %s\n", segmentId, newNodeList.c_str());
+
 	BSONArray arr = arrb.arr();
 	BSONObj updateSegment = BSON ("$set" << BSON ("nodeList" << arr));
 	_segmentMetaDataStorage->update(querySegment, updateSegment);

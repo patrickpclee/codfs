@@ -123,8 +123,13 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 						stripeSize);
 			} else {
 				// XOR second block onwards
-				Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
-						blockDataList[blockId].buf, stripeSize);
+                if (blockDataList[blockId].info.blockSize < stripeSize) {
+                    Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
+                            blockDataList[blockId].buf, blockDataList[blockId].info.blockSize);
+                } else {
+                    Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
+                            blockDataList[blockId].buf, stripeSize);
+                }
 			}
 			i++;
 		}
@@ -282,13 +287,16 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		uint32_t blockId = block.first;
 		if (i == 0) {
 			// memcpy first block
-//			debug_yellow ("Memcpy block %" PRIu32 " %p\n", blockId, blockData[blockId].buf);
 			memcpy(rebuildBlockData.buf, blockData[blockId].buf, blockSize);
 		} else {
 			// XOR second block onwards
-//			debug_yellow ("XOR block %" PRIu32 "\n", blockId);
-			Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
-					blockData[blockId].buf, blockSize);
+            if (blockData[blockId].info.blockSize < blockSize) {
+                Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
+                        blockData[blockId].buf, blockData[blockId].info.blockSize);
+            } else {
+                Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
+                        blockData[blockId].buf, blockSize);
+            }
 		}
 		i++;
 	}
