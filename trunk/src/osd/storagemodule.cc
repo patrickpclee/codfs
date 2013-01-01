@@ -323,6 +323,7 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId,
 	for (auto offsetLengthPair : symbols) {
 		uint32_t offset = offsetLengthPair.first;
 		uint32_t length = offsetLengthPair.second;
+        blockOffset += offset;
 		readFile(blockPath, blockData.buf, blockOffset, length);
 	}
 
