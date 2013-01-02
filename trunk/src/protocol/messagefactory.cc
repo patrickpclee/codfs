@@ -25,6 +25,8 @@
 #include "metadata/setfilesizerequest.hh"
 #include "metadata/renamefilerequest.hh"
 #include "metadata/renamefilereply.hh"
+#include "metadata/cachesegmentrequest.hh"
+#include "metadata/cachesegmentreply.hh"
 #include "transfer/putsegmentinitrequest.hh"
 #include "transfer/putsegmentinitreply.hh"
 #include "transfer/blocktransferendrequest.hh"
@@ -137,6 +139,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new RenameFileRequestMsg(communicator);
 		break;
 	case (RENAME_FILE_REPLY):
+		return new RenameFileReplyMsg(communicator);
+		break;
+	case (CACHE_SEGMENT_REQUEST):
+		return new RenameFileReplyMsg(communicator);
+		break;
+	case (CACHE_SEGMENT_REPLY):
 		return new RenameFileReplyMsg(communicator);
 		break;
 

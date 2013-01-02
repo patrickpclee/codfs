@@ -65,14 +65,26 @@ public:
 			uint64_t segmentId);
 
 	/**
-	 * Send a failure report to MDS / Monitor
-	 * @param osdId ID of the OSD that failed
-	 * @return 0 if success, -1 if failure
+	 * Reply to PutBlockEndRequest / RecoveryBlockData
+	 * @param requestId Request ID
+	 * @param connectionId Connection ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param waitOnRequestId (For recovery, specify a request id for reply)
 	 */
 
-    // waitOnRequestId (use a different request id from the request message -> for recovery)
 	void replyPutBlockEnd(uint32_t requestId, uint32_t connectionId,
 			uint64_t segmentId, uint32_t blockId, uint32_t waitOnRequestId = 0);
+
+	/**
+	 * Reply to MDS when the segment is cached
+	 * @param requestId Request ID
+	 * @param connectionId Connection ID
+	 * @param segmentId Segment ID
+	 */
+
+	void replyCacheSegment(uint32_t requestId, uint32_t connectionId,
+			uint64_t segmentId);
 
 	/**
 	 * (to be implemented)
@@ -91,17 +103,36 @@ public:
 	 */
 
 	uint32_t sendBlock(uint32_t sockfd, struct BlockData blockData);
-	uint32_t sendRecoveryBlock(uint32_t requestId, uint32_t sockfd, struct BlockData blockData);
+
+	/**
+	 * Send a recovery block to another OSD
+	 * @param requestId Request ID
+	 * @param sockfd Socket Descriptor of the destination
+	 * @param blockData BlockData structure
+	 * @return 0 if success, -1 if failure
+	 */
+	uint32_t sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
+			struct BlockData blockData);
 
 	/**
 	 * Send a request to get a block to other OSD
-	 * @param connectionId ID of the target component connection
-	 * @param segmentId ID of the segment that the block is belonged to
+	 * @param osdId Target Osd ID
+	 * @param segmentId Segment ID
 	 * @param blockId Block ID
+	 * @param symbols List of <offset,length> to obtain for the block
 	 */
 
-	void getBlockRequest(uint32_t osdId, uint64_t segmentId,
-			uint32_t blockId, vector<offset_length_t> symbols);
+	void getBlockRequest(uint32_t osdId, uint64_t segmentId, uint32_t blockId,
+			vector<offset_length_t> symbols);
+
+	/**
+	 * Send a request to get a recovery block to other OSD
+	 * @param osdId Target Osd ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param symbols List of <offset,length> to obtain for the block
+	 * @return Received BlockData Structure
+	 */
 
 	BlockData getRecoveryBlock(uint32_t osdId, uint64_t segmentId,
 			uint32_t blockId, vector<offset_length_t> symbols);
@@ -115,8 +146,8 @@ public:
 	 */
 
 	vector<struct BlockLocation> getOsdListRequest(uint64_t segmentId,
-			ComponentType dstComponent, uint32_t blockCount,
-			uint32_t primaryId, uint64_t blockSize);
+			ComponentType dstComponent, uint32_t blockCount, uint32_t primaryId,
+			uint64_t blockSize);
 
 	/**
 	 * Send an acknowledgement to inform the dstComponent that the block is stored
@@ -211,7 +242,6 @@ private:
 	 */
 
 	void putBlockEnd(uint32_t sockfd, uint64_t segmentId, uint32_t blockId);
-
 
 };
 

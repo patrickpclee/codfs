@@ -80,35 +80,65 @@ public:
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param segmentId 	ID of the segment to send
-	 * @param localRetrieve (Optional) Return segment directly for recovery
+	 * @param localRetrieve (Optional) Retrieve the segment and store in cache
 	 */
 
-	SegmentData getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
+	void getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, bool localRetrieve = false);
 
 	/**
 	 * Action when a getBlockRequest is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
-	 * @param segmentId 	ID of Segment that the block is belonged to
-	 * @param symbols	List of symbols to retrieve
-	 * @param blockId ID of the block to send
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param symbols List of symbols to retrieve
 	 */
 
 	void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId,
 			vector<offset_length_t> symbols);
 
+	/**
+	 * Action when a getRecoveryBlockRequest is received
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param symbols List of symbols to retrieve
+	 */
+
 	void getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId,
 			vector<offset_length_t> symbols);
 
-	void recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf, uint32_t waitOnRequestId);
+	/**
+	 * Action when a recoveryBlockData is received
+	 * @param requestId Request ID
+	 * @param sockfd Socket descriptor of message source
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param length Length of recovery block data
+	 * @param buf Pointer to buffer
+	 * @param waitOnRequestId new request ID that this message should wait for reply
+	 */
 
-	void retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId, uint64_t segmentId,
-			uint32_t blockId, vector<offset_length_t> &offsetLength,
-			BlockData &repairedBlock);
+	void recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
+			uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf,
+			uint32_t waitOnRequestId);
+
+	/**
+	 * Get a recovery block from another OSD
+	 * @param requestId Request ID
+	 * @param osdId ID of the OSD to retrieve from
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param offsetLength List of <offset, length> in the target block
+	 * @param repairedBlock Referenced memory which the recovered block is stored
+	 */
+	void retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId,
+			uint64_t segmentId, uint32_t blockId,
+			vector<offset_length_t> &offsetLength, BlockData &repairedBlock);
 
 	/**
 	 * Action when a put segment request is received
@@ -152,8 +182,8 @@ public:
 			uint64_t segmentId, uint64_t offset, uint32_t length, char* buf);
 
 	/**
-	 * Action when a put segment request is received
-	 * A number of trunks are expected to receive afterwards
+	 * Action when a putBlockInitRequest is received
+	 * A number of trunks are expected to be received afterwards
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param segmentId Segment ID
@@ -162,19 +192,21 @@ public:
 	 * @param chunkCount No of trunks to receive
 	 */
 
-	/**
-	 * Distribute Blocks to OSD
-	 *
-	 * @param	segmentId		Segment Id
-	 * @param	blockData		Data Block
-	 * @param	blockLocation Location of Block
-	 */
-	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
-			const struct BlockLocation& blockLocation, uint32_t blocktpRequestId = 0);
-
 	void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t length,
 			uint32_t chunkCount);
+
+	/**
+	 * Distribute Blocks to OSD
+	 *
+	 * @param segmentId	Segment Id
+	 * @param blockData	Data Block
+	 * @param blockLocation Location of Block
+	 * @param blocktpRequestId The requestId of the message in the thread pool
+	 */
+	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
+			const struct BlockLocation& blockLocation,
+			uint32_t blocktpRequestId = 0);
 
 	/**
 	 * Action when a block trunk is received
@@ -302,7 +334,7 @@ private:
 	 * @param osdListStatus Bool array representing OSD status (true = up, false = down)
 	 */
 
-//	void setOsdListStatus (vector<bool> &secondaryOsdStatus);
+	//	void setOsdListStatus (vector<bool> &secondaryOsdStatus);
 	/**
 	 * Retrieve a block from the storage
 	 * @param segmentId ID of the segment that the block is belonged to
@@ -367,7 +399,7 @@ private:
 
 	CodingModule* _codingModule;
 
-//	Coding _cunit; // encode & decode done here
+	//	Coding _cunit; // encode & decode done here
 	uint32_t _osdId;
 
 	// upload
@@ -384,8 +416,8 @@ private:
 	ConcurrentMap<uint64_t, mutex*> _segmentDownloadMutex;
 	ConcurrentMap<uint64_t, SegmentData> _segmentDataMap;
 	ConcurrentMap<uint64_t, bool> _isSegmentDownloaded;
-    
-    // recovery
+
+	// recovery
 	ConcurrentMap<uint32_t, uint32_t> _recoverytpRequestCount;
 
 	// upload / download

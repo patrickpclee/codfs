@@ -1,5 +1,5 @@
-#ifndef __GET_SEGMENT_REQUEST_HH__
-#define __GET_SEGMENT_REQUEST_HH__
+#ifndef __CACHE_SEGMENT_REPLY_HH__
+#define __CACHE_SEGMENT_REPLY_HH__
 
 #include "../message.hh"
 
@@ -10,13 +10,13 @@ using namespace std;
  * Initiate an segment upload
  */
 
-class GetSegmentRequestMsg: public Message {
+class CacheSegmentReplyMsg: public Message {
 public:
 
-	GetSegmentRequestMsg(Communicator* communicator);
+	CacheSegmentReplyMsg(Communicator* communicator);
 
-	GetSegmentRequestMsg(Communicator* communicator, uint32_t dstSockfd,
-			uint64_t segmentId);
+	CacheSegmentReplyMsg(Communicator* communicator, uint32_t requestId,
+			uint32_t dstSockfd, uint64_t segmentId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -46,7 +46,6 @@ public:
 	 */
 
 	void printProtocol();
-	uint32_t getRequestId();
 
 private:
 	uint64_t _segmentId;
