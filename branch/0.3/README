@@ -1,0 +1,47 @@
+This is the master branch. 
+
+All the stable codes are here.
+
+========================================================================================
+
+1. Install Protobuf
+
+> cd lib/protobuf;  ./configure; make clean; make; make install
+
+In Ubuntu, the following changes are needed
+> sudo ln -s /usr/local/lib/libprotobuf.so.7 /usr/lib/libprotobuf.so.7
+> sudo ln -s /usr/local/lib/libprotoc.so.7 /usr/lib/libprotoc.so.7
+
+-------------------------------
+
+2. Install Prerequsite for MongoDB C++ Driver
+
+> apt-get install build-essential scons libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
+> cd lib/mongo; scons install
+
+-------------------------------
+
+3. Install FUSE
+
+> apt-get install libfuse-dev
+
+-------------------------------
+
+4. Install OPENSSL
+
+> apt-get install libssl-dev
+
+-------------------------------
+
+5. Optional: Install Apache Runtime (For APR Memory Pool)
+
+> apt-get install libaprutil1-dev libapr1-dev
+
+-------------------------------
+
+6. Optional: Install tcmalloc (For replacing malloc with tcmalloc)
+
+(only required for 64-bit OS) > sudo apt-get install libunwind7 libunwind7-dev
+> sudo apt-get install libgoogle-perftools-dev
+
+-------------------------------
