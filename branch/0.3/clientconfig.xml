@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+    <Communication>
+		<NumClientThreads>10</NumClientThreads>
+    </Communication>
+    
+    <Storage>
+    	<!-- KB -->
+    	<SegmentSize>10240</SegmentSize>
+    </Storage>
+
+	<Fuse>
+		<PreallocateSegmentNumber>10</PreallocateSegmentNumber>
+		<TempStorage>/tmp/</TempStorage>
+		<ReadAhead>10</ReadAhead>
+		<WritePoolLimit>20</WritePoolLimit>
+		<ReadCacheLimit>50</ReadCacheLimit>
+	</Fuse>
+</NcvfsConfig>

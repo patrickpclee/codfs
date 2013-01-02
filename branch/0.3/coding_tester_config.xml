@@ -1,0 +1,28 @@
+<CodingTesterConfig>
+
+	<SegmentFolder>./coding_tester_segment</SegmentFolder>
+	<BlockFolder>./coding_tester_block</BlockFolder>
+    <RepairFolder>./coding_tester_repair</RepairFolder>
+
+	<SelectedCodingScheme>RAID5</SelectedCodingScheme>
+
+	<CodingSetting>
+		<RAID0>
+			<n>3</n>
+		</RAID0>
+		<RAID1>
+			<n>3</n>
+		</RAID1>
+		<RAID5>
+			<n>7</n>
+		</RAID5>
+		<RS>
+			<k>6</k>
+			<m>2</m>
+			<w>8</w>
+		</RS>
+	</CodingSetting>
+
+	<NumFailedOsd>1</NumFailedOsd>
+    
+</CodingTesterConfig>
