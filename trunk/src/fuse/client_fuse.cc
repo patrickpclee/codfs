@@ -30,7 +30,6 @@ ConfigLayer* configLayer;
 ClientCommunicator* _clientCommunicator;
 
 string _fuseFolder = "./fusedir";
-string _mountDir = "./mount";
 
 CodingScheme codingScheme = RAID1_CODING;
 string codingSetting = Raid1Coding::generateSetting(1);
@@ -248,7 +247,7 @@ static int ncvfs_create(const char * path, mode_t mode,
 	uint32_t segmentSize = configLayer->getConfigInt("Storage>SegmentSize")
 			* 1024;
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(
-			_clientId, path, 0, segmentCount, codingScheme, codingSetting);
+			_clientId, path, 0, segmentCount);
 	fileMetaData._fileType = NORMAL;
 	_fileIdCache[path] = fileMetaData._id;
 	_fileInfoCache[fileMetaData._id] = fileMetaData;
@@ -503,12 +502,13 @@ int ncvfs_rmdir(const char *path) {
 
 }
 
+/*
 // not required
 int ncvfs_symlink(const char *path, const char *link) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	const char* fpath = (_mountDir + string(path)).c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 	const char* flink = (_fuseFolder + string(link)).c_str();
 	//const char* bpath = ("/" + string(path)).c_str();
 
@@ -522,6 +522,7 @@ int ncvfs_symlink(const char *path, const char *link) {
 	return retstat;
 
 }
+*/
 
 int ncvfs_rename(const char *path, const char *newpath) {
 	debug_cyan ("%s\n", "implemented");
@@ -767,7 +768,7 @@ struct ncvfs_fuse_operations: fuse_operations {
 		mkdir = ncvfs_mkdir;
 		unlink = ncvfs_unlink;
 		rmdir = ncvfs_rmdir;
-		symlink = ncvfs_symlink; // not required
+//		symlink = ncvfs_symlink; // not required and not implemented
 		rename = ncvfs_rename;
 		link = ncvfs_link; // not required
 		chmod = ncvfs_chmod;

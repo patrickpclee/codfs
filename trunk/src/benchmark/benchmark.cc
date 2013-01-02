@@ -149,7 +149,7 @@ void testUpload() {
 	typedef chrono::milliseconds milliseconds;
 	Clock::time_point t0 = Clock::now();
 
-	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(clientId, fileName, fileSize, numberOfSegment, codingScheme, codingSetting);
+	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(clientId, fileName, fileSize, numberOfSegment);
 
 	debug("File ID %" PRIu32 "\n", fileMetaData._id);
 
