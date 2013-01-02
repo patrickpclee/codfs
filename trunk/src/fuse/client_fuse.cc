@@ -287,7 +287,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 	debug_cyan ("%s\n", "implemented");
 	struct FileMetaData fileMetaData = getAndCacheFileInfo(fi->fh);
 
-	if (offset >= (size_t)fileMetaData._size)
+	if (offset >= (off_t)fileMetaData._size)
 		return 0;
 	if ((offset + size) > fileMetaData._size){
 		size = fileMetaData._size - offset;

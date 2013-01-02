@@ -8,7 +8,7 @@
 		<BasePath>/tmp/ncvfs</BasePath>
 
 		<MongoDB>
-			<Host>137.189.89.130</Host>
+			<Host>192.168.50.98</Host>
 			<Database>ncvfs</Database>
 
 			<User>ncvfs</User>
