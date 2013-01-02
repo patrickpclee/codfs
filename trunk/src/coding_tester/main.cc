@@ -1,6 +1,9 @@
 #include <iostream>
 #include <algorithm>
 #include <ctime>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include "config/config.hh"
 #include "lib/lexical_cast.hpp"
 #include "../coding/coding.hh"
@@ -18,6 +21,7 @@ using namespace std;
 ConfigLayer* configLayer;
 string blockFolder;
 string segmentFolder;
+string repairFolder;
 Coding* coding;
 string codingSetting;
 uint32_t numFailedOsd;
@@ -40,6 +44,18 @@ void printOsdStatus(vector<bool> secondaryOsdStatus) {
 	cout << "=================================" << endl;
 }
 
+void createFolder (string folder) {
+	// create folder if not exist
+	struct stat st;
+	if(stat(folder.c_str(),&st) != 0) {
+		cout << folder << " does not exist, make directory automatically" << endl;
+		if (mkdir (folder.c_str(), S_IRWXU | S_IRGRP | S_IROTH) < 0) {
+			perror ("mkdir");
+			exit (-1);
+		}
+	}
+}
+
 uint32_t readConfig(const char* configFile) {
 
 	uint32_t numBlocks;
@@ -49,9 +65,15 @@ uint32_t readConfig(const char* configFile) {
 	// read storage location
 	segmentFolder = string(configLayer->getConfigString("SegmentFolder"));
 	cout << "Segment Location: " << segmentFolder << endl;
+	createFolder (segmentFolder);
 
 	blockFolder = string(configLayer->getConfigString("BlockFolder"));
 	cout << "Block Location: " << blockFolder << endl;
+	createFolder (blockFolder);
+
+	repairFolder = string(configLayer->getConfigString("RepairFolder"));
+	cout << "Repair Location: " << repairFolder << endl;
+	createFolder (repairFolder);
 
 	// read coding configuration
 	string selectedCoding = string(
@@ -196,7 +218,6 @@ int main(int argc, char* argv[]) {
 		printOsdStatus(secondaryOsdStatus);
 
 		vector<string> dstBlockPaths;
-		string repairFolder = string(configLayer->getConfigString("RepairFolder"));
 		cout << "Repair Location: " << repairFolder << endl;
 
 		for (uint32_t i = 0; i < numFailedOsd; i++) {

@@ -110,6 +110,8 @@ void doEncode(std::string srcSegmentPath) {
 	cout << endl << "Command for Decoding: " << endl
 			<< "./CODING_TESTER decode " << segmentId << " " << filesize
 			<< " ./decoded_file" << endl;
+	cout << endl << "Command for Repair: " << endl << "./CODING_TESTER repair "
+			<< segmentId << " " << filesize << endl;
 
 }
 
@@ -174,7 +176,8 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 
 	// free blocks
 	for (auto blockSymbol : requiredBlockSymbols) {
-		MemoryPool::getInstance().poolFree(blockDataList[blockSymbol.first].buf);
+		MemoryPool::getInstance().poolFree(
+				blockDataList[blockSymbol.first].buf);
 	}
 
 	// take time for writing and clean up
@@ -246,7 +249,7 @@ void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 		i++;
 	}
 
-	 //free repairBlockData
+	//free repairBlockData
 	for (auto block : blockSymbols) {
 		uint32_t blockId = block.first;
 		MemoryPool::getInstance().poolFree(repairBlockData[blockId].buf);
