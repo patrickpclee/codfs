@@ -215,7 +215,6 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	const uint32_t m = params[1];
 	//const uint32_t noOfDataStripes = k + m;
 	const uint32_t noOfDataStripes = k;
-	const uint32_t size = roundTo(roundTo(segmentSize, noOfDataStripes) / noOfDataStripes, 4);
 	vector<uint32_t> requiredBlocks;
 	requiredBlocks.reserve(noOfDataStripes);
 
@@ -229,8 +228,9 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		}
 	}
 
-	uint32_t blockSize = roundTo(segmentSize, noOfDataStripes)
-			/ noOfDataStripes;
+	const uint32_t blockSize = roundTo(roundTo(segmentSize, noOfDataStripes) / noOfDataStripes, 4);
+	//uint32_t blockSize = roundTo(segmentSize, noOfDataStripes)
+	//		/ noOfDataStripes;
 	block_list_t requiredBlockSymbols;
 	for (uint32_t i : requiredBlocks) {
 		offset_length_t symbol = make_pair(0, blockSize);
