@@ -111,13 +111,11 @@ message SegmentDataPro {
 
 message GetSegmentRequestPro {
 	optional fixed64 segmentId = 1;
-	optional fixed32 segmentSize = 2;
-	optional fixed32 chunkCount = 3;
 }
 
-message GetSegmentReadyPro {
-	optional fixed64 segmentId = 1;
-}
+// message GetSegmentReadyPro {
+//	 optional fixed64 segmentId = 1;
+// }
 
 // Upload: CLIENT -> OSD
 // Download: OSD -> CLIENT
@@ -211,6 +209,10 @@ message GetSegmentInfoReplyPro {
 	optional fixed32 segmentSize = 5;
 }
 
+message CacheSegmentRequestPro {
+	optional fixed64 segmentId = 1;
+}
+
 //
 // MDS -> MONITOR
 //
@@ -250,6 +252,9 @@ message GetSegmentInfoRequestPro {
 	optional fixed64 segmentId = 1;	
 }
 
+message CacheSegmentReplyPro {
+	optional fixed64 segmentId = 1;
+}
 
 //
 // OSD -> CLIENT
@@ -266,11 +271,11 @@ message SegmentTransferEndReplyPro {
 	optional fixed64 segmentId = 1;
 }
 
-message GetSegmentReplyPro {
-	optional fixed64 segmentId = 1;
-	optional fixed32 segmentSize = 2;
-	optional fixed32 chunkCount = 3;
-}
+// message GetSegmentReplyPro {
+// 	optional fixed64 segmentId = 1;
+// 	optional fixed32 segmentSize = 2;
+// 	optional fixed32 chunkCount = 3;
+// }
 
 //
 // OSD -> OSD

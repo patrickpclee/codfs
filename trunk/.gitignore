@@ -11,6 +11,11 @@ BENCHMARK
 *.log
 *.swp
 core
+coding_tester_segment/
+coding_tester_block/
+coding_tester_repair/
+osd_block/
+osd_block2/
 osd_object/
 osd_segment/
 osd_object2/
@@ -20,3 +25,8 @@ osd_segment2/
 abc*
 fusedir/
 test*
+.project
+*.tmp
+decoded_file
+output*
+log/

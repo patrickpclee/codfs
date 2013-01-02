@@ -48,8 +48,6 @@ void GetSegmentRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_segmentId = getSegmentRequestPro.segmentid();
-	_segmentSize = getSegmentRequestPro.segmentsize();
-	_chunkCount = getSegmentRequestPro.chunkcount();
 
 }
 
@@ -57,22 +55,6 @@ void GetSegmentRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->getSegmentRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId);
 #endif
-}
-
-void GetSegmentRequestMsg::setSegmentSize(uint32_t segmentSize){
-	_segmentSize = segmentSize;
-}
-
-void GetSegmentRequestMsg::setChunkCount(uint32_t chunkCount){
-	_chunkCount = chunkCount;
-}
-
-uint32_t GetSegmentRequestMsg::getSegmentSize(){
-	return _segmentSize;
-}
-
-uint32_t GetSegmentRequestMsg::getChunkCount(){
-	return _chunkCount;
 }
 
 uint32_t GetSegmentRequestMsg::getRequestId(){

@@ -102,7 +102,7 @@ void Osd::freeSegment(uint64_t segmentId, SegmentData segmentData) {
  * Send the segment to the target
  */
 
-SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
+void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, bool localRetrieve) {
 
 	if (localRetrieve) {
@@ -144,8 +144,13 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			if (_storageModule->isSegmentCached(segmentId)) {
 				// case 1: if segment exists in cache
 				debug("Segment ID = %" PRIu64 " exists in cache", segmentId);
-				segmentData = _storageModule->getSegmentFromDiskCache(
-						segmentId);
+
+				// for local retrieve, no need to get it
+				if (!localRetrieve) {
+					segmentData = _storageModule->getSegmentFromDiskCache(
+							segmentId);
+				}
+
 			} else {
 				// case 2: if segment does not exist in cache
 
@@ -278,28 +283,34 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 	}
 
-	// 5. send segment
+	// 5. send segment if not localRetrieve
 	if (!localRetrieve) {
 		_osdCommunicator->sendSegment(_osdId, sockfd, segmentData);
+	}
 
 #ifdef TIME_POINT
-		t6 = Clock::now();
+	t6 = Clock::now();
 #endif
-		{
-			lock_guard<mutex> lk(segmentRequestCountMutex);
-			_segmentRequestCount.decrement(segmentId);
-			if (_segmentRequestCount.get(segmentId) == 0) {
-				_segmentRequestCount.erase(segmentId);
 
-				cacheSegment(segmentId, segmentData);
-				freeSegment(segmentId, segmentData);
+	// 6. cache and free
+	{
+		lock_guard<mutex> lk(segmentRequestCountMutex);
+		_segmentRequestCount.decrement(segmentId);
+		if (_segmentRequestCount.get(segmentId) == 0) {
+			_segmentRequestCount.erase(segmentId);
 
-				debug("%s\n", "[DOWNLOAD] Cleanup completed");
-			}
+			cacheSegment(segmentId, segmentData);
+			freeSegment(segmentId, segmentData);
+
+			debug("%s\n", "[DOWNLOAD] Cleanup completed");
 		}
-	} else {
-		return segmentData;
 	}
+
+	// send reply to MDS for localRetrieve
+	if (localRetrieve) {
+		_osdCommunicator->replyCacheSegment(requestId, sockfd, segmentId);
+	}
+
 #ifdef TIME_POINT
 	t7 = Clock::now();
 #endif
@@ -311,15 +322,13 @@ SegmentData Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	getOSDStatusTime += chrono::duration_cast < milliseconds > (t3 - t2).count();
 	getBlockTime += chrono::duration_cast < milliseconds > (t4 - t3).count();
 	decodeSegmentTime += chrono::duration_cast < milliseconds > (t5 - t4).count();
+	sendSegmentTime += chrono::duration_cast < milliseconds > (t6 - t5).count();
 	if (!localRetrieve) {
-		sendSegmentTime += chrono::duration_cast < milliseconds > (t6 - t5).count();
 		cacheSegmentTime += chrono::duration_cast < milliseconds > (t7 - t6).count();
 	}
 	timeMutex.unlock();
 #endif
 
-	// if not local retrieve, return value is not used
-	return {};
 }
 
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
@@ -668,6 +677,14 @@ uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, vector<uint32_t> repairBlockList,
 		vector<uint32_t> repairBlockOsdList) {
+
+	string repairBlockOsdListString;
+	for (uint32_t osd : repairBlockOsdList) {
+		repairBlockOsdListString += to_string(osd) + " ";
+	}
+	debug_yellow(
+			"Repair OSD List repairBlockList size = %zu Osd List size = %zu: %s\n",
+			repairBlockList.size(), repairBlockOsdList.size(), repairBlockOsdListString.c_str());
 
 //    lock_guard<mutex> lk(recoveryMutex);
 

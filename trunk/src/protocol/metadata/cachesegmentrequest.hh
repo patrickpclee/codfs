@@ -1,5 +1,5 @@
-#ifndef __GET_SEGMENT_REQUEST_HH__
-#define __GET_SEGMENT_REQUEST_HH__
+#ifndef __CACHE_SEGMENT_REQUEST_HH__
+#define __CACHE_SEGMENT_REQUEST_HH__
 
 #include "../message.hh"
 
@@ -10,12 +10,12 @@ using namespace std;
  * Initiate an segment upload
  */
 
-class GetSegmentRequestMsg: public Message {
+class CacheSegmentRequestMsg: public Message {
 public:
 
-	GetSegmentRequestMsg(Communicator* communicator);
+	CacheSegmentRequestMsg(Communicator* communicator);
 
-	GetSegmentRequestMsg(Communicator* communicator, uint32_t dstSockfd,
+	CacheSegmentRequestMsg(Communicator* communicator, uint32_t dstSockfd,
 			uint64_t segmentId);
 
 	/**

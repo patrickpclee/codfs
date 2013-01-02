@@ -12,8 +12,8 @@
         
         <!-- timeout for select -->
         <SelectTimeout>
-            <sec>1</sec>
-            <usec>0</usec>
+            <sec>0</sec>
+            <usec>100</usec>
         </SelectTimeout>
 	
 		<!-- Chunk Size used in transfer -->
