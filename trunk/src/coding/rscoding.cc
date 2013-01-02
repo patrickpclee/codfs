@@ -222,9 +222,12 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		return {};
 	}
 
-	for (uint32_t i = 0; i < noOfDataStripes; i++) {
+	for (uint32_t i = 0; i < k+m; i++) {
 		if (blockStatus[i] != false) {
 			requiredBlocks.push_back(i);
+		}
+		if (requiredBlocks.size() >= k) {
+			break;
 		}
 	}
 
@@ -252,6 +255,13 @@ block_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		vector<BlockData> &blockData, block_list_t &symbolList,
 		uint32_t segmentSize, string setting) {
+
+	string blockIdString;
+	for (auto block : repairBlockIdList) {
+		blockIdString += block + " ";
+	}
+
+	debug_yellow("Start repairBlocks for %s\n", blockIdString.c_str());
 
 	vector<BlockData> ret;
 	//decode(blockData, symbolList, segmentSize, setting);
