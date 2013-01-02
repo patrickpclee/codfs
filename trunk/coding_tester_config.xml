@@ -4,7 +4,7 @@
 	<BlockFolder>./coding_tester_block</BlockFolder>
     <RepairFolder>./coding_tester_repair</RepairFolder>
 
-	<SelectedCodingScheme>RS</SelectedCodingScheme>
+	<SelectedCodingScheme>RAID5</SelectedCodingScheme>
 
 	<CodingSetting>
 		<RAID0>
@@ -14,7 +14,7 @@
 			<n>3</n>
 		</RAID1>
 		<RAID5>
-			<n>8</n>
+			<n>7</n>
 		</RAID5>
 		<RS>
 			<k>6</k>
