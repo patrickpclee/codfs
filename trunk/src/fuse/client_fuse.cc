@@ -189,7 +189,19 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 
 	retstat = lstat(fpath, stbuf);
 	if (retstat != -1) { // if file is found in fuseFolder
-		struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
+		uint64_t fileId = 0;
+		struct FileMetaData fileMetaData;
+		//
+		// Load File ID
+		FILE* fp = fopen(fpath,"r");
+		int ret = fscanf(fp,"%" PRIu64, &fileId);
+		fclose(fp);
+		if(ret > 0)
+			fileMetaData = getAndCacheFileInfo(fileId);
+		else
+			// Newly Created File
+			fileMetaData = getAndCacheFileInfo(path);
+
 		if (fileMetaData._id == 0) { // should not happen?
 			_fileIdCache.erase(path);
 			_fileInfoCache.erase(fileMetaData._id);
@@ -226,8 +238,21 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 
 static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
-	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
-	fi->fh = fileMetaData._id;
+//	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
+	
+	// Load File ID
+	const char* fpath = (_fuseFolder + string(path)).c_str();
+	FILE* fp = fopen(fpath,"r");
+	int ret = fscanf(fp,"%" PRIu64, &(fi->fh));
+	if (ret < 0) {
+		perror("fscanf()");
+		exit(-1);
+	}
+	fclose(fp);
+
+	struct FileMetaData fileMetaData = getAndCacheFileInfo(fi->fh);
+
+	debug("Open File %s with ID %" PRIu64 "\n",path,fi->fh);
 	vector<bool> segmentProcessing (fileMetaData._segmentList.size(),false);
 	_segmentProcessing[fi->fh] = segmentProcessing;
 	_readAheadCount[fi->fh] = 0;
@@ -336,6 +361,13 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 	debug("Release %s [%" PRIu32 "]\n", path, (uint32_t)fi->fh);
+
+	// Save File ID
+	const char* fpath = (_fuseFolder + string(path)).c_str();
+	FILE* fp = fopen(fpath,"w");
+	fprintf(fp,"%" PRIu64, fi->fh);
+	fclose(fp);
+
 	ClientStorageModule* storageModule = client->getStorageModule();
 	if(_fileDataCache.count(fi->fh)){
 		delete _fileDataCache[fi->fh];
@@ -481,8 +513,14 @@ int ncvfs_mkdir(const char *path, mode_t mode) {
 
 int ncvfs_unlink(const char *path) {
 	debug_cyan("%s\n", "not implemented");
-	client->deleteFileRequest(path,0);
 	const char* fpath = (_fuseFolder + string(path)).c_str();
+	uint64_t fileId = 0;
+	FILE* fp = fopen(fpath,"r");
+	int ret = fscanf(fp,"%" PRIu64, &fileId);
+	if (ret < 0) {
+		return 0;
+	}
+	client->deleteFileRequest(path,fileId);
 	remove (fpath);
 	// TODO: Clear File Meta Data Cache
 	return 0;
@@ -551,8 +589,19 @@ int ncvfs_link(const char *path, const char *newpath) {
 int ncvfs_truncate(const char *path, off_t newsize) {
 	debug_cyan ("%s\n", "implemented");
 
-	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
-	uint32_t fileId = fileMetaData._id;
+	uint64_t fileId = 0;
+
+	// Load File ID
+	const char* fpath = (_fuseFolder + string(path)).c_str();
+	FILE* fp = fopen(fpath,"r");
+	int ret = fscanf(fp,"%" PRIu64, &fileId);
+	if (ret < 0) {
+		perror("fscanf()");
+		exit(-1);
+	}
+	fclose(fp);
+
+	//struct FileMetaData fileMetaData = getAndCacheFileInfo(fileId);
 	client->truncateFileRequest(fileId);
 	return 0;
 
