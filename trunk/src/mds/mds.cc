@@ -312,7 +312,7 @@ void Mds::secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
 void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 		vector<uint32_t> deadOsdList) {
 
-	debug_yellow("%s\n", "HAHA");
+	debug_yellow("%s\n", "Recovery Triggered");
 	vector<struct SegmentLocation> segmentLocationList;
 
 	struct SegmentLocation segmentLocation;
