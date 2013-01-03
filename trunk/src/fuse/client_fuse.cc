@@ -39,6 +39,9 @@ uint32_t _clientId = 51000;
 uint32_t _readAhead = 5;
 #endif
 
+char* cwdpath;
+string cwd;
+
 mutex fileInfoCacheMutex;
 mutex _segmentProcessingMutex;
 mutex _readAheadCountMutex;
@@ -135,6 +138,13 @@ void startGarbageCollectionThread() {
 
 void* ncvfs_init(struct fuse_conn_info *conn) {
 	debug_cyan ("%s\n", "implemented");
+	cwd = string(cwdpath) + "/";
+	_fuseFolder = cwd + _fuseFolder;
+	
+	configLayer = new ConfigLayer((cwd+"common.xml").c_str(),(cwd+"clientconfig.xml").c_str());
+	client = new Client(_clientId);
+	_clientCommunicator = client->getCommunicator();
+
 	_clientCommunicator->createServerSocket();
 
 	// 1. Garbage Collection Thread
@@ -177,8 +187,8 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 	int retstat = 0;
 	const char* fpath = (_fuseFolder + string(path)).c_str();
 
-	//debug ("fpath = %s\n", fpath);
-	printf("%s\n",fpath);
+	debug ("fpath = %s\n", fpath);
+	//printf("%s\n",fpath);
 
 	if (strcmp(path, "/") == 0) {
 		stbuf->st_mode = S_IFDIR | 0755;
@@ -847,9 +857,11 @@ struct ncvfs_fuse_operations: fuse_operations {
 static struct ncvfs_fuse_operations ncvfs_oper;
 
 int main(int argc, char *argv[]) {
-	configLayer = new ConfigLayer("clientconfig.xml");
-	client = new Client(_clientId);
-	//fileDataModule = new FileDataModule();
-	_clientCommunicator = client->getCommunicator();
-	return fuse_main(argc, argv, &ncvfs_oper, NULL);
+	cwdpath = (char*)calloc(sizeof(PATH_MAX) * PATH_MAX,1);
+	if(getcwd(cwdpath, PATH_MAX) == NULL){
+		perror("getcwd()");
+		exit(-1);
+	}
+	debug("Current Directory = %s\n",cwdpath);
+	return fuse_main(argc, argv, &ncvfs_oper, cwdpath);
 }
