@@ -95,9 +95,13 @@ void Osd::reportRemovedCache() {
 		currentCacheList.sort();
 
 		// deleted segments (current - previous)
-		list <uint64_t> deletedCacheList;
-		set_difference(currentCacheList.begin(), currentCacheList.end(),
-				_previousCacheList.begin(), _previousCacheList.end(),
+
+		debug_cyan("Old cache size = %zu, new cache size = %zu\n",
+				_previousCacheList.size(), currentCacheList.size());
+
+		list<uint64_t> deletedCacheList;
+		set_difference(_previousCacheList.begin(), _previousCacheList.end(),
+				currentCacheList.begin(), currentCacheList.end(),
 				std::inserter(deletedCacheList, deletedCacheList.end()));
 
 		// for debug

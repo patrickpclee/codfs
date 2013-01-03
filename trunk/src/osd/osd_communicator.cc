@@ -95,6 +95,10 @@ void OsdCommunicator::replyCacheSegment(uint32_t requestId,
 void OsdCommunicator::reportDeletedCache(list<uint64_t> segmentIdList,
 		uint32_t osdId) {
 
+	if (segmentIdList.size() == 0) {
+		return;
+	}
+
 	ReportDeletedCacheMsg* reportDeletedCacheMsg = new ReportDeletedCacheMsg(
 			this, getMdsSockfd(), segmentIdList, osdId);
 	reportDeletedCacheMsg->prepareProtocolMsg();

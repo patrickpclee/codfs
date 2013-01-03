@@ -301,35 +301,19 @@ void Communicator::addMessage(Message* message, bool expectReply, uint32_t waitO
 
 	// add message to outMessageQueue
 	switch(message->getMsgHeader().protocolMsgType) {
-		case SEGMENT_DATA:
-		case BLOCK_DATA:
+	case SEGMENT_DATA:
+	case BLOCK_DATA:
 #ifdef USE_MULTIPLE_QUEUE
-	#ifdef USE_LOWLOCK_QUEUE
-			_outDataQueue[message->getSockfd()]->push(message);
-	#else
-			_outDataQueue[message->getSockfd()]->push(message);
-	#endif
+		_outDataQueue[message->getSockfd()]->push(message);
 #else
-	#ifdef USE_LOWLOCK_QUEUE
-			_outDataQueue.push(message);
-	#else
-			_outDataQueue.push(message);
-	#endif
+		_outDataQueue.push(message);
 #endif
-			break;
-		default:
+		break;
+	default:
 #ifdef USE_MULTIPLE_QUEUE
-	#ifdef USE_LOWLOCK_QUEUE
-			_outMessageQueue[message->getSockfd()]->push(message);
-	#else
-			_outMessageQueue[message->getSockfd()]->push(message);
-	#endif
+		_outMessageQueue[message->getSockfd()]->push(message);
 #else
-	#ifdef USE_LOWLOCK_QUEUE
-			_outMessageQueue.push(message);
-	#else
-			_outMessageQueue.push(message);
-	#endif
+		_outMessageQueue.push(message);
 #endif
 	}
 
