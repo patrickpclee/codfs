@@ -112,4 +112,14 @@ enum CodingScheme {
 	RS_CODING = 4
 };
 
+enum HotnessAlgorithm{
+	DEFAULT_HOTNESS_ALG
+};
+
+enum HotnessType {
+	COLD,
+	HOT,
+	HOTTEST
+};
+
 #endif

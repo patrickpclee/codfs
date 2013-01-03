@@ -257,6 +257,12 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 			segmentMetaData._size, segmentMetaData._nodeList,
 			segmentMetaData._codingScheme, segmentMetaData._codingSetting);
 
+	struct HotnessRequset req = _hotnessModule->updateSegmentHotness(segmentId,
+		 DEFAULT_HOTNESS_ALG, 0);
+	if (req.numOfNewCache > 0) {
+		_mdsCommunicator->requestCache(segmentId, req);
+	}
+
 	return;
 }
 
