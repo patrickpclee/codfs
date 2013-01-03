@@ -148,10 +148,10 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new RenameFileReplyMsg(communicator);
 		break;
 	case (CACHE_SEGMENT_REQUEST):
-		return new RenameFileReplyMsg(communicator);
+		return new CacheSegmentRequestMsg(communicator);
 		break;
 	case (CACHE_SEGMENT_REPLY):
-		return new RenameFileReplyMsg(communicator);
+		return new CacheSegmentReplyMsg(communicator);
 		break;
 	case (REPORT_DELETED_CACHE):
 		return new ReportDeletedCacheMsg(communicator);
