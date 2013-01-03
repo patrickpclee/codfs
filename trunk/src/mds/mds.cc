@@ -77,6 +77,16 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 	return fileId;
 }
 
+void Mds::reportDeleteCacheProcessor(uint32_t requestId, uint32_t connectionId,
+		list<uint64_t> segmentIdList, uint32_t osdId) {
+
+	string deletedCacheString;
+	for (auto segmentId : segmentIdList) {
+		deletedCacheString += to_string(segmentId) + " ";
+	}
+	debug_yellow("Deleted Cache for OSD %" PRIu32 " = %s\n", osdId, deletedCacheString.c_str());
+}
+
 void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId,
 		uint32_t clientId, uint32_t fileId, const string &path) {
 

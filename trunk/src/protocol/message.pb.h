@@ -66,6 +66,7 @@ class RecoveryTriggerReplyPro;
 class UploadSegmentAckPro;
 class GetSegmentInfoRequestPro;
 class CacheSegmentReplyPro;
+class ReportDeletedCachePro;
 class PutSegmentInitReplyPro;
 class SegmentTransferEndReplyPro;
 class OffsetLengthPro;
@@ -3586,30 +3587,115 @@ class CacheSegmentReplyPro : public ::google::protobuf::Message {
   
   // accessors -------------------------------------------------------
   
-  // optional fixed32 osdId = 1;
-  inline bool has_osdid() const;
-  inline void clear_osdid();
-  static const int kOsdIdFieldNumber = 1;
-  inline ::google::protobuf::uint32 osdid() const;
-  inline void set_osdid(::google::protobuf::uint32 value);
-  
-  // optional fixed64 segmentId = 2;
+  // optional fixed64 segmentId = 1;
   inline bool has_segmentid() const;
   inline void clear_segmentid();
-  static const int kSegmentIdFieldNumber = 2;
+  static const int kSegmentIdFieldNumber = 1;
   inline ::google::protobuf::uint64 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint64 value);
   
   // @@protoc_insertion_point(class_scope:ncvfs.CacheSegmentReplyPro)
  private:
-  inline void set_has_osdid();
-  inline void clear_has_osdid();
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static CacheSegmentReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ReportDeletedCachePro : public ::google::protobuf::Message {
+ public:
+  ReportDeletedCachePro();
+  virtual ~ReportDeletedCachePro();
+  
+  ReportDeletedCachePro(const ReportDeletedCachePro& from);
+  
+  inline ReportDeletedCachePro& operator=(const ReportDeletedCachePro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ReportDeletedCachePro& default_instance();
+  
+  void Swap(ReportDeletedCachePro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  ReportDeletedCachePro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ReportDeletedCachePro& from);
+  void MergeFrom(const ReportDeletedCachePro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // repeated fixed64 segmentIdList = 1;
+  inline int segmentidlist_size() const;
+  inline void clear_segmentidlist();
+  static const int kSegmentIdListFieldNumber = 1;
+  inline ::google::protobuf::uint64 segmentidlist(int index) const;
+  inline void set_segmentidlist(int index, ::google::protobuf::uint64 value);
+  inline void add_segmentidlist(::google::protobuf::uint64 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
+      segmentidlist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
+      mutable_segmentidlist();
+  
+  // optional fixed32 osdId = 2;
+  inline bool has_osdid() const;
+  inline void clear_osdid();
+  static const int kOsdIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.ReportDeletedCachePro)
+ private:
+  inline void set_has_osdid();
+  inline void clear_has_osdid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > segmentidlist_;
   ::google::protobuf::uint32 osdid_;
   
   mutable int _cached_size_;
@@ -3620,7 +3706,7 @@ class CacheSegmentReplyPro : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_message_2eproto();
   
   void InitAsDefaultInstance();
-  static CacheSegmentReplyPro* default_instance_;
+  static ReportDeletedCachePro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -8734,37 +8820,15 @@ inline void GetSegmentInfoRequestPro::set_segmentid(::google::protobuf::uint64 v
 
 // CacheSegmentReplyPro
 
-// optional fixed32 osdId = 1;
-inline bool CacheSegmentReplyPro::has_osdid() const {
+// optional fixed64 segmentId = 1;
+inline bool CacheSegmentReplyPro::has_segmentid() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void CacheSegmentReplyPro::set_has_osdid() {
+inline void CacheSegmentReplyPro::set_has_segmentid() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void CacheSegmentReplyPro::clear_has_osdid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void CacheSegmentReplyPro::clear_osdid() {
-  osdid_ = 0u;
-  clear_has_osdid();
-}
-inline ::google::protobuf::uint32 CacheSegmentReplyPro::osdid() const {
-  return osdid_;
-}
-inline void CacheSegmentReplyPro::set_osdid(::google::protobuf::uint32 value) {
-  set_has_osdid();
-  osdid_ = value;
-}
-
-// optional fixed64 segmentId = 2;
-inline bool CacheSegmentReplyPro::has_segmentid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void CacheSegmentReplyPro::set_has_segmentid() {
-  _has_bits_[0] |= 0x00000002u;
-}
 inline void CacheSegmentReplyPro::clear_has_segmentid() {
-  _has_bits_[0] &= ~0x00000002u;
+  _has_bits_[0] &= ~0x00000001u;
 }
 inline void CacheSegmentReplyPro::clear_segmentid() {
   segmentid_ = GOOGLE_ULONGLONG(0);
@@ -8776,6 +8840,57 @@ inline ::google::protobuf::uint64 CacheSegmentReplyPro::segmentid() const {
 inline void CacheSegmentReplyPro::set_segmentid(::google::protobuf::uint64 value) {
   set_has_segmentid();
   segmentid_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// ReportDeletedCachePro
+
+// repeated fixed64 segmentIdList = 1;
+inline int ReportDeletedCachePro::segmentidlist_size() const {
+  return segmentidlist_.size();
+}
+inline void ReportDeletedCachePro::clear_segmentidlist() {
+  segmentidlist_.Clear();
+}
+inline ::google::protobuf::uint64 ReportDeletedCachePro::segmentidlist(int index) const {
+  return segmentidlist_.Get(index);
+}
+inline void ReportDeletedCachePro::set_segmentidlist(int index, ::google::protobuf::uint64 value) {
+  segmentidlist_.Set(index, value);
+}
+inline void ReportDeletedCachePro::add_segmentidlist(::google::protobuf::uint64 value) {
+  segmentidlist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
+ReportDeletedCachePro::segmentidlist() const {
+  return segmentidlist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
+ReportDeletedCachePro::mutable_segmentidlist() {
+  return &segmentidlist_;
+}
+
+// optional fixed32 osdId = 2;
+inline bool ReportDeletedCachePro::has_osdid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void ReportDeletedCachePro::set_has_osdid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void ReportDeletedCachePro::clear_has_osdid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void ReportDeletedCachePro::clear_osdid() {
+  osdid_ = 0u;
+  clear_has_osdid();
+}
+inline ::google::protobuf::uint32 ReportDeletedCachePro::osdid() const {
+  return osdid_;
+}
+inline void ReportDeletedCachePro::set_osdid(::google::protobuf::uint32 value) {
+  set_has_osdid();
+  osdid_ = value;
 }
 
 // -------------------------------------------------------------------

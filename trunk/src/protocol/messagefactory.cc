@@ -7,6 +7,7 @@
 #include "../common/debug.hh"
 #include "../common/enums.hh"
 #include "../common/enumtostring.hh"
+
 #include "metadata/listdirectoryrequest.hh"
 #include "metadata/listdirectoryreply.hh"
 #include "metadata/uploadfilerequest.hh"
@@ -27,6 +28,8 @@
 #include "metadata/renamefilereply.hh"
 #include "metadata/cachesegmentrequest.hh"
 #include "metadata/cachesegmentreply.hh"
+#include "metadata/reportdeletedcache.hh"
+
 #include "transfer/putsegmentinitrequest.hh"
 #include "transfer/putsegmentinitreply.hh"
 #include "transfer/blocktransferendrequest.hh"
@@ -40,14 +43,17 @@
 #include "transfer/getblockinitrequest.hh"
 #include "transfer/getsegmentrequest.hh"
 #include "transfer/recoveryblockdatamsg.hh"
+
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
+
 #include "status/osdstartupmsg.hh"
 #include "status/osdshutdownmsg.hh"
 #include "status/osdstatupdaterequestmsg.hh"
 #include "status/osdstatupdatereplymsg.hh"
 #include "status/newosdregistermsg.hh"
 #include "status/onlineosdlistmsg.hh"
+
 #include "nodelist/getprimarylistrequest.hh"
 #include "nodelist/getprimarylistreply.hh"
 #include "nodelist/getsecondarylistrequest.hh"
@@ -146,6 +152,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (CACHE_SEGMENT_REPLY):
 		return new RenameFileReplyMsg(communicator);
+		break;
+	case (REPORT_DELETED_CACHE):
+		return new ReportDeletedCacheMsg(communicator);
 		break;
 
 	//TRANSFER
