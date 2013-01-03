@@ -775,5 +775,6 @@ void StorageModule::clearSegmentDiskCache() {
 }
 
 list <uint64_t> StorageModule::getSegmentCacheQueue() {
+	lock_guard<mutex> lk(diskCacheMutex);
 	return _segmentCacheQueue;
 }
