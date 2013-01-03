@@ -87,6 +87,14 @@ public:
 			uint64_t segmentId);
 
 	/**
+	 * Report deleted segment for the last polling interval to the MDS
+	 * @param segmentIdList A list of deleted segment ID
+	 * @param osdId My OSD ID
+	 */
+
+	void reportDeletedCache(list<uint64_t> segmentIdList, uint32_t osdId);
+
+	/**
 	 * (to be implemented)
 	 * Report a failure of OSD to monitor / MDS
 	 * @param osdId Failed OSD ID

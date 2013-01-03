@@ -66,7 +66,19 @@ public:
 	 * @param	newPath	New File Path
 	 */
 	void renameFileProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t clientId, uint32_t fileId, const string &path, const string &newPath);
+			uint32_t clientId, uint32_t fileId, const string &path,
+			const string &newPath);
+
+	/**
+	 * @brief	Handle Report Delete Cache Message from OSD
+	 * @param requestId 	Request ID
+	 * @param connectionId 	Connection ID
+	 * @param segmentIdList	List of deleted segment ID
+	 * @param osdId OSD ID
+	 */
+
+	void reportDeleteCacheProcessor(uint32_t requestId, uint32_t connectionId,
+			list<uint64_t> segmentIdList, uint32_t osdId);
 
 	/**
 	 * @brief	Handle Upload Segment Acknowledgement from Primary
@@ -82,8 +94,8 @@ public:
 	 */
 	void uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 			uint64_t segmentId, uint32_t segmentSize, CodingScheme codingScheme,
-			const string &codingSetting, const vector<uint32_t> &segmentNodeList,
-			const string &checksum);
+			const string &codingSetting,
+			const vector<uint32_t> &segmentNodeList, const string &checksum);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)

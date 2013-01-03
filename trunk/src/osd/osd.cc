@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 #include <openssl/md5.h>
+#include <algorithm>
 #include "osd.hh"
 #include "../common/blocklocation.hh"
 #include "../common/debug.hh"
@@ -41,10 +42,8 @@ boost::threadpool::pool _recoverytp;
 
 #ifdef TIME_POINT
 #include <chrono>
-using namespace std;
 typedef chrono::high_resolution_clock Clock;
 typedef chrono::milliseconds milliseconds;
-mutex timeMutex;
 double lockSegmentCountMutexTime = 0;
 double getSegmentInfoTime = 0;
 double getOSDStatusTime = 0;
@@ -52,7 +51,10 @@ double getBlockTime = 0;
 double decodeSegmentTime = 0;
 double sendSegmentTime = 0;
 double cacheSegmentTime = 0;
+mutex timeMutex;
 #endif
+
+using namespace std;
 
 Osd::Osd(uint32_t selfId) {
 
@@ -70,12 +72,52 @@ Osd::Osd(uint32_t selfId) {
 	_recoverytp.size_controller().resize(RECOVERY_THREADS);
 #endif
 
+	_reportCacheInterval = configLayer->getConfigLong(
+			"Storage>ReportCacheInterval");
 }
 
 Osd::~Osd() {
 	//delete _blockLocationCache;
 	delete _storageModule;
 	delete _osdCommunicator;
+}
+
+void Osd::reportRemovedCache() {
+	debug("%s\n", "Cache report thread started");
+
+	while (true) {
+		debug("%s\n", "Checking cache...");
+
+		list<uint64_t> currentCacheList =
+				_storageModule->getSegmentCacheQueue();
+
+		// sort list
+		currentCacheList.sort();
+
+		// deleted segments (current - previous)
+
+		debug_cyan("Old cache size = %zu, new cache size = %zu\n",
+				_previousCacheList.size(), currentCacheList.size());
+
+		list<uint64_t> deletedCacheList;
+		set_difference(_previousCacheList.begin(), _previousCacheList.end(),
+				currentCacheList.begin(), currentCacheList.end(),
+				std::inserter(deletedCacheList, deletedCacheList.end()));
+
+		// for debug
+		string deletedCacheString;
+		for (auto segmentId : deletedCacheList) {
+			deletedCacheString += to_string(segmentId) + " ";
+		}
+		debug_yellow("Deleted Cache = %s\n", deletedCacheString.c_str());
+
+		// report to MDS
+		_osdCommunicator->reportDeletedCache(deletedCacheList, _osdId);
+
+		_previousCacheList = currentCacheList;
+
+		sleep(_reportCacheInterval);
+	}
 }
 
 void Osd::cacheSegment(uint64_t segmentId, SegmentData segmentData) {

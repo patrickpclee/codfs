@@ -103,6 +103,9 @@ int main(int argc, char* argv[]) {
 	thread sendThread(&Communicator::sendMessage, communicator);
 #endif
 
+	// 4. Cache Thread
+	thread cacheThread (&Osd::reportRemovedCache, osd);
+
 	uint32_t selfAddr = getInterfaceAddressV4(interfaceName);
 	uint16_t selfPort = communicator->getServerPort();
 	printIp(selfAddr);
@@ -113,10 +116,6 @@ int main(int argc, char* argv[]) {
 	communicator->connectToMds();
 	communicator->connectToMonitor();
 	communicator->registerToMonitor(selfAddr, selfPort);
-
-	//thread testThread(startTestThread, communicator);
-	// TODO: pause before connect for now
-	//getchar();
 
 	garbageCollectionThread.join();
 	receiveThread.join();

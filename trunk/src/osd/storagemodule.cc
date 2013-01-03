@@ -773,3 +773,8 @@ void StorageModule::clearSegmentDiskCache() {
 	_freeSegmentSpace = _maxSegmentCache;
 	_currentSegmentUsage = 0;
 }
+
+list <uint64_t> StorageModule::getSegmentCacheQueue() {
+	lock_guard<mutex> lk(diskCacheMutex);
+	return _segmentCacheQueue;
+}
