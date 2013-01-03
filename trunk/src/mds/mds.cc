@@ -63,7 +63,7 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 	segmentList = _metaDataModule->newSegmentList(numOfObjs);
 	_metaDataModule->saveSegmentList(fileId, segmentList);
 
-//	primaryList = _mdsCommunicator->askPrimaryList(numOfObjs);
+	//	primaryList = _mdsCommunicator->askPrimaryList(numOfObjs);
 	primaryList = _mdsCommunicator->getPrimaryList(
 			_mdsCommunicator->getMonitorSockfd(), numOfObjs);
 	for (uint32_t i = 0; i < primaryList.size(); i++) {
@@ -127,10 +127,10 @@ void Mds::renameFileProcessor(uint32_t requestId, uint32_t connectionId,
  * 2. Set the Primary for the segment
  */
 /*
- void Mds::FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId){
- uint64_t fileSize = _metaDataModule->readFileSize(fileId);
- _mdsCommunicator->replyFileSize(requestId, connectionId, fileId, fileSize);
- }
+   void Mds::FileSizeProcessor(uint32_t requestId, uint32_t connectionId, uint32_t fileId){
+   uint64_t fileSize = _metaDataModule->readFileSize(fileId);
+   _mdsCommunicator->replyFileSize(requestId, connectionId, fileId, fileSize);
+   }
  */
 
 void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
@@ -257,10 +257,17 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 			segmentMetaData._size, segmentMetaData._nodeList,
 			segmentMetaData._codingScheme, segmentMetaData._codingSetting);
 
+	// Hotness update and see whether new cache should be requested
 	struct HotnessRequset req = _hotnessModule->updateSegmentHotness(segmentId,
-		 DEFAULT_HOTNESS_ALG, 0);
+			DEFAULT_HOTNESS_ALG, 0);
+
+	// Check whether new cache should be issued
 	if (req.numOfNewCache > 0) {
-		_mdsCommunicator->requestCache(segmentId, req);
+		// Issue the cache request
+		vector<uint32_t> newAdded = _mdsCommunicator->requestCache(segmentId, req);
+
+		// Update the cache list
+		_hotnessModule->updateSegmentCache(segmentId, newAdded);
 	}
 
 	return;
@@ -302,7 +309,7 @@ void Mds::primaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
 	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(segmentId,
 			nodeList, nodeStatus);
 
-//	_mdsCommunicator->reportFailure(osdId, reason);
+	//	_mdsCommunicator->reportFailure(osdId, reason);
 
 	_mdsCommunicator->replyPrimary(requestId, connectionId, segmentId,
 			actingPrimary);
@@ -339,7 +346,7 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 
 		// get the list of segments owned by the failed osd as primary
 		vector<uint64_t> primarySegmentList =
-				_metaDataModule->readOsdPrimarySegmentList(osdId);
+			_metaDataModule->readOsdPrimarySegmentList(osdId);
 
 		for (auto segmentId : primarySegmentList) {
 			// get the node list of an segment and their status
@@ -426,36 +433,36 @@ void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId,
  */
 void Mds::test() {
 	/*
-	 uint64_t segmentId = 976172415;
-	 struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(segmentId);
+	   uint64_t segmentId = 976172415;
+	   struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(segmentId);
 
-	 debug("Segment %" PRIu64 "- Coding %d:%s\n",segmentId, (int)segmentMetaData._codingScheme, segmentMetaData._codingSetting.c_str());
-	 for(const auto node : segmentMetaData._nodeList) {
-	 debug("%" PRIu32 "\n",node);
-	 }
+	   debug("Segment %" PRIu64 "- Coding %d:%s\n",segmentId, (int)segmentMetaData._codingScheme, segmentMetaData._codingSetting.c_str());
+	   for(const auto node : segmentMetaData._nodeList) {
+	   debug("%" PRIu32 "\n",node);
+	   }
 	 */
 	/*
-	 uint32_t fileId = 216;
-	 vector <uint64_t> segmentList = _metaDataModule->readSegmentList(fileId);
-	 debug("Segment List [%" PRIu32 "]\n",fileId);
-	 for(const auto segment : segmentList){
-	 uint32_t primaryId = _metaDataModule->getPrimary(segment);
-	 printf("%" PRIu64 " [%" PRIu32 "]- ", segment,primaryId);
-	 }
-	 printf("\n");
+	   uint32_t fileId = 216;
+	   vector <uint64_t> segmentList = _metaDataModule->readSegmentList(fileId);
+	   debug("Segment List [%" PRIu32 "]\n",fileId);
+	   for(const auto segment : segmentList){
+	   uint32_t primaryId = _metaDataModule->getPrimary(segment);
+	   printf("%" PRIu64 " [%" PRIu32 "]- ", segment,primaryId);
+	   }
+	   printf("\n");
 	 */
 	/*
-	 debug("%s\n", "Test\n");
-	 for (int i = 0; i < 10; ++i) {
-	 uint32_t temp = _metaDataModule->createFile(1, ".", 1024, RAID1_CODING);
-	 vector<uint64_t> segmentList;
-	 segmentList = _metaDataModule->newSegmentList(10);
-	 _metaDataModule->saveSegmentList(temp, segmentList);
-	 for (int j = 0; j < 10; ++j) {
-	 _metaDataModule->saveNodeList(segmentList[j], { 1 });
-	 _metaDataModule->setPrimary(segmentList[j], 1);
-	 }
-	 }
+	   debug("%s\n", "Test\n");
+	   for (int i = 0; i < 10; ++i) {
+	   uint32_t temp = _metaDataModule->createFile(1, ".", 1024, RAID1_CODING);
+	   vector<uint64_t> segmentList;
+	   segmentList = _metaDataModule->newSegmentList(10);
+	   _metaDataModule->saveSegmentList(temp, segmentList);
+	   for (int j = 0; j < 10; ++j) {
+	   _metaDataModule->saveNodeList(segmentList[j], { 1 });
+	   _metaDataModule->setPrimary(segmentList[j], 1);
+	   }
+	   }
 	 */
 }
 
