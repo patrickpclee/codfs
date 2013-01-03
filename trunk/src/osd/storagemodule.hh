@@ -275,7 +275,18 @@ public:
 
 	struct SegmentData getSegmentFromDiskCache(uint64_t segmentId);
 
+	/**
+	 * Clear all segment disk cache
+	 */
+
 	void clearSegmentDiskCache();
+
+	/**
+	 * Return the list of cached segment ID
+	 * @return ID of cached segments
+	 */
+
+	list <uint64_t> getSegmentCacheQueue();
 
 private:
 
