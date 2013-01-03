@@ -149,6 +149,20 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 	//_metaDataModule->saveNodeList(segmentId, segmentNodeList);
 	//_metaDataModule->setPrimary(segmentId, segmentNodeList[0]);
 
+
+	// Hotness update and see whether new cache should be requested
+	struct HotnessRequset req = _hotnessModule->updateSegmentHotness(segmentId,
+			DEFAULT_HOTNESS_ALG, 0);
+
+	// Check whether new cache should be issued
+	if (req.numOfNewCache > 0) {
+		// Issue the cache request
+		vector<uint32_t> newAdded = _mdsCommunicator->requestCache(segmentId, 
+			req, segmentMetaData._nodeList);
+
+		// Update the cache list
+		_hotnessModule->updateSegmentCache(segmentId, newAdded);
+	}
 	return;
 }
 
@@ -264,7 +278,8 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 	// Check whether new cache should be issued
 	if (req.numOfNewCache > 0) {
 		// Issue the cache request
-		vector<uint32_t> newAdded = _mdsCommunicator->requestCache(segmentId, req);
+		vector<uint32_t> newAdded = _mdsCommunicator->requestCache(segmentId, 
+			req, segmentMetaData._nodeList);
 
 		// Update the cache list
 		_hotnessModule->updateSegmentCache(segmentId, newAdded);
