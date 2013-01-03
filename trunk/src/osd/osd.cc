@@ -100,10 +100,15 @@ void Osd::reportRemovedCache() {
 				std::inserter(deletedCache, deletedCache.end()));
 
 		// TODO: report to MDS
+		string deletedCacheString;
+		for (auto segmentId : deletedCache) {
+			deletedCacheString += to_string(segmentId) + " ";
+		}
+		debug_yellow ("Deleted Cache = %s\n", deletedCacheString.c_str());
 
 		_previousCacheSet = _currentCacheSet;
 
-		usleep(_reportCacheInterval);
+		sleep(_reportCacheInterval);
 	}
 }
 
