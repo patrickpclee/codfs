@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 #include <openssl/md5.h>
+#include <algorithm>
 #include "osd.hh"
 #include "../common/blocklocation.hh"
 #include "../common/debug.hh"
@@ -41,10 +42,8 @@ boost::threadpool::pool _recoverytp;
 
 #ifdef TIME_POINT
 #include <chrono>
-using namespace std;
 typedef chrono::high_resolution_clock Clock;
 typedef chrono::milliseconds milliseconds;
-mutex timeMutex;
 double lockSegmentCountMutexTime = 0;
 double getSegmentInfoTime = 0;
 double getOSDStatusTime = 0;
@@ -52,7 +51,10 @@ double getBlockTime = 0;
 double decodeSegmentTime = 0;
 double sendSegmentTime = 0;
 double cacheSegmentTime = 0;
+mutex timeMutex;
 #endif
+
+using namespace std;
 
 Osd::Osd(uint32_t selfId) {
 
@@ -70,12 +72,39 @@ Osd::Osd(uint32_t selfId) {
 	_recoverytp.size_controller().resize(RECOVERY_THREADS);
 #endif
 
+	_reportCacheInterval = configLayer->getConfigLong(
+			"Storage>ReportCacheInterval");
 }
 
 Osd::~Osd() {
 	//delete _blockLocationCache;
 	delete _storageModule;
 	delete _osdCommunicator;
+}
+
+void Osd::reportRemovedCache() {
+	debug("%s\n", "Cache report thread started");
+
+	while (true) {
+		debug("%s\n", "Checking cache...");
+
+		list<uint64_t> segmentCacheQueue =
+				_storageModule->getSegmentCacheQueue();
+		set<uint64_t> _currentCacheSet(segmentCacheQueue.begin(),
+				segmentCacheQueue.end());
+
+		// deleted segments (current - previous)
+		set<uint64_t> deletedCache;
+		set_difference(_currentCacheSet.begin(), _currentCacheSet.end(),
+				_previousCacheSet.begin(), _previousCacheSet.end(),
+				std::inserter(deletedCache, deletedCache.end()));
+
+		// TODO: report to MDS
+
+		_previousCacheSet = _currentCacheSet;
+
+		usleep(_reportCacheInterval);
+	}
 }
 
 void Osd::cacheSegment(uint64_t segmentId, SegmentData segmentData) {
