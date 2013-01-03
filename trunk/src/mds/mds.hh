@@ -5,6 +5,7 @@
 #ifndef __MDS_HH__
 #define __MDS_HH__
 
+#include "../common/hotness.hh"
 #include "hotnessmodule.hh"
 #include "metadatamodule.hh"
 #include "namespacemodule.hh"

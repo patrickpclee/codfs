@@ -1,4 +1,5 @@
 #include <iostream>
+#include <algorithm>
 #include "mds_communicator.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
@@ -11,6 +12,7 @@
 #include "../protocol/metadata/downloadfilereply.hh"
 #include "../protocol/metadata/getsegmentidlistreply.hh"
 #include "../protocol/metadata/renamefilereply.hh"
+#include "../protocol/metadata/cachesegmentrequest.hh"
 #include "../protocol/status/switchprimaryosdreplymsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/recoverytriggerreply.hh"
@@ -20,6 +22,38 @@ extern ConfigLayer* configLayer;
 
 MdsCommunicator::MdsCommunicator() {
 	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
+}
+
+vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
+		HotnessRequest req, vector<uint32_t> osdList) {
+
+	vector<uint32_t> newCacheOsdList;
+
+	// random select a few
+	while ((uint32_t) newCacheOsdList.size() < req.numOfNewCache) {
+		int idx = rand() % osdList.size();
+		if (find(req.cachedOsdList.begin(), req.cachedOsdList.end(),
+				osdList[idx]) == req.cachedOsdList.end()) {
+			newCacheOsdList.push_back(osdList[idx]);
+		}
+	}
+
+	for (uint32_t i = 0; i < req.numOfNewCache; i++) {
+
+		CacheSegmentRequestMsg* cacheSegmentRequestMsg =
+				new CacheSegmentRequestMsg(this,
+						getSockfdFromId(newCacheOsdList[i]), segmentId);
+		cacheSegmentRequestMsg->prepareProtocolMsg();
+
+		addMessage(cacheSegmentRequestMsg); // discard the reply for now
+
+		debug_yellow(
+				"Request cache for segment %" PRIu64 " at OSD %" PRIu32 "\n",
+				segmentId, newCacheOsdList[i]);
+
+	}
+
+	return newCacheOsdList;
 }
 
 /**
@@ -89,20 +123,23 @@ void MdsCommunicator::replyDeleteFile(uint32_t requestId, uint32_t connectionId,
  * @param	fileId	File Id
  * @param	path	File Path
  */
-void MdsCommunicator::replyRenameFile(uint32_t requestId, uint32_t connectionId, uint32_t fileId, const string& path) {
-	RenameFileReplyMsg* renameFileReplyMsg = new RenameFileReplyMsg(this, requestId, connectionId, fileId);
+void MdsCommunicator::replyRenameFile(uint32_t requestId, uint32_t connectionId,
+		uint32_t fileId, const string& path) {
+	RenameFileReplyMsg* renameFileReplyMsg = new RenameFileReplyMsg(this,
+			requestId, connectionId, fileId);
 	renameFileReplyMsg->prepareProtocolMsg();
 	addMessage(renameFileReplyMsg);
-	return ;
+	return;
 }
 
 void MdsCommunicator::display() {
 	return;
 }
 
-void MdsCommunicator::replySegmentInfo(uint32_t requestId, uint32_t connectionId,
-		uint64_t segmentId, uint32_t segmentSize, vector<uint32_t> nodeList,
-		CodingScheme codingScheme, string codingSetting) {
+void MdsCommunicator::replySegmentInfo(uint32_t requestId,
+		uint32_t connectionId, uint64_t segmentId, uint32_t segmentSize,
+		vector<uint32_t> nodeList, CodingScheme codingScheme,
+		string codingSetting) {
 	GetSegmentInfoReplyMsg* getSegmentInfoReplyMsg = new GetSegmentInfoReplyMsg(
 			this, requestId, connectionId, segmentId, segmentSize, nodeList,
 			codingScheme, codingSetting);
@@ -122,8 +159,8 @@ void MdsCommunicator::replySegmentInfo(uint32_t requestId, uint32_t connectionId
  */
 void MdsCommunicator::replySaveSegmentList(uint32_t requestId,
 		uint32_t connectionId, uint32_t fileId) {
-	SaveSegmentListReplyMsg* saveSegmentListReplyMsg = new SaveSegmentListReplyMsg(
-			this, requestId, connectionId, fileId);
+	SaveSegmentListReplyMsg* saveSegmentListReplyMsg =
+			new SaveSegmentListReplyMsg(this, requestId, connectionId, fileId);
 	saveSegmentListReplyMsg->prepareProtocolMsg();
 	addMessage(saveSegmentListReplyMsg);
 	return;
@@ -191,7 +228,8 @@ void MdsCommunicator::replySegmentIdList(uint32_t requestId,
 void MdsCommunicator::replyRecoveryTrigger(uint32_t requestId,
 		uint32_t connectionId, vector<SegmentLocation> segmentLocationList) {
 	RecoveryTriggerReplyMsg * recoveryTriggerReplyMsg =
-			new RecoveryTriggerReplyMsg(this, requestId, connectionId, segmentLocationList);
+			new RecoveryTriggerReplyMsg(this, requestId, connectionId,
+					segmentLocationList);
 	recoveryTriggerReplyMsg->prepareProtocolMsg();
 	addMessage(recoveryTriggerReplyMsg);
 }
