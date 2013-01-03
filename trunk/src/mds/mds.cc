@@ -27,6 +27,7 @@ ConfigLayer* configLayer;
  * Initialise MDS Communicator and MetaData Modules
  */
 Mds::Mds() {
+	_hotnessModule = new HotnessModule();
 	_metaDataModule = new MetaDataModule();
 	_nameSpaceModule = new NameSpaceModule();
 	_mdsCommunicator = new MdsCommunicator();
@@ -36,6 +37,7 @@ Mds::~Mds() {
 	delete _mdsCommunicator;
 	delete _metaDataModule;
 	delete _nameSpaceModule;
+	delete _hotnessModule;
 }
 
 /**
