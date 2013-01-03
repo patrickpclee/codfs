@@ -88,25 +88,29 @@ void Osd::reportRemovedCache() {
 	while (true) {
 		debug("%s\n", "Checking cache...");
 
-		list<uint64_t> segmentCacheQueue =
+		list<uint64_t> currentCacheList =
 				_storageModule->getSegmentCacheQueue();
-		set<uint64_t> _currentCacheSet(segmentCacheQueue.begin(),
-				segmentCacheQueue.end());
+
+		// sort list
+		currentCacheList.sort();
 
 		// deleted segments (current - previous)
-		set<uint64_t> deletedCache;
-		set_difference(_currentCacheSet.begin(), _currentCacheSet.end(),
-				_previousCacheSet.begin(), _previousCacheSet.end(),
-				std::inserter(deletedCache, deletedCache.end()));
+		list <uint64_t> deletedCacheList;
+		set_difference(currentCacheList.begin(), currentCacheList.end(),
+				_previousCacheList.begin(), _previousCacheList.end(),
+				std::inserter(deletedCacheList, deletedCacheList.end()));
 
-		// TODO: report to MDS
+		// for debug
 		string deletedCacheString;
-		for (auto segmentId : deletedCache) {
+		for (auto segmentId : deletedCacheList) {
 			deletedCacheString += to_string(segmentId) + " ";
 		}
-		debug_yellow ("Deleted Cache = %s\n", deletedCacheString.c_str());
+		debug_yellow("Deleted Cache = %s\n", deletedCacheString.c_str());
 
-		_previousCacheSet = _currentCacheSet;
+		// report to MDS
+		_osdCommunicator->reportDeletedCache(deletedCacheList, _osdId);
+
+		_previousCacheList = currentCacheList;
 
 		sleep(_reportCacheInterval);
 	}

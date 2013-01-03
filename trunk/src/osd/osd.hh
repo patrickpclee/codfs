@@ -432,6 +432,6 @@ private:
 
 	// cache report
 	uint32_t _reportCacheInterval;
-	set<uint64_t> _previousCacheSet;
+	list<uint64_t> _previousCacheList;
 };
 #endif
