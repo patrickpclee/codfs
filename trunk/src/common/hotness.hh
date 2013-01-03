@@ -3,17 +3,8 @@
 
 #include <ctime>
 #include <vector>
+#include "enums.hh"
 using namespace std;
-
-enum HotnessAlgorithm{
-	DEFAULT_HOTNESS_ALG
-};
-
-enum HotnessType {
-	COLD,
-	HOT,
-	HOTTEST
-};
 
 struct Hotness {
 	Hotness() { 
