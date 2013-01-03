@@ -5,6 +5,7 @@
 #ifndef __MDS_HH__
 #define __MDS_HH__
 
+#include "hotnessmodule.hh"
 #include "metadatamodule.hh"
 #include "namespacemodule.hh"
 #include "mds_communicator.hh"
@@ -273,6 +274,9 @@ private:
 
 	/// Handle Namespace Operations
 	NameSpaceModule* _nameSpaceModule;
+
+	/// Handle Hotness Operations
+	HotnessModule* _hotnessModule;
 
 	/// Running Indicator
 	bool running;
