@@ -50,6 +50,9 @@ typedef std::vector<symbol_list_t> block_list_t ;
 
 // osd/storagemodule.cc
 #define USE_SEGMENT_CACHE
+#define USE_IO_THREADS
+#define IO_THREADS 2
+#define IO_POLL_INTERVAL 10000
 
 // protocol/message.hh
 #define USE_MESSAGE_MEMORY_POOL
