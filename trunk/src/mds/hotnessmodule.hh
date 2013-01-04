@@ -60,6 +60,14 @@ class HotnessModule {
 		 */
 		void deleteSegmentCache(uint32_t osdId, vector<uint64_t> segmentIdList);
 
+		/*
+ 		 * @brief Get function for cache entry of a particular segmentId
+		 *
+		 * @param segmentId Target segmentId
+		 *
+		 * @return return a vector of cached OSD list
+		 */
+		vector<uint32_t>  getSegmentCacheEntry(uint64_t segmentId);
 
 	private:
 
@@ -76,14 +84,6 @@ class HotnessModule {
 		struct HotnessRequest checkHotnessCache(uint64_t segmentId, enum HotnessType
 				type);
 
-		/*
- 		 * @brief Get function for cache entry of a particular segmentId
-		 *
-		 * @param segmentId Target segmentId
-		 * 
-		 * @return return a vector of cached OSD list
-		 */
-		vector<uint32_t>  getSegmentCacheEntry(uint64_t segmentId);
 
 		/*
  		 * @brief Get function for hotness entry of a particular segmentId
