@@ -1,5 +1,6 @@
 #include <mutex>
 #include <thread>
+#include "../common/debug.hh"
 #include "hotnessmodule.hh"
 
 const double HOUR12 = 60 * 60 * 12.0;
@@ -35,6 +36,10 @@ struct HotnessRequest HotnessModule::updateSegmentHotness(uint64_t segmentId,
 			break;
 	}
 	setSegmentHotnessEntry(segmentId, newHotness);
+	{
+		lock_guard<mutex> lk(hotnessMapMutex);
+		debug_yellow("Hotness of SegmentId %" PRIu64 " Value = %lf and Type = %" PRIu32 "\n", segmentId, _hotnessMap[segmentId].hotness, _hotnessMap[segmentId].type);
+	}
 	return checkHotnessCache(segmentId, newHotness.type);
 }
 
@@ -87,7 +92,10 @@ void HotnessModule::deleteSegmentCache(uint32_t osdId, vector<uint64_t> segmentI
 			return;
 		} else {
 			vector<uint32_t>& listRef = it->second;
-			listRef.erase(find(listRef.begin(), listRef.end(), osdId));
+			vector<uint32_t>::iterator eraseIt = find(listRef.begin(), listRef.end(), osdId);
+			if (eraseIt != listRef.end()) {
+				listRef.erase(eraseIt);
+			}
 		}
 	}
 	return;

@@ -378,32 +378,38 @@ void OsdCommunicator::segmentUploadAck(uint64_t segmentId, uint32_t segmentSize,
 // DOWNLOAD
 
 struct SegmentTransferOsdInfo OsdCommunicator::getSegmentInfoRequest(
-		uint64_t segmentId) {
+		uint64_t segmentId, uint32_t osdId, bool needReply) {
 
 	struct SegmentTransferOsdInfo segmentInfo = { };
 	uint32_t mdsSockFd = getMdsSockfd();
 
 	GetSegmentInfoRequestMsg* getSegmentInfoRequestMsg =
-			new GetSegmentInfoRequestMsg(this, mdsSockFd, segmentId);
+			new GetSegmentInfoRequestMsg(this, mdsSockFd, segmentId, osdId, needReply);
 	getSegmentInfoRequestMsg->prepareProtocolMsg();
-	addMessage(getSegmentInfoRequestMsg, true);
 
-	MessageStatus status = getSegmentInfoRequestMsg->waitForStatusChange();
-	if (status == READY) {
-		segmentInfo._id = segmentId;
-		segmentInfo._size = getSegmentInfoRequestMsg->getSegmentSize();
-		segmentInfo._codingScheme = getSegmentInfoRequestMsg->getCodingScheme();
-		segmentInfo._codingSetting =
-				getSegmentInfoRequestMsg->getCodingSetting();
-		segmentInfo._checksum = getSegmentInfoRequestMsg->getChecksum();
-		segmentInfo._osdList = getSegmentInfoRequestMsg->getNodeList();
-		waitAndDelete(getSegmentInfoRequestMsg);
+	if (needReply) {
+		addMessage(getSegmentInfoRequestMsg, true);
+
+		MessageStatus status = getSegmentInfoRequestMsg->waitForStatusChange();
+		if (status == READY) {
+			segmentInfo._id = segmentId;
+			segmentInfo._size = getSegmentInfoRequestMsg->getSegmentSize();
+			segmentInfo._codingScheme = getSegmentInfoRequestMsg->getCodingScheme();
+			segmentInfo._codingSetting =
+					getSegmentInfoRequestMsg->getCodingSetting();
+			segmentInfo._checksum = getSegmentInfoRequestMsg->getChecksum();
+			segmentInfo._osdList = getSegmentInfoRequestMsg->getNodeList();
+			waitAndDelete(getSegmentInfoRequestMsg);
+		} else {
+			debug("Get Segment Info Request Failed %" PRIu64 "\n", segmentId);
+			exit(-1);
+		}
+
+		return segmentInfo;
 	} else {
-		debug("Get Segment Info Request Failed %" PRIu64 "\n", segmentId);
-		exit(-1);
+		addMessage(getSegmentInfoRequestMsg);
+		return {};
 	}
-
-	return segmentInfo;
 }
 
 void OsdCommunicator::registerToMonitor(uint32_t ip, uint16_t port) {

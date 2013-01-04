@@ -171,10 +171,12 @@ public:
 	/**
 	 * Obtain the information about an segment from the MDS
 	 * @param segmentId Segment ID
+	 * @param osdId OSD ID
+	 * @param needReply Need MDS to reply segment info
 	 * @return SegmentTransferOsdInfo struct
 	 */
 
-	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId);
+	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId, uint32_t osdId, bool needReply = true);
 
 	/**
 	 * Send acknowledgement to MDS when upload is complete

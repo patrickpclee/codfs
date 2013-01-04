@@ -148,9 +148,10 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	segmentID	ID of the Segment
+	 * @param 	osdId	OSDID
 	 */
 	void getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId);
+			uint64_t segmentId, uint32_t osdId, bool needReply);
 
 	/**
 	 * @brief	Handle List Folder Request from Client

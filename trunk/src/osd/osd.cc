@@ -191,6 +191,9 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				if (!localRetrieve) {
 					segmentData = _storageModule->getSegmentFromDiskCache(
 							segmentId);
+
+					// hack: trigger MDS to update hotness
+					_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, false);
 				}
 
 			} else {
@@ -201,7 +204,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// 1. ask MDS to get segment information
 
 				SegmentTransferOsdInfo segmentInfo =
-						_osdCommunicator->getSegmentInfoRequest(segmentId);
+						_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId);
 #ifdef TIME_POINT
 				t2 = Clock::now();
 #endif
@@ -335,17 +338,23 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 #endif
 
 	// 6. cache and free
-	{
-		lock_guard<mutex> lk(segmentRequestCountMutex);
-		_segmentRequestCount.decrement(segmentId);
-		if (_segmentRequestCount.get(segmentId) == 0) {
-			_segmentRequestCount.erase(segmentId);
+	segmentRequestCountMutex.lock();
+	bool isLocked = true;
 
-			cacheSegment(segmentId, segmentData);
-			freeSegment(segmentId, segmentData);
+	_segmentRequestCount.decrement(segmentId);
+	if (_segmentRequestCount.get(segmentId) == 0) {
+		_segmentRequestCount.erase(segmentId);
+		segmentRequestCountMutex.unlock();
+		isLocked = false;
 
-			debug("%s\n", "[DOWNLOAD] Cleanup completed");
-		}
+		cacheSegment(segmentId, segmentData);
+		freeSegment(segmentId, segmentData);
+
+		debug("%s\n", "[DOWNLOAD] Cleanup completed");
+	}
+
+	if (isLocked) {
+		segmentRequestCountMutex.unlock();
 	}
 
 	// send reply to MDS for localRetrieve
@@ -732,7 +741,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// get coding information from MDS
 	SegmentTransferOsdInfo segmentInfo =
-			_osdCommunicator->getSegmentInfoRequest(segmentId);
+			_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId);
 
 	const CodingScheme codingScheme = segmentInfo._codingScheme;
 	const string codingSetting = segmentInfo._codingSetting;
