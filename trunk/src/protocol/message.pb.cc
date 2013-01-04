@@ -749,8 +749,10 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(UploadSegmentAckPro));
   GetSegmentInfoRequestPro_descriptor_ = file->message_type(32);
-  static const int GetSegmentInfoRequestPro_offsets_[1] = {
+  static const int GetSegmentInfoRequestPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSegmentInfoRequestPro, segmentid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSegmentInfoRequestPro, osdid_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSegmentInfoRequestPro, needreply_),
   };
   GetSegmentInfoRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1578,57 +1580,58 @@ void protobuf_AddDesc_message_2eproto() {
     "\014codingScheme\030\002 \001(\0162,.ncvfs.PutSegmentIn"
     "itRequestPro.CodingScheme\022\025\n\rcodingSetti"
     "ng\030\003 \001(\t\022\020\n\010nodeList\030\004 \003(\007\022\020\n\010checksum\030\005"
-    " \001(\t\022\023\n\013segmentSize\030\006 \001(\007\"-\n\030GetSegmentI"
-    "nfoRequestPro\022\021\n\tsegmentId\030\001 \001(\006\")\n\024Cach"
-    "eSegmentReplyPro\022\021\n\tsegmentId\030\001 \001(\006\"=\n\025R"
-    "eportDeletedCachePro\022\025\n\rsegmentIdList\030\001 "
-    "\003(\006\022\r\n\005osdId\030\002 \001(\007\"+\n\026PutSegmentInitRepl"
-    "yPro\022\021\n\tsegmentId\030\001 \001(\006\"/\n\032SegmentTransf"
-    "erEndReplyPro\022\021\n\tsegmentId\030\001 \001(\006\"1\n\017Offs"
-    "etLengthPro\022\016\n\006offset\030\001 \001(\007\022\016\n\006length\030\002 "
-    "\001(\007\"c\n\026PutBlockInitRequestPro\022\021\n\tsegment"
-    "Id\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\021\n\tblockSize\030\003"
-    " \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"c\n\024RecoveryBloc"
-    "kDataPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002"
-    " \001(\007\022\016\n\006length\030\004 \001(\007\022\027\n\017waitOnRequestId\030"
-    "\005 \001(\007\"R\n\014BlockDataPro\022\021\n\tsegmentId\030\001 \001(\006"
-    "\022\017\n\007blockId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006len"
-    "gth\030\004 \001(\007\"@\n\032BlockTransferEndRequestPro\022"
-    "\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\":\n\024P"
-    "utBlockInitReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017"
-    "\n\007blockId\030\002 \001(\007\"R\n\030BlockTransferEndReply"
-    "Pro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022"
-    "\022\n\nisRecovery\030\003 \001(\010\"~\n\026GetBlockInitReque"
-    "stPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001("
-    "\007\022,\n\014offsetLength\030\003 \003(\0132\026.ncvfs.OffsetLe"
-    "ngthPro\022\022\n\nisRecovery\030\004 \001(\010\"a\n\024GetBlockI"
-    "nitReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockI"
-    "d\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\007\022\022\n\nchunkCount"
-    "\030\004 \001(\007\"6\n\020GetBlockReadyPro\022\021\n\tsegmentId\030"
-    "\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\"g\n\rOsdStartupPro\022"
-    "\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\no"
-    "sdLoading\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPor"
-    "t\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001 \001(\007"
-    "\"O\n\025OsdStatUpdateReplyPro\022\r\n\005osdId\030\001 \001(\007"
-    "\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001("
-    "\007\"U\n\032GetSecondaryListRequestPro\022\021\n\tnumOf"
-    "Segs\030\001 \001(\007\022\021\n\tprimaryId\030\002 \001(\007\022\021\n\tblockSi"
-    "ze\030\003 \001(\006\"\031\n\027OsdStatUpdateRequestPro\"J\n\030G"
-    "etSecondaryListReplyPro\022.\n\rsecondaryList"
-    "\030\001 \003(\0132\027.ncvfs.BlockLocationPro\"B\n\021NewOs"
-    "dRegisterPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001"
-    "(\007\022\017\n\007osdPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n\005o"
-    "sdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001"
-    "(\007\">\n\020OnlineOsdListPro\022*\n\ronlineOsdList\030"
-    "\001 \003(\0132\023.ncvfs.OnlineOsdPro\"(\n\026GetOsdStat"
-    "usRequestPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetOsdSt"
-    "atusReplyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n\024Repai"
-    "rSegmentInfoPro\022\021\n\tsegmentId\030\001 \001(\006\022\024\n\014de"
-    "adBlockIds\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n\026G"
-    "etPrimaryListReplyPro\022\023\n\013primaryList\030\001 \003"
-    "(\007\",\n\031RecoveryTriggerRequestPro\022\017\n\007osdLi"
-    "st\030\001 \003(\007\"@\n\022GetOsdListReplyPro\022*\n\ronline"
-    "OsdList\030\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 4878);
+    " \001(\t\022\023\n\013segmentSize\030\006 \001(\007\"O\n\030GetSegmentI"
+    "nfoRequestPro\022\021\n\tsegmentId\030\001 \001(\006\022\r\n\005osdI"
+    "d\030\002 \001(\007\022\021\n\tneedReply\030\003 \001(\010\")\n\024CacheSegme"
+    "ntReplyPro\022\021\n\tsegmentId\030\001 \001(\006\"=\n\025ReportD"
+    "eletedCachePro\022\025\n\rsegmentIdList\030\001 \003(\006\022\r\n"
+    "\005osdId\030\002 \001(\007\"+\n\026PutSegmentInitReplyPro\022\021"
+    "\n\tsegmentId\030\001 \001(\006\"/\n\032SegmentTransferEndR"
+    "eplyPro\022\021\n\tsegmentId\030\001 \001(\006\"1\n\017OffsetLeng"
+    "thPro\022\016\n\006offset\030\001 \001(\007\022\016\n\006length\030\002 \001(\007\"c\n"
+    "\026PutBlockInitRequestPro\022\021\n\tsegmentId\030\001 \001"
+    "(\006\022\017\n\007blockId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\007\022\022"
+    "\n\nchunkCount\030\004 \001(\007\"c\n\024RecoveryBlockDataP"
+    "ro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\016"
+    "\n\006length\030\004 \001(\007\022\027\n\017waitOnRequestId\030\005 \001(\007\""
+    "R\n\014BlockDataPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007bl"
+    "ockId\030\002 \001(\007\022\016\n\006offset\030\003 \001(\006\022\016\n\006length\030\004 "
+    "\001(\007\"@\n\032BlockTransferEndRequestPro\022\021\n\tseg"
+    "mentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\":\n\024PutBloc"
+    "kInitReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007bloc"
+    "kId\030\002 \001(\007\"R\n\030BlockTransferEndReplyPro\022\021\n"
+    "\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\022\n\nisR"
+    "ecovery\030\003 \001(\010\"~\n\026GetBlockInitRequestPro\022"
+    "\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022,\n\014o"
+    "ffsetLength\030\003 \003(\0132\026.ncvfs.OffsetLengthPr"
+    "o\022\022\n\nisRecovery\030\004 \001(\010\"a\n\024GetBlockInitRep"
+    "lyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001("
+    "\007\022\021\n\tblockSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007"
+    "\"6\n\020GetBlockReadyPro\022\021\n\tsegmentId\030\001 \001(\006\022"
+    "\017\n\007blockId\030\002 \001(\007\"g\n\rOsdStartupPro\022\r\n\005osd"
+    "Id\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoad"
+    "ing\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001("
+    "\007\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025Os"
+    "dStatUpdateReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013os"
+    "dCapacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"U\n\032G"
+    "etSecondaryListRequestPro\022\021\n\tnumOfSegs\030\001"
+    " \001(\007\022\021\n\tprimaryId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001"
+    "(\006\"\031\n\027OsdStatUpdateRequestPro\"J\n\030GetSeco"
+    "ndaryListReplyPro\022.\n\rsecondaryList\030\001 \003(\013"
+    "2\027.ncvfs.BlockLocationPro\"B\n\021NewOsdRegis"
+    "terPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007"
+    "osdPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001"
+    " \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020"
+    "OnlineOsdListPro\022*\n\ronlineOsdList\030\001 \003(\0132"
+    "\023.ncvfs.OnlineOsdPro\"(\n\026GetOsdStatusRequ"
+    "estPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetOsdStatusRe"
+    "plyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n\024RepairSegme"
+    "ntInfoPro\022\021\n\tsegmentId\030\001 \001(\006\022\024\n\014deadBloc"
+    "kIds\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n\026GetPrim"
+    "aryListReplyPro\022\023\n\013primaryList\030\001 \003(\007\",\n\031"
+    "RecoveryTriggerRequestPro\022\017\n\007osdList\030\001 \003"
+    "(\007\"@\n\022GetOsdListReplyPro\022*\n\ronlineOsdLis"
+    "t\030\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 4912);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -10654,6 +10657,8 @@ void UploadSegmentAckPro::Swap(UploadSegmentAckPro* other) {
 
 #ifndef _MSC_VER
 const int GetSegmentInfoRequestPro::kSegmentIdFieldNumber;
+const int GetSegmentInfoRequestPro::kOsdIdFieldNumber;
+const int GetSegmentInfoRequestPro::kNeedReplyFieldNumber;
 #endif  // !_MSC_VER
 
 GetSegmentInfoRequestPro::GetSegmentInfoRequestPro()
@@ -10673,6 +10678,8 @@ GetSegmentInfoRequestPro::GetSegmentInfoRequestPro(const GetSegmentInfoRequestPr
 void GetSegmentInfoRequestPro::SharedCtor() {
   _cached_size_ = 0;
   segmentid_ = GOOGLE_ULONGLONG(0);
+  osdid_ = 0u;
+  needreply_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -10708,6 +10715,8 @@ GetSegmentInfoRequestPro* GetSegmentInfoRequestPro::New() const {
 void GetSegmentInfoRequestPro::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     segmentid_ = GOOGLE_ULONGLONG(0);
+    osdid_ = 0u;
+    needreply_ = false;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -10727,6 +10736,38 @@ bool GetSegmentInfoRequestPro::MergePartialFromCodedStream(
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
                  input, &segmentid_)));
           set_has_segmentid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_osdId;
+        break;
+      }
+      
+      // optional fixed32 osdId = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_osdId:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, &osdid_)));
+          set_has_osdid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(24)) goto parse_needReply;
+        break;
+      }
+      
+      // optional bool needReply = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_needReply:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &needreply_)));
+          set_has_needreply();
         } else {
           goto handle_uninterpreted;
         }
@@ -10757,6 +10798,16 @@ void GetSegmentInfoRequestPro::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteFixed64(1, this->segmentid(), output);
   }
   
+  // optional fixed32 osdId = 2;
+  if (has_osdid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(2, this->osdid(), output);
+  }
+  
+  // optional bool needReply = 3;
+  if (has_needreply()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->needreply(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -10768,6 +10819,16 @@ void GetSegmentInfoRequestPro::SerializeWithCachedSizes(
   // optional fixed64 segmentId = 1;
   if (has_segmentid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(1, this->segmentid(), target);
+  }
+  
+  // optional fixed32 osdId = 2;
+  if (has_osdid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed32ToArray(2, this->osdid(), target);
+  }
+  
+  // optional bool needReply = 3;
+  if (has_needreply()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->needreply(), target);
   }
   
   if (!unknown_fields().empty()) {
@@ -10784,6 +10845,16 @@ int GetSegmentInfoRequestPro::ByteSize() const {
     // optional fixed64 segmentId = 1;
     if (has_segmentid()) {
       total_size += 1 + 8;
+    }
+    
+    // optional fixed32 osdId = 2;
+    if (has_osdid()) {
+      total_size += 1 + 4;
+    }
+    
+    // optional bool needReply = 3;
+    if (has_needreply()) {
+      total_size += 1 + 1;
     }
     
   }
@@ -10816,6 +10887,12 @@ void GetSegmentInfoRequestPro::MergeFrom(const GetSegmentInfoRequestPro& from) {
     if (from.has_segmentid()) {
       set_segmentid(from.segmentid());
     }
+    if (from.has_osdid()) {
+      set_osdid(from.osdid());
+    }
+    if (from.has_needreply()) {
+      set_needreply(from.needreply());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -10840,6 +10917,8 @@ bool GetSegmentInfoRequestPro::IsInitialized() const {
 void GetSegmentInfoRequestPro::Swap(GetSegmentInfoRequestPro* other) {
   if (other != this) {
     std::swap(segmentid_, other->segmentid_);
+    std::swap(osdid_, other->osdid_);
+    std::swap(needreply_, other->needreply_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

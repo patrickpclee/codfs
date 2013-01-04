@@ -3512,17 +3512,37 @@ class GetSegmentInfoRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint64 value);
   
+  // optional fixed32 osdId = 2;
+  inline bool has_osdid() const;
+  inline void clear_osdid();
+  static const int kOsdIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
+  
+  // optional bool needReply = 3;
+  inline bool has_needreply() const;
+  inline void clear_needreply();
+  static const int kNeedReplyFieldNumber = 3;
+  inline bool needreply() const;
+  inline void set_needreply(bool value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetSegmentInfoRequestPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
+  inline void set_has_osdid();
+  inline void clear_has_osdid();
+  inline void set_has_needreply();
+  inline void clear_has_needreply();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
+  ::google::protobuf::uint32 osdid_;
+  bool needreply_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -8814,6 +8834,50 @@ inline ::google::protobuf::uint64 GetSegmentInfoRequestPro::segmentid() const {
 inline void GetSegmentInfoRequestPro::set_segmentid(::google::protobuf::uint64 value) {
   set_has_segmentid();
   segmentid_ = value;
+}
+
+// optional fixed32 osdId = 2;
+inline bool GetSegmentInfoRequestPro::has_osdid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void GetSegmentInfoRequestPro::set_has_osdid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void GetSegmentInfoRequestPro::clear_has_osdid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void GetSegmentInfoRequestPro::clear_osdid() {
+  osdid_ = 0u;
+  clear_has_osdid();
+}
+inline ::google::protobuf::uint32 GetSegmentInfoRequestPro::osdid() const {
+  return osdid_;
+}
+inline void GetSegmentInfoRequestPro::set_osdid(::google::protobuf::uint32 value) {
+  set_has_osdid();
+  osdid_ = value;
+}
+
+// optional bool needReply = 3;
+inline bool GetSegmentInfoRequestPro::has_needreply() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void GetSegmentInfoRequestPro::set_has_needreply() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void GetSegmentInfoRequestPro::clear_has_needreply() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void GetSegmentInfoRequestPro::clear_needreply() {
+  needreply_ = false;
+  clear_has_needreply();
+}
+inline bool GetSegmentInfoRequestPro::needreply() const {
+  return needreply_;
+}
+inline void GetSegmentInfoRequestPro::set_needreply(bool value) {
+  set_has_needreply();
+  needreply_ = value;
 }
 
 // -------------------------------------------------------------------

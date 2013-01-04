@@ -154,6 +154,9 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 	//_metaDataModule->saveNodeList(segmentId, segmentNodeList);
 	//_metaDataModule->setPrimary(segmentId, segmentNodeList[0]);
 
+	// add primary to cache list
+	_hotnessModule->updateSegmentCache(segmentId, segmentNodeList[0]);
+
 	// Hotness update and see whether new cache should be requested
 	struct HotnessRequest req;
 	req = _hotnessModule->updateSegmentHotness(segmentId, DEFAULT_HOTNESS_ALG,
@@ -277,12 +280,19 @@ void Mds::getFileInfoProcessor(uint32_t requestId, uint32_t connectionId,
  * TODO: Currently Only Supplying Info Same as Download
  */
 void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t segmentId) {
+		uint64_t segmentId, uint32_t osdId, bool needReply) {
+
 	struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(
 			segmentId);
+
+	if (needReply) {
 	_mdsCommunicator->replySegmentInfo(requestId, connectionId, segmentId,
 			segmentMetaData._size, segmentMetaData._nodeList,
 			segmentMetaData._codingScheme, segmentMetaData._codingSetting);
+	}
+
+	// add primary to cache list
+	_hotnessModule->updateSegmentCache(segmentId, osdId);
 
 	// Hotness update and see whether new cache should be requested
 	struct HotnessRequest req = _hotnessModule->updateSegmentHotness(segmentId,

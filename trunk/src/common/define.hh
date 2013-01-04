@@ -49,7 +49,7 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define RECOVERY_THREADS 10
 
 // osd/storagemodule.cc
-//#define USE_SEGMENT_CACHE
+#define USE_SEGMENT_CACHE
 
 // protocol/message.hh
 #define USE_MESSAGE_MEMORY_POOL
