@@ -218,14 +218,21 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		vector<uint64_t>::iterator it;
 		uint32_t primaryId;
 		for (it = segmentList.begin(); it < segmentList.end(); ++it) {
-			debug("Read primary list %" PRIu64 "\n", *it);
-			try {
-				primaryId = _metaDataModule->getPrimary(*it);
-			} catch (...) {
-				debug_yellow("%s\n", "No Primary Found");
-				continue;
+			// return a random cached copy if available
+			vector<uint32_t> segmentCacheEntry = _hotnessModule->getSegmentCacheEntry(*it);
+			if (segmentCacheEntry.size() > 0) {
+				int idx = rand() % segmentCacheEntry.size();
+				primaryList.push_back(segmentCacheEntry[idx]);
+			} else {
+				debug("Read primary list %" PRIu64 "\n", *it);
+				try {
+					primaryId = _metaDataModule->getPrimary(*it);
+				} catch (...) {
+					debug_yellow("%s\n", "No Primary Found");
+					continue;
+				}
+				primaryList.push_back(primaryId);
 			}
-			primaryList.push_back(primaryId);
 		}
 		segmentList.resize(primaryList.size());
 
