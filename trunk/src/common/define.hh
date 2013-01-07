@@ -9,6 +9,8 @@ typedef std::pair<uint32_t, uint32_t> offset_length_t;
 typedef std::pair<uint32_t, std::vector<offset_length_t> > symbol_list_t;
 typedef std::vector<symbol_list_t> block_list_t ;
 
+#define USLEEP_DURATION 10000
+
 // osd/storagemodule.cc
 #define MAX_OPEN_FILES 100
 
@@ -49,7 +51,10 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define RECOVERY_THREADS 10
 
 // osd/storagemodule.cc
-//#define USE_SEGMENT_CACHE
+#define USE_SEGMENT_CACHE
+#define USE_IO_THREADS
+#define IO_THREADS 2
+#define IO_POLL_INTERVAL 10000
 
 // protocol/message.hh
 #define USE_MESSAGE_MEMORY_POOL

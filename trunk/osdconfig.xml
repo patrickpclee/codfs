@@ -6,6 +6,7 @@
     	
     	<BlockCapacity>10G</BlockCapacity>
     	<SegmentCacheCapacity>100M</SegmentCacheCapacity>
+        <ReportCacheInterval>5</ReportCacheInterval> <!-- sleep -->
     </Storage>
 	<ThreadPool>
 		<NumThreads>10</NumThreads>

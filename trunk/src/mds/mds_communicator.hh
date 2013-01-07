@@ -1,6 +1,7 @@
 #ifndef __MDS_COMMUNICATOR_HH__
 #define __MDS_COMMUNICATOR_HH__
 
+#include "../common/hotness.hh"
 #include "../common/metadata.hh"
 #include "../communicator/communicator.hh"
 #include "../common/segmentlocation.hh"
@@ -16,7 +17,15 @@ public:
 
 	void display();
 
-	// Reply to Request
+	/**
+	 * @brief Request OSD to cache extra copies
+	 * @param segmentId Segment ID
+	 * @param req HotnessRequest
+	 * @param osdList OSD list
+	 * @return Position of new cache
+	 */
+
+	vector<uint32_t> requestCache(uint64_t segmentId, HotnessRequest req, vector<uint32_t> osdList);
 
 	/**
 	 * @brief	Reply Segment and Primary List to Client

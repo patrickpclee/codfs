@@ -17,7 +17,7 @@ public:
 	GetSegmentInfoRequestMsg(Communicator* communicator);
 
 	GetSegmentInfoRequestMsg(Communicator* communicator, uint32_t dstSockfd,
-			uint64_t segmentId);
+			uint64_t segmentId, uint32_t osdId, bool needReply = true);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -62,6 +62,8 @@ public:
 
 private:
 	uint64_t _segmentId;
+	uint32_t _osdId;
+	bool _needReply;
 
 	// reply
 	uint32_t _segmentSize;
