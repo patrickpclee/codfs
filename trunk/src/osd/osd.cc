@@ -74,6 +74,9 @@ Osd::Osd(uint32_t selfId) {
 
 	_reportCacheInterval = configLayer->getConfigLong(
 			"Storage>ReportCacheInterval");
+
+    _blocktpId = 0;
+    _recoverytpId = 0;
 }
 
 Osd::~Osd() {
@@ -402,7 +405,7 @@ void Osd::getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 	MemoryPool::getInstance().poolFree(blockData.buf);
 }
 
-void Osd::retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId,
+void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		uint64_t segmentId, uint32_t blockId,
 		vector<offset_length_t> &offsetLength, BlockData &repairedBlock) {
 
@@ -417,7 +420,7 @@ void Osd::retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId,
 				blockId);
 	}
 
-	_recoverytpRequestCount.decrement(requestId);
+	_recoverytpRequestCount.decrement(recoverytpId);
 }
 
 void Osd::recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
@@ -473,7 +476,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
-		const struct BlockLocation& blockLocation, uint32_t blocktpRequestId) {
+		const struct BlockLocation& blockLocation, uint32_t blocktpId) {
 	debug("Distribute Block %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
 			segmentId, blockData.info.blockId, blockLocation.osdId);
 	// if destination is myself
@@ -492,8 +495,8 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 	// free memory
 	MemoryPool::getInstance().poolFree(blockData.buf);
 
-	if (blocktpRequestId != 0) {
-		_blocktpRequestCount.decrement(blocktpRequestId);
+	if (blocktpId != 0) {
+		_blocktpRequestCount.decrement(blocktpId);
 	}
 
 	debug(
@@ -553,7 +556,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			vector<uint32_t> nodeList;
 			uint32_t i = 0;
 
-			_blocktpRequestCount.set(requestId, blockDataList.size());
+            uint32_t blocktpId = ++_blocktpId; // should not use 0
+			_blocktpRequestCount.set(blocktpId, blockDataList.size());
 
 			for (const auto blockData : blockDataList) {
 
@@ -562,7 +566,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 						(int)_blocktp.active(), (int)_blocktp.pending(), (int)_blocktp.size());
 				_blocktp.schedule(
 						boost::bind(&Osd::distributeBlock, this, segmentId,
-								blockData, blockLocationList[i], requestId));
+								blockData, blockLocationList[i], blocktpId));
 #else
 				distributeBlock(segmentId, blockData,blockLocationList[i]);
 #endif
@@ -573,7 +577,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			}
 #ifdef PARALLEL_TRANSFER
 			// block until all blocks retrieved
-			while (_blocktpRequestCount.get(requestId) > 0) {
+			while (_blocktpRequestCount.get(blocktpId) > 0) {
 				usleep(USLEEP_DURATION);
 			}
 #endif
@@ -764,7 +768,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			_codingModule->getNumberOfBlocks(codingScheme, codingSetting));
 
 	// initialize map for tracking recovery
-	_recoverytpRequestCount.set(requestId, blockSymbols.size());
+    uint32_t recoverytpId = ++_recoverytpId; // should not use 0
+	_recoverytpRequestCount.set(recoverytpId, blockSymbols.size());
 
 	for (auto block : blockSymbols) {
 
@@ -785,7 +790,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	// block until all recovery blocks retrieved
-	while (_recoverytpRequestCount.get(requestId) > 0) {
+	while (_recoverytpRequestCount.get(recoverytpId) > 0) {
 		usleep(USLEEP_DURATION);
 	}
 	_recoverytpRequestCount.erase(requestId);
