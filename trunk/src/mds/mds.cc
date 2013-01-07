@@ -32,6 +32,8 @@ Mds::Mds() {
 	_metaDataModule = new MetaDataModule();
 	_nameSpaceModule = new NameSpaceModule();
 	_mdsCommunicator = new MdsCommunicator();
+
+	initializeCacheList();
 }
 
 Mds::~Mds() {
@@ -39,6 +41,18 @@ Mds::~Mds() {
 	delete _metaDataModule;
 	delete _nameSpaceModule;
 	delete _hotnessModule;
+}
+
+void Mds::initializeCacheList() {
+	vector<pair<uint32_t, uint64_t>> segmentList =
+			_metaDataModule->getSegmentsFromCoding(RAID1_CODING);
+
+	for (auto osdSegmentPair : segmentList) {
+		_hotnessModule->updateSegmentCache(osdSegmentPair.first,
+				osdSegmentPair.second);
+	}
+
+	debug ("Cache list initialized for %zu copies\n", segmentList.size());
 }
 
 /**
@@ -222,7 +236,8 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		uint32_t primaryId;
 		for (it = segmentList.begin(); it < segmentList.end(); ++it) {
 			// return a random cached copy if available
-			vector<uint32_t> segmentCacheEntry = _hotnessModule->getSegmentCacheEntry(*it);
+			vector<uint32_t> segmentCacheEntry =
+					_hotnessModule->getSegmentCacheEntry(*it);
 			if (segmentCacheEntry.size() > 0) {
 				int idx = rand() % segmentCacheEntry.size();
 				primaryList.push_back(segmentCacheEntry[idx]);
@@ -286,9 +301,9 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 			segmentId);
 
 	if (needReply) {
-	_mdsCommunicator->replySegmentInfo(requestId, connectionId, segmentId,
-			segmentMetaData._size, segmentMetaData._nodeList,
-			segmentMetaData._codingScheme, segmentMetaData._codingSetting);
+		_mdsCommunicator->replySegmentInfo(requestId, connectionId, segmentId,
+				segmentMetaData._size, segmentMetaData._nodeList,
+				segmentMetaData._codingScheme, segmentMetaData._codingSetting);
 	}
 
 	// add primary to cache list

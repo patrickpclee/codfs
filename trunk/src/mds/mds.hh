@@ -257,6 +257,12 @@ public:
 	MdsCommunicator* getCommunicator();
 
 	/**
+	 * Put RAID-1 segments into cache list
+	 */
+
+	void initializeCacheList();
+
+	/**
 	 * @brief	Run the MDS
 	 */
 	void run();

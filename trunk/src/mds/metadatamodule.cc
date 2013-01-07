@@ -34,7 +34,8 @@ void MetaDataModule::deleteFile(uint32_t clientId, uint32_t fileId) {
 	_fileMetaDataModule->deleteFile(fileId);
 }
 
-void MetaDataModule::renameFile(uint32_t clientId, uint32_t fileId, const string& newPath) {
+void MetaDataModule::renameFile(uint32_t clientId, uint32_t fileId,
+		const string& newPath) {
 	_fileMetaDataModule->renameFile(fileId, newPath);
 }
 
@@ -121,15 +122,16 @@ void MetaDataModule::setPrimary(uint64_t segmentId, uint32_t primaryOsdId) {
 	return;
 }
 
-uint32_t MetaDataModule::selectActingPrimary(uint64_t segmentId, vector<uint32_t> nodeList,
-		vector<bool> nodeStatus) {
+uint32_t MetaDataModule::selectActingPrimary(uint64_t segmentId,
+		vector<uint32_t> nodeList, vector<bool> nodeStatus) {
 
-	int failedOsdCount = (int) count(nodeStatus.begin(),
-			nodeStatus.end(), false);
+	int failedOsdCount = (int) count(nodeStatus.begin(), nodeStatus.end(),
+			false);
 
-	if (failedOsdCount == (int)nodeStatus.size()) {
-		debug_yellow ("All OSD has died for segmentId = %" PRIu64 "\n", segmentId);
-		exit (-1);
+	if (failedOsdCount == (int) nodeStatus.size()) {
+		debug_yellow("All OSD has died for segmentId = %" PRIu64 "\n",
+				segmentId);
+		exit(-1);
 	}
 
 	srand(time(NULL));
@@ -138,7 +140,7 @@ uint32_t MetaDataModule::selectActingPrimary(uint64_t segmentId, vector<uint32_t
 	while (true) {
 		int newPrimary = rand() % nodeStatus.size();
 		if (nodeStatus[newPrimary] == true) {
-			setPrimary (segmentId, nodeList[newPrimary]);
+			setPrimary(segmentId, nodeList[newPrimary]);
 			return nodeList[newPrimary];
 		}
 	}
@@ -175,4 +177,9 @@ uint32_t MetaDataModule::lookupFileId(const string &path) {
 
 string MetaDataModule::lookupFilePath(uint32_t fileId) {
 	return "";
+}
+
+vector<pair<uint32_t, uint64_t>> MetaDataModule::getSegmentsFromCoding(
+		CodingScheme codingScheme) {
+	return _segmentMetaDataModule->getSegmentsFromCoding(codingScheme);
 }
