@@ -5,6 +5,8 @@
 #ifndef __MDS_HH__
 #define __MDS_HH__
 
+#include "../common/hotness.hh"
+#include "hotnessmodule.hh"
 #include "metadatamodule.hh"
 #include "namespacemodule.hh"
 #include "mds_communicator.hh"
@@ -65,7 +67,19 @@ public:
 	 * @param	newPath	New File Path
 	 */
 	void renameFileProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t clientId, uint32_t fileId, const string &path, const string &newPath);
+			uint32_t clientId, uint32_t fileId, const string &path,
+			const string &newPath);
+
+	/**
+	 * @brief	Handle Report Delete Cache Message from OSD
+	 * @param requestId 	Request ID
+	 * @param connectionId 	Connection ID
+	 * @param segmentIdList	List of deleted segment ID
+	 * @param osdId OSD ID
+	 */
+
+	void reportDeleteCacheProcessor(uint32_t requestId, uint32_t connectionId,
+			list<uint64_t> segmentIdList, uint32_t osdId);
 
 	/**
 	 * @brief	Handle Upload Segment Acknowledgement from Primary
@@ -81,8 +95,8 @@ public:
 	 */
 	void uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 			uint64_t segmentId, uint32_t segmentSize, CodingScheme codingScheme,
-			const string &codingSetting, const vector<uint32_t> &segmentNodeList,
-			const string &checksum);
+			const string &codingSetting,
+			const vector<uint32_t> &segmentNodeList, const string &checksum);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)
@@ -134,9 +148,10 @@ public:
 	 * @param	requestId	Request ID
 	 * @param	conenctionId	Connection ID
 	 * @param	segmentID	ID of the Segment
+	 * @param 	osdId	OSDID
 	 */
 	void getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId);
+			uint64_t segmentId, uint32_t osdId, bool needReply);
 
 	/**
 	 * @brief	Handle List Folder Request from Client
@@ -242,6 +257,12 @@ public:
 	MdsCommunicator* getCommunicator();
 
 	/**
+	 * Put RAID-1 segments into cache list
+	 */
+
+	void initializeCacheList();
+
+	/**
 	 * @brief	Run the MDS
 	 */
 	void run();
@@ -273,6 +294,9 @@ private:
 
 	/// Handle Namespace Operations
 	NameSpaceModule* _nameSpaceModule;
+
+	/// Handle Hotness Operations
+	HotnessModule* _hotnessModule;
 
 	/// Running Indicator
 	bool running;

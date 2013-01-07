@@ -57,6 +57,7 @@ public:
       case RENAME_FILE_REPLY: return "RENAME_FILE_REPLY";
       case RENAME_FILE_REQUEST: return "RENAME_FILE_REQUEST";
       case REPAIR_SEGMENT_INFO: return "REPAIR_SEGMENT_INFO";
+      case REPORT_DELETED_CACHE: return "REPORT_DELETED_CACHE";
       case SAVE_SEGMENT_LIST_REPLY: return "SAVE_SEGMENT_LIST_REPLY";
       case SAVE_SEGMENT_LIST_REQUEST: return "SAVE_SEGMENT_LIST_REQUEST";
       case SEGMENT_DATA: return "SEGMENT_DATA";
@@ -93,6 +94,15 @@ public:
     return "???";
   }
 
+  static const char * toString( HotnessType en ) {
+    switch( en ) {
+      case COLD: return "COLD";
+      case HOT: return "HOT";
+      case HOTTEST: return "HOTTEST";
+    }
+    return "???";
+  }
+
   static const char * toString( CodingScheme en ) {
     switch( en ) {
       case DEFAULT_CODING: return "DEFAULT_CODING";
@@ -100,6 +110,13 @@ public:
       case RAID1_CODING: return "RAID1_CODING";
       case RAID5_CODING: return "RAID5_CODING";
       case RS_CODING: return "RS_CODING";
+    }
+    return "???";
+  }
+
+  static const char * toString( HotnessAlgorithm en ) {
+    switch( en ) {
+      case DEFAULT_HOTNESS_ALG: return "DEFAULT_HOTNESS_ALG";
     }
     return "???";
   }

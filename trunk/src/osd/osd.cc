@@ -5,6 +5,7 @@
 #include <thread>
 #include <vector>
 #include <openssl/md5.h>
+#include <algorithm>
 #include "osd.hh"
 #include "../common/blocklocation.hh"
 #include "../common/debug.hh"
@@ -41,10 +42,8 @@ boost::threadpool::pool _recoverytp;
 
 #ifdef TIME_POINT
 #include <chrono>
-using namespace std;
 typedef chrono::high_resolution_clock Clock;
 typedef chrono::milliseconds milliseconds;
-mutex timeMutex;
 double lockSegmentCountMutexTime = 0;
 double getSegmentInfoTime = 0;
 double getOSDStatusTime = 0;
@@ -52,7 +51,10 @@ double getBlockTime = 0;
 double decodeSegmentTime = 0;
 double sendSegmentTime = 0;
 double cacheSegmentTime = 0;
+mutex timeMutex;
 #endif
+
+using namespace std;
 
 Osd::Osd(uint32_t selfId) {
 
@@ -70,12 +72,52 @@ Osd::Osd(uint32_t selfId) {
 	_recoverytp.size_controller().resize(RECOVERY_THREADS);
 #endif
 
+	_reportCacheInterval = configLayer->getConfigLong(
+			"Storage>ReportCacheInterval");
 }
 
 Osd::~Osd() {
 	//delete _blockLocationCache;
 	delete _storageModule;
 	delete _osdCommunicator;
+}
+
+void Osd::reportRemovedCache() {
+	debug("%s\n", "Cache report thread started");
+
+	while (true) {
+		debug("%s\n", "Checking cache...");
+
+		list<uint64_t> currentCacheList =
+				_storageModule->getSegmentCacheQueue();
+
+		// sort list
+		currentCacheList.sort();
+
+		// deleted segments (current - previous)
+
+		debug_cyan("Old cache size = %zu, new cache size = %zu\n",
+				_previousCacheList.size(), currentCacheList.size());
+
+		list<uint64_t> deletedCacheList;
+		set_difference(_previousCacheList.begin(), _previousCacheList.end(),
+				currentCacheList.begin(), currentCacheList.end(),
+				std::inserter(deletedCacheList, deletedCacheList.end()));
+
+		// for debug
+		string deletedCacheString;
+		for (auto segmentId : deletedCacheList) {
+			deletedCacheString += to_string(segmentId) + " ";
+		}
+		debug_yellow("Deleted Cache = %s\n", deletedCacheString.c_str());
+
+		// report to MDS
+		_osdCommunicator->reportDeletedCache(deletedCacheList, _osdId);
+
+		_previousCacheList = currentCacheList;
+
+		sleep(_reportCacheInterval);
+	}
 }
 
 void Osd::cacheSegment(uint64_t segmentId, SegmentData segmentData) {
@@ -149,6 +191,9 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				if (!localRetrieve) {
 					segmentData = _storageModule->getSegmentFromDiskCache(
 							segmentId);
+
+					// hack: trigger MDS to update hotness
+					_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, false);
 				}
 
 			} else {
@@ -159,7 +204,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// 1. ask MDS to get segment information
 
 				SegmentTransferOsdInfo segmentInfo =
-						_osdCommunicator->getSegmentInfoRequest(segmentId);
+						_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId);
 #ifdef TIME_POINT
 				t2 = Clock::now();
 #endif
@@ -272,7 +317,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 						break;
 					} else {
-						usleep(50000); // 0.01s
+						usleep(USLEEP_DURATION); // 0.01s
 					}
 				}
 			}
@@ -293,17 +338,23 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 #endif
 
 	// 6. cache and free
-	{
-		lock_guard<mutex> lk(segmentRequestCountMutex);
-		_segmentRequestCount.decrement(segmentId);
-		if (_segmentRequestCount.get(segmentId) == 0) {
-			_segmentRequestCount.erase(segmentId);
+	segmentRequestCountMutex.lock();
+	bool isLocked = true;
 
-			cacheSegment(segmentId, segmentData);
-			freeSegment(segmentId, segmentData);
+	_segmentRequestCount.decrement(segmentId);
+	if (_segmentRequestCount.get(segmentId) == 0) {
+		_segmentRequestCount.erase(segmentId);
+		segmentRequestCountMutex.unlock();
+		isLocked = false;
 
-			debug("%s\n", "[DOWNLOAD] Cleanup completed");
-		}
+		cacheSegment(segmentId, segmentData);
+		freeSegment(segmentId, segmentData);
+
+		debug("%s\n", "[DOWNLOAD] Cleanup completed");
+	}
+
+	if (isLocked) {
+		segmentRequestCountMutex.unlock();
 	}
 
 	// send reply to MDS for localRetrieve
@@ -523,7 +574,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 #ifdef PARALLEL_TRANSFER
 			// block until all blocks retrieved
 			while (_blocktpRequestCount.get(requestId) > 0) {
-				usleep(10000);
+				usleep(USLEEP_DURATION);
 			}
 #endif
 			_blocktpRequestCount.erase(requestId);
@@ -547,7 +598,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			break;
 		} else {
-			usleep(10000); // sleep 0.01s
+			usleep(USLEEP_DURATION); // sleep 0.01s
 		}
 
 	}
@@ -584,7 +635,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 					blockId);
 			break;
 		} else {
-			usleep(10000); // sleep 0.01s
+			usleep(USLEEP_DURATION); // sleep 0.01s
 		}
 
 	}
@@ -690,7 +741,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// get coding information from MDS
 	SegmentTransferOsdInfo segmentInfo =
-			_osdCommunicator->getSegmentInfoRequest(segmentId);
+			_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId);
 
 	const CodingScheme codingScheme = segmentInfo._codingScheme;
 	const string codingSetting = segmentInfo._codingSetting;
@@ -735,7 +786,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// block until all recovery blocks retrieved
 	while (_recoverytpRequestCount.get(requestId) > 0) {
-		usleep(10000);
+		usleep(USLEEP_DURATION);
 	}
 	_recoverytpRequestCount.erase(requestId);
 
