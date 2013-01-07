@@ -251,7 +251,7 @@ public:
 	 * @return boolean 	TRUE/FALSE
 	 */
 
-	bool verifyBlockSpace(uint32_t size);
+	bool isEnoughBlockSpace(uint32_t size);
 
 	/**
 	 * Verify whether segment cache has enough space
@@ -260,7 +260,7 @@ public:
 	 * @return boolean 	TRUE/FALSE
 	 */
 
-	bool verifySegmentSpace(uint32_t size);
+	bool isEnoughSegmentSpace(uint32_t size);
 
 	/**
 	 * Save segment to segment cache on the disk
@@ -302,9 +302,9 @@ private:
 
 	/**
 	 * Calculate and update the free space and usage of OSD
-	 * @param new_block_size	the size of the block to be saved
+	 * @param size the size of the block to be saved
 	 */
-	void updateBlockFreespace(uint32_t new_block_size);
+	void updateBlockFreespace(uint32_t size);
 
 	/**
 	 * Calculate and update the free space and usage of segment cache
@@ -325,10 +325,10 @@ private:
 	 * @param segmentId Segment ID
 	 * @param segmentSize Number of bytes the segment takes
 	 * @param filepath Location of the segment in the filesystem
-	 */
 
 	void writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
 			string filepath);
+	 */
 
 	/**
 	 * Read the information about an segment from the database
