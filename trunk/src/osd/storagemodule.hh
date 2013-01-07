@@ -13,6 +13,11 @@
 #include "../common/segmentdata.hh"
 #include "../datastructure/concurrentmap.hh"
 #include "filelrucache.hh"
+
+#ifdef USE_IO_THREADS
+#include "../../lib/threadpool/threadpool.hpp"
+#endif
+
 using namespace std;
 
 /**
@@ -246,7 +251,7 @@ public:
 	 * @return boolean 	TRUE/FALSE
 	 */
 
-	bool verifyBlockSpace(uint32_t size);
+	bool isEnoughBlockSpace(uint32_t size);
 
 	/**
 	 * Verify whether segment cache has enough space
@@ -255,7 +260,7 @@ public:
 	 * @return boolean 	TRUE/FALSE
 	 */
 
-	bool verifySegmentSpace(uint32_t size);
+	bool isEnoughSegmentSpace(uint32_t size);
 
 	/**
 	 * Save segment to segment cache on the disk
@@ -275,7 +280,18 @@ public:
 
 	struct SegmentData getSegmentFromDiskCache(uint64_t segmentId);
 
+	/**
+	 * Clear all segment disk cache
+	 */
+
 	void clearSegmentDiskCache();
+
+	/**
+	 * Return the list of cached segment ID
+	 * @return ID of cached segments
+	 */
+
+	list <uint64_t> getSegmentCacheQueue();
 
 private:
 
@@ -286,9 +302,9 @@ private:
 
 	/**
 	 * Calculate and update the free space and usage of OSD
-	 * @param new_block_size	the size of the block to be saved
+	 * @param size the size of the block to be saved
 	 */
-	void updateBlockFreespace(uint32_t new_block_size);
+	void updateBlockFreespace(uint32_t size);
 
 	/**
 	 * Calculate and update the free space and usage of segment cache
@@ -309,10 +325,10 @@ private:
 	 * @param segmentId Segment ID
 	 * @param segmentSize Number of bytes the segment takes
 	 * @param filepath Location of the segment in the filesystem
-	 */
 
 	void writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
 			string filepath);
+	 */
 
 	/**
 	 * Read the information about an segment from the database
@@ -351,7 +367,10 @@ private:
 	 */
 
 	uint32_t readFile(string filepath, char* buf, uint64_t offset,
-			uint32_t length);
+			uint32_t length, int priority = 10);
+
+	uint32_t doReadFile(string filepath, char* buf, uint64_t offset,
+			uint32_t length, bool &isFinished);
 
 	/**
 	 * Open a file and write data from buffer
@@ -363,7 +382,10 @@ private:
 	 */
 
 	uint32_t writeFile(string filepath, char* buf, uint64_t offset,
-			uint32_t length);
+			uint32_t length, int priority = 10);
+
+	uint32_t doWriteFile(string filepath, char* buf, uint64_t offset,
+			uint32_t length, bool &isFinished);
 
 	/**
 	 * Return the segment path given Segment ID
@@ -424,6 +446,10 @@ private:
 	atomic<uint64_t> _freeSegmentSpace;
 	atomic<uint32_t> _currentBlockUsage;
 	atomic<uint32_t> _currentSegmentUsage;
+
+#ifdef USE_IO_THREADS
+	boost::threadpool::prio_pool _iotp;
+#endif
 };
 
 #endif

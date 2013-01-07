@@ -49,6 +49,7 @@ enum MsgType {
 	RENAME_FILE_REPLY,//20
 	CACHE_SEGMENT_REQUEST,
 	CACHE_SEGMENT_REPLY,
+	REPORT_DELETED_CACHE,
 
 	// TRANSFER
 	PUT_SEGMENT_INIT_REQUEST,
@@ -109,6 +110,16 @@ enum CodingScheme {
 	RAID1_CODING = 2,
 	RAID5_CODING = 3,
 	RS_CODING = 4
+};
+
+enum HotnessAlgorithm{
+	DEFAULT_HOTNESS_ALG
+};
+
+enum HotnessType {
+	COLD,
+	HOT,
+	HOTTEST
 };
 
 #endif

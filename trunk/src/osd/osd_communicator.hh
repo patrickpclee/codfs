@@ -87,6 +87,14 @@ public:
 			uint64_t segmentId);
 
 	/**
+	 * Report deleted segment for the last polling interval to the MDS
+	 * @param segmentIdList A list of deleted segment ID
+	 * @param osdId My OSD ID
+	 */
+
+	void reportDeletedCache(list<uint64_t> segmentIdList, uint32_t osdId);
+
+	/**
 	 * (to be implemented)
 	 * Report a failure of OSD to monitor / MDS
 	 * @param osdId Failed OSD ID
@@ -163,10 +171,12 @@ public:
 	/**
 	 * Obtain the information about an segment from the MDS
 	 * @param segmentId Segment ID
+	 * @param osdId OSD ID
+	 * @param needReply Need MDS to reply segment info
 	 * @return SegmentTransferOsdInfo struct
 	 */
 
-	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId);
+	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId, uint32_t osdId, bool needReply = true);
 
 	/**
 	 * Send acknowledgement to MDS when upload is complete

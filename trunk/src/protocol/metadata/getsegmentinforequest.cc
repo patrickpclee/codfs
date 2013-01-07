@@ -17,11 +17,13 @@ GetSegmentInfoRequestMsg::GetSegmentInfoRequestMsg(Communicator* communicator) :
 }
 
 GetSegmentInfoRequestMsg::GetSegmentInfoRequestMsg(Communicator* communicator,
-		uint32_t dstSockfd, uint64_t segmentId) :
+		uint32_t dstSockfd, uint64_t segmentId, uint32_t osdId, bool needReply) :
 		Message(communicator) {
 
 	_sockfd = dstSockfd;
 	_segmentId = segmentId;
+	_osdId = osdId;
+	_needReply = needReply;
 }
 
 void GetSegmentInfoRequestMsg::prepareProtocolMsg() {
@@ -29,6 +31,8 @@ void GetSegmentInfoRequestMsg::prepareProtocolMsg() {
 
 	ncvfs::GetSegmentInfoRequestPro getSegmentInfoRequestPro;
 	getSegmentInfoRequestPro.set_segmentid(_segmentId);
+	getSegmentInfoRequestPro.set_osdid(_osdId);
+	getSegmentInfoRequestPro.set_needreply(_needReply);
 
 	if (!getSegmentInfoRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -50,12 +54,14 @@ void GetSegmentInfoRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_segmentId = getSegmentInfoRequestPro.segmentid();
+	_osdId = getSegmentInfoRequestPro.osdid();
+	_needReply = getSegmentInfoRequestPro.needreply();
 
 }
 
 void GetSegmentInfoRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->getSegmentInfoProcessor (_msgHeader.requestId, _sockfd, _segmentId);
+	mds->getSegmentInfoProcessor (_msgHeader.requestId, _sockfd, _segmentId, _osdId, _needReply);
 #endif
 }
 
