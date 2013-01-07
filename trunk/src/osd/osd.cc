@@ -317,7 +317,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 						break;
 					} else {
-						usleep(50000); // 0.01s
+						usleep(USLEEP_DURATION); // 0.01s
 					}
 				}
 			}
@@ -574,7 +574,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 #ifdef PARALLEL_TRANSFER
 			// block until all blocks retrieved
 			while (_blocktpRequestCount.get(requestId) > 0) {
-				usleep(10000);
+				usleep(USLEEP_DURATION);
 			}
 #endif
 			_blocktpRequestCount.erase(requestId);
@@ -598,7 +598,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 			break;
 		} else {
-			usleep(10000); // sleep 0.01s
+			usleep(USLEEP_DURATION); // sleep 0.01s
 		}
 
 	}
@@ -635,7 +635,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 					blockId);
 			break;
 		} else {
-			usleep(10000); // sleep 0.01s
+			usleep(USLEEP_DURATION); // sleep 0.01s
 		}
 
 	}
@@ -786,7 +786,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// block until all recovery blocks retrieved
 	while (_recoverytpRequestCount.get(requestId) > 0) {
-		usleep(10000);
+		usleep(USLEEP_DURATION);
 	}
 	_recoverytpRequestCount.erase(requestId);
 
