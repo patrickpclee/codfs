@@ -136,14 +136,14 @@ public:
 
 	/**
 	 * Get a recovery block from another OSD
-	 * @param requestId Request ID
+	 * @param recoverytpId Map Key for recoverytpRequestCount
 	 * @param osdId ID of the OSD to retrieve from
 	 * @param segmentId Segment ID
 	 * @param blockId Block ID
 	 * @param offsetLength List of <offset, length> in the target block
 	 * @param repairedBlock Referenced memory which the recovered block is stored
 	 */
-	void retrieveRecoveryBlock(uint32_t requestId, uint32_t osdId,
+	void retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 			uint64_t segmentId, uint32_t blockId,
 			vector<offset_length_t> &offsetLength, BlockData &repairedBlock);
 
@@ -209,11 +209,11 @@ public:
 	 * @param segmentId	Segment Id
 	 * @param blockData	Data Block
 	 * @param blockLocation Location of Block
-	 * @param blocktpRequestId The requestId of the message in the thread pool
+	 * @param blocktpId Map key of blocktpRequestCount
 	 */
 	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 			const struct BlockLocation& blockLocation,
-			uint32_t blocktpRequestId = 0);
+			uint32_t blocktpId = 0);
 
 	/**
 	 * Action when a block trunk is received
@@ -416,6 +416,7 @@ private:
 
 	// download
 	ConcurrentMap<uint32_t, uint32_t> _blocktpRequestCount;
+    atomic <uint32_t> _blocktpId;
 
 	ConcurrentMap<uint64_t, vector<struct BlockData>> _receivedBlockData;
 	ConcurrentMap<uint64_t, uint32_t> _downloadBlockRemaining;
@@ -426,6 +427,7 @@ private:
 
 	// recovery
 	ConcurrentMap<uint32_t, uint32_t> _recoverytpRequestCount;
+    atomic <uint32_t> _recoverytpId;
 
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingBlockChunk;
