@@ -80,7 +80,7 @@ struct SegmentTransferCache Client::getSegment(uint32_t clientId,
 
 	// wait until the segment is fully downloaded
 	while (_pendingSegmentChunk.count(segmentId)) {
-		usleep(10000);
+		usleep(USLEEP_DURATION);
 	}
 
 	// write segment from cache to file
@@ -166,7 +166,7 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	double duration = ms.count() / 1000.0;
 
 	// allow time for messages to go out
-	usleep(10000);
+	usleep(USLEEP_DURATION);
 
 	cout << "Upload " << path << " Done [" << fileMetaData._id << "]" << endl;
 
@@ -253,7 +253,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	double duration = ms.count() / 1000.0;
 
 	// allow time for messages to go out
-	usleep(10000);
+	usleep(USLEEP_DURATION);
 
 	cout << fixed;
 	cout << setprecision(2);
@@ -305,7 +305,7 @@ void Client::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_clientCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId);
 			break;
 		} else {
-			usleep(10000); // sleep 0.1s
+			usleep(USLEEP_DURATION); // sleep 0.01s
 		}
 
 	}

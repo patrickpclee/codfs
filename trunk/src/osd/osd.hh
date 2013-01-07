@@ -6,6 +6,7 @@
 #define __OSD_HH__
 #include <stdint.h>
 #include <vector>
+#include <set>
 #include "osd_communicator.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
@@ -60,6 +61,12 @@ public:
 	 */
 
 	~Osd();
+
+	/**
+	 * Report deleted cache to MDS
+	 */
+
+	void reportRemovedCache();
 
 	/**
 	 * Action when an OSD list is received
@@ -422,5 +429,9 @@ private:
 
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingBlockChunk;
+
+	// cache report
+	uint32_t _reportCacheInterval;
+	list<uint64_t> _previousCacheList;
 };
 #endif

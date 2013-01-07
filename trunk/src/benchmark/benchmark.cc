@@ -135,7 +135,7 @@ void testDownload() {
 	double duration = ms.count() / 1000.0;
 
 	// allow time for messages to go out
-	usleep(10000);
+	usleep(USLEEP_DURATION);
 
 	cout << fixed;
 	cout << setprecision(2);
@@ -182,7 +182,7 @@ void testUpload() {
 	double duration = ms.count() / 1000.0;
 
 	// allow time for messages to go out
-	usleep(10000);
+	usleep(USLEEP_DURATION);
 
 	cout << "Upload Done [" << fileMetaData._id << "]" << endl;
 
