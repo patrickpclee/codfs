@@ -203,6 +203,15 @@ public:
 	 */
 	uint32_t lookupFileId(const string &path);
 
+	/**
+	 * @brief Search segment IDs with a specific coding scheme
+	 * @param codingScheme CodingScheme struct
+	 * @return list of segment ID
+	 */
+
+	vector<pair<uint32_t, uint64_t>> getSegmentsFromCoding(
+			CodingScheme codingScheme);
+
 private:
 
 	ConfigMetaDataModule* _configMetaDataStorage;

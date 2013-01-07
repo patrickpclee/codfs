@@ -56,7 +56,8 @@ void SegmentMetaDataModule::saveSegmentInfo(uint64_t segmentId,
  *
  * @return	Info of the Segment
  */
-struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(uint64_t segmentId) {
+struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(
+		uint64_t segmentId) {
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONObj result = _segmentMetaDataStorage->readOne(querySegment);
 	struct SegmentMetaData segmentMetaData;
@@ -64,7 +65,8 @@ struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(uint64_t segmentId
 	BSONForEach(it, result.getObjectField("nodeList")) {
 		segmentMetaData._nodeList.push_back((uint32_t) it.numberInt());
 	}
-	segmentMetaData._primary = (uint32_t) result.getField("primary").numberInt();
+	segmentMetaData._primary =
+			(uint32_t) result.getField("primary").numberInt();
 	segmentMetaData._checksum = result.getField("checksum").str();
 	segmentMetaData._size = (uint32_t) result.getField("size").numberInt();
 	segmentMetaData._codingScheme = (CodingScheme) result.getField(
@@ -83,13 +85,14 @@ void SegmentMetaDataModule::saveNodeList(uint64_t segmentId,
 	vector<uint32_t>::const_iterator it;
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONArrayBuilder arrb;
-    
-    string newNodeList;
+
+	string newNodeList;
 	for (it = segmentNodeList.begin(); it < segmentNodeList.end(); ++it) {
-        newNodeList += to_string(*it) + " ";
+		newNodeList += to_string(*it) + " ";
 		arrb.append(*it);
 	}
-	debug("New Node List for Segment ID %" PRIu64 " %s\n", segmentId, newNodeList.c_str());
+	debug("New Node List for Segment ID %" PRIu64 " %s\n",
+			segmentId, newNodeList.c_str());
 
 	BSONArray arr = arrb.arr();
 	BSONObj updateSegment = BSON ("$set" << BSON ("nodeList" << arr));
@@ -144,7 +147,7 @@ vector<uint64_t> SegmentMetaDataModule::findOsdSegments(uint32_t osdId) {
 	BSONObj querySegment = BSON ("nodeList" << (int) osdId);
 	vector<BSONObj> result = _segmentMetaDataStorage->read(querySegment);
 	for (auto bson : result) {
-		uint64_t id = (uint64_t)bson.getField("id").numberLong();
+		uint64_t id = (uint64_t) bson.getField("id").numberLong();
 		segmentList.push_back(id);
 	}
 	return segmentList;
@@ -155,8 +158,22 @@ vector<uint64_t> SegmentMetaDataModule::findOsdPrimarySegments(uint32_t osdId) {
 	BSONObj querySegment = BSON ("primary" << (int) osdId);
 	vector<BSONObj> result = _segmentMetaDataStorage->read(querySegment);
 	for (auto bson : result) {
-		uint64_t id = (uint64_t)bson.getField("id").numberLong();
+		uint64_t id = (uint64_t) bson.getField("id").numberLong();
 		segmentList.push_back(id);
+	}
+	return segmentList;
+}
+
+vector<pair<uint32_t, uint64_t>> SegmentMetaDataModule::getSegmentsFromCoding(
+		CodingScheme codingScheme) {
+	vector<pair<uint32_t, uint64_t>> segmentList;
+	BSONObj querySegment = BSON ("codingScheme" << (int) codingScheme);
+	vector<BSONObj> result = _segmentMetaDataStorage->read(querySegment);
+	for (auto bson : result) {
+		uint64_t segmentId = (uint64_t) bson.getField("id").numberLong();
+		BSONForEach(it, bson.getObjectField("nodeList")) {
+			segmentList.push_back(make_pair((uint32_t)it.numberInt(), segmentId));
+		}
 	}
 	return segmentList;
 }

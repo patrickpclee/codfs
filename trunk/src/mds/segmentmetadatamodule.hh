@@ -25,7 +25,8 @@ public:
 	 * @param	segmentId	ID of the Segment
 	 * @param	segmentInfo	Info of the Segment
 	 */
-	void saveSegmentInfo(uint64_t segmentId, struct SegmentMetaData segmentInfo);
+	void saveSegmentInfo(uint64_t segmentId,
+			struct SegmentMetaData segmentInfo);
 
 	/**
 	 * @brief	Read Segment Info
@@ -92,6 +93,16 @@ public:
 	 * @return	File ID
 	 */
 	uint64_t generateSegmentId();
+
+	/**
+	 * @brief Search segment IDs with a specific coding scheme
+	 * @param codingScheme CodingScheme struct
+	 * @return list of segment ID
+	 */
+
+	vector<pair<uint32_t, uint64_t>> getSegmentsFromCoding(
+			CodingScheme codingScheme);
+
 private:
 	/// Collection
 	string _collection;
