@@ -122,7 +122,6 @@ void FileDataCache::flush(){
 	uint32_t osdSockfd;
 	vector<uint64_t> segmentList;
 	_segmentDataList.resize(_lastSegmentCount + 1);
-	unsigned char checksum[MD5_DIGEST_LENGTH];
 	for (uint32_t i = 0; i < _lastSegmentCount; ++i)
 	{
 		//if(_segmentStatusList[i] != DIRTY)
@@ -159,7 +158,12 @@ void FileDataCache::flush(){
 	debug_cyan("Send Segment 2 %" PRIu64 " Size %" PRIu32"\n",segmentData.info.segmentId,segmentData.info.segmentSize);
 	primary = _primaryList[_lastSegmentCount];
 	osdSockfd = _clientCommunicator->getSockfdFromId(primary);
+
+#ifdef USE_CHECKSUM
+	unsigned char checksum[MD5_DIGEST_LENGTH];
 	MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
+#endif
+
 	debug_cyan("Send Segment 3 %" PRIu64 " Size %" PRIu32"\n",segmentData.info.segmentId,segmentData.info.segmentSize);
 	_clientCommunicator->sendSegment(_clientId, osdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum));
 	MemoryPool::getInstance().poolFree(segmentData.buf);
@@ -180,8 +184,12 @@ void FileDataCache::writeBack(uint32_t index) {
 	struct SegmentData segmentData = _segmentDataList[index];
 	uint32_t primary = _primaryList[index];
 	uint32_t osdSockfd = _clientCommunicator->getSockfdFromId(primary);
+
+#ifdef USE_CHECKSUM
 	unsigned char checksum[MD5_DIGEST_LENGTH];
 	MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
+#endif
+
 	debug_cyan("Send Segment %" PRIu64 " Size %" PRIu32"\n",segmentData.info.segmentId,segmentData.info.segmentSize);
 	_clientCommunicator->sendSegment(_clientId, osdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum));
 	MemoryPool::getInstance().poolFree(segmentData.buf);
