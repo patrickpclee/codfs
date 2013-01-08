@@ -7,13 +7,13 @@
 	
 	<Communication>
 
-        <!-- polling interval in terms of ms -->
-        <SendPollingInterval>100</SendPollingInterval>
+        <!-- polling interval in terms of us -->
+        <SendPollingInterval>1000</SendPollingInterval>
         
         <!-- timeout for select -->
         <SelectTimeout>
             <sec>0</sec>
-            <usec>100</usec>
+            <usec>10000</usec>
         </SelectTimeout>
 	
 		<!-- Chunk Size used in transfer -->
