@@ -1,6 +1,6 @@
 OPTIMIZE := -O2
 WARNINGS := -Wall 
-EXTRA_CFLAGS := -g -std=c++0x
+EXTRA_CFLAGS := -g -std=c++0x -DDEBUG=1 -D_FILE_OFFSET_BITS=64
 
 ############################################
 
@@ -17,11 +17,22 @@ BENCHMARK_DIR=		${SRC}/benchmark
 CODING_TESTER_DIR=		${SRC}/coding_tester
 
 
-all:
+default:
 	make mds;
 	make client;
 	make osd;
 	make monitor;
+
+all:
+	make protocol;
+	make enum;
+	make mds;
+	make client;
+	make osd;
+	make monitor;
+	make codingtester;
+	make clientfuse;
+	make benchmark
 
 mds:
 	cd ${MDS_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
@@ -36,10 +47,10 @@ monitor:
 	cd ${MONITOR_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 codingtester:
-	cd ${CODING_TESTER_DIR}; make -j3
+	cd ${CODING_TESTER_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 clientfuse:
-	cd ${FUSE_DIR}; make -j3
+	cd ${FUSE_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 enum:
 	cd ${COMMON_DIR}; make

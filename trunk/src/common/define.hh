@@ -19,7 +19,9 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define PARALLEL_TRANSFER
 
 // common/debug.hh
+#ifndef DEBUG
 #define DEBUG 1
+#endif
 
 // common/memorypool.hh
 //#define USE_APR_MEMORY_POOL
