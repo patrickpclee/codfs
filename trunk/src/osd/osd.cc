@@ -470,8 +470,10 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_storageModule->createSegmentTransferCache(segmentId, length);
 	_osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 
+#ifdef USE_CHECKSUM
 	// save md5 to map
 	_checksumMap.set(segmentId, checksum);
+#endif
 
 }
 
@@ -516,8 +518,11 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			struct SegmentTransferCache segmentCache =
 					_storageModule->getSegmentTransferCache(segmentId);
 
-			// compute md5 checksum
 			unsigned char checksum[MD5_DIGEST_LENGTH];
+            memset (checksum, 0, MD5_DIGEST_LENGTH);
+
+#ifdef USE_CHECKSUM
+			// compute md5 checksum
 			MD5((unsigned char*) segmentCache.buf, segmentCache.length,
 					checksum);
 			debug_cyan("md5 of segment ID %" PRIu64 " = %s\n",
@@ -532,6 +537,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 				debug("MD5 of Segment ID = %" PRIu64 " match\n", segmentId);
 				_checksumMap.erase(segmentId);
 			}
+#endif
 
 			// perform coding
 			struct CodingSetting codingSetting = _codingSettingMap.get(

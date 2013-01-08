@@ -138,10 +138,14 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		segmentData.info.segmentId = fileMetaData._segmentList[i];
 
-		// get checksum
 		unsigned char checksum[MD5_DIGEST_LENGTH];
+        memset (checksum, 0, MD5_DIGEST_LENGTH);
+
+#ifdef USE_CHECKSUM
+		// get checksum
 		MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize,
 				checksum);
+#endif
 
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(

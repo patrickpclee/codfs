@@ -103,12 +103,15 @@ void parseOption(int argc, char* argv[]){
 
 void prepareData(){
 	databuf = (char*)calloc(segmentSize,1);
-	checksum = (unsigned char*)calloc(MD5_DIGEST_LENGTH,1);
 	int* intptr = (int*)databuf;
 	for(uint32_t i = 0; i < segmentSize / 4; ++i) {
 		intptr[i] = rand();
 	}
+
+#ifdef USE_CHECKSUM
+	checksum = (unsigned char*)calloc(MD5_DIGEST_LENGTH,1);
 	MD5((unsigned char*) databuf, segmentSize, checksum);
+#endif
 }
 
 void testDownload() {
