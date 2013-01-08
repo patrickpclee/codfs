@@ -9,6 +9,7 @@
 #include "../coding/raid1coding.hh"
 #include "../coding/raid5coding.hh"
 #include "../coding/rscoding.hh"
+#include "../coding/embrcoding.hh"
 #include "../../lib/logger.hh"
 
 using namespace std;
@@ -52,7 +53,7 @@ int main(int argc, char *argv[]) {
 				("action,a", po::value<string>(&action)->required(),
 						"Action: upload/download")
 				("coding,c", po::value<string>(&coding),
-						"Coding Scheme: raid0/raid1/raid5/rs")
+						"Coding Scheme: raid0/raid1/raid5/rs/embr")
 				("cid,i", po::value<int>(&clientId)->required(),"client ID")
 				("n,n", po::value<int>(&n),"number of stripes")
 				("k,k", po::value<int>(&k),"number of rs_k")
@@ -130,6 +131,15 @@ int main(int argc, char *argv[]) {
 					codingSetting = RSCoding::generateSetting(k,m,w);
 				} else {
 					cout << "Please specify [n,k,m,w]" << endl;
+					return 1;
+				}
+			}
+			else if (coding == "embr") {
+				codingScheme = EMBR_CODING;
+				if (vm.count("n") && vm.count("k") && vm.count("w")) {
+					codingSetting = EMBRCoding::generateSetting(n,k,w);
+				} else {
+					cout << "Please specify [n,k,w]" << endl;
 					return 1;
 				}
 			}
