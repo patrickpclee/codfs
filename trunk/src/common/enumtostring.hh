@@ -106,6 +106,7 @@ public:
   static const char * toString( CodingScheme en ) {
     switch( en ) {
       case DEFAULT_CODING: return "DEFAULT_CODING";
+      case EMBR_CODING: return "EMBR_CODING";
       case RAID0_CODING: return "RAID0_CODING";
       case RAID1_CODING: return "RAID1_CODING";
       case RAID5_CODING: return "RAID5_CODING";

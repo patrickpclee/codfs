@@ -121,6 +121,7 @@ enum PutSegmentInitRequestPro_CodingScheme {
   PutSegmentInitRequestPro_CodingScheme_RAID1_CODING = 2,
   PutSegmentInitRequestPro_CodingScheme_RAID5_CODING = 3,
   PutSegmentInitRequestPro_CodingScheme_RS_CODING = 4,
+  PutSegmentInitRequestPro_CodingScheme_EMBR_CODING = 5,
   PutSegmentInitRequestPro_CodingScheme_DEFAULT_CODING = 15
 };
 bool PutSegmentInitRequestPro_CodingScheme_IsValid(int value);
@@ -1352,6 +1353,7 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   static const CodingScheme RAID1_CODING = PutSegmentInitRequestPro_CodingScheme_RAID1_CODING;
   static const CodingScheme RAID5_CODING = PutSegmentInitRequestPro_CodingScheme_RAID5_CODING;
   static const CodingScheme RS_CODING = PutSegmentInitRequestPro_CodingScheme_RS_CODING;
+  static const CodingScheme EMBR_CODING = PutSegmentInitRequestPro_CodingScheme_EMBR_CODING;
   static const CodingScheme DEFAULT_CODING = PutSegmentInitRequestPro_CodingScheme_DEFAULT_CODING;
   static inline bool CodingScheme_IsValid(int value) {
     return PutSegmentInitRequestPro_CodingScheme_IsValid(value);
