@@ -44,6 +44,9 @@ Mds::~Mds() {
 }
 
 void Mds::initializeCacheList() {
+	// SLOW! DISABLE FOR NOW
+
+	/*
 	vector<pair<uint32_t, uint64_t>> segmentList =
 			_metaDataModule->getSegmentsFromCoding(RAID1_CODING);
 
@@ -53,6 +56,7 @@ void Mds::initializeCacheList() {
 	}
 
 	debug ("Cache list initialized for %zu copies\n", segmentList.size());
+	*/
 }
 
 /**
