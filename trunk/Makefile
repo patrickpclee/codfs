@@ -24,8 +24,6 @@ default:
 	make monitor;
 
 all:
-	make protocol;
-	make enum;
 	make mds;
 	make client;
 	make osd;
