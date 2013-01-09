@@ -159,8 +159,10 @@ void FileDataCache::flush(){
 	primary = _primaryList[_lastSegmentCount];
 	osdSockfd = _clientCommunicator->getSockfdFromId(primary);
 
-#ifdef USE_CHECKSUM
 	unsigned char checksum[MD5_DIGEST_LENGTH];
+    memset (checksum, 0, MD5_DIGEST_LENGTH);
+
+#ifdef USE_CHECKSUM
 	MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
 #endif
 
@@ -185,8 +187,10 @@ void FileDataCache::writeBack(uint32_t index) {
 	uint32_t primary = _primaryList[index];
 	uint32_t osdSockfd = _clientCommunicator->getSockfdFromId(primary);
 
-#ifdef USE_CHECKSUM
 	unsigned char checksum[MD5_DIGEST_LENGTH];
+    memset (checksum, 0, MD5_DIGEST_LENGTH);
+
+#ifdef USE_CHECKSUM
 	MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
 #endif
 
