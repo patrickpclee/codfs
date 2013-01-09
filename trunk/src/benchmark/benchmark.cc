@@ -88,10 +88,10 @@ void parseOption(int argc, char* argv[]) {
 		debug("Testing %s with File Size %" PRIu64 " Segment Size %"PRIu32"\n",
 				argv[2], fileSize, segmentSize);
 
-		//codingScheme = RAID1_CODING;
-		//codingSetting = Raid1Coding::generateSetting(1);
-		codingScheme = EMBR_CODING;
-		codingSetting = EMBRCoding::generateSetting(4, 2, 8);
+		codingScheme = RAID1_CODING;
+		codingSetting = Raid1Coding::generateSetting(1);
+		//codingScheme = EMBR_CODING;
+		//codingSetting = EMBRCoding::generateSetting(4, 2, 8);
 		debug("Coding Setting: %s\n", codingSetting.c_str());
 	}
 
