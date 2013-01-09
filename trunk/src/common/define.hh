@@ -12,7 +12,7 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define USLEEP_DURATION 10000
 
 // osd.cc, client.cc, filedatacache.cc, benchmark.cc
- #define USE_CHECKSUM
+//#define USE_CHECKSUM
 
 // osd/storagemodule.cc
 #define MAX_OPEN_FILES 100
