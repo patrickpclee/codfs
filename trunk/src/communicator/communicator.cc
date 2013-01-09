@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include <sys/types.h>		// required by select()
 #include <unistd.h>		// required by select()
@@ -19,6 +20,7 @@
 #include "../common/enumtostring.hh"
 #include "../common/debug.hh"
 #include "../common/define.hh"
+#include "../common/memorypool.hh"
 #include "../common/convertor.hh"
 #include "../common/segmentdata.hh"
 #include "../protocol/message.pb.h"
@@ -43,6 +45,8 @@ using namespace std;
 #include "../../lib/threadpool/threadpool.hpp"
 using namespace boost::threadpool;
 
+pool _parsingtp;
+pool threadPools[MSGTYPE_END];
 #endif
 
 // global variable defined in each component
@@ -51,6 +55,8 @@ extern ConfigLayer* configLayer;
 // mutex
 boost::shared_mutex connectionMapMutex;
 boost::shared_mutex threadPoolMapMutex;
+
+const uint32_t MSG_HEADER_SIZE = sizeof(struct MsgHeader);
 
 Communicator::Communicator() {
 
@@ -61,6 +67,9 @@ Communicator::Communicator() {
 	_requestId = 0;
 	_maxFd = 0;
 	_connectionMap = {};
+
+	_sockfdMutexMap = {};
+	_sockfdBufMap = {};
 
 	// select timeout
 	_timeoutSec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
@@ -77,6 +86,7 @@ Communicator::Communicator() {
 	_pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
 
+	_parsingtp.size_controller().resize(PARSING_THREADS);
 	debug("%s\n", "Communicator constructed");
 
 }
@@ -119,7 +129,6 @@ void Communicator::createServerSocket() {
 
 void Communicator::waitForMessage() {
 
-	char* buf; // message receive buffer
 	map<uint32_t, Connection*>::iterator p; // connectionMap iterator
 
 	int result; // return value for select
@@ -137,13 +146,14 @@ void Communicator::waitForMessage() {
 
 	// each MsgType has its own threadpool
 	// number of threads in each pool is defined in _threadPoolSize in the message
-	pool threadPools[MSGTYPE_END];
+	// pool threadPools[MSGTYPE_END]; MOVE TO GLOBAL
 	for (int i = 1; i < MSGTYPE_END; i++) { // i = 1 skip DEFAULT
 		Message* tempMessage = MessageFactory::createMessage(this, (MsgType) i);
 		uint32_t threadPoolSize = tempMessage->getThreadPoolSize();
 		threadPools[i].size_controller().resize(threadPoolSize);
 		delete tempMessage;
 	}
+
 
 #endif
 
@@ -199,6 +209,12 @@ void Communicator::waitForMessage() {
 #endif
 			}
 
+			// Receive Optimization
+			// add new socket to mutexMap and bufMap
+			_sockfdMutexMap[conn->getSockfd()] = new std::mutex();
+			_sockfdBufMap[conn->getSockfd()] = RecvBuffer();
+			debug_cyan("Add socket to mutex and buf map %" PRIu32 "\n", conn->getSockfd());
+
 
 			debug("New connection sockfd = %" PRIu32 "\n", conn->getSockfd());
 
@@ -219,45 +235,72 @@ void Communicator::waitForMessage() {
 				// if socket has data available
 				if (FD_ISSET(sockfd, &sockfdSet)) {
 
-//					debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
+					if (_sockfdMutexMap[sockfd]->try_lock()) {
 
-					// check if connection is lost
-					int nbytes = 0;
-					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
-					if (nbytes == 0) {
+						//debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
 
-						// upgrade shared lock to exclusive lock
-						boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
-								lock);
+						// check if connection is lost
+						int nbytes = 0;
+						ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
+						if (nbytes == 0) {
 
-						// disconnect and remove from _connectionMap
-						debug("SOCKFD = %" PRIu32 " connection lost\n",
-								p->first);
+							// upgrade shared lock to exclusive lock
+							boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
+									lock);
+
+							// disconnect and remove from _connectionMap
+							debug("SOCKFD = %" PRIu32 " connection lost\n",
+									p->first);
+
+							// Receive Optimization
+							{
+								lock_guard<mutex> lk(*_sockfdMutexMap[p->first]);
+								_sockfdBufMap.erase(p->first);
+							}
+							_sockfdMutexMap.erase(p->first);
+
 #ifdef COMPILE_FOR_MONITOR
-						monitor->getStatModule()->removeStatBySockfd(sockfd);
+							monitor->getStatModule()->removeStatBySockfd(sockfd);
 #endif
-						// hack: post-increment adjusts iterator even erase is called
-						_connectionMap.erase(p++);
-						continue;
-					} else {
-						// receive message into buffer, memory allocated in recvMessage
-						buf = p->second->recvMessage();
+							// hack: post-increment adjusts iterator even erase is called
+							_connectionMap.erase(p++);
+
+							continue;
+						} else {
+
+							struct RecvBuffer& rb = _sockfdBufMap[sockfd];
+
+							int32_t byteRead = p->second->getSocket()->aggressiveRecv(rb.buf + rb.len, RECV_BUF_PER_SOCKET - rb.len);
+							rb.len += byteRead;
+							debug_cyan("Add Recv to ThreadPool for socket %" PRIu32 "Read Byte %" PRIu32 "\n", sockfd, byteRead);
+							_parsingtp.schedule(boost::bind(&Communicator::parsing, this, sockfd));
+
+							// receive message into buffer, memory allocated in recvMessage
+							/*
+
+							   buf = p->second->recvMessage();
 
 #ifdef USE_THREAD_POOL
-						MsgType msgType =
-								((struct MsgHeader*) buf)->protocolMsgType;
+MsgType msgType =
+((struct MsgHeader*) buf)->protocolMsgType;
 
-						// schedule message in its own threadpool
-						threadPools[msgType].schedule(
-								boost::bind(&Communicator::dispatch, this, buf,
-										p->first, 0));
-						debug("Add Thread Pool [%s] %d/%d/%d\n",
-								EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
+							// schedule message in its own threadpool
+							threadPools[msgType].schedule(
+							boost::bind(&Communicator::dispatch, this, buf,
+							p->first, 0));
+							debug("Add Thread Pool [%s] %d/%d/%d\n",
+							EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
 
 
 #else
-						dispatch(buf, p->first);
+dispatch(buf, p->first);// Not used anymore
 #endif
+							 */
+						}
+						_sockfdMutexMap[sockfd]->unlock();
+					} else {
+						// NOT OBTAINED LOCK
+						// LEFT TO NEXT ROUND
 					}
 				}
 
@@ -266,6 +309,45 @@ void Communicator::waitForMessage() {
 		} // end critical section
 
 	} // end while (1)
+
+}
+
+
+void Communicator::parsing(uint32_t sockfd) {
+	lock_guard<mutex> lk(*_sockfdMutexMap[sockfd]);
+	struct RecvBuffer& recvBuffer = _sockfdBufMap[sockfd];
+	debug_red("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer.len);
+	uint32_t idx = 0;
+	struct MsgHeader *msgHeader;
+	MsgType msgType;
+	while (idx + MSG_HEADER_SIZE <= recvBuffer.len) 
+	{
+		//memcpy((char*) &msgHeader, recvBuffer.buf + idx, MSG_HEADER_SIZE);
+		msgHeader = (struct MsgHeader*) (recvBuffer.buf +idx);
+		msgType = msgHeader->protocolMsgType;
+		uint32_t totalMsgSize = MSG_HEADER_SIZE + msgHeader->protocolMsgSize + msgHeader->payloadSize;
+		debug_yellow("[%s] FOR SOCKET %" PRIu32 " RECV BUF SIZE %" PRIu32 " IDX = %" PRIu32 " TOTAL MSG SIZE %" PRIu32 "\n", EnumToString::toString(msgType), sockfd, recvBuffer.len, idx, totalMsgSize);
+		if (idx + totalMsgSize <= recvBuffer.len) {
+			char* buffer = MemoryPool::getInstance().poolMalloc(totalMsgSize);
+			memcpy (buffer, recvBuffer.buf + idx, totalMsgSize);
+			// DISPATCH
+			threadPools[msgType].schedule(boost::bind(&Communicator::dispatch, this, buffer ,sockfd, 0));
+			debug("Add Thread Pool [%s] %d/%d/%d\n",EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
+			idx += totalMsgSize;
+		} else {
+			// Not receive complete message, memmove to head
+			if (idx > 0) {
+				memmove(recvBuffer.buf, recvBuffer.buf + idx, recvBuffer.len - idx);
+				recvBuffer.len = recvBuffer.len - idx;
+				idx = 0;
+			}
+			break;
+		}
+	}
+	if (idx > 0) {
+		memmove(recvBuffer.buf, recvBuffer.buf + idx, recvBuffer.len - idx);
+		recvBuffer.len = recvBuffer.len - idx;
+	}
 
 }
 
@@ -286,12 +368,12 @@ void Communicator::addMessage(Message* message, bool expectReply, uint32_t waitO
 	if (expectReply) {
 		message->setExpectReply(true);
 		{
-            uint32_t requestId = 0;
-            if (waitOnRequestId == 0) { // if a requestId is not specified
-                requestId = message->getMsgHeader().requestId;
-            } else {
-                requestId = waitOnRequestId;
-            }
+			uint32_t requestId = 0;
+			if (waitOnRequestId == 0) { // if a requestId is not specified
+				requestId = message->getMsgHeader().requestId;
+			} else {
+				requestId = waitOnRequestId;
+			}
 
 			_waitReplyMessageMap.set(requestId, message);
 			debug(
@@ -302,19 +384,19 @@ void Communicator::addMessage(Message* message, bool expectReply, uint32_t waitO
 
 	// add message to outMessageQueue
 	switch(message->getMsgHeader().protocolMsgType) {
-	case SEGMENT_DATA:
-	case BLOCK_DATA:
+		case SEGMENT_DATA:
+		case BLOCK_DATA:
 #ifdef USE_MULTIPLE_QUEUE
-		_outDataQueue[message->getSockfd()]->push(message);
+			_outDataQueue[message->getSockfd()]->push(message);
 #else
-		_outDataQueue.push(message);
+			_outDataQueue.push(message);
 #endif
-		break;
-	default:
+			break;
+		default:
 #ifdef USE_MULTIPLE_QUEUE
-		_outMessageQueue[message->getSockfd()]->push(message);
+			_outMessageQueue[message->getSockfd()]->push(message);
 #else
-		_outMessageQueue.push(message);
+			_outMessageQueue.push(message);
 #endif
 	}
 
@@ -337,593 +419,605 @@ Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 #ifdef USE_MULTIPLE_QUEUE
 void Communicator::sendMessage(uint32_t fd){
 #else
-void Communicator::sendMessage() {
+	void Communicator::sendMessage() {
 #endif
 
-	while (1) {
+		while (1) {
 
-		Message* message;
+			Message* message;
 
-		// send all message in the outMessageQueue
+			// send all message in the outMessageQueue
 #ifdef USE_MULTIPLE_QUEUE
-		while ((message = popMessage(fd)) != NULL) {
+			while ((message = popMessage(fd)) != NULL) {
 #else
-		while ((message = popMessage()) != NULL) {
+				while ((message = popMessage()) != NULL) {
 #endif
 
-			const uint32_t sockfd = message->getSockfd();
+					const uint32_t sockfd = message->getSockfd();
 
-			// handle disconnected component
-			if (sockfd == (uint32_t) -1) {
-				debug("Message (ID: %" PRIu32 ") disconnected, ignore\n",
-						message->getMsgHeader().requestId);
-				debug(
-						"Deleting Message since sockfd == -1 (Type = %d ID: %" PRIu32 ")\n",
-						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
-				delete message;
-				continue;
-			}
+					// handle disconnected component
+					if (sockfd == (uint32_t) -1) {
+						debug("Message (ID: %" PRIu32 ") disconnected, ignore\n",
+								message->getMsgHeader().requestId);
+						debug(
+								"Deleting Message since sockfd == -1 (Type = %d ID: %" PRIu32 ")\n",
+								(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+						delete message;
+						continue;
+					}
 
-			{
-				boost::shared_lock<boost::shared_mutex> lock(
-						connectionMapMutex);
-				if (!(_connectionMap.count(sockfd))) {
-					debug("Connection SOCKFD = %" PRIu32 " not found!\n",
-							sockfd);
+					{
+						boost::shared_lock<boost::shared_mutex> lock(
+								connectionMapMutex);
+						if (!(_connectionMap.count(sockfd))) {
+							debug("Connection SOCKFD = %" PRIu32 " not found!\n",
+									sockfd);
+							debug(
+									"Deleting Message since sockfd not found (Type = %d ID: %" PRIu32 ")\n",
+									(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+							delete message;
+							continue;
+						}
+						_connectionMap[sockfd]->sendMessage(message);
+					}
+
+					// debug
+
+					message->printProtocol();
+					message->printHeader();
+
 					debug(
-							"Deleting Message since sockfd not found (Type = %d ID: %" PRIu32 ")\n",
-							(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
-					delete message;
-					continue;
+							"Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
+							message->getMsgHeader().requestId, sockfd);
+
+					// delete message if it is not waiting for reply
+					if (!message->isExpectReply()) {
+						debug("Deleting Message (Type = %d ID: %" PRIu32 ")\n",
+								(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+						delete message;
+					}
 				}
-				_connectionMap[sockfd]->sendMessage(message);
+
+#ifdef USE_LOWLOCK_QUEUE
+				// polling is not required for concurrent queue since it uses conditional signal
+				usleep(_pollingInterval); // in terms of 10^-6 seconds
+#endif
 			}
+		}
+
+		/**
+		 * 1. Connect to target component
+		 * 2. Add the connection to the corresponding map
+		 */
+
+		uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
+				ComponentType connectionType) {
+
+			// Construct a Connection segment and connect to component
+			Connection* conn = new Connection();
+			const uint32_t sockfd = conn->doConnect(ip, port, connectionType);
+
+			// Save the connection into corresponding list
+			{
+				boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
+				_connectionMap[sockfd] = conn;
+#ifdef USE_MULTIPLE_QUEUE
+				//	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
+				_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+				_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+				_dataMutex[conn->getSockfd()] = new mutex();
+				_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
+#endif
+			}
+
+			// adjust _maxFd
+			if (sockfd > _maxFd) {
+				_maxFd = sockfd;
+			}
+
+			return sockfd;
+		}
+
+		/**
+		 * 1. Disconnect the connection
+		 * 2. Remove the connection from map
+		 * 3. Run the connection destructor
+		 */
+
+		void Communicator::disconnectAndRemove(uint32_t sockfd) {
+			boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
+
+			if (_connectionMap.count(sockfd)) {
+				Connection* conn = _connectionMap[sockfd];
+				delete conn;
+				_connectionMap.erase(sockfd);
+				debug("Connection erased for sockfd = %" PRIu32 "\n", sockfd);
+			} else {
+				cerr << "Connection not found, cannot remove connection" << endl;
+				exit(-1);
+			}
+
+		}
+
+		uint32_t Communicator::getMdsSockfd() {
+			// TODO: assume return first MDS
+			map<uint32_t, Connection*>::iterator p;
+
+			boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
+
+			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+				if (p->second->getConnectionType() == MDS) {
+					return p->second->getSockfd();
+				}
+			}
+
+			return -1;
+		}
+
+		uint32_t Communicator::getMonitorSockfd() {
+			// TODO: assume return first Monitor
+			map<uint32_t, Connection*>::iterator p;
+
+			boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
+
+			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+				if (p->second->getConnectionType() == MONITOR) {
+					return p->second->getSockfd();
+				}
+			}
+
+			return -1;
+		}
+
+		uint32_t Communicator::getOsdSockfd() {
+			// TODO: assume return first Osd
+			map<uint32_t, Connection*>::iterator p;
+
+			boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
+
+			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
+				if (p->second->getConnectionType() == OSD) {
+					return p->second->getSockfd();
+				}
+			}
+
+			return -1;
+		}
+
+		// static function
+		void Communicator::handleThread(Message* message) {
+			message->handle();
+		}
+
+		// static function
+		void Communicator::sendThread(Communicator* communicator) {
+#ifdef USE_MULTIPLE_QUEUE
+#else
+			communicator->sendMessage();
+#endif
+		}
+
+		/**
+		 * 1. Get the MsgHeader from the receive buffer
+		 * 2. Get the MsgType from the MsgHeader
+		 * 3. Use the MessageFactory to obtain a new Message segment
+		 * 4. Fill in the socket descriptor into the Message
+		 * 5. message->parse() and fill in payload pointer
+		 * 6. start new thread for message->handle()
+		 */
+
+		void Communicator::dispatch(char* buf, uint32_t sockfd,
+				uint32_t threadPoolLevel) {
+
+			struct MsgHeader msgHeader;
+			memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
+
+			debug("Running dispatch ID = %" PRIu32 " Type = %s\n",
+					msgHeader.requestId, EnumToString::toString(msgHeader.protocolMsgType));
+
+			const MsgType msgType = msgHeader.protocolMsgType;
+
+			// delete after message is handled
+			Message* message = MessageFactory::createMessage(this, msgType);
+
+			message->setSockfd(sockfd);
+			message->setRecvBuf(buf);
+			message->parse(buf);
+
+			// set payload pointer
+			message->setPayload(
+					buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
 
 			// debug
-
-			message->printProtocol();
 			message->printHeader();
-
-			debug(
-					"Message (ID: %" PRIu32 ") FD = %" PRIu32 " removed from queue\n",
-					message->getMsgHeader().requestId, sockfd);
-
-			// delete message if it is not waiting for reply
-			if (!message->isExpectReply()) {
-				debug("Deleting Message (Type = %d ID: %" PRIu32 ")\n",
-						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
-				delete message;
-			}
-		}
-
-#ifdef USE_LOWLOCK_QUEUE
-		// polling is not required for concurrent queue since it uses conditional signal
-		usleep(_pollingInterval); // in terms of 10^-6 seconds
-#endif
-	}
-}
-
-/**
- * 1. Connect to target component
- * 2. Add the connection to the corresponding map
- */
-
-uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
-		ComponentType connectionType) {
-
-	// Construct a Connection segment and connect to component
-	Connection* conn = new Connection();
-	const uint32_t sockfd = conn->doConnect(ip, port, connectionType);
-
-	// Save the connection into corresponding list
-	{
-		boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
-		_connectionMap[sockfd] = conn;
-#ifdef USE_MULTIPLE_QUEUE
-	//	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
-		_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
-		_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
-		_dataMutex[conn->getSockfd()] = new mutex();
-		_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
-#endif
-	}
-
-	// adjust _maxFd
-	if (sockfd > _maxFd) {
-		_maxFd = sockfd;
-	}
-
-	return sockfd;
-}
-
-/**
- * 1. Disconnect the connection
- * 2. Remove the connection from map
- * 3. Run the connection destructor
- */
-
-void Communicator::disconnectAndRemove(uint32_t sockfd) {
-	boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
-
-	if (_connectionMap.count(sockfd)) {
-		Connection* conn = _connectionMap[sockfd];
-		delete conn;
-		_connectionMap.erase(sockfd);
-		debug("Connection erased for sockfd = %" PRIu32 "\n", sockfd);
-	} else {
-		cerr << "Connection not found, cannot remove connection" << endl;
-		exit(-1);
-	}
-
-}
-
-uint32_t Communicator::getMdsSockfd() {
-	// TODO: assume return first MDS
-	map<uint32_t, Connection*>::iterator p;
-
-	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
-
-	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-		if (p->second->getConnectionType() == MDS) {
-			return p->second->getSockfd();
-		}
-	}
-
-	return -1;
-}
-
-uint32_t Communicator::getMonitorSockfd() {
-	// TODO: assume return first Monitor
-	map<uint32_t, Connection*>::iterator p;
-
-	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
-
-	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-		if (p->second->getConnectionType() == MONITOR) {
-			return p->second->getSockfd();
-		}
-	}
-
-	return -1;
-}
-
-uint32_t Communicator::getOsdSockfd() {
-	// TODO: assume return first Osd
-	map<uint32_t, Connection*>::iterator p;
-
-	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
-
-	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
-		if (p->second->getConnectionType() == OSD) {
-			return p->second->getSockfd();
-		}
-	}
-
-	return -1;
-}
-
-// static function
-void Communicator::handleThread(Message* message) {
-	message->handle();
-}
-
-// static function
-void Communicator::sendThread(Communicator* communicator) {
-#ifdef USE_MULTIPLE_QUEUE
-#else
-	communicator->sendMessage();
-#endif
-}
-
-/**
- * 1. Get the MsgHeader from the receive buffer
- * 2. Get the MsgType from the MsgHeader
- * 3. Use the MessageFactory to obtain a new Message segment
- * 4. Fill in the socket descriptor into the Message
- * 5. message->parse() and fill in payload pointer
- * 6. start new thread for message->handle()
- */
-
-void Communicator::dispatch(char* buf, uint32_t sockfd,
-		uint32_t threadPoolLevel) {
-
-	struct MsgHeader msgHeader;
-	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
-
-	debug("Running dispatch ID = %" PRIu32 " Type = %s\n",
-			msgHeader.requestId, EnumToString::toString(msgHeader.protocolMsgType));
-
-	const MsgType msgType = msgHeader.protocolMsgType;
-
-	// delete after message is handled
-	Message* message = MessageFactory::createMessage(this, msgType);
-
-	message->setSockfd(sockfd);
-	message->setRecvBuf(buf);
-	message->parse(buf);
-
-	// set payload pointer
-	message->setPayload(
-			buf + sizeof(struct MsgHeader) + msgHeader.protocolMsgSize);
-
-	// debug
-	message->printHeader();
-	message->printProtocol();
+			message->printProtocol();
 
 #ifdef USE_THREAD_POOL
-	message->handle();
+			message->handle();
 #else
-	thread t(handleThread, message);
-	t.detach();
+			thread t(handleThread, message);
+			t.detach();
 #endif
 
-}
+		}
 
 
 #ifdef USE_MULTIPLE_QUEUE
-Message* Communicator::popMessage(uint32_t fd) {
+		Message* Communicator::popMessage(uint32_t fd) {
 #else
-Message* Communicator::popMessage() {
+			Message* Communicator::popMessage() {
 #endif
-	Message* message = NULL;
+				Message* message = NULL;
 
 #ifdef USE_LOWLOCK_QUEUE
 #ifdef USE_MULTIPLE_QUEUE
-	if (_outMessageQueue[fd]->pop(message) != false) {
+				if (_outMessageQueue[fd]->pop(message) != false) {
 #else
-	if (_outMessageQueue.pop(message) != false) {
+					if (_outMessageQueue.pop(message) != false) {
 #endif
-		return message;
+						return message;
 #ifdef USE_MULTIPLE_QUEUE
-	} else if (_outDataQueue[fd]->pop(message) != false) {
+					} else if (_outDataQueue[fd]->pop(message) != false) {
 #else
-	} else if (_outDataQueue.pop(message) != false) {
+					} else if (_outDataQueue.pop(message) != false) {
 #endif
-		return message;
-	} else
-		return NULL;
+						return message;
+					} else
+						return NULL;
 #else
-	_outMessageQueue.wait_and_pop(message);
-	return message;
+					_outMessageQueue.wait_and_pop(message);
+					return message;
 #endif
-}
+				}
 
-void Communicator::waitAndDelete(Message* message) {
-	GarbageCollector::getInstance().addToDeleteList(message);
-}
+				void Communicator::waitAndDelete(Message* message) {
+					GarbageCollector::getInstance().addToDeleteList(message);
+				}
 
-void Communicator::setId(uint32_t id) {
-	_componentId = id;
-}
+				void Communicator::setId(uint32_t id) {
+					_componentId = id;
+				}
 
-void Communicator::setComponentType(ComponentType componentType) {
-	_componentType = componentType;
-}
+				void Communicator::setComponentType(ComponentType componentType) {
+					_componentType = componentType;
+				}
 
-void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
-		ComponentType componentType) {
+				void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
+						ComponentType componentType) {
 
-	HandshakeRequestMsg* requestHandshakeMsg = new HandshakeRequestMsg(this,
-			sockfd, componentId, componentType);
+					HandshakeRequestMsg* requestHandshakeMsg = new HandshakeRequestMsg(this,
+							sockfd, componentId, componentType);
 
-	requestHandshakeMsg->prepareProtocolMsg();
-	addMessage(requestHandshakeMsg, true);
+					requestHandshakeMsg->prepareProtocolMsg();
+					addMessage(requestHandshakeMsg, true);
 
-	MessageStatus status = requestHandshakeMsg->waitForStatusChange();
-	if (status == READY) {
+					MessageStatus status = requestHandshakeMsg->waitForStatusChange();
+					if (status == READY) {
 
-		// retrieve replied values
-		uint32_t targetComponentId =
-				requestHandshakeMsg->getTargetComponentId();
+						// retrieve replied values
+						uint32_t targetComponentId =
+							requestHandshakeMsg->getTargetComponentId();
 
-		// delete message
-		waitAndDelete(requestHandshakeMsg);
+						// delete message
+						waitAndDelete(requestHandshakeMsg);
 
-		// add <ID> <sockfd> mapping to map
-		_componentIdMap.set(targetComponentId, sockfd);
-		debug(
-				"[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
-				targetComponentId, sockfd);
+						// add <ID> <sockfd> mapping to map
+						_componentIdMap.set(targetComponentId, sockfd);
+						debug(
+								"[HANDSHAKE ACK RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
+								targetComponentId, sockfd);
 
-	} else {
-		debug_error("%s\n", "Handshake Request Failed");
-		exit(-1);
-	}
-}
+					} else {
+						debug_error("%s\n", "Handshake Request Failed");
+						exit(-1);
+					}
+				}
 
-void Communicator::handshakeRequestProcessor(uint32_t requestId,
-		uint32_t sockfd, uint32_t componentId, ComponentType componentType) {
+				void Communicator::handshakeRequestProcessor(uint32_t requestId,
+						uint32_t sockfd, uint32_t componentId, ComponentType componentType) {
 
-	// add ID -> sockfd mapping to map
-	_componentIdMap.set(componentId, sockfd);
+					// add ID -> sockfd mapping to map
+					_componentIdMap.set(componentId, sockfd);
 
-	debug(
-			"[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
-			componentId, sockfd);
+					debug(
+							"[HANDSHAKE SYN RECV] Component ID = %" PRIu32 " FD = %" PRIu32 " added to map\n",
+							componentId, sockfd);
 
-	// save component type into connectionMap
-	_connectionMap[sockfd]->setConnectionType(componentType);
+					// save component type into connectionMap
+					_connectionMap[sockfd]->setConnectionType(componentType);
 
-	// prepare reply message
-	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this,
-			requestId, sockfd, _componentId, _componentType);
-	handshakeReplyMsg->prepareProtocolMsg();
-	addMessage(handshakeReplyMsg, false);
-}
+					// prepare reply message
+					HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this,
+							requestId, sockfd, _componentId, _componentType);
+					handshakeReplyMsg->prepareProtocolMsg();
+					addMessage(handshakeReplyMsg, false);
+				}
 
-vector<struct Component> Communicator::parseConfigFile(string componentType) {
-	vector<struct Component> componentList;
+				vector<struct Component> Communicator::parseConfigFile(string componentType) {
+					vector<struct Component> componentList;
 
-	// get count
-	const string componentCountQuery = "Components>" + componentType + ">count";
-	const uint32_t componentCount = configLayer->getConfigInt(
-			componentCountQuery.c_str());
+					// get count
+					const string componentCountQuery = "Components>" + componentType + ">count";
+					const uint32_t componentCount = configLayer->getConfigInt(
+							componentCountQuery.c_str());
 
-	for (uint32_t i = 0; i < componentCount; i++) {
-		const string idQuery = "Components>" + componentType + ">"
-				+ componentType + to_string(i) + ">id";
-		const string ipQuery = "Components>" + componentType + ">"
-				+ componentType + to_string(i) + ">ip";
-		const string portQuery = "Components>" + componentType + ">"
-				+ componentType + to_string(i) + ">port";
+					for (uint32_t i = 0; i < componentCount; i++) {
+						const string idQuery = "Components>" + componentType + ">"
+							+ componentType + to_string(i) + ">id";
+						const string ipQuery = "Components>" + componentType + ">"
+							+ componentType + to_string(i) + ">ip";
+						const string portQuery = "Components>" + componentType + ">"
+							+ componentType + to_string(i) + ">port";
 
-		const uint32_t id = configLayer->getConfigInt(idQuery.c_str());
-		const string ip = configLayer->getConfigString(ipQuery.c_str());
-		const uint32_t port = configLayer->getConfigInt(portQuery.c_str());
+						const uint32_t id = configLayer->getConfigInt(idQuery.c_str());
+						const string ip = configLayer->getConfigString(ipQuery.c_str());
+						const uint32_t port = configLayer->getConfigInt(portQuery.c_str());
 
-		struct Component component;
+						struct Component component;
 
-		if (componentType == "MDS")
-			component.type = MDS;
-		else if (componentType == "OSD")
-			component.type = OSD;
-		else if (componentType == "MONITOR")
-			component.type = MONITOR;
-		else if (componentType == "CLIENT")
-			component.type = CLIENT;
+						if (componentType == "MDS")
+							component.type = MDS;
+						else if (componentType == "OSD")
+							component.type = OSD;
+						else if (componentType == "MONITOR")
+							component.type = MONITOR;
+						else if (componentType == "CLIENT")
+							component.type = CLIENT;
 
-		component.id = id;
-		component.ip = ip;
-		component.port = (uint16_t) port;
+						component.id = id;
+						component.ip = ip;
+						component.port = (uint16_t) port;
 
-		componentList.push_back(component);
-	}
+						componentList.push_back(component);
+					}
 
-	return componentList;
-}
+					return componentList;
+				}
 
-void Communicator::printComponents(string componentType,
-		vector<Component> componentList) {
+				void Communicator::printComponents(string componentType,
+						vector<Component> componentList) {
 
-	cout << "========== " << componentType << " LIST ==========" << endl;
-	for (Component component : componentList) {
-		if (_componentId == component.id) {
-			cout << "(*)";
-		}
-		cout << "ID: " << component.id << " IP: " << component.ip << ":"
-				<< component.port << endl;
-	}
-}
+					cout << "========== " << componentType << " LIST ==========" << endl;
+					for (Component component : componentList) {
+						if (_componentId == component.id) {
+							cout << "(*)";
+						}
+						cout << "ID: " << component.id << " IP: " << component.ip << ":"
+							<< component.port << endl;
+					}
+				}
 
-void Communicator::connectToComponents(vector<Component> componentList) {
+				void Communicator::connectToComponents(vector<Component> componentList) {
 
-	// if I am a CLIENT, always connect
-	// if I am not a CLIENT, connect if My ID > Peer ID
+					// if I am a CLIENT, always connect
+					// if I am not a CLIENT, connect if My ID > Peer ID
 
-	for (Component component : componentList) {
-		if (_componentType == CLIENT || _componentId > component.id) {
-			debug("Connecting to %s:%" PRIu16 "\n",
-					component.ip.c_str(), component.port);
-			uint32_t sockfd = connectAndAdd(component.ip, component.port,
-					component.type);
+					for (Component component : componentList) {
+						if (_componentType == CLIENT || _componentId > component.id) {
+							debug("Connecting to %s:%" PRIu16 "\n",
+									component.ip.c_str(), component.port);
+							uint32_t sockfd = connectAndAdd(component.ip, component.port,
+									component.type);
 
-			// send HandshakeRequest
-			requestHandshake(sockfd, _componentId, _componentType);
+							// send HandshakeRequest
+							requestHandshake(sockfd, _componentId, _componentType);
 
-		} else if ((_componentType == MDS || _componentType == OSD)
-				&& component.type == MONITOR) {
-			debug("Connecting to %s:%" PRIu16 "\n",
-					component.ip.c_str(), component.port);
-			uint32_t sockfd = connectAndAdd(component.ip, component.port,
-					component.type);
+						} else if ((_componentType == MDS || _componentType == OSD)
+								&& component.type == MONITOR) {
+							debug("Connecting to %s:%" PRIu16 "\n",
+									component.ip.c_str(), component.port);
+							uint32_t sockfd = connectAndAdd(component.ip, component.port,
+									component.type);
 
-			// send HandshakeRequest
-			requestHandshake(sockfd, _componentId, _componentType);
+							// send HandshakeRequest
+							requestHandshake(sockfd, _componentId, _componentType);
 
-		} else {
-			debug("Skipping %s:%" PRIu16 "\n",
-					component.ip.c_str(), component.port);
-		}
-	}
-}
+						} else {
+							debug("Skipping %s:%" PRIu16 "\n",
+									component.ip.c_str(), component.port);
+						}
+					}
+				}
 
-void Communicator::connectToMyself(string ip, uint16_t port,
-		ComponentType type) {
-	uint32_t sockfd = connectAndAdd(ip, port, type);
-	requestHandshake(sockfd, _componentId, _componentType);
-}
+				void Communicator::connectToMyself(string ip, uint16_t port,
+						ComponentType type) {
+					uint32_t sockfd = connectAndAdd(ip, port, type);
+					_sockfdMutexMap[sockfd] = new std::mutex();
+					_sockfdBufMap[sockfd] = RecvBuffer();
+					debug_cyan("connectToMySelf: Add socket to mutex and buf map %" PRIu32 "\n", sockfd);
+					requestHandshake(sockfd, _componentId, _componentType);
+				}
 
-void Communicator::connectToMonitor() {
-	vector<Component> monitorList = parseConfigFile("MONITOR");
-	printComponents("MONITOR", monitorList);
-	for (Component component : monitorList) {
-		uint32_t sockfd = connectAndAdd(component.ip, component.port,
-				component.type);
-		requestHandshake(sockfd, _componentId, _componentType);
-	}
-}
+				void Communicator::connectToMonitor() {
+					vector<Component> monitorList = parseConfigFile("MONITOR");
+					printComponents("MONITOR", monitorList);
+					for (Component component : monitorList) {
+						uint32_t sockfd = connectAndAdd(component.ip, component.port,
+								component.type);
+						_sockfdMutexMap[sockfd] = new std::mutex();
+						_sockfdBufMap[sockfd] = RecvBuffer();
+						debug_cyan("connectToMonitor: Add socket to mutex and buf map %" PRIu32 "\n", sockfd);
+						requestHandshake(sockfd, _componentId, _componentType);
+					}
+				}
 
-void Communicator::connectToMds() {
-	vector<Component> mdsList = parseConfigFile("MDS");
-	printComponents("MDS", mdsList);
-	for (Component component : mdsList) {
-		uint32_t sockfd = connectAndAdd(component.ip, component.port,
-				component.type);
-		requestHandshake(sockfd, _componentId, _componentType);
-	}
-}
+				void Communicator::connectToMds() {
+					vector<Component> mdsList = parseConfigFile("MDS");
+					printComponents("MDS", mdsList);
+					for (Component component : mdsList) {
+						uint32_t sockfd = connectAndAdd(component.ip, component.port,
+								component.type);
+						_sockfdMutexMap[sockfd] = new std::mutex();
+						_sockfdBufMap[sockfd] = RecvBuffer();
+						debug_cyan("connectToMds: Add socket to mutex and buf map %" PRIu32 "\n", sockfd);
+						requestHandshake(sockfd, _componentId, _componentType);
+					}
+				}
 
-void Communicator::connectToOsd(uint32_t dstOsdIp, uint32_t dstOsdPort) {
-	uint32_t sockfd = connectAndAdd(Ipv4Int2Str(dstOsdIp), dstOsdPort,
-			_componentType);
-	requestHandshake(sockfd, _componentId, _componentType);
-}
+				void Communicator::connectToOsd(uint32_t dstOsdIp, uint32_t dstOsdPort) {
+					uint32_t sockfd = connectAndAdd(Ipv4Int2Str(dstOsdIp), dstOsdPort,
+							_componentType);
+					_sockfdMutexMap[sockfd] = new std::mutex();
+					_sockfdBufMap[sockfd] = RecvBuffer();
+					debug_cyan("connectToOsd: Add socket to mutex and buf map %" PRIu32 "\n", sockfd);
+					requestHandshake(sockfd, _componentId, _componentType);
+				}
 
-void Communicator::connectAllComponents() {
+				void Communicator::connectAllComponents() {
 
-	// parse config file
-	vector<Component> mdsList = parseConfigFile("MDS");
-	vector<Component> osdList = parseConfigFile("OSD");
-	vector<Component> monitorList = parseConfigFile("MONITOR");
+					// parse config file
+					vector<Component> mdsList = parseConfigFile("MDS");
+					vector<Component> osdList = parseConfigFile("OSD");
+					vector<Component> monitorList = parseConfigFile("MONITOR");
 
-	// debug
-	printComponents("MDS", mdsList);
-	printComponents("OSD", osdList);
-	printComponents("MONITOR", monitorList);
+					// debug
+					printComponents("MDS", mdsList);
+					printComponents("OSD", osdList);
+					printComponents("MONITOR", monitorList);
 
-	// connect to components
-	connectToComponents(mdsList);
-	connectToComponents(osdList);
-	//connectToComponents(monitorList);
+					// connect to components
+					connectToComponents(mdsList);
+					connectToComponents(osdList);
+					//connectToComponents(monitorList);
 
-}
+				}
 
-uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
-	if (!_componentIdMap.count(componentId)) {
-		debug_error("SOCKFD for Component ID = %" PRIu32 " not found!\n",
-				componentId);
-		return -1;
-		//exit(-1);
-	}
-	return _componentIdMap.get(componentId);
-}
+				uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
+					if (!_componentIdMap.count(componentId)) {
+						debug_error("SOCKFD for Component ID = %" PRIu32 " not found!\n",
+								componentId);
+						return -1;
+						//exit(-1);
+					}
+					return _componentIdMap.get(componentId);
+				}
 
-uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
-		struct SegmentData segmentData, CodingScheme codingScheme,
-		string codingSetting, string checksum) {
+				uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
+						struct SegmentData segmentData, CodingScheme codingScheme,
+						string codingSetting, string checksum) {
 
-	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
-			segmentData.info.segmentId, sockfd);
+					debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
+							segmentData.info.segmentId, sockfd);
 
-	const uint64_t totalSize = segmentData.info.segmentSize;
-	const uint64_t segmentId = segmentData.info.segmentId;
-	char* buf = segmentData.buf;
+					const uint64_t totalSize = segmentData.info.segmentSize;
+					const uint64_t segmentId = segmentData.info.segmentId;
+					char* buf = segmentData.buf;
 
-	const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
+					const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
 
-	// Step 1 : Send Init message (wait for reply)
+					// Step 1 : Send Init message (wait for reply)
 
-	putSegmentInit(componentId, sockfd, segmentId, totalSize, chunkCount,
-			codingScheme, codingSetting, checksum);
-	debug("%s\n", "Put Segment Init ACK-ed");
+					putSegmentInit(componentId, sockfd, segmentId, totalSize, chunkCount,
+							codingScheme, codingSetting, checksum);
+					debug("%s\n", "Put Segment Init ACK-ed");
 
 #ifdef SERIALIZE_DATA_QUEUE
-	lockDataQueue(sockfd);
+					lockDataQueue(sockfd);
 #endif
-	// Step 2 : Send data chunk by chunk
+					// Step 2 : Send data chunk by chunk
 
-	uint64_t byteToSend = 0;
-	uint64_t byteProcessed = 0;
-	uint64_t byteRemaining = totalSize;
+					uint64_t byteToSend = 0;
+					uint64_t byteProcessed = 0;
+					uint64_t byteRemaining = totalSize;
 
-	while (byteProcessed < totalSize) {
+					while (byteProcessed < totalSize) {
 
-		if (byteRemaining > _chunkSize) {
-			byteToSend = _chunkSize;
-		} else {
-			byteToSend = byteRemaining;
-		}
+						if (byteRemaining > _chunkSize) {
+							byteToSend = _chunkSize;
+						} else {
+							byteToSend = byteRemaining;
+						}
 
-		putSegmentData(componentId, sockfd, segmentId, buf, byteProcessed,
-				byteToSend);
-		byteProcessed += byteToSend;
-		byteRemaining -= byteToSend;
+						putSegmentData(componentId, sockfd, segmentId, buf, byteProcessed,
+								byteToSend);
+						byteProcessed += byteToSend;
+						byteRemaining -= byteToSend;
 
-	}
+					}
 
-	// Step 3: Send End message
+					// Step 3: Send End message
 #ifdef SERIALIZE_DATA_QUEUE
-	unlockDataQueue(sockfd);
+					unlockDataQueue(sockfd);
 #endif
 
-	putSegmentEnd(componentId, sockfd, segmentId);
+					putSegmentEnd(componentId, sockfd, segmentId);
 
-	cout << "Put Segment ID = " << segmentId << " Finished" << endl;
+					cout << "Put Segment ID = " << segmentId << " Finished" << endl;
 
-	return byteProcessed;
+					return byteProcessed;
 
-}
+				}
 
-void Communicator::lockDataQueue(uint32_t sockfd){
-	_dataMutex[sockfd]->lock();
-}
+				void Communicator::lockDataQueue(uint32_t sockfd){
+					_dataMutex[sockfd]->lock();
+				}
 
 
-void Communicator::unlockDataQueue(uint32_t sockfd){
-	_dataMutex[sockfd]->unlock();
-}
-//
-// PRIVATE FUNCTIONS
-//
+				void Communicator::unlockDataQueue(uint32_t sockfd){
+					_dataMutex[sockfd]->unlock();
+				}
+				//
+				// PRIVATE FUNCTIONS
+				//
 
-// codingScheme (DEFAULT_CODING) and codingSetting ("") are optional
-void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
-		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme, string codingSetting, string checksum) {
+				// codingScheme (DEFAULT_CODING) and codingSetting ("") are optional
+				void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
+						uint64_t segmentId, uint32_t length, uint32_t chunkCount,
+						CodingScheme codingScheme, string codingSetting, string checksum) {
 
-	// Step 1 of the upload process
+					// Step 1 of the upload process
 
-	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
-			new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, length,
-					chunkCount, codingScheme, codingSetting, checksum);
+					PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
+						new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, length,
+								chunkCount, codingScheme, codingSetting, checksum);
 
-	putSegmentInitRequestMsg->prepareProtocolMsg();
-	addMessage(putSegmentInitRequestMsg, true);
+					putSegmentInitRequestMsg->prepareProtocolMsg();
+					addMessage(putSegmentInitRequestMsg, true);
 
-	MessageStatus status = putSegmentInitRequestMsg->waitForStatusChange();
-	if (status == READY) {
-		waitAndDelete(putSegmentInitRequestMsg);
-		return;
-	} else {
-		debug_error("Put Segment Init Failed %" PRIu64 "\n", segmentId);
-		exit(-1);
-	}
-}
+					MessageStatus status = putSegmentInitRequestMsg->waitForStatusChange();
+					if (status == READY) {
+						waitAndDelete(putSegmentInitRequestMsg);
+						return;
+					} else {
+						debug_error("Put Segment Init Failed %" PRIu64 "\n", segmentId);
+						exit(-1);
+					}
+				}
 
-void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
-		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length) {
+				void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
+						uint64_t segmentId, char* buf, uint64_t offset, uint32_t length) {
 
-	// Step 2 of the upload process
-	SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, dstOsdSockfd,
-			segmentId, offset, length);
+					// Step 2 of the upload process
+					SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, dstOsdSockfd,
+							segmentId, offset, length);
 
-	segmentDataMsg->prepareProtocolMsg();
-	segmentDataMsg->preparePayload(buf + offset, length);
+					segmentDataMsg->prepareProtocolMsg();
+					segmentDataMsg->preparePayload(buf + offset, length);
 
-	addMessage(segmentDataMsg, false);
-}
+					addMessage(segmentDataMsg, false);
+				}
 
-void Communicator::putSegmentEnd(uint32_t componentId, uint32_t dstOsdSockfd,
-		uint64_t segmentId) {
+				void Communicator::putSegmentEnd(uint32_t componentId, uint32_t dstOsdSockfd,
+						uint64_t segmentId) {
 
-	// Step 3 of the upload process
+					// Step 3 of the upload process
 
-	SegmentTransferEndRequestMsg* putSegmentEndRequestMsg =
-			new SegmentTransferEndRequestMsg(this, dstOsdSockfd, segmentId);
+					SegmentTransferEndRequestMsg* putSegmentEndRequestMsg =
+						new SegmentTransferEndRequestMsg(this, dstOsdSockfd, segmentId);
 
-	putSegmentEndRequestMsg->prepareProtocolMsg();
-	addMessage(putSegmentEndRequestMsg, true);
+					putSegmentEndRequestMsg->prepareProtocolMsg();
+					addMessage(putSegmentEndRequestMsg, true);
 
-	MessageStatus status = putSegmentEndRequestMsg->waitForStatusChange();
-	if (status == READY) {
-		waitAndDelete(putSegmentEndRequestMsg);
-		return;
-	} else {
-		debug_error("Put Segment End Failed %" PRIu64 "\n", segmentId);
-		exit(-1);
-	}
-}
+					MessageStatus status = putSegmentEndRequestMsg->waitForStatusChange();
+					if (status == READY) {
+						waitAndDelete(putSegmentEndRequestMsg);
+						return;
+					} else {
+						debug_error("Put Segment End Failed %" PRIu64 "\n", segmentId);
+						exit(-1);
+					}
+				}
 
-uint16_t Communicator::getServerPort() {
-	return _serverPort;
-}
+				uint16_t Communicator::getServerPort() {
+					return _serverPort;
+				}
