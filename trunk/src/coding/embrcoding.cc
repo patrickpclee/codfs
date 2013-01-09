@@ -26,7 +26,7 @@ vector<BlockData> EMBRCoding::encode(SegmentData segmentData, string setting) {
 	vector<struct BlockData> blockDataList;
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t n = params[0];
-	const uint32_t k = params[1];
+//	const uint32_t k = params[1];
 	const uint32_t w = params[2];
 
 	const uint32_t rs_k = params[3];
@@ -74,7 +74,7 @@ vector<BlockData> EMBRCoding::encode(SegmentData segmentData, string setting) {
 
 SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &symbolList, uint32_t segmentSize, string setting){
 	vector<uint32_t> params = getParameters(setting);
-	const uint32_t n = params[0];
+	//const uint32_t n = params[0];
 	const uint32_t k = params[1];
 	const uint32_t w = params[2];
 
@@ -82,7 +82,7 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 	const uint32_t rs_m = params[4];
 	const uint32_t rs_w = w;
 
-	const uint32_t blockGroupSize = (rs_k + rs_m) * 2 / n;
+//	const uint32_t blockGroupSize = (rs_k + rs_m) * 2 / n;
 
 	string RSSetting = RSCoding::generateSetting(rs_k, rs_m, rs_w);
 	
@@ -95,12 +95,18 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 	uint32_t symbol = 0;
 	block_list_t RSBlockSymbols;
 	for(uint32_t i = 0; i < k; ++i){
+		uint32_t offset = 0;
 		for(uint32_t j = 0; j < symbolList[i].second.size(); ++j){
 			struct BlockData blockData;
 			blockData.info.segmentId = blockDataList[0].info.segmentId;
 			blockData.info.blockId = symbol;
 			blockData.info.blockSize = symbolSize;
-			blockData.buf = blockDataList[i].buf + symbolList[i].second[j].first;
+			if(j == 0)
+				blockData.buf = blockDataList[i].buf;
+			else {
+				offset += symbolList[i].second[j-1].second;
+				blockData.buf = blockDataList[i].buf + offset;
+			}
 			RSBlockData.push_back(blockData);
 
 			offset_length_t RSSymbol = make_pair(0, symbolSize);
@@ -136,12 +142,15 @@ block_list_t EMBRCoding::getRequiredBlockSymbols(vector<bool> blockStatus, uint3
 	// TODO: Handle Node Failure
 	
 	uint32_t offset = 0;
+	uint32_t count = 0;
 	for(uint32_t i = 0; i < k; ++i) {
 		vector<offset_length_t> symbolList = {};
 		offset = i * symbolSize;
 		for(uint32_t j = 0; j < blockGroupSize - i; ++j) {
 			offset_length_t symbol = make_pair(offset,symbolSize);
 			symbolList.push_back(symbol);
+			++count;
+			debug("%" PRIu32 ".%" PRIu32 ":%" PRIu32 "-offset %" PRIu32 "\n",count,i,j,offset);
 			offset += symbolSize;
 		}
 		symbol_list_t blockSymbols = make_pair(i, symbolList);

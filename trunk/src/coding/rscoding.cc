@@ -35,7 +35,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 	const uint32_t size = roundTo(
 			(roundTo(segmentData.info.segmentSize, k) / k), 4);
 
-	if (k <= 0 || m <= 0 || (w != 8 && w != 16 && w != 32)
+	if (k <= 0 || m < 0 || (w != 8 && w != 16 && w != 32)
 			|| (w <= 16 && k + m > (1 << w))) {
 		cerr << "Bad Parameters" << endl;
 		exit(-1);
@@ -63,10 +63,16 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 		} else
 			memcpy(blockData.buf, bufPos, size);
 
-		blockDataList.push_back(blockData);
+		data[i] = blockData.buf;
+		//data[i] = talloc<char, uint32_t>(size);
+		//memcpy(data[i], blockData.buf, size);
 
-		data[i] = talloc<char, uint32_t>(size);
-		memcpy(data[i], blockData.buf, size);
+		blockDataList.push_back(blockData);
+	}
+
+	if (m == 0){
+		tfree(data);
+		return blockDataList;
 	}
 
 	code = talloc<char*, uint32_t>(m);
@@ -82,21 +88,22 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 		blockData.info.blockId = k + i;
 		blockData.info.blockSize = size;
 
-		blockData.buf = MemoryPool::getInstance().poolMalloc(size);
-		memcpy(blockData.buf, code[i], size);
+		blockData.buf = code[i];
+		//blockData.buf = MemoryPool::getInstance().poolMalloc(size);
+		//memcpy(blockData.buf, code[i], size);
 
 		blockDataList.push_back(blockData);
 	}
 
 	// free memory
-	for (uint32_t i = 0; i < k; i++) {
-		tfree(data[i]);
-	}
+	//for (uint32_t i = 0; i < k; i++) {
+	//	tfree(data[i]);
+	//}
 	tfree(data);
 
-	for (uint32_t i = 0; i < m; i++) {
-		tfree(code[i]);
-	}
+	//for (uint32_t i = 0; i < m; i++) {
+	//	tfree(code[i]);
+	//}
 	tfree(code);
 
 	return blockDataList;
