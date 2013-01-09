@@ -15,6 +15,7 @@
 #include "../protocol/message.hh"
 #include "../common/enums.hh"
 #include "../common/define.hh"
+#include "../common/recvbuffer.hh"
 #include "../datastructure/concurrentmap.hh"
 #include "socket.hh"
 #include "component.hh"
@@ -337,6 +338,8 @@ protected:
 	// DEBUG
 	void listThreadPool();
 
+	void parsing(uint32_t sockfd);
+
 #ifdef USE_MULTIPLE_QUEUE
 	map<uint32_t, thread> _sendThread; 
 	map<uint32_t, mutex*> _dataMutex;
@@ -378,6 +381,12 @@ protected:
 	vector<Component> mdsList;
 	vector<Component> osdList;
 	vector<Component> monitorList;
+
+
+	// Recv Optimization
+	map<uint32_t, mutex*> _sockfdMutexMap;
+	map<uint32_t, struct RecvBuffer> _sockfdBufMap;
+
 
 };
 #endif

@@ -148,6 +148,16 @@ int32_t Socket::recvn(char* buf, int32_t buf_len) {
 	return buf_len;
 }
 
+int32_t Socket::aggressiveRecv(char* dst, int32_t maxRecvByte) {
+	const uint32_t sd = m_sock;
+	int32_t recvByte = recv(sd, dst, maxRecvByte, 0);
+	if (recvByte < 0) {
+		perror("Aggressive Recv");
+		exit(-1);
+	}
+	return recvByte;
+}
+
 bool Socket::connect(const std::string host, const int port) {
 	if (!is_valid())
 		return false;
