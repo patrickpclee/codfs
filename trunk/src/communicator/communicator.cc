@@ -255,14 +255,11 @@ void Communicator::waitForMessage() {
 									p->first);
 
 							// Receive Optimization
-							{
-								lock_guard<mutex> lk(
-										*_sockfdMutexMap[p->first]);
-								_sockfdBufMap.erase(p->first);
-								debug_red(
-										"SOCKET %" PRIu32 " deleted from Map\n",
-										p->first);
-							}
+							_sockfdBufMap.erase(p->first);
+							debug_red("SOCKET %" PRIu32 " deleted from Map\n",p->first);
+							debug_red("SOCKFD = %" PRIu32 " delete from mutex map\n",
+									p->first);
+							_sockfdMutexMap[p->first]->unlock();
 							_sockfdMutexMap.erase(p->first);
 
 #ifdef COMPILE_FOR_MONITOR
@@ -309,8 +306,8 @@ void Communicator::waitForMessage() {
 							 dispatch(buf, p->first);// Not used anymore
 							 #endif
 							 */
+							_sockfdMutexMap[sockfd]->unlock();
 						}
-						_sockfdMutexMap[sockfd]->unlock();
 					} else {
 						// NOT OBTAINED LOCK
 						// LEFT TO NEXT ROUND
