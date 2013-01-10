@@ -140,13 +140,14 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 
 	// read blocks from files
 	cout << "Reading Blocks: " << endl;
+	uint32_t j = 0;
 	for (uint32_t i : requiredBlocks) {
 		const string blockPath = blockFolder + "/" + to_string(segmentId) + "."
 				+ to_string(i);
 
 		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
-		blockData.buf = readFile(blockPath, filesize, requiredBlockSymbols[i].second); // read block
+		blockData.buf = readFile(blockPath, filesize, requiredBlockSymbols[j].second); // read block
 
 		// fill in block information
 		blockData.info.segmentId = segmentId;
@@ -156,6 +157,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 		cout << i << ": " << blockPath << " size = " << filesize << endl;
 
 		blockDataList[i] = blockData;
+		j++;
 	}
 
 	// take time for reading segments

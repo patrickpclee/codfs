@@ -53,6 +53,7 @@ char* readFile(string filepath, uint32_t &filesize,
 	for (auto offsetLength : offsetLengths) {
 		readSize += offsetLength.second;
 	}
+	filesize = readSize;
 
 	// allocate space
 	buf = MemoryPool::getInstance().poolMalloc(readSize);
