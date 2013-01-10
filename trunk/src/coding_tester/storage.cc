@@ -8,7 +8,7 @@
 #include "../common/memorypool.hh"
 using namespace std;
 
-char* readFile (string filepath, uint32_t &filesize) {
+char* readFile(string filepath, uint32_t &filesize) {
 
 	char* buf;
 
@@ -37,7 +37,44 @@ char* readFile (string filepath, uint32_t &filesize) {
 	return buf;
 }
 
-void writeFile (string filepath, char* buf, uint32_t length) {
+char* readFile(string filepath, uint32_t &filesize,
+		vector<offset_length_t> offsetLengths) {
+
+	char* buf;
+
+	// open file
+	ifstream file(filepath, ios::in | ios::binary | ios::ate);
+	if (!file.is_open()) {
+		cerr << "Cannot open read " << filepath << endl;
+		exit(-1);
+	}
+
+	uint32_t readSize = 0;
+	for (auto offsetLength : offsetLengths) {
+		readSize += offsetLength.second;
+	}
+
+	// allocate space
+	buf = MemoryPool::getInstance().poolMalloc(readSize);
+
+	uint32_t currentOffset = 0;
+	for (auto offsetLength : offsetLengths) {
+		file.seekg(offsetLength.first, ios::beg);
+		if (!file.read(buf + currentOffset, offsetLength.second)) {
+			cerr << "Cannot read " << filepath << " Offset = "
+					<< offsetLength.first << " Length = " << offsetLength.second
+					<< endl;
+			exit(-1);
+		}
+		currentOffset += offsetLength.second;
+	}
+
+	file.close();
+
+	return buf;
+}
+
+void writeFile(string filepath, char* buf, uint32_t length) {
 
 	// open file
 	ofstream file(filepath, ios::out | ios::binary | ios::trunc);

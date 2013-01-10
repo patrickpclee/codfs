@@ -22,6 +22,7 @@ default:
 	make client;
 	make osd;
 	make monitor;
+	make benchmark;
 
 all:
 	make mds;
@@ -30,7 +31,7 @@ all:
 	make monitor;
 	make codingtester;
 	make clientfuse;
-	make benchmark
+	make benchmark;
 
 mds:
 	cd ${MDS_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
