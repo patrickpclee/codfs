@@ -210,37 +210,14 @@ uint32_t OsdCommunicator::sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
 }
 
 void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
-		uint32_t blockId, vector<offset_length_t> symbols) {
+		uint32_t blockId, vector<offset_length_t> symbols, bool isRecovery) {
 
 	uint32_t dstSockfd = getSockfdFromId(osdId);
 	GetBlockInitRequestMsg* getBlockInitRequestMsg = new GetBlockInitRequestMsg(
-			this, dstSockfd, segmentId, blockId, symbols);
+			this, dstSockfd, segmentId, blockId, symbols, isRecovery);
 	getBlockInitRequestMsg->prepareProtocolMsg();
 
 	addMessage(getBlockInitRequestMsg, false);
-
-}
-
-BlockData OsdCommunicator::getRecoveryBlock(uint32_t osdId, uint64_t segmentId,
-		uint32_t blockId, vector<offset_length_t> symbols) {
-
-	uint32_t dstSockfd = getSockfdFromId(osdId);
-	GetBlockInitRequestMsg* getRecoveryBlockRequestMsg =
-			new GetBlockInitRequestMsg(this, dstSockfd, segmentId, blockId,
-					symbols, true); // is recovery
-	getRecoveryBlockRequestMsg->prepareProtocolMsg();
-
-	addMessage(getRecoveryBlockRequestMsg, true);
-	MessageStatus status = getRecoveryBlockRequestMsg->waitForStatusChange();
-
-	if (status == READY) {
-		return getRecoveryBlockRequestMsg->getRecoveryBlockData();
-	}
-
-	debug_error(
-			"ERROR: getRecoveryBlockData segmentId = %" PRIu64 " blockId = %" PRIu32 "\n",
-			segmentId, blockId);
-	return {};
 
 }
 
