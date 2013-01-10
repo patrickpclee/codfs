@@ -146,7 +146,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 
 		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
-		blockData.buf = readFile(blockPath, filesize); // read block
+		blockData.buf = readFile(blockPath, filesize, requiredBlockSymbols[i].second); // read block
 
 		// fill in block information
 		blockData.info.segmentId = segmentId;
