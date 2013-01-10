@@ -75,8 +75,8 @@ Osd::Osd(uint32_t selfId) {
 	_reportCacheInterval = configLayer->getConfigLong(
 			"Storage>ReportCacheInterval");
 
-	_blocktpId = 0;
-	_recoverytpId = 0;
+    _blocktpId = 0;
+    _recoverytpId = 0;
 }
 
 Osd::~Osd() {
@@ -196,8 +196,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 							segmentId);
 
 					// hack: trigger MDS to update hotness
-					_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId,
-							false);
+					_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, false);
 				}
 
 			} else {
@@ -208,8 +207,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				// 1. ask MDS to get segment information
 
 				SegmentTransferOsdInfo segmentInfo =
-						_osdCommunicator->getSegmentInfoRequest(segmentId,
-								_osdId);
+						_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId);
 #ifdef TIME_POINT
 				t2 = Clock::now();
 #endif
@@ -416,11 +414,8 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		repairedBlock = _storageModule->readBlock(segmentId, blockId,
 				offsetLength);
 	} else {
-		_osdCommunicator->getBlockRequest(osdId, segmentId, blockId,
-				offsetLength, true);
-
-		// PENDING
-
+		repairedBlock = _osdCommunicator->getRecoveryBlock(osdId, segmentId,
+				blockId, offsetLength);
 		debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
 				blockId);
 	}
@@ -524,7 +519,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 					_storageModule->getSegmentTransferCache(segmentId);
 
 			unsigned char checksum[MD5_DIGEST_LENGTH];
-			memset(checksum, 0, MD5_DIGEST_LENGTH);
+            memset (checksum, 0, MD5_DIGEST_LENGTH);
 
 #ifdef USE_CHECKSUM
 			// compute md5 checksum
@@ -567,7 +562,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			vector<uint32_t> nodeList;
 			uint32_t i = 0;
 
-			uint32_t blocktpId = ++_blocktpId; // should not use 0
+            uint32_t blocktpId = ++_blocktpId; // should not use 0
 			_blocktpRequestCount.set(blocktpId, blockDataList.size());
 
 			for (const auto blockData : blockDataList) {
@@ -779,7 +774,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			_codingModule->getNumberOfBlocks(codingScheme, codingSetting));
 
 	// initialize map for tracking recovery
-	uint32_t recoverytpId = ++_recoverytpId; // should not use 0
+    uint32_t recoverytpId = ++_recoverytpId; // should not use 0
 	_recoverytpRequestCount.set(recoverytpId, blockSymbols.size());
 
 	for (auto block : blockSymbols) {
