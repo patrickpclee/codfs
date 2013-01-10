@@ -386,6 +386,7 @@ protected:
 	// Recv Optimization
 	map<uint32_t, mutex*> _sockfdMutexMap;
 	map<uint32_t, struct RecvBuffer> _sockfdBufMap;
+	map<uint32_t, bool> _sockfdInQueueMap;
 
 
 };

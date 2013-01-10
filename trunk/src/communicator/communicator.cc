@@ -278,12 +278,13 @@ void Communicator::waitForMessage() {
 											rb.buf + rb.len,
 											RECV_BUF_PER_SOCKET - rb.len);
 							rb.len += byteRead;
-							debug_cyan(
-									"Add Recv to ThreadPool for socket %" PRIu32 "Read Byte %" PRIu32 "\n",
-									sockfd, byteRead);
-							_parsingtp.schedule(
+							if (!_sockfdInQueueMap[sockfd] && byteRead != 0) {
+								debug_cyan("Add Recv to ThreadPool for socket %" PRIu32 " Read Byte %" PRIu32 "\n",sockfd, byteRead);
+								_parsingtp.schedule(
 									boost::bind(&Communicator::parsing, this,
 											sockfd));
+								_sockfdInQueueMap[sockfd] = true;
+							}
 
 							// receive message into buffer, memory allocated in recvMessage
 							/*
@@ -325,8 +326,7 @@ void Communicator::waitForMessage() {
 void Communicator::parsing(uint32_t sockfd) {
 	lock_guard<mutex> lk(*_sockfdMutexMap[sockfd]);
 	struct RecvBuffer& recvBuffer = _sockfdBufMap[sockfd];
-	debug_red("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n",
-			sockfd, recvBuffer.len);
+	debug_red("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer.len);
 	uint32_t idx = 0;
 	struct MsgHeader *msgHeader;
 	MsgType msgType;
@@ -351,12 +351,6 @@ void Communicator::parsing(uint32_t sockfd) {
 			idx += totalMsgSize;
 		} else {
 			// Not receive complete message, memmove to head
-			if (idx > 0) {
-				memmove(recvBuffer.buf, recvBuffer.buf + idx,
-						recvBuffer.len - idx);
-				recvBuffer.len = recvBuffer.len - idx;
-				idx = 0;
-			}
 			break;
 		}
 	}
@@ -364,6 +358,7 @@ void Communicator::parsing(uint32_t sockfd) {
 		memmove(recvBuffer.buf, recvBuffer.buf + idx, recvBuffer.len - idx);
 		recvBuffer.len = recvBuffer.len - idx;
 	}
+	_sockfdInQueueMap[sockfd] = false;
 
 }
 
