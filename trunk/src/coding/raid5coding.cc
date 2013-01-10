@@ -28,7 +28,6 @@ vector<BlockData> Raid5Coding::encode(SegmentData segmentData, string setting) {
 	const uint32_t raid5_n = getParameters(setting);
 	const uint32_t parityIndex = raid5_n - 1; // index starts from 0, last block is parity
 	const uint32_t numDataBlock = raid5_n - 1;
-	const uint32_t lastDataIndex = raid5_n - 2;
 
 	if (raid5_n < 3) {
 		cerr << "At least 3 blocks are needed for RAID-5 encode" << endl;
@@ -52,13 +51,7 @@ vector<BlockData> Raid5Coding::encode(SegmentData segmentData, string setting) {
 		struct BlockData blockData;
 		blockData.info.segmentId = segmentData.info.segmentId;
 		blockData.info.blockId = i;
-
-		if (i == lastDataIndex) { // last data block
-			blockData.info.blockSize = segmentData.info.segmentSize
-					- i * stripeSize;
-		} else {
-			blockData.info.blockSize = stripeSize;
-		}
+		blockData.info.blockSize = stripeSize;
 
 		// copy data to block
 		blockData.buf = MemoryPool::getInstance().poolMalloc(stripeSize);
@@ -123,13 +116,8 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 						stripeSize);
 			} else {
 				// XOR second block onwards
-                if (blockDataList[blockId].info.blockSize < stripeSize) {
-                    Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
-                            blockDataList[blockId].buf, blockDataList[blockId].info.blockSize);
-                } else {
-                    Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
-                            blockDataList[blockId].buf, stripeSize);
-                }
+				Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
+						blockDataList[blockId].buf, stripeSize);
 			}
 			i++;
 		}
@@ -152,13 +140,7 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 
 				// fill in rebuildBlockData Information
 				rebuildBlockData.info.blockId = repairedBlockIndex;
-
-				if (i == blockDataList.size() - 1) {
-					rebuildBlockData.info.blockSize = segmentSize
-							- stripeSize * lastDataIndex;
-				} else {
-					rebuildBlockData.info.blockSize = stripeSize;
-				}
+				rebuildBlockData.info.blockSize = stripeSize;
 
 				// block at i does not exist
 				blockDataList[i] = rebuildBlockData;
@@ -181,9 +163,15 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 	uint64_t offset = 0;
 	for (auto blockSymbols : symbolList) {
 		uint32_t blockId = blockSymbols.first;
+		uint32_t copySize = 0;
+		if (blockId == lastDataIndex) {
+			copySize = segmentSize - lastDataIndex * stripeSize;
+		} else {
+			copySize = stripeSize;
+		}
 		memcpy(segmentData.buf + offset, blockDataList[blockId].buf,
-				blockDataList[blockId].info.blockSize);
-		offset += blockDataList[blockId].info.blockSize;
+				copySize);
+		offset += copySize;
 	}
 
 	return segmentData;
@@ -203,7 +191,6 @@ block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	// for raid 5, only requires n-1 stripes (raid5_n - 1) to decode
 	const uint32_t raid5_n = getParameters(setting);
 	const uint32_t dataBlockCount = raid5_n - 1;
-	const uint32_t lastDataIndex = raid5_n - 2;
 	block_list_t requiredBlockSymbols;
 	requiredBlockSymbols.reserve(dataBlockCount);
 
@@ -223,11 +210,6 @@ block_list_t Raid5Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		// select only available blocks
 		if (blockStatus[i] != false) {
 			offset_length_t symbol = make_pair(0, blockSize);
-
-            if (i == lastDataIndex) {
-                symbol.second = segmentSize - lastDataIndex * blockSize;
-            }
-
 			vector<offset_length_t> symbolList = { symbol };
 			symbol_list_t blockSymbols = make_pair(i, symbolList);
 			requiredBlockSymbols.push_back(blockSymbols);
@@ -272,7 +254,6 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	const uint32_t raid5_n = getParameters(setting);
 	const uint32_t dataBlockCount = raid5_n - 1;
-	const uint32_t lastDataIndex = raid5_n - 2;
 
 	const uint32_t blockSize = Coding::roundTo(segmentSize, dataBlockCount)
 			/ dataBlockCount;
@@ -290,13 +271,8 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 			memcpy(rebuildBlockData.buf, blockData[blockId].buf, blockSize);
 		} else {
 			// XOR second block onwards
-            if (blockData[blockId].info.blockSize < blockSize) {
-                Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
-                        blockData[blockId].buf, blockData[blockId].info.blockSize);
-            } else {
-                Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
-                        blockData[blockId].buf, blockSize);
-            }
+			Coding::bitwiseXor(rebuildBlockData.buf, rebuildBlockData.buf,
+					blockData[blockId].buf, blockSize);
 		}
 		i++;
 	}
@@ -305,13 +281,7 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	rebuildBlockData.info.segmentId =
 			blockData[symbolList[0].first].info.segmentId;
 
-	uint32_t repairBlockId = repairBlockIdList[0];
-	if (repairBlockId == lastDataIndex) { // last data block
-		rebuildBlockData.info.blockSize = segmentSize
-				- repairBlockId * blockSize;
-	} else {
-		rebuildBlockData.info.blockSize = blockSize;
-	}
+	rebuildBlockData.info.blockSize = blockSize;
 
 	// for raid5, there can be only one rebuildBlockData
 	return {rebuildBlockData};
