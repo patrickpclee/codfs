@@ -27,7 +27,9 @@ mutex openedFileMutex;
 mutex transferCacheMutex;
 mutex diskCacheMutex;
 
+#ifdef USE_IO_THREADS
 using namespace boost::threadpool;
+#endif
 
 StorageModule::StorageModule() {
 	_openedFile = new FileLruCache<string, FILE*>(MAX_OPEN_FILES);
