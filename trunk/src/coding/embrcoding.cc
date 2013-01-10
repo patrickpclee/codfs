@@ -1,5 +1,6 @@
 #include <string.h>
 #include <sstream>
+#include <unordered_map>
 #include "coding.hh"
 #include "embrcoding.hh"
 #include "../common/debug.hh"
@@ -74,7 +75,7 @@ vector<BlockData> EMBRCoding::encode(SegmentData segmentData, string setting) {
 
 SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &symbolList, uint32_t segmentSize, string setting){
 	vector<uint32_t> params = getParameters(setting);
-	//const uint32_t n = params[0];
+	const uint32_t n = params[0];
 	const uint32_t k = params[1];
 	const uint32_t w = params[2];
 
@@ -82,7 +83,7 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 	const uint32_t rs_m = params[4];
 	const uint32_t rs_w = w;
 
-//	const uint32_t blockGroupSize = (rs_k + rs_m) * 2 / n;
+	const uint32_t blockGroupSize = (rs_k + rs_m) * 2 / n;
 
 	string RSSetting = RSCoding::generateSetting(rs_k, rs_m, rs_w);
 	
@@ -92,41 +93,58 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 
 	//TODO: Handle Node Failure
 	
-	uint32_t symbol = 0;
-	block_list_t RSBlockSymbols;
-	for(uint32_t i = 0; i < k; ++i){
-		uint32_t offset = 0;
-		for(uint32_t j = 0; j < symbolList[i].second.size(); ++j){
-			struct BlockData blockData;
-			blockData.info.segmentId = blockDataList[0].info.segmentId;
-			blockData.info.blockId = symbol;
-			blockData.info.blockSize = symbolSize;
-			if(j == 0)
-				blockData.buf = blockDataList[i].buf;
-			else {
-				offset += symbolList[i].second[j-1].second;
-				blockData.buf = blockDataList[i].buf + offset;
-			}
-			RSBlockData.push_back(blockData);
+	unordered_map <uint32_t, uint32_t> base_id;
 
-			offset_length_t RSSymbol = make_pair(0, symbolSize);
-			vector<offset_length_t> symbolList = {RSSymbol};
-			symbol_list_t blockSymbols = make_pair(symbol, symbolList);
-			RSBlockSymbols.push_back(blockSymbols);
+	unordered_map <uint32_t, struct BlockData> blockDataMap;
 
-			++symbol;
-		}
-		
+	base_id[0] = 0;
+	for(uint32_t i = 1; i < k; ++i){
+		base_id[i] = base_id[i-1] + blockGroupSize - (i - 1);
 	}
 
-	return RSCoding::decode(RSBlockData, RSBlockSymbols, segmentSize, RSSetting);
+	uint64_t segmentId = blockDataList[0].info.segmentId;	
+
+	for(uint32_t i = 0; i < symbolList.size(); ++i){
+		uint32_t id = symbolList[i].first;	
+		for(uint32_t j = 0; j < symbolList[i].second.size(); ++j){
+			offset_length_t symbol = symbolList[i].second[j];
+			uint32_t offset_id = symbol.first / symbolSize;
+			struct BlockData blockData;
+			if(offset_id >= id) {
+				blockData.info.blockId = base_id[id] + offset_id - id;
+			} else {
+				uint32_t base_id2 = 0;
+				for(uint32_t l = 0; l < offset_id; ++l) {
+					base_id2 += n - 1 - l;
+				}
+				blockData.info.blockId = base_id2 + id; 
+			}
+			blockData.info.segmentId = segmentId;
+			blockData.info.blockSize = symbolSize;
+			blockData.buf = blockDataList[i].buf + j * symbolSize;
+			blockDataMap[blockData.info.blockId] = blockData;
+		}
+	}
+
+	offset_length_t RSsymbol = make_pair(0, symbolSize);
+	vector<offset_length_t> RSSymbolList = {RSsymbol};
+	block_list_t RSRequiredBlockSymbols;
+	for(uint32_t i = 0; i < rs_k + rs_m; ++i) {
+		if(blockDataMap.count(i) == 1) {
+			RSBlockData.push_back(blockDataMap[i]);
+			symbol_list_t RSBlockSymbols = make_pair(i, RSSymbolList);
+			RSRequiredBlockSymbols.push_back(RSBlockSymbols);
+		}
+	}
+
+	return RSCoding::decode(RSBlockData, RSRequiredBlockSymbols, segmentSize, RSSetting);
 }
 
 block_list_t EMBRCoding::getRequiredBlockSymbols(vector<bool> blockStatus, uint32_t segmentSize, string setting){
 	block_list_t requiredBlockSymbols;
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t n = params[0];
-	const uint32_t k = params[1];
+	//const uint32_t k = params[1];
 	const uint32_t w = params[2];
 
 	const uint32_t rs_k = params[3];
@@ -139,24 +157,54 @@ block_list_t EMBRCoding::getRequiredBlockSymbols(vector<bool> blockStatus, uint3
 
 	const uint32_t symbolSize = roundTo(roundTo(segmentSize, rs_k) / rs_k, 4);
 
-	// TODO: Handle Node Failure
-	
-	uint32_t offset = 0;
+	unordered_map< uint32_t, vector<offset_length_t> > symbolList;
+
 	uint32_t count = 0;
-	for(uint32_t i = 0; i < k; ++i) {
-		vector<offset_length_t> symbolList = {};
-		offset = i * symbolSize;
-		for(uint32_t j = 0; j < blockGroupSize - i; ++j) {
-			offset_length_t symbol = make_pair(offset,symbolSize);
-			symbolList.push_back(symbol);
-			++count;
-			debug("%" PRIu32 ".%" PRIu32 ":%" PRIu32 "-offset %" PRIu32 "\n",count,i,j,offset);
-			offset += symbolSize;
+
+	for(uint32_t i = 0; i < n; ++i) {
+		if(count == rs_k) {
+			if(symbolList[i].size() > 0) {
+				symbol_list_t blockSymbols = make_pair(i, symbolList[i]);
+				requiredBlockSymbols.push_back(blockSymbols);
+			}
+			continue;
 		}
-		symbol_list_t blockSymbols = make_pair(i, symbolList);
-		requiredBlockSymbols.push_back(blockSymbols);
+
+		if(blockStatus[i] == false) {
+			offset_length_t symbol = make_pair(i * symbolSize, symbolSize);
+			for(uint32_t j = i + 1; j < n; ++j) {
+				if(blockStatus[j] == true) {
+					symbolList[j].push_back(symbol);
+					++count;
+					if(count == rs_k) break;
+				}
+			}
+		} else {
+			for(uint32_t j = i; j < blockGroupSize; ++j) {
+				offset_length_t symbol = make_pair(j * symbolSize, symbolSize);
+				symbolList[i].push_back(symbol);
+				++count;
+				if(count == rs_k) break;
+			}
+		}
+
+		if(symbolList[i].size() > 0) {
+			symbol_list_t blockSymbols = make_pair(i, symbolList[i]);
+			requiredBlockSymbols.push_back(blockSymbols);
+		}
 	}
 
+	for(uint32_t i = 0; i < n; ++i){
+		debug("===== %" PRIu32 " =====\n",i);
+		for(uint32_t j = 0; j < symbolList[i].size(); ++j){
+			debug("%" PRIu32 "-%" PRIu32 "\n",symbolList[i][j].first, symbolList[i][j].second);
+		}
+	}
+
+	if(count < rs_k) {
+		debug_error ("Not Enough Surviving Symbols, %" PRIu32 "/%" PRIu32 "\n",count,rs_k);
+		exit(-1);
+	}
 	return requiredBlockSymbols;
 }
 
