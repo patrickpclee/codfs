@@ -256,6 +256,7 @@ void Communicator::waitForMessage() {
 							{
 								lock_guard<mutex> lk(*_sockfdMutexMap[p->first]);
 								_sockfdBufMap.erase(p->first);
+								debug_red("SOCKET %" PRIu32 " deleted from Map\n", p->first);
 							}
 							_sockfdMutexMap.erase(p->first);
 
