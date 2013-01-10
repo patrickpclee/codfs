@@ -182,6 +182,7 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t
 					swap (allOnlineList[i], allOnlineList[j]);
 				}
 			}
+		allOnlineList.push_back(primary);
 		for (uint32_t i = 0; i < numOfBlks; i++) {
 			uint32_t id = allOnlineList[i%(allOnlineList.size())];
 			tmp.osdId = id;
