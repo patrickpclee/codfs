@@ -22,8 +22,6 @@
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
-mutex fileMutex;
-mutex openedFileMutex;
 mutex transferCacheMutex;
 mutex diskCacheMutex;
 
@@ -483,9 +481,6 @@ uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
 
 	debug("Read File :%s\n", filepath.c_str());
 
-	// lock file access function
-	lock_guard<mutex> lk(fileMutex);
-
 	FILE* file = openFile(filepath);
 
 	if (file == NULL) { // cannot open file
@@ -532,9 +527,6 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 
 uint32_t StorageModule::doWriteFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length, bool &isFinished) {
-
-	// lock file access function
-	lock_guard<mutex> lk(fileMutex);
 
 	FILE* file = openFile(filepath);
 
