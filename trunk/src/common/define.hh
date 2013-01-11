@@ -70,4 +70,8 @@ typedef std::vector<symbol_list_t> block_list_t ;
 // monitor/selectionmodule.cc
 //#define RR_DISTRIBUTE
 
+// Receive Optimization
+#define RECV_BUF_PER_SOCKET 10485760
+#define USE_PARSING_THREADS
+#define PARSING_THREADS 20
 #endif

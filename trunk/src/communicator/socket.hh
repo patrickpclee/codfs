@@ -94,6 +94,14 @@ public:
 
 	int32_t recvn(char* buf, int32_t buf_len);
 
+	/**
+	 * Aggressive read
+	 * @param dst buffer place
+	 * @param maxRecvByte max receive byte
+	 * @return Number of bytes received
+	 */
+	int32_t aggressiveRecv(char* dst, int32_t maxRecvByte);
+
 	void set_non_blocking(const bool);
 
 	/**
