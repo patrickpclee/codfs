@@ -1,6 +1,7 @@
 #include <string.h>
 #include <sstream>
 #include <unordered_map>
+#include <iostream>
 #include "coding.hh"
 #include "embrcoding.hh"
 #include "../common/debug.hh"
@@ -76,7 +77,7 @@ vector<BlockData> EMBRCoding::encode(SegmentData segmentData, string setting) {
 SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &symbolList, uint32_t segmentSize, string setting){
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t n = params[0];
-	const uint32_t k = params[1];
+	//const uint32_t k = params[1];
 	const uint32_t w = params[2];
 
 	const uint32_t rs_k = params[3];
@@ -90,6 +91,9 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 	const uint32_t symbolSize = roundTo(roundTo(segmentSize, rs_k) / rs_k, 4);
 
 	vector<BlockData> RSBlockData;
+	RSBlockData.reserve(rs_k + rs_m);
+
+	debug("%s - %s\n", setting.c_str(), RSSetting.c_str());
 
 	//TODO: Handle Node Failure
 	
@@ -98,11 +102,11 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 	unordered_map <uint32_t, struct BlockData> blockDataMap;
 
 	base_id[0] = 0;
-	for(uint32_t i = 1; i < k; ++i){
+	for(uint32_t i = 1; i < n; ++i){
 		base_id[i] = base_id[i-1] + blockGroupSize - (i - 1);
 	}
 
-	uint64_t segmentId = blockDataList[0].info.segmentId;	
+	uint64_t segmentId = blockDataList[symbolList[0].first].info.segmentId;	
 
 	for(uint32_t i = 0; i < symbolList.size(); ++i){
 		uint32_t id = symbolList[i].first;	
@@ -117,11 +121,11 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 				for(uint32_t l = 0; l < offset_id; ++l) {
 					base_id2 += n - 1 - l;
 				}
-				blockData.info.blockId = base_id2 + id; 
+				blockData.info.blockId = base_id2 + id - (offset_id + 1); 
 			}
 			blockData.info.segmentId = segmentId;
 			blockData.info.blockSize = symbolSize;
-			blockData.buf = blockDataList[i].buf + j * symbolSize;
+			blockData.buf = blockDataList[id].buf + j * symbolSize;
 			blockDataMap[blockData.info.blockId] = blockData;
 		}
 	}
@@ -129,13 +133,17 @@ SegmentData EMBRCoding::decode(vector<BlockData> &blockDataList, block_list_t &s
 	offset_length_t RSsymbol = make_pair(0, symbolSize);
 	vector<offset_length_t> RSSymbolList = {RSsymbol};
 	block_list_t RSRequiredBlockSymbols;
+	uint32_t count = 0;
 	for(uint32_t i = 0; i < rs_k + rs_m; ++i) {
 		if(blockDataMap.count(i) == 1) {
-			RSBlockData.push_back(blockDataMap[i]);
+			RSBlockData[i] = blockDataMap[i];
 			symbol_list_t RSBlockSymbols = make_pair(i, RSSymbolList);
 			RSRequiredBlockSymbols.push_back(RSBlockSymbols);
+			++count;
 		}
 	}
+
+	debug("%" PRIu32 "\n",count);
 
 	return RSCoding::decode(RSBlockData, RSRequiredBlockSymbols, segmentSize, RSSetting);
 }
@@ -194,13 +202,14 @@ block_list_t EMBRCoding::getRequiredBlockSymbols(vector<bool> blockStatus, uint3
 		}
 	}
 
-	for(uint32_t i = 0; i < n; ++i){
-		debug("===== %" PRIu32 " =====\n",i);
-		for(uint32_t j = 0; j < symbolList[i].size(); ++j){
-			debug("%" PRIu32 "-%" PRIu32 "\n",symbolList[i][j].first, symbolList[i][j].second);
+	/*
+	for(uint32_t i = 0; i < requiredBlockSymbols.size(); ++i) {
+		debug("===== %" PRIu32 " =====\n",requiredBlockSymbols[i].first);
+		for(uint32_t j = 0; j < requiredBlockSymbols[i].second.size(); ++j){
+			debug("%" PRIu32 "-%" PRIu32 "\n",requiredBlockSymbols[i].second[j].first, requiredBlockSymbols[i].second[j].second);
 		}
 	}
-
+	*/
 	if(count < rs_k) {
 		debug_error ("Not Enough Surviving Symbols, %" PRIu32 "/%" PRIu32 "\n",count,rs_k);
 		exit(-1);
@@ -217,6 +226,12 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 
 }
 */
+
+uint32_t EMBRCoding::getBlockCountFromSetting (string setting) {
+	vector<uint32_t> params = getParameters(setting);
+	const uint32_t n = params[0];
+	return n;
+}
 
 //
 // PRIVATE FUNCTION

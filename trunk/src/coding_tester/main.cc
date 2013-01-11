@@ -11,6 +11,7 @@
 #include "../coding/raid1coding.hh"
 #include "../coding/raid5coding.hh"
 #include "../coding/rscoding.hh"
+#include "../coding/embrcoding.hh"
 #include "../common/convertor.hh"
 #include "../common/debug.hh"
 #include "docoding.hh"
@@ -113,6 +114,17 @@ uint32_t readConfig(const char* configFile) {
 				(uint32_t) w);
 		numBlocks = k + m;
 		cout << "Coding: Reed Solomon, k = " << k << " m = " << m << " w = "
+				<< w << endl;
+	} else if (selectedCoding == "EMBR") {
+
+		int n = configLayer->getConfigInt("CodingSetting>EMBR>n");
+		int k = configLayer->getConfigInt("CodingSetting>EMBR>k");
+		int w = configLayer->getConfigInt("CodingSetting>EMBR>w");
+		coding = new EMBRCoding();
+		codingSetting = EMBRCoding::generateSetting((uint32_t) n, (uint32_t) k,
+				(uint32_t) w);
+		numBlocks = n;
+		cout << "Coding: E-MBR, n = " << n << " k = " << k << " w = "
 				<< w << endl;
 	} else {
 
