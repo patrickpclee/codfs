@@ -191,6 +191,10 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 		}
 		tfree(code);
 
+		tfree(erasures);
+
+		tfree(matrix);
+
 	}
 
 	blockIdList.clear();

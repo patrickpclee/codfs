@@ -148,6 +148,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
 		blockData.buf = readFile(blockPath, filesize, requiredBlockSymbols[j].second); // read block
+		debug("%p\n",blockData.buf);
 
 		// fill in block information
 		blockData.info.segmentId = segmentId;
@@ -178,6 +179,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 
 	// free blocks
 	for (auto blockSymbol : requiredBlockSymbols) {
+		//debug("%" PRIu32 " %p\n", blockSymbol.first, blockDataList[blockSymbol.first].buf);
 		MemoryPool::getInstance().poolFree(
 				blockDataList[blockSymbol.first].buf);
 	}

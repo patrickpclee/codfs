@@ -25,9 +25,9 @@ public:
 	vector<BlockData> repairBlocks(vector<uint32_t> repairBlockIdList,
 			vector<BlockData> &blockData, block_list_t &symbolList,
 			uint32_t segmentSize, string setting);
+	*/
 
 	uint32_t getBlockCountFromSetting (string setting);
-	*/
 
 	static string generateSetting(uint32_t n, uint32_t k, uint32_t w) {
 		const uint32_t rs_k = k * (n - 1) - k * (k - 1) / 2;
