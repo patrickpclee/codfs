@@ -318,13 +318,14 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 	blockData.info.blockId = blockId;
 	blockData.info.blockSize = combinedLength;
 	blockData.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
+	char* bufptr = blockData.buf;
 
-	uint32_t blockOffset = 0;
+	//uint32_t blockOffset = 0;
 	for (auto offsetLengthPair : symbols) {
 		uint32_t offset = offsetLengthPair.first;
 		uint32_t length = offsetLengthPair.second;
-		blockOffset += offset;
-		readFile(blockPath, blockData.buf, blockOffset, length);
+		readFile(blockPath, bufptr, offset, length);
+		bufptr += length;
 	}
 
 	debug( "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " read %zu symbols\n",
@@ -492,8 +493,8 @@ uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
 	uint32_t byteRead = pread(fileno(file), buf, length, offset);
 
 	if (byteRead != length) {
-		debug_error("ERROR: Length = %" PRIu32 ", byteRead = %" PRIu32 "\n",
-				length, byteRead);
+		debug_error("ERROR: Length = %" PRIu32 ", Offset = %" PRIu64 ", byteRead = %" PRIu32 "\n",
+				length, offset, byteRead);
 		perror("pread()");
 		exit(-1);
 	}
