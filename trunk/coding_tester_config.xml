@@ -4,7 +4,7 @@
 	<BlockFolder>./coding_tester_block</BlockFolder>
     <RepairFolder>./coding_tester_repair</RepairFolder>
 
-	<SelectedCodingScheme>RAID5</SelectedCodingScheme>
+	<SelectedCodingScheme>RS</SelectedCodingScheme>
 
 	<CodingSetting>
 		<RAID0>
@@ -21,8 +21,13 @@
 			<m>2</m>
 			<w>8</w>
 		</RS>
+		<EMBR>
+			<n>4</n>
+			<k>2</k>
+			<w>8</w>
+		</EMBR>
 	</CodingSetting>
 
-	<NumFailedOsd>1</NumFailedOsd>
+	<NumFailedOsd>2</NumFailedOsd>
     
 </CodingTesterConfig>
