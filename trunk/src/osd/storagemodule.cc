@@ -22,6 +22,7 @@
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
+boost::shared_mutex fileMutex[2];
 mutex transferCacheMutex;
 mutex diskCacheMutex;
 
@@ -263,7 +264,7 @@ struct SegmentData StorageModule::readSegment(uint64_t segmentId,
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
 	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,
-			byteToRead);
+			byteToRead, true);
 
 	debug(
 			"Segment ID = %" PRIu64 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
@@ -295,7 +296,7 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 
 	blockData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
-	readFile(blockPath, blockData.buf, offsetInBlock, byteToRead);
+	readFile(blockPath, blockData.buf, offsetInBlock, byteToRead, false);
 
 	debug(
 			"Segment ID = %" PRIu64 " Block ID = %" PRIu32 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
@@ -324,7 +325,7 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 	for (auto offsetLengthPair : symbols) {
 		uint32_t offset = offsetLengthPair.first;
 		uint32_t length = offsetLengthPair.second;
-		readFile(blockPath, bufptr, offset, length);
+		readFile(blockPath, bufptr, offset, length, false);
 		bufptr += length;
 	}
 
@@ -363,7 +364,7 @@ uint32_t StorageModule::writeSegmentDiskCache(uint64_t segmentId, char* buf,
 	string filepath = generateSegmentPath(segmentId, _segmentFolder);
 
 	// lower priority then other read / write
-	byteWritten = writeFile(filepath, buf, offsetInSegment, length, 0);
+	byteWritten = writeFile(filepath, buf, offsetInSegment, length, true, 0);
 
 	debug(
 			"Segment ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
@@ -378,7 +379,7 @@ uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
 	uint32_t byteWritten = 0;
 
 	string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
-	byteWritten = writeFile(filepath, buf, offsetInBlock, length);
+	byteWritten = writeFile(filepath, buf, offsetInBlock, false, length);
 
 	debug(
 			"Segment ID = %" PRIu64 " Block ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
@@ -456,7 +457,7 @@ struct SegmentInfo StorageModule::readSegmentInfo(uint64_t segmentId) {
 }
 
 uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
-		uint32_t length, int priority) {
+		uint32_t length, bool isCache, int priority) {
 
 	bool isFinished = false;
 
@@ -464,7 +465,7 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 	schedule(_iotp,
 			prio_task_func(priority,
 					boost::bind(&StorageModule::doReadFile, this, filepath, buf,
-							offset, length, boost::ref(isFinished))));
+							offset, length, isCache, boost::ref(isFinished))));
 
 	while (!isFinished) {
 		usleep(IO_POLL_INTERVAL);
@@ -472,12 +473,15 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 
 	return length;
 #else
-	return doReadFile (filepath, buf, offset, length, isFinished);
+	return doReadFile (filepath, buf, offset, length, isCache, isFinished);
 #endif
 }
 
 uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
-		uint32_t length, bool &isFinished) {
+		uint32_t length, bool isCache, bool &isFinished) {
+
+    // cache and segment share different mutex
+    boost::shared_lock<boost::shared_mutex>lock(fileMutex[isCache]);
 
 	debug("Read File :%s\n", filepath.c_str());
 
@@ -505,7 +509,7 @@ uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
 }
 
 uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
-		uint32_t length, int priority) {
+		uint32_t length, bool isCache, int priority) {
 
 	bool isFinished = false;
 
@@ -513,7 +517,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	_iotp.schedule(
 			prio_task_func(priority,
 					boost::bind(&StorageModule::doWriteFile, this, filepath,
-							buf, offset, length, boost::ref(isFinished))));
+							buf, offset, length, isCache, boost::ref(isFinished))));
 
 	while (!isFinished) {
 		usleep(IO_POLL_INTERVAL);
@@ -521,12 +525,15 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 
 	return length;
 #else
-	return doWriteFile (filepath, buf, offset, length, isFinished);
+	return doWriteFile (filepath, buf, offset, length, isCache, isFinished);
 #endif
 }
 
 uint32_t StorageModule::doWriteFile(string filepath, char* buf, uint64_t offset,
-		uint32_t length, bool &isFinished) {
+		uint32_t length, bool isCache, bool &isFinished) {
+
+    // cache and segment share different mutex
+    boost::unique_lock<boost::shared_mutex>lock(fileMutex[isCache]);
 
 	FILE* file = openFile(filepath);
 

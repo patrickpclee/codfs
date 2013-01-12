@@ -456,6 +456,11 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
 		CodingScheme codingScheme, string setting, string checksum) {
 
+    // reduce memory consumption by limiting the number processing segments
+    while (_pendingSegmentChunk.size() > MAX_NUM_PROCESSING_SEGMENT) {
+        usleep(USLEEP_DURATION);
+    }
+
 	struct CodingSetting codingSetting;
 	codingSetting.codingScheme = codingScheme;
 	codingSetting.setting = setting;
