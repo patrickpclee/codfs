@@ -203,6 +203,7 @@ uint32_t OsdCommunicator::sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
 
 	if (status == READY) {
 		debug("sendRecoveryBlock wait on %" PRIu32 "READY\n", newRequestId);
+        waitAndDelete(recoveryBlockDataMsg);
 		return 0;
 	}
 
@@ -234,7 +235,9 @@ BlockData OsdCommunicator::getRecoveryBlock(uint32_t osdId, uint64_t segmentId,
 	MessageStatus status = getRecoveryBlockRequestMsg->waitForStatusChange();
 
 	if (status == READY) {
-		return getRecoveryBlockRequestMsg->getRecoveryBlockData();
+        BlockData blockData = getRecoveryBlockRequestMsg->getRecoveryBlockData();
+        waitAndDelete(getRecoveryBlockRequestMsg);
+        return blockData;
 	}
 
 	debug_error(
@@ -259,6 +262,7 @@ vector<struct BlockLocation> OsdCommunicator::getOsdListRequest(
 	if (status == READY) {
 		vector<struct BlockLocation> osdList =
 				getSecondaryListRequestMsg->getSecondaryList();
+        waitAndDelete(getSecondaryListRequestMsg);
 		return osdList;
 	}
 
@@ -276,6 +280,7 @@ vector<bool> OsdCommunicator::getOsdStatusRequest(vector<uint32_t> osdIdList) {
 
 	if (status == READY) {
 		vector<bool> osdStatusList = getOsdStatusRequestMsg->getOsdStatus();
+        waitAndDelete(getOsdStatusRequestMsg);
 		return osdStatusList;
 	}
 
