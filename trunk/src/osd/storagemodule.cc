@@ -638,6 +638,16 @@ FILE* StorageModule::openFile(string filepath) {
 	return filePtr;
 }
 
+void StorageModule::tryCloseFile(string filepath) {
+	FILE* filePtr = NULL;
+	try {
+		filePtr = _openedFile->get(filepath);
+        fclose(filePtr);
+	} catch (out_of_range& oor) { // file pointer not found in cache
+        return;
+	}
+}
+
 struct SegmentTransferCache StorageModule::getSegmentTransferCache(
 		uint64_t segmentId) {
 	lock_guard<mutex> lk(transferCacheMutex);
@@ -672,6 +682,7 @@ int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
 		segmentId = _segmentCacheQueue.front();
 		segmentCache = _segmentDiskCacheMap.get(segmentId);
 
+        tryCloseFile (segmentCache.filepath);
 		remove(segmentCache.filepath.c_str());
 
 		// update size
@@ -760,7 +771,9 @@ void StorageModule::clearSegmentDiskCache() {
 	lock_guard<mutex> lk(diskCacheMutex);
 
 	for (auto segment : _segmentCacheQueue) {
-		remove(string(_segmentFolder + to_string(segment)).c_str());
+        string filepath = _segmentFolder + to_string(segment);
+        tryCloseFile (filepath);
+		remove(filepath.c_str());
 	}
 
 	_segmentCacheQueue.clear();

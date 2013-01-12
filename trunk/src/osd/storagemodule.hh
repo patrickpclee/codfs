@@ -424,6 +424,13 @@ private:
 
 	FILE* openFile(string filepath);
 
+    /**
+     * Try to close the file before remove
+	 * @param filepath Path to the file on disk
+     */
+    
+    void tryCloseFile(string filepath);
+
 	/**
 	 * Open the file and finds the size of it
 	 * @param filepath Path to the file on disk
