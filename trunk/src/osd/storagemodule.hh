@@ -367,10 +367,10 @@ private:
 	 */
 
 	uint32_t readFile(string filepath, char* buf, uint64_t offset,
-			uint32_t length, int priority = 10);
+			uint32_t length, bool isCache, int priority = 10);
 
 	uint32_t doReadFile(string filepath, char* buf, uint64_t offset,
-			uint32_t length, bool &isFinished);
+			uint32_t length, bool isCache, bool &isFinished);
 
 	/**
 	 * Open a file and write data from buffer
@@ -382,10 +382,10 @@ private:
 	 */
 
 	uint32_t writeFile(string filepath, char* buf, uint64_t offset,
-			uint32_t length, int priority = 10);
+			uint32_t length, bool isCache, int priority = 10);
 
 	uint32_t doWriteFile(string filepath, char* buf, uint64_t offset,
-			uint32_t length, bool &isFinished);
+			uint32_t length, bool isCache, bool &isFinished);
 
 	/**
 	 * Return the segment path given Segment ID

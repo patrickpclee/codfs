@@ -15,7 +15,7 @@ extern Client* client;
 #endif
 SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(Communicator* communicator) :
 		Message(communicator) {
-	_threadPoolSize = 10;
+	_threadPoolSize = 4;
 }
 
 SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(Communicator* communicator,
