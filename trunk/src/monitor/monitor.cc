@@ -166,8 +166,10 @@ int main(void) {
 			monitor->getUpdatePeriod());
 
 	// 5. Recovery Thread
+#ifdef TRIGGER_RECOVERY
 	thread recoveryThread(&RecoveryModule::failureDetection, recoverymodule,
 			monitor->getDeadPeriod(), monitor->getSleepPeriod());
+#endif
 
 	// threads join
 	garbageCollectionThread.join();
@@ -177,7 +179,9 @@ int main(void) {
 	sendThread.join();
 #endif
 	updateThread.join();
+#ifdef TRIGGER_RECOVERY
 	recoveryThread.join();
+#endif
 	//clean up
 	delete configLayer;
 	delete monitor;
