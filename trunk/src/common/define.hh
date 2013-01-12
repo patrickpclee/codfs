@@ -74,4 +74,8 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define RECV_BUF_PER_SOCKET 10485760
 #define USE_PARSING_THREADS
 #define PARSING_THREADS 20
+
+
+// Trigger Recovery or not
+//#define TRIGGER_RECOVERY
 #endif
