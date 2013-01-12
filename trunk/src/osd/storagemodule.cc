@@ -22,7 +22,7 @@
 // global variable defined in each component
 extern ConfigLayer* configLayer;
 
-boost::shared_mutex fileMutex[2];
+mutex fileMutex[2];
 mutex transferCacheMutex;
 mutex diskCacheMutex;
 
@@ -481,7 +481,7 @@ uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length, bool isCache, bool &isFinished) {
 
     // cache and segment share different mutex
-    boost::shared_lock<boost::shared_mutex>lock(fileMutex[isCache]);
+    lock_guard<mutex> lk(fileMutex[isCache]);
 
 	debug("Read File :%s\n", filepath.c_str());
 
@@ -533,7 +533,7 @@ uint32_t StorageModule::doWriteFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length, bool isCache, bool &isFinished) {
 
     // cache and segment share different mutex
-    boost::unique_lock<boost::shared_mutex>lock(fileMutex[isCache]);
+    lock_guard<mutex> lk(fileMutex[isCache]);
 
 	FILE* file = openFile(filepath);
 
