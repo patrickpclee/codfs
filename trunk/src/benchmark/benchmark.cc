@@ -303,6 +303,10 @@ int main(int argc, char *argv[]) {
 	 client->downloadFileRequest(atoi(argv[3]), argv[4]);
 	 }
 	 */
+	cout << "Now Sleep 5 Seconds then Exit" << endl;
+	sleep(5);
+	exit(0);
+
 
 	garbageCollectionThread.join();
 	receiveThread.join();
@@ -310,10 +314,6 @@ int main(int argc, char *argv[]) {
 #else
 	sendThread.join();
 #endif
-
-	cout << "Now Sleep 5 Seconds then Exit" << endl;
-	sleep(5);
-	exit(0);
 
 	return 0;
 }
