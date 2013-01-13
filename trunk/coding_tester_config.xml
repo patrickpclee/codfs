@@ -16,6 +16,9 @@
 		<RAID5>
 			<n>7</n>
 		</RAID5>
+		<EVENODD>
+			<n>7</n>
+		</EVENODD>
 		<RS>
 			<k>6</k>
 			<m>2</m>

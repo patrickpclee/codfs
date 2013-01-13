@@ -107,6 +107,7 @@ public:
     switch( en ) {
       case DEFAULT_CODING: return "DEFAULT_CODING";
       case EMBR_CODING: return "EMBR_CODING";
+      case EVENODD_CODING: return "EVENODD_CODING";
       case RAID0_CODING: return "RAID0_CODING";
       case RAID1_CODING: return "RAID1_CODING";
       case RAID5_CODING: return "RAID5_CODING";
