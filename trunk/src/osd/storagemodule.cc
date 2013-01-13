@@ -643,6 +643,7 @@ void StorageModule::tryCloseFile(string filepath) {
 	try {
 		filePtr = _openedFile->get(filepath);
         fclose(filePtr);
+        _openedFile->remove(filepath);
 	} catch (out_of_range& oor) { // file pointer not found in cache
         return;
 	}
