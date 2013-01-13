@@ -5,6 +5,7 @@ MONITOR
 testfile
 CLIENT_FUSE
 BENCHMARK
+CODING_TESTER
 *.d
 *.la
 *.o
