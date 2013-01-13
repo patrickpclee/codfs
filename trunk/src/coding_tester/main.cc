@@ -10,6 +10,7 @@
 #include "../coding/raid0coding.hh"
 #include "../coding/raid1coding.hh"
 #include "../coding/raid5coding.hh"
+#include "../coding/evenoddcoding.hh"
 #include "../coding/rscoding.hh"
 #include "../coding/embrcoding.hh"
 #include "../common/convertor.hh"
@@ -103,6 +104,14 @@ uint32_t readConfig(const char* configFile) {
 		codingSetting = Raid5Coding::generateSetting(raid5_n);
 		numBlocks = raid5_n;
 		cout << "Coding: RAID 5, n = " << raid5_n << endl;
+
+	} else if (selectedCoding == "EVENODD") {
+
+		int n = configLayer->getConfigInt("CodingSetting>EVENODD>n");
+		coding = new EvenOddCoding();
+		codingSetting = EvenOddCoding::generateSetting(n);
+		numBlocks = coding->getBlockCountFromSetting(codingSetting);
+		cout << "Coding: Even Odd, n = " << n << endl;
 
 	} else if (selectedCoding == "RS") {
 
