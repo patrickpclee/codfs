@@ -138,6 +138,7 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
 
+	// TODO: Need Fix, Now Would Only Give First Avilable k
 	if (blockIdList.size() != k + m) {
 		int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
 		char **data, **code;
@@ -176,9 +177,11 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 			blockDataList[erasures[i]] = temp;
 		}
 
+		/*
 		for (uint32_t i = 0; i < m; i++) {
 			MemoryPool::getInstance().poolFree(blockDataList[k + i].buf);
 		}
+		*/
 
 		// free memory
 		for (uint32_t i = 0; i < k; i++) {
