@@ -149,6 +149,9 @@ int main(int argc, char **argv)
   for (i = 0; i < m; i++) {
     coding[i] = talloc(char, sizeof(long)*w);
   }
+ 
+  printf("Original data\n\n"); 
+  print_data_and_coding(k, m ,w, sizeof(long), data, coding);
 
   jerasure_schedule_encode(k, m, w, smart, data, coding, w*sizeof(long), sizeof(long));
   jerasure_get_stats(stats);
