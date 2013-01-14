@@ -148,6 +148,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
 		blockData.buf = readFile(blockPath, filesize, requiredBlockSymbols[j].second); // read block
+		debug("%p\n",blockData.buf);
 
 		// fill in block information
 		blockData.info.segmentId = segmentId;
@@ -179,10 +180,12 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 	MemoryPool::getInstance().poolFree(segmentData.buf);
 
 	// free blocks
+
 //	for (auto blockSymbol : requiredBlockSymbols) {
 //		MemoryPool::getInstance().poolFree(
 //				blockDataList[blockSymbol.first].buf);
 //	}
+
 
 	// take time for writing and clean up
 	Clock::time_point tWrite = Clock::now();

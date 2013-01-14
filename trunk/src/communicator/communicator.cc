@@ -3,6 +3,7 @@
  */
 
 #include <iostream>
+#include <mutex>
 #include <thread>
 #include <sys/types.h>		// required by select()
 #include <unistd.h>		// required by select()
@@ -19,6 +20,7 @@
 #include "../common/enumtostring.hh"
 #include "../common/debug.hh"
 #include "../common/define.hh"
+#include "../common/memorypool.hh"
 #include "../common/convertor.hh"
 #include "../common/segmentdata.hh"
 #include "../protocol/message.pb.h"
@@ -43,6 +45,8 @@ using namespace std;
 #include "../../lib/threadpool/threadpool.hpp"
 using namespace boost::threadpool;
 
+pool _parsingtp;
+pool threadPools[MSGTYPE_END];
 #endif
 
 // global variable defined in each component
@@ -51,6 +55,8 @@ extern ConfigLayer* configLayer;
 // mutex
 boost::shared_mutex connectionMapMutex;
 boost::shared_mutex threadPoolMapMutex;
+
+const uint32_t MSG_HEADER_SIZE = sizeof(struct MsgHeader);
 
 Communicator::Communicator() {
 
@@ -61,6 +67,11 @@ Communicator::Communicator() {
 	_requestId = 0;
 	_maxFd = 0;
 	_connectionMap = {};
+
+#ifdef USE_PARSING_THREADS
+	_sockfdMutexMap = {};
+#endif
+	_sockfdBufMap = {};
 
 	// select timeout
 	_timeoutSec = configLayer->getConfigInt("Communication>SelectTimeout>sec");
@@ -77,6 +88,7 @@ Communicator::Communicator() {
 	_pollingInterval = configLayer->getConfigInt(
 			"Communication>SendPollingInterval");
 
+	_parsingtp.size_controller().resize(PARSING_THREADS);
 	debug("%s\n", "Communicator constructed");
 
 }
@@ -119,7 +131,6 @@ void Communicator::createServerSocket() {
 
 void Communicator::waitForMessage() {
 
-	char* buf; // message receive buffer
 	map<uint32_t, Connection*>::iterator p; // connectionMap iterator
 
 	int result; // return value for select
@@ -137,7 +148,7 @@ void Communicator::waitForMessage() {
 
 	// each MsgType has its own threadpool
 	// number of threads in each pool is defined in _threadPoolSize in the message
-	pool threadPools[MSGTYPE_END];
+	// pool threadPools[MSGTYPE_END]; MOVE TO GLOBAL
 	for (int i = 1; i < MSGTYPE_END; i++) { // i = 1 skip DEFAULT
 		Message* tempMessage = MessageFactory::createMessage(this, (MsgType) i);
 		uint32_t threadPoolSize = tempMessage->getThreadPoolSize();
@@ -192,13 +203,24 @@ void Communicator::waitForMessage() {
 				_connectionMap[conn->getSockfd()] = conn;
 #ifdef USE_MULTIPLE_QUEUE
 				//thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
-				_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
-				_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+				_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue<
+						Message *>();
+				_outDataQueue[conn->getSockfd()] = new struct LowLockQueue<
+						Message *>();
 				_dataMutex[conn->getSockfd()] = new mutex();
-				_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
+				_sendThread[conn->getSockfd()] = thread(
+						&Communicator::sendMessage, this, conn->getSockfd());
 #endif
 			}
 
+			// Receive Optimization
+			// add new socket to mutexMap and bufMap
+#ifdef USE_PARSING_THREADS
+			_sockfdMutexMap[conn->getSockfd()] = new std::mutex();
+#endif
+			_sockfdBufMap[conn->getSockfd()] = RecvBuffer();
+			debug_cyan("Add socket to mutex and buf map %" PRIu32 "\n",
+					conn->getSockfd());
 
 			debug("New connection sockfd = %" PRIu32 "\n", conn->getSockfd());
 
@@ -218,45 +240,72 @@ void Communicator::waitForMessage() {
 
 				// if socket has data available
 				if (FD_ISSET(sockfd, &sockfdSet)) {
-
-//					debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
-
-					// check if connection is lost
-					int nbytes = 0;
-					ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
-					if (nbytes == 0) {
-
-						// upgrade shared lock to exclusive lock
-						boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
-								lock);
-
-						// disconnect and remove from _connectionMap
-						debug("SOCKFD = %" PRIu32 " connection lost\n",
-								p->first);
-#ifdef COMPILE_FOR_MONITOR
-						monitor->getStatModule()->removeStatBySockfd(sockfd);
-#endif
-						// hack: post-increment adjusts iterator even erase is called
-						_connectionMap.erase(p++);
-						continue;
-					} else {
-						// receive message into buffer, memory allocated in recvMessage
-						buf = p->second->recvMessage();
-
-#ifdef USE_THREAD_POOL
-						MsgType msgType =
-								((struct MsgHeader*) buf)->protocolMsgType;
-
-						// schedule message in its own threadpool
-						threadPools[msgType].schedule(
-								boost::bind(&Communicator::dispatch, this, buf,
-										p->first, 0));
-						debug("Add Thread Pool [%s] %d/%d/%d\n",
-								EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
-
+#ifdef USE_PARSING_THREADS
+					if (_sockfdMutexMap[sockfd]->try_lock()) {
 #else
-						dispatch(buf, p->first);
+					if (true) {
 #endif
+
+						//debug("FD_ISSET FD = %" PRIu32 "\n", sockfd);
+
+						// check if connection is lost
+						int nbytes = 0;
+						ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
+						if (nbytes == 0) {
+
+							// upgrade shared lock to exclusive lock
+							boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
+									lock);
+
+							// disconnect and remove from _connectionMap
+							debug("SOCKFD = %" PRIu32 " connection lost\n",
+									p->first);
+
+							// Receive Optimization
+							_sockfdBufMap.erase(p->first);
+							debug_red("SOCKET %" PRIu32 " deleted from Map\n",p->first);
+							debug_red("SOCKFD = %" PRIu32 " delete from mutex map\n",
+									p->first);
+
+#ifdef USE_PARSING_THREADS
+							_sockfdMutexMap[p->first]->unlock();
+							_sockfdMutexMap.erase(p->first);
+#endif
+
+#ifdef COMPILE_FOR_MONITOR
+							monitor->getStatModule()->removeStatBySockfd(sockfd);
+#endif
+							// hack: post-increment adjusts iterator even erase is called
+							_connectionMap.erase(p++);
+
+							continue;
+						} else {
+
+							struct RecvBuffer& rb = _sockfdBufMap[sockfd];
+
+							int32_t byteRead =
+									p->second->getSocket()->aggressiveRecv(
+											rb.buf + rb.len,
+											RECV_BUF_PER_SOCKET - rb.len);
+							rb.len += byteRead;
+#ifdef USE_PARSING_THREADS
+							if (!_sockfdInQueueMap[sockfd] && byteRead != 0) {
+								debug_cyan("Add Recv to ThreadPool for socket %" PRIu32 " Read Byte %" PRIu32 "\n",sockfd, byteRead);
+								_parsingtp.schedule(
+									boost::bind(&Communicator::parsing, this,
+										sockfd));
+								_sockfdInQueueMap[sockfd] = true;
+							}
+							_sockfdMutexMap[sockfd]->unlock();
+#else
+							if (byteRead != 0) {
+								parsing(sockfd);
+							}
+#endif
+						}
+					} else {
+						// NOT OBTAINED LOCK
+						// LEFT TO NEXT ROUND
 					}
 				}
 
@@ -268,13 +317,57 @@ void Communicator::waitForMessage() {
 
 }
 
+void Communicator::parsing(uint32_t sockfd) {
+#ifdef USE_PARSING_THREADS
+	lock_guard<mutex> lk(*_sockfdMutexMap[sockfd]);
+#endif
+	struct RecvBuffer& recvBuffer = _sockfdBufMap[sockfd];
+	debug_red("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer.len);
+	uint32_t idx = 0;
+	struct MsgHeader *msgHeader;
+	MsgType msgType;
+	while (idx + MSG_HEADER_SIZE <= recvBuffer.len) {
+		//memcpy((char*) &msgHeader, recvBuffer.buf + idx, MSG_HEADER_SIZE);
+		msgHeader = (struct MsgHeader*) (recvBuffer.buf + idx);
+		msgType = msgHeader->protocolMsgType;
+		uint32_t totalMsgSize = MSG_HEADER_SIZE + msgHeader->protocolMsgSize
+				+ msgHeader->payloadSize;
+		debug_yellow(
+				"[%s] FOR SOCKET %" PRIu32 " RECV BUF SIZE %" PRIu32 " IDX = %" PRIu32 " TOTAL MSG SIZE %" PRIu32 "\n",
+				EnumToString::toString(msgType), sockfd, recvBuffer.len, idx, totalMsgSize);
+		if (idx + totalMsgSize <= recvBuffer.len) {
+			char* buffer = MemoryPool::getInstance().poolMalloc(totalMsgSize);
+			memcpy(buffer, recvBuffer.buf + idx, totalMsgSize);
+			// DISPATCH
+			threadPools[msgType].schedule(
+					boost::bind(&Communicator::dispatch, this, buffer, sockfd,
+							0));
+			debug("Add Thread Pool [%s] %d/%d/%d\n",
+					EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
+			idx += totalMsgSize;
+		} else {
+			// Not receive complete message, memmove to head
+			break;
+		}
+	}
+	if (idx > 0) {
+		memmove(recvBuffer.buf, recvBuffer.buf + idx, recvBuffer.len - idx);
+		recvBuffer.len = recvBuffer.len - idx;
+	}
+#ifdef USE_PARSING_THREADS
+	_sockfdInQueueMap[sockfd] = false;
+#endif
+
+}
+
 /**
  * 1. Set a requestId for a message if it is 0
  * 2. Push the message to _outMessageQueue
  * 3. If need to wait for reply, add the message to waitReplyMessageMap
  */
 
-void Communicator::addMessage(Message* message, bool expectReply, uint32_t waitOnRequestId) {
+void Communicator::addMessage(Message* message, bool expectReply,
+		uint32_t waitOnRequestId) {
 
 	// if requestID == 0, generate a new one
 	if (message->getMsgHeader().requestId == 0) {
@@ -285,12 +378,12 @@ void Communicator::addMessage(Message* message, bool expectReply, uint32_t waitO
 	if (expectReply) {
 		message->setExpectReply(true);
 		{
-            uint32_t requestId = 0;
-            if (waitOnRequestId == 0) { // if a requestId is not specified
-                requestId = message->getMsgHeader().requestId;
-            } else {
-                requestId = waitOnRequestId;
-            }
+			uint32_t requestId = 0;
+			if (waitOnRequestId == 0) { // if a requestId is not specified
+				requestId = message->getMsgHeader().requestId;
+			} else {
+				requestId = waitOnRequestId;
+			}
 
 			_waitReplyMessageMap.set(requestId, message);
 			debug(
@@ -300,7 +393,7 @@ void Communicator::addMessage(Message* message, bool expectReply, uint32_t waitO
 	}
 
 	// add message to outMessageQueue
-	switch(message->getMsgHeader().protocolMsgType) {
+	switch (message->getMsgHeader().protocolMsgType) {
 	case SEGMENT_DATA:
 	case BLOCK_DATA:
 #ifdef USE_MULTIPLE_QUEUE
@@ -334,9 +427,9 @@ Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
 }
 
 #ifdef USE_MULTIPLE_QUEUE
-void Communicator::sendMessage(uint32_t fd){
+void Communicator::sendMessage(uint32_t fd) {
 #else
-void Communicator::sendMessage() {
+	void Communicator::sendMessage() {
 #endif
 
 	while (1) {
@@ -347,7 +440,7 @@ void Communicator::sendMessage() {
 #ifdef USE_MULTIPLE_QUEUE
 		while ((message = popMessage(fd)) != NULL) {
 #else
-		while ((message = popMessage()) != NULL) {
+			while ((message = popMessage()) != NULL) {
 #endif
 
 			const uint32_t sockfd = message->getSockfd();
@@ -419,11 +512,13 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 		boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 		_connectionMap[sockfd] = conn;
 #ifdef USE_MULTIPLE_QUEUE
-	//	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
-		_outMessageQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
-		_outDataQueue[conn->getSockfd()] = new struct LowLockQueue <Message *>();
+		//	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
+		_outMessageQueue[conn->getSockfd()] =
+				new struct LowLockQueue<Message *>();
+		_outDataQueue[conn->getSockfd()] = new struct LowLockQueue<Message *>();
 		_dataMutex[conn->getSockfd()] = new mutex();
-		_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,this,conn->getSockfd());
+		_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,
+				this, conn->getSockfd());
 #endif
 	}
 
@@ -558,11 +653,10 @@ void Communicator::dispatch(char* buf, uint32_t sockfd,
 
 }
 
-
 #ifdef USE_MULTIPLE_QUEUE
 Message* Communicator::popMessage(uint32_t fd) {
 #else
-Message* Communicator::popMessage() {
+	Message* Communicator::popMessage() {
 #endif
 	Message* message = NULL;
 
@@ -570,7 +664,7 @@ Message* Communicator::popMessage() {
 #ifdef USE_MULTIPLE_QUEUE
 	if (_outMessageQueue[fd]->pop(message) != false) {
 #else
-	if (_outMessageQueue.pop(message) != false) {
+		if (_outMessageQueue.pop(message) != false) {
 #endif
 		return message;
 #ifdef USE_MULTIPLE_QUEUE
@@ -739,6 +833,12 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 void Communicator::connectToMyself(string ip, uint16_t port,
 		ComponentType type) {
 	uint32_t sockfd = connectAndAdd(ip, port, type);
+#ifdef USE_PARSING_THREADS
+	_sockfdMutexMap[sockfd] = new std::mutex();
+#endif
+	_sockfdBufMap[sockfd] = RecvBuffer();
+	debug_cyan("connectToMySelf: Add socket to mutex and buf map %" PRIu32 "\n",
+			sockfd);
 	requestHandshake(sockfd, _componentId, _componentType);
 }
 
@@ -748,6 +848,13 @@ void Communicator::connectToMonitor() {
 	for (Component component : monitorList) {
 		uint32_t sockfd = connectAndAdd(component.ip, component.port,
 				component.type);
+#ifdef USE_PARSING_THREADS
+	_sockfdMutexMap[sockfd] = new std::mutex();
+#endif
+		_sockfdBufMap[sockfd] = RecvBuffer();
+		debug_cyan(
+				"connectToMonitor: Add socket to mutex and buf map %" PRIu32 "\n",
+				sockfd);
 		requestHandshake(sockfd, _componentId, _componentType);
 	}
 }
@@ -758,6 +865,13 @@ void Communicator::connectToMds() {
 	for (Component component : mdsList) {
 		uint32_t sockfd = connectAndAdd(component.ip, component.port,
 				component.type);
+#ifdef USE_PARSING_THREADS
+	_sockfdMutexMap[sockfd] = new std::mutex();
+#endif
+		_sockfdBufMap[sockfd] = RecvBuffer();
+		debug_cyan(
+				"connectToMds: Add socket to mutex and buf map %" PRIu32 "\n",
+				sockfd);
 		requestHandshake(sockfd, _componentId, _componentType);
 	}
 }
@@ -765,6 +879,12 @@ void Communicator::connectToMds() {
 void Communicator::connectToOsd(uint32_t dstOsdIp, uint32_t dstOsdPort) {
 	uint32_t sockfd = connectAndAdd(Ipv4Int2Str(dstOsdIp), dstOsdPort,
 			_componentType);
+#ifdef USE_PARSING_THREADS
+	_sockfdMutexMap[sockfd] = new std::mutex();
+#endif
+	_sockfdBufMap[sockfd] = RecvBuffer();
+	debug_cyan("connectToOsd: Add socket to mutex and buf map %" PRIu32 "\n",
+			sockfd);
 	requestHandshake(sockfd, _componentId, _componentType);
 }
 
@@ -853,12 +973,11 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 
 }
 
-void Communicator::lockDataQueue(uint32_t sockfd){
+void Communicator::lockDataQueue(uint32_t sockfd) {
 	_dataMutex[sockfd]->lock();
 }
 
-
-void Communicator::unlockDataQueue(uint32_t sockfd){
+void Communicator::unlockDataQueue(uint32_t sockfd) {
 	_dataMutex[sockfd]->unlock();
 }
 //

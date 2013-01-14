@@ -71,12 +71,11 @@ boost::threadpool::pool _tp;
 #endif
 
 void parseOption(int argc, char* argv[]) {
-	clientId = atoi(argv[1]);
 
 	if (strcmp(argv[2], "download") == 0) {
 		download = true;
 		fileId = atoi(argv[3]);
-		debug("Downloading File %"PRIu32"\n", fileId);
+		debug("Downloading File %" PRIu32 "\n", fileId);
 	} else {
 
 		fileName = to_string(time(NULL));
@@ -85,7 +84,7 @@ void parseOption(int argc, char* argv[]) {
 		segmentSize = stringToByte(argv[4]);
 		numberOfSegment = fileSize / segmentSize;
 
-		debug("Testing %s with File Size %" PRIu64 " Segment Size %"PRIu32"\n",
+		debug("Testing %s with File Size %" PRIu64 " Segment Size %" PRIu32 "\n",
 				argv[2], fileSize, segmentSize);
 
 		codingScheme = RAID1_CODING;
@@ -237,6 +236,7 @@ int main(int argc, char *argv[]) {
 	signal(SIGINT, sighandler);
 
 	configLayer = new ConfigLayer("clientconfig.xml");
+	clientId = atoi(argv[1]);
 	client = new Client(clientId);
 	_clientCommunicator = client->getCommunicator();
 	_storageModule = client->getStorageModule();
@@ -303,10 +303,11 @@ int main(int argc, char *argv[]) {
 	 client->downloadFileRequest(atoi(argv[3]), argv[4]);
 	 }
 	 */
-
 	cout << "Now Sleep 5 Seconds then Exit" << endl;
 	sleep(5);
 	exit(0);
+
+
 	garbageCollectionThread.join();
 	receiveThread.join();
 #ifdef USE_MULTIPLE_QUEUE

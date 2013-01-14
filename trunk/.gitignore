@@ -5,6 +5,7 @@ MONITOR
 testfile
 CLIENT_FUSE
 BENCHMARK
+CODING_TESTER
 *.d
 *.la
 *.o
@@ -30,3 +31,6 @@ test*
 decoded_file
 output*
 log/
+/o1
+/file1
+/lib

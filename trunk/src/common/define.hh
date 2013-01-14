@@ -54,6 +54,7 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define INF (1<<29)
 #define DISK_PATH "/"
 #define RECOVERY_THREADS 10
+#define MAX_NUM_PROCESSING_SEGMENT 4
 
 // osd/storagemodule.cc
 #define USE_SEGMENT_CACHE
@@ -70,4 +71,12 @@ typedef std::vector<symbol_list_t> block_list_t ;
 // monitor/selectionmodule.cc
 //#define RR_DISTRIBUTE
 
+// Receive Optimization
+#define RECV_BUF_PER_SOCKET 10485760
+#define USE_PARSING_THREADS
+#define PARSING_THREADS 20
+
+
+// Trigger Recovery or not
+//#define TRIGGER_RECOVERY
 #endif
