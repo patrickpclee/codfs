@@ -4,7 +4,7 @@
 	<BlockFolder>./coding_tester_block</BlockFolder>
     <RepairFolder>./coding_tester_repair</RepairFolder>
 
-	<SelectedCodingScheme>RAID5</SelectedCodingScheme>
+	<SelectedCodingScheme>CAUCHY</SelectedCodingScheme>
 
 	<CodingSetting>
 		<RAID0>
@@ -21,8 +21,13 @@
 			<m>2</m>
 			<w>8</w>
 		</RS>
+		<CAUCHY>
+			<k>3</k>
+			<m>3</m>
+			<w>3</w>
+		</CAUCHY>
 	</CodingSetting>
 
-	<NumFailedOsd>1</NumFailedOsd>
+	<NumFailedOsd>3</NumFailedOsd>
     
 </CodingTesterConfig>
