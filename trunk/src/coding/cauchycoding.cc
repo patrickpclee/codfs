@@ -4,7 +4,7 @@
 #include <set>
 #include <string.h>
 #include "coding.hh"
-#include "rscoding.hh"
+#include "cauchycoding.hh"
 #include "../common/debug.hh"
 #include "../common/blockdata.hh"
 #include "../common/segmentdata.hh"
@@ -12,20 +12,21 @@
 
 extern "C" {
 #include "../../lib/jerasure/jerasure.h"
-#include "../../lib/jerasure/reed_sol.h"
+#include "../../lib/jerasure/cauchy.h"
+
 }
 
 using namespace std;
 
-RSCoding::RSCoding() {
+CauchyCoding::CauchyCoding() {
 
 }
 
-RSCoding::~RSCoding() {
+CauchyCoding::~CauchyCoding() {
 
 }
 
-vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
+vector<BlockData> CauchyCoding::encode(SegmentData segmentData, string setting) {
 
 	vector<struct BlockData> blockDataList;
 	vector<uint32_t> params = getParameters(setting);
@@ -33,15 +34,18 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
 	const uint32_t size = roundTo(
-			(roundTo(segmentData.info.segmentSize, k) / k), 4);
+			(roundTo(segmentData.info.segmentSize, k*w) / (k*w)), 4);
 
-	if (k <= 0 || m < 0 || (w != 8 && w != 16 && w != 32)
-			|| (w <= 16 && k + m > (1 << w))) {
+
+	if (k <= 0 || m < 0 || w <= 0 || w > 32
+			|| (w < 30 && k + m > (1 << w))) {
 		cerr << "Bad Parameters" << endl;
 		exit(-1);
 	}
 
-	int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
+	int *matrix = cauchy_good_general_coding_matrix(k, m, w);
+	int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
+	int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
 
 	char **data, **code;
 	data = talloc<char*, uint32_t>(k);
@@ -50,22 +54,22 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 		struct BlockData blockData;
 		blockData.info.segmentId = segmentData.info.segmentId;
 		blockData.info.blockId = i;
-		blockData.info.blockSize = size;
-
-		blockData.buf = MemoryPool::getInstance().poolMalloc(size);
-		char* bufPos = segmentData.buf + i * size;
+		blockData.info.blockSize = size*w;
+		blockData.buf = MemoryPool::getInstance().poolMalloc(size*w);
+		char* bufPos = segmentData.buf + i * size*w;
 		if (i == k - 1) {
 			//memset(blockData.buf, 0, size);
+
 			memcpy(blockData.buf, bufPos,
-					segmentData.info.segmentSize - i * size);
-			memset(blockData.buf + segmentData.info.segmentSize - i * size, 0,
-					k * size - segmentData.info.segmentSize);
-		} else
-			memcpy(blockData.buf, bufPos, size);
+					segmentData.info.segmentSize - i * size*w);
+
+			memset(blockData.buf + segmentData.info.segmentSize - i * size*w, 0,
+					k * size*w - segmentData.info.segmentSize);
+		} else{
+			memcpy(blockData.buf, bufPos, size*w);
+		}
 
 		data[i] = blockData.buf;
-		//data[i] = talloc<char, uint32_t>(size);
-		//memcpy(data[i], blockData.buf, size);
 
 		blockDataList.push_back(blockData);
 	}
@@ -77,23 +81,49 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 
 	code = talloc<char*, uint32_t>(m);
 	for (uint32_t i = 0; i < m; i++) {
-		code[i] = talloc<char, uint32_t>(size);
+		code[i] = talloc<char, uint32_t>(size*w);
 	}
 
-	jerasure_matrix_encode(k, m, w, matrix, data, code, size);
+	jerasure_schedule_encode(k, m, w, smart, data, code, w*size, size);
+
+//	for (uint32_t i = 0; i < k; i++) {
+//		char path[100];
+//		sprintf (path, "encode %" PRIu32, i);
+//		FILE* f = fopen (path, "w");
+//		fwrite (data[i], w*size, 1,f);
+//	}
+//	for (uint32_t i = 0; i < m; i++) {
+//		char path[100];
+//		sprintf (path, "encode %" PRIu32, i+k);
+//		FILE* f = fopen (path, "w");
+//		fwrite (code[i], w*size, 1,f);
+//	}
 
 	for (uint32_t i = 0; i < m; i++) {
 		struct BlockData blockData;
 		blockData.info.segmentId = segmentData.info.segmentId;
 		blockData.info.blockId = k + i;
-		blockData.info.blockSize = size;
+		blockData.info.blockSize = size*w;
 
 		blockData.buf = code[i];
-		//blockData.buf = MemoryPool::getInstance().poolMalloc(size);
-		//memcpy(blockData.buf, code[i], size);
+//		blockData.buf = MemoryPool::getInstance().poolMalloc(size*w);
+//		memcpy(blockData.buf, code[i], size*w);
 
 		blockDataList.push_back(blockData);
 	}
+
+//	for (uint32_t i = 0; i < k+m; i++) {
+//		char path[100];
+//		sprintf (path, "ENCODE %" PRIu32, i);
+//		FILE* f = fopen (path, "w");
+//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
+//	}
+//	for (uint32_t i = 0; i < k+m; i++) {
+//			char path[100];
+//			sprintf (path, "ENCODE %" PRIu32, i);
+//			FILE* f = fopen (path, "w");
+//			fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1, f);
+//		}
 
 	// free memory
 	//for (uint32_t i = 0; i < k; i++) {
@@ -109,7 +139,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 	return blockDataList;
 }
 
-SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
+SegmentData CauchyCoding::decode(vector<BlockData> &blockDataList,
 		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
 	// transform symbolList to blockIdList
@@ -122,12 +152,19 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
-	const uint32_t size = roundTo(roundTo(segmentSize, k) / k, 4);
+	const uint32_t size = roundTo(roundTo(segmentSize, k*w) / (k*w), 4);
 
-	if (blockIdList.size() < k) {
-		cerr << "Not enough blocks for decode " << blockIdList.size() << endl;
-		exit(-1);
-	}
+//	if (blockIdList.size() < k) {
+//		cerr << "Not enough blocks for decode " << blockIdList.size() << endl;
+//		exit(-1);
+//	}
+//
+//	for (uint32_t i = 0; i < k+m; i++) {
+//		char path[100];
+//		sprintf (path, "DECODE %" PRIu32, i);
+//		FILE* f = fopen (path, "w");
+//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
+//	}
 
 	struct SegmentData segmentData;
 
@@ -139,7 +176,10 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
 
 	if (blockIdList.size() != k + m) {
-		int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
+		int *matrix = cauchy_good_general_coding_matrix(k, m, w);
+		int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
+		int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
+
 		char **data, **code;
 		int *erasures;
 		int j = 0;
@@ -149,32 +189,47 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 		erasures = talloc<int, uint32_t>(k + m - blockIdList.size() + 1);
 
 		for (uint32_t i = 0; i < k + m; i++) {
-			i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
-				talloc<char, uint32_t>(size);
+			i < k ? data[i] = talloc<char, uint32_t>(size*w) : code[i - k] =
+				talloc<char, uint32_t>(size*w);
 			if (blockIdListSet.count(i) > 0) {
-				i < k ? memcpy(data[i], blockDataList[i].buf, size) : memcpy(
-						code[i - k], blockDataList[i].buf, size);
+				i < k ? memcpy(data[i], blockDataList[i].buf, size*w) : memcpy(
+						code[i - k], blockDataList[i].buf, size*w);
 			} else {
 				erasures[j++] = i;
 			}
 		}
 		erasures[j] = -1;
 
-		jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
+
+//		for (uint32_t i = 0; i < k; i++) {
+//			char path[100];
+//			sprintf (path, "predecode %" PRIu32, i);
+//			FILE* f = fopen (path, "w");
+//			fwrite (data[i], w*size, 1,f);
+//		}
+//		for (uint32_t i = 0; i < m; i++) {
+//					char path[100];
+//					sprintf (path, "predecode %" PRIu32, i+k);
+//					FILE* f = fopen (path, "w");
+//					fwrite (code[i], w*size, 1,f);
+//				}
+		jerasure_schedule_decode_lazy(k, m, w, bitmatrix, erasures, data, code, w*size, size, 1);
 
 		for (uint32_t i = 0; i < k + m - blockIdList.size(); i++) {
 			struct BlockData temp;
 			temp.info.segmentId = segmentData.info.segmentId;
 			temp.info.blockId = erasures[i];
-			temp.info.blockSize = size;
+			temp.info.blockSize = size*w;
 
-			temp.buf = MemoryPool::getInstance().poolMalloc(size);
+			temp.buf = MemoryPool::getInstance().poolMalloc(size*w);
 			memcpy(temp.buf,
 					(uint32_t) erasures[i] < k ?
-					data[erasures[i]] : code[erasures[i] - k], size);
+					data[erasures[i]] : code[erasures[i] - k], size*w);
 
 			blockDataList[erasures[i]] = temp;
+
 		}
+
 
 		for (uint32_t i = 0; i < m; i++) {
 			MemoryPool::getInstance().poolFree(blockDataList[k + i].buf);
@@ -198,6 +253,13 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 		blockIdList.push_back(i);
 	}
 
+//	for (uint32_t i = 0; i < k+m; i++) {
+//		char path[100];
+//		sprintf (path, "DECODE %" PRIu32, i);
+//		FILE* f = fopen (path, "w");
+//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
+//	}
+
 	uint64_t offset = 0;
 	for (uint32_t i = 0; i < k - 1; i++) {
 		memcpy(segmentData.buf + offset, blockDataList[i].buf,
@@ -210,7 +272,7 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 	return segmentData;
 }
 
-block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
+block_list_t CauchyCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 		uint32_t segmentSize, string setting) {
 
 	// if more than one in secondaryOsdStatus is false, return {} (error)
@@ -220,8 +282,9 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
+	const uint32_t w = params[2];
 	//const uint32_t noOfDataStripes = k + m;
-	const uint32_t noOfDataStripes = k;
+	const uint32_t noOfDataStripes = k*w;
 	vector<uint32_t> requiredBlocks;
 	requiredBlocks.reserve(noOfDataStripes);
 
@@ -243,7 +306,7 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	//		/ noOfDataStripes;
 	block_list_t requiredBlockSymbols;
 	for (uint32_t i : requiredBlocks) {
-		offset_length_t symbol = make_pair(0, blockSize);
+		offset_length_t symbol = make_pair(0, blockSize*w);
 		vector<offset_length_t> symbolList = { symbol };
 		symbol_list_t blockSymbols = make_pair(i, symbolList);
 		requiredBlockSymbols.push_back(blockSymbols);
@@ -252,24 +315,25 @@ block_list_t RSCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	return requiredBlockSymbols;
 }
 
-block_list_t RSCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
+block_list_t CauchyCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		vector<bool> blockStatus, uint32_t segmentSize, string setting) {
 
 	// for raid-6, same as download
 	return getRequiredBlockSymbols(blockStatus, segmentSize, setting);
 }
 
-vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
+vector<BlockData> CauchyCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		vector<BlockData> &blockData, block_list_t &symbolList,
 		uint32_t segmentSize, string setting) {
 
-	string blockIdString;
-	for (auto block : repairBlockIdList) {
-		blockIdString += to_string(block) + " ";
-	}
+//	string blockIdString;
+//	for (auto block : repairBlockIdList) {
+//		blockIdString += block + " ";
+//	}
+//
+//	debug_yellow("Start repairBlocks for %s\n", blockIdString.c_str());
 
-	debug_yellow("Start repairBlocks for %s\n", blockIdString.c_str());
-
+	//set<uint32_t> repairBlockIdListSet(repairBlockIdList.begin(), repairBlockIdList.end());
 	vector<BlockData> ret;
 	//decode(blockData, symbolList, segmentSize, setting);
 	vector<uint32_t> blockIdList;
@@ -277,11 +341,13 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		blockIdList.push_back(blockSymbol.first);
 	}
 
+	set<uint32_t> repairListSet(repairBlockIdList.begin(), repairBlockIdList.end());
+
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
-	const uint32_t size = roundTo(roundTo(segmentSize, k) / k, 4);
+	const uint32_t size = roundTo(roundTo(segmentSize, k*w) / (k*w), 4);
 
 	if (blockIdList.size() < k) {
 		cerr << "Not enough blocks for decode " << blockIdList.size() << endl;
@@ -298,7 +364,10 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
 
 	//if (blockIdList.size() != k + m) {
-	int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
+	int *matrix = cauchy_good_general_coding_matrix(k, m, w);
+	int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
+	int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
+
 	char **data, **code;
 	int *erasures;
 	int j = 0;
@@ -308,34 +377,34 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	erasures = talloc<int, uint32_t>(k + m - blockIdList.size() + 1);
 
 	for (uint32_t i = 0; i < k + m; i++) {
-		i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
-			talloc<char, uint32_t>(size);
+		i < k ? data[i] = talloc<char, uint32_t>(size*w) : code[i - k] =
+			talloc<char, uint32_t>(size*w);
 		if (blockIdListSet.count(i) > 0) {
-			i < k ? memcpy(data[i], blockData[i].buf, size) : memcpy(
-					code[i - k], blockData[i].buf, size);
+			i < k ? memcpy(data[i], blockData[i].buf, size*w) : memcpy(
+					code[i - k], blockData[i].buf, size*w);
 		} else {
 			erasures[j++] = i;
 		}
 	}
 	erasures[j] = -1;
 
-	jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
+	jerasure_schedule_decode_lazy(k, m, w, bitmatrix, erasures, data, code, w*size, size, 1);
 
-	for (uint32_t i = 0; i < repairBlockIdList.size(); i++) {
-		struct BlockData temp;
-		temp.info.segmentId = segmentData.info.segmentId;
-		//temp.info.blockId = erasures[i];
-		temp.info.blockId = repairBlockIdList[i];
-		temp.info.blockSize = size;
+	for (uint32_t i = 0; i < k + m - blockIdList.size(); i++) {
+		if(repairListSet.count(erasures[i]) > 0){
+			struct BlockData temp;
+			temp.info.segmentId = segmentData.info.segmentId;
+			temp.info.blockId = erasures[i];
+			temp.info.blockSize = size*w;
 
-		temp.buf = MemoryPool::getInstance().poolMalloc(size);
-		memcpy(temp.buf,
-				(uint32_t) temp.info.blockId < k ?
-				data[erasures[i]] : code[erasures[i] - k], size);
+			temp.buf = MemoryPool::getInstance().poolMalloc(size*w);
+			memcpy(temp.buf,
+					(uint32_t) erasures[i] < k ?
+					data[erasures[i]] : code[erasures[i] - k], size*w);
 
-		blockData[temp.info.blockId] = temp;
-		//blockData[erasures[i]] = temp;
-		ret.push_back(temp);
+			blockData[erasures[i]] = temp;
+			ret.push_back(temp);
+		}
 	}
 
 	// free memory
@@ -354,7 +423,7 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	return ret;
 }
 
-uint32_t RSCoding::getBlockCountFromSetting(string setting) {
+uint32_t CauchyCoding::getBlockCountFromSetting(string setting) {
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
@@ -365,7 +434,7 @@ uint32_t RSCoding::getBlockCountFromSetting(string setting) {
 // PRIVATE FUNCTION
 //
 
-vector<uint32_t> RSCoding::getParameters(string setting) {
+vector<uint32_t> CauchyCoding::getParameters(string setting) {
 	vector<uint32_t> params(3);
 	int i = 0;
 	string token;

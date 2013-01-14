@@ -110,7 +110,8 @@ enum CodingScheme {
 	RAID1_CODING = 2,
 	RAID5_CODING = 3,
 	RS_CODING = 4,
-	EMBR_CODING = 5
+	EMBR_CODING = 5,
+	CAUCHY = 6
 };
 
 enum HotnessAlgorithm{
