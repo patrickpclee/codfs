@@ -263,8 +263,8 @@ void Communicator::waitForMessage() {
 
 							// Receive Optimization
 							_sockfdBufMap.erase(p->first);
-							debug_red("SOCKET %" PRIu32 " deleted from Map\n",p->first);
-							debug_red("SOCKFD = %" PRIu32 " delete from mutex map\n",
+							debug("SOCKET %" PRIu32 " deleted from Map\n",p->first);
+							debug("SOCKFD = %" PRIu32 " delete from mutex map\n",
 									p->first);
 
 #ifdef USE_PARSING_THREADS
@@ -322,7 +322,7 @@ void Communicator::parsing(uint32_t sockfd) {
 	lock_guard<mutex> lk(*_sockfdMutexMap[sockfd]);
 #endif
 	struct RecvBuffer& recvBuffer = _sockfdBufMap[sockfd];
-	debug_red("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer.len);
+	debug("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer.len);
 	uint32_t idx = 0;
 	struct MsgHeader *msgHeader;
 	MsgType msgType;
