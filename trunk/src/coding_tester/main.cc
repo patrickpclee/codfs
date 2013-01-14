@@ -11,6 +11,7 @@
 #include "../coding/raid1coding.hh"
 #include "../coding/raid5coding.hh"
 #include "../coding/rscoding.hh"
+#include "../coding/cauchycoding.hh"
 #include "../common/convertor.hh"
 #include "../common/debug.hh"
 #include "docoding.hh"
@@ -114,6 +115,17 @@ uint32_t readConfig(const char* configFile) {
 		numBlocks = k + m;
 		cout << "Coding: Reed Solomon, k = " << k << " m = " << m << " w = "
 				<< w << endl;
+	} else if (selectedCoding == "CAUCHY") {
+
+		int k = configLayer->getConfigInt("CodingSetting>CAUCHY>k");
+		int m = configLayer->getConfigInt("CodingSetting>CAUCHY>m");
+		int w = configLayer->getConfigInt("CodingSetting>CAUCHY>w");
+		coding = new CauchyCoding();
+		codingSetting = CauchyCoding::generateSetting((uint32_t) k, (uint32_t) m,
+				(uint32_t) w);
+		numBlocks = k + m;
+		cout << "Coding: Cauchy RS, k = " << k << " m = " << m << " w = "
+				<< w << endl;
 	} else {
 
 		cerr << "Wrong Coding Scheme Specified!" << endl;
@@ -201,16 +213,15 @@ int main(int argc, char* argv[]) {
 		}
 
 		// Simulate OSD Failure
-		vector<uint32_t> shuffleArray(numBlocks);
-		for (uint32_t i = 0; i < numBlocks; i++) {
-			shuffleArray[i] = i;
-		}
-
 		// randomly set the specified number of OSD to FAIL
 		srand(time(NULL));
-		random_shuffle(shuffleArray.begin(), shuffleArray.end());
-		for (uint32_t i = 0; i < numFailedOsd; i++) {
-			secondaryOsdStatus[shuffleArray[i]] = false;
+		uint32_t j = 0;
+		while (j < numFailedOsd) {
+			uint32_t idx = rand() % numBlocks;
+			if (secondaryOsdStatus[idx] == true) {
+				secondaryOsdStatus[idx] = false;
+				j++;
+			}
 		}
 
 		cout << "Randomly failed " << numFailedOsd << " OSDs" << endl;
@@ -220,8 +231,10 @@ int main(int argc, char* argv[]) {
 		vector<string> dstBlockPaths;
 		cout << "Repair Location: " << repairFolder << endl;
 
-		for (uint32_t i = 0; i < numFailedOsd; i++) {
-			dstBlockPaths.push_back (repairFolder + "/" + to_string(segmentId) + "." + to_string(shuffleArray[i]));
+		for (uint32_t i = 0; i < numBlocks; i++) {
+			if (secondaryOsdStatus[i] == false) {
+				dstBlockPaths.push_back (repairFolder + "/" + to_string(segmentId) + "." + to_string(i));
+			}
 		}
 
 		doRepair(segmentId, segmentSize, numBlocks, secondaryOsdStatus, dstBlockPaths);

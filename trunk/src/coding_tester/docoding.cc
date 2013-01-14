@@ -160,12 +160,14 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 		j++;
 	}
 
+
 	// take time for reading segments
 	Clock::time_point tRead = Clock::now();
 
 	// perform decoding
 	SegmentData segmentData = coding->decode(blockDataList,
 			requiredBlockSymbols, segmentSize, codingSetting);
+
 
 	// take time for coding segments
 	Clock::time_point tCode = Clock::now();
@@ -177,10 +179,10 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 	MemoryPool::getInstance().poolFree(segmentData.buf);
 
 	// free blocks
-	for (auto blockSymbol : requiredBlockSymbols) {
-		MemoryPool::getInstance().poolFree(
-				blockDataList[blockSymbol.first].buf);
-	}
+//	for (auto blockSymbol : requiredBlockSymbols) {
+//		MemoryPool::getInstance().poolFree(
+//				blockDataList[blockSymbol.first].buf);
+//	}
 
 	// take time for writing and clean up
 	Clock::time_point tWrite = Clock::now();
@@ -245,9 +247,9 @@ void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 
 	// write segment to dstBlockPaths
 	uint32_t i = 0;
+	printf("before write files\n");
 	for (auto repairedblock : repairedBlocks) {
-		writeFile(dstBlockPaths[i], repairedblock.buf,
-				repairedblock.info.blockSize);
+		writeFile(dstBlockPaths[i], repairedblock.buf, repairedblock.info.blockSize);
 		i++;
 	}
 

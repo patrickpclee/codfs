@@ -79,13 +79,16 @@ void writeFile(string filepath, char* buf, uint32_t length) {
 
 	// open file
 	ofstream file(filepath, ios::out | ios::binary | ios::trunc);
+
 	if (!file.is_open()) {
 		cerr << "Cannot open write " << filepath << endl;
 		exit(-1);
 	}
 
 	if (!file.write(buf, length)) {
-		cerr << "Cannot write " << filepath << endl;
+		printf("buff: %p, length = %u\n", buf, length);
+		perror ("Write");
+		cerr << "Cannot write " << filepath << " " << length << endl;
 		exit(-1);
 	}
 
