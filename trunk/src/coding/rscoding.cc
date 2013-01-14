@@ -257,7 +257,7 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	string blockIdString;
 	for (auto block : repairBlockIdList) {
-		blockIdString += block + " ";
+		blockIdString += to_string(block) + " ";
 	}
 
 	debug_yellow("Start repairBlocks for %s\n", blockIdString.c_str());

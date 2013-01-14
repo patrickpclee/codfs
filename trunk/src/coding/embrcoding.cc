@@ -255,13 +255,17 @@ block_list_t EMBRCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks, ve
 	for(uint32_t i = 0; i < failedBlocks.size(); ++i) {
 		// Horizontal Group
 		for(uint32_t j = 0; j < failedBlocks[i]; ++j) {
-			symbol = make_pair((failedBlocks[i] - 1)* symbolSize, symbolSize);
-			symbolListMap[j].push_back(symbol);
+			if(blockStatus[j] == true){
+				symbol = make_pair((failedBlocks[i] - 1)* symbolSize, symbolSize);
+				symbolListMap[j].push_back(symbol);
+			}
 		}
 		// Vertical Group
 		for(uint32_t j = failedBlocks[i]; j < blockGroupSize; ++j) {
-			symbol = make_pair(failedBlocks[i] * symbolSize, symbolSize);
-			symbolListMap[j + 1].push_back(symbol);
+			if(blockStatus[j + 1] == true){
+				symbol = make_pair(failedBlocks[i] * symbolSize, symbolSize);
+				symbolListMap[j + 1].push_back(symbol);
+			}
 		}
 	}
 
@@ -296,6 +300,7 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 	// Build Data Availability List
 	for(uint32_t i = 0; i < RSBlockCount; ++i) {
 		data_availability[i] = (RSBlockDataList[i].buf != NULL);
+		debug("%" PRIu32 "-%d\n", i, data_availability[i]);
 	}
 
 	vector<uint32_t> failedBlocks;
@@ -344,6 +349,7 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 				// Horizontal Group
 				RSBlockId = base_id_h[j] + id - (j + 1);
 		
+			debug("%" PRIu32 "-%" PRIu32 " <- %" PRIu32 "\n", id, j, RSBlockId);
 			memcpy(blockData.buf + j * symbolSize, RSBlockDataList[RSBlockId].buf, symbolSize);
 		}
 
