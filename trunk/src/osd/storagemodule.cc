@@ -379,7 +379,7 @@ uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
 	uint32_t byteWritten = 0;
 
 	string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
-	byteWritten = writeFile(filepath, buf, offsetInBlock, false, length);
+	byteWritten = writeFile(filepath, buf, offsetInBlock, length, false);
 
 	debug(
 			"Segment ID = %" PRIu64 " Block ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
@@ -523,6 +523,7 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 		usleep(IO_POLL_INTERVAL);
 	}
 
+	debug ("Length = %" PRIu32 "\n", length);
 	return length;
 #else
 	return doWriteFile (filepath, buf, offset, length, isCache, isFinished);
