@@ -31,3 +31,6 @@ test*
 decoded_file
 output*
 log/
+/o1
+/file1
+/lib
