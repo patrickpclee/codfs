@@ -71,6 +71,10 @@ vector<BlockData> EMBRCoding::encode(SegmentData segmentData, string setting) {
 		}
 	}
 
+	for(uint32_t i = 0; i < RSBlockDataList.size(); ++i) {
+		MemoryPool::getInstance().poolFree(RSBlockDataList[i].buf);
+	}
+
 	return blockDataList;
 }
 
