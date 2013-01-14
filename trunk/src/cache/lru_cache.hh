@@ -70,6 +70,13 @@ public:
 	}
 	;
 
+	void remove(const keyType &key) {
+		std::lock_guard<std::mutex> lk(_cacheMutex);
+		typename valueMapType::iterator it = _valueMap.find(key);
+        _valueMap.erase(it);
+        _accessTimeList.remove(key);
+	}
+
 	void pop_back() {
 		typename valueMapType::iterator it = _valueMap.find(
 				_accessTimeList.front());

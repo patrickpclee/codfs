@@ -97,6 +97,7 @@ message PutSegmentInitRequestPro {
 		RS_CODING = 4;
 		EMBR_CODING = 5;
 		CAUCHY = 6;
+		EVENODD_CODING = 7;
 		DEFAULT_CODING = 15;
 	}
 	

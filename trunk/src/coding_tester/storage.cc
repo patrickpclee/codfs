@@ -57,6 +57,7 @@ char* readFile(string filepath, uint32_t &filesize,
 
 	// allocate space
 	buf = MemoryPool::getInstance().poolMalloc(readSize);
+	fprintf(stderr,"%p\n",buf);
 
 	uint32_t currentOffset = 0;
 	for (auto offsetLength : offsetLengths) {

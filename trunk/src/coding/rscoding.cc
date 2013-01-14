@@ -138,74 +138,66 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
 
-	if (blockIdList.size() != k + m) {
-		int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
-		char **data, **code;
-		int *erasures;
-		int j = 0;
+	int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
+	char **data, **code;
+	int *erasures;
+	int j = 0;
 
-		data = talloc<char*, uint32_t>(k);
-		code = talloc<char*, uint32_t>(m);
-		erasures = talloc<int, uint32_t>(k + m - blockIdList.size() + 1);
+	data = talloc<char*, uint32_t>(k);
+	code = talloc<char*, uint32_t>(m);
+	erasures = talloc<int, uint32_t>(k + m - blockIdList.size() + 1);
 
-		for (uint32_t i = 0; i < k + m; i++) {
-			i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
-				talloc<char, uint32_t>(size);
-			if (blockIdListSet.count(i) > 0) {
-				i < k ? memcpy(data[i], blockDataList[i].buf, size) : memcpy(
-						code[i - k], blockDataList[i].buf, size);
-			} else {
-				erasures[j++] = i;
-			}
+	for (uint32_t i = 0; i < k + m; i++) {
+		i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
+			talloc<char, uint32_t>(size);
+		if (blockIdListSet.count(i) > 0) {
+			i < k ? memcpy(data[i], blockDataList[i].buf, size) : 
+				memcpy(code[i - k], blockDataList[i].buf, size);
+		} else {
+			erasures[j++] = i;
 		}
-		erasures[j] = -1;
-
-		jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
-
-		for (uint32_t i = 0; i < k + m - blockIdList.size(); i++) {
-			struct BlockData temp;
-			temp.info.segmentId = segmentData.info.segmentId;
-			temp.info.blockId = erasures[i];
-			temp.info.blockSize = size;
-
-			temp.buf = MemoryPool::getInstance().poolMalloc(size);
-			memcpy(temp.buf,
-					(uint32_t) erasures[i] < k ?
-					data[erasures[i]] : code[erasures[i] - k], size);
-
-			blockDataList[erasures[i]] = temp;
-		}
-
-		for (uint32_t i = 0; i < m; i++) {
-			MemoryPool::getInstance().poolFree(blockDataList[k + i].buf);
-		}
-
-		// free memory
-		for (uint32_t i = 0; i < k; i++) {
-			tfree(data[i]);
-		}
-		tfree(data);
-
-		for (uint32_t i = 0; i < m; i++) {
-			tfree(code[i]);
-		}
-		tfree(code);
-
 	}
+	erasures[j] = -1;
 
-	blockIdList.clear();
-	for (uint32_t i = 0; i < k; i++) {
-		blockIdList.push_back(i);
+	jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
+
+	for (uint32_t i = 0; i < k + m - blockIdList.size(); i++) {
+		struct BlockData temp;
+		temp.info.segmentId = segmentData.info.segmentId;
+		temp.info.blockId = erasures[i];
+		temp.info.blockSize = size;
+
+		temp.buf = MemoryPool::getInstance().poolMalloc(size);
+		memcpy(temp.buf,
+				(uint32_t) erasures[i] < k ?
+				data[erasures[i]] : code[erasures[i] - k], size);
+
+		blockDataList[erasures[i]] = temp;
 	}
 
 	uint64_t offset = 0;
 	for (uint32_t i = 0; i < k - 1; i++) {
-		memcpy(segmentData.buf + offset, blockDataList[i].buf,
-				blockDataList[i].info.blockSize);
-		offset += blockDataList[i].info.blockSize;
+		memcpy(segmentData.buf + offset, data[i], size);
+		offset += size;
 	}
-	memcpy(segmentData.buf + offset, blockDataList[k - 1].buf,
+	memcpy(segmentData.buf + offset, data[k - 1],
 			segmentSize - offset);
+
+
+	// free memory
+	for (uint32_t i = 0; i < k; i++) {
+		tfree(data[i]);
+	}
+	tfree(data);
+
+	for (uint32_t i = 0; i < m; i++) {
+		tfree(code[i]);
+	}
+	tfree(code);
+
+	tfree(erasures);
+
+	tfree(matrix);
 
 	return segmentData;
 }

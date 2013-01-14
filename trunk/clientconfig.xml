@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
     <Communication>
-		<NumClientThreads>10</NumClientThreads>
+		<NumClientThreads>4</NumClientThreads>
     </Communication>
     
     <Storage>

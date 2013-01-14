@@ -64,6 +64,11 @@ public:
 		_map[key]--;
 	}
 
+    size_t size() {
+		std::lock_guard<std::mutex> lk(this->_m);
+        return _map.size();
+    }
+
 };
 
 #endif /* CONCURRENTMAP_HH_ */
