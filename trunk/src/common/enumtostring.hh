@@ -73,6 +73,20 @@ public:
     return "???";
   }
 
+  static const char * toString( CodingScheme en ) {
+    switch( en ) {
+      case CAUCHY: return "CAUCHY";
+      case DEFAULT_CODING: return "DEFAULT_CODING";
+      case EMBR_CODING: return "EMBR_CODING";
+      case EVENODD_CODING: return "EVENODD_CODING";
+      case RAID0_CODING: return "RAID0_CODING";
+      case RAID1_CODING: return "RAID1_CODING";
+      case RAID5_CODING: return "RAID5_CODING";
+      case RS_CODING: return "RS_CODING";
+    }
+    return "???";
+  }
+
   static const char * toString( SegmentDataStatus en ) {
     switch( en ) {
       case CLEAN: return "CLEAN";
@@ -99,19 +113,6 @@ public:
       case COLD: return "COLD";
       case HOT: return "HOT";
       case HOTTEST: return "HOTTEST";
-    }
-    return "???";
-  }
-
-  static const char * toString( CodingScheme en ) {
-    switch( en ) {
-      case DEFAULT_CODING: return "DEFAULT_CODING";
-      case EMBR_CODING: return "EMBR_CODING";
-      case EVENODD_CODING: return "EVENODD_CODING";
-      case RAID0_CODING: return "RAID0_CODING";
-      case RAID1_CODING: return "RAID1_CODING";
-      case RAID5_CODING: return "RAID5_CODING";
-      case RS_CODING: return "RS_CODING";
     }
     return "???";
   }

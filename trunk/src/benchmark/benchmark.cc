@@ -84,13 +84,45 @@ void parseOption(int argc, char* argv[]) {
 		segmentSize = stringToByte(argv[4]);
 		numberOfSegment = fileSize / segmentSize;
 
-		debug("Testing %s with File Size %" PRIu64 " Segment Size %" PRIu32 "\n",
+		debug(
+				"Testing %s with File Size %" PRIu64 " Segment Size %" PRIu32 "\n",
 				argv[2], fileSize, segmentSize);
 
-		codingScheme = RAID1_CODING;
-		codingSetting = Raid1Coding::generateSetting(1);
-		//codingScheme = EMBR_CODING;
-		//codingSetting = EMBRCoding::generateSetting(4, 2, 8);
+		int benchmarkTest = atoi(argv[5]);
+
+		switch (benchmarkTest) {
+		case 0:
+			codingScheme = RAID0_CODING;
+			codingSetting = Raid0Coding::generateSetting(5);
+			break;
+		case 1:
+			codingScheme = RAID1_CODING;
+			codingSetting = Raid1Coding::generateSetting(1);
+			break;
+		case 2:
+			codingScheme = RAID1_CODING;
+			codingSetting = Raid1Coding::generateSetting(2);
+			break;
+		case 3:
+			codingScheme = RAID1_CODING;
+			codingSetting = Raid1Coding::generateSetting(3);
+			break;
+		case 4:
+			codingScheme = RAID5_CODING;
+			codingSetting = Raid5Coding::generateSetting(5);
+			break;
+		case 5:
+			codingScheme = RS_CODING;
+			codingSetting = RSCoding::generateSetting(4, 2, 8);
+			break;
+		case 6:
+			codingScheme = EMBR_CODING;
+			codingSetting = EMBRCoding::generateSetting(4, 2, 8);
+			break;
+		default:
+			debug("Invalid Test = %d\n", benchmarkTest);
+			break;
+		}
 		debug("Coding Setting: %s\n", codingSetting.c_str());
 	}
 
@@ -108,7 +140,7 @@ void prepareData() {
 		intptr[i] = rand();
 	}
 
-	checksum = (unsigned char*)calloc(MD5_DIGEST_LENGTH,1);
+	checksum = (unsigned char*) calloc(MD5_DIGEST_LENGTH, 1);
 
 #ifdef USE_CHECKSUM
 	MD5((unsigned char*) databuf, segmentSize, checksum);
@@ -306,7 +338,6 @@ int main(int argc, char *argv[]) {
 	cout << "Now Sleep 5 Seconds then Exit" << endl;
 	sleep(5);
 	exit(0);
-
 
 	garbageCollectionThread.join();
 	receiveThread.join();
