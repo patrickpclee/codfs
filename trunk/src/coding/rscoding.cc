@@ -96,15 +96,9 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 	}
 
 	// free memory
-	//for (uint32_t i = 0; i < k; i++) {
-	//	tfree(data[i]);
-	//}
 	tfree(data);
-
-	//for (uint32_t i = 0; i < m; i++) {
-	//	tfree(code[i]);
-	//}
 	tfree(code);
+	tfree(matrix);
 
 	return blockDataList;
 }
@@ -161,6 +155,7 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 
 	jerasure_matrix_decode(k, m, w, matrix, 1, erasures, data, code, size);
 
+	/*
 	for (uint32_t i = 0; i < k + m - blockIdList.size(); i++) {
 		struct BlockData temp;
 		temp.info.segmentId = segmentData.info.segmentId;
@@ -174,14 +169,14 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 
 		blockDataList[erasures[i]] = temp;
 	}
+	*/
 
 	uint64_t offset = 0;
 	for (uint32_t i = 0; i < k - 1; i++) {
 		memcpy(segmentData.buf + offset, data[i], size);
 		offset += size;
 	}
-	memcpy(segmentData.buf + offset, data[k - 1],
-			segmentSize - offset);
+	memcpy(segmentData.buf + offset, data[k - 1], segmentSize - offset);
 
 
 	// free memory
@@ -194,9 +189,7 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 		tfree(code[i]);
 	}
 	tfree(code);
-
 	tfree(erasures);
-
 	tfree(matrix);
 
 	return segmentData;
