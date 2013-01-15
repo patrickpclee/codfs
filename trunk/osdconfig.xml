@@ -3,6 +3,7 @@
     <Storage>
     	<SegmentCacheLocation>./osd_segment/</SegmentCacheLocation>
     	<BlockLocation>./osd_block/</BlockLocation>
+    	<RemoteBlockLocation>./remote_osd_block/</RemoteBlockLocation>
     	
     	<BlockCapacity>10G</BlockCapacity>
     	<SegmentCacheCapacity>100M</SegmentCacheCapacity>
