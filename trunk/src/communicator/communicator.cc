@@ -712,8 +712,10 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		ComponentType targetComponentType = 
 				requestHandshakeMsg->getTargetComponentType();
 		if (targetComponentType == OSD && componentType == OSD) {
-			string cmd = "mount ncds"+to_string(targetComponentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
-			system(cmd.c_str());
+			string cmd_umount = "umount ncds"+to_string(targetComponentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+			string cmd_mount = "mount ncds"+to_string(targetComponentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+			system(cmd_umount.c_str());
+			system(cmd_mount.c_str());
 		}
 #endif
 
@@ -747,8 +749,10 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 
 #ifdef MOUNT_OSD
 		if (componentType == OSD && _componentType == OSD) {
-			string cmd = "mount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
-			system(cmd.c_str());
+			string cmd_umount = "umount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+			string cmd_mount = "mount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+			system(cmd_umount.c_str());
+			system(cmd_mount.c_str());
 		}
 #endif
 
