@@ -86,6 +86,19 @@ public:
 
 	void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
 
+#ifdef MOUNT_OSD
+	/**
+	 * Create and open the file for storing the block on disk
+	 * @param osdId OSD ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param length Length of block
+	 */
+
+	void createRemoteBlock(uint32_t osdId, uint64_t segmentId, uint32_t blockId,
+			uint32_t length);
+#endif
+
 	/**
 	 * Read a part of an segment from the storage
 	 * @param segmentId SegmentID
@@ -106,8 +119,10 @@ public:
 	 * @return BlockData structure
 	 */
 
+	/* deprecated
 	struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
 			uint64_t offsetInBlock = 0, uint32_t length = 0);
+	*/
 
 	/**
 	 * Read symbols from a block
@@ -119,6 +134,18 @@ public:
 
 	struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
 			vector<offset_length_t> symbols);
+
+	/**
+	 * Read symbols from a remote block
+	 * @param osdId OSD ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param symbols A list of <offset, length> tuples
+	 * @return BlockData structure
+	 */
+
+	struct BlockData readRemoteBlock(uint32_t osdId, uint64_t segmentId,
+			uint32_t blockId, vector<offset_length_t> symbols);
 
 	/**
 	 * Write a partial segment to the storage
@@ -157,6 +184,23 @@ public:
 	uint32_t writeBlock(uint64_t segmentId, uint32_t blockId, char* buf,
 			uint64_t offsetInBlock, uint32_t length);
 
+#ifdef MOUNT_OSD
+	/**
+	 * Write a partial Block ID to a remote storage
+	 * @param osdId Destination OSD ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param buf Pointer to buffer containing data
+	 * @param offsetInSegment Offset of the trunk in the block
+	 * @param length Number of bytes of the trunk
+	 * @return Number of bytes written
+	 */
+
+	uint32_t writeRemoteBlock(uint32_t osdId, uint64_t segmentId,
+			uint32_t blockId, char* buf, uint64_t offsetInBlock,
+			uint32_t length);
+#endif
+
 	/**
 	 * Close and remove the segment cache after the transfer is finished
 	 * @param segmentId Segment ID
@@ -178,6 +222,17 @@ public:
 	 */
 
 	void flushBlock(uint64_t segmentId, uint32_t blockId);
+
+#ifdef MOUNT_OSD
+	/**
+	 * Close the block after the transfer is finished
+	 * @param osdId OSD ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 */
+
+	void flushRemoteBlock(uint32_t osdId, uint64_t segmentId, uint32_t blockId);
+#endif
 
 	/**
 	 * Get back the SegmentCache from segmentId
@@ -291,7 +346,7 @@ public:
 	 * @return ID of cached segments
 	 */
 
-	list <uint64_t> getSegmentCacheQueue();
+	list<uint64_t> getSegmentCacheQueue();
 
 private:
 
@@ -326,8 +381,8 @@ private:
 	 * @param segmentSize Number of bytes the segment takes
 	 * @param filepath Location of the segment in the filesystem
 
-	void writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
-			string filepath);
+	 void writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
+	 string filepath);
 	 */
 
 	/**
@@ -407,6 +462,20 @@ private:
 	string generateBlockPath(uint64_t segmentId, uint32_t blockId,
 			string blockFolder);
 
+#ifdef MOUNT_OSD
+	/**
+	 * Return the block path given Segment ID and Block ID
+	 * @param osdId Destination OSD ID
+	 * @param segmentId Segment ID
+	 * @param blockId Block ID
+	 * @param blockFolder Location where blocks are stored
+	 * @return filepath of the block in the filesystem
+	 */
+
+	string generateRemoteBlockPath(uint32_t osdId, uint64_t segmentId,
+			uint32_t blockId, string blockFolder);
+#endif
+
 	/**
 	 * Create a file on disk and open it
 	 * @param filepath Path of the file on storage
@@ -424,12 +493,12 @@ private:
 
 	FILE* openFile(string filepath);
 
-    /**
-     * Try to close the file before remove
+	/**
+	 * Try to close the file before remove
 	 * @param filepath Path to the file on disk
-     */
-    
-    void tryCloseFile(string filepath);
+	 */
+
+	void tryCloseFile(string filepath);
 
 	/**
 	 * Open the file and finds the size of it
@@ -447,6 +516,7 @@ private:
 	map<uint64_t, struct SegmentTransferCache> _segmentTransferCache;
 	string _segmentFolder;
 	string _blockFolder;
+	string _remoteBlockFolder;
 	uint64_t _maxBlockCapacity;
 	uint64_t _maxSegmentCache;
 	atomic<uint64_t> _freeBlockSpace;

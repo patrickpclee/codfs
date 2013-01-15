@@ -55,6 +55,7 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define DISK_PATH "/"
 #define RECOVERY_THREADS 10
 #define MAX_NUM_PROCESSING_SEGMENT 4
+#define MOUNT_OSD
 
 // osd/storagemodule.cc
 #define USE_SEGMENT_CACHE
