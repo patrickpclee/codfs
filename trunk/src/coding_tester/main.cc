@@ -135,7 +135,7 @@ uint32_t readConfig(const char* configFile) {
 		codingSetting = CauchyCoding::generateSetting((uint32_t) k, (uint32_t) m,
 				(uint32_t) w);
 		numBlocks = k + m;
-		cout << "Coding: Cauchy RS, k = " << k << " m = " << m << " w = "
+		cout << "Coding: Cauchy RS, k = " << k << " m = " << m << " w = " << w << endl;
 
 	} else if (selectedCoding == "EMBR") {
 
