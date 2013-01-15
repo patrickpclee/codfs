@@ -708,6 +708,14 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		// retrieve replied values
 		uint32_t targetComponentId =
 				requestHandshakeMsg->getTargetComponentId();
+#ifdef MOUNT_OSD
+		ComponentType targetComponentType = 
+				requestHandshakeMsg->getTargetComponentType();
+		if (targetComponentType == OSD && componentType == OSD) {
+			string cmd = "mount ncds"+to_string(targetComponentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+			system(cmd.c_str());
+		}
+#endif
 
 		// delete message
 		waitAndDelete(requestHandshakeMsg);
@@ -736,6 +744,13 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 
 	// save component type into connectionMap
 	_connectionMap[sockfd]->setConnectionType(componentType);
+
+#ifdef MOUNT_OSD
+		if (componentType == OSD && _componentType == OSD) {
+			string cmd = "mount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+			system(cmd.c_str());
+		}
+#endif
 
 	// prepare reply message
 	HandshakeReplyMsg* handshakeReplyMsg = new HandshakeReplyMsg(this,
