@@ -367,7 +367,7 @@ struct BlockData StorageModule::readRemoteBlock(uint32_t osdId,
 	}
 
 	struct BlockData blockData;
-	string blockPath = generateRemoteBlockPath(osdId, segmentId, blockId, _blockFolder);
+	string blockPath = generateRemoteBlockPath(osdId, segmentId, blockId, _remoteBlockFolder);
 	blockData.info.segmentId = segmentId;
 	blockData.info.blockId = blockId;
 	blockData.info.blockSize = combinedLength;
