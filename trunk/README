@@ -33,12 +33,14 @@ In Ubuntu, the following changes are needed
 
 -------------------------------
 
+// DEPRECATED
 5. Optional: Install Apache Runtime (For APR Memory Pool)
 
 > apt-get install libaprutil1-dev libapr1-dev
 
 -------------------------------
 
+// DEPRECATED
 6. Optional: Install tcmalloc (For replacing malloc with tcmalloc)
 
 (only required for 64-bit OS) > sudo apt-get install libunwind7 libunwind7-dev
