@@ -8,6 +8,8 @@
 typedef std::pair<uint32_t, uint32_t> offset_length_t;
 typedef std::pair<uint32_t, std::vector<offset_length_t> > symbol_list_t;
 typedef std::vector<symbol_list_t> block_list_t ;
+typedef std::pair<uint32_t, uint32_t> block_symbol_t;
+
 
 #define USLEEP_DURATION 10000
 
