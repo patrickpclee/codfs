@@ -16,30 +16,30 @@ In Ubuntu, the following changes are needed
 
 2. Install Prerequsite for MongoDB C++ Driver
 
-> apt-get install build-essential scons libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
+> sudo apt-get install build-essential scons libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
 > cd lib/mongo; scons install
 
 -------------------------------
 
 3. Install FUSE
 
-> apt-get install libfuse-dev
+> sudo apt-get install libfuse-dev
 
 -------------------------------
 
 4. Install OPENSSL
 
-> apt-get install libssl-dev
+> sudo apt-get install libssl-dev
 
 -------------------------------
 
-5. Optional: Install Apache Runtime (For APR Memory Pool)
+5. (DEPRECATED) Install Apache Runtime (For APR Memory Pool)
 
-> apt-get install libaprutil1-dev libapr1-dev
+> sudo apt-get install libaprutil1-dev libapr1-dev
 
 -------------------------------
 
-6. Optional: Install tcmalloc (For replacing malloc with tcmalloc)
+6. (DEPRECATED) Install tcmalloc (For replacing malloc with tcmalloc)
 
 (only required for 64-bit OS) > sudo apt-get install libunwind7 libunwind7-dev
 > sudo apt-get install libgoogle-perftools-dev
