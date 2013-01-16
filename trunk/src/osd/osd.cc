@@ -661,13 +661,17 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 		if (_pendingBlockChunk.get(blockKey) == 0) {
 
 			if (!isDownload) {
-				// write, close file and free cache
+				// write block in one go
 				string blockDataKey = to_string(segmentId) + "."
 						+ to_string(blockId);
 				struct BlockData blockData = _uploadBlockData.get(blockDataKey);
+
+				_storageModule->createBlock(segmentId, blockId, blockData.info.blockSize);
 				_storageModule->writeBlock(segmentId, blockId, blockData.buf, 0,
 						blockData.info.blockSize);
 				_storageModule->flushBlock(segmentId, blockId);
+
+				MemoryPool::getInstance().poolFree(blockData.buf);
 				_uploadBlockData.erase(blockDataKey);
 			} else {
 				_downloadBlockRemaining.decrement(segmentId);
@@ -733,8 +737,6 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 		string blockDataKey = to_string(segmentId) + "." + to_string(blockId);
 		_uploadBlockData.set(blockDataKey, blockData);
-
-		_storageModule->createBlock(segmentId, blockId, length);
 	}
 
 	_osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId, blockId);
