@@ -137,6 +137,7 @@ uint32_t readConfig(const char* configFile) {
 		numBlocks = k + m;
 		cout << "Coding: Cauchy RS, k = " << k << " m = " << m << " w = " << w << endl;
 
+
 	} else if (selectedCoding == "EMBR") {
 
 		int n = configLayer->getConfigInt("CodingSetting>EMBR>n");
