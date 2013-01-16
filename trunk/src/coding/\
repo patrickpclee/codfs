@@ -101,7 +101,7 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 	uint32_t diagonal_group_erasure[k];
 	uint32_t datadisk_block_erasure[k];
 	bool disk_block_status[n][k - 1];
-	bool need_diagonal_adjust[k][k - 1];
+	bool need_diagonal_adjust[k1][k - 1];
 	uint32_t numOfFailedDataDisk = k;
 	std::fill_n (row_group_erasure, k - 1, k + 1);
 	std::fill_n (diagonal_group_erasure, k - 1, k);
@@ -162,9 +162,9 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 	}
 
 
-	bool diagonal_parity_failed = !(diagonal_group_erasure[k - 1] == 0);
-	bool diagonal_clean[k];
-	std::fill_n(diagonal_clean, k , true);
+	bool diagonal_parity_failed = false;
+	if(diagonal_group_erasure[k] > 1)
+		diagonal_parity_failed = true;
 	vector<block_symbol_t> needDiagonalFix = {};
 
 	// Fix Failed Data Disk
@@ -172,6 +172,7 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 	uint32_t symbol;
 	uint32_t target_id;
 	uint32_t target_symbol;
+	uint32_t healthy_diagonal = k;
 	while(numOfFailedDataDisk > 0) {
 		for(uint32_t i = 0; i < k - 1; ++i){
 			debug("Row %" PRIu32 ": %" PRIu32 " Erasures, Diagonal %" PRIu32 ": %" PRIu32 " Erasures\n", i, row_group_erasure[i], i, diagonal_group_erasure[i]);
@@ -180,24 +181,17 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 		target_id = (uint32_t)-1;
 		target_symbol = (uint32_t)-1;
 		memset(repair_symbol, 0, symbolSize);
-		bool cur_symbol_need_adjust = false;
 		for(uint32_t i = 0; i < k - 1; ++i) {
 			// Fix by Row
 			if(use_row && (row_group_erasure[i] == 1)) {
-				cur_symbol_need_adjust = false;
 				symbol = i;
 				target_symbol = i;
 				for(uint32_t j = 0; j < k + 1; ++j) {
 					id = j;
 					if((id < k) && (disk_block_status[id][symbol] == false))
 						target_id = id;
-					else {
+					else
 						bitwiseXor(repair_symbol, repair_symbol, tempBlock[id] + symbol * symbolSize, symbolSize);
-						if(need_diagonal_adjust[id][symbol]){
-							debug("%" PRIu32 ":%" PRIu32 " toggles need adjustment\n", id, symbol);
-							cur_symbol_need_adjust = !cur_symbol_need_adjust;
-						}
-					}
 				}
 				
 				if(use_diagonal) {
@@ -206,7 +200,6 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 					if(diagonal_group == k - 1)
 						bitwiseXor(diagonal_parity, repair_symbol, diagonal_parity, symbolSize);
 					--diagonal_group_erasure[diagonal_group];
-					diagonal_clean[diagonal_group] = diagonal_clean[diagonal_group] != cur_symbol_need_adjust;
 				}
 
 				--row_group_erasure[symbol];
@@ -217,7 +210,6 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 
 			// Fix by Diagonal
 			if(use_diagonal && (diagonal_group_erasure[i] == 1)) {
-				cur_symbol_need_adjust = true;
 				for(uint32_t j = 0; j < k - 1; ++j){
 					id = (i - j + k) % k;
 					symbol = (i - id + k) % k;
@@ -226,17 +218,18 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 						target_symbol = symbol;
 					} else {
 						bitwiseXor(repair_symbol, repair_symbol, tempBlock[id] + symbol * symbolSize, symbolSize);
-						if(need_diagonal_adjust[id][symbol]){
-							debug("%" PRIu32 ":%" PRIu32 " toggles need adjustment\n", id, symbol);
-							cur_symbol_need_adjust = !cur_symbol_need_adjust;
-						}
 					}
 				}
 				bitwiseXor(repair_symbol, repair_symbol, tempBlock[k + 1] + i * symbolSize, symbolSize);
-
-				diagonal_clean[i] = diagonal_clean[i] != cur_symbol_need_adjust;
 				
+				if(diagonal_parity_failed)
+					needDiagonalFix.push_back(make_pair(target_id, target_symbol));
+				else
+					bitwiseXor(repair_symbol, repair_symbol, diagonal_parity, symbolSize);
+
 				diagonal_group_erasure[i] = 0;
+				if(healthy_diagonal == k)
+					healthy_diagonal = i;
 				if(use_row)
 					--row_group_erasure[target_symbol];
 				debug("Fix %" PRIu32 ":%" PRIu32 " with diagonal %" PRIu32 "\n", target_id, target_symbol, i);
@@ -244,36 +237,9 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 			}
 		}
 
-		// Fix Diagonal Adjuster
-		if(use_diagonal && (target_id == (uint32_t)-1) && (diagonal_group_erasure[k - 1] == 1)) {
-			cur_symbol_need_adjust = true;
-			id = k - 1;
-			symbol = 0;
-			for(uint32_t i = 0; i < k - 1; ++i) {
-				if(disk_block_status[id][symbol]){
-					bitwiseXor(repair_symbol, repair_symbol, tempBlock[id] + symbol * symbolSize, symbolSize);
-					if(need_diagonal_adjust[id][symbol]){
-						debug("%" PRIu32 ":%" PRIu32 " toggles need adjustment\n", id, symbol);
-						cur_symbol_need_adjust = !cur_symbol_need_adjust;
-					}
-				} else {
-					target_id = id;
-					target_symbol = symbol;
-				}
-				--id;
-				++symbol;
-			}
-		}
-
 		if(target_id == (uint32_t)-1){
 			debug_error("%s\n","Cannot fix any");
 			exit(-1);
-		}
-
-		if(cur_symbol_need_adjust) {
-			debug("%" PRIu32 ":%" PRIu32 " need diagonal adjustment\n", target_id, target_symbol);
-			need_diagonal_adjust[target_id][target_symbol] = true;
-			needDiagonalFix.push_back(make_pair(target_id, target_symbol));
 		}
 
 		disk_block_status[target_id][target_symbol] = true;
@@ -286,27 +252,59 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 			--numOfFailedDataDisk;
 			debug("Disk %" PRIu32 " Fixed, %" PRIu32 " Failure Left\n", target_id, numOfFailedDataDisk);
 		}
+		/*
+		if(use_diagonal) {
+			if(diagonal_group_erasure[k - 1] == 0) {
+				diagonal_parity_failed = false;
+			} else if((healthy_diagonal != k) && (diagonal_group_erasure[k - 1] == 1)) {
+				debug("Fix Diagonal %" PRIu32 " with Healthy Diagonal %" PRIu32 "\n", k - 1, healthy_diagonal);
+				memcpy(repair_symbol, tempBlock[k + 1] + healthy_diagonal * symbolSize, symbolSize);
+				// Special Handle Symbol Repair by Diagonal Group k - 1
+				for(uint32_t i = 0; i < k - 1; ++i) {
+					id = (healthy_diagonal - i + k) % k;
+					symbol = (healthy_diagonal - id + k) % k;
+					bitwiseXor(repair_symbol, repair_symbol, tempBlock[id] + symbol * symbolSize, symbolSize);
+				}
+				char* tempDiagonal = MemoryPool::getInstance().poolMalloc(symbolSize);
+				memcpy(tempDiagonal, repair_symbol, symbolSize); 
+				
+				bitwiseXor(repair_symbol, repair_symbol, diagonal_parity, symbolSize);
+				MemoryPool::getInstance().poolFree(diagonal_parity);
+				diagonal_parity = tempDiagonal;
+
+				id = k - 1;
+				symbol = 0;
+				for(uint32_t i = 0; i < k - 1; ++i) {
+					debug("%" PRIu32 ":%" PRIu32 "-%d\n",id, symbol, disk_block_status[id][symbol]);
+					if(disk_block_status[id][symbol] == false){
+						target_id = id;
+						target_symbol = symbol;
+						break;
+					}
+					--id;
+					++symbol;
+				}
+				debug("Fix %" PRIu32 ":%" PRIu32 " with diagonal %" PRIu32 "\n", target_id, target_symbol, k - 1);
+
+				if(use_row)
+					--row_group_erasure[target_symbol];
+				diagonal_group_erasure[k - 1] = 0;
+				diagonal_parity_failed = false;
+
+				disk_block_status[target_id][target_symbol] = true;
+				memcpy(tempBlock[target_id] + target_symbol * symbolSize, repair_symbol, symbolSize);
+				--datadisk_block_erasure[target_id];
+				debug("Disk %" PRIu32 " Erasure %" PRIu32 "\n", target_id, datadisk_block_erasure[target_id]);
+				if(datadisk_block_erasure[target_id] == 0){
+					--numOfFailedDataDisk;
+					debug("Disk %" PRIu32 " Fixed, %" PRIu32 " Failure Left\n", target_id, numOfFailedDataDisk);
+				}
+			}
+		}
+		*/
 	}
 
 	if(use_diagonal) {
-		// Find a Clean Diagonal Parity
-		//if(diagonal_parity_failed && !diagonal_clean[k - 1]) {
-		if(diagonal_parity_failed){
-			for(uint32_t i = 0; i < k - 1; ++i)
-				if(diagonal_clean[i]){
-					debug("Clean Diagonal Found at %" PRIu32 "\n", i);
-					memcpy(diagonal_parity, tempBlock[k + 1] + i * symbolSize, symbolSize);
-					id = i;
-					symbol = 0;
-					for(uint32_t j = 0; j < k - 1; ++j){
-						bitwiseXor(diagonal_parity, diagonal_parity, tempBlock[id] + symbol * symbolSize, symbolSize);
-						id = (id - 1 + k) % k; 
-						symbol++;
-					} 
-					break;
-				}
-		}
-
 		// Apply Diagonal Parity Adjuster
 		for(auto block_symbol : needDiagonalFix){
 			char* bufPtr = tempBlock[block_symbol.first] + block_symbol.second * symbolSize;
@@ -323,11 +321,6 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 	for(uint32_t i = 0; i < k - 1; ++i)
 		memcpy(segmentData.buf + i * blockSize, tempBlock[i], blockSize);
 	memcpy(segmentData.buf + (k - 1) * blockSize, tempBlock[k - 1], segmentSize - (k - 1) * blockSize);
-
-	for(uint32_t i = 0; i < n; ++i)
-		MemoryPool::getInstance().poolFree(tempBlock[i]);
-	MemoryPool::getInstance().poolFree(repair_symbol);
-	MemoryPool::getInstance().poolFree(diagonal_parity);
 	return segmentData;
 }
 
