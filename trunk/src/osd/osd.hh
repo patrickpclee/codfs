@@ -413,12 +413,13 @@ private:
 	ConcurrentMap<uint64_t, uint32_t> _pendingSegmentChunk;
 	ConcurrentMap<uint64_t, struct CodingSetting> _codingSettingMap;
 	ConcurrentMap<uint64_t, string> _checksumMap;
+	ConcurrentMap<string, BlockData> _uploadBlockData;
 
 	// download
 	ConcurrentMap<uint32_t, uint32_t> _blocktpRequestCount;
     atomic <uint32_t> _blocktpId;
 
-	ConcurrentMap<uint64_t, vector<struct BlockData>> _receivedBlockData;
+	ConcurrentMap<uint64_t, vector<struct BlockData>> _downloadBlockData;
 	ConcurrentMap<uint64_t, uint32_t> _downloadBlockRemaining;
 	ConcurrentMap<uint64_t, uint32_t> _segmentRequestCount;
 	ConcurrentMap<uint64_t, mutex*> _segmentDownloadMutex;

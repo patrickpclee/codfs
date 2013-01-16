@@ -244,10 +244,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				const uint32_t blockCount = requiredBlockSymbols.size();
 
 				_downloadBlockRemaining.set(segmentId, blockCount);
-				_receivedBlockData.set(segmentId,
+				_downloadBlockData.set(segmentId,
 						vector<struct BlockData>(totalNumOfBlocks));
 				vector<struct BlockData>& blockDataList =
-						_receivedBlockData.get(segmentId);
+						_downloadBlockData.get(segmentId);
 
 				debug("PendingBlockCount = %" PRIu32 "\n", blockCount);
 
@@ -280,8 +280,8 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 #ifdef MOUNT_OSD
 						// read block from mounted disk
 						struct BlockData blockData =
-								_storageModule->readRemoteBlock(osdId,
-										segmentId, i, blockSymbols.second);
+						_storageModule->readRemoteBlock(osdId,
+								segmentId, i, blockSymbols.second);
 
 						// blockDataList reserved space for "all blocks"
 						// only fill in data for "required blocks"
@@ -331,7 +331,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 							debug("%" PRIu32 " block %" PRIu32 " free-d\n",
 									i, blockDataList[i].info.blockId);
 						}
-						_receivedBlockData.erase(segmentId);
+						_downloadBlockData.erase(segmentId);
 #ifdef TIME_PONT
 						t5 = Clock::now();
 #endif
@@ -661,8 +661,14 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 		if (_pendingBlockChunk.get(blockKey) == 0) {
 
 			if (!isDownload) {
-				// close file and free cache
+				// write, close file and free cache
+				string blockDataKey = to_string(segmentId) + "."
+						+ to_string(blockId);
+				struct BlockData blockData = _uploadBlockData.get(blockDataKey);
+				_storageModule->writeBlock(segmentId, blockId, blockData.buf, 0,
+						blockData.info.blockSize);
 				_storageModule->flushBlock(segmentId, blockId);
+				_uploadBlockData.erase(blockDataKey);
 			} else {
 				_downloadBlockRemaining.decrement(segmentId);
 				debug("all chunks for block %" PRIu32 "is received\n", blockId);
@@ -711,7 +717,7 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_pendingBlockChunk.set(blockKey, chunkCount);
 
 	if (isDownload) {
-		struct BlockData& blockData = _receivedBlockData.get(segmentId)[blockId];
+		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
 
 		blockData.info.segmentId = segmentId;
 		blockData.info.blockId = blockId;
@@ -719,6 +725,15 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
 	} else {
 		// create file
+		BlockData blockData;
+		blockData.info.segmentId = segmentId;
+		blockData.info.blockId = blockId;
+		blockData.info.blockSize = length;
+		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+
+		string blockDataKey = to_string(segmentId) + "." + to_string(blockId);
+		_uploadBlockData.set(blockDataKey, blockData);
+
 		_storageModule->createBlock(segmentId, blockId, length);
 	}
 
@@ -735,36 +750,19 @@ uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 	uint32_t byteWritten = 0;
 	bool isDownload = _downloadBlockRemaining.count(segmentId);
 
-	// if the block received is for download process
 	if (isDownload) {
-		struct BlockData& blockData = _receivedBlockData.get(segmentId)[blockId];
-
-		debug("offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
+		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
 		memcpy(blockData.buf + offset, buf, length);
+		debug("[Download] block offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
 	} else {
-		byteWritten = _storageModule->writeBlock(segmentId, blockId, buf,
-				offset, length);
+		string blockDataKey = to_string(segmentId) + "." + to_string(blockId);
+		struct BlockData& blockData = _uploadBlockData.get(blockDataKey);
+		memcpy(blockData.buf + offset, buf, length);
+		debug("[Upload] block offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
 	}
 
 	_pendingBlockChunk.decrement(blockKey);
 
-	/*
-	 // if all chunks have arrived
-	 if (_pendingBlockChunk.get(blockKey) == 0) {
-
-	 if (!isDownload) {
-	 // close file and free cache
-	 _storageModule->flushBlock(segmentId, blockId);
-	 } else {
-	 _downloadBlockRemaining.decrement(segmentId);
-	 debug("all chunks for block %" PRIu32 "is received\n", blockId);
-	 }
-
-	 // remove from map
-	 _pendingBlockChunk.erase(blockKey);
-
-	 }
-	 */
 	return byteWritten;
 }
 
