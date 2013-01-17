@@ -54,7 +54,7 @@ typedef std::vector<symbol_list_t> block_list_t ;
 #define INF (1<<29)
 #define DISK_PATH "/"
 #define RECOVERY_THREADS 10
-#define MAX_NUM_PROCESSING_SEGMENT 4
+#define MAX_NUM_PROCESSING_SEGMENT 10
 //#define MOUNT_OSD
 
 // osd/storagemodule.cc
@@ -74,7 +74,7 @@ typedef std::vector<symbol_list_t> block_list_t ;
 
 // Receive Optimization
 #define RECV_BUF_PER_SOCKET 10485760
-#define USE_PARSING_THREADS
+//#define USE_PARSING_THREADS
 #define PARSING_THREADS 20
 
 
