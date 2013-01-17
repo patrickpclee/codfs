@@ -32,6 +32,8 @@ public:
 
 private:
 	uint32_t getParameters(string setting);
+	char** repairDataBlocks(vector<BlockData> &blockDataList,
+			block_list_t &symbolList, uint32_t segmentSize, string setting);
 };
 
 #endif
