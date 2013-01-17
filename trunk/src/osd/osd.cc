@@ -660,7 +660,11 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (_pendingBlockChunk.get(blockKey) == 0) {
 
-			if (!isDownload) {
+			if (isDownload) {
+				// for download, do nothing, handled by getSegmentRequestProcessor
+				_downloadBlockRemaining.decrement(segmentId);
+				debug("all chunks for block %" PRIu32 "is received\n", blockId);
+			} else {
 				// write block in one go
 				string blockDataKey = to_string(segmentId) + "."
 						+ to_string(blockId);
@@ -673,9 +677,6 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 				MemoryPool::getInstance().poolFree(blockData.buf);
 				_uploadBlockData.erase(blockDataKey);
-			} else {
-				_downloadBlockRemaining.decrement(segmentId);
-				debug("all chunks for block %" PRIu32 "is received\n", blockId);
 			}
 
 			// remove from map
