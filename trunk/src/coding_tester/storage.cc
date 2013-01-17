@@ -86,8 +86,8 @@ void writeFile(string filepath, char* buf, uint32_t length) {
 		exit(-1);
 	}
 
+	printf("buff: %p, length = %u\n", buf, length);
 	if (!file.write(buf, length)) {
-		printf("buff: %p, length = %u\n", buf, length);
 		perror ("Write");
 		cerr << "Cannot write " << filepath << " " << length << endl;
 		exit(-1);
