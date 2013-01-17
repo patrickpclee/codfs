@@ -148,7 +148,6 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
 		blockData.buf = readFile(blockPath, filesize, requiredBlockSymbols[j].second); // read block
-		debug("%p\n",blockData.buf);
 
 		// fill in block information
 		blockData.info.segmentId = segmentId;
@@ -208,55 +207,62 @@ void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 	}
 
 	// obtain required blockSymbols for repair
-	block_list_t blockSymbols = coding->getRepairBlockSymbols(repairBlockList,
+	block_list_t requiredBlockSymbols = coding->getRepairBlockSymbols(repairBlockList,
 			blockStatus, segmentSize, codingSetting);
 
-	if (blockSymbols.size() == 0) {
+	if (requiredBlockSymbols.size() == 0) {
 		cerr << "Not enough blocks to reconstruct file" << endl;
 		return;
+	}
+
+	cout << requiredBlockSymbols.size() << endl;
+
+	vector<uint32_t> requiredBlocks;
+	for (auto blockSymbol : requiredBlockSymbols) {
+		cout << blockSymbol.first << endl;
+		requiredBlocks.push_back(blockSymbol.first);
 	}
 
 	vector<BlockData> repairBlockData(
 			coding->getBlockCountFromSetting(codingSetting));
 
-	for (auto block : blockSymbols) {
-
-		uint32_t blockId = block.first;
-
-		vector<offset_length_t> offsetLength = block.second;
+	cout << "Reading Blocks: " << endl;
+	uint32_t j = 0;
+	for (uint32_t i : requiredBlocks) {
 
 		const string blockPath = blockFolder + "/" + to_string(segmentId) + "."
-				+ to_string(blockId);
+				+ to_string(i);
 
 		BlockData blockData;
 		uint32_t filesize; // set by reference in readFile
-		blockData.buf = readFile(blockPath, filesize); // read block
+		blockData.buf = readFile(blockPath, filesize, requiredBlockSymbols[j].second); // read block
 
 		// fill in block information
 		blockData.info.segmentId = segmentId;
-		blockData.info.blockId = blockId;
+		blockData.info.blockId = i;
 		blockData.info.blockSize = filesize;
 
-		cout << blockId << ": " << blockPath << " size = " << filesize << endl;
+		cout << i << ": " << blockPath << " size = " << filesize << endl;
 
-		repairBlockData[blockId] = blockData;
-
+		repairBlockData[i] = blockData;
+		j++;
 	}
 
 	// perform repair
 	vector<BlockData> repairedBlocks = coding->repairBlocks(repairBlockList,
-			repairBlockData, blockSymbols, segmentSize, codingSetting);
+			repairBlockData, requiredBlockSymbols, segmentSize, codingSetting);
 
 	// write segment to dstBlockPaths
 	uint32_t i = 0;
 	printf("before write files\n");
 	for (auto repairedblock : repairedBlocks) {
+		printf("%c\n",repairedblock.buf[0]);
 		writeFile(dstBlockPaths[i], repairedblock.buf, repairedblock.info.blockSize);
 		i++;
 	}
 
 	//free repairBlockData
-	for (auto block : blockSymbols) {
+	for (auto block : requiredBlockSymbols) {
 		uint32_t blockId = block.first;
 		MemoryPool::getInstance().poolFree(repairBlockData[blockId].buf);
 	}
