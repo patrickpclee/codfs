@@ -218,7 +218,7 @@ void Communicator::waitForMessage() {
 #ifdef USE_PARSING_THREADS
 			_sockfdMutexMap[conn->getSockfd()] = new std::mutex();
 #endif
-			_sockfdBufMap[conn->getSockfd()] = RecvBuffer();
+			_sockfdBufMap[conn->getSockfd()] = new RecvBuffer();
 			debug_cyan("Add socket to mutex and buf map %" PRIu32 "\n",
 					conn->getSockfd());
 
@@ -281,13 +281,13 @@ void Communicator::waitForMessage() {
 							continue;
 						} else {
 
-							struct RecvBuffer& rb = _sockfdBufMap[sockfd];
+							struct RecvBuffer* rb = _sockfdBufMap[sockfd];
 
 							int32_t byteRead =
 									p->second->getSocket()->aggressiveRecv(
-											rb.buf + rb.len,
-											RECV_BUF_PER_SOCKET - rb.len);
-							rb.len += byteRead;
+											rb->buf + rb->len,
+											RECV_BUF_PER_SOCKET - rb->len);
+							rb->len += byteRead;
 #ifdef USE_PARSING_THREADS
 							if (!_sockfdInQueueMap[sockfd] && byteRead != 0) {
 								debug_cyan("Add Recv to ThreadPool for socket %" PRIu32 " Read Byte %" PRIu32 "\n",sockfd, byteRead);
@@ -321,23 +321,23 @@ void Communicator::parsing(uint32_t sockfd) {
 #ifdef USE_PARSING_THREADS
 	lock_guard<mutex> lk(*_sockfdMutexMap[sockfd]);
 #endif
-	struct RecvBuffer& recvBuffer = _sockfdBufMap[sockfd];
-	debug("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer.len);
+	struct RecvBuffer* recvBuffer = _sockfdBufMap[sockfd];
+	debug("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer->len);
 	uint32_t idx = 0;
 	struct MsgHeader *msgHeader;
 	MsgType msgType;
-	while (idx + MSG_HEADER_SIZE <= recvBuffer.len) {
-		//memcpy((char*) &msgHeader, recvBuffer.buf + idx, MSG_HEADER_SIZE);
-		msgHeader = (struct MsgHeader*) (recvBuffer.buf + idx);
+	while (idx + MSG_HEADER_SIZE <= recvBuffer->len) {
+		//memcpy((char*) &msgHeader, recvBuffer->buf + idx, MSG_HEADER_SIZE);
+		msgHeader = (struct MsgHeader*) (recvBuffer->buf + idx);
 		msgType = msgHeader->protocolMsgType;
 		uint32_t totalMsgSize = MSG_HEADER_SIZE + msgHeader->protocolMsgSize
 				+ msgHeader->payloadSize;
 		debug_yellow(
 				"[%s] FOR SOCKET %" PRIu32 " RECV BUF SIZE %" PRIu32 " IDX = %" PRIu32 " TOTAL MSG SIZE %" PRIu32 "\n",
-				EnumToString::toString(msgType), sockfd, recvBuffer.len, idx, totalMsgSize);
-		if (idx + totalMsgSize <= recvBuffer.len) {
+				EnumToString::toString(msgType), sockfd, recvBuffer->len, idx, totalMsgSize);
+		if (idx + totalMsgSize <= recvBuffer->len) {
 			char* buffer = MemoryPool::getInstance().poolMalloc(totalMsgSize);
-			memcpy(buffer, recvBuffer.buf + idx, totalMsgSize);
+			memcpy(buffer, recvBuffer->buf + idx, totalMsgSize);
 			// DISPATCH
 			threadPools[msgType].schedule(
 					boost::bind(&Communicator::dispatch, this, buffer, sockfd,
@@ -351,8 +351,8 @@ void Communicator::parsing(uint32_t sockfd) {
 		}
 	}
 	if (idx > 0) {
-		memmove(recvBuffer.buf, recvBuffer.buf + idx, recvBuffer.len - idx);
-		recvBuffer.len = recvBuffer.len - idx;
+		memmove(recvBuffer->buf, recvBuffer->buf + idx, recvBuffer->len - idx);
+		recvBuffer->len = recvBuffer->len - idx;
 	}
 #ifdef USE_PARSING_THREADS
 	_sockfdInQueueMap[sockfd] = false;
@@ -855,7 +855,7 @@ void Communicator::connectToMyself(string ip, uint16_t port,
 #ifdef USE_PARSING_THREADS
 	_sockfdMutexMap[sockfd] = new std::mutex();
 #endif
-	_sockfdBufMap[sockfd] = RecvBuffer();
+	_sockfdBufMap[sockfd] = new RecvBuffer();
 	debug_cyan("connectToMySelf: Add socket to mutex and buf map %" PRIu32 "\n",
 			sockfd);
 	requestHandshake(sockfd, _componentId, _componentType);
@@ -870,7 +870,7 @@ void Communicator::connectToMonitor() {
 #ifdef USE_PARSING_THREADS
 	_sockfdMutexMap[sockfd] = new std::mutex();
 #endif
-		_sockfdBufMap[sockfd] = RecvBuffer();
+		_sockfdBufMap[sockfd] = new RecvBuffer();
 		debug_cyan(
 				"connectToMonitor: Add socket to mutex and buf map %" PRIu32 "\n",
 				sockfd);
@@ -887,7 +887,7 @@ void Communicator::connectToMds() {
 #ifdef USE_PARSING_THREADS
 	_sockfdMutexMap[sockfd] = new std::mutex();
 #endif
-		_sockfdBufMap[sockfd] = RecvBuffer();
+		_sockfdBufMap[sockfd] = new RecvBuffer();
 		debug_cyan(
 				"connectToMds: Add socket to mutex and buf map %" PRIu32 "\n",
 				sockfd);
@@ -901,7 +901,7 @@ void Communicator::connectToOsd(uint32_t dstOsdIp, uint32_t dstOsdPort) {
 #ifdef USE_PARSING_THREADS
 	_sockfdMutexMap[sockfd] = new std::mutex();
 #endif
-	_sockfdBufMap[sockfd] = RecvBuffer();
+	_sockfdBufMap[sockfd] = new RecvBuffer();
 	debug_cyan("connectToOsd: Add socket to mutex and buf map %" PRIu32 "\n",
 			sockfd);
 	requestHandshake(sockfd, _componentId, _componentType);

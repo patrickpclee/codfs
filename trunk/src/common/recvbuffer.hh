@@ -10,6 +10,9 @@ struct RecvBuffer {
 		len = 0;
 		buf = MemoryPool::getInstance().poolMalloc(RECV_BUF_PER_SOCKET);
 	}
+	~RecvBuffer() {
+		MemoryPool::getInstance().poolFree(buf);
+	}
 	uint32_t len;
 	char* buf;
 };
