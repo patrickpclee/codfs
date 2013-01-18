@@ -1003,6 +1003,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 
 }
 
+#ifdef USE_MULTIPLE_QUEUE
 void Communicator::lockDataQueue(uint32_t sockfd) {
 	_dataMutex[sockfd]->lock();
 }
@@ -1010,6 +1011,8 @@ void Communicator::lockDataQueue(uint32_t sockfd) {
 void Communicator::unlockDataQueue(uint32_t sockfd) {
 	_dataMutex[sockfd]->unlock();
 }
+#endif
+
 //
 // PRIVATE FUNCTIONS
 //
