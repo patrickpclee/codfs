@@ -967,13 +967,14 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 
 	// Step 1 : Send Init message (wait for reply)
 
+#ifdef SERIALIZE_DATA_QUEUE
+	lockDataQueue(sockfd);
+#endif
+
 	putSegmentInit(componentId, sockfd, segmentId, totalSize, chunkCount,
 			codingScheme, codingSetting, checksum);
 	debug("%s\n", "Put Segment Init ACK-ed");
 
-#ifdef SERIALIZE_DATA_QUEUE
-	lockDataQueue(sockfd);
-#endif
 	// Step 2 : Send data chunk by chunk
 
 	uint64_t byteToSend = 0;
@@ -996,11 +997,12 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	}
 
 	// Step 3: Send End message
+
+	putSegmentEnd(componentId, sockfd, segmentId);
+
 #ifdef SERIALIZE_DATA_QUEUE
 	unlockDataQueue(sockfd);
 #endif
-
-	putSegmentEnd(componentId, sockfd, segmentId);
 
 	cout << "Put Segment ID = " << segmentId << " Finished" << endl;
 
