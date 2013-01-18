@@ -141,7 +141,9 @@ int main(void) {
 	monitor = new Monitor();
 	MonitorCommunicator* communicator = monitor->getCommunicator();
 	StatModule* statmodule = monitor->getStatModule();
+#ifdef TRIGGER_RECOVERY
 	RecoveryModule* recoverymodule = monitor->getRecoveryModule();
+#endif
 
 	// set up communicator
 	communicator->setId(monitor->getMonitorId());
