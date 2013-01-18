@@ -178,7 +178,7 @@ SegmentData CauchyCoding::decode(vector<BlockData> &blockDataList,
 	if (blockIdList.size() != k + m) {
 		int *matrix = cauchy_good_general_coding_matrix(k, m, w);
 		int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
-		int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
+//		int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
 
 		char **data, **code;
 		int *erasures;
@@ -366,7 +366,7 @@ vector<BlockData> CauchyCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	//if (blockIdList.size() != k + m) {
 	int *matrix = cauchy_good_general_coding_matrix(k, m, w);
 	int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
-	int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
+//	int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
 
 	char **data, **code;
 	int *erasures;

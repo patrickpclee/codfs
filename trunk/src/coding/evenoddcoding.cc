@@ -86,7 +86,7 @@ vector<BlockData> EvenOddCoding::encode(SegmentData segmentData, string setting)
 		blockDataList[i] = blockData;
 	}
 
-	debug("Block Data List Count: %" PRIu32 "\n", blockDataList.size());
+	debug("Block Data List Count: %zu\n", blockDataList.size());
 	return blockDataList;
 }
 
