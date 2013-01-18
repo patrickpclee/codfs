@@ -53,7 +53,8 @@ pool threadPools[MSGTYPE_END];
 extern ConfigLayer* configLayer;
 
 // mutex
-mutex connectionMapMutex;
+boost::shared_mutex connectionMapMutex;
+boost::shared_mutex threadPoolMapMutex;
 
 const uint32_t MSG_HEADER_SIZE = sizeof(struct MsgHeader);
 
@@ -170,7 +171,7 @@ void Communicator::waitForMessage() {
 
 		// add all socket descriptors into sockfdSet
 		{
-			lock_guard<mutex> lk(connectionMapMutex);
+			boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 			for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 				FD_SET(p->second->getSockfd(), &sockfdSet);
 			}
@@ -197,7 +198,8 @@ void Communicator::waitForMessage() {
 
 			// add connection to _connectionMap
 			{
-				lock_guard<mutex> lk(connectionMapMutex);
+				boost::unique_lock<boost::shared_mutex> lock(
+						connectionMapMutex);
 				_connectionMap[conn->getSockfd()] = conn;
 #ifdef USE_MULTIPLE_QUEUE
 				//thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
@@ -230,7 +232,7 @@ void Communicator::waitForMessage() {
 
 		// if there is data in existing connections
 		{ // start critical session
-			lock_guard<mutex> lk(connectionMapMutex);
+			boost::upgrade_lock<boost::shared_mutex> lock(connectionMapMutex);
 			p = _connectionMap.begin();
 			while (p != _connectionMap.end()) {
 
@@ -250,6 +252,10 @@ void Communicator::waitForMessage() {
 						int nbytes = 0;
 						ioctl(p->second->getSockfd(), FIONREAD, &nbytes);
 						if (nbytes == 0) {
+
+							// upgrade shared lock to exclusive lock
+							boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
+									lock);
 
 							// disconnect and remove from _connectionMap
 							debug("SOCKFD = %" PRIu32 " connection lost\n",
@@ -451,7 +457,8 @@ void Communicator::sendMessage(uint32_t fd) {
 			}
 
 			{
-				lock_guard<mutex> lk(connectionMapMutex);
+				boost::shared_lock<boost::shared_mutex> lock(
+						connectionMapMutex);
 				if (!(_connectionMap.count(sockfd))) {
 					debug("Connection SOCKFD = %" PRIu32 " not found!\n",
 							sockfd);
@@ -502,7 +509,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 
 	// Save the connection into corresponding list
 	{
-		lock_guard<mutex> lk(connectionMapMutex);
+		boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 		_connectionMap[sockfd] = conn;
 #ifdef USE_MULTIPLE_QUEUE
 		//	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
@@ -530,7 +537,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
  */
 
 void Communicator::disconnectAndRemove(uint32_t sockfd) {
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	if (_connectionMap.count(sockfd)) {
 		Connection* conn = _connectionMap[sockfd];
@@ -548,7 +555,7 @@ uint32_t Communicator::getMdsSockfd() {
 	// TODO: assume return first MDS
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MDS) {
@@ -563,7 +570,7 @@ uint32_t Communicator::getMonitorSockfd() {
 	// TODO: assume return first Monitor
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == MONITOR) {
@@ -578,7 +585,7 @@ uint32_t Communicator::getOsdSockfd() {
 	// TODO: assume return first Osd
 	map<uint32_t, Connection*>::iterator p;
 
-	lock_guard<mutex> lk(connectionMapMutex);
+	boost::shared_lock<boost::shared_mutex> lock(connectionMapMutex);
 
 	for (p = _connectionMap.begin(); p != _connectionMap.end(); p++) {
 		if (p->second->getConnectionType() == OSD) {
@@ -1003,6 +1010,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 
 }
 
+#ifdef SERIALIZE_DATA_QUEUE
 void Communicator::lockDataQueue(uint32_t sockfd) {
 	_dataMutex[sockfd]->lock();
 }
@@ -1010,6 +1018,7 @@ void Communicator::lockDataQueue(uint32_t sockfd) {
 void Communicator::unlockDataQueue(uint32_t sockfd) {
 	_dataMutex[sockfd]->unlock();
 }
+#endif
 //
 // PRIVATE FUNCTIONS
 //
