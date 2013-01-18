@@ -39,6 +39,8 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 	// save connection info in private variables
 	_connectionType = connectionType;
 
+	_isDisconnected = false;
+
 	return _socket.getSockfd();
 }
 

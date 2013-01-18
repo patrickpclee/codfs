@@ -32,11 +32,11 @@ typedef std::vector<symbol_list_t> block_list_t ;
 
 // communicator/communicator.cc
 #define USE_THREAD_POOL
-//#define SERIALIZE_DATA_QUEUE
+#define SERIALIZE_DATA_QUEUE
 
 // communicator/communicator.hh
 #define USE_LOWLOCK_QUEUE
-//#define USE_MULTIPLE_QUEUE
+#define USE_MULTIPLE_QUEUE
 
 // config/config.hh
 #define DEFAULT_CONFIG_PATH	"config.xml"
