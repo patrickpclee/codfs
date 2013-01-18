@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+	<Storage>
+		<SegmentCacheLocation>./osd_segment/</SegmentCacheLocation>
+		<BlockLocation>./osd_block/</BlockLocation>
+		<BlockCapacity>10G</BlockCapacity>
+		<SegmentCacheCapacity>100M</SegmentCacheCapacity>
+		<ReportCacheInterval>5</ReportCacheInterval> <!-- sleep -->
+	</Storage>
+	<ThreadPool>
+		<NumThreads>10</NumThreads>
+	</ThreadPool>
+</NcvfsConfig>
