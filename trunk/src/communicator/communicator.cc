@@ -654,32 +654,48 @@ void Communicator::dispatch(char* buf, uint32_t sockfd,
 }
 
 #ifdef USE_MULTIPLE_QUEUE
-Message* Communicator::popMessage(uint32_t fd) {
-#else
-	Message* Communicator::popMessage() {
-#endif
-	Message* message = NULL;
 
+Message* Communicator::popMessage(uint32_t fd) {
+	Message* message = NULL;
 #ifdef USE_LOWLOCK_QUEUE
-#ifdef USE_MULTIPLE_QUEUE
 	if (_outMessageQueue[fd]->pop(message) != false) {
-#else
-		if (_outMessageQueue.pop(message) != false) {
-#endif
 		return message;
-#ifdef USE_MULTIPLE_QUEUE
 	} else if (_outDataQueue[fd]->pop(message) != false) {
-#else
-	} else if (_outDataQueue.pop(message) != false) {
-#endif
 		return message;
 	} else
 		return NULL;
 #else
-	_outMessageQueue.wait_and_pop(message);
-	return message;
+	if (_outMessageQueue[fd]->try_pop(message) != false) {
+		return message;
+	} else if (_outDataQueue[fd]->try_pop(message) != false) {
+		return message;
+	} else
+		return NULL;
 #endif
 }
+
+#else
+Message* Communicator::popMessage() {
+	Message* message = NULL;
+
+#ifdef USE_LOWLOCK_QUEUE
+	if (_outMessageQueue.pop(message) != false) {
+		return message;
+	} else if (_outDataQueue.pop(message) != false) {
+		return message;
+	} else
+		return NULL;
+#else
+	if (_outMessageQueue->try_pop(message) != false) {
+		return message;
+	} else if (_outDataQueue->try_pop(message) != false) {
+		return message;
+	} else
+		return NULL;
+#endif
+}
+
+#endif
 
 void Communicator::waitAndDelete(Message* message) {
 	GarbageCollector::getInstance().addToDeleteList(message);
