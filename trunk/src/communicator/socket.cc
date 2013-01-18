@@ -101,23 +101,25 @@ int32_t Socket::sendn(const char* buf, int32_t buf_len) {
 		// check if tcp socket is writable
 		// -----------
 
-		fd_set wfds;
-		struct timeval tv = { 0, 0 };
-		int retval;
+        if(DEBUG) {
+            fd_set wfds;
+            struct timeval tv = { 0, 0 };
+            int retval;
 
-		FD_ZERO(&wfds);
-		FD_SET(m_sock, &wfds);
+            FD_ZERO(&wfds);
+            FD_SET(m_sock, &wfds);
 
-		retval = select(m_sock + 1, NULL, &wfds, NULL, &tv);
+            retval = select(m_sock + 1, NULL, &wfds, NULL, &tv);
 
-		if (retval == -1)
-			perror("select()\n");
-		else if (retval)
-			debug ("FD = %" PRIu32 " Writable\n", sd);
-		else
-			debug ("FD = %" PRIu32 " Not Writable\n", sd);
+            if (retval == -1)
+                perror("select()\n");
+            else if (retval)
+                debug ("FD = %" PRIu32 " Writable\n", sd);
+            else
+                debug ("FD = %" PRIu32 " Not Writable\n", sd);
 
-		fflush(stdout);
+            fflush(stdout);
+        }
 
 		// -----------
 
