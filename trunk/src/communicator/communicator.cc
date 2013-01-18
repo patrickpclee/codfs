@@ -282,6 +282,7 @@ void Communicator::waitForMessage() {
 							// hack: post-increment adjusts iterator even erase is called
 //							_connectionMap.erase(p++);
 							p->second->setIsDisconnected(true);
+							p++;
 
 							continue;
 						} else {
