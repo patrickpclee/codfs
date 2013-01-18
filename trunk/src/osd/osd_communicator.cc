@@ -173,11 +173,11 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 
 	// Step 3: Send End message
 
-	putBlockEnd(sockfd, segmentId, blockId);
-
 #ifdef SERIALIZE_DATA_QUEUE
 	unlockDataQueue(sockfd);
 #endif
+
+	putBlockEnd(sockfd, segmentId, blockId);
 
 	cout << "Put Block ID = " << segmentId << "." << blockId << " Finished"
 			<< endl;

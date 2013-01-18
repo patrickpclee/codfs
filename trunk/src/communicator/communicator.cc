@@ -1004,11 +1004,11 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 
 	// Step 3: Send End message
 
-	putSegmentEnd(componentId, sockfd, segmentId);
-
 #ifdef SERIALIZE_DATA_QUEUE
 	unlockDataQueue(sockfd);
 #endif
+
+	putSegmentEnd(componentId, sockfd, segmentId);
 
 	cout << "Put Segment ID = " << segmentId << " Finished" << endl;
 
