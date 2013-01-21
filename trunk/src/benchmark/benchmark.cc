@@ -1,6 +1,7 @@
 #include <iostream>
 #include <signal.h>
 #include <chrono>
+#include <ctime>
 #include <openssl/md5.h>
 #include <boost/thread/thread.hpp>
 
@@ -72,11 +73,22 @@ boost::threadpool::pool _tp;
 
 void parseOption(int argc, char* argv[]) {
 
+
 	if (strcmp(argv[2], "download") == 0) {
+		if (argc < 4) {
+			cout << "Download: ./BENCHMARK [ID] download [FILEID]" << endl;
+			exit(-1);
+		}
 		download = true;
 		fileId = atoi(argv[3]);
 		debug("Downloading File %" PRIu32 "\n", fileId);
 	} else {
+
+		if (argc < 5) {
+			cout << "Upload: ./BENCHMARK [ID] upload [FILESIZE] [SEGMENTSIZE] [CODING_TEST]"
+					<< endl;
+			exit (-1);
+		}
 
 		fileName = to_string(time(NULL));
 
@@ -191,6 +203,9 @@ void testDownload() {
 void testUpload() {
 	typedef chrono::high_resolution_clock Clock;
 	typedef chrono::milliseconds milliseconds;
+
+	cout << "[UPLOAD START] " << getTime() << endl;
+
 	Clock::time_point t0 = Clock::now();
 
 	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(clientId,
@@ -226,6 +241,9 @@ void testUpload() {
 #endif
 
 	Clock::time_point t1 = Clock::now();
+
+	cout << "[UPLOAD END] " << getTime() << endl;
+
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1000.0;
 
@@ -257,13 +275,6 @@ void startReceiveThread(Communicator* _clientCommunicator) {
 }
 
 int main(int argc, char *argv[]) {
-
-	if (argc < 4) {
-		cout << "Upload: ./BENCHMARK [ID] upload [FILESIZE] [SEGMENTSIZE]"
-				<< endl;
-		cout << "Download: ./BENCHMARK [ID] download [FILEID]" << endl;
-		exit(-1);
-	}
 	// handle signal for profiler
 	signal(SIGINT, sighandler);
 
