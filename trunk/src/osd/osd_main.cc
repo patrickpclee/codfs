@@ -103,8 +103,10 @@ int main(int argc, char* argv[]) {
 	thread sendThread(&Communicator::sendMessage, communicator);
 #endif
 
+#ifdef USE_SEGMENT_CACHE
 	// 4. Cache Thread
 	thread cacheThread (&Osd::reportRemovedCache, osd);
+#endif
 
 	uint32_t selfAddr = getInterfaceAddressV4(interfaceName);
 	uint16_t selfPort = communicator->getServerPort();
@@ -124,6 +126,10 @@ int main(int argc, char* argv[]) {
 	sendThread.join();
 #endif
 	//testThread.join();
+
+#ifdef USE_SEGMENT_CACHE
+	cacheThread.join();
+#endif
 
 	// cleanup
 	delete configLayer;
