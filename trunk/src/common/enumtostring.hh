@@ -82,6 +82,7 @@ public:
       case RAID0_CODING: return "RAID0_CODING";
       case RAID1_CODING: return "RAID1_CODING";
       case RAID5_CODING: return "RAID5_CODING";
+      case RDP_CODING: return "RDP_CODING";
       case RS_CODING: return "RS_CODING";
     }
     return "???";
