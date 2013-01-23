@@ -160,6 +160,9 @@ void prepareData() {
 }
 
 void testDownload() {
+
+	cout << "[BENCHMARK START] " << getTime() << endl;
+
 	typedef chrono::high_resolution_clock Clock;
 	typedef chrono::milliseconds milliseconds;
 	Clock::time_point t0 = Clock::now();
@@ -187,6 +190,9 @@ void testDownload() {
 #endif
 
 	Clock::time_point t1 = Clock::now();
+
+	cout << "[BENCHMARK END] " << getTime() << endl;
+
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1000.0;
 
@@ -204,7 +210,7 @@ void testUpload() {
 	typedef chrono::high_resolution_clock Clock;
 	typedef chrono::milliseconds milliseconds;
 
-	cout << "[UPLOAD START] " << getTime() << endl;
+	cout << "[BENCHMARK START] " << getTime() << endl;
 
 	Clock::time_point t0 = Clock::now();
 
@@ -242,7 +248,7 @@ void testUpload() {
 
 	Clock::time_point t1 = Clock::now();
 
-	cout << "[UPLOAD END] " << getTime() << endl;
+	cout << "[BENCHMARK END] " << getTime() << endl;
 
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1000.0;
