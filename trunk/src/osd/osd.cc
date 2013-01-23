@@ -364,12 +364,16 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	_segmentRequestCount.decrement(segmentId);
 	if (_segmentRequestCount.get(segmentId) == 0) {
 		_segmentRequestCount.erase(segmentId);
+
+		// make a copy of segmentData and then erase
+		SegmentData tempSegmentData = segmentData;
 		_segmentDataMap.erase(segmentId);
+
 		segmentRequestCountMutex.unlock();
 		isLocked = false;
 
-		cacheSegment(segmentId, segmentData);
-		freeSegment(segmentId, segmentData);
+		cacheSegment(segmentId, tempSegmentData);
+		freeSegment(segmentId, tempSegmentData);
 
 		debug("%s\n", "[DOWNLOAD] Cleanup completed");
 	}
