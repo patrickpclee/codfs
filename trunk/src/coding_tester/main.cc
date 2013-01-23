@@ -11,6 +11,7 @@
 #include "../coding/raid1coding.hh"
 #include "../coding/raid5coding.hh"
 #include "../coding/evenoddcoding.hh"
+#include "../coding/rdpcoding.hh"
 #include "../coding/rscoding.hh"
 #include "../coding/cauchycoding.hh"
 #include "../coding/embrcoding.hh"
@@ -113,6 +114,14 @@ uint32_t readConfig(const char* configFile) {
 		codingSetting = EvenOddCoding::generateSetting(n);
 		numBlocks = coding->getBlockCountFromSetting(codingSetting);
 		cout << "Coding: Even Odd, n = " << n << endl;
+
+	} else if (selectedCoding == "RDP") {
+
+		int n = configLayer->getConfigInt("CodingSetting>RDP>n");
+		coding = new RDPCoding();
+		codingSetting = RDPCoding::generateSetting(n);
+		numBlocks = coding->getBlockCountFromSetting(codingSetting);
+		cout << "Coding: RDP, n = " << n << endl;
 
 	} else if (selectedCoding == "RS") {
 

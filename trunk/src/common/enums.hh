@@ -112,7 +112,8 @@ enum CodingScheme {
 	RS_CODING = 4,
 	EMBR_CODING = 5,
 	CAUCHY = 6,
-	EVENODD_CODING = 7
+	EVENODD_CODING = 7,
+	RDP_CODING = 8
 };
 
 enum HotnessAlgorithm{
