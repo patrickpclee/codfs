@@ -140,7 +140,6 @@ void Osd::freeSegment(uint64_t segmentId, SegmentData segmentData) {
 	MemoryPool::getInstance().poolFree(segmentData.buf);
 	debug("segment %" PRIu64 "free-d\n", segmentId);
 
-	_segmentDataMap.erase(segmentId);
 }
 
 /**
@@ -365,6 +364,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	_segmentRequestCount.decrement(segmentId);
 	if (_segmentRequestCount.get(segmentId) == 0) {
 		_segmentRequestCount.erase(segmentId);
+		_segmentDataMap.erase(segmentId);
 		segmentRequestCountMutex.unlock();
 		isLocked = false;
 
