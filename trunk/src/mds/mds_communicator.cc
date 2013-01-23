@@ -29,6 +29,10 @@ vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
 
 	vector<uint32_t> newCacheOsdList;
 
+	if (osdList.size() < req.numOfNewCache) {
+		return {};
+	}
+
 	// random select a few
 	while ((uint32_t) newCacheOsdList.size() < req.numOfNewCache) {
 		int idx = rand() % osdList.size();

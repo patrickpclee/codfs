@@ -348,7 +348,7 @@ void Communicator::parsing(uint32_t sockfd) {
 			threadPools[msgType].schedule(
 					boost::bind(&Communicator::dispatch, this, buffer, sockfd,
 							0));
-			debug("Add Thread Pool [%s] %d/%d/%d\n",
+			debug("Add Thread Pool [%s] Active: %d/Pending: %d/Size: %d\n",
 					EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
 			idx += totalMsgSize;
 		} else {
