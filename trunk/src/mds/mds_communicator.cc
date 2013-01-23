@@ -29,6 +29,7 @@ vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
 
 	vector<uint32_t> newCacheOsdList;
 
+	std::sort(osdList.begin(), osdList.end());
 	std::vector<uint32_t>::iterator it;
 	it = std::unique (osdList.begin(), osdList.end());
 
