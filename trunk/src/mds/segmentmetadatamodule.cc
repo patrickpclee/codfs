@@ -17,7 +17,7 @@ SegmentMetaDataModule::SegmentMetaDataModule(
 		ConfigMetaDataModule* configMetaDataModule) {
 	_configMetaDataModule = configMetaDataModule;
 
-	_collection = "Segment Meta Data";
+	_collection = "SegmentMetaData";
 
 	_segmentMetaDataStorage = new MongoDB();
 	_segmentMetaDataStorage->connect();
