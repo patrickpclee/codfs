@@ -99,14 +99,22 @@ block_list_t Raid0Coding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	const uint32_t raid0_n = getParameters(setting);
 	block_list_t requiredBlockSymbols(raid0_n);
 	uint32_t blockSize = roundTo(segmentSize, raid0_n) / raid0_n;
+	uint32_t lastBlockSize = segmentSize - blockSize * (raid0_n - 1);
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
-		offset_length_t symbol = make_pair(0, blockSize);
+
+		offset_length_t symbol;
+		if (i == raid0_n - 1) {
+			symbol = make_pair(0, lastBlockSize);
+		} else {
+			symbol = make_pair(0, blockSize);
+		}
 		vector<offset_length_t> symbolList = { symbol };
 		symbol_list_t blockSymbolPair = make_pair(i, symbolList);
 
 		requiredBlockSymbols[i] = blockSymbolPair;
 	}
+
 	return requiredBlockSymbols;
 }
 

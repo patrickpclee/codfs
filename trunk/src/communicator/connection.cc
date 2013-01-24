@@ -16,10 +16,11 @@
 using namespace std;
 
 Connection::Connection() {
-
+	_isDisconnected = false;
 }
 
 Connection::Connection(string ip, uint16_t port, ComponentType connectionType) {
+	_isDisconnected = false;
 	doConnect(ip, port, connectionType);
 }
 
@@ -38,6 +39,7 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 
 	// save connection info in private variables
 	_connectionType = connectionType;
+
 
 	return _socket.getSockfd();
 }

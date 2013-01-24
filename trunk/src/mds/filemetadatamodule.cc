@@ -14,7 +14,7 @@ using namespace mongo;
 FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModule) {
 	_configMetaDataModule = configMetaDataModule;
 
-	_collection = "File Meta Data";
+	_collection = "FileMetaData";
 
 	_fileMetaDataStorage = new MongoDB();
 	_fileMetaDataStorage->connect();

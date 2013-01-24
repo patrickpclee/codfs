@@ -29,11 +29,23 @@ vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
 
 	vector<uint32_t> newCacheOsdList;
 
+	std::sort(osdList.begin(), osdList.end());
+	std::vector<uint32_t>::iterator it;
+	it = std::unique (osdList.begin(), osdList.end());
+
+	uint32_t adjustedNumOfNewCache = (it - osdList.begin()) - req.cachedOsdList.size();
+
+	if (adjustedNumOfNewCache < req.numOfNewCache) {
+		req.numOfNewCache = adjustedNumOfNewCache;
+	}
+
 	// random select a few
 	while ((uint32_t) newCacheOsdList.size() < req.numOfNewCache) {
 		int idx = rand() % osdList.size();
 		if (find(req.cachedOsdList.begin(), req.cachedOsdList.end(),
-				osdList[idx]) == req.cachedOsdList.end()) {
+				osdList[idx]) == req.cachedOsdList.end() &&
+			find(newCacheOsdList.begin(), newCacheOsdList.end(),
+				osdList[idx]) == newCacheOsdList.end()) {
 			newCacheOsdList.push_back(osdList[idx]);
 		}
 	}

@@ -90,9 +90,19 @@ public:
 
 	ComponentType getConnectionType();
 
+	void setIsDisconnected (bool isDisconnected) {
+		_isDisconnected = isDisconnected;
+	}
+
+	bool getIsDisconnected () {
+		return _isDisconnected;
+	}
+
+
 private:
 	Socket _socket;
 	ComponentType _connectionType;
+	bool _isDisconnected;
 };
 
 #endif
