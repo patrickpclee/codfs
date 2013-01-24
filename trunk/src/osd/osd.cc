@@ -650,7 +650,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t blockId) {
+		uint64_t segmentId, uint32_t blockId, bool isRecovery) {
 
 	// TODO: check integrity of block received
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
@@ -711,7 +711,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId, uint32_t length,
-		uint32_t chunkCount) {
+		uint32_t chunkCount, bool isRecovery) {
 
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
 	bool isDownload = _downloadBlockRemaining.count(segmentId);
@@ -747,7 +747,7 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId, uint32_t offset, uint32_t length,
-		char* buf) {
+		char* buf, bool isRecovery) {
 
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
 

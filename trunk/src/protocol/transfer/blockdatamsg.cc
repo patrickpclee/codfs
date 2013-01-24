@@ -19,7 +19,8 @@ BlockDataMsg::BlockDataMsg(Communicator* communicator) :
 }
 
 BlockDataMsg::BlockDataMsg(Communicator* communicator, uint32_t osdSockfd,
-		uint64_t segmentId, uint32_t blockId, uint64_t offset, uint32_t length) :
+		uint64_t segmentId, uint32_t blockId, uint64_t offset, uint32_t length,
+		bool isRecovery) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -27,7 +28,8 @@ BlockDataMsg::BlockDataMsg(Communicator* communicator, uint32_t osdSockfd,
 	_blockId = blockId;
 	_offset = offset;
 	_length = length;
-	
+	_isRecovery = isRecovery;
+
 }
 
 void BlockDataMsg::prepareProtocolMsg() {
@@ -38,6 +40,7 @@ void BlockDataMsg::prepareProtocolMsg() {
 	blockDataPro.set_blockid(_blockId);
 	blockDataPro.set_offset(_offset);
 	blockDataPro.set_length(_length);
+	blockDataPro.set_isrecovery(_isRecovery);
 
 	if (!blockDataPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -62,6 +65,7 @@ void BlockDataMsg::parse(char* buf) {
 	_blockId = blockDataPro.blockid();
 	_offset = blockDataPro.offset();
 	_length = blockDataPro.length();
+	_isRecovery = blockDataPro.isrecovery();
 
 }
 
@@ -72,6 +76,7 @@ void BlockDataMsg::doHandle() {
 }
 
 void BlockDataMsg::printProtocol() {
-	debug("[BLOCK_DATA] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", offset = %" PRIu64 ", length = %" PRIu32 "\n",
-			_segmentId, _blockId, _offset, _length);
+	debug(
+			"[BLOCK_DATA] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", offset = %" PRIu64 ", length = %" PRIu32 ", isRecovery = %d\n",
+			_segmentId, _blockId, _offset, _length, _isRecovery);
 }

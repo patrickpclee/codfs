@@ -14,7 +14,8 @@ PutBlockInitRequestMsg::PutBlockInitRequestMsg(Communicator* communicator) :
 }
 
 PutBlockInitRequestMsg::PutBlockInitRequestMsg(Communicator* communicator,
-		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId, uint32_t blockSize, uint32_t chunkCount) :
+		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId,
+		uint32_t blockSize, uint32_t chunkCount, bool isRecovery) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -22,7 +23,8 @@ PutBlockInitRequestMsg::PutBlockInitRequestMsg(Communicator* communicator,
 	_blockId = blockId;
 	_blockSize = blockSize;
 	_chunkCount = chunkCount;
-	
+	_isRecovery = isRecovery;
+
 }
 
 void PutBlockInitRequestMsg::prepareProtocolMsg() {
@@ -32,6 +34,7 @@ void PutBlockInitRequestMsg::prepareProtocolMsg() {
 	putBlockInitRequestPro.set_blockid(_blockId);
 	putBlockInitRequestPro.set_blocksize(_blockSize);
 	putBlockInitRequestPro.set_chunkcount(_chunkCount);
+	putBlockInitRequestPro.set_isrecovery(_isRecovery);
 
 	if (!putBlockInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -56,18 +59,20 @@ void PutBlockInitRequestMsg::parse(char* buf) {
 	_blockId = putBlockInitRequestPro.blockid();
 	_blockSize = putBlockInitRequestPro.blocksize();
 	_chunkCount = putBlockInitRequestPro.chunkcount();
+	_isRecovery = putBlockInitRequestPro.isrecovery();
 
 }
 
 void PutBlockInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	debug("[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
-			_segmentId, _blockId, _blockSize, _chunkCount);
-	osd->putBlockInitProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _blockSize, _chunkCount);
+	debug("[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 ", isRecovery = %d\n",
+			_segmentId, _blockId, _blockSize, _chunkCount, _isRecovery);
+	osd->putBlockInitProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _blockSize, _chunkCount, _isRecovery);
 #endif
 }
 
 void PutBlockInitRequestMsg::printProtocol() {
-	debug("[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "\n",
-			_segmentId, _blockId, _blockSize, _chunkCount);
+	debug(
+			"[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 ", isRecovery = %d\n",
+			_segmentId, _blockId, _blockSize, _chunkCount, _isRecovery);
 }

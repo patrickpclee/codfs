@@ -302,13 +302,7 @@ message PutBlockInitRequestPro {
 	optional fixed32 blockId = 2;
 	optional fixed32 blockSize = 3;
 	optional fixed32 chunkCount = 4;
-}
-
-message RecoveryBlockDataPro {
-	optional fixed64 segmentId = 1;
-	optional fixed32 blockId = 2;
-	optional fixed32 length = 4;
-    optional fixed32 waitOnRequestId = 5;
+	optional bool isRecovery = 5;
 }
 
 message BlockDataPro {
@@ -316,11 +310,13 @@ message BlockDataPro {
 	optional fixed32 blockId = 2;
 	optional fixed64 offset = 3;
 	optional fixed32 length = 4;
+	optional bool isRecovery = 5;
 }
 
 message BlockTransferEndRequestPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
+	optional bool isRecovery = 3;
 }
 
 message PutBlockInitReplyPro {
@@ -331,7 +327,6 @@ message PutBlockInitReplyPro {
 message BlockTransferEndReplyPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
-	optional bool isRecovery = 3;
 }
 
 message GetBlockInitRequestPro {
@@ -346,11 +341,6 @@ message GetBlockInitReplyPro {
 	optional fixed32 blockId = 2;
 	optional fixed32 blockSize = 3;
 	optional fixed32 chunkCount = 4;
-}
-
-message GetBlockReadyPro {
-	optional fixed64 segmentId = 1;
-	optional fixed32 blockId = 2;
 }
 
 //

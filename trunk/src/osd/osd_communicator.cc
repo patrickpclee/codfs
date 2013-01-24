@@ -25,7 +25,6 @@
 #include "../protocol/transfer/blocktransferendrequest.hh"
 #include "../protocol/transfer/blocktransferendreply.hh"
 #include "../protocol/transfer/blockdatamsg.hh"
-#include "../protocol/transfer/recoveryblockdatamsg.hh"
 #include "../protocol/nodelist/getsecondarylistrequest.hh"
 #include "../protocol/status/osdstartupmsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
@@ -165,7 +164,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 		}
 
 		putBlockData(sockfd, segmentId, blockId, buf, byteProcessed,
-				byteToSend);
+				byteToSend, isRecovery);
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
 
@@ -177,7 +176,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 	unlockDataQueue(sockfd);
 #endif
 
-	putBlockEnd(sockfd, segmentId, blockId);
+	putBlockEnd(sockfd, segmentId, blockId, isRecovery);
 
 	cout << "Put Block ID = " << segmentId << "." << blockId << " Finished"
 			<< endl;
@@ -277,7 +276,7 @@ void OsdCommunicator::putBlockInit(uint32_t sockfd, uint64_t segmentId,
 	// Step 1 of the upload process
 
 	PutBlockInitRequestMsg* putBlockInitRequestMsg = new PutBlockInitRequestMsg(
-			this, sockfd, segmentId, blockId, length, chunkCount);
+			this, sockfd, segmentId, blockId, length, chunkCount, isRecovery);
 
 	putBlockInitRequestMsg->prepareProtocolMsg();
 	addMessage(putBlockInitRequestMsg, true);
@@ -299,7 +298,7 @@ void OsdCommunicator::putBlockData(uint32_t sockfd, uint64_t segmentId,
 
 	// Step 2 of the upload process
 	BlockDataMsg* blockDataMsg = new BlockDataMsg(this, sockfd, segmentId,
-			blockId, offset, length);
+			blockId, offset, length, isRecovery);
 
 	blockDataMsg->prepareProtocolMsg();
 	blockDataMsg->preparePayload(buf + offset, length);
