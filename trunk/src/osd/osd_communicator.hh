@@ -107,20 +107,12 @@ public:
 	 * Send a block to another OSD
 	 * @param sockfd Socket Descriptor of the destination
 	 * @param blockData BlockData structure
+	 * @param isRecovery isRecovery
 	 * @return 0 if success, -1 if failure
 	 */
 
-	uint32_t sendBlock(uint32_t sockfd, struct BlockData blockData);
-
-	/**
-	 * Send a recovery block to another OSD
-	 * @param requestId Request ID
-	 * @param sockfd Socket Descriptor of the destination
-	 * @param blockData BlockData structure
-	 * @return 0 if success, -1 if failure
-	 */
-	uint32_t sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
-			struct BlockData blockData);
+	uint32_t sendBlock(uint32_t sockfd, struct BlockData blockData,
+			bool isRecovery = false);
 
 	/**
 	 * Send a request to get a block to other OSD
@@ -131,7 +123,7 @@ public:
 	 */
 
 	void getBlockRequest(uint32_t osdId, uint64_t segmentId, uint32_t blockId,
-			vector<offset_length_t> symbols);
+			vector<offset_length_t> symbols, bool isRecovery = false);
 
 	/**
 	 * Send a request to get a recovery block to other OSD
@@ -176,7 +168,8 @@ public:
 	 * @return SegmentTransferOsdInfo struct
 	 */
 
-	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId, uint32_t osdId, bool needReply = true);
+	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId,
+			uint32_t osdId, bool needReply = true);
 
 	/**
 	 * Send acknowledgement to MDS when upload is complete
@@ -226,10 +219,11 @@ private:
 	 * @param blockId Block ID
 	 * @param length Size of the segment
 	 * @param chunkCount Number of chunks that will be sent
+	 * @param isRecovery isRecovery
 	 */
 
 	void putBlockInit(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
-			uint32_t length, uint32_t chunkCount);
+			uint32_t length, uint32_t chunkCount, bool isRecovery = false);
 
 	/**
 	 * Send an segment chunk to OSD (Step 2)
@@ -239,19 +233,23 @@ private:
 	 * @param buf Buffer containing the segment
 	 * @param offset Offset of the chunk inside the buffer
 	 * @param length Length of the chunk
+	 * @param isRecovery isRecovery
 	 */
 
 	void putBlockData(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
-			char* buf, uint64_t offset, uint32_t length);
+			char* buf, uint64_t offset, uint32_t length,
+			bool isRecovery = false);
 
 	/**
 	 * Finalise upload process to OSD (Step 3)
 	 * @param sockfd Destination OSD Socket Descriptor
 	 * @param segmentId Segment ID
 	 * @param blockId Block ID
+	 * @param isRecovery isRecovery
 	 */
 
-	void putBlockEnd(uint32_t sockfd, uint64_t segmentId, uint32_t blockId);
+	void putBlockEnd(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
+			bool isRecovery = false);
 
 };
 

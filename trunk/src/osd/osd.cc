@@ -420,10 +420,7 @@ void Osd::getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
 	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
 			symbols);
-
-	// will block until reply is received
-	_osdCommunicator->sendRecoveryBlock(requestId, sockfd, blockData);
-
+	_osdCommunicator->sendBlock(sockfd, blockData, true);
 	MemoryPool::getInstance().poolFree(blockData.buf);
 }
 
