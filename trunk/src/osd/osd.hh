@@ -201,7 +201,7 @@ public:
 
 	void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t length,
-			uint32_t chunkCount);
+			uint32_t chunkCount, bool isRecovery = false);
 
 	/**
 	 * Distribute Blocks to OSD
@@ -229,7 +229,7 @@ public:
 
 	uint32_t putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t offset,
-			uint32_t length, char* buf);
+			uint32_t length, char* buf, bool isRecovery = false);
 
 	/**
 	 * Action when a put block end is received
@@ -240,7 +240,7 @@ public:
 	 */
 
 	void putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t blockId);
+			uint64_t segmentId, uint32_t blockId, bool isRecovery = false);
 
 	/**
 	 * Action when a recovery request is received

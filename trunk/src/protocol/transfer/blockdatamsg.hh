@@ -26,10 +26,8 @@ public:
 	 */
 
 	BlockDataMsg(Communicator* communicator, uint32_t dstSockfd,
-			uint64_t segmentId,
-			uint32_t blockId,
-			uint64_t offset,
-			uint32_t length);
+			uint64_t segmentId, uint32_t blockId, uint64_t offset,
+			uint32_t length, bool isRecovery);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -65,6 +63,7 @@ private:
 	uint32_t _blockId;
 	uint64_t _offset;
 	uint32_t _length;
+	bool _isRecovery;
 };
 
 #endif

@@ -19,7 +19,7 @@ public:
 	PutBlockInitRequestMsg(Communicator* communicator);
 
 	PutBlockInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t segmentId, uint32_t blockId, uint32_t blockSize, uint32_t chunkCount);
+			uint64_t segmentId, uint32_t blockId, uint32_t blockSize, uint32_t chunkCount, bool isRecovery);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -55,6 +55,7 @@ private:
 	uint32_t _blockId;
 	uint32_t _blockSize;
 	uint32_t _chunkCount;
+	bool _isRecovery;
 };
 
 #endif
