@@ -725,26 +725,30 @@ uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 		char* buf, bool isRecovery) {
 
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
-
-	uint32_t byteWritten = 0;
 	bool isDownload = _downloadBlockRemaining.count(segmentId);
 
-	if (isDownload) {
-		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
-		memcpy(blockData.buf + offset, buf, length);
-		debug("[Download] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
-				offset, length);
+	if (isRecovery) {
+			struct BlockData& blockData = _recoveryBlockData.get(blockKey);
+			memcpy(blockData.buf + offset, buf, length);
+			debug("[Recovery] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
+					offset, length);
 	} else {
-		string blockDataKey = to_string(segmentId) + "." + to_string(blockId);
-		struct BlockData& blockData = _uploadBlockData.get(blockDataKey);
-		memcpy(blockData.buf + offset, buf, length);
-		debug("[Upload] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
-				offset, length);
+		if (isDownload) {
+			struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
+			memcpy(blockData.buf + offset, buf, length);
+			debug("[Download] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
+					offset, length);
+		} else {
+			struct BlockData& blockData = _uploadBlockData.get(blockKey);
+			memcpy(blockData.buf + offset, buf, length);
+			debug("[Upload] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
+					offset, length);
+		}
+
+		_pendingBlockChunk.decrement(blockKey);
 	}
 
-	_pendingBlockChunk.decrement(blockKey);
-
-	return byteWritten;
+	return length;
 }
 
 void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
