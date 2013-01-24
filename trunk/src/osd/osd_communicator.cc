@@ -132,7 +132,7 @@ uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 }
 
 uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
-		struct BlockData blockData) {
+		struct BlockData blockData, bool isRecovery) {
 
 	uint64_t segmentId = blockData.info.segmentId;
 	uint32_t blockId = blockData.info.blockId;
@@ -147,7 +147,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 #endif
 
 	debug("Put Block Init to FD = %" PRIu32 "\n", sockfd);
-	putBlockInit(sockfd, segmentId, blockId, length, chunkCount);
+	putBlockInit(sockfd, segmentId, blockId, length, chunkCount, isRecovery);
 	debug("Put Block Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
 
 	// step 2: send data
@@ -185,40 +185,12 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 	return 0;
 }
 
-uint32_t OsdCommunicator::sendRecoveryBlock(uint32_t requestId, uint32_t sockfd,
-		struct BlockData blockData) {
-
-	uint64_t segmentId = blockData.info.segmentId;
-	uint32_t blockId = blockData.info.blockId;
-	uint32_t length = blockData.info.blockSize;
-	char* buf = blockData.buf;
-
-	uint32_t newRequestId = generateRequestId();
-
-	RecoveryBlockDataMsg* recoveryBlockDataMsg = new RecoveryBlockDataMsg(this,
-			requestId, sockfd, segmentId, blockId, length, newRequestId);
-
-	recoveryBlockDataMsg->prepareProtocolMsg();
-	recoveryBlockDataMsg->preparePayload(buf, length);
-
-	addMessage(recoveryBlockDataMsg, true, newRequestId);
-	MessageStatus status = recoveryBlockDataMsg->waitForStatusChange();
-
-	if (status == READY) {
-		debug("sendRecoveryBlock wait on %" PRIu32 "READY\n", newRequestId);
-        waitAndDelete(recoveryBlockDataMsg);
-		return 0;
-	}
-
-	return 0;
-}
-
 void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
-		uint32_t blockId, vector<offset_length_t> symbols) {
+		uint32_t blockId, vector<offset_length_t> symbols, bool isRecovery) {
 
 	uint32_t dstSockfd = getSockfdFromId(osdId);
 	GetBlockInitRequestMsg* getBlockInitRequestMsg = new GetBlockInitRequestMsg(
-			this, dstSockfd, segmentId, blockId, symbols);
+			this, dstSockfd, segmentId, blockId, symbols, isRecovery);
 	getBlockInitRequestMsg->prepareProtocolMsg();
 
 	addMessage(getBlockInitRequestMsg, false);
@@ -300,7 +272,7 @@ uint32_t OsdCommunicator::sendBlockAck(uint64_t segmentId, uint32_t blockId,
 //
 
 void OsdCommunicator::putBlockInit(uint32_t sockfd, uint64_t segmentId,
-		uint32_t blockId, uint32_t length, uint32_t chunkCount) {
+		uint32_t blockId, uint32_t length, uint32_t chunkCount, bool isRecovery) {
 
 	// Step 1 of the upload process
 
@@ -323,7 +295,7 @@ void OsdCommunicator::putBlockInit(uint32_t sockfd, uint64_t segmentId,
 }
 
 void OsdCommunicator::putBlockData(uint32_t sockfd, uint64_t segmentId,
-		uint32_t blockId, char* buf, uint64_t offset, uint32_t length) {
+		uint32_t blockId, char* buf, uint64_t offset, uint32_t length, bool isRecovery) {
 
 	// Step 2 of the upload process
 	BlockDataMsg* blockDataMsg = new BlockDataMsg(this, sockfd, segmentId,
@@ -336,7 +308,7 @@ void OsdCommunicator::putBlockData(uint32_t sockfd, uint64_t segmentId,
 }
 
 void OsdCommunicator::putBlockEnd(uint32_t sockfd, uint64_t segmentId,
-		uint32_t blockId) {
+		uint32_t blockId, bool isRecovery) {
 
 	// Step 3 of the upload process
 
