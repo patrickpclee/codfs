@@ -172,6 +172,9 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 	//_metaDataModule->saveNodeList(segmentId, segmentNodeList);
 	//_metaDataModule->setPrimary(segmentId, segmentNodeList[0]);
 
+
+#ifdef USE_SEGMENT_CACHE
+
 	// add primary to cache list
 	_hotnessModule->updateSegmentCache(segmentId, segmentNodeList[0]);
 
@@ -190,6 +193,9 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 		_hotnessModule->updateSegmentCache(segmentId, newAdded);
 		//debug ("%s\n", "HAHA upload");
 	}
+
+#endif
+
 	return;
 }
 
@@ -310,6 +316,8 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 				segmentMetaData._codingScheme, segmentMetaData._codingSetting);
 	}
 
+#ifdef USE_SEGMENT_CACHE
+
 	// add primary to cache list
 	_hotnessModule->updateSegmentCache(segmentId, osdId);
 
@@ -327,6 +335,8 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 		_hotnessModule->updateSegmentCache(segmentId, newAdded);
 		//debug ("%s\n", "HAHA download");
 	}
+
+#endif
 
 	return;
 }

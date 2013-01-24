@@ -37,6 +37,11 @@ StorageModule::StorageModule() {
 			"Storage>SegmentCacheLocation");
 	_blockFolder = configLayer->getConfigString("Storage>BlockLocation");
 
+#ifdef MOUNT_OSD
+	_remoteBlockFolder = configLayer->getConfigString(
+			"Storage>RemoteBlockLocation");
+#endif
+
 #ifdef USE_IO_THREADS
 	// create threadpool
 	_iotp.size_controller().resize(IO_THREADS);
@@ -221,6 +226,20 @@ void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
 			segmentId, blockId, length, filepath.c_str());
 }
 
+#ifdef MOUNT_OSD
+void StorageModule::createRemoteBlock(uint32_t osdId, uint64_t segmentId,
+		uint32_t blockId, uint32_t length) {
+
+	const string filepath = generateRemoteBlockPath(osdId, segmentId, blockId,
+			_remoteBlockFolder);
+	createFile(filepath);
+
+	debug(
+			"Remote Block created OsdID = %" PRIu32 " Segment ID = %" PRIu64 " BlockID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
+			osdId, segmentId, blockId, length, filepath.c_str());
+}
+#endif
+
 bool StorageModule::isSegmentCached(uint64_t segmentId) {
 
 #ifndef USE_SEGMENT_CACHE
@@ -274,6 +293,7 @@ struct SegmentData StorageModule::readSegment(uint64_t segmentId,
 
 }
 
+/* deprecated
 struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 		uint64_t offsetInBlock, uint32_t length) {
 
@@ -304,6 +324,7 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 
 	return blockData;
 }
+*/
 
 struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 		vector<offset_length_t> symbols) {
@@ -335,6 +356,39 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 	return blockData;
 
 }
+
+#ifdef MOUNT_OSD
+struct BlockData StorageModule::readRemoteBlock(uint32_t osdId,
+		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
+
+	uint32_t combinedLength = 0;
+	for (auto offsetLengthPair : symbols) {
+		combinedLength += offsetLengthPair.second;
+	}
+
+	struct BlockData blockData;
+	string blockPath = generateRemoteBlockPath(osdId, segmentId, blockId, _remoteBlockFolder);
+	blockData.info.segmentId = segmentId;
+	blockData.info.blockId = blockId;
+	blockData.info.blockSize = combinedLength;
+	blockData.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
+	char* bufptr = blockData.buf;
+
+	//uint32_t blockOffset = 0;
+	for (auto offsetLengthPair : symbols) {
+		uint32_t offset = offsetLengthPair.first;
+		uint32_t length = offsetLengthPair.second;
+		readFile(blockPath, bufptr, offset, length, false);
+		bufptr += length;
+	}
+
+	debug( "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " read %zu symbols\n",
+			segmentId, blockId, symbols.size());
+
+	return blockData;
+
+}
+#endif
 
 uint32_t StorageModule::writeSegmentTransferCache(uint64_t segmentId, char* buf,
 		uint64_t offsetInSegment, uint32_t length) {
@@ -391,6 +445,28 @@ uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
 	return byteWritten;
 }
 
+#ifdef MOUNT_OSD
+uint32_t StorageModule::writeRemoteBlock(uint32_t osdId, uint64_t segmentId,
+		uint32_t blockId, char* buf, uint64_t offsetInBlock, uint32_t length) {
+
+	uint32_t byteWritten = 0;
+
+	string filepath = generateRemoteBlockPath(osdId, segmentId, blockId,
+			_remoteBlockFolder);
+	byteWritten = writeFile(filepath, buf, offsetInBlock, length, false);
+
+	debug(
+			"Remote Write: Osd ID = %" PRIu32 "  Segment ID = %" PRIu64 " Block ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
+			osdId, segmentId, blockId, byteWritten, offsetInBlock);
+
+	// TODO: update remote block freespace?
+	//	updateBlockFreespace(length);
+	//	closeFile(filepath);
+
+	return byteWritten;
+}
+#endif
+
 void StorageModule::closeSegmentTransferCache(uint64_t segmentId) {
 	// close cache
 	struct SegmentTransferCache segmentCache = getSegmentTransferCache(
@@ -431,6 +507,23 @@ void StorageModule::flushBlock(uint64_t segmentId, uint32_t blockId) {
 		return; // file already closed by cache, do nothing
 	}
 }
+
+#ifdef MOUNT_OSD
+void StorageModule::flushRemoteBlock(uint32_t osdId, uint64_t segmentId,
+		uint32_t blockId) {
+
+	FILE* filePtr = NULL;
+	try {
+		string filepath = generateRemoteBlockPath(osdId, segmentId, blockId,
+				_remoteBlockFolder);
+		filePtr = _openedFile->get(filepath);
+		fflush(filePtr);
+		fsync(fileno(filePtr));
+	} catch (out_of_range& oor) { // file pointer not found in cache
+		return; // file already closed by cache, do nothing
+	}
+}
+#endif
 
 //
 // PRIVATE METHODS
@@ -480,8 +573,8 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
 uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length, bool isCache, bool &isFinished) {
 
-    // cache and segment share different mutex
-    lock_guard<mutex> lk(fileMutex[isCache]);
+	// cache and segment share different mutex
+	lock_guard<mutex> lk(fileMutex[isCache]);
 
 	debug("Read File :%s\n", filepath.c_str());
 
@@ -497,7 +590,8 @@ uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
 	uint32_t byteRead = pread(fileno(file), buf, length, offset);
 
 	if (byteRead != length) {
-		debug_error("ERROR: Length = %" PRIu32 ", Offset = %" PRIu64 ", byteRead = %" PRIu32 "\n",
+		debug_error(
+				"ERROR: Length = %" PRIu32 ", Offset = %" PRIu64 ", byteRead = %" PRIu32 "\n",
 				length, offset, byteRead);
 		perror("pread()");
 		exit(-1);
@@ -517,13 +611,14 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 	_iotp.schedule(
 			prio_task_func(priority,
 					boost::bind(&StorageModule::doWriteFile, this, filepath,
-							buf, offset, length, isCache, boost::ref(isFinished))));
+							buf, offset, length, isCache,
+							boost::ref(isFinished))));
 
 	while (!isFinished) {
 		usleep(IO_POLL_INTERVAL);
 	}
 
-	debug ("Length = %" PRIu32 "\n", length);
+	debug("Length = %" PRIu32 "\n", length);
 	return length;
 #else
 	return doWriteFile (filepath, buf, offset, length, isCache, isFinished);
@@ -533,8 +628,8 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
 uint32_t StorageModule::doWriteFile(string filepath, char* buf, uint64_t offset,
 		uint32_t length, bool isCache, bool &isFinished) {
 
-    // cache and segment share different mutex
-    lock_guard<mutex> lk(fileMutex[isCache]);
+	// cache and segment share different mutex
+	lock_guard<mutex> lk(fileMutex[isCache]);
 
 	FILE* file = openFile(filepath);
 
@@ -579,6 +674,20 @@ string StorageModule::generateBlockPath(uint64_t segmentId, uint32_t blockId,
 
 	return blockFolder + to_string(segmentId) + "." + to_string(blockId);
 }
+
+#ifdef MOUNT_OSD
+string StorageModule::generateRemoteBlockPath(uint32_t osdId,
+		uint64_t segmentId, uint32_t blockId, string remoteBlockFolder) {
+
+	// append a '/' if not present
+	if (remoteBlockFolder[remoteBlockFolder.length() - 1] != '/') {
+		remoteBlockFolder.append("/");
+	}
+
+	return remoteBlockFolder + to_string(osdId) + "/" + to_string(segmentId)
+			+ "." + to_string(blockId);
+}
+#endif
 
 /**
  * Create and open a new file
@@ -643,10 +752,10 @@ void StorageModule::tryCloseFile(string filepath) {
 	FILE* filePtr = NULL;
 	try {
 		filePtr = _openedFile->get(filepath);
-        fclose(filePtr);
-        _openedFile->remove(filepath);
+		fclose(filePtr);
+		_openedFile->remove(filepath);
 	} catch (out_of_range& oor) { // file pointer not found in cache
-        return;
+		return;
 	}
 }
 
@@ -684,7 +793,7 @@ int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
 		segmentId = _segmentCacheQueue.front();
 		segmentCache = _segmentDiskCacheMap.get(segmentId);
 
-        tryCloseFile (segmentCache.filepath);
+		tryCloseFile(segmentCache.filepath);
 		remove(segmentCache.filepath.c_str());
 
 		// update size
@@ -773,8 +882,8 @@ void StorageModule::clearSegmentDiskCache() {
 	lock_guard<mutex> lk(diskCacheMutex);
 
 	for (auto segment : _segmentCacheQueue) {
-        string filepath = _segmentFolder + to_string(segment);
-        tryCloseFile (filepath);
+		string filepath = _segmentFolder + to_string(segment);
+		tryCloseFile(filepath);
 		remove(filepath.c_str());
 	}
 

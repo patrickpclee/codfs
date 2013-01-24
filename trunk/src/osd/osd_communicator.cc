@@ -141,13 +141,15 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 	const uint32_t chunkCount = ((length - 1) / _chunkSize) + 1;
 
 	// step 1: send init message, wait for ack
-	debug("Put Block Init to FD = %" PRIu32 "\n", sockfd);
-	putBlockInit(sockfd, segmentId, blockId, length, chunkCount);
-	debug("Put Block Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
 
 #ifdef SERIALIZE_DATA_QUEUE
 	lockDataQueue(sockfd);
 #endif
+
+	debug("Put Block Init to FD = %" PRIu32 "\n", sockfd);
+	putBlockInit(sockfd, segmentId, blockId, length, chunkCount);
+	debug("Put Block Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
+
 	// step 2: send data
 
 	uint64_t byteToSend = 0;
@@ -168,11 +170,12 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 		byteRemaining -= byteToSend;
 
 	}
+
+	// Step 3: Send End message
+
 #ifdef SERIALIZE_DATA_QUEUE
 	unlockDataQueue(sockfd);
 #endif
-
-	// Step 3: Send End message
 
 	putBlockEnd(sockfd, segmentId, blockId);
 

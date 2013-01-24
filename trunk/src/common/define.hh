@@ -56,11 +56,12 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 #define INF (1<<29)
 #define DISK_PATH "/"
 #define RECOVERY_THREADS 10
-#define MAX_NUM_PROCESSING_SEGMENT 4
+#define MAX_NUM_PROCESSING_SEGMENT 10
+//#define MOUNT_OSD
 
 // osd/storagemodule.cc
 #define USE_SEGMENT_CACHE
-#define USE_IO_THREADS
+//#define USE_IO_THREADS
 #define IO_THREADS 2
 #define IO_POLL_INTERVAL 10000
 
@@ -75,7 +76,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 
 // Receive Optimization
 #define RECV_BUF_PER_SOCKET 10485760
-#define USE_PARSING_THREADS
+//#define USE_PARSING_THREADS
 #define PARSING_THREADS 20
 
 
