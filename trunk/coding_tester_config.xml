@@ -5,7 +5,7 @@
     <RepairFolder>./coding_tester_repair</RepairFolder>
 
 
-	<SelectedCodingScheme>CAUCHY</SelectedCodingScheme>
+	<SelectedCodingScheme>RDP</SelectedCodingScheme>
 
 	<CodingSetting>
 		<RAID0>
@@ -40,7 +40,7 @@
 		</EMBR>
 	</CodingSetting>
 
-	<NumFailedOsd>3</NumFailedOsd>
+	<NumFailedOsd>2</NumFailedOsd>
 
     
 </CodingTesterConfig>

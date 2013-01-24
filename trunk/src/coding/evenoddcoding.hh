@@ -30,9 +30,17 @@ public:
 		return to_string(n);
 	}
 
-private:
+protected:
+	virtual uint32_t getBlockSize(uint32_t segmentSize, uint32_t k) {
+		return roundTo(segmentSize, k * (k - 1)) / k;
+	}
+
+	virtual uint32_t getSymbolSize(uint32_t blockSize, uint32_t k) {
+		return blockSize / (k - 1);
+	}
+
 	uint32_t getParameters(string setting);
-	char** repairDataBlocks(vector<BlockData> &blockDataList,
+	virtual char** repairDataBlocks(vector<BlockData> &blockDataList,
 			block_list_t &symbolList, uint32_t segmentSize, string setting);
 };
 
