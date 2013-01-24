@@ -408,20 +408,13 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
+		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols,
+		bool isRecovery) {
 	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
 			symbols);
-	_osdCommunicator->sendBlock(sockfd, blockData);
+	_osdCommunicator->sendBlock(sockfd, blockData, isRecovery);
 	MemoryPool::getInstance().poolFree(blockData.buf);
 	debug("Block ID = %" PRIu32 " free-d\n", blockId);
-}
-
-void Osd::getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
-	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
-			symbols);
-	_osdCommunicator->sendBlock(sockfd, blockData, true);
-	MemoryPool::getInstance().poolFree(blockData.buf);
 }
 
 void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
@@ -433,42 +426,15 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		repairedBlock = _storageModule->readBlock(segmentId, blockId,
 				offsetLength);
 	} else {
-		repairedBlock = _osdCommunicator->getRecoveryBlock(osdId, segmentId,
-				blockId, offsetLength);
-		debug_cyan("[RECOVERY] Collected Symbols for Block %" PRIu32 "\n",
+		_osdCommunicator->getBlockRequest(osdId, segmentId, blockId,
+				offsetLength, true);
+		debug_cyan("[RECOVERY] Requested Symbols for Block %" PRIu32 "\n",
 				blockId);
+
+		// TODO: wait for block to arrive
 	}
 
 	_recoverytpRequestCount.decrement(recoverytpId);
-}
-
-void Osd::recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf,
-		uint32_t waitOnRequestId) {
-
-	// copy data
-	BlockData blockData;
-	blockData.info.segmentId = segmentId;
-	blockData.info.blockSize = length;
-	blockData.info.blockId = blockId;
-	blockData.buf = MemoryPool::getInstance().poolMalloc(length);
-	memcpy(blockData.buf, buf, length);
-
-	// attach data to request
-	GetBlockInitRequestMsg* getBlockInitRequestMsg =
-			(GetBlockInitRequestMsg*) _osdCommunicator->popWaitReplyMessage(
-					requestId);
-	getBlockInitRequestMsg->setRecoveryBlockData(blockData);
-	getBlockInitRequestMsg->setStatus(READY);
-
-	debug_yellow(
-			"Recovery block for segment %" PRIu64 " ,Block %" PRIu32 ", requestId %" PRIu32 " arrived\n",
-			segmentId, blockId, requestId);
-
-	// send reply
-	_osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId, blockId,
-			waitOnRequestId);
-
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
@@ -671,7 +637,8 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 						+ to_string(blockId);
 				struct BlockData blockData = _uploadBlockData.get(blockDataKey);
 
-				_storageModule->createBlock(segmentId, blockId, blockData.info.blockSize);
+				_storageModule->createBlock(segmentId, blockId,
+						blockData.info.blockSize);
 				_storageModule->writeBlock(segmentId, blockId, blockData.buf, 0,
 						blockData.info.blockSize);
 				_storageModule->flushBlock(segmentId, blockId);
@@ -717,32 +684,40 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 	bool isDownload = _downloadBlockRemaining.count(segmentId);
 
 	debug(
-			"[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "isDownload = %d\n",
-			segmentId, blockId, length, chunkCount, isDownload);
+			"[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "isDownload = %d, isRecovery = %d\n",
+			segmentId, blockId, length, chunkCount, isDownload, isRecovery);
 
-	_pendingBlockChunk.set(blockKey, chunkCount);
-
-	if (isDownload) {
-		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
-
-		blockData.info.segmentId = segmentId;
-		blockData.info.blockId = blockId;
-		blockData.info.blockSize = length;
-		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+	if (isRecovery) {
+		_pendingRecoveryBlockChunk.set(blockKey, chunkCount);
+			BlockData blockData;
+			blockData.info.segmentId = segmentId;
+			blockData.info.blockId = blockId;
+			blockData.info.blockSize = length;
+			blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+			_uploadBlockData.set(blockKey, blockData);
 	} else {
-		// create file
-		BlockData blockData;
-		blockData.info.segmentId = segmentId;
-		blockData.info.blockId = blockId;
-		blockData.info.blockSize = length;
-		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
 
-		string blockDataKey = to_string(segmentId) + "." + to_string(blockId);
-		_uploadBlockData.set(blockDataKey, blockData);
+		_pendingBlockChunk.set(blockKey, chunkCount);
+
+		if (isDownload) {
+			struct BlockData& blockData =
+					_downloadBlockData.get(segmentId)[blockId];
+
+			blockData.info.segmentId = segmentId;
+			blockData.info.blockId = blockId;
+			blockData.info.blockSize = length;
+			blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+		} else {
+			// create file
+			BlockData blockData;
+			blockData.info.segmentId = segmentId;
+			blockData.info.blockId = blockId;
+			blockData.info.blockSize = length;
+			blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+			_uploadBlockData.set(blockKey, blockData);
+		}
 	}
-
 	_osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId, blockId);
-
 }
 
 uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
@@ -757,12 +732,14 @@ uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 	if (isDownload) {
 		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
 		memcpy(blockData.buf + offset, buf, length);
-		debug("[Download] block offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
+		debug("[Download] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
+				offset, length);
 	} else {
 		string blockDataKey = to_string(segmentId) + "." + to_string(blockId);
 		struct BlockData& blockData = _uploadBlockData.get(blockDataKey);
 		memcpy(blockData.buf + offset, buf, length);
-		debug("[Upload] block offset = %" PRIu32 ", length = %" PRIu32 "\n", offset, length);
+		debug("[Upload] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
+				offset, length);
 	}
 
 	_pendingBlockChunk.decrement(blockKey);

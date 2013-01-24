@@ -100,11 +100,12 @@ public:
 	 * @param segmentId Segment ID
 	 * @param blockId Block ID
 	 * @param symbols List of symbols to retrieve
+	 * @param isRecovery isRecovery
 	 */
 
 	void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId,
-			vector<offset_length_t> symbols);
+			vector<offset_length_t> symbols, bool isRecovery = false);
 
 	/**
 	 * Action when a getRecoveryBlockRequest is received
@@ -118,21 +119,6 @@ public:
 	void getRecoveryBlockProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId,
 			vector<offset_length_t> symbols);
-
-	/**
-	 * Action when a recoveryBlockData is received
-	 * @param requestId Request ID
-	 * @param sockfd Socket descriptor of message source
-	 * @param segmentId Segment ID
-	 * @param blockId Block ID
-	 * @param length Length of recovery block data
-	 * @param buf Pointer to buffer
-	 * @param waitOnRequestId new request ID that this message should wait for reply
-	 */
-
-	void recoveryBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t blockId, uint32_t length, char* buf,
-			uint32_t waitOnRequestId);
 
 	/**
 	 * Get a recovery block from another OSD
@@ -427,6 +413,8 @@ private:
 	ConcurrentMap<uint64_t, bool> _isSegmentDownloaded;
 
 	// recovery
+	ConcurrentMap<string, uint32_t> _pendingRecoveryBlockChunk;
+	ConcurrentMap<string, BlockData> _recoveryBlockData;
 	ConcurrentMap<uint32_t, uint32_t> _recoverytpRequestCount;
     atomic <uint32_t> _recoverytpId;
 

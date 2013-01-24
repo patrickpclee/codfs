@@ -196,31 +196,6 @@ void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
 
 }
 
-BlockData OsdCommunicator::getRecoveryBlock(uint32_t osdId, uint64_t segmentId,
-		uint32_t blockId, vector<offset_length_t> symbols) {
-
-	uint32_t dstSockfd = getSockfdFromId(osdId);
-	GetBlockInitRequestMsg* getRecoveryBlockRequestMsg =
-			new GetBlockInitRequestMsg(this, dstSockfd, segmentId, blockId,
-					symbols, true); // is recovery
-	getRecoveryBlockRequestMsg->prepareProtocolMsg();
-
-	addMessage(getRecoveryBlockRequestMsg, true);
-	MessageStatus status = getRecoveryBlockRequestMsg->waitForStatusChange();
-
-	if (status == READY) {
-        BlockData blockData = getRecoveryBlockRequestMsg->getRecoveryBlockData();
-        waitAndDelete(getRecoveryBlockRequestMsg);
-        return blockData;
-	}
-
-	debug_error(
-			"ERROR: getRecoveryBlockData segmentId = %" PRIu64 " blockId = %" PRIu32 "\n",
-			segmentId, blockId);
-	return {};
-
-}
-
 vector<struct BlockLocation> OsdCommunicator::getOsdListRequest(
 		uint64_t segmentId, ComponentType dstComponent, uint32_t blockCount,
 		uint32_t primaryId, uint64_t blockSize) {
