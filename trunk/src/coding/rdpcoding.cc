@@ -28,8 +28,8 @@ RDPCoding::~RDPCoding() {
 vector<BlockData> RDPCoding::encode(SegmentData segmentData, string setting) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentData.info.segmentSize, k * k) / k;
-	const uint32_t symbolSize = blockSize / k;
+	const uint32_t blockSize = getBlockSize(segmentData.info.segmentSize, k);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	vector<struct BlockData> blockDataList;
 	blockDataList.reserve(n);
@@ -92,8 +92,8 @@ vector<BlockData> RDPCoding::encode(SegmentData segmentData, string setting) {
 char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_t &blockList, uint32_t segmentSize, string setting) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * k) / k;
-	const uint32_t symbolSize = blockSize / k;
+	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	uint32_t row_group_erasure[k];
 	uint32_t diagonal_group_erasure[k + 1];
@@ -223,8 +223,8 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * k) / k;
-	const uint32_t symbolSize = blockSize / k;
+	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 	const uint32_t numOfFailed = (uint32_t)std::count(blockStatus.begin(), blockStatus.end(), false);
 
 	if(numOfFailed > 2) {
@@ -234,7 +234,8 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		return getRequiredBlockSymbols(blockStatus, segmentSize, setting);
 	}
 
-	if (!blockStatus[k] || !blockStatus[k+1])
+	// Diagonal Failed
+	if (!blockStatus[k+1])
 		return getRequiredBlockSymbols(blockStatus, segmentSize, setting);
 
 	// Optimisation From 
@@ -244,67 +245,68 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 
 	uint32_t failedDisk = failedBlocks[0];
 
-	bool requiredSymbol[n][k - 1];
+	bool requiredSymbol[n][k];
 	for(uint32_t i = 0; i < n; ++i){
-		std::fill_n(requiredSymbol[i], k - 1, false);
+		std::fill_n(requiredSymbol[i], k, false);
 	}
 
-	uint32_t symbol = 0;
-	uint32_t id = k - 1;
-	uint32_t numOfRows = (k - 1) / 2;
-	uint32_t numOfDiagonals = k - 1 - numOfRows;
-	bool fixedSymbol[k - 1];
-	std::fill_n(fixedSymbol, k - 1, false);
+	uint32_t numOfRows = k / 2;
+	uint32_t numOfDiagonals = k - numOfRows;
+	bool fixedSymbol[k];
+	std::fill_n(fixedSymbol, k, false);
 
-	// Read Diagonal Adjuster
-	for(uint32_t i = 0 ; i < k - 1; ++i) {
-		if(id == failedDisk) {
-			for(uint32_t j = 0; j < k + 1; ++j) {
-				if(j == failedDisk) continue;
+	uint32_t symbol;
+
+
+	// Force Row Fix for Symbol on Diagonal K
+	symbol = k - failedDisk;
+	if(symbol < k) {
+		for(uint32_t j = 0; j < k + 1; ++j) {
+			if(j != failedDisk){ 
 				requiredSymbol[j][symbol] = true;
 			}
-			fixedSymbol[symbol] = true;
-			--numOfRows;
-		} else
-			requiredSymbol[id][symbol] = true;
-		--id;
-		++symbol;
+		}
+		fixedSymbol[symbol] = true;
+		debug("Row %" PRIu32 "\n", symbol);
+		--numOfRows;
 	}
+	
 
-	id = failedDisk;
 	symbol = 0;
-	// Read k - 1 / 2 rows
 	for(uint32_t i = 0; i < numOfRows; ++i) {
 		while(fixedSymbol[symbol])
 			++symbol;
 		for(uint32_t j = 0; j < k + 1; ++j) {
-			if(j == failedDisk) continue;
-			requiredSymbol[j][symbol] = true;
+			if(j != failedDisk){ 
+				requiredSymbol[j][symbol] = true;
+			}
 		}
 		fixedSymbol[symbol] = true;
 		debug("Row %" PRIu32 "\n", symbol);
 		++symbol;
 	}
-
-	uint32_t diagonal_group;
-	// Read rest diagonals
+	
 	for(uint32_t i = 0; i < numOfDiagonals; ++i) {
 		while(fixedSymbol[symbol])
 			++symbol;
-		diagonal_group = (symbol + failedDisk) % k;
-		uint32_t temp_id = diagonal_group;
+		uint32_t d_group = (symbol + failedDisk) % (k + 1);
+		uint32_t temp_id = d_group;
 		uint32_t temp_symbol = 0;
-		for(uint32_t j = 0; j < k - 1; ++j) {
-			if(temp_id != failedDisk)
+		for(uint32_t j = 0; j < k + 1; ++j) {
+			if(temp_id != failedDisk){
 				requiredSymbol[temp_id][temp_symbol] = true;
-			temp_id = (temp_id - 1 + k) % k;
-			++temp_symbol;
+			}
+			if(temp_id == 0)
+				temp_id = k + 1;
+			else {
+				--temp_id;
+				++temp_symbol;
+			}
 		}
-		requiredSymbol[k + 1][diagonal_group] = true;
-		debug("Diagonal %" PRIu32 "\n", diagonal_group);
 		fixedSymbol[symbol] = true;
+		debug("Diagonal %" PRIu32 "\n", d_group);
 		++symbol;
-	} 
+	}
 
 	block_list_t requiredBlockList;
 	// Convert BitMap to Block Symbol List
@@ -312,7 +314,7 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		vector<offset_length_t> symbolList;
 		uint32_t startSymbol = 0;
 		uint32_t length = 0;
-		for(uint32_t j = 0; j < k - 1; ++j){
+		for(uint32_t j = 0; j < k; ++j){
 			if(requiredSymbol[i][j]) {
 				debug("Require Symbol %" PRIu32 ":%" PRIu32 "\n", i, j);
 				if(length == 0)
@@ -345,56 +347,21 @@ vector<BlockData> RDPCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * k) / k;
-	const uint32_t symbolSize = blockSize / k;
+	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	//const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	uint32_t segmentId = blockData[symbolList[0].first].info.segmentId;
 
 	char** tempBlock = repairDataBlocks(blockData, symbolList, segmentSize, setting);
 
 	vector<BlockData> blockDataList;
-	bool blockNeeded[n];
-	std::fill_n(blockNeeded, n , false);
 	for(auto targetBlock : repairBlockIdList) {
-		blockNeeded[targetBlock] = true;	
 		struct BlockData blockData;
 		blockData.info.segmentId = segmentId;
 		blockData.info.blockId = targetBlock;
 		blockData.info.blockSize = blockSize;
 		blockData.buf = MemoryPool::getInstance().poolMalloc(blockSize);
 
-		// Row Parity Block
-		if(targetBlock == k) {
-			for(uint32_t i = 0; i < k; ++i)
-				bitwiseXor(tempBlock[k], tempBlock[k], tempBlock[i], blockSize);
-		// Diagonal Parity Block
-		} else if(targetBlock == k + 1) {
-			// Reconstruct Diagonal Adjuster
-			char* diagonal_adjuster = MemoryPool::getInstance().poolMalloc(symbolSize);
-			uint32_t id = k - 1;
-			uint32_t symbol = 0;
-			memcpy(diagonal_adjuster, tempBlock[id] + symbol * symbolSize, symbolSize);
-			--id;
-			++symbol;
-			for(uint32_t i = 1; i < k - 1; ++i) {
-				bitwiseXor(diagonal_adjuster, diagonal_adjuster, tempBlock[id] + symbol * symbolSize, symbolSize);
-				--id;
-				++symbol;
-			} 
-
-			for(uint32_t i = 0; i < k - 1; ++i) {
-				id = i;
-				symbol = 0;
-				char* targetSymbol = tempBlock[targetBlock] + i * symbolSize;
-				for(uint32_t j = 0; j < k - 1; ++j) {
-					bitwiseXor(targetSymbol, targetSymbol, tempBlock[id] + symbol * symbolSize, symbolSize);
-					id = (id - 1 + k) % k;
-					++symbol;
-				}
-				bitwiseXor(targetSymbol, targetSymbol, diagonal_adjuster, symbolSize);
-			}
-			MemoryPool::getInstance().poolFree(diagonal_adjuster);
-		}
 		memcpy(blockData.buf, tempBlock[targetBlock], blockSize);
 		blockDataList.push_back(blockData);
 	}
