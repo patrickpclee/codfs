@@ -71,7 +71,7 @@ void BlockDataMsg::parse(char* buf) {
 
 void BlockDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putBlockDataProcessor(_msgHeader.requestId, _sockfd, _segmentId, _blockId, _offset, _length, _payload);
+	osd->putBlockDataProcessor(_msgHeader.requestId, _sockfd, _segmentId, _blockId, _offset, _length, _payload, _isRecovery);
 #endif
 }
 

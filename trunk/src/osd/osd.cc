@@ -421,6 +421,8 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		uint64_t segmentId, uint32_t blockId,
 		vector<offset_length_t> &offsetLength, BlockData &repairedBlock) {
 
+	debug ("1) recoverytprequestcount = %" PRIu32 "\n", _recoverytpRequestCount.get(recoverytpId));
+
 	if (osdId == _osdId) {
 		// read block from disk
 		repairedBlock = _storageModule->readBlock(segmentId, blockId,
@@ -441,6 +443,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 				debug(
 						"[RECOVERY] retrieveRecoveryBlock returns for block %" PRIu64 ".%" PRIu32 "is received\n",
 						segmentId, blockId);
+				break;
 			} else {
 				usleep(USLEEP_DURATION); // sleep 0.01s
 			}
@@ -454,6 +457,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 	}
 
 	_recoverytpRequestCount.decrement(recoverytpId);
+	debug ("2) recoverytprequestcount = %" PRIu32 "\n", _recoverytpRequestCount.get(recoverytpId));
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
@@ -641,12 +645,18 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
 	bool isDownload = _downloadBlockRemaining.count(segmentId);
 
+	debug ("isRecovery = %d\n", isRecovery);
+
 	if (isRecovery) {
 		while (1) {
 			if (_pendingRecoveryBlockChunk.get(blockKey) == 0) {
 				debug(
 						"[RECOVERY] all chunks for block %" PRIu64 ".%" PRIu32 "is received\n",
 						segmentId, blockId);
+				_isPendingRecovery.set (blockKey, false);
+				_osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId,
+						blockId);
+				break;
 			} else {
 				usleep(USLEEP_DURATION); // sleep 0.01s
 			}
@@ -724,7 +734,7 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 		blockData.info.blockId = blockId;
 		blockData.info.blockSize = length;
 		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
-		_uploadBlockData.set(blockKey, blockData);
+		_recoveryBlockData.set(blockKey, blockData);
 	} else {
 
 		_pendingBlockChunk.set(blockKey, chunkCount);
@@ -825,6 +835,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	// initialize map for tracking recovery
 	uint32_t recoverytpId = ++_recoverytpId; // should not use 0
 	_recoverytpRequestCount.set(recoverytpId, blockSymbols.size());
+	debug ("blockSymbols.size = %zu\n", blockSymbols.size());
 
 	for (auto block : blockSymbols) {
 
@@ -838,7 +849,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 				offsetLength.size(), blockId, osdId);
 
 		_recoverytp.schedule(
-				boost::bind(&Osd::retrieveRecoveryBlock, this, requestId, osdId,
+				boost::bind(&Osd::retrieveRecoveryBlock, this, recoverytpId, osdId,
 						segmentId, blockId, offsetLength,
 						boost::ref(repairBlockData[blockId])));
 
@@ -881,6 +892,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	// send success message to MDS
 	_osdCommunicator->repairBlockAck(segmentId, repairBlockList,
 			repairBlockOsdList);
+
+	debug ("[RECOVERY] Recovery completed for segment %" PRIu64 "\n", segmentId);
 }
 
 void Osd::OsdStatUpdateRequestProcessor(uint32_t requestId, uint32_t sockfd) {

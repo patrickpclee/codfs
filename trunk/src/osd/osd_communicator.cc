@@ -287,7 +287,7 @@ void OsdCommunicator::putBlockEnd(uint32_t sockfd, uint64_t segmentId,
 	// Step 3 of the upload process
 
 	BlockTransferEndRequestMsg* blockTransferEndRequestMsg =
-			new BlockTransferEndRequestMsg(this, sockfd, segmentId, blockId);
+			new BlockTransferEndRequestMsg(this, sockfd, segmentId, blockId, isRecovery);
 
 	blockTransferEndRequestMsg->prepareProtocolMsg();
 	addMessage(blockTransferEndRequestMsg, true);

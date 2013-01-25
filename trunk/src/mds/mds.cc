@@ -248,6 +248,23 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 			// return a random cached copy if available
 			vector<uint32_t> segmentCacheEntry =
 					_hotnessModule->getSegmentCacheEntry(*it);
+
+			// remove OSD entry if disconnected
+			vector<uint32_t>::iterator segmentIt;
+			segmentIt = segmentCacheEntry.begin();
+			while (segmentIt != segmentCacheEntry.end()) {
+				if (_mdsCommunicator->getSockfdFromId(*segmentIt) == (uint32_t)-1){
+					segmentCacheEntry.erase(segmentIt++);
+					continue;
+				}
+				segmentIt++;
+			}
+
+			// remove segmentCacheEntry if no more cache
+			if (segmentCacheEntry.size() == 0) {
+				_hotnessModule->deleteSegmentCache(*it);
+			}
+
 			if (segmentCacheEntry.size() > 0) {
 				int idx = rand() % segmentCacheEntry.size();
 				primaryList.push_back(segmentCacheEntry[idx]);
