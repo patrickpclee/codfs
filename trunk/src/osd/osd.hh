@@ -413,6 +413,7 @@ private:
 	ConcurrentMap<uint64_t, bool> _isSegmentDownloaded;
 
 	// recovery
+	ConcurrentMap<string, bool> _isPendingRecovery;
 	ConcurrentMap<string, uint32_t> _pendingRecoveryBlockChunk;
 	ConcurrentMap<string, BlockData> _recoveryBlockData;
 	ConcurrentMap<uint32_t, uint32_t> _recoverytpRequestCount;
