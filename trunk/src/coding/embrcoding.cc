@@ -281,7 +281,13 @@ block_list_t EMBRCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks, ve
 
 vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, vector<BlockData> &blockDataList, block_list_t &symbolList, uint32_t segmentSize, string setting){
 
+	debug ("Repair Setting = %s\n", setting.c_str());
+
 	vector<uint32_t> params = getParameters(setting);
+
+	//const uint32_t rs_k = k * (n - 1) - k * (k - 1) / 2;
+	//const uint32_t rs_m = n * (n - 1) / 2 - k * (2 * n - k - 1) / 2;
+
 	const uint32_t n = params[0];
 	const uint32_t rs_k = params[3];
 	const uint32_t rs_m = params[4];
@@ -313,7 +319,7 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 	// Use RS Repair
 	if(repairBlockIdList.size() > 1) {
 		vector<BlockData> RSRecoverBlockDataList;
-		RSRecoverBlockDataList = repairBlocks(failedBlocks, RSBlockDataList, RSSymbolList, segmentSize, RSSetting); 
+		RSRecoverBlockDataList = RSCoding::repairBlocks(failedBlocks, RSBlockDataList, RSSymbolList, segmentSize, RSSetting);
 		for(uint32_t i = 0; i < RSRecoverBlockDataList.size(); ++i)
 			RSBlockDataList[RSRecoverBlockDataList[i].info.blockId] = RSRecoverBlockDataList[i];
 	}

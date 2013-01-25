@@ -85,7 +85,7 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 			/*
 			   printf ("--------Original OSD----------------\n");
 			   for (uint32_t osdid : ol.osdList) printf("%d ", osdid);
-			   printf("\n--------Reverse OSD-------------\n");
+			   printf("\n--------Reverse OSD-------------:\n");
 
 			   for (uint32_t osdid : ol.osdList) printf("%d ", osdid);
 			   printf("\n------------------------------------\n");
@@ -97,8 +97,11 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 			RepairSegmentInfoMsg* roim = new RepairSegmentInfoMsg(_communicator,
 					_communicator->getSockfdFromId(ol.primaryId), ori.segmentId,
 					ori.repPos, ori.repOsd);
+			debug ("sockfd for repair = %" PRIu32 "\n", _communicator->getSockfdFromId(ol.primaryId));
 			roim->prepareProtocolMsg();
+			debug ("%s\n", "add repair segment info msg");
 			_communicator->addMessage(roim);
+			debug ("%s\n", "added to queue repair segment info msg");
 		}
 
 	} else {
