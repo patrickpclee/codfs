@@ -80,6 +80,10 @@ message SwitchPrimaryOsdRequestPro {
 	optional fixed64 segmentId = 1;
 }
 
+message PrecacheSegmentRequestPro {
+	optional fixed32 clientId = 1;
+	optional fixed64 segmentId = 2;
+}
 
 //
 // CLIENT -> OSD
