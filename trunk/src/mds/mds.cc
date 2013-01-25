@@ -341,6 +341,37 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
+
+/**
+ * @brief	Hendle Precache Segment Request from Client
+ */
+void Mds::precacheSegmentProcessor(uint32_t requestId, uint32_t connectionId,
+		uint32_t clientId, uint64_t segmentId){
+	
+#ifdef USE_SEGMENT_CACHE
+
+	struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(
+			segmentId);
+
+	// Hotness update and see whether new cache should be requested
+	struct HotnessRequest req = _hotnessModule->updateSegmentHotness(segmentId,
+			DEFAULT_HOTNESS_ALG, 0);
+
+	// Check whether new cache should be issued
+	if (req.numOfNewCache > 0) {
+		// Issue the cache request
+		vector<uint32_t> newAdded = _mdsCommunicator->requestCache(segmentId,
+				req, segmentMetaData._nodeList);
+
+		// Update the cache list
+		_hotnessModule->updateSegmentCache(segmentId, newAdded);
+		//debug ("%s\n", "HAHA download");
+	}
+
+#endif
+	return;
+}
+
 /**
  * @brief	Handle List Folder Request from Client
  *
