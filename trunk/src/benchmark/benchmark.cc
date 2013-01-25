@@ -126,7 +126,7 @@ void parseOption(int argc, char* argv[]) {
 			break;
 		case 4:
 			codingScheme = RAID5_CODING;
-			codingSetting = Raid5Coding::generateSetting(5);
+			codingSetting = Raid5Coding::generateSetting(3);
 			break;
 		case 5:
 			codingScheme = RS_CODING;

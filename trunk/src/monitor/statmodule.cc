@@ -19,15 +19,18 @@ void StatModule::updateOsdStatMap (Communicator* communicator, uint32_t
 		{
 			lock_guard<mutex> lk(osdStatMapMutex);
 			for(auto& entry: _osdStatMap) {
-				printf("Entry %3d:\n",entry.first);
-				printf("		 "); 
-				entry.second.out();			
+				if (entry.second.osdHealth == ONLINE) {
 
-				OsdStatUpdateRequestMsg* requestMsg = new 
-				  OsdStatUpdateRequestMsg(communicator, entry.second.osdSockfd);
-				requestMsg -> prepareProtocolMsg();
-				// Do not need to wait for reply.
-				communicator -> addMessage (requestMsg);
+					printf("Entry %3d:\n",entry.first);
+					printf("		 "); 
+					entry.second.out();			
+
+					OsdStatUpdateRequestMsg* requestMsg = new 
+					  OsdStatUpdateRequestMsg(communicator, entry.second.osdSockfd);
+					requestMsg -> prepareProtocolMsg();
+					// Do not need to wait for reply.
+					communicator -> addMessage (requestMsg);
+				}
 			}
 		}
 		sleep(updatePeriod);
