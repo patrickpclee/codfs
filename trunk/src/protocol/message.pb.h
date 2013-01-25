@@ -43,6 +43,7 @@ class SaveSegmentListRequestPro;
 class SetFileSizeRequestPro;
 class GetSegmentIdListRequestPro;
 class SwitchPrimaryOsdRequestPro;
+class PrecacheSegmentRequestPro;
 class PutSegmentInitRequestPro;
 class SegmentDataPro;
 class GetSegmentRequestPro;
@@ -1296,6 +1297,98 @@ class SwitchPrimaryOsdRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static SwitchPrimaryOsdRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PrecacheSegmentRequestPro : public ::google::protobuf::Message {
+ public:
+  PrecacheSegmentRequestPro();
+  virtual ~PrecacheSegmentRequestPro();
+  
+  PrecacheSegmentRequestPro(const PrecacheSegmentRequestPro& from);
+  
+  inline PrecacheSegmentRequestPro& operator=(const PrecacheSegmentRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PrecacheSegmentRequestPro& default_instance();
+  
+  void Swap(PrecacheSegmentRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PrecacheSegmentRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PrecacheSegmentRequestPro& from);
+  void MergeFrom(const PrecacheSegmentRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 clientId = 1;
+  inline bool has_clientid() const;
+  inline void clear_clientid();
+  static const int kClientIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 clientid() const;
+  inline void set_clientid(::google::protobuf::uint32 value);
+  
+  // optional fixed64 segmentId = 2;
+  inline bool has_segmentid() const;
+  inline void clear_segmentid();
+  static const int kSegmentIdFieldNumber = 2;
+  inline ::google::protobuf::uint64 segmentid() const;
+  inline void set_segmentid(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PrecacheSegmentRequestPro)
+ private:
+  inline void set_has_clientid();
+  inline void clear_has_clientid();
+  inline void set_has_segmentid();
+  inline void clear_has_segmentid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 segmentid_;
+  ::google::protobuf::uint32 clientid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PrecacheSegmentRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -7222,6 +7315,54 @@ inline ::google::protobuf::uint64 SwitchPrimaryOsdRequestPro::segmentid() const 
   return segmentid_;
 }
 inline void SwitchPrimaryOsdRequestPro::set_segmentid(::google::protobuf::uint64 value) {
+  set_has_segmentid();
+  segmentid_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// PrecacheSegmentRequestPro
+
+// optional fixed32 clientId = 1;
+inline bool PrecacheSegmentRequestPro::has_clientid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PrecacheSegmentRequestPro::set_has_clientid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PrecacheSegmentRequestPro::clear_has_clientid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PrecacheSegmentRequestPro::clear_clientid() {
+  clientid_ = 0u;
+  clear_has_clientid();
+}
+inline ::google::protobuf::uint32 PrecacheSegmentRequestPro::clientid() const {
+  return clientid_;
+}
+inline void PrecacheSegmentRequestPro::set_clientid(::google::protobuf::uint32 value) {
+  set_has_clientid();
+  clientid_ = value;
+}
+
+// optional fixed64 segmentId = 2;
+inline bool PrecacheSegmentRequestPro::has_segmentid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PrecacheSegmentRequestPro::set_has_segmentid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PrecacheSegmentRequestPro::clear_has_segmentid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PrecacheSegmentRequestPro::clear_segmentid() {
+  segmentid_ = GOOGLE_ULONGLONG(0);
+  clear_has_segmentid();
+}
+inline ::google::protobuf::uint64 PrecacheSegmentRequestPro::segmentid() const {
+  return segmentid_;
+}
+inline void PrecacheSegmentRequestPro::set_segmentid(::google::protobuf::uint64 value) {
   set_has_segmentid();
   segmentid_ = value;
 }
