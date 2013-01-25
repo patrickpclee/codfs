@@ -426,12 +426,31 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		repairedBlock = _storageModule->readBlock(segmentId, blockId,
 				offsetLength);
 	} else {
+
+        // create entry first, wait for putBlockInit to set real value
+        const string blockKey = to_string(segmentId) + "." + to_string(blockId);
+        _isPendingRecovery.set (blockKey, true);
+
 		_osdCommunicator->getBlockRequest(osdId, segmentId, blockId,
 				offsetLength, true);
 		debug_cyan("[RECOVERY] Requested Symbols for Block %" PRIu32 "\n",
 				blockId);
 
-		// TODO: wait for block to arrive
+		while (1) {
+			if (_isPendingRecovery.get(blockKey) == false) {
+				debug(
+						"[RECOVERY] retrieveRecoveryBlock returns for block %" PRIu64 ".%" PRIu32 "is received\n",
+						segmentId, blockId);
+			} else {
+				usleep(USLEEP_DURATION); // sleep 0.01s
+			}
+		}
+
+		// retrieve block from _recoveryBlockData and cleanup
+		repairedBlock = _recoveryBlockData.get(blockKey);
+		_recoveryBlockData.erase(blockKey);
+		_isPendingRecovery.erase(blockKey);
+		_pendingRecoveryBlockChunk.erase(blockKey);
 	}
 
 	_recoverytpRequestCount.decrement(recoverytpId);

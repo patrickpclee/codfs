@@ -258,7 +258,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		return new RecoveryTriggerReplyMsg(communicator);
 		break;
 
-
 	default:
 		debug("Invalid message type : %s\n", EnumToString::toString(messageType));
 		break;

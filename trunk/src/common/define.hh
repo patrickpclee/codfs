@@ -81,5 +81,5 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 
 
 // Trigger Recovery or not
-//#define TRIGGER_RECOVERY
+#define TRIGGER_RECOVERY
 #endif
