@@ -19,6 +19,7 @@
 #include "../protocol/transfer/segmenttransferendreply.hh"
 #include "../protocol/transfer/segmentdatamsg.hh"
 #include "../protocol/metadata/getsegmentidlistrequest.hh"
+#include "../protocol/metadata/precachesegmentrequest.hh"
 #include "../protocol/transfer/getsegmentrequest.hh"
 #include "../protocol/nodelist/getosdlistrequest.hh"
 #include "../protocol/nodelist/getosdlistreply.hh"
@@ -275,6 +276,14 @@ void ClientCommunicator::requestSegment(uint32_t dstSockfd, uint64_t segmentId) 
 
 	getSegmentRequestMsg->prepareProtocolMsg();
 	addMessage(getSegmentRequestMsg);
+}
+
+void ClientCommunicator::precacheSegment(uint32_t clientId, uint64_t segmentId) {
+	uint32_t mdsSockFd = getMdsSockfd();
+	PrecacheSegmentRequestMsg* precacheSegmentRequestMsg = new PrecacheSegmentRequestMsg(this,
+			mdsSockFd, clientId, segmentId);
+	precacheSegmentRequestMsg->prepareProtocolMsg();
+	addMessage(precacheSegmentRequestMsg);
 }
 
 void ClientCommunicator::getOsdListAndConnect() {
