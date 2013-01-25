@@ -250,14 +250,14 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 					_hotnessModule->getSegmentCacheEntry(*it);
 
 			// remove OSD entry if disconnected
-			vector<uint32_t>::iterator segmentIt;
-			segmentIt = segmentCacheEntry.begin();
-			while (segmentIt != segmentCacheEntry.end()) {
-				if (_mdsCommunicator->getSockfdFromId(*segmentIt) == (uint32_t)-1){
-					segmentCacheEntry.erase(segmentIt++);
+			vector<uint32_t>::iterator p = segmentCacheEntry.begin();
+			p = segmentCacheEntry.begin();
+			while (p != segmentCacheEntry.end()) {
+				if (_mdsCommunicator->getSockfdFromId(*p) == (uint32_t)-1){
+					p = segmentCacheEntry.erase(p);
 					continue;
 				}
-				segmentIt++;
+				p++;
 			}
 
 			// remove segmentCacheEntry if no more cache
@@ -322,7 +322,7 @@ void Mds::getFileInfoProcessor(uint32_t requestId, uint32_t connectionId,
  * TODO: Currently Only Supplying Info Same as Download
  */
 void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
-		uint64_t segmentId, uint32_t osdId, bool needReply) {
+		uint64_t segmentId, uint32_t osdId, bool needReply, bool isRecovery) {
 
 	struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(
 			segmentId);
@@ -335,22 +335,24 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 
 #ifdef USE_SEGMENT_CACHE
 
-	// add primary to cache list
-	_hotnessModule->updateSegmentCache(segmentId, osdId);
+	if (!isRecovery) {
+		// add primary to cache list
+		_hotnessModule->updateSegmentCache(segmentId, osdId);
 
-	// Hotness update and see whether new cache should be requested
-	struct HotnessRequest req = _hotnessModule->updateSegmentHotness(segmentId,
-			DEFAULT_HOTNESS_ALG, 0);
+		// Hotness update and see whether new cache should be requested
+		struct HotnessRequest req = _hotnessModule->updateSegmentHotness(
+				segmentId, DEFAULT_HOTNESS_ALG, 0);
 
-	// Check whether new cache should be issued
-	if (req.numOfNewCache > 0) {
-		// Issue the cache request
-		vector<uint32_t> newAdded = _mdsCommunicator->requestCache(segmentId,
-				req, segmentMetaData._nodeList);
+		// Check whether new cache should be issued
+		if (req.numOfNewCache > 0) {
+			// Issue the cache request
+			vector<uint32_t> newAdded = _mdsCommunicator->requestCache(
+					segmentId, req, segmentMetaData._nodeList);
 
-		// Update the cache list
-		_hotnessModule->updateSegmentCache(segmentId, newAdded);
-		//debug ("%s\n", "HAHA download");
+			// Update the cache list
+			_hotnessModule->updateSegmentCache(segmentId, newAdded);
+			//debug ("%s\n", "HAHA download");
+		}
 	}
 
 #endif

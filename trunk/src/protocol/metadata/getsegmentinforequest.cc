@@ -17,13 +17,14 @@ GetSegmentInfoRequestMsg::GetSegmentInfoRequestMsg(Communicator* communicator) :
 }
 
 GetSegmentInfoRequestMsg::GetSegmentInfoRequestMsg(Communicator* communicator,
-		uint32_t dstSockfd, uint64_t segmentId, uint32_t osdId, bool needReply) :
+		uint32_t dstSockfd, uint64_t segmentId, uint32_t osdId, bool needReply, bool isRecovery) :
 		Message(communicator) {
 
 	_sockfd = dstSockfd;
 	_segmentId = segmentId;
 	_osdId = osdId;
 	_needReply = needReply;
+	_isRecovery = isRecovery;
 }
 
 void GetSegmentInfoRequestMsg::prepareProtocolMsg() {
@@ -33,6 +34,7 @@ void GetSegmentInfoRequestMsg::prepareProtocolMsg() {
 	getSegmentInfoRequestPro.set_segmentid(_segmentId);
 	getSegmentInfoRequestPro.set_osdid(_osdId);
 	getSegmentInfoRequestPro.set_needreply(_needReply);
+	getSegmentInfoRequestPro.set_isrecovery(_isRecovery);
 
 	if (!getSegmentInfoRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -56,17 +58,18 @@ void GetSegmentInfoRequestMsg::parse(char* buf) {
 	_segmentId = getSegmentInfoRequestPro.segmentid();
 	_osdId = getSegmentInfoRequestPro.osdid();
 	_needReply = getSegmentInfoRequestPro.needreply();
+	_isRecovery = getSegmentInfoRequestPro.isrecovery();
 
 }
 
 void GetSegmentInfoRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->getSegmentInfoProcessor (_msgHeader.requestId, _sockfd, _segmentId, _osdId, _needReply);
+	mds->getSegmentInfoProcessor (_msgHeader.requestId, _sockfd, _segmentId, _osdId, _needReply, _isRecovery);
 #endif
 }
 
 void GetSegmentInfoRequestMsg::printProtocol() {
-	debug("[GET_SEGMENT_INFO_REQUEST] Segment ID = %" PRIu64 "\n", _segmentId);
+	debug("[GET_SEGMENT_INFO_REQUEST] Segment ID = %" PRIu64 ", isRecovery = %d\n", _segmentId, _isRecovery);
 }
 
 vector<uint32_t> GetSegmentInfoRequestMsg::getNodeList() {

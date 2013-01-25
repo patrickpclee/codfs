@@ -17,7 +17,7 @@ public:
 	GetSegmentInfoRequestMsg(Communicator* communicator);
 
 	GetSegmentInfoRequestMsg(Communicator* communicator, uint32_t dstSockfd,
-			uint64_t segmentId, uint32_t osdId, bool needReply = true);
+			uint64_t segmentId, uint32_t osdId, bool needReply = true, bool isRecovery = false);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -71,6 +71,7 @@ private:
 	CodingScheme _codingScheme;
 	string _codingSetting;
 	string _checksum;
+	bool _isRecovery;
 };
 
 #endif

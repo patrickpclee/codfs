@@ -431,6 +431,12 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
         // create entry first, wait for putBlockInit to set real value
         const string blockKey = to_string(segmentId) + "." + to_string(blockId);
+
+        // wait for recovery of the same block to complete
+        while (_isPendingRecovery.count(blockKey)) {
+        	usleep(USLEEP_DURATION);
+        }
+
         _isPendingRecovery.set (blockKey, true);
 
 		_osdCommunicator->getBlockRequest(osdId, segmentId, blockId,
@@ -810,7 +816,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// get coding information from MDS
 	SegmentTransferOsdInfo segmentInfo =
-			_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId);
+			_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, true, true);
 
 	const CodingScheme codingScheme = segmentInfo._codingScheme;
 	const string codingSetting = segmentInfo._codingSetting;

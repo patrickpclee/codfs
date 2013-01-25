@@ -256,6 +256,7 @@ message GetSegmentInfoRequestPro {
 	optional fixed64 segmentId = 1;	
 	optional fixed32 osdId = 2;
 	optional bool needReply = 3;
+	optional bool isRecovery = 4;
 }
 
 message CacheSegmentReplyPro {
