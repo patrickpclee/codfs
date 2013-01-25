@@ -446,6 +446,9 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 			_metaDataModule->selectActingPrimary(segmentId, nodeList,
 					nodeStatus);
 		}
+	}
+
+	for (uint32_t osdId : deadOsdList) {
 
 		// get the list of segments owned by failed osd
 		vector<uint64_t> segmentList = _metaDataModule->readOsdSegmentList(

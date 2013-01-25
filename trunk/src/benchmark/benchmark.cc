@@ -18,6 +18,7 @@
 #include "../coding/raid5coding.hh"
 #include "../coding/rscoding.hh"
 #include "../coding/embrcoding.hh"
+#include "../coding/rdpcoding.hh"
 
 #include "../../lib/threadpool/threadpool.hpp"
 
@@ -136,6 +137,10 @@ void parseOption(int argc, char* argv[]) {
 			codingScheme = EMBR_CODING;
 			codingSetting = EMBRCoding::generateSetting(4, 2, 8);
 			break;
+		case 7:
+			codingScheme = RDP_CODING;
+			codingSetting = RDPCoding::generateSetting(6);
+			break;
 		default:
 			debug("Invalid Test = %d\n", benchmarkTest);
 			break;
@@ -182,6 +187,8 @@ void testDownload() {
 		uint32_t primary = fileMetaData._primaryList[i];
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		uint64_t segmentId = fileMetaData._segmentList[i];
+
+		debug ("segmentId = %" PRIu64 " primary = %" PRIu32 "\n", segmentId, primary);
 
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(

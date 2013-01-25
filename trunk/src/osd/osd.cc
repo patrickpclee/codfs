@@ -867,8 +867,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 	_recoverytpRequestCount.erase(requestId);
 
-	debug_cyan("[RECOVERY] Performing Repair for Segment %" PRIu64 "\n",
-			segmentId);
+	debug_cyan("[RECOVERY] Performing Repair for Segment %" PRIu64 " setting = %s\n",
+			segmentId, codingSetting.c_str());
 
 	// perform repair
 	vector<BlockData> repairedBlocks = _codingModule->repairBlocks(codingScheme,
