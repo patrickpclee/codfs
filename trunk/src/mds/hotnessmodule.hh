@@ -59,6 +59,7 @@ class HotnessModule {
 		 * from its cache
 		 */
 		void deleteSegmentCache(uint32_t osdId, vector<uint64_t> segmentIdList);
+		void deleteSegmentCache(uint64_t segmentId);
 
 		/*
  		 * @brief Get function for cache entry of a particular segmentId

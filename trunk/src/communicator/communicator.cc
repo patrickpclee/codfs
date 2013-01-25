@@ -954,6 +954,8 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 				componentId);
 		return -1;
 		//exit(-1);
+	} else if (_connectionMap[_componentIdMap.get(componentId)]->getIsDisconnected()) {
+		return -1;
 	}
 	return _componentIdMap.get(componentId);
 }

@@ -101,6 +101,11 @@ void HotnessModule::deleteSegmentCache(uint32_t osdId, vector<uint64_t> segmentI
 	return;
 }
 
+void HotnessModule::deleteSegmentCache(uint64_t segmentId) {
+	lock_guard<mutex> lk(cacheMapMutex);
+	_cacheMap.erase(segmentId);
+}
+
 /*
  * @brief newHotness = F(currentTime - lastUpdateTime) * oldHotness + constant
  * where F is a quadratic function f(x) = 1-x^2, for x in (0, 1)

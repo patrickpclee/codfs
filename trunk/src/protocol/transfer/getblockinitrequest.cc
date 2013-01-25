@@ -84,8 +84,8 @@ void GetBlockInitRequestMsg::doHandle() {
 
 void GetBlockInitRequestMsg::printProtocol() {
 	debug(
-			"[GET_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 "\n",
-			_segmentId, _blockId);
+			"[GET_BLOCK_INIT_REQUEST] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", isRecovery = %d\n",
+			_segmentId, _blockId, _isRecovery);
 }
 
 void GetBlockInitRequestMsg::setRecoveryBlockData (BlockData blockData) {
