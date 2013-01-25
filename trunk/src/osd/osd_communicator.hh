@@ -157,7 +157,7 @@ public:
 	 */
 
 	SegmentTransferOsdInfo getSegmentInfoRequest(uint64_t segmentId,
-			uint32_t osdId, bool needReply = true);
+			uint32_t osdId, bool needReply = true, bool isRecovery = false);
 
 	/**
 	 * Send acknowledgement to MDS when upload is complete

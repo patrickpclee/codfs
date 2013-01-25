@@ -3532,6 +3532,13 @@ class GetSegmentInfoRequestPro : public ::google::protobuf::Message {
   inline bool needreply() const;
   inline void set_needreply(bool value);
   
+  // optional bool isRecovery = 4;
+  inline bool has_isrecovery() const;
+  inline void clear_isrecovery();
+  static const int kIsRecoveryFieldNumber = 4;
+  inline bool isrecovery() const;
+  inline void set_isrecovery(bool value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetSegmentInfoRequestPro)
  private:
   inline void set_has_segmentid();
@@ -3540,15 +3547,18 @@ class GetSegmentInfoRequestPro : public ::google::protobuf::Message {
   inline void clear_has_osdid();
   inline void set_has_needreply();
   inline void clear_has_needreply();
+  inline void set_has_isrecovery();
+  inline void clear_has_isrecovery();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::uint32 osdid_;
   bool needreply_;
+  bool isrecovery_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -8700,6 +8710,28 @@ inline bool GetSegmentInfoRequestPro::needreply() const {
 inline void GetSegmentInfoRequestPro::set_needreply(bool value) {
   set_has_needreply();
   needreply_ = value;
+}
+
+// optional bool isRecovery = 4;
+inline bool GetSegmentInfoRequestPro::has_isrecovery() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void GetSegmentInfoRequestPro::set_has_isrecovery() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void GetSegmentInfoRequestPro::clear_has_isrecovery() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void GetSegmentInfoRequestPro::clear_isrecovery() {
+  isrecovery_ = false;
+  clear_has_isrecovery();
+}
+inline bool GetSegmentInfoRequestPro::isrecovery() const {
+  return isrecovery_;
+}
+inline void GetSegmentInfoRequestPro::set_isrecovery(bool value) {
+  set_has_isrecovery();
+  isrecovery_ = value;
 }
 
 // -------------------------------------------------------------------

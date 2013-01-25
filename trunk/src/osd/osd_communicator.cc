@@ -332,13 +332,13 @@ void OsdCommunicator::segmentUploadAck(uint64_t segmentId, uint32_t segmentSize,
 // DOWNLOAD
 
 struct SegmentTransferOsdInfo OsdCommunicator::getSegmentInfoRequest(
-		uint64_t segmentId, uint32_t osdId, bool needReply) {
+		uint64_t segmentId, uint32_t osdId, bool needReply, bool isRecovery) {
 
 	struct SegmentTransferOsdInfo segmentInfo = { };
 	uint32_t mdsSockFd = getMdsSockfd();
 
 	GetSegmentInfoRequestMsg* getSegmentInfoRequestMsg =
-			new GetSegmentInfoRequestMsg(this, mdsSockFd, segmentId, osdId, needReply);
+			new GetSegmentInfoRequestMsg(this, mdsSockFd, segmentId, osdId, needReply, isRecovery);
 	getSegmentInfoRequestMsg->prepareProtocolMsg();
 
 	if (needReply) {

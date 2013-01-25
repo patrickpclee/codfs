@@ -151,7 +151,7 @@ public:
 	 * @param 	osdId	OSDID
 	 */
 	void getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId, uint32_t osdId, bool needReply);
+			uint64_t segmentId, uint32_t osdId, bool needReply, bool isRecovery = false);
 
 	/**
 	 * @brief	Handle List Folder Request from Client
