@@ -20,6 +20,7 @@
 #include "../common/debug.hh"
 
 #include "../coding/raid1coding.hh"
+#include "../coding/raid5coding.hh"
 
 #include "../config/config.hh"
 
@@ -31,12 +32,15 @@ ClientCommunicator* _clientCommunicator;
 
 string _fuseFolder = "./fusedir";
 
-CodingScheme codingScheme = RAID1_CODING;
-string codingSetting = Raid1Coding::generateSetting(1);
+CodingScheme codingScheme = EMBR_CODING;
+string codingSetting = EMBRCoding::generateSetting(4,2,8);
 
 uint32_t _clientId = 51000;
 #ifdef FUSE_READ_AHEAD
 uint32_t _readAhead = 5;
+#endif
+#ifdef FUSE_PRECACHE_AHEAD
+uint32_t _precacheAhead = 5;
 #endif
 
 char* cwdpath;
@@ -52,6 +56,7 @@ unordered_map<uint32_t, FileDataCache*> _fileDataCache;
 unordered_map<uint32_t, struct FileMetaData> _fileInfoCache;
 unordered_map<string, uint32_t> _fileIdCache;
 unordered_map<uint32_t, uint32_t> _readAheadCount;
+unordered_map<uint32_t, uint32_t> _precacheAheadCount;
 unordered_map<uint32_t, vector<bool> > _segmentProcessing;
 
 list<uint64_t> _segmentReadCacheAccessTime;
@@ -169,6 +174,10 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 
 #ifdef FUSE_READ_AHEAD
 	_readAhead = configLayer->getConfigInt("Fuse>ReadAhead");
+#endif
+
+#ifdef FUSE_PRECACHE_AHEAD
+	_precacheAhead = configLayer->getConfigInt("Fuse>PrecacheAhead");
 #endif
 
 #ifdef PARALLEL_TRANSFER
@@ -340,8 +349,20 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 		uint64_t segmentId = fileMetaData._segmentList[j];
 		uint32_t componentId = fileMetaData._primaryList[j];
 		uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
-		_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, segmentId, fi->fh, j));
 		_segmentProcessing[fi->fh][j] = true;
+		_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, segmentId, fi->fh, j));
+	}
+#endif
+
+#ifdef FUSE_PRECACHE_AHEAD
+	for(uint32_t j = _precacheAheadCount[fi->fh]; j <= endSegmentNum + _readAhead + _precacheAhead; ++j) {
+		if(j >= fileMetaData._segmentList.size())
+			break;
+		if(j <= _precacheAheadCount[fi->fh])
+			continue;
+		_precacheAheadCount[fi->fh] = j;
+		uint64_t segmentId = fileMetaData._segmentList[j];
+		precacheSegment(_clientId, segmentId);
 	}
 #endif
 	return byteWritten;
