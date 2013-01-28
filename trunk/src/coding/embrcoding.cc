@@ -139,7 +139,7 @@ void EMBRCoding::convertToRS(vector<BlockData> &blockDataList, block_list_t &sym
 			blockData.info.segmentId = segmentId;
 			blockData.info.blockSize = symbolSize;
 			blockData.buf = blockDataList[id].buf + j * symbolSize;
-//			debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", id,offset_id,blockData.info.blockId);
+			debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", id,offset_id,blockData.info.blockId);
 			blockDataMap[blockData.info.blockId] = blockData;
 		}
 	}
@@ -149,6 +149,7 @@ void EMBRCoding::convertToRS(vector<BlockData> &blockDataList, block_list_t &sym
 	uint32_t count = 0;
 	for(uint32_t i = 0; i < rs_k + rs_m; ++i) {
 		if(blockDataMap.count(i) == 1) {
+			debug("Added %" PRIu32 "\n", i);
 			RSBlockDataList[i] = blockDataMap[i];
 			symbol_list_t RSBlockSymbols = make_pair(i, RSSymbolList_);
 			RSSymbolList.push_back(RSBlockSymbols);
@@ -303,11 +304,17 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 	uint32_t RSBlockCount = RSCoding::getBlockCountFromSetting(RSSetting);
 
 	bool data_availability[RSBlockCount];
+	std::fill_n(data_availability, RSBlockCount, false);
 	// Build Data Availability List
+	for(auto blockSymbol : RSSymbolList) {
+		data_availability[blockSymbol.first] = true;
+	}
+
+	/*
 	for(uint32_t i = 0; i < RSBlockCount; ++i) {
-		data_availability[i] = (RSBlockDataList[i].buf != NULL);
 		debug("%" PRIu32 "-%d\n", i, data_availability[i]);
 	}
+	*/
 
 	vector<uint32_t> failedBlocks;
 	// Build RS Repair Block List
