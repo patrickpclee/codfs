@@ -162,7 +162,7 @@ public:
 	 */
 	void getOsdListAndConnect();
 
-	uint32_t switchPrimaryRequest(uint32_t clientId, uint64_t segmentId);
+//	uint32_t switchPrimaryRequest(uint32_t clientId, uint64_t segmentId);
 
 private:
 

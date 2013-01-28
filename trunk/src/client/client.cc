@@ -229,8 +229,10 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
 
+		/*
 		if (dstSockfd == (uint32_t) -1) 
 			dstSockfd = _clientCommunicator->switchPrimaryRequest(_clientId, segmentId);		
+			*/
 
 		const uint64_t offset = segmentSize * i;
 #ifdef PARALLEL_TRANSFER

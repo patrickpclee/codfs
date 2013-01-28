@@ -13,7 +13,6 @@
 #include "../protocol/metadata/getsegmentidlistreply.hh"
 #include "../protocol/metadata/renamefilereply.hh"
 #include "../protocol/metadata/cachesegmentrequest.hh"
-#include "../protocol/status/switchprimaryosdreplymsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/recoverytriggerreply.hh"
 //#include "../protocol/metadata/heresfilesize.hh"
@@ -210,16 +209,6 @@ void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
 	downloadFileReplyMsg->prepareProtocolMsg();
 
 	addMessage(downloadFileReplyMsg);
-	return;
-}
-
-void MdsCommunicator::replyPrimary(uint32_t requestId, uint32_t connectionId,
-		uint64_t segmentId, uint32_t osdId) {
-
-	SwitchPrimaryOsdReplyMsg* reply = new SwitchPrimaryOsdReplyMsg(this,
-			requestId, connectionId, osdId);
-	reply->prepareProtocolMsg();
-	addMessage(reply);
 	return;
 }
 

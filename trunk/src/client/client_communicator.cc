@@ -22,7 +22,6 @@
 #include "../protocol/transfer/getsegmentrequest.hh"
 #include "../protocol/nodelist/getosdlistrequest.hh"
 #include "../protocol/nodelist/getosdlistreply.hh"
-#include "../protocol/status/switchprimaryosdrequestmsg.hh"
 
 /**
  * @brief	Send List Folder Request to MDS (Blocking)
@@ -293,6 +292,7 @@ void ClientCommunicator::getOsdListAndConnect() {
 	
 }
 
+/*
 uint32_t ClientCommunicator::switchPrimaryRequest(uint32_t clientId, uint64_t segmentId) {
 	uint32_t dstSockfd = -1;
 	while (dstSockfd == (uint32_t) -1) {
@@ -307,3 +307,4 @@ uint32_t ClientCommunicator::switchPrimaryRequest(uint32_t clientId, uint64_t se
 	}
 	return dstSockfd;
 }
+*/

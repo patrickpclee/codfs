@@ -126,17 +126,6 @@ public:
 			vector<FileMetaData> folderData);
 
 	/**
-	 * @brief	Reply Current Primary of an segment
-	 *
-	 * @param	requestId	Request ID
-	 * @param	connectionId	Connection ID
-	 * @param	segmentId	ID of the Segment
-	 * @oarm	osdId		ID of the Primary Osd
-	 */
-	void replyPrimary(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId, uint32_t osdId);
-
-	/**
 	 * @brief	Reply the Recovery Information (Segment List and Associated Node List
 	 * 
 	 * @param	requestId	Request ID
