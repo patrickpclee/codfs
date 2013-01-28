@@ -29,6 +29,7 @@
 #include "metadata/cachesegmentrequest.hh"
 #include "metadata/cachesegmentreply.hh"
 #include "metadata/reportdeletedcache.hh"
+#include "metadata/precachesegmentrequest.hh"
 
 #include "transfer/putsegmentinitrequest.hh"
 #include "transfer/putsegmentinitreply.hh"
@@ -151,6 +152,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (REPORT_DELETED_CACHE):
 		return new ReportDeletedCacheMsg(communicator);
+		break;
+	case (PRECACHE_SEGMENT_REQUEST):
+		return new PrecacheSegmentRequestMsg(communicator);
 		break;
 
 	//TRANSFER

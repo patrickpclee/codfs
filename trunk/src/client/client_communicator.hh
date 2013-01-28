@@ -127,6 +127,13 @@ public:
 	void requestSegment (uint32_t dstSockfd, uint64_t segmentId);
 
 	/**
+	 * @brief	Send a PreCache Segment Request to MDS
+	 * @param	clientId	Client ID
+	 * @param	segmentId	Segment ID
+	 */
+	void precacheSegment (uint32_t clientId, uint64_t segmentId);
+
+	/**
 	 * 1. Send an init message
 	 * 2. Repeatedly send data chunks to OSD
 	 * 3. Send an end message

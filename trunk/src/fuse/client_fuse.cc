@@ -15,11 +15,15 @@
 //#include "filedatamodule.hh"
 #include "filedatacache.hh"
 
+#include "fuselogger.hh"
+
 #include "../common/metadata.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 
 #include "../coding/raid1coding.hh"
+#include "../coding/raid5coding.hh"
+#include "../coding/embrcoding.hh"
 
 #include "../config/config.hh"
 
@@ -29,14 +33,22 @@ ConfigLayer* configLayer;
 
 ClientCommunicator* _clientCommunicator;
 
+
+FuseLogger* _fuseLogger;
+
 string _fuseFolder = "./fusedir";
 
-CodingScheme codingScheme = RAID1_CODING;
-string codingSetting = Raid1Coding::generateSetting(1);
+CodingScheme codingScheme = EMBR_CODING;
+string codingSetting = EMBRCoding::generateSetting(4,2,8);
 
 uint32_t _clientId = 51000;
 #ifdef FUSE_READ_AHEAD
 uint32_t _readAhead = 5;
+mutex _readAheadCountMutex;
+#endif
+#ifdef FUSE_PRECACHE_AHEAD
+uint32_t _precacheAhead = 5;
+mutex _precacheAheadCountMutex;
 #endif
 
 char* cwdpath;
@@ -44,7 +56,6 @@ string cwd;
 
 mutex fileInfoCacheMutex;
 mutex _segmentProcessingMutex;
-mutex _readAheadCountMutex;
 mutex _segmentReadCacheAccessTimeMutex;
 
 unordered_map<uint32_t, FileDataCache*> _fileDataCache;
@@ -52,6 +63,7 @@ unordered_map<uint32_t, FileDataCache*> _fileDataCache;
 unordered_map<uint32_t, struct FileMetaData> _fileInfoCache;
 unordered_map<string, uint32_t> _fileIdCache;
 unordered_map<uint32_t, uint32_t> _readAheadCount;
+unordered_map<uint32_t, uint32_t> _precacheAheadCount;
 unordered_map<uint32_t, vector<bool> > _segmentProcessing;
 
 list<uint64_t> _segmentReadCacheAccessTime;
@@ -143,6 +155,8 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 	
 	configLayer = new ConfigLayer((cwd+"common.xml").c_str(),(cwd+"clientconfig.xml").c_str());
 	client = new Client(_clientId);
+	_fuseLogger = new FuseLogger("fuse.log");
+
 	_clientCommunicator = client->getCommunicator();
 
 	_clientCommunicator->createServerSocket();
@@ -169,6 +183,10 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 
 #ifdef FUSE_READ_AHEAD
 	_readAhead = configLayer->getConfigInt("Fuse>ReadAhead");
+#endif
+
+#ifdef FUSE_PRECACHE_AHEAD
+	_precacheAhead = configLayer->getConfigInt("Fuse>PrecacheAhead");
 #endif
 
 #ifdef PARALLEL_TRANSFER
@@ -327,22 +345,50 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 		uint64_t segmentOffset = (offset + byteWritten) - i * segmentSize;
 		memcpy(buf + byteWritten, segmentCache.buf + segmentOffset, copySize);
 		byteWritten += copySize;
+
+		_fuseLogger->logRead(_clientId, segmentId, segmentOffset, copySize);
 		//storageModule->closeSegment(segmentId);
 	}
 
+	uint32_t base = endSegmentNum;
 #ifdef FUSE_READ_AHEAD
-	for(uint32_t j = _readAheadCount[fi->fh]; j <= endSegmentNum + _readAhead; ++j){
-		if( j >= fileMetaData._segmentList.size())
-			break;
-		if( j <= _readAheadCount[fi->fh])
-			continue;
-		_readAheadCount[fi->fh] = j;
-		uint64_t segmentId = fileMetaData._segmentList[j];
-		uint32_t componentId = fileMetaData._primaryList[j];
-		uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
-		_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, segmentId, fi->fh, j));
-		_segmentProcessing[fi->fh][j] = true;
+	_readAheadCountMutex.lock();
+	if(_readAhead > 0) {
+		if(endSegmentNum > _readAheadCount[fi->fh])
+			base = endSegmentNum;
+		for(uint32_t j = base; j <= endSegmentNum + _readAhead; ++j){
+			if( j >= fileMetaData._segmentList.size())
+				break;
+			if( j <= _readAheadCount[fi->fh])
+				continue;
+			_readAheadCount[fi->fh] = j;
+			uint64_t segmentId = fileMetaData._segmentList[j];
+			uint32_t componentId = fileMetaData._primaryList[j];
+			uint32_t sockfd = _clientCommunicator->getSockfdFromId(componentId);
+			_segmentProcessing[fi->fh][j] = true;
+			_tp.schedule(boost::bind(startDownloadThread, _clientId, sockfd, segmentId, fi->fh, j));
+		}
 	}
+	_readAheadCountMutex.unlock();
+#endif
+
+#ifdef FUSE_PRECACHE_AHEAD
+	_precacheAheadCountMutex.lock();
+	if(_precacheAheadCount > 0) {
+		base = _readAheadCount[fi->fh];
+		if((endSegmentNum + _readAhead) > _precacheAheadCount[fi->fh])
+			base = endSegmentNum + _readAhead;
+		for(uint32_t j = base; j <= endSegmentNum + _readAhead + _precacheAhead; ++j) {
+			if(j >= fileMetaData._segmentList.size())
+				break;
+			if(j <= _precacheAheadCount[fi->fh])
+				continue;
+			_precacheAheadCount[fi->fh] = j;
+			uint64_t segmentId = fileMetaData._segmentList[j];
+			precacheSegment(_clientId, segmentId);
+		}
+	}
+	_precacheAheadCountMutex.unlock();
 #endif
 	return byteWritten;
 }

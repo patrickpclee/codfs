@@ -154,6 +154,16 @@ public:
 			uint64_t segmentId, uint32_t osdId, bool needReply, bool isRecovery = false);
 
 	/**
+	 * @brief	Hendle Precache Segment Request from Client
+	 * 
+	 * @param	requestId	Request ID
+	 * @param	conenctionId	Connection ID
+	 * @param	clientId	ID of the Client
+	 * @param	segmentID	ID of the Segment
+	 */
+	void precacheSegmentProcessor(uint32_t requestId, uint32_t connectionId,
+			uint32_t clientId, uint64_t segmentId);
+	/**
 	 * @brief	Handle List Folder Request from Client
 	 *
 	 * @param	requestId	Request ID
