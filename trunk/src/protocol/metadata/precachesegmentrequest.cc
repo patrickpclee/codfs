@@ -55,11 +55,9 @@ void PrecacheSegmentRequestMsg::parse(char* buf) {
 }
 
 void PrecacheSegmentRequestMsg::doHandle() {
-/*
 #ifdef COMPILE_FOR_MDS
-	mds->precacheSegmentRequestProcessor (_msgHeader.requestId, _sockfd, _clientId, _segmentId);
+	mds->precacheSegmentProcessor (_msgHeader.requestId, _sockfd, _clientId, _segmentId);
 #endif
-*/
 }
 
 void PrecacheSegmentRequestMsg::printProtocol() {
