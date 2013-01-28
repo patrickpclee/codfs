@@ -424,6 +424,8 @@ void Mds::secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
 void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 		vector<uint32_t> deadOsdList) {
 
+	set <uint64_t> recoverySegments;
+
 	debug_yellow("%s\n", "Recovery Triggered");
 	vector<struct SegmentLocation> segmentLocationList;
 
@@ -455,11 +457,16 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 				osdId);
 
 		for (auto segmentId : segmentList) {
-			debug_cyan("Check segmentid = %" PRIu64 "\n", segmentId);
-			segmentLocation.segmentId = segmentId;
-			segmentLocation.osdList = _metaDataModule->readNodeList(segmentId);
-			segmentLocation.primaryId = _metaDataModule->getPrimary(segmentId);
-			segmentLocationList.push_back(segmentLocation);
+			if (!recoverySegments.count(segmentId)) {
+				debug_cyan("Check segmentid = %" PRIu64 "\n", segmentId);
+				segmentLocation.segmentId = segmentId;
+				segmentLocation.osdList = _metaDataModule->readNodeList(
+						segmentId);
+				segmentLocation.primaryId = _metaDataModule->getPrimary(
+						segmentId);
+				segmentLocationList.push_back(segmentLocation);
+				recoverySegments.insert(segmentId);
+			}
 		}
 	}
 
