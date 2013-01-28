@@ -28,8 +28,8 @@ EvenOddCoding::~EvenOddCoding() {
 vector<BlockData> EvenOddCoding::encode(SegmentData segmentData, string setting) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentData.info.segmentSize, k * (k - 1)) / k;
-	const uint32_t symbolSize = blockSize / (k - 1);
+	const uint32_t blockSize = getBlockSize(segmentData.info.segmentSize, k);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	vector<struct BlockData> blockDataList;
 	blockDataList.reserve(n);
@@ -94,10 +94,10 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 		block_list_t &blockList, uint32_t segmentSize, string setting) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * (k - 1)) / k;
-	//	const uint32_t symbolSize = blockSize / (k - 1);
+	const uint32_t blockSize = this->getBlockSize(segmentSize, k);
+	//const uint32_t symbolSize = this->getSymbolSize(blockSize, k);
 
-	char** tempBlock = repairDataBlocks(blockDataList, blockList, segmentSize, setting);
+	char** tempBlock = this->repairDataBlocks(blockDataList, blockList, segmentSize, setting);
 	SegmentData segmentData;
 	segmentData.info.segmentId = blockDataList[blockList[0].first].info.segmentId;
 	segmentData.info.segmentSize = segmentSize;
@@ -117,8 +117,8 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_t &blockList, uint32_t segmentSize, string setting) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * (k - 1)) / k;
-	const uint32_t symbolSize = blockSize / (k - 1);
+	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 	uint32_t row_group_erasure[k - 1];
 	uint32_t diagonal_group_erasure[k];
 	uint32_t datadisk_block_erasure[k];
@@ -360,8 +360,9 @@ block_list_t EvenOddCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * (k - 1)) / k;
-	//const uint32_t symbolSize = blockSize / (k - 1);
+	const uint32_t blockSize = this->getBlockSize(segmentSize, k);
+	debug("%" PRIu32 "\n", blockSize);
+	//const uint32_t symbolSize = this->getSymbolSize(blockSize, k);
 	const uint32_t numOfFailed = (uint32_t)std::count(blockStatus.begin(), blockStatus.end(), false);
 
 	if(numOfFailed > 2) {
@@ -390,8 +391,8 @@ block_list_t EvenOddCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * (k - 1)) / k;
-	const uint32_t symbolSize = blockSize / (k - 1);
+	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 	const uint32_t numOfFailed = (uint32_t)std::count(blockStatus.begin(), blockStatus.end(), false);
 
 	if(numOfFailed > 2) {
@@ -512,8 +513,8 @@ vector<BlockData> EvenOddCoding::repairBlocks(vector<uint32_t> repairBlockIdList
 
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = roundTo(segmentSize, k * (k - 1)) / k;
-	const uint32_t symbolSize = blockSize / (k - 1);
+	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	uint32_t segmentId = blockData[symbolList[0].first].info.segmentId;
 
