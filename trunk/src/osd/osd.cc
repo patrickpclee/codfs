@@ -434,6 +434,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
         // wait for recovery of the same block to complete
         while (_isPendingRecovery.count(blockKey)) {
+        	debug ("NEED TO WAIT for %s\n", blockKey.c_str());
         	usleep(USLEEP_DURATION);
         }
 
@@ -458,8 +459,8 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		// retrieve block from _recoveryBlockData and cleanup
 		repairedBlock = _recoveryBlockData.get(blockKey);
 		_recoveryBlockData.erase(blockKey);
-		_isPendingRecovery.erase(blockKey);
 		_pendingRecoveryBlockChunk.erase(blockKey);
+		_isPendingRecovery.erase(blockKey);
 	}
 
 	_recoverytpRequestCount.decrement(recoverytpId);
@@ -675,9 +676,11 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 				if (isDownload) {
 					// for download, do nothing, handled by getSegmentRequestProcessor
 					_downloadBlockRemaining.decrement(segmentId);
-					debug("all chunks for block %" PRIu32 "is received\n",
+					debug("[DOWNLOAD] all chunks for block %" PRIu32 "is received\n",
 							blockId);
 				} else {
+					debug("[UPLOAD] all chunks for block %" PRIu32 "is received\n",
+							blockId);
 					// write block in one go
 					string blockDataKey = to_string(segmentId) + "."
 							+ to_string(blockId);
@@ -754,13 +757,14 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 			blockData.info.blockSize = length;
 			blockData.buf = MemoryPool::getInstance().poolMalloc(length);
 		} else {
-			// create file
 			BlockData blockData;
 			blockData.info.segmentId = segmentId;
 			blockData.info.blockId = blockId;
 			blockData.info.blockSize = length;
 			blockData.buf = MemoryPool::getInstance().poolMalloc(length);
 			_uploadBlockData.set(blockKey, blockData);
+			debug ("[UPLOAD/RECOVERY] Memory prepared for incoming block %" PRIu64 ".%" PRIu32 "\n", segmentId, blockId);
+			debug ("[UPLOAD/RECOVERY] Pending Block Chunk = %" PRIu32 "\n", _pendingBlockChunk.get(blockKey));
 		}
 	}
 	_osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId, blockId);
@@ -795,6 +799,7 @@ uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 		}
 
 		_pendingBlockChunk.decrement(blockKey);
+		debug ("[BLOCK_DATA] Pending Block Chunk = %" PRIu32 "\n", _pendingBlockChunk.get(blockKey));
 	}
 
 	return length;
