@@ -51,6 +51,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 // fuse/client_fuse.cc
 #define FUSE_USE_VERSION 26
 #define FUSE_READ_AHEAD
+#define FUSE_PRECACHE_AHEAD
 
 // osd/osd.cc
 #define INF (1<<29)
