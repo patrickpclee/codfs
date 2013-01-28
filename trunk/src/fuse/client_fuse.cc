@@ -38,8 +38,8 @@ FuseLogger* _fuseLogger;
 
 string _fuseFolder = "./fusedir";
 
-CodingScheme codingScheme = EMBR_CODING;
-string codingSetting = EMBRCoding::generateSetting(4,2,8);
+CodingScheme codingScheme = RAID5_CODING;
+string codingSetting = Raid5Coding::generateSetting(4);
 
 uint32_t _clientId = 51000;
 #ifdef FUSE_READ_AHEAD
@@ -374,8 +374,8 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 
 #ifdef FUSE_PRECACHE_AHEAD
 	_precacheAheadCountMutex.lock();
-	if(_precacheAheadCount > 0) {
-		base = _readAheadCount[fi->fh];
+	if(_precacheAhead > 0) {
+		base = _precacheAheadCount[fi->fh];
 		if((endSegmentNum + _readAhead) > _precacheAheadCount[fi->fh])
 			base = endSegmentNum + _readAhead;
 		for(uint32_t j = base; j <= endSegmentNum + _readAhead + _precacheAhead; ++j) {
@@ -385,7 +385,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset,
 				continue;
 			_precacheAheadCount[fi->fh] = j;
 			uint64_t segmentId = fileMetaData._segmentList[j];
-			precacheSegment(_clientId, segmentId);
+			_clientCommunicator->precacheSegment(_clientId, segmentId);
 		}
 	}
 	_precacheAheadCountMutex.unlock();
