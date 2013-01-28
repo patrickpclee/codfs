@@ -165,19 +165,6 @@ public:
 			uint32_t connectionId, const string &path);
 
 	/**
-	 * @brief	Handle Primary Node Failure Report from Client
-	 *
-	 * @param	requestId	Request ID
-	 * @param	conenctionId	Connection ID
-	 * @param	osdId		ID of the Failed Osd
-	 * @param	segmentId	ID of the Failed Segment
-	 * @param	reason		Reason of the Failure (Default to Node Failure)
-	 */
-	void primaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t osdId, uint64_t segmentId, FailureReason reason =
-					UNREACHABLE);
-
-	/**
 	 * @brief	Handle Secondary Node Failure Report from Osd
 	 *
 	 * @param	requestId	Request ID

@@ -63,9 +63,6 @@
 #include "status/getosdstatusrequestmsg.hh"
 #include "status/getosdstatusreplymsg.hh"
 
-#include "status/switchprimaryosdrequestmsg.hh"
-#include "status/switchprimaryosdreplymsg.hh"
-
 #include "status/recoverytriggerrequest.hh"
 #include "status/recoverytriggerreply.hh"
 #include "status/repairsegmentinfomsg.hh"
@@ -218,12 +215,6 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (GET_OSD_STATUS_REPLY):
 		return new GetOsdStatusReplyMsg(communicator);
-		break;
-	case (SWITCH_PRIMARY_OSD_REQUEST):
-		return new SwitchPrimaryOsdRequestMsg(communicator);
-		break;
-	case (SWITCH_PRIMARY_OSD_REPLY):
-		return new SwitchPrimaryOsdReplyMsg(communicator);
 		break;
 
 	//NODELIST

@@ -76,9 +76,9 @@ message GetSegmentIdListRequestPro {
 	optional fixed32 numOfObjs = 2;
 }
 
-message SwitchPrimaryOsdRequestPro {
-	optional fixed64 segmentId = 1;
-}
+//message SwitchPrimaryOsdRequestPro {
+//	optional fixed64 segmentId = 1;
+//}
 
 
 //

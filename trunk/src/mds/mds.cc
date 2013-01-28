@@ -272,6 +272,19 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 				debug("Read primary list %" PRIu64 "\n", *it);
 				try {
 					primaryId = _metaDataModule->getPrimary(*it);
+					if (_mdsCommunicator->getSockfdFromId(primaryId) == (uint32_t) -1) {
+						// if currently fail
+						vector<uint32_t> nodeList = _metaDataModule->readNodeList(*it);
+						while (true) {
+							uint32_t idx = rand() % nodeList.size();
+							if (_mdsCommunicator->getSockfdFromId(nodeList[idx]) != (uint32_t) -1) {
+								primaryId = nodeList[idx];
+								break;
+							}
+						}
+
+					}
+
 				} catch (...) {
 					debug_yellow("%s\n", "No Primary Found");
 					continue;
@@ -374,32 +387,6 @@ void Mds::listFolderProcessor(uint32_t requestId, uint32_t connectionId,
 	folderData = _nameSpaceModule->listFolder(clientId, path);
 	_mdsCommunicator->replyFolderData(requestId, connectionId, path,
 			folderData);
-
-	return;
-}
-
-/**
- * @brief	Handle Primary Node Failure Report from Client
- *
- * 1. Select Acting Primary \n
- * 2. Report Node Failure to Monitor \n
- * 3. Reply with Acting Primary ID \n
- */
-void Mds::primaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t osdId, uint64_t segmentId, FailureReason reason) {
-
-	// get the node list of an segment and their status
-	vector<uint32_t> nodeList = _metaDataModule->readNodeList(segmentId);
-	vector<bool> nodeStatus = _mdsCommunicator->getOsdStatusRequest(nodeList);
-
-	// select new primary OSD and write to DB
-	uint32_t actingPrimary = _metaDataModule->selectActingPrimary(segmentId,
-			nodeList, nodeStatus);
-
-	//	_mdsCommunicator->reportFailure(osdId, reason);
-
-	_mdsCommunicator->replyPrimary(requestId, connectionId, segmentId,
-			actingPrimary);
 
 	return;
 }

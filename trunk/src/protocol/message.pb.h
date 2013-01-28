@@ -42,7 +42,6 @@ class DownloadFileRequestPro;
 class SaveSegmentListRequestPro;
 class SetFileSizeRequestPro;
 class GetSegmentIdListRequestPro;
-class SwitchPrimaryOsdRequestPro;
 class PutSegmentInitRequestPro;
 class SegmentDataPro;
 class GetSegmentRequestPro;
@@ -1212,88 +1211,6 @@ class GetSegmentIdListRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static GetSegmentIdListRequestPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class SwitchPrimaryOsdRequestPro : public ::google::protobuf::Message {
- public:
-  SwitchPrimaryOsdRequestPro();
-  virtual ~SwitchPrimaryOsdRequestPro();
-  
-  SwitchPrimaryOsdRequestPro(const SwitchPrimaryOsdRequestPro& from);
-  
-  inline SwitchPrimaryOsdRequestPro& operator=(const SwitchPrimaryOsdRequestPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const SwitchPrimaryOsdRequestPro& default_instance();
-  
-  void Swap(SwitchPrimaryOsdRequestPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  SwitchPrimaryOsdRequestPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const SwitchPrimaryOsdRequestPro& from);
-  void MergeFrom(const SwitchPrimaryOsdRequestPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed64 segmentId = 1;
-  inline bool has_segmentid() const;
-  inline void clear_segmentid();
-  static const int kSegmentIdFieldNumber = 1;
-  inline ::google::protobuf::uint64 segmentid() const;
-  inline void set_segmentid(::google::protobuf::uint64 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.SwitchPrimaryOsdRequestPro)
- private:
-  inline void set_has_segmentid();
-  inline void clear_has_segmentid();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint64 segmentid_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static SwitchPrimaryOsdRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -7022,32 +6939,6 @@ inline ::google::protobuf::uint32 GetSegmentIdListRequestPro::numofobjs() const 
 inline void GetSegmentIdListRequestPro::set_numofobjs(::google::protobuf::uint32 value) {
   set_has_numofobjs();
   numofobjs_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// SwitchPrimaryOsdRequestPro
-
-// optional fixed64 segmentId = 1;
-inline bool SwitchPrimaryOsdRequestPro::has_segmentid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void SwitchPrimaryOsdRequestPro::set_has_segmentid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void SwitchPrimaryOsdRequestPro::clear_has_segmentid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void SwitchPrimaryOsdRequestPro::clear_segmentid() {
-  segmentid_ = GOOGLE_ULONGLONG(0);
-  clear_has_segmentid();
-}
-inline ::google::protobuf::uint64 SwitchPrimaryOsdRequestPro::segmentid() const {
-  return segmentid_;
-}
-inline void SwitchPrimaryOsdRequestPro::set_segmentid(::google::protobuf::uint64 value) {
-  set_has_segmentid();
-  segmentid_ = value;
 }
 
 // -------------------------------------------------------------------
