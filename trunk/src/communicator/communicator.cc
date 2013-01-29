@@ -401,11 +401,17 @@ void Communicator::addMessage(Message* message, bool expectReply,
 	// add message to outMessageQueue
 	switch (message->getMsgHeader().protocolMsgType) {
 	case SEGMENT_DATA:
-	case BLOCK_DATA:
 #ifdef USE_MULTIPLE_QUEUE
 		_outDataQueue[message->getSockfd()]->push(message);
 #else
 		_outDataQueue.push(message);
+#endif
+		break;
+	case BLOCK_DATA:
+#ifdef USE_MULTIPLE_QUEUE
+		_outBlockQueue[message->getSockfd()]->push(message);
+#else
+		_outBlockQueue.push(message);
 #endif
 		break;
 	default:
@@ -668,6 +674,8 @@ Message* Communicator::popMessage(uint32_t fd) {
 		return message;
 	} else if (_outDataQueue[fd]->pop(message) != false) {
 		return message;
+	} else if (_outBlockQueue[fd]->pop(message) != false) {
+		return message;
 	} else
 		return NULL;
 #else
@@ -675,6 +683,8 @@ Message* Communicator::popMessage(uint32_t fd) {
 		return message;
 	} else if (_outDataQueue[fd]->try_pop(message) != false) {
 		return message;
+	} else if (_outBlockQueue[fd]->try_pop(message) != false) {
+		return message;	
 	} else
 		return NULL;
 #endif
@@ -689,12 +699,16 @@ Message* Communicator::popMessage() {
 		return message;
 	} else if (_outDataQueue.pop(message) != false) {
 		return message;
+	} else if (_outBlockQueue.pop(message) != false) {
+		return message;
 	} else
 		return NULL;
 #else
 	if (_outMessageQueue->try_pop(message) != false) {
 		return message;
 	} else if (_outDataQueue->try_pop(message) != false) {
+		return message;
+	} else if (_outBlockQueue->try_pop(message) != false) {
 		return message;
 	} else
 		return NULL;
