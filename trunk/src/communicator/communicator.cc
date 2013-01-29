@@ -209,6 +209,8 @@ void Communicator::waitForMessage() {
 						Message *>();
 				_outDataQueue[conn->getSockfd()] = new struct LowLockQueue<
 						Message *>();
+				_outBlockQueue[conn->getSockfd()] = new struct LowLockQueue<
+						Message *>();
 				_dataMutex[conn->getSockfd()] = new mutex();
 				_sendThread[conn->getSockfd()] = thread(
 						&Communicator::sendMessage, this, conn->getSockfd());
@@ -528,6 +530,7 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 		_outMessageQueue[conn->getSockfd()] =
 				new struct LowLockQueue<Message *>();
 		_outDataQueue[conn->getSockfd()] = new struct LowLockQueue<Message *>();
+		_outBlockQueue[conn->getSockfd()] = new struct LowLockQueue<Message *>();
 		_dataMutex[conn->getSockfd()] = new mutex();
 		_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,
 				this, conn->getSockfd());
