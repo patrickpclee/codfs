@@ -141,6 +141,10 @@ void parseOption(int argc, char* argv[]) {
 			codingScheme = RDP_CODING;
 			codingSetting = RDPCoding::generateSetting(6);
 			break;
+		case 8:
+			codingScheme = EVENODD_CODING;
+			codingSetting = EvenOddCoding::generateSetting(7);
+			break;
 		default:
 			debug("Invalid Test = %d\n", benchmarkTest);
 			break;
