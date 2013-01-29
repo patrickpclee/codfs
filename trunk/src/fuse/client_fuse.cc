@@ -284,6 +284,7 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 	vector<bool> segmentProcessing (fileMetaData._segmentList.size(),false);
 	_segmentProcessing[fi->fh] = segmentProcessing;
 	_readAheadCount[fi->fh] = 0;
+	_precacheAheadCount[fi->fh] = 0;
 
 	return 0;
 }
