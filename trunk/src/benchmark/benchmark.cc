@@ -331,8 +331,6 @@ void startReceiveThread(Communicator* _clientCommunicator) {
 
 int main(int argc, char *argv[]) {
 
-	srand(time(NULL));
-
 	// handle signal for profiler
 	signal(SIGINT, sighandler);
 
@@ -341,6 +339,8 @@ int main(int argc, char *argv[]) {
 	client = new Client(clientId);
 	_clientCommunicator = client->getCommunicator();
 	_storageModule = client->getStorageModule();
+
+	srand(time(NULL) + clientId);
 
 	parseOption(argc, argv);
 	prepareData();
