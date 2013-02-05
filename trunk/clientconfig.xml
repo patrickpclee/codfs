@@ -13,6 +13,7 @@
 		<PreallocateSegmentNumber>10</PreallocateSegmentNumber>
 		<TempStorage>/tmp/</TempStorage>
 		<ReadAhead>10</ReadAhead>
+		<PrecacheAhead>10</PrecacheAhead>
 		<WritePoolLimit>20</WritePoolLimit>
 		<ReadCacheLimit>50</ReadCacheLimit>
 	</Fuse>

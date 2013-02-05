@@ -1,9 +1,9 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
 	<MonitorId>53000</MonitorId>
-    <SleepPeriod>5</SleepPeriod>
-    <DeadPeriod>10</DeadPeriod>
-	<UpdatePeriod>5</UpdatePeriod>
+    <SleepPeriod>15</SleepPeriod>
+    <DeadPeriod>600</DeadPeriod>
+	<UpdatePeriod>15</UpdatePeriod>
     <Communication>
     
         <ServerPort>53000</ServerPort>
