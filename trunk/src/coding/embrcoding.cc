@@ -106,7 +106,7 @@ void EMBRCoding::convertToRS(vector<BlockData> &blockDataList, block_list_t &sym
 
 	RSBlockDataList.reserve(rs_k + rs_m);
 
-	debug("%s - %s\n", setting.c_str(), RSSetting.c_str());
+	//debug("%s - %s\n", setting.c_str(), RSSetting.c_str());
 
 	//TODO: Handle Node Failure
 	
@@ -139,7 +139,7 @@ void EMBRCoding::convertToRS(vector<BlockData> &blockDataList, block_list_t &sym
 			blockData.info.segmentId = segmentId;
 			blockData.info.blockSize = symbolSize;
 			blockData.buf = blockDataList[id].buf + j * symbolSize;
-			debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", id,offset_id,blockData.info.blockId);
+			//debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", id,offset_id,blockData.info.blockId);
 			blockDataMap[blockData.info.blockId] = blockData;
 		}
 	}
@@ -149,7 +149,7 @@ void EMBRCoding::convertToRS(vector<BlockData> &blockDataList, block_list_t &sym
 	uint32_t count = 0;
 	for(uint32_t i = 0; i < rs_k + rs_m; ++i) {
 		if(blockDataMap.count(i) == 1) {
-			debug("Added %" PRIu32 "\n", i);
+			//debug("Added %" PRIu32 "\n", i);
 			RSBlockDataList[i] = blockDataMap[i];
 			symbol_list_t RSBlockSymbols = make_pair(i, RSSymbolList_);
 			RSSymbolList.push_back(RSBlockSymbols);
@@ -157,7 +157,7 @@ void EMBRCoding::convertToRS(vector<BlockData> &blockDataList, block_list_t &sym
 		}
 	}
 
-	debug("%" PRIu32 "\n",count);
+	//debug("%" PRIu32 "\n",count);
 }
 
 block_list_t EMBRCoding::getRequiredBlockSymbols(vector<bool> blockStatus, uint32_t segmentSize, string setting){
@@ -282,7 +282,7 @@ block_list_t EMBRCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks, ve
 
 vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, vector<BlockData> &blockDataList, block_list_t &symbolList, uint32_t segmentSize, string setting){
 
-	debug ("Repair Setting = %s\n", setting.c_str());
+	//debug ("Repair Setting = %s\n", setting.c_str());
 
 	vector<uint32_t> params = getParameters(setting);
 
@@ -362,7 +362,7 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 				// Horizontal Group
 				RSBlockId = base_id_h[j] + id - (j + 1);
 		
-			debug("%" PRIu32 "-%" PRIu32 " <- %" PRIu32 "\n", id, j, RSBlockId);
+			//debug("%" PRIu32 "-%" PRIu32 " <- %" PRIu32 "\n", id, j, RSBlockId);
 			memcpy(blockData.buf + j * symbolSize, RSBlockDataList[RSBlockId].buf, symbolSize);
 		}
 

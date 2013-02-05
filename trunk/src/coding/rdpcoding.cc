@@ -85,7 +85,7 @@ vector<BlockData> RDPCoding::encode(SegmentData segmentData, string setting) {
 	// Adjust to Diagonal Parity
 	bitwiseXor(blockDataList[k+1].buf, blockDataList[k].buf + symbolSize , blockDataList[k+1].buf, (k - 1) * symbolSize);
 
-	debug("Block Data List Count: %zu\n", blockDataList.size());
+	//debug("Block Data List Count: %zu\n", blockDataList.size());
 	return blockDataList;
 }
 
@@ -142,10 +142,12 @@ char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_
 	uint32_t target_symbol;
 	char* repair_symbol = MemoryPool::getInstance().poolMalloc(symbolSize);
 	while(1) {
+		/*
 		for(uint32_t i = 0; i < k; ++i) {
 			debug("Row %" PRIu32 ": %" PRIu32 " Erasures, Diagonal %" PRIu32 ": %" PRIu32 " Erasures\n", i, row_group_erasure[i], i, diagonal_group_erasure[i]);
 		}		
 		debug("                   Diagonal %" PRIu32 ": %" PRIu32 " Erasures\n", k, diagonal_group_erasure[k]);
+		*/
 
 		if(numOfFailedDisk == 0)
 			break;
@@ -172,7 +174,7 @@ char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_
 				--diagonal_group_erasure[d_group];
 
 				row_group_erasure[symbol] = 0;
-				debug("Fix %" PRIu32 ":%" PRIu32 " with row %" PRIu32 "\n", target_id, target_symbol, symbol);
+				//debug("Fix %" PRIu32 ":%" PRIu32 " with row %" PRIu32 "\n", target_id, target_symbol, symbol);
 				break;
 			}
 			
@@ -197,20 +199,20 @@ char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_
 				if(target_id != k + 1)
 					--row_group_erasure[target_symbol];
 
-				debug("Fix %" PRIu32 ":%" PRIu32 " with diagonal %" PRIu32 "\n", target_id, target_symbol, i);
+				//debug("Fix %" PRIu32 ":%" PRIu32 " with diagonal %" PRIu32 "\n", target_id, target_symbol, i);
 				break;
 			}
 		}
 
 		if(target_id == (uint32_t)-1) {
-			debug_error("%s\n", "Cannot fix any more");
+			//debug_error("%s\n", "Cannot fix any more");
 			break;
 		}
 
 		disk_block_status[target_id][target_symbol] = true;
 		memcpy(tempBlock[target_id] + target_symbol * symbolSize, repair_symbol, symbolSize);
 		--disk_block_erasure[target_id];
-		debug("Disk %" PRIu32 " Erasure %" PRIu32 "\n", target_id, disk_block_erasure[target_id]);
+		//debug("Disk %" PRIu32 " Erasure %" PRIu32 "\n", target_id, disk_block_erasure[target_id]);
 		if(disk_block_erasure[target_id] == 0)
 			--numOfFailedDisk;
 	}
@@ -267,7 +269,7 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 			}
 		}
 		fixedSymbol[symbol] = true;
-		debug("Row %" PRIu32 "\n", symbol);
+		//debug("Row %" PRIu32 "\n", symbol);
 		--numOfRows;
 	}
 	
@@ -282,7 +284,7 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 			}
 		}
 		fixedSymbol[symbol] = true;
-		debug("Row %" PRIu32 "\n", symbol);
+		//debug("Row %" PRIu32 "\n", symbol);
 		++symbol;
 	}
 	
@@ -304,7 +306,7 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 			}
 		}
 		fixedSymbol[symbol] = true;
-		debug("Diagonal %" PRIu32 "\n", d_group);
+		//debug("Diagonal %" PRIu32 "\n", d_group);
 		++symbol;
 	}
 
@@ -316,19 +318,19 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		uint32_t length = 0;
 		for(uint32_t j = 0; j < k; ++j){
 			if(requiredSymbol[i][j]) {
-				debug("Require Symbol %" PRIu32 ":%" PRIu32 "\n", i, j);
+				//debug("Require Symbol %" PRIu32 ":%" PRIu32 "\n", i, j);
 				if(length == 0)
 					startSymbol = j;
 				length += symbolSize;
 			} else if(length > 0) {
-				debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
+				//debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
 				symbolList.push_back(make_pair(startSymbol * symbolSize, length));
 				startSymbol = 0;
 				length = 0;
 			}
 		}
 		if(length > 0) {
-			debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
+			//debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
 			symbolList.push_back(make_pair(startSymbol * symbolSize, length));
 			startSymbol = 0;
 			length = 0;
