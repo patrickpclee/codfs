@@ -176,7 +176,7 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 						diagonal_group = firstSymbolId + i;
 					}
 					--diagonal_group_erasure[diagonal_group];
-					debug("%" PRIu32 ":%" PRIu32 " Diagonal Group %" PRIu32 "\n", id, firstSymbolId + i, diagonal_group);
+					//debug("%" PRIu32 ":%" PRIu32 " Diagonal Group %" PRIu32 "\n", id, firstSymbolId + i, diagonal_group);
 					if(diagonal_group == k - 1) {
 						//debug("bitwise %" PRIu32 ":%" PRIu32 "to adjuster\n", id, firstSymbolId + i);
 						bitwiseXor(diagonal_adjuster, tempBlock[id] + (firstSymbolId + i) * symbolSize, diagonal_adjuster, symbolSize);	
@@ -198,10 +198,12 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 	uint32_t target_id;
 	uint32_t target_symbol;
 	while(1) {
+		/*
 		for(uint32_t i = 0; i < k - 1; ++i){
 			debug("Row %" PRIu32 ": %" PRIu32 " Erasures, Diagonal %" PRIu32 ": %" PRIu32 " Erasures\n", i, row_group_erasure[i], i, diagonal_group_erasure[i]);
 		}
 		debug("Diagonal %" PRIu32 ": %" PRIu32 " Erasures\n", k - 1, diagonal_group_erasure[k - 1]);
+		*/
 
 		if(numOfFailedDataDisk == 0)
 			break;
@@ -242,7 +244,7 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 
 				--row_group_erasure[symbol];
 
-				debug("Fix %" PRIu32 ":%" PRIu32 " with row %" PRIu32 "\n", target_id, target_symbol, symbol);
+				//debug("Fix %" PRIu32 ":%" PRIu32 " with row %" PRIu32 "\n", target_id, target_symbol, symbol);
 				break;
 			}
 
@@ -273,14 +275,14 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 				diagonal_group_erasure[i] = 0;
 				if(use_row)
 					--row_group_erasure[target_symbol];
-				debug("Fix %" PRIu32 ":%" PRIu32 " with diagonal %" PRIu32 "\n", target_id, target_symbol, i);
+				//debug("Fix %" PRIu32 ":%" PRIu32 " with diagonal %" PRIu32 "\n", target_id, target_symbol, i);
 				break;
 			}
 		}
 
 		// Fix Diagonal Adjuster
 		if(use_diagonal && (target_id == (uint32_t)-1) && (diagonal_group_erasure[k - 1] == 1)) {
-			debug("%s\n","Fix Diagonal Adjuster");
+			//debug("%s\n","Fix Diagonal Adjuster");
 			cur_symbol_need_adjust = true;
 			id = k - 1;
 			symbol = 0;
@@ -306,7 +308,7 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 		}
 
 		if(cur_symbol_need_adjust) {
-			debug("%" PRIu32 ":%" PRIu32 " need diagonal adjustment\n", target_id, target_symbol);
+			//debug("%" PRIu32 ":%" PRIu32 " need diagonal adjustment\n", target_id, target_symbol);
 			need_diagonal_adjust[target_id][target_symbol] = true;
 			needDiagonalFix.push_back(make_pair(target_id, target_symbol));
 		}
@@ -316,10 +318,10 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 		memcpy(tempBlock[target_id] + target_symbol * symbolSize, repair_symbol, symbolSize);
 
 		--datadisk_block_erasure[target_id];
-		debug("Disk %" PRIu32 " Erasure %" PRIu32 "\n", target_id, datadisk_block_erasure[target_id]);
+		//debug("Disk %" PRIu32 " Erasure %" PRIu32 "\n", target_id, datadisk_block_erasure[target_id]);
 		if(datadisk_block_erasure[target_id] == 0){
 			--numOfFailedDataDisk;
-			debug("Disk %" PRIu32 " Fixed, %" PRIu32 " Failure Left\n", target_id, numOfFailedDataDisk);
+			//debug("Disk %" PRIu32 " Fixed, %" PRIu32 " Failure Left\n", target_id, numOfFailedDataDisk);
 		}
 	}
 
@@ -329,7 +331,7 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 		if(diagonal_adjuster_failed){
 			for(uint32_t i = 0; i < k - 1; ++i)
 				if(diagonal_clean[i] && (diagonal_group_erasure[i] == 0)){
-					debug("Clean Diagonal Found at %" PRIu32 "\n", i);
+					//debug("Clean Diagonal Found at %" PRIu32 "\n", i);
 					memcpy(diagonal_adjuster, tempBlock[k + 1] + i * symbolSize, symbolSize);
 					id = i;
 					symbol = 0;
@@ -345,7 +347,7 @@ char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_l
 		// Apply Diagonal Parity Adjuster
 		for(auto block_symbol : needDiagonalFix){
 			char* bufPtr = tempBlock[block_symbol.first] + block_symbol.second * symbolSize;
-			debug("Apply Diagonal Parity Adjuster %" PRIu32 ":%" PRIu32 "\n", block_symbol.first, block_symbol.second);
+			//debug("Apply Diagonal Parity Adjuster %" PRIu32 ":%" PRIu32 "\n", block_symbol.first, block_symbol.second);
 			bitwiseXor(bufPtr, bufPtr, diagonal_adjuster, symbolSize);
 		}
 	}
@@ -361,7 +363,7 @@ block_list_t EvenOddCoding::getRequiredBlockSymbols(vector<bool> blockStatus,
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
 	const uint32_t blockSize = this->getBlockSize(segmentSize, k);
-	debug("%" PRIu32 "\n", blockSize);
+	//debug("%" PRIu32 "\n", blockSize);
 	//const uint32_t symbolSize = this->getSymbolSize(blockSize, k);
 	const uint32_t numOfFailed = (uint32_t)std::count(blockStatus.begin(), blockStatus.end(), false);
 
@@ -450,7 +452,7 @@ block_list_t EvenOddCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 			requiredSymbol[j][symbol] = true;
 		}
 		fixedSymbol[symbol] = true;
-		debug("Row %" PRIu32 "\n", symbol);
+		//debug("Row %" PRIu32 "\n", symbol);
 		++symbol;
 	}
 
@@ -469,7 +471,7 @@ block_list_t EvenOddCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 			++temp_symbol;
 		}
 		requiredSymbol[k + 1][diagonal_group] = true;
-		debug("Diagonal %" PRIu32 "\n", diagonal_group);
+		//debug("Diagonal %" PRIu32 "\n", diagonal_group);
 		fixedSymbol[symbol] = true;
 		++symbol;
 	} 
@@ -482,19 +484,19 @@ block_list_t EvenOddCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 		uint32_t length = 0;
 		for(uint32_t j = 0; j < k - 1; ++j){
 			if(requiredSymbol[i][j]) {
-				debug("Require Symbol %" PRIu32 ":%" PRIu32 "\n", i, j);
+				//debug("Require Symbol %" PRIu32 ":%" PRIu32 "\n", i, j);
 				if(length == 0)
 					startSymbol = j;
 				length += symbolSize;
 			} else if(length > 0) {
-				debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
+				//debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
 				symbolList.push_back(make_pair(startSymbol * symbolSize, length));
 				startSymbol = 0;
 				length = 0;
 			}
 		}
 		if(length > 0) {
-			debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
+			//debug("%" PRIu32 "-%" PRIu32 ":%" PRIu32 "\n", i,startSymbol, length);
 			symbolList.push_back(make_pair(startSymbol * symbolSize, length));
 			startSymbol = 0;
 			length = 0;

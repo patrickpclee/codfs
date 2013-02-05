@@ -67,6 +67,8 @@ void doEncode(std::string srcSegmentPath) {
 	segmentData.info.segmentId = segmentId;
 	segmentData.info.segmentPath = srcSegmentPath;
 
+	uint32_t writeSize = 0;
+
 	cout << "Segment ID: " << segmentId << " Size: " << formatSize(filesize)
 			<< endl;
 
@@ -96,6 +98,8 @@ void doEncode(std::string srcSegmentPath) {
 
 		// free blocks
 		MemoryPool::getInstance().poolFree(block.buf);
+
+		writeSize += block.info.blockSize;
 	}
 
 	// free segment
@@ -106,6 +110,8 @@ void doEncode(std::string srcSegmentPath) {
 
 	// print timing result
 	printResult(tStart, tRead, tCode, tWrite);
+
+	cout << "Written: " << writeSize / 1024 /1024 << "MB" << endl << endl;
 
 	cout << endl << "Command for Decoding: " << endl
 			<< "./CODING_TESTER decode " << segmentId << " " << filesize
@@ -121,6 +127,8 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 
 	// start timer
 	Clock::time_point tStart = Clock::now();
+
+	uint32_t readSize = 0;
 
 	vector<BlockData> blockDataList(numBlocks);
 
@@ -154,6 +162,8 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 		blockData.info.blockId = i;
 		blockData.info.blockSize = filesize;
 
+		readSize += filesize;
+
 		cout << i << ": " << blockPath << " size = " << filesize << endl;
 
 		blockDataList[i] = blockData;
@@ -185,11 +195,15 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 //	}
 
 
+
 	// take time for writing and clean up
 	Clock::time_point tWrite = Clock::now();
 
 	// print timing result
 	printResult(tStart, tRead, tCode, tWrite);
+
+	cout << "Read: " << readSize / 1024 /1024 << "MB" << endl;
+	cout << "Written: " << segmentData.info.segmentSize / 1024 /1024 << "MB" << endl << endl;
 
 	cout << "Decoded segment written to " << dstSegmentPath << endl;
 
@@ -197,6 +211,12 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 
 void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 		vector<bool> blockStatus, vector<string> dstBlockPaths) {
+
+	// start timer
+	Clock::time_point tStart = Clock::now();
+
+	uint32_t readSize = 0;
+	uint32_t writeSize = 0;
 
 	// transform blockStatus to repairBlockList
 	vector<uint32_t> repairBlockList;
@@ -215,11 +235,11 @@ void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 		return;
 	}
 
-	cout << requiredBlockSymbols.size() << endl;
+	//cout << requiredBlockSymbols.size() << endl;
 
 	vector<uint32_t> requiredBlocks;
 	for (auto blockSymbol : requiredBlockSymbols) {
-		cout << blockSymbol.first << endl;
+		//cout << blockSymbol.first << endl;
 		requiredBlocks.push_back(blockSymbol.first);
 	}
 
@@ -244,20 +264,29 @@ void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 
 		cout << i << ": " << blockPath << " size = " << filesize << endl;
 
+		readSize += filesize;
+
 		repairBlockData[i] = blockData;
 		j++;
 	}
+
+	// take time for reading segments
+	Clock::time_point tRead = Clock::now();
 
 	// perform repair
 	vector<BlockData> repairedBlocks = coding->repairBlocks(repairBlockList,
 			repairBlockData, requiredBlockSymbols, segmentSize, codingSetting);
 
+	// take time for coding segments
+	Clock::time_point tCode = Clock::now();
+
 	// write segment to dstBlockPaths
 	uint32_t i = 0;
-	printf("before write files\n");
+	//printf("before write files\n");
 	for (auto repairedblock : repairedBlocks) {
-		printf("%c\n",repairedblock.buf[0]);
+		//printf("%c\n",repairedblock.buf[0]);
 		writeFile(dstBlockPaths[i], repairedblock.buf, repairedblock.info.blockSize);
+		writeSize += repairedblock.info.blockSize;
 		i++;
 	}
 
@@ -271,6 +300,15 @@ void doRepair(uint64_t segmentId, uint64_t segmentSize, uint32_t numBlocks,
 	for (auto block : repairedBlocks) {
 		MemoryPool::getInstance().poolFree(block.buf);
 	}
+
+	// take time for writing and clean up
+	Clock::time_point tWrite = Clock::now();
+
+	// print timing result
+	printResult(tStart, tRead, tCode, tWrite);
+
+	cout << "Read: " << readSize / 1024 /1024 << "MB" << endl;
+	cout << "Written: " << writeSize / 1024 /1024 << "MB" << endl << endl;
 
 	cout << "Repaired blocks:" << endl;
 	for (auto path : dstBlockPaths) {

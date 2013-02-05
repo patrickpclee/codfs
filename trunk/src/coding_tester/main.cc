@@ -34,10 +34,10 @@ uint64_t segmentSize;
 void printUsage() {
 	cout << "Encode: ./coding_tester encode [SRC_SEGMENT_PATH]" << endl;
 	cout
-			<< "Decode: ./coding_tester decode [SEGMENT_ID] [SEGMENT_SIZE] [DST_SEGMENT_PATH]"
-			<< endl;
+		<< "Decode: ./coding_tester decode [SEGMENT_ID] [SEGMENT_SIZE] [DST_SEGMENT_PATH]"
+		<< endl;
 	cout << "Repair: ./coding_tester repair [SEGMENT_ID] [SEGMENT_SIZE]"
-			<< endl;
+		<< endl;
 }
 
 void printOsdStatus(vector<bool> secondaryOsdStatus) {
@@ -133,7 +133,7 @@ uint32_t readConfig(const char* configFile) {
 				(uint32_t) w);
 		numBlocks = k + m;
 		cout << "Coding: Reed Solomon, k = " << k << " m = " << m << " w = "
-				<< w << endl;
+			<< w << endl;
 
 	} else if (selectedCoding == "CAUCHY") {
 
@@ -192,46 +192,76 @@ int main(int argc, char* argv[]) {
 
 		const uint64_t segmentId = boost::lexical_cast<uint64_t>(argv[2]);
 		const uint64_t segmentSize = boost::lexical_cast<uint64_t>(argv[3]);
-		const string dstSegmentPath = argv[4];
+		string dstSegmentPath = argv[4];
 		cout << "Decoding Segment ID: " << segmentId << " size = "
-				<< segmentSize << " to " << dstSegmentPath << endl;
+			<< segmentSize << " to " << dstSegmentPath << endl;
 
 		// OSD status array, true = ONLINE, false = OFFLINE
 		vector<bool> secondaryOsdStatus(numBlocks, true);
 
-		// get the number of failed OSD from config
 		numFailedOsd = configLayer->getConfigInt("NumFailedOsd");
+		/*
+		// get the number of failed OSD from config
 		if (numFailedOsd > numBlocks) {
-			cerr << "Number of Failed OSD > Number of Blocks" << endl;
-			exit(0);
+		cerr << "Number of Failed OSD > Number of Blocks" << endl;
+		exit(0);
 		}
 
 		// Simulate OSD Failure
 		vector<uint32_t> shuffleArray(numBlocks);
 		for (uint32_t i = 0; i < numBlocks; i++) {
-			shuffleArray[i] = i;
+		shuffleArray[i] = i;
 		}
 
 		// randomly set the specified number of OSD to FAIL
 		srand(time(NULL));
 		random_shuffle(shuffleArray.begin(), shuffleArray.end());
 		for (uint32_t i = 0; i < numFailedOsd; i++) {
-			secondaryOsdStatus[shuffleArray[i]] = false;
+		secondaryOsdStatus[shuffleArray[i]] = false;
 		}
 
 		cout << "Randomly failed " << numFailedOsd << " OSDs" << endl;
+		 */
+		string ori_dstSegmentPath = dstSegmentPath;
+		if(numFailedOsd == 1) {
+			for(uint32_t i = 0; i < numBlocks; ++i) {
+				secondaryOsdStatus[i] = false;
+				dstSegmentPath = ori_dstSegmentPath + "_" + to_string(i);
+				printOsdStatus(secondaryOsdStatus);
 
-		printOsdStatus(secondaryOsdStatus);
+				doDecode(segmentId, segmentSize, dstSegmentPath, numBlocks,
+						secondaryOsdStatus);
 
-		doDecode(segmentId, segmentSize, dstSegmentPath, numBlocks,
-				secondaryOsdStatus);
+				secondaryOsdStatus[i] = true;
+			}
+		} else if(numFailedOsd == 2) {
+			for(uint32_t i = 0; i < numBlocks; ++i) {
+				secondaryOsdStatus[i] = false;
+				for(uint32_t j = i + 1; j < numBlocks; ++j) {
+					secondaryOsdStatus[j] = false;
+					dstSegmentPath = ori_dstSegmentPath + "_" + to_string(i) + "-" + to_string(j);
+					printOsdStatus(secondaryOsdStatus);
+
+					doDecode(segmentId, segmentSize, dstSegmentPath, numBlocks,
+							secondaryOsdStatus);
+
+					secondaryOsdStatus[j] = true;
+				}
+				secondaryOsdStatus[i] = true;
+			}
+		} else {
+			printOsdStatus(secondaryOsdStatus);
+
+			doDecode(segmentId, segmentSize, dstSegmentPath, numBlocks,
+					secondaryOsdStatus);
+		}
 
 	} else if (string(argv[1]) == "repair") {
 		const uint64_t segmentId = boost::lexical_cast<uint64_t>(argv[2]);
 		const uint64_t segmentSize = boost::lexical_cast<uint64_t>(argv[3]);
 
 		cout << "Decoding Segment ID: " << segmentId << " size = "
-				<< segmentSize << endl;
+			<< segmentSize << endl;
 
 		// OSD status array, true = ONLINE, false = OFFLINE
 		vector<bool> secondaryOsdStatus(numBlocks, true);
@@ -245,31 +275,62 @@ int main(int argc, char* argv[]) {
 
 		// Simulate OSD Failure
 		// randomly set the specified number of OSD to FAIL
-		srand(time(NULL));
-		uint32_t j = 0;
-		while (j < numFailedOsd) {
-			uint32_t idx = rand() % numBlocks;
-			if (secondaryOsdStatus[idx] == true) {
-				secondaryOsdStatus[idx] = false;
-				j++;
+		/*
+		   srand(time(NULL));
+		   uint32_t j = 0;
+		   while (j < numFailedOsd) {
+		   uint32_t idx = rand() % numBlocks;
+		   if (secondaryOsdStatus[idx] == true) {
+		   secondaryOsdStatus[idx] = false;
+		   j++;
+		   }
+		   }
+		 */
+		if(numFailedOsd == 1) {
+			for(uint32_t i = 0; i < numBlocks; ++i) {
+				secondaryOsdStatus[i] = false;
+				cout << "Failed " << numFailedOsd << " OSDs" << endl;
+
+				printOsdStatus(secondaryOsdStatus);
+
+				vector<string> dstBlockPaths;
+				cout << "Repair Location: " << repairFolder << endl;
+
+				for (uint32_t k = 0; k < numBlocks; k++) {
+					if (secondaryOsdStatus[k] == false) {
+						dstBlockPaths.push_back (repairFolder + "/" + to_string(segmentId) + "." + to_string(k));
+					}
+				}
+
+				doRepair(segmentId, segmentSize, numBlocks, secondaryOsdStatus, dstBlockPaths);
+				secondaryOsdStatus[i] = true;
+			}
+		} else if(numFailedOsd == 2) {
+			for(uint32_t i = 0; i < numBlocks; ++i) {
+				secondaryOsdStatus[i] = false;
+				for(uint32_t j = i + 1; j < numBlocks; ++j) {
+					secondaryOsdStatus[j] = false;
+
+					cout << "Failed " << numFailedOsd << " OSDs" << endl;
+
+					printOsdStatus(secondaryOsdStatus);
+
+					vector<string> dstBlockPaths;
+					cout << "Repair Location: " << repairFolder << endl;
+
+					for (uint32_t k = 0; k < numBlocks; k++) {
+						if (secondaryOsdStatus[k] == false) {
+							dstBlockPaths.push_back (repairFolder + "/" + to_string(segmentId) + "." + to_string(k));
+						}
+					}
+
+					doRepair(segmentId, segmentSize, numBlocks, secondaryOsdStatus, dstBlockPaths);
+
+					secondaryOsdStatus[j] = true;
+				}
+				secondaryOsdStatus[i] = true;
 			}
 		}
-
-		cout << "Randomly failed " << numFailedOsd << " OSDs" << endl;
-
-		printOsdStatus(secondaryOsdStatus);
-
-		vector<string> dstBlockPaths;
-		cout << "Repair Location: " << repairFolder << endl;
-
-		for (uint32_t i = 0; i < numBlocks; i++) {
-			if (secondaryOsdStatus[i] == false) {
-				dstBlockPaths.push_back (repairFolder + "/" + to_string(segmentId) + "." + to_string(i));
-			}
-		}
-
-		doRepair(segmentId, segmentSize, numBlocks, secondaryOsdStatus, dstBlockPaths);
-
 	}
 
 	return 0;
