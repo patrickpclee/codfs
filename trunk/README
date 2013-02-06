@@ -33,12 +33,18 @@ In Ubuntu, the following changes are needed
 
 -------------------------------
 
-5. (DEPRECATED) Install Apache Runtime (For APR Memory Pool)
+5. Install pkg-config
+
+> sudo apt-get install pkg-config
+
+-------------------------------
+
+6. (DEPRECATED) Install Apache Runtime (For APR Memory Pool)
 
 > sudo apt-get install libaprutil1-dev libapr1-dev
 
 
-6. (DEPRECATED) Install tcmalloc (For replacing malloc with tcmalloc)
+7. (DEPRECATED) Install tcmalloc (For replacing malloc with tcmalloc)
 
 (only required for 64-bit OS) > sudo apt-get install libunwind7 libunwind7-dev
 > sudo apt-get install libgoogle-perftools-dev
