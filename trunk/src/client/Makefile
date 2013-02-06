@@ -15,7 +15,7 @@ OPTIMIZE :=
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_CLIENT
 EXTRA_CFLAGS := -O2 -g -std=c++0x
-LIBS := `pkg-config --cflags --libs protobuf` -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lapr-1 -laprutil-1 -lcrypto -lboost_program_options
+LIBS := `pkg-config --cflags --libs protobuf` -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lcrypto -lboost_program_options
 
 INC_DIR   =
 SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure
