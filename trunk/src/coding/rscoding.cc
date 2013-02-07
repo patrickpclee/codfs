@@ -54,6 +54,19 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 
 		blockData.buf = MemoryPool::getInstance().poolMalloc(size);
 		char* bufPos = segmentData.buf + i * size;
+		
+		if (i * size >= segmentData.info.segmentSize) {
+			//Zero Padding
+		} else if ((i + 1) * size > segmentData.info.segmentSize) {
+			memcpy(blockData.buf, bufPos,
+					segmentData.info.segmentSize - i * size);
+			memset(blockData.buf + segmentData.info.segmentSize - i * size, 0,
+					(i + 1) * size - segmentData.info.segmentSize);
+		} else
+			memcpy(blockData.buf, bufPos, size);
+
+
+		/*
 		if (i == k - 1) {
 			//memset(blockData.buf, 0, size);
 			memcpy(blockData.buf, bufPos,
@@ -62,6 +75,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 					k * size - segmentData.info.segmentSize);
 		} else
 			memcpy(blockData.buf, bufPos, size);
+		*/
 
 		data[i] = blockData.buf;
 		//data[i] = talloc<char, uint32_t>(size);
