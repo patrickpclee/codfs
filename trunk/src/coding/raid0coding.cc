@@ -35,13 +35,13 @@ vector<BlockData> Raid0Coding::encode(SegmentData segmentData, string setting) {
 		blockData.info.segmentId = segmentData.info.segmentId;
 		blockData.info.blockId = i;
 
-		if (i == raid0_n - 1) { // last block
+		if (i * stripSize >= segmentData.info.segmentSize) {
+			blockData.info.blockSize = 0;
+		} else if ((i + 1) * stripSize > segmentData.info.segmentSize) {
 			blockData.info.blockSize = segmentData.info.segmentSize
 					- i * stripSize;
-
-		} else {
+		} else
 			blockData.info.blockSize = stripSize;
-		}
 
 		// TODO: free
 		blockData.buf = MemoryPool::getInstance().poolMalloc(stripSize);

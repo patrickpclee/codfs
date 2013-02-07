@@ -56,7 +56,15 @@ vector<BlockData> Raid5Coding::encode(SegmentData segmentData, string setting) {
 		// copy data to block
 		blockData.buf = MemoryPool::getInstance().poolMalloc(stripeSize);
 		char* bufPos = segmentData.buf + i * stripeSize;
-		memcpy(blockData.buf, bufPos, blockData.info.blockSize);
+		if (i * stripeSize >= segmentData.info.segmentSize) {
+			//Zero Padding
+		} else if ((i + 1) * stripeSize > segmentData.info.segmentSize) {
+			memcpy(blockData.buf, bufPos,
+					segmentData.info.segmentSize - i * stripeSize);
+			memset(blockData.buf + segmentData.info.segmentSize - i * stripeSize, 0,
+					(i + 1) * stripeSize - segmentData.info.segmentSize);
+		} else
+			memcpy(blockData.buf, bufPos, stripeSize);
 
 		blockDataList.push_back(blockData);
 

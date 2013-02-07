@@ -57,17 +57,15 @@ vector<BlockData> CauchyCoding::encode(SegmentData segmentData, string setting) 
 		blockData.info.blockSize = size*w;
 		blockData.buf = MemoryPool::getInstance().poolMalloc(size*w);
 		char* bufPos = segmentData.buf + i * size*w;
-		if (i == k - 1) {
-			//memset(blockData.buf, 0, size);
-
+		if (i * w *size >= segmentData.info.segmentSize) {
+			//Zero Padding
+		} else if ((i + 1) * w * size > segmentData.info.segmentSize) {
 			memcpy(blockData.buf, bufPos,
-					segmentData.info.segmentSize - i * size*w);
-
-			memset(blockData.buf + segmentData.info.segmentSize - i * size*w, 0,
-					k * size*w - segmentData.info.segmentSize);
-		} else{
-			memcpy(blockData.buf, bufPos, size*w);
-		}
+					segmentData.info.segmentSize - i * w * size);
+			memset(blockData.buf + segmentData.info.segmentSize - i * w * size, 0,
+					(i + 1) * w * size - segmentData.info.segmentSize);
+		} else
+			memcpy(blockData.buf, bufPos, w * size);
 
 		data[i] = blockData.buf;
 
