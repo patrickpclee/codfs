@@ -54,12 +54,13 @@ vector<BlockData> EvenOddCoding::encode(SegmentData segmentData, string setting)
 
 		// Copy Data
 		char* bufPos = segmentData.buf + i * blockSize;
-		if (i == k - 1) {
-			//memset(blockData.buf, 0, size);
+		if (i * blockSize >= segmentData.info.segmentSize) {
+			//Zero Padding
+		} else if ((i + 1) * blockSize > segmentData.info.segmentSize) {
 			memcpy(blockData.buf, bufPos,
 					segmentData.info.segmentSize - i * blockSize);
 			memset(blockData.buf + segmentData.info.segmentSize - i * blockSize, 0,
-					k * blockSize - segmentData.info.segmentSize);
+					(i + 1) * blockSize - segmentData.info.segmentSize);
 		} else
 			memcpy(blockData.buf, bufPos, blockSize);
 
