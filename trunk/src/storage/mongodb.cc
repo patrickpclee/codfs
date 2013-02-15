@@ -120,7 +120,7 @@ vector<BSONObj> MongoDB::read (Query querySegment)
 		result.push_back(tempObj);
 	}
 	_conn->done();
-	
+
 	return result;
 }
 
@@ -142,6 +142,7 @@ void MongoDB::insert (BSONObj insertSegment)
 	_connection->insert(_database + "." + _collection, insertSegment);
 	_conn->done();
 
+	pool.flush();
 	return ;
 }
 
@@ -155,6 +156,7 @@ void MongoDB::update (Query querySegment, BSONObj updateSegment)
 	_connection->update(_database + "." + _collection, querySegment, updateSegment, true);
 	_conn->done();
 
+	pool.flush();
 	return ;
 }
 
@@ -167,6 +169,7 @@ void MongoDB::push (Query querySegment, BSONObj pushSegment)
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, pushSegment, true);
 	_conn->done();
+	pool.flush();
 }
 
 BSONObj MongoDB::findAndModify (BSONObj querySegment, BSONObj updateSegment)
@@ -177,6 +180,7 @@ BSONObj MongoDB::findAndModify (BSONObj querySegment, BSONObj updateSegment)
 	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << querySegment << "update" << updateSegment), result);
 	_conn->done();
 
+	pool.flush();
 	return result.getObjectField("value").copy();
 };
 
@@ -187,6 +191,8 @@ void MongoDB::removeField (Query querySegment, string field)
 	BSONObj unsetSegment = BSON ("$unset" << BSON (field << "1"));
 	_connection->update(_database + "." + _collection, querySegment, unsetSegment, true);
 	_conn->done();
+
+	pool.flush();
 }
 
 void MongoDB::remove (Query querySegment)
@@ -196,6 +202,7 @@ void MongoDB::remove (Query querySegment)
 	_connection->remove(_database + "." + _collection, querySegment);
 	_conn->done();
 
+	pool.flush();
 	return ;
 }
 
