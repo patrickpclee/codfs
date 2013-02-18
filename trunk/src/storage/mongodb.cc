@@ -134,7 +134,7 @@ BSONObj MongoDB::readOne (Query querySegment)
 	BSONObj result = _connection->findOne(_database + "." + _collection, querySegment);
 	_conn->done();
 
-	return result;
+	return result.copy();
 }
 
 /**
