@@ -129,7 +129,12 @@ vector<BSONObj> MongoDB::read (Query querySegment)
  */
 BSONObj MongoDB::readOne (Query querySegment)
 {
-	return read(querySegment).at(0);
+	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
+	DBClientBase* _connection = _conn->get();
+	BSONObj result = _connection->findOne(_database + "." + _collection, querySegment);
+	_conn->done();
+
+	return result.copy();
 }
 
 /**
