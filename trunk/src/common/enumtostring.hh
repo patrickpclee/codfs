@@ -119,6 +119,7 @@ public:
   static const char * toString( HotnessAlgorithm en ) {
     switch( en ) {
       case DEFAULT_HOTNESS_ALG: return "DEFAULT_HOTNESS_ALG";
+      case TOP_HOTNESS_ALG: return "TOP_HOTNESS_ALG";
     }
     return "???";
   }

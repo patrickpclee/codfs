@@ -32,6 +32,9 @@ struct HotnessRequest HotnessModule::updateSegmentHotness(uint64_t segmentId,
 		case DEFAULT_HOTNESS_ALG:
 			defaultHotnessUpdate(oldHotness, newHotness);
 			break;
+		case TOP_HOTNESS_ALG:
+			topHotnessUpdate(oldHotness, newHotness, 64, 64);
+			break;
 		default:
 			break;
 	}
@@ -138,6 +141,51 @@ void HotnessModule::defaultHotnessUpdate(const struct Hotness& oldHotness,
 			newHotness.type = COLD;
 		}
 
+}
+
+/*
+ * @brief newHotness = oldHotness+1
+ * loop all entry in _hotnessMap and check whether newHotness is in topK 
+ */
+void HotnessModule::topHotnessUpdate(const struct Hotness& oldHotness,
+	struct Hotness& newHotness, uint32_t topK, uint32_t topK2) {
+
+	newHotness.hotness = oldHotness.hotness+1;
+	newHotness.type = oldHotness.type;
+	uint32_t count = 0;
+	if (oldHotness.type == COLD)
+	{
+		lock_guard<mutex> lk(hotnessMapMutex);
+		for(auto& entry: _hotnessMap) {
+			if (entry.second.hotness > newHotness.hotness) count++;
+			// if there are already K2 segments' hotness larger than this one,
+			// break and not update hotness
+			if (count >= topK2) break;
+		}
+		if (count < topK2) newHotness.type = HOT;
+		else newHotness.type = COLD;
+	} 
+	else if(oldHotness.type == HOT || oldHotness.type == HOTTEST)
+	{
+		lock_guard<mutex> lk(hotnessMapMutex);
+		for(auto& entry: _hotnessMap) {
+			if (entry.second.hotness > newHotness.hotness) count++;
+			// if there are already K segments' hotness larger than this one,
+			// break and not update hotness
+			if (count >= topK && count >= topK2) break;
+		}
+		if (count < topK) {
+			// in the topK, from HOT to HOTNESS
+			newHotness.type = HOTTEST;
+		} 
+		else if (count >= topK2) {
+			// outside topK2, from HOT to COLD
+			newHotness.type = COLD;
+		} else {
+			// not very hot, but still hot
+			newHotness.type = HOT;
+		}
+	}
 }
 
 struct Hotness HotnessModule::getSegmentHotnessEntry(uint64_t segmentId) {

@@ -114,7 +114,8 @@ enum CodingScheme {
 };
 
 enum HotnessAlgorithm{
-	DEFAULT_HOTNESS_ALG
+	DEFAULT_HOTNESS_ALG,
+	TOP_HOTNESS_ALG
 };
 
 enum HotnessType {

@@ -37,7 +37,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 #define SERIALIZE_DATA_QUEUE
 
 // communicator/message.cc
-#define NUM_THREADS_PER_MSG 10
+#define NUM_THREADS_PER_MSG 4
 
 // communicator/communicator.hh
 #define USE_LOWLOCK_QUEUE
@@ -65,6 +65,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 
 // osd/storagemodule.cc
 #define USE_SEGMENT_CACHE
+#define HOTNESS_ALG TOP_HOTNESS_ALG
 //#define USE_IO_THREADS
 #define IO_THREADS 2
 #define IO_POLL_INTERVAL 10000
