@@ -3,11 +3,17 @@
 #include "../common/debug.hh"
 #include "hotnessmodule.hh"
 
+// DEFAULT HOTNESS ALG
 const double HOUR12 = 60 * 60 * 12.0;
 const double NEWUPDATE = 10.0;
 const double NEWUPDATE15 = 10 * 1.5;
 const double NEWUPDATE25 = 10 * 2.5;
+
+// TOP K HOTNESS ALG
+const uint32_t THRESHOLD = 10;
+
 const uint32_t REPLICA[3] = {0, 1, 3};
+
 
 mutex hotnessMapMutex;
 mutex cacheMapMutex;
@@ -152,6 +158,10 @@ void HotnessModule::topHotnessUpdate(const struct Hotness& oldHotness,
 
 	newHotness.hotness = oldHotness.hotness+1;
 	newHotness.type = oldHotness.type;
+
+	// IF NOT ENOUGH REQUEST, JUST RETURN
+	if (newHotness.hotness < THRESHOLD) return;
+
 	uint32_t count = 0;
 	if (oldHotness.type == COLD)
 	{
