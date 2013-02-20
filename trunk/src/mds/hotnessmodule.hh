@@ -113,6 +113,19 @@ class HotnessModule {
 				struct Hotness& newHotness);
 
 		/*
+ 		 * @brief Top k algorithm for hotness value update
+		 *
+		 * @param oldHotness Original hotness struct
+		 * @param newHotness Reference for new hotness struct
+		 * @param topK Select top K access segment for update type VERY HOT
+		 * @param topK2 Select top K2 access segment for update type HOT
+		 */
+		void topHotnessUpdate(const struct Hotness& oldHotness, 
+				struct Hotness& newHotness, uint32_t topK, uint32_t topK2);
+
+
+
+		/*
  		 * @brief Map structure for storing the hotness
 		 */
 		map<uint64_t, struct Hotness> _hotnessMap;

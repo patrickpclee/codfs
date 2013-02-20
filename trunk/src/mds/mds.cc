@@ -180,7 +180,7 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 
 	// Hotness update and see whether new cache should be requested
 	struct HotnessRequest req;
-	req = _hotnessModule->updateSegmentHotness(segmentId, DEFAULT_HOTNESS_ALG,
+	req = _hotnessModule->updateSegmentHotness(segmentId, HOTNESS_ALG,
 			0);
 
 	// Check whether new cache should be issued
@@ -354,7 +354,7 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 
 		// Hotness update and see whether new cache should be requested
 		struct HotnessRequest req = _hotnessModule->updateSegmentHotness(
-				segmentId, DEFAULT_HOTNESS_ALG, 0);
+				segmentId, HOTNESS_ALG, 0);
 
 		// Check whether new cache should be issued
 		if (req.numOfNewCache > 0) {
@@ -387,7 +387,7 @@ void Mds::precacheSegmentProcessor(uint32_t requestId, uint32_t connectionId,
 
 	// Hotness update and see whether new cache should be requested
 	struct HotnessRequest req = _hotnessModule->updateSegmentHotness(segmentId,
-			DEFAULT_HOTNESS_ALG, 0);
+			HOTNESS_ALG, 0);
 
 	// Check whether new cache should be issued
 	if (req.numOfNewCache > 0) {
