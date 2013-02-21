@@ -374,7 +374,7 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 
 void Mds::cacheSegmentReplyProcessor (uint64_t segmentId, uint32_t osdId) {
 	// Update the cache list
-	cout << "[CACHE] Cache Completed " << getTime() << endl;
+	cout << "[CACHE] Cache Completed " << getTime() << "Segment = " << segmentId << "OSD = " << osdId << endl;
 	_hotnessModule->updateSegmentCache(segmentId, osdId);
 }
 
