@@ -488,7 +488,7 @@ void StorageModule::flushSegmentDiskCache(uint64_t segmentId) {
 		string filepath = generateSegmentPath(segmentId, _segmentFolder);
 		filePtr = _openedFile->get(filepath);
 		fflush(filePtr);
-		fsync(fileno(filePtr));
+		//fsync(fileno(filePtr));
 	} catch (out_of_range& oor) { // file pointer not found in cache
 		return; // file already closed by cache, do nothing
 	}
@@ -502,7 +502,7 @@ void StorageModule::flushBlock(uint64_t segmentId, uint32_t blockId) {
 		string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
 		filePtr = _openedFile->get(filepath);
 		fflush(filePtr);
-		fsync(fileno(filePtr));
+		//fsync(fileno(filePtr));
 	} catch (out_of_range& oor) { // file pointer not found in cache
 		return; // file already closed by cache, do nothing
 	}

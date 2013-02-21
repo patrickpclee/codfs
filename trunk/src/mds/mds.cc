@@ -176,7 +176,9 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 #ifdef USE_SEGMENT_CACHE
 
 	// add primary to cache list
+    #ifdef CACHE_AFTER_TRANSFER
 	_hotnessModule->updateSegmentCache(segmentId, segmentNodeList[0]);
+    #endif
 
 	// Hotness update and see whether new cache should be requested
 	struct HotnessRequest req;
