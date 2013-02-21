@@ -11,6 +11,7 @@ const double NEWUPDATE25 = 10 * 2.5;
 
 // TOP K HOTNESS ALG
 const uint32_t THRESHOLD = 10;
+const uint32_t THRESHOLD2 = 20;
 
 const uint32_t REPLICA[3] = {0, 1, 3};
 
@@ -161,6 +162,7 @@ void HotnessModule::topHotnessUpdate(const struct Hotness& oldHotness,
 
 	// IF NOT ENOUGH REQUEST, JUST RETURN
 	if (newHotness.hotness < THRESHOLD) return;
+    if (newHotness.hotness < THRESHOLD2 && newHotness.type == HOT) return;
 
 	uint32_t count = 0;
 	if (oldHotness.type == COLD)
