@@ -26,6 +26,8 @@ MdsCommunicator::MdsCommunicator() {
 vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
 		HotnessRequest req, vector<uint32_t> osdList) {
 
+	cout << "[CACHE] Cache Request " << getTime() << endl;
+
 	vector<uint32_t> newCacheOsdList;
 
 	std::sort(osdList.begin(), osdList.end());

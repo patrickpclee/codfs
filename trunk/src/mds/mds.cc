@@ -192,7 +192,6 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 				req, segmentMetaData._nodeList);
 
 		// Update the cache list
-		_hotnessModule->updateSegmentCache(segmentId, newAdded);
 		//debug ("%s\n", "HAHA upload");
 	}
 
@@ -364,8 +363,6 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 			vector<uint32_t> newAdded = _mdsCommunicator->requestCache(
 					segmentId, req, segmentMetaData._nodeList);
 
-			// Update the cache list
-			_hotnessModule->updateSegmentCache(segmentId, newAdded);
 			//debug ("%s\n", "HAHA download");
 		}
 	}
@@ -373,6 +370,12 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 #endif
 
 	return;
+}
+
+void Mds::cacheSegmentReplyProcessor (uint64_t segmentId, uint32_t osdId) {
+	// Update the cache list
+	cout << "[CACHE] Cache Completed " << getTime() << endl;
+	_hotnessModule->updateSegmentCache(segmentId, osdId);
 }
 
 
@@ -398,7 +401,6 @@ void Mds::precacheSegmentProcessor(uint32_t requestId, uint32_t connectionId,
 				req, segmentMetaData._nodeList);
 
 		// Update the cache list
-		_hotnessModule->updateSegmentCache(segmentId, newAdded);
 		//debug ("%s\n", "HAHA download");
 	}
 

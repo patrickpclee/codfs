@@ -247,6 +247,13 @@ public:
 			vector<uint32_t> repairBlockOsdList);
 
 	/**
+	 * Add OSD to cacheList
+	 * @param segmentId Segment ID
+	 * @param osdId OSD ID
+	 */
+	void cacheSegmentReplyProcessor (uint64_t segmentId, uint32_t osdId);
+
+	/**
 	 * @brief	Get the MDS Communicator
 	 *
 	 * @return	Pointer to the MDS Communicator Module

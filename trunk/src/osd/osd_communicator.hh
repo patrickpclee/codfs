@@ -81,10 +81,11 @@ public:
 	 * @param requestId Request ID
 	 * @param connectionId Connection ID
 	 * @param segmentId Segment ID
+	 * @param osdId OSD ID
 	 */
 
 	void replyCacheSegment(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId);
+			uint64_t segmentId, uint32_t osdId);
 
 	/**
 	 * Report deleted segment for the last polling interval to the MDS

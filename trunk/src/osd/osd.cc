@@ -391,7 +391,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// send reply to MDS for localRetrieve
 
 	if (localRetrieve) {
-		_osdCommunicator->replyCacheSegment(requestId, sockfd, segmentId);
+		_osdCommunicator->replyCacheSegment(requestId, sockfd, segmentId, _osdId);
 	}
 
 #ifdef TIME_POINT
