@@ -223,8 +223,15 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 	// 2. Download file from OSD
 
+	vector <uint64_t> segmentList = fileMetaData._segmentList;
+
+#ifdef RANDOM_SHUFFLE_SEGMENT_ORDER
+	srand (time(NULL));
+	std::random_shuffle ( segmentListShuffle.begin(), segmentListShuffle.end() );
+#endif
+
 	uint32_t i = 0;
-	for (uint64_t segmentId : fileMetaData._segmentList) {
+	for (uint64_t segmentId : segmentList) {
 		uint32_t dstComponentId = fileMetaData._primaryList[i];
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
