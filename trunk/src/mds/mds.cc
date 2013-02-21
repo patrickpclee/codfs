@@ -351,7 +351,9 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 
 	if (!isRecovery) {
 		// add primary to cache list
+    #ifdef CACHE_AFTER_TRANSFER
 		_hotnessModule->updateSegmentCache(segmentId, osdId);
+    #endif
 
 		// Hotness update and see whether new cache should be requested
 		struct HotnessRequest req = _hotnessModule->updateSegmentHotness(
