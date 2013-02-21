@@ -22,7 +22,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 // benchmark/benchmark.cc
 // client/client.cc
 #define PARALLEL_TRANSFER
-//#define RANDOM_SHUFFLE_SEGMENT_ORDER
+#define RANDOM_SHUFFLE_SEGMENT_ORDER
 
 // common/debug.hh
 #ifndef DEBUG
@@ -38,7 +38,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 #define SERIALIZE_DATA_QUEUE
 
 // communicator/message.cc
-#define NUM_THREADS_PER_MSG 4
+#define NUM_THREADS_PER_MSG 10
 
 // communicator/communicator.hh
 #define USE_LOWLOCK_QUEUE
@@ -62,6 +62,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 #define DISK_PATH "/"
 #define RECOVERY_THREADS 10
 #define MAX_NUM_PROCESSING_SEGMENT 10
+//#define CACHE_AFTER_TRANSFER
 //#define MOUNT_OSD
 
 // osd/storagemodule.cc
@@ -87,5 +88,5 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 
 
 // Trigger Recovery or not
-#define TRIGGER_RECOVERY
+//#define TRIGGER_RECOVERY
 #endif

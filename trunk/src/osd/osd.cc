@@ -345,7 +345,11 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			debug("%s\n", "[DOWNLOAD] Send Segment");
 
 			_isSegmentDownloaded.set(segmentId, true);
-		}
+		} else {
+			// hack: trigger MDS to update hotness
+			_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId,
+				false);
+        }
 	}
 
 	// 5. send segment if not localRetrieve
@@ -372,7 +376,9 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		segmentRequestCountMutex.unlock();
 		isLocked = false;
 
+#ifdef CACHE_AFTER_TRANSFER
 		cacheSegment(segmentId, tempSegmentData);
+#endif
 		freeSegment(segmentId, tempSegmentData);
 
 		debug("%s\n", "[DOWNLOAD] Cleanup completed");
@@ -383,9 +389,12 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 
 	// send reply to MDS for localRetrieve
+
+#ifdef CACHE_AFTER_TRANSFER
 	if (localRetrieve) {
 		_osdCommunicator->replyCacheSegment(requestId, sockfd, segmentId);
 	}
+#endif
 
 #ifdef TIME_POINT
 	t7 = Clock::now();
@@ -630,8 +639,11 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			// if all chunks have arrived, send ack
 			_osdCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId);
 
+
+#ifdef CACHE_AFTER_TRANSFER
 			// after ack, write segment cache to disk (and close file)
 			_storageModule->putSegmentToDiskCache(segmentId, segmentCache);
+#endif
 
 			// close file and free cache
 			_storageModule->closeSegmentTransferCache(segmentId);

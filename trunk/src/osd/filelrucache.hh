@@ -43,7 +43,7 @@ public:
 
 		FILE* filePtr = (*it).second.first;
 		fflush (filePtr);
-		fsync (fileno (filePtr));
+		//fsync (fileno (filePtr));
 		fclose(filePtr);
 
 		this->_valueMap.erase(it);
