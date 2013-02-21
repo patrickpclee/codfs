@@ -26,7 +26,11 @@ MdsCommunicator::MdsCommunicator() {
 vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
 		HotnessRequest req, vector<uint32_t> osdList) {
 
-	cout << "[CACHE] Cache Request " << getTime() << endl;
+	string osdListString;
+	for (auto osdId : osdList) {
+		osdListString += to_string(osdId) + " ";
+	}
+	cout << "[CACHE] Cache Request " << getTime() << "Segment = " << segmentId << "OSD = " << osdListString << endl;
 
 	vector<uint32_t> newCacheOsdList;
 
