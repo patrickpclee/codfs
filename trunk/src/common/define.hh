@@ -22,6 +22,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 // benchmark/benchmark.cc
 // client/client.cc
 #define PARALLEL_TRANSFER
+//#define RANDOM_SHUFFLE_SEGMENT_ORDER
 
 // common/debug.hh
 #ifndef DEBUG

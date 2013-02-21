@@ -47,6 +47,7 @@ ConfigLayer* configLayer;
 uint32_t clientId;
 string fileName;
 uint32_t fileId;
+uint32_t startPercent, endPercent;
 CodingScheme codingScheme;
 string codingSetting;
 uint64_t fileSize;
@@ -80,12 +81,21 @@ boost::threadpool::pool _tp;
 void parseOption(int argc, char* argv[]) {
 
 	if (strcmp(argv[2], "download") == 0) {
-		if (argc < 4) {
-			cout << "Download: ./BENCHMARK [ID] download [FILEID]" << endl;
-			exit(-1);
+		if (argc < 6) {
+			if (argc == 4) {
+				startPercent = 0;
+				endPercent = 100;
+			} else {
+				cout
+						<< "Download: ./BENCHMARK [ID] download [FILEID] [START PERCENT] [END PERCENT]"
+						<< endl;
+				exit(-1);
+			}
 		}
 		download = true;
 		fileId = atoi(argv[3]);
+		startPercent = atoi(argv[4]);
+		endPercent = atoi(argv[5]);
 		debug("Downloading File %" PRIu32 "\n", fileId);
 	} else {
 
@@ -184,15 +194,26 @@ void testDownload() {
 	// prepare checksum array
 	vector<char *> segmentChecksumList(fileMetaData._segmentList.size());
 	for (uint32_t i = 0; i < segmentChecksumList.size(); i++) {
-		segmentChecksumList[i] = (char *)calloc(MD5_DIGEST_LENGTH, 1);
+		segmentChecksumList[i] = (char *) calloc(MD5_DIGEST_LENGTH, 1);
 	}
 
-	for (uint32_t i = 0; i < fileMetaData._segmentList.size(); ++i) {
+	double startPortion = startPercent / (double) 100;
+	double endPortion = endPercent / (double) 100;
+
+	uint32_t segmentCount = fileMetaData._segmentList.size();
+	for (uint32_t i = 0; i < segmentCount; ++i) {
+
+		if (i / (double) segmentCount < startPortion
+				|| i / (double) segmentCount > endPortion) {
+			continue; // skip this segment
+		}
+
 		uint32_t primary = fileMetaData._primaryList[i];
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		uint64_t segmentId = fileMetaData._segmentList[i];
 
-		debug ("segmentId = %" PRIu64 " primary = %" PRIu32 "\n", segmentId, primary);
+		debug("segmentId = %" PRIu64 " primary = %" PRIu32 "\n",
+				segmentId, primary);
 
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(
@@ -222,7 +243,7 @@ void testDownload() {
 	cout << "[BENCHMARK END] " << getTime() << endl;
 
 	cout << "Download Done [" << fileMetaData._id << " "
-				<< md5ToHex((unsigned char *) fileChecksum) << "]" << endl;
+			<< md5ToHex((unsigned char *) fileChecksum) << "]" << endl;
 
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1000.0;
