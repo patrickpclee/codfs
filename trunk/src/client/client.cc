@@ -227,7 +227,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 #ifdef RANDOM_SHUFFLE_SEGMENT_ORDER
 	srand (time(NULL));
-	std::random_shuffle ( segmentListShuffle.begin(), segmentListShuffle.end() );
+	std::random_shuffle ( segmentList.begin(), segmentList.end() );
 #endif
 
 	uint32_t i = 0;
