@@ -3640,17 +3640,27 @@ class CacheSegmentReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint64 value);
   
+  // optional fixed32 osdId = 2;
+  inline bool has_osdid() const;
+  inline void clear_osdid();
+  static const int kOsdIdFieldNumber = 2;
+  inline ::google::protobuf::uint32 osdid() const;
+  inline void set_osdid(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.CacheSegmentReplyPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
+  inline void set_has_osdid();
+  inline void clear_has_osdid();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
+  ::google::protobuf::uint32 osdid_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -8790,6 +8800,28 @@ inline ::google::protobuf::uint64 CacheSegmentReplyPro::segmentid() const {
 inline void CacheSegmentReplyPro::set_segmentid(::google::protobuf::uint64 value) {
   set_has_segmentid();
   segmentid_ = value;
+}
+
+// optional fixed32 osdId = 2;
+inline bool CacheSegmentReplyPro::has_osdid() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void CacheSegmentReplyPro::set_has_osdid() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void CacheSegmentReplyPro::clear_has_osdid() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void CacheSegmentReplyPro::clear_osdid() {
+  osdid_ = 0u;
+  clear_has_osdid();
+}
+inline ::google::protobuf::uint32 CacheSegmentReplyPro::osdid() const {
+  return osdid_;
+}
+inline void CacheSegmentReplyPro::set_osdid(::google::protobuf::uint32 value) {
+  set_has_osdid();
+  osdid_ = value;
 }
 
 // -------------------------------------------------------------------

@@ -16,7 +16,7 @@ public:
 	CacheSegmentReplyMsg(Communicator* communicator);
 
 	CacheSegmentReplyMsg(Communicator* communicator, uint32_t requestId,
-			uint32_t dstSockfd, uint64_t segmentId);
+			uint32_t dstSockfd, uint64_t segmentId, uint32_t osdId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -49,6 +49,7 @@ public:
 
 private:
 	uint64_t _segmentId;
+	uint32_t _osdId;
 };
 
 #endif
