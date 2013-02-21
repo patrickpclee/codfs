@@ -16,12 +16,13 @@ CacheSegmentReplyMsg::CacheSegmentReplyMsg(Communicator* communicator) :
 
 CacheSegmentReplyMsg::CacheSegmentReplyMsg(Communicator* communicator,
 		uint32_t requestId, uint32_t dstSockfd,
-		uint64_t segmentId) :
+		uint64_t segmentId, uint32_t osdId) :
 		Message(communicator) {
 
 	_sockfd = dstSockfd;
 	_msgHeader.requestId = requestId;
 	_segmentId = segmentId;
+	_osdId = osdId;
 }
 
 void CacheSegmentReplyMsg::prepareProtocolMsg() {
@@ -29,6 +30,7 @@ void CacheSegmentReplyMsg::prepareProtocolMsg() {
 
 	ncvfs::CacheSegmentReplyPro cacheSegmentReplyPro;
 	cacheSegmentReplyPro.set_segmentid(_segmentId);
+	cacheSegmentReplyPro.set_osdid(_osdId);
 
 	if (!cacheSegmentReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -50,17 +52,18 @@ void CacheSegmentReplyMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_segmentId = cacheSegmentReplyPro.segmentid();
+	_osdId = cacheSegmentReplyPro.osdid();
 
 }
 
 void CacheSegmentReplyMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-
+	mds->cacheSegmentReplyProcessor (_segmentId, _osdId);
 #endif
 }
 
 void CacheSegmentReplyMsg::printProtocol() {
 	debug(
-			"[CACHE_SEGMENT_REPLY] Segment ID = %" PRIu64 "\n",
-			_segmentId);
+			"[CACHE_SEGMENT_REPLY] Segment ID = %" PRIu64 " OSD ID = %" PRIu32 "\n",
+			_segmentId, _osdId);
 }
