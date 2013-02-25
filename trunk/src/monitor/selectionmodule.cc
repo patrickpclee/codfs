@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <set>
 #include <iterator>
+#include <algorithm>
 #include "../config/config.hh"
 #include "../common/debug.hh"
 #include "selectionmodule.hh"
@@ -183,7 +184,7 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t
         numOfBlks--;
 
         // start repeating if no more nodes available
-        if (i == allOnlineList.size()) {
+        if (i == (int)allOnlineList.size()) {
             i=0;
         }
     }
