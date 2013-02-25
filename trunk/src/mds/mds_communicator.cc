@@ -23,14 +23,14 @@ MdsCommunicator::MdsCommunicator() {
 	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
 }
 
-vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
+uint32_t MdsCommunicator::requestCache(uint64_t segmentId,
 		HotnessRequest req, vector<uint32_t> osdList) {
 
 	string osdListString;
 	for (auto osdId : osdList) {
 		osdListString += to_string(osdId) + " ";
 	}
-	cout << "[CACHE] Cache Request " << getTime() << "Segment = " << segmentId << "OSD = " << osdListString << endl;
+	cout << "[CACHE] Cache Request " << getTime() << "Segment = " << segmentId << " OSD = " << osdListString << endl;
 
 	vector<uint32_t> newCacheOsdList;
 
@@ -70,7 +70,8 @@ vector<uint32_t> MdsCommunicator::requestCache(uint64_t segmentId,
 
 	}
 
-	return newCacheOsdList;
+	return newCacheOsdList.size();
+	//return newCacheOsdList; discard return, since now wait for reply
 }
 
 /**

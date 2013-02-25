@@ -16,4 +16,13 @@
 			<Password>cf8b7fa0b1bcd277da8217f04f498bd0</Password>
 		</MongoDB>
 	</MetaData>
+
+	<Hotness>
+		<TopK>
+			<THRESHOLD1>10</THRESHOLD1>
+			<THRESHOLD2>20</THRESHOLD2>
+			<HotCount>64</HotCount>
+			<HottestCount>64</HottestCount>
+		</TopK>
+	</Hotness>
 </NcvfsConfig>

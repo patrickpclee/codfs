@@ -1,6 +1,8 @@
 #include <mutex>
 #include <thread>
 #include "../common/debug.hh"
+#include "../config/config.hh"
+
 #include "hotnessmodule.hh"
 
 // DEFAULT HOTNESS ALG
@@ -9,21 +11,27 @@ const double NEWUPDATE = 10.0;
 const double NEWUPDATE15 = 10 * 1.5;
 const double NEWUPDATE25 = 10 * 2.5;
 
-// TOP K HOTNESS ALG
-const uint32_t THRESHOLD = 10;
-const uint32_t THRESHOLD2 = 20;
 
 const uint32_t REPLICA[3] = {0, 1, 3};
 
+extern ConfigLayer* configLayer;
 
 mutex hotnessMapMutex;
 mutex cacheMapMutex;
+mutex requestMapMutex;
+
 // Function Implementation go here
 
 /*
  * @brief Default constructor
  */
 HotnessModule::HotnessModule() {
+
+	_threshold1 = configLayer->getConfigInt("Hotness>TopK>THRESHOLD1");
+	_threshold2 = configLayer->getConfigInt("Hotness>TopK>THRESHOLD2");
+	_hotCount = configLayer->getConfigInt("Hotness>TopK>HotCount");
+	_hottestCount = configLayer->getConfigInt("Hotness>TopK>HottestCount");
+
 	_hotnessMap.clear();
 	_cacheMap.clear();
 }
@@ -40,16 +48,19 @@ struct HotnessRequest HotnessModule::updateSegmentHotness(uint64_t segmentId,
 			defaultHotnessUpdate(oldHotness, newHotness);
 			break;
 		case TOP_HOTNESS_ALG:
-			topHotnessUpdate(oldHotness, newHotness, 64, 64);
+			topHotnessUpdate(oldHotness, newHotness, _hottestCount, _hotCount);
 			break;
 		default:
 			break;
 	}
 	setSegmentHotnessEntry(segmentId, newHotness);
-	{
-		lock_guard<mutex> lk(hotnessMapMutex);
-		debug_yellow("Hotness of SegmentId %" PRIu64 " Value = %lf and Type = %" PRIu32 "\n", segmentId, _hotnessMap[segmentId].hotness, _hotnessMap[segmentId].type);
-	}
+
+	/*
+	   {
+	   lock_guard<mutex> lk(hotnessMapMutex);
+	   debug_yellow("Hotness of SegmentId %" PRIu64 " Value = %lf and Type = %" PRIu32 "\n", segmentId, _hotnessMap[segmentId].hotness, _hotnessMap[segmentId].type);
+	   }
+	 */
 	return checkHotnessCache(segmentId, newHotness.type);
 }
 
@@ -155,14 +166,14 @@ void HotnessModule::defaultHotnessUpdate(const struct Hotness& oldHotness,
  * loop all entry in _hotnessMap and check whether newHotness is in topK 
  */
 void HotnessModule::topHotnessUpdate(const struct Hotness& oldHotness,
-	struct Hotness& newHotness, uint32_t topK, uint32_t topK2) {
+		struct Hotness& newHotness, uint32_t topK, uint32_t topK2) {
 
 	newHotness.hotness = oldHotness.hotness+1;
 	newHotness.type = oldHotness.type;
 
 	// IF NOT ENOUGH REQUEST, JUST RETURN
-	if (newHotness.hotness < THRESHOLD) return;
-    if (newHotness.hotness < THRESHOLD2 && newHotness.type == HOT) return;
+	if (newHotness.hotness < _threshold1) return;
+	if (newHotness.hotness < _threshold2 && newHotness.type == HOT) return;
 
 	uint32_t count = 0;
 	if (oldHotness.type == COLD)
@@ -241,4 +252,16 @@ struct HotnessRequest HotnessModule::checkHotnessCache(uint64_t segmentId,
 		req.numOfNewCache = REPLICA[type] - req.cachedOsdList.size();
 	}
 	return req;
+}
+
+bool HotnessModule::setRequestSent(uint64_t segmentId, int32_t numOfReq) {
+	lock_guard<mutex> lk(requestMapMutex);
+	if (_requestSentMap[segmentId] > 0) return false;
+	_requestSentMap[segmentId] = numOfReq;
+	return true;	
+}
+
+void HotnessModule::decRequestSent(uint64_t segmentId, int32_t numOfReply) {
+	lock_guard<mutex> lk(requestMapMutex);
+	_requestSentMap[segmentId] -= numOfReply;
 }

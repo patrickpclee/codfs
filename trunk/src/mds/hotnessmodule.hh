@@ -70,6 +70,24 @@ class HotnessModule {
 		 */
 		vector<uint32_t>  getSegmentCacheEntry(uint64_t segmentId);
 
+		/*
+ 		 * @brief To avoid duplicate request send for make cache
+		 *
+		 * @param segmentId segmentId for make request
+		 * @param numOfReq number of request try to make
+		 * @return True for success and false for not
+		 */
+		bool setRequestSent(uint64_t segmentId, int32_t numOfReq);
+		
+		/*
+ 		 * @brief After getting reply for make cache, decrease
+		 *
+		 * @param segmentId segmentId for make request
+		 * @param numOfReply received reply
+		 */
+		void decRequestSent(uint64_t segmentId, int32_t numOfReply);
+
+
 	private:
 
 		/*
@@ -124,7 +142,6 @@ class HotnessModule {
 				struct Hotness& newHotness, uint32_t topK, uint32_t topK2);
 
 
-
 		/*
  		 * @brief Map structure for storing the hotness
 		 */
@@ -134,6 +151,17 @@ class HotnessModule {
  		 * @brief Map structure for storing the cache list
 		 */
 		map<uint64_t, vector<uint32_t> > _cacheMap;
+
+		/*
+ 		 * @brief Map structure for storing the request sent for each segment
+		 */
+		map<uint64_t, int32_t> _requestSentMap;
+
+
+		/*
+ 		 * @brief For Top K update algorithm
+		 */
+		uint32_t _threshold1, _threshold2, _hotCount, _hottestCount;
 };
 
 #endif
