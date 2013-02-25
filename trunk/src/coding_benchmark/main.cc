@@ -61,6 +61,8 @@ int main(int argc, char *argv[]) {
 			if (vm.count("help")) {
 				cout << endl << "ENCODE: ./CODING_BENCHMARK -a encode -c [CODING] -n ... -fs [FILESIZE] -ss [SEGMENT_SIZE]" << endl;
 				cout << "DECODE: ./CODING_BENCHMARK -a decode -c [CODING] -n ... -ne [NUM_OF_ERASURE] -fs [FILESIZE] -ss [SEGMENT_SIZE]" << endl;
+				cout << "REPAIR: ./CODING_BENCHMARK -a repair -c [CODING] -n ... -ne [NUM_OF_ERASURE] -fs [FILESIZE] -ss [SEGMENT_SIZE]" << endl;
+				cout << "DECODE&REPAIR: ./CODING_BENCHMARK -a all -c [CODING] -n ... -ne [NUM_OF_ERASURE] -fs [FILESIZE] -ss [SEGMENT_SIZE]" << endl;
 				cout << "Coding Benchmark Help" << endl << desc << endl;
 				return 0;
 			}
@@ -249,7 +251,7 @@ int main(int argc, char *argv[]) {
 		return 0;
 
 
-	if (action == "decode") {
+	if ((action == "decode") || (action == "all")) {
 		cout << endl;
 		cout << "///Decoding Data///" << endl;
 
@@ -301,9 +303,8 @@ int main(int argc, char *argv[]) {
 				tDecode = Clock::now();
 
 				free(segmentData.buf);
-				for(auto blockSymbol : repairBlockDataList) {
-					if(blockSymbol.buf != NULL)
-						free(blockSymbol.buf);
+				for(auto blockSymbol : requiredBlockSymbols) {
+					free(repairBlockDataList[blockSymbol.first].buf);
 				}
 
 				double durationCurrentDecode = (chrono::duration_cast <milliseconds> (tDecode - tRead)).count() / 1024.0;
@@ -328,10 +329,9 @@ int main(int argc, char *argv[]) {
 		cout << "Average Read Size: " << allReadSize / numOfBlocks / 1024 / 1024 << " MB" << endl;
 		cout << "Average Time Spent on Decode: " << durationTotalDecode / numOfBlocks << " secs" << endl;
 		cout << "Average Decode Rate: " << fileSize / durationTotalDecode * numOfBlocks / 1024 / 1024 << " MB/s" << endl;
-		return 0;
 	}
 
-	if (action == "repair") {
+	if ((action == "repair") || (action == "all" )){
 		cout << endl;
 		cout << "///Repairing Data///" << endl;
 
@@ -391,10 +391,8 @@ int main(int argc, char *argv[]) {
 				}
 
 				
-				for(auto blockData : repairBlockDataList) {
-					if(blockData.buf != NULL){
-						free(blockData.buf);
-					}
+				for(auto blockSymbol : repairBlockSymbols) {
+					free(repairBlockDataList[blockSymbol.first].buf);
 				}
 
 				double durationCurrentRepair = (chrono::duration_cast <milliseconds> (tDecode - tRead)).count() / 1024.0;
@@ -418,7 +416,6 @@ int main(int argc, char *argv[]) {
 		cout << "Average Read Size: " << allReadSize / numOfBlocks /1024 / 1024 << " MB" << endl;
 		cout << "Average Time Spent on Repair: " << durationTotalRepair / numOfBlocks << " secs" << endl;
 		cout << "Average Repair Rate: " << totalRepairSize / durationTotalRepair / 1024 / 1024 << " MB/s" << endl;
-		return 0;
 	}
 
 	return 0;

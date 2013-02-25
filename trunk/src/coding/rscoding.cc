@@ -86,6 +86,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 
 	if (m == 0){
 		tfree(data);
+		free(matrix);
 		return blockDataList;
 	}
 
@@ -112,7 +113,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 	// free memory
 	tfree(data);
 	tfree(code);
-	tfree(matrix);
+	free(matrix);
 
 	return blockDataList;
 }
@@ -348,6 +349,8 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	}
 	tfree(code);
 
+	free(matrix);
+	tfree(erasures);
 	//}
 
 	return ret;

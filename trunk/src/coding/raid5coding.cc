@@ -286,10 +286,11 @@ vector<BlockData> Raid5Coding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	}
 
 	rebuildBlockData.info.blockId = repairBlockIdList[0];
-	rebuildBlockData.info.segmentId =
-			blockData[symbolList[0].first].info.segmentId;
+	rebuildBlockData.info.segmentId = blockData[symbolList[0].first].info.segmentId;
 
 	rebuildBlockData.info.blockSize = blockSize;
+
+	blockData[repairBlockIdList[0]] = rebuildBlockData;
 
 	// for raid5, there can be only one rebuildBlockData
 	return {rebuildBlockData};
