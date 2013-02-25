@@ -11,10 +11,12 @@ struct Hotness {
 		hotness = 0;
 		type = COLD;
 		timestamp = time(NULL);
+		requested = 0;
 	}
 	double hotness;
 	enum HotnessType type;
 	uint32_t timestamp;
+	uint32_t requested;
 };
 
 struct HotnessRequest {

@@ -22,10 +22,10 @@ public:
 	 * @param segmentId Segment ID
 	 * @param req HotnessRequest
 	 * @param osdList OSD list
-	 * @return Position of new cache
+	 * @return actual number of request made for cache
 	 */
 
-	vector<uint32_t> requestCache(uint64_t segmentId, HotnessRequest req, vector<uint32_t> osdList);
+	uint32_t requestCache(uint64_t segmentId, HotnessRequest req, vector<uint32_t> osdList);
 
 	/**
 	 * @brief	Reply Segment and Primary List to Client
