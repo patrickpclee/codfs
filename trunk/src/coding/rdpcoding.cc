@@ -346,7 +346,7 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 }
 
 vector<BlockData> RDPCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
-		vector<BlockData> &blockData, block_list_t &symbolList,
+		vector<BlockData> &blockDataList, block_list_t &symbolList,
 		uint32_t segmentSize, string setting) {
 
 	const uint32_t n = getBlockCountFromSetting(setting);
@@ -354,11 +354,11 @@ vector<BlockData> RDPCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	const uint32_t blockSize = getBlockSize(segmentSize, k);
 	//const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
-	uint32_t segmentId = blockData[symbolList[0].first].info.segmentId;
+	uint32_t segmentId = blockDataList[symbolList[0].first].info.segmentId;
 
-	char** tempBlock = repairDataBlocks(blockData, symbolList, segmentSize, setting);
+	char** tempBlock = repairDataBlocks(blockDataList, symbolList, segmentSize, setting);
 
-	vector<BlockData> blockDataList;
+	vector<BlockData> repairedBlockDataList;
 	for(auto targetBlock : repairBlockIdList) {
 		struct BlockData blockData;
 		blockData.info.segmentId = segmentId;
@@ -367,12 +367,13 @@ vector<BlockData> RDPCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		blockData.buf = MemoryPool::getInstance().poolMalloc(blockSize);
 
 		memcpy(blockData.buf, tempBlock[targetBlock], blockSize);
-		blockDataList.push_back(blockData);
+		blockDataList[targetBlock] = blockData;
+		repairedBlockDataList.push_back(blockData);
 	}
 
 	for(uint32_t i = 0; i < n; ++i)
 		MemoryPool::getInstance().poolFree(tempBlock[i]);
 	MemoryPool::getInstance().poolFree((char*)tempBlock);
 	
-	return blockDataList;
+	return repairedBlockDataList;
 }

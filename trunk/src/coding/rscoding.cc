@@ -292,7 +292,7 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	// copy segmentID from first available block
 	segmentData.info.segmentId = blockData[blockIdList[0]].info.segmentId;
 	segmentData.info.segmentSize = segmentSize;
-	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
+	//segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
 

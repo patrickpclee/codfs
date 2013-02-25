@@ -366,6 +366,7 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 			memcpy(blockData.buf + j * symbolSize, RSBlockDataList[RSBlockId].buf, symbolSize);
 		}
 
+		blockDataList[repairBlockIdList[i]] = blockData;
 		repairedBlockData.push_back(blockData);
 	}
 
