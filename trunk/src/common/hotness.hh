@@ -21,6 +21,7 @@ struct Hotness {
 
 struct HotnessRequest {
 	uint32_t numOfNewCache;
+	enum HotnessType type;
 	vector<uint32_t> cachedOsdList;
 };
 

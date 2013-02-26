@@ -188,14 +188,11 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 	// Check whether new cache should be issued
 	if (req.numOfNewCache > 0) {
 		// Issue the cache request
-		if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache)) {
+		if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache, req.type)) {
 			uint32_t actualReq = _mdsCommunicator->requestCache(segmentId, 
 					req, segmentMetaData._nodeList);
+			cout << "194Actual request " << segmentId << " osd " << actualReq << endl;
 
-			if (actualReq < req.numOfNewCache) {
-				// pretend to send reply back
-				_hotnessModule->decRequestSent(segmentId, req.numOfNewCache - actualReq);
-			}
 		} // else don't send request
 
 	}
@@ -367,14 +364,11 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 		// Check whether new cache should be issued
 		if (req.numOfNewCache > 0) {
 			// Issue the cache request
-			if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache)) {
+			if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache, req.type)) {
 				uint32_t actualReq = _mdsCommunicator->requestCache(segmentId, req, 
 						segmentMetaData._nodeList);
+				cout << "369Actual request " << segmentId << " osd " << actualReq << endl;
 
-				if (actualReq < req.numOfNewCache) {
-					// pretend to send reply back
-					_hotnessModule->decRequestSent(segmentId, req.numOfNewCache - actualReq);
-				}
 			} // else don't send request
 		}
 	}
@@ -389,8 +383,6 @@ void Mds::cacheSegmentReplyProcessor (uint64_t segmentId, uint32_t osdId) {
 	cout << "[CACHE] Cache Completed " << getTime() << "Segment = " << segmentId << " OSD = " << osdId << endl;
 	// first update cache
 	_hotnessModule->updateSegmentCache(segmentId, osdId);
-	// decrease segment request
-	_hotnessModule->decRequestSent(segmentId, 1);
 }
 
 
@@ -412,14 +404,10 @@ void Mds::precacheSegmentProcessor(uint32_t requestId, uint32_t connectionId,
 	// Check whether new cache should be issued
 	if (req.numOfNewCache > 0) {
 		// Issue the cache request
-		if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache)) {
+		if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache, req.type)) {
 			uint32_t actualReq = _mdsCommunicator->requestCache(segmentId, 
 					req, segmentMetaData._nodeList);
-
-			if (actualReq < req.numOfNewCache) {
-				// pretend to send reply back
-				_hotnessModule->decRequestSent(segmentId, req.numOfNewCache - actualReq);
-			}
+			cout << "409Actual request " << segmentId << " osd " << actualReq << endl;
 		} // else don't send request
 	}
 

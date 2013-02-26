@@ -75,19 +75,12 @@ class HotnessModule {
 		 *
 		 * @param segmentId segmentId for make request
 		 * @param numOfReq number of request try to make
+		 * @param type Hottness type
 		 * @return True for success and false for not
 		 */
-		bool setRequestSent(uint64_t segmentId, int32_t numOfReq);
+		bool setRequestSent(uint64_t segmentId, int32_t numOfReq, enum
+			HotnessType type);
 		
-		/*
- 		 * @brief After getting reply for make cache, decrease
-		 *
-		 * @param segmentId segmentId for make request
-		 * @param numOfReply received reply
-		 */
-		void decRequestSent(uint64_t segmentId, int32_t numOfReply);
-
-
 	private:
 
 		/*
@@ -155,7 +148,8 @@ class HotnessModule {
 		/*
  		 * @brief Map structure for storing the request sent for each segment
 		 */
-		map<uint64_t, int32_t> _requestSentMap;
+		map<uint64_t, bool> _requestHotSentMap;
+		map<uint64_t, bool> _requestHottestSentMap;
 
 
 		/*
