@@ -362,7 +362,7 @@ vector<BlockData> EMBRCoding::repairBlocks(vector<uint32_t> repairBlockIdList, v
 				// Horizontal Group
 				RSBlockId = base_id_h[j] + id - (j + 1);
 		
-			//debug("%" PRIu32 "-%" PRIu32 " <- %" PRIu32 "\n", id, j, RSBlockId);
+			debug("%" PRIu32 "-%" PRIu32 " <- %" PRIu32 "\n", id, j, RSBlockId);
 			memcpy(blockData.buf + j * symbolSize, RSBlockDataList[RSBlockId].buf, symbolSize);
 		}
 

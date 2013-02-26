@@ -264,10 +264,14 @@ int main(int argc, char *argv[]) {
 		Clock::time_point tDecode = Clock::now();
 		double durationTotalDecode = 0.0;
 		uint64_t allReadSize = 0;
-		for(uint32_t i = 0; i < (uint32_t)numOfBlocks; ++i) {
+		for(uint32_t i = 0; i < (uint32_t)numOfBlocks + 1; ++i) {
 			double durationDecode = 0.0;
-			blockStatus[i] = false;
-			cout << "Erasure: " << i << endl;
+			if(i < (uint32_t)numOfBlocks) {
+				blockStatus[i] = false;
+				cout << "Erasure: " << i << endl;
+			} else {
+				cout << "Erasure: None" << endl;
+			}
 			uint64_t totalReadSize = 0;
 			for(uint32_t j = 0; j < (uint32_t)numOfSegments; ++j) {
 				block_list_t requiredBlockSymbols = _coding->getRequiredBlockSymbols(blockStatus, segmentSize, codingSetting);
@@ -322,7 +326,9 @@ int main(int argc, char *argv[]) {
 			durationTotalDecode += durationDecode;
 			allReadSize += totalReadSize;
 
-			blockStatus[i] = true;
+			if(i < (uint32_t)numOfBlocks) {
+				blockStatus[i] = true;
+			}
 		}
 
 		cout << fixed << setprecision(2);
@@ -388,6 +394,7 @@ int main(int argc, char *argv[]) {
 
 				for(auto blockData : repairedBlocks) {
 					repairSize += blockData.info.blockSize;
+					free(blockData.buf);
 				}
 
 				
