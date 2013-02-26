@@ -84,18 +84,18 @@ vector<BlockData> CauchyCoding::encode(SegmentData segmentData, string setting) 
 
 	jerasure_schedule_encode(k, m, w, smart, data, code, w*size, size);
 
-//	for (uint32_t i = 0; i < k; i++) {
-//		char path[100];
-//		sprintf (path, "encode %" PRIu32, i);
-//		FILE* f = fopen (path, "w");
-//		fwrite (data[i], w*size, 1,f);
-//	}
-//	for (uint32_t i = 0; i < m; i++) {
-//		char path[100];
-//		sprintf (path, "encode %" PRIu32, i+k);
-//		FILE* f = fopen (path, "w");
-//		fwrite (code[i], w*size, 1,f);
-//	}
+	//	for (uint32_t i = 0; i < k; i++) {
+	//		char path[100];
+	//		sprintf (path, "encode %" PRIu32, i);
+	//		FILE* f = fopen (path, "w");
+	//		fwrite (data[i], w*size, 1,f);
+	//	}
+	//	for (uint32_t i = 0; i < m; i++) {
+	//		char path[100];
+	//		sprintf (path, "encode %" PRIu32, i+k);
+	//		FILE* f = fopen (path, "w");
+	//		fwrite (code[i], w*size, 1,f);
+	//	}
 
 	for (uint32_t i = 0; i < m; i++) {
 		struct BlockData blockData;
@@ -104,24 +104,24 @@ vector<BlockData> CauchyCoding::encode(SegmentData segmentData, string setting) 
 		blockData.info.blockSize = size*w;
 
 		blockData.buf = code[i];
-//		blockData.buf = MemoryPool::getInstance().poolMalloc(size*w);
-//		memcpy(blockData.buf, code[i], size*w);
+		//		blockData.buf = MemoryPool::getInstance().poolMalloc(size*w);
+		//		memcpy(blockData.buf, code[i], size*w);
 
 		blockDataList.push_back(blockData);
 	}
 
-//	for (uint32_t i = 0; i < k+m; i++) {
-//		char path[100];
-//		sprintf (path, "ENCODE %" PRIu32, i);
-//		FILE* f = fopen (path, "w");
-//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
-//	}
-//	for (uint32_t i = 0; i < k+m; i++) {
-//			char path[100];
-//			sprintf (path, "ENCODE %" PRIu32, i);
-//			FILE* f = fopen (path, "w");
-//			fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1, f);
-//		}
+	//	for (uint32_t i = 0; i < k+m; i++) {
+	//		char path[100];
+	//		sprintf (path, "ENCODE %" PRIu32, i);
+	//		FILE* f = fopen (path, "w");
+	//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
+	//	}
+	//	for (uint32_t i = 0; i < k+m; i++) {
+	//			char path[100];
+	//			sprintf (path, "ENCODE %" PRIu32, i);
+	//			FILE* f = fopen (path, "w");
+	//			fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1, f);
+	//		}
 
 	// free memory
 	//for (uint32_t i = 0; i < k; i++) {
@@ -152,17 +152,17 @@ SegmentData CauchyCoding::decode(vector<BlockData> &blockDataList,
 	const uint32_t w = params[2];
 	const uint32_t size = roundTo(roundTo(segmentSize, k*w) / (k*w), 4);
 
-//	if (blockIdList.size() < k) {
-//		cerr << "Not enough blocks for decode " << blockIdList.size() << endl;
-//		exit(-1);
-//	}
-//
-//	for (uint32_t i = 0; i < k+m; i++) {
-//		char path[100];
-//		sprintf (path, "DECODE %" PRIu32, i);
-//		FILE* f = fopen (path, "w");
-//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
-//	}
+	if (blockIdList.size() < k) {
+		cerr << "Not enough blocks for decode " << blockIdList.size() << endl;
+		exit(-1);
+	}
+	//
+	//	for (uint32_t i = 0; i < k+m; i++) {
+	//		char path[100];
+	//		sprintf (path, "DECODE %" PRIu32, i);
+	//		FILE* f = fopen (path, "w");
+	//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
+	//	}
 
 	struct SegmentData segmentData;
 
@@ -173,99 +173,72 @@ SegmentData CauchyCoding::decode(vector<BlockData> &blockDataList,
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
 
-	if (blockIdList.size() != k + m) {
-		int *matrix = cauchy_good_general_coding_matrix(k, m, w);
-		int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
-//		int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
+	int *matrix = cauchy_good_general_coding_matrix(k, m, w);
+	int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
+	//		int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
 
-		char **data, **code;
-		int *erasures;
-		int j = 0;
+	char **data, **code;
+	int *erasures;
+	int j = 0;
 
-		data = talloc<char*, uint32_t>(k);
-		code = talloc<char*, uint32_t>(m);
-		erasures = talloc<int, uint32_t>(k + m - blockIdList.size() + 1);
+	data = talloc<char*, uint32_t>(k);
+	code = talloc<char*, uint32_t>(m);
+	erasures = talloc<int, uint32_t>(k + m - blockIdList.size() + 1);
 
-		for (uint32_t i = 0; i < k + m; i++) {
-			i < k ? data[i] = talloc<char, uint32_t>(size*w) : code[i - k] =
-				talloc<char, uint32_t>(size*w);
-			if (blockIdListSet.count(i) > 0) {
-				i < k ? memcpy(data[i], blockDataList[i].buf, size*w) : memcpy(
-						code[i - k], blockDataList[i].buf, size*w);
-			} else {
-				erasures[j++] = i;
-			}
+	for (uint32_t i = 0; i < k + m; i++) {
+		i < k ? data[i] = talloc<char, uint32_t>(size*w) : code[i - k] =
+			talloc<char, uint32_t>(size*w);
+		if (blockIdListSet.count(i) > 0) {
+			i < k ? memcpy(data[i], blockDataList[i].buf, size*w) : memcpy(
+					code[i - k], blockDataList[i].buf, size*w);
+		} else {
+			erasures[j++] = i;
 		}
-		erasures[j] = -1;
-
-
-//		for (uint32_t i = 0; i < k; i++) {
-//			char path[100];
-//			sprintf (path, "predecode %" PRIu32, i);
-//			FILE* f = fopen (path, "w");
-//			fwrite (data[i], w*size, 1,f);
-//		}
-//		for (uint32_t i = 0; i < m; i++) {
-//					char path[100];
-//					sprintf (path, "predecode %" PRIu32, i+k);
-//					FILE* f = fopen (path, "w");
-//					fwrite (code[i], w*size, 1,f);
-//				}
-		jerasure_schedule_decode_lazy(k, m, w, bitmatrix, erasures, data, code, w*size, size, 1);
-
-		for (uint32_t i = 0; i < k + m - blockIdList.size(); i++) {
-			struct BlockData temp;
-			temp.info.segmentId = segmentData.info.segmentId;
-			temp.info.blockId = erasures[i];
-			temp.info.blockSize = size*w;
-
-			temp.buf = MemoryPool::getInstance().poolMalloc(size*w);
-			memcpy(temp.buf,
-					(uint32_t) erasures[i] < k ?
-					data[erasures[i]] : code[erasures[i] - k], size*w);
-
-			blockDataList[erasures[i]] = temp;
-
-		}
-
-
-		for (uint32_t i = 0; i < m; i++) {
-			MemoryPool::getInstance().poolFree(blockDataList[k + i].buf);
-		}
-
-		// free memory
-		for (uint32_t i = 0; i < k; i++) {
-			tfree(data[i]);
-		}
-		tfree(data);
-
-		for (uint32_t i = 0; i < m; i++) {
-			tfree(code[i]);
-		}
-		tfree(code);
-
 	}
+	erasures[j] = -1;
 
-	blockIdList.clear();
-	for (uint32_t i = 0; i < k; i++) {
-		blockIdList.push_back(i);
-	}
 
-//	for (uint32_t i = 0; i < k+m; i++) {
-//		char path[100];
-//		sprintf (path, "DECODE %" PRIu32, i);
-//		FILE* f = fopen (path, "w");
-//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
-//	}
+	//		for (uint32_t i = 0; i < k; i++) {
+	//			char path[100];
+	//			sprintf (path, "predecode %" PRIu32, i);
+	//			FILE* f = fopen (path, "w");
+	//			fwrite (data[i], w*size, 1,f);
+	//		}
+	//		for (uint32_t i = 0; i < m; i++) {
+	//					char path[100];
+	//					sprintf (path, "predecode %" PRIu32, i+k);
+	//					FILE* f = fopen (path, "w");
+	//					fwrite (code[i], w*size, 1,f);
+	//				}
+	jerasure_schedule_decode_lazy(k, m, w, bitmatrix, erasures, data, code, w*size, size, 1);
+
+	//	for (uint32_t i = 0; i < k+m; i++) {
+	//		char path[100];
+	//		sprintf (path, "DECODE %" PRIu32, i);
+	//		FILE* f = fopen (path, "w");
+	//		fwrite (blockDataList[i].buf, blockDataList[i].info.blockSize, 1,f);
+	//	}
 
 	uint64_t offset = 0;
 	for (uint32_t i = 0; i < k - 1; i++) {
-		memcpy(segmentData.buf + offset, blockDataList[i].buf,
-				blockDataList[i].info.blockSize);
-		offset += blockDataList[i].info.blockSize;
+		memcpy(segmentData.buf + offset, data[i], size);
+		offset += size;
 	}
-	memcpy(segmentData.buf + offset, blockDataList[k - 1].buf,
-			segmentSize - offset);
+	memcpy(segmentData.buf + offset, data[k - 1], segmentSize - offset);
+
+
+	// free memory
+	for (uint32_t i = 0; i < k; i++) {
+		tfree(data[i]);
+	}
+	tfree(data);
+
+	for (uint32_t i = 0; i < m; i++) {
+		tfree(code[i]);
+	}
+	tfree(code);
+	tfree(erasures);
+	tfree(matrix);
 
 	return segmentData;
 }
@@ -324,12 +297,12 @@ vector<BlockData> CauchyCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		vector<BlockData> &blockData, block_list_t &symbolList,
 		uint32_t segmentSize, string setting) {
 
-//	string blockIdString;
-//	for (auto block : repairBlockIdList) {
-//		blockIdString += block + " ";
-//	}
-//
-//	debug_yellow("Start repairBlocks for %s\n", blockIdString.c_str());
+	//	string blockIdString;
+	//	for (auto block : repairBlockIdList) {
+	//		blockIdString += block + " ";
+	//	}
+	//
+	//	debug_yellow("Start repairBlocks for %s\n", blockIdString.c_str());
 
 	//set<uint32_t> repairBlockIdListSet(repairBlockIdList.begin(), repairBlockIdList.end());
 	vector<BlockData> ret;
@@ -357,14 +330,14 @@ vector<BlockData> CauchyCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	// copy segmentID from first available block
 	segmentData.info.segmentId = blockData[blockIdList[0]].info.segmentId;
 	segmentData.info.segmentSize = segmentSize;
-	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
+	//segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
 
 	//if (blockIdList.size() != k + m) {
 	int *matrix = cauchy_good_general_coding_matrix(k, m, w);
 	int *bitmatrix = jerasure_matrix_to_bitmatrix(k, m, w, matrix);
-//	int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
+	//	int **smart = jerasure_smart_bitmatrix_to_schedule(k, m, w, bitmatrix);
 
 	char **data, **code;
 	int *erasures;
@@ -388,21 +361,21 @@ vector<BlockData> CauchyCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	jerasure_schedule_decode_lazy(k, m, w, bitmatrix, erasures, data, code, w*size, size, 1);
 
-	for (uint32_t i = 0; i < k + m - blockIdList.size(); i++) {
-		if(repairListSet.count(erasures[i]) > 0){
-			struct BlockData temp;
-			temp.info.segmentId = segmentData.info.segmentId;
-			temp.info.blockId = erasures[i];
-			temp.info.blockSize = size*w;
+	for (uint32_t i = 0; i < repairBlockIdList.size(); i++) {
+		struct BlockData temp;
+		temp.info.segmentId = segmentData.info.segmentId;
+		//temp.info.blockId = erasures[i];
+		temp.info.blockId = repairBlockIdList[i];
+		temp.info.blockSize = size*w;
 
-			temp.buf = MemoryPool::getInstance().poolMalloc(size*w);
-			memcpy(temp.buf,
-					(uint32_t) erasures[i] < k ?
-					data[erasures[i]] : code[erasures[i] - k], size*w);
+		temp.buf = MemoryPool::getInstance().poolMalloc(size*w);
+		memcpy(temp.buf,
+				(uint32_t) erasures[i] < k ?
+				data[erasures[i]] : code[erasures[i] - k], size*w);
 
-			blockData[erasures[i]] = temp;
-			ret.push_back(temp);
-		}
+		blockData[temp.info.blockId] = temp;
+		//blockData[erasures[i]] = temp;
+		ret.push_back(temp);
 	}
 
 	// free memory
@@ -416,6 +389,8 @@ vector<BlockData> CauchyCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	}
 	tfree(code);
 
+	free(matrix);
+	tfree(erasures);
 	//}
 
 	return ret;
