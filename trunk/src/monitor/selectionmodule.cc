@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <set>
 #include <iterator>
+#include <algorithm>
 #include "../config/config.hh"
 #include "../common/debug.hh"
 #include "selectionmodule.hh"
@@ -153,6 +154,43 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfSegs) {
 vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t 
 		numOfBlks, uint32_t	primary, uint64_t blkSize) {
 
+#ifdef RANDOM_CHOOSE_SECONDARY
+    vector<uint32_t> allOnlineList;
+    {
+        lock_guard<mutex> lk(osdStatMapMutex);
+        for(auto& entry: _osdStatMap) {
+            if (entry.second.osdHealth == ONLINE && entry.first != primary) {
+                allOnlineList.push_back(entry.first);
+            }
+        }
+    }
+
+    vector<struct BlockLocation> secondaryList;
+    struct BlockLocation tmp;
+    tmp.osdId = primary;
+    tmp.blockId = 0;
+    secondaryList.push_back(tmp);
+    numOfBlks--;
+
+    random_shuffle(allOnlineList.begin(), allOnlineList.end());
+    allOnlineList.push_back(primary); // ensure primary is at the end
+
+    int i = 0;
+    while (numOfBlks > 0) {
+        tmp.osdId = allOnlineList[i];
+        tmp.blockId = 0;
+        secondaryList.push_back(tmp);
+        i++;
+        numOfBlks--;
+
+        // start repeating if no more nodes available
+        if (i == (int)allOnlineList.size()) {
+            i=0;
+        }
+    }
+    return secondaryList;
+#else
+
 	vector<uint32_t> allOnlineList;
 	{
 		lock_guard<mutex> lk(osdStatMapMutex);
@@ -193,6 +231,7 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t
 	}
 
 	return secondaryList;
+#endif
 }
 
 void SelectionModule::addNewOsdToLBMap(uint32_t osdId) {
