@@ -137,7 +137,7 @@ void parseOption(int argc, char* argv[]) {
 			break;
 		case 4:
 			codingScheme = RAID5_CODING;
-			codingSetting = Raid5Coding::generateSetting(5);
+			codingSetting = Raid5Coding::generateSetting(6);
 			break;
 		case 5:
 			codingScheme = RS_CODING;
@@ -153,7 +153,7 @@ void parseOption(int argc, char* argv[]) {
 			break;
 		case 8:
 			codingScheme = EVENODD_CODING;
-			codingSetting = EvenOddCoding::generateSetting(5);
+			codingSetting = EvenOddCoding::generateSetting(7);
 			break;
 		default:
 			debug("Invalid Test = %d\n", benchmarkTest);
