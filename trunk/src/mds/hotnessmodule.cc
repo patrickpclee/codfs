@@ -18,7 +18,8 @@ extern ConfigLayer* configLayer;
 
 mutex hotnessMapMutex;
 mutex cacheMapMutex;
-mutex requestMapMutex;
+mutex requestHottestMapMutex;
+mutex requestHotMapMutex;
 
 // Function Implementation go here
 
@@ -33,6 +34,8 @@ HotnessModule::HotnessModule() {
 	_hottestCount = configLayer->getConfigInt("Hotness>TopK>HottestCount");
 
 	_hotnessMap.clear();
+	_requestHotSentMap.clear();
+	_requestHottestSentMap.clear();
 	_cacheMap.clear();
 }
 
@@ -246,6 +249,7 @@ struct HotnessRequest HotnessModule::checkHotnessCache(uint64_t segmentId,
 
 	struct HotnessRequest req;
 	req.cachedOsdList = getSegmentCacheEntry(segmentId);
+	req.type = type;
 	if (REPLICA[type] <= req.cachedOsdList.size()) {
 		req.numOfNewCache = 0;
 	} else {
@@ -254,14 +258,18 @@ struct HotnessRequest HotnessModule::checkHotnessCache(uint64_t segmentId,
 	return req;
 }
 
-bool HotnessModule::setRequestSent(uint64_t segmentId, int32_t numOfReq) {
-	lock_guard<mutex> lk(requestMapMutex);
-	if (_requestSentMap[segmentId] > 0) return false;
-	_requestSentMap[segmentId] = numOfReq;
-	return true;	
-}
-
-void HotnessModule::decRequestSent(uint64_t segmentId, int32_t numOfReply) {
-	lock_guard<mutex> lk(requestMapMutex);
-	_requestSentMap[segmentId] -= numOfReply;
+bool HotnessModule::setRequestSent(uint64_t segmentId, int32_t numOfReq, enum
+	HotnessType type) {
+	if (type == HOT) {
+		lock_guard<mutex> lk(requestHotMapMutex);
+		if (_requestHotSentMap.find(segmentId) != _requestHotSentMap.end()) return false;
+		_requestHotSentMap[segmentId] = true;
+		return true;
+	} else if (type == HOTTEST) {
+		lock_guard<mutex> lk(requestHottestMapMutex);
+		if (_requestHottestSentMap.find(segmentId) != _requestHottestSentMap.end()) return false;
+		_requestHottestSentMap[segmentId] = true;
+		return true;
+	}
+	return false;
 }
