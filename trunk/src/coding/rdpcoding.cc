@@ -91,7 +91,7 @@ vector<BlockData> RDPCoding::encode(SegmentData segmentData, string setting) {
 	return blockDataList;
 }
 
-char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_t &blockList, uint32_t segmentSize, string setting) {
+char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_t &blockList, uint32_t segmentSize, string setting, bool recovery) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
 	const uint32_t blockSize = getBlockSize(segmentSize, k);
@@ -104,6 +104,7 @@ char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_
 	std::fill_n (diagonal_group_erasure, k + 1, k + 1);
 
 	uint32_t numOfFailedDisk = n;
+	uint32_t numOfFailedDataDisk = k;
 	uint32_t disk_block_erasure[n];
 	std::fill_n (disk_block_erasure, n, k);
 
@@ -120,6 +121,8 @@ char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_
 		uint32_t id = blockSymbols.first;
 		disk_block_erasure[id] = 0;
 		--numOfFailedDisk;
+		if(id < k)
+			--numOfFailedDataDisk;
 		uint32_t offset = 0;
 		for(auto symbol : symbolList) {
 			memcpy(tempBlock[id] + symbol.first, blockDataList[id].buf + offset, symbol.second);
@@ -137,6 +140,9 @@ char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_
 			}
 		}
 	}
+
+	if(!recovery && (numOfFailedDataDisk == 0))
+		return tempBlock;
 
 	uint32_t id;
 	uint32_t symbol;
@@ -356,7 +362,7 @@ vector<BlockData> RDPCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	uint32_t segmentId = blockDataList[symbolList[0].first].info.segmentId;
 
-	char** tempBlock = repairDataBlocks(blockDataList, symbolList, segmentSize, setting);
+	char** tempBlock = repairDataBlocks(blockDataList, symbolList, segmentSize, setting, true);
 
 	vector<BlockData> repairedBlockDataList;
 	for(auto targetBlock : repairBlockIdList) {

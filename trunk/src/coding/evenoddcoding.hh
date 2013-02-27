@@ -41,7 +41,7 @@ protected:
 
 	uint32_t getParameters(string setting);
 	virtual char** repairDataBlocks(vector<BlockData> &blockDataList,
-			block_list_t &symbolList, uint32_t segmentSize, string setting);
+			block_list_t &symbolList, uint32_t segmentSize, string setting, bool recovery = false);
 };
 
 #endif
