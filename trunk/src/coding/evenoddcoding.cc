@@ -115,7 +115,7 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 }
 
 
-char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_t &blockList, uint32_t segmentSize, string setting) {
+char** EvenOddCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_t &blockList, uint32_t segmentSize, string setting, bool recovery) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
 	const uint32_t blockSize = getBlockSize(segmentSize, k);
