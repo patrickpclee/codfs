@@ -481,10 +481,12 @@ void StorageModule::closeSegmentTransferCache(uint64_t segmentId) {
 	debug("Segment Cache ID = %" PRIu64 " closed\n", segmentId);
 }
 
-void StorageModule::doFlushFile(FILE* filePtr, bool &isFinished) {
+void StorageModule::doFlushFile(string filePath, bool &isFinished) {
+	FILE* filePtr = NULL;
 	try {
-	fflush(filePtr);
-	//fsync(fileno(filePtr));
+		filePtr = _openedFile->get(filePath);
+		fflush(filePtr);
+		//fsync(fileno(filePtr));
 	} catch (out_of_range& oor) { // file pointer not found in cache
 		return; // file already closed by cache, do nothing
 	}
@@ -492,14 +494,14 @@ void StorageModule::doFlushFile(FILE* filePtr, bool &isFinished) {
 	return ;
 }
 
-void StorageModule::flushFile(FILE* filePtr) {
+void StorageModule::flushFile(string filePath) {
 	bool isFinished = false;
 	int priority = 10;
 
 #ifdef USE_IO_THREADS
 	schedule(_iotp,
 			prio_task_func(priority,
-					boost::bind(&StorageModule::doFlushFile, this, filePtr, boost::ref(isFinished))));
+					boost::bind(&StorageModule::doFlushFile, this, filePath, boost::ref(isFinished))));
 
 	while (!isFinished) {
 		usleep(IO_POLL_INTERVAL);
@@ -513,46 +515,23 @@ void StorageModule::flushFile(FILE* filePtr) {
 
 void StorageModule::flushSegmentDiskCache(uint64_t segmentId) {
 
-	FILE* filePtr = NULL;
-	try {
-		string filepath = generateSegmentPath(segmentId, _segmentFolder);
-		filePtr = _openedFile->get(filepath);
-		flushFile(filePtr);
-		//fflush(filePtr);
-		//fsync(fileno(filePtr));
-	} catch (out_of_range& oor) { // file pointer not found in cache
-		return; // file already closed by cache, do nothing
-	}
+	string filepath = generateSegmentPath(segmentId, _segmentFolder);
+	flushFile(filepath);
 
 }
 
 void StorageModule::flushBlock(uint64_t segmentId, uint32_t blockId) {
 
-	FILE* filePtr = NULL;
-	try {
-		string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
-		filePtr = _openedFile->get(filepath);
-		flushFile(filePtr);
-		//fsync(fileno(filePtr));
-	} catch (out_of_range& oor) { // file pointer not found in cache
-		return; // file already closed by cache, do nothing
-	}
+	string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
+	flushFile(filepath);
 }
 
 #ifdef MOUNT_OSD
 void StorageModule::flushRemoteBlock(uint32_t osdId, uint64_t segmentId,
 		uint32_t blockId) {
 
-	FILE* filePtr = NULL;
-	try {
-		string filepath = generateRemoteBlockPath(osdId, segmentId, blockId,
-				_remoteBlockFolder);
-		filePtr = _openedFile->get(filepath);
-		flushFile(filePtr);
-		fsync(fileno(filePtr));
-	} catch (out_of_range& oor) { // file pointer not found in cache
-		return; // file already closed by cache, do nothing
-	}
+	string filepath = generateRemoteBlockPath(osdId, segmentId, blockId,
+	flushFile(filepath);
 }
 #endif
 

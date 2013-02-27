@@ -208,8 +208,8 @@ public:
 
 	void closeSegmentTransferCache(uint64_t segmentId);
 
-	void doFlushFile(FILE* filePtr, bool &isFinished);
-	void flushFile(FILE* filePtr);
+	void doFlushFile(string filepath, bool &isFinished);
+	void flushFile(string filepath);
 
 	/**
 	 * Close the segment file
