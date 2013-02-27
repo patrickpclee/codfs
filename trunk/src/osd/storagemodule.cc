@@ -489,6 +489,7 @@ void StorageModule::doFlushFile(FILE* filePtr, bool &isFinished) {
 
 void StorageModule::flushFile(FILE* filePtr) {
 	bool isFinished = false;
+	int priority = 10;
 
 #ifdef USE_IO_THREADS
 	schedule(_iotp,
