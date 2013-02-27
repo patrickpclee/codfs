@@ -208,6 +208,9 @@ public:
 
 	void closeSegmentTransferCache(uint64_t segmentId);
 
+	void doFlushFile(FILE* filePtr, bool &isFinished);
+	void flushFile(FILE* filePtr);
+
 	/**
 	 * Close the segment file
 	 * @param segmentId Segment ID
