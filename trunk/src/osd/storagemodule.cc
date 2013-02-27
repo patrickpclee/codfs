@@ -482,7 +482,12 @@ void StorageModule::closeSegmentTransferCache(uint64_t segmentId) {
 }
 
 void StorageModule::doFlushFile(FILE* filePtr, bool &isFinished) {
+	try {
 	fflush(filePtr);
+	//fsync(fileno(filePtr));
+	} catch (out_of_range& oor) { // file pointer not found in cache
+		return; // file already closed by cache, do nothing
+	}
 	isFinished = true;
 	return ;
 }
