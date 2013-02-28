@@ -355,6 +355,9 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	// 5. send segment if not localRetrieve
 	if (!localRetrieve) {
 		_osdCommunicator->sendSegment(_osdId, sockfd, segmentData);
+	} else {
+		cacheSegment(segmentId, segmentData);
+		_osdCommunicator->replyCacheSegment(requestId, sockfd, segmentId, _osdId);
 	}
 
 #ifdef TIME_POINT
@@ -376,9 +379,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		segmentRequestCountMutex.unlock();
 		isLocked = false;
 
-        if (localRetrieve) {
-		    cacheSegment(segmentId, tempSegmentData);
-        }
 		freeSegment(segmentId, tempSegmentData);
 
 		debug("%s\n", "[DOWNLOAD] Cleanup completed");
@@ -386,12 +386,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 	if (isLocked) {
 		segmentRequestCountMutex.unlock();
-	}
-
-	// send reply to MDS for localRetrieve
-
-	if (localRetrieve) {
-		_osdCommunicator->replyCacheSegment(requestId, sockfd, segmentId, _osdId);
 	}
 
 #ifdef TIME_POINT
