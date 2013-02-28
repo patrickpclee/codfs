@@ -496,9 +496,9 @@ void StorageModule::doFlushFile(string filePath, bool &isFinished) {
 
 void StorageModule::flushFile(string filePath) {
 	bool isFinished = false;
-	int priority = 10;
 
 #ifdef USE_IO_THREADS
+	int priority = 10;
 	schedule(_iotp,
 			prio_task_func(priority,
 					boost::bind(&StorageModule::doFlushFile, this, filePath, boost::ref(isFinished))));
@@ -509,7 +509,7 @@ void StorageModule::flushFile(string filePath) {
 	
 	return ;
 #else
-	return doFlushFile (filePtr, isFinished);
+	return doFlushFile (filePath, isFinished);
 #endif
 }
 
