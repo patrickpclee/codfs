@@ -47,7 +47,7 @@ ConfigLayer* configLayer;
 uint32_t clientId;
 string fileName;
 uint32_t fileId;
-uint32_t startPercent, endPercent;
+uint32_t startPercent, endPercent, iteration;
 CodingScheme codingScheme;
 string codingSetting;
 uint64_t fileSize;
@@ -81,22 +81,26 @@ boost::threadpool::pool _tp;
 void parseOption(int argc, char* argv[]) {
 
 	if (strcmp(argv[2], "download") == 0) {
-		if (argc != 4 && argc != 6) {
-				cout
-						<< "Download: ./BENCHMARK [ID] download [FILEID] [START PERCENT] [END PERCENT]"
-						<< endl;
-				exit(-1);
-		} else 	if (argc == 4) {
+		if (argc != 4 && argc != 7) {
+			cout
+					<< "Download: ./BENCHMARK [ID] download [FILEID] [START PERCENT] [END PERCENT] [ITERATION]"
+					<< endl;
+			exit(-1);
+		} else if (argc == 4) {
 			// backward compatible
 			startPercent = 0;
 			endPercent = 100;
+			iteration = 1;
 		} else {
 			startPercent = atoi(argv[4]);
 			endPercent = atoi(argv[5]);
+			iteration = atoi(argv[6]);
 		}
 		download = true;
 		fileId = atoi(argv[3]);
-		debug("Downloading File %" PRIu32 " start = %d end = %d\n", fileId, (int) startPercent, (int) endPercent);
+		debug(
+				"Downloading File %" PRIu32 " start = %d end = %d iteration = %d\n",
+				fileId, (int) startPercent, (int) endPercent, (int)iteration);
 	} else {
 
 		if (argc < 5) {
@@ -390,7 +394,11 @@ int main(int argc, char *argv[]) {
 	_clientCommunicator->getOsdListAndConnect();
 
 	if (download)
-		testDownload();
+		for (uint32_t i = 0; i < iteration; i++) {
+			cout << "START ITERATION " << i << endl;
+			testDownload();
+			cout << "END ITERATION " << i << endl;
+		}
 	else
 		testUpload();
 
