@@ -48,6 +48,7 @@ uint32_t clientId;
 string fileName;
 uint32_t fileId;
 uint32_t startPercent, endPercent, iteration;
+uint32_t replicationPercent;
 CodingScheme codingScheme;
 string codingSetting;
 uint64_t fileSize;
@@ -57,6 +58,7 @@ char* databuf;
 unsigned char* checksum;
 
 bool download;
+bool hotness = false;
 
 #ifdef PARALLEL_TRANSFER
 void startBenchUploadThread(uint32_t clientId, uint32_t sockfd,
@@ -80,7 +82,18 @@ boost::threadpool::pool _tp;
 
 void parseOption(int argc, char* argv[]) {
 
-	if (strcmp(argv[2], "download") == 0) {
+	if (strcmp (argv[2], "hotness") == 0) {
+		if (argc != 4) {
+			cout << "Hotness: ./BENCHMARK [ID] hotness [FILEID]" << endl;
+			exit(-1);
+		}
+		startPercent = 0;
+		endPercent = 100;
+		iteration = 1;
+		download = true;
+		hotness = true;
+		fileId = atoi(argv[3]);
+	} else if (strcmp(argv[2], "download") == 0) {
 		if (argc != 4 && argc != 7) {
 			cout
 					<< "Download: ./BENCHMARK [ID] download [FILEID] [START PERCENT] [END PERCENT] [ITERATION]"
@@ -103,9 +116,9 @@ void parseOption(int argc, char* argv[]) {
 				fileId, (int) startPercent, (int) endPercent, (int)iteration);
 	} else {
 
-		if (argc < 5) {
+		if (argc < 6) {
 			cout
-					<< "Upload: ./BENCHMARK [ID] upload [FILESIZE] [SEGMENTSIZE] [CODING_TEST]"
+					<< "Upload: ./BENCHMARK [ID] upload [FILESIZE] [SEGMENTSIZE] [CODING_TEST] [REPLICATION PERCENT]"
 					<< endl;
 			exit(-1);
 		}
@@ -115,6 +128,12 @@ void parseOption(int argc, char* argv[]) {
 		fileSize = stringToByte(argv[3]);
 		segmentSize = stringToByte(argv[4]);
 		numberOfSegment = fileSize / segmentSize;
+
+		if (argc == 7) {
+			replicationPercent = atoi (argv[6]);
+		} else {
+			replicationPercent = 0;
+		}
 
 		debug(
 				"Testing %s with File Size %" PRIu64 " Segment Size %" PRIu32 "\n",
@@ -205,28 +224,49 @@ void testDownload() {
 	double endPortion = endPercent / (double) 100;
 
 	uint32_t segmentCount = fileMetaData._segmentList.size();
-	for (uint32_t i = 0; i < segmentCount; ++i) {
 
-		if (i / (double) segmentCount < startPortion
-				|| i / (double) segmentCount > endPortion) {
-			continue; // skip this segment
-		}
-
-		uint32_t primary = fileMetaData._primaryList[i];
-		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
-		uint64_t segmentId = fileMetaData._segmentList[i];
-
-		debug("segmentId = %" PRIu64 " primary = %" PRIu32 "\n",
-				segmentId, primary);
+	if (hotness) {
+		int i = 0;
+		while (scanf ("%d", &i) == 1) {
+			uint32_t primary = fileMetaData._primaryList[i];
+			uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
+			uint64_t segmentId = fileMetaData._segmentList[i];
+			debug("segmentId = %" PRIu64 " primary = %" PRIu32 "\n",
+					segmentId, primary);
 
 #ifdef PARALLEL_TRANSFER
-		_tp.schedule(
-				boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd,
-						segmentId, segmentChecksumList[i]));
+			_tp.schedule(
+					boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd,
+							segmentId, segmentChecksumList[i]));
 #else
-		client->getSegment(clientId, sockfd, segmentId);
-		_storageModule->closeSegment(segmentId);
+			client->getSegment(clientId, sockfd, segmentId);
+			_storageModule->closeSegment(segmentId);
 #endif
+		}
+	} else {
+		for (uint32_t i = 0; i < segmentCount; ++i) {
+
+			if (i / (double) segmentCount < startPortion
+					|| i / (double) segmentCount > endPortion) {
+				continue; // skip this segment
+			}
+
+			uint32_t primary = fileMetaData._primaryList[i];
+			uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
+			uint64_t segmentId = fileMetaData._segmentList[i];
+
+			debug("segmentId = %" PRIu64 " primary = %" PRIu32 "\n",
+					segmentId, primary);
+
+#ifdef PARALLEL_TRANSFER
+			_tp.schedule(
+					boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd,
+							segmentId, segmentChecksumList[i]));
+#else
+			client->getSegment(clientId, sockfd, segmentId);
+			_storageModule->closeSegment(segmentId);
+#endif
+		}
 	}
 
 #ifdef PARALLEL_TRANSFER
@@ -306,13 +346,24 @@ void testUpload() {
 			OSDLoadCount[primary] += 1;
 
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
+
+		CodingScheme currentCodingScheme = codingScheme;
+		string currentCodingSetting = codingSetting;
+
+		double replicationPortion = replicationPercent / (double) 100;
+
+		if ((double)i / numberOfSegment < replicationPortion) {
+			currentCodingScheme = RAID1_CODING;
+			currentCodingSetting = Raid1Coding::generateSetting(1);
+		}
+
 #ifdef PARALLEL_TRANSFER
 		_tp.schedule(
 				boost::bind(startBenchUploadThread, clientId, dstOsdSockfd,
-						segmentData, codingScheme, codingSetting,
+						segmentData, currentCodingScheme, currentCodingSetting,
 						md5ToHex(checksum)));
 #else
-		_clientCommunicator->sendSegment(clientId, dstOsdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum));
+		_clientCommunicator->sendSegment(clientId, dstOsdSockfd, segmentData, currentCodingScheme, currentCodingSetting, md5ToHex(checksum));
 #endif
 	}
 #ifdef PARALLEL_TRANSFER
@@ -394,10 +445,14 @@ int main(int argc, char *argv[]) {
 	_clientCommunicator->getOsdListAndConnect();
 
 	if (download)
-		for (uint32_t i = 0; i < iteration; i++) {
-			cout << "START ITERATION " << i << endl;
+		if (hotness) {
 			testDownload();
-			cout << "END ITERATION " << i << endl;
+		} else {
+			for (uint32_t i = 0; i < iteration; i++) {
+				cout << "START ITERATION " << i << endl;
+				testDownload();
+				cout << "END ITERATION " << i << endl;
+			}
 		}
 	else
 		testUpload();
