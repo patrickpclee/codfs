@@ -225,11 +225,6 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 	vector <uint64_t> segmentList = fileMetaData._segmentList;
 
-#ifdef RANDOM_SHUFFLE_SEGMENT_ORDER
-	srand (time(NULL));
-	std::random_shuffle ( segmentList.begin(), segmentList.end() );
-#endif
-
 	uint32_t i = 0;
 	for (uint64_t segmentId : segmentList) {
 		uint32_t dstComponentId = fileMetaData._primaryList[i];
