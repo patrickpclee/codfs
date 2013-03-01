@@ -228,7 +228,13 @@ void testDownload() {
 
 	if (hotness) {
 		int i = 0;
+		vector <int> requestList;
 		while (scanf ("%d", &i) == 1) {
+			requestList.push_back(i);
+		}
+		random_shuffle(requestList.begin(), requestList.end());
+
+		for (int i : requestList) {
 			uint32_t primary = fileMetaData._primaryList[i];
 			uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 			uint64_t segmentId = fileMetaData._segmentList[i];
