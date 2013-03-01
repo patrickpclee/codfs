@@ -222,6 +222,7 @@ void testDownload() {
 
 	double startPortion = startPercent / (double) 100;
 	double endPortion = endPercent / (double) 100;
+	debug ("StartPortion = %f, endPortion = %f\n", startPortion, endPortion);
 
 	uint32_t segmentCount = fileMetaData._segmentList.size();
 
@@ -244,16 +245,35 @@ void testDownload() {
 #endif
 		}
 	} else {
+
+		vector <uint64_t> segmentList (fileMetaData._segmentList.size());
+		vector <uint32_t> primaryList (fileMetaData._primaryList.size());
+		vector<int> shuffleList (segmentList.size());
+		for (int i = 0; i < (int)shuffleList.size(); i++) {
+			shuffleList[i] = i;
+		}
+
+#ifdef RANDOM_SHUFFLE_SEGMENT_ORDER
+		std::random_shuffle ( shuffleList.begin(), shuffleList.end() );
+#endif
+
+		for (int i = 0; i < (int)shuffleList.size(); i++) {
+			segmentList[i] = fileMetaData._segmentList[shuffleList[i]];
+			primaryList[i] = fileMetaData._primaryList[shuffleList[i]];
+		}
+
 		for (uint32_t i = 0; i < segmentCount; ++i) {
 
+#ifndef RANDOM_SHUFFLE_SEGMENT_ORDER
 			if (i / (double) segmentCount < startPortion
 					|| i / (double) segmentCount > endPortion) {
 				continue; // skip this segment
 			}
+#endif
 
-			uint32_t primary = fileMetaData._primaryList[i];
+			uint32_t primary = primaryList[i];
 			uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
-			uint64_t segmentId = fileMetaData._segmentList[i];
+			uint64_t segmentId = segmentList[i];
 
 			debug("segmentId = %" PRIu64 " primary = %" PRIu32 "\n",
 					segmentId, primary);
