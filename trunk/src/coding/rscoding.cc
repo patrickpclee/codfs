@@ -121,17 +121,22 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 		block_list_t &symbolList, uint32_t segmentSize, string setting) {
 
-	// transform symbolList to blockIdList
-	vector<uint32_t> blockIdList;
-	for (auto blockSymbol : symbolList) {
-		blockIdList.push_back(blockSymbol.first);
-	}
 
 	vector<uint32_t> params = getParameters(setting);
 	const uint32_t k = params[0];
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
 	const uint32_t size = roundTo(roundTo(segmentSize, k) / k, 4);
+	uint32_t numOfFailedDataDisk = k;
+
+	// transform symbolList to blockIdList
+	vector<uint32_t> blockIdList;
+	for (auto blockSymbol : symbolList) {
+		blockIdList.push_back(blockSymbol.first);
+		if(blockSymbol.first < k) {
+			--numOfFailedDataDisk;
+		}
+	}
 
 	if (blockIdList.size() < k) {
 		cerr << "Not enough blocks for decode " << blockIdList.size() << endl;
@@ -146,6 +151,17 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
+
+	//Optimization for no Data Disk Erasure
+	if(numOfFailedDataDisk == 0) {
+		uint64_t offset = 0;
+		for (uint32_t i = 0; i < k - 1; i++) {
+			memcpy(segmentData.buf + offset, blockDataList[i].buf, size);
+			offset += size;
+		}
+		memcpy(segmentData.buf + offset, blockDataList[k - 1].buf, segmentSize - offset);
+		return segmentData;
+	}
 
 	int *matrix = reed_sol_vandermonde_coding_matrix(k, m, w);
 	char **data, **code;
