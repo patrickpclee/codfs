@@ -155,11 +155,23 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 	//Optimization for no Data Disk Erasure
 	if(numOfFailedDataDisk == 0) {
 		uint64_t offset = 0;
+		uint32_t i = 0;
+		uint32_t copySize = size;
+		while(offset < segmentSize) {
+			if((offset + size) > segmentSize) {
+				copySize = segmentSize - offset;
+			}
+			memcpy(segmentData.buf + offset, blockDataList[i].buf, copySize);
+			++i;
+			offset += copySize;
+		}
+		/*
 		for (uint32_t i = 0; i < k - 1; i++) {
 			memcpy(segmentData.buf + offset, blockDataList[i].buf, size);
 			offset += size;
 		}
 		memcpy(segmentData.buf + offset, blockDataList[k - 1].buf, segmentSize - offset);
+		*/
 		return segmentData;
 	}
 
