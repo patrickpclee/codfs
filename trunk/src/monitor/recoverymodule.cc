@@ -12,11 +12,18 @@ using namespace std;
 
 RecoveryModule::RecoveryModule(map<uint32_t, struct OsdStat>& mapRef,
 		MonitorCommunicator* communicator):
-	_osdStatMap(mapRef), _communicator(communicator) { }
+	_osdStatMap(mapRef), _communicator(communicator) { 
 
-	void startRecoveryProcedure(RecoveryModule* rm, vector<uint32_t> deadOsdList) {
-		rm->executeRecovery(deadOsdList);
 	}
+
+void startRecoveryProcedure(RecoveryModule* rm, vector<uint32_t> deadOsdList) {
+	string osdListString;
+	for (auto osdId : deadOsdList) {
+		osdListString += to_string(osdId) + " ";
+	}
+	cout << "Start to recover failure OSD " << osdListString << endl;
+	rm->executeRecovery(deadOsdList);
+}
 
 
 // Just sequentially choose one.
@@ -92,14 +99,14 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 			 */
 			struct SegmentRepairInfo ori;
 			replaceFailedOsd (ol, ori);	
-			ori.out();
+				ori.out();
 
 			RepairSegmentInfoMsg* roim = new RepairSegmentInfoMsg(_communicator,
 					_communicator->getSockfdFromId(ol.primaryId), ori.segmentId,
 					ori.repPos, ori.repOsd);
 			debug ("sockfd for repair = %" PRIu32 "\n", _communicator->getSockfdFromId(ol.primaryId));
 			roim->prepareProtocolMsg();
-			debug ("%s\n", "add repair segment info msg");
+				debug ("%s\n", "add repair segment info msg");
 			_communicator->addMessage(roim);
 			debug ("%s\n", "added to queue repair segment info msg");
 		}
@@ -112,28 +119,54 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 
 void RecoveryModule::failureDetection(uint32_t deadPeriod, uint32_t sleepPeriod) {
 	while (1) {
-		uint32_t currentTS = time(NULL);
-		vector<uint32_t> deadOsdList;
 		{
-			lock_guard<mutex> lk(osdStatMapMutex);
-			for(auto& entry: _osdStatMap) {
-				//entry.second.out();
-				if ((currentTS - entry.second.timestamp) > deadPeriod &&
-						(entry.second.osdHealth != RECOVERING &&
-						 entry.second.osdHealth != ONLINE)) {
-					// Trigger recovery 
-					debug_yellow("Detect failure OSD = %" PRIu32 "\n", entry.first);
-					deadOsdList.push_back (entry.first);
-					entry.second.osdHealth = RECOVERING;
+			lock_guard<mutex> lk(triggerRecoveryMutex);
+			uint32_t currentTS = time(NULL);
+			vector<uint32_t> deadOsdList;
+			{
+				lock_guard<mutex> lk(osdStatMapMutex);
+				for(auto& entry: _osdStatMap) {
+					//entry.second.out();
+					if ((currentTS - entry.second.timestamp) > deadPeriod &&
+							(entry.second.osdHealth != RECOVERING &&
+							 entry.second.osdHealth != ONLINE)) {
+						// Trigger recovery 
+						debug_yellow("Detect failure OSD = %" PRIu32 "\n", entry.first);
+						deadOsdList.push_back (entry.first);
+						entry.second.osdHealth = RECOVERING;
+					}
 				}
 			}
-		}
-		// If has dead Osd, start recovery
-		if (deadOsdList.size() > 0) {
-			thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList);
-			recoveryProcedure.detach();
+			// If has dead Osd, start recovery
+			if (deadOsdList.size() > 0) {
+				thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList);
+				recoveryProcedure.detach();
+			}
 		}
 		sleep(sleepPeriod);
+	}
+}
+
+void RecoveryModule::userTriggerDetection() {
+	lock_guard<mutex> lk(triggerRecoveryMutex);
+	vector<uint32_t> deadOsdList;
+	{
+		lock_guard<mutex> lk(osdStatMapMutex);
+		for(auto& entry: _osdStatMap) {
+			//entry.second.out();
+			if ((entry.second.osdHealth != RECOVERING &&
+						entry.second.osdHealth != ONLINE)) {
+				// Trigger recovery 
+				debug_yellow("Detect failure OSD = %" PRIu32 "\n", entry.first);
+				deadOsdList.push_back (entry.first);
+				entry.second.osdHealth = RECOVERING;
+			}
+		}
+	}
+	// If has dead Osd, start recovery
+	if (deadOsdList.size() > 0) {
+		thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList);
+		recoveryProcedure.detach();
 	}
 }
 

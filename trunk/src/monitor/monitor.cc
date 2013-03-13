@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <signal.h>
 #include "monitor.hh"
 #include "../config/config.hh"
 #include "../common/blocklocation.hh"
@@ -14,6 +15,15 @@ Monitor* monitor;
 
 mutex osdStatMapMutex;
 mutex osdLBMapMutex;
+
+void sighandler(int signum) {
+	cout << "Signal" << signum << "received" << endl;
+	if (signum == SIGUSR1) {
+		cout << "Try to recover failure" << endl;
+		monitor->getRecoveryModule()->userTriggerDetection();
+		cout << "done" << endl;
+	}
+}
 
 /*  Monitor default constructor
  */
@@ -135,6 +145,7 @@ uint32_t Monitor::getUpdatePeriod() {
 }
 
 int main(void) {
+	signal(SIGUSR1, sighandler);
 
 	printf("MONITOR\n");
 
