@@ -6,6 +6,7 @@
 #include "../common/debug.hh"
 #include "monitor_communicator.hh"
 #include <map>
+#include <mutex>
 
 using namespace std;
 
@@ -16,6 +17,8 @@ public:
 
 	void failureDetection(uint32_t deadPeriod, uint32_t sleelPeriod);
 
+	void userTriggerDetection();
+
 	void executeRecovery(vector<uint32_t>& deadOsdList);
 
 	void replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret);
@@ -23,5 +26,6 @@ public:
 private:
 	map<uint32_t, struct OsdStat>& _osdStatMap;
 	MonitorCommunicator* _communicator;
+	mutex triggerRecoveryMutex;
 };
 #endif
