@@ -422,7 +422,12 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		uint64_t segmentId, uint32_t blockId,
 		vector<offset_length_t> &offsetLength, BlockData &repairedBlock) {
 
-	debug ("1) recoverytprequestcount = %" PRIu32 "\n", _recoverytpRequestCount.get(recoverytpId));
+	uint64_t recoveryLength = 0;
+	for (auto it: offsetLength) {
+		recoveryLength += it.second;
+	}
+
+	debug ("[RECOVERY_DATA] Segment ID = %" PRIu64 " Length = %" PRIu64 "\n", segmentId, recoveryLength);
 
 	if (osdId == _osdId) {
 		// read block from disk
@@ -465,7 +470,6 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 	}
 
 	_recoverytpRequestCount.decrement(recoverytpId);
-	debug ("2) recoverytprequestcount = %" PRIu32 "\n", _recoverytpRequestCount.get(recoverytpId));
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
