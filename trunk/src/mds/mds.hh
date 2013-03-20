@@ -195,7 +195,8 @@ public:
 	 * @param	osdId		ID of the failed Osd
 	 */
 	void recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
-			vector<uint32_t> deadOsdList);
+			vector<uint32_t> deadOsdList, bool dstSpecified, vector<uint32_t>
+			dstOsdList);
 
 	/**
 	 * @brief	Handle Segment Node List Update from Osd

@@ -22,6 +22,10 @@ void sighandler(int signum) {
 		cout << "Try to recover failure" << endl;
 		monitor->getRecoveryModule()->userTriggerDetection();
 		cout << "done" << endl;
+	}else if (signum == SIGUSR2) {
+		cout << "Try to recover failure with destination specified" << endl;
+		monitor->getRecoveryModule()->userTriggerDetection(true);
+		cout << "done" << endl;
 	}
 }
 
@@ -146,6 +150,7 @@ uint32_t Monitor::getUpdatePeriod() {
 
 int main(void) {
 	signal(SIGUSR1, sighandler);
+	signal(SIGUSR2, sighandler);
 
 	printf("MONITOR\n");
 

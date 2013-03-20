@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <thread>
+#include <algorithm>
 #include "recoverymodule.hh"
 #include "../protocol/status/recoverytriggerrequest.hh"
 #include "../protocol/status/repairsegmentinfomsg.hh"
@@ -16,19 +17,39 @@ RecoveryModule::RecoveryModule(map<uint32_t, struct OsdStat>& mapRef,
 
 	}
 
-void startRecoveryProcedure(RecoveryModule* rm, vector<uint32_t> deadOsdList) {
+void startRecoveryProcedure(RecoveryModule* rm, vector<uint32_t> deadOsdList,
+		bool dstSpecified, vector<uint32_t> dstSpec) {
 	string osdListString;
 	for (auto osdId : deadOsdList) {
 		osdListString += to_string(osdId) + " ";
 	}
 	cout << "Start to recover failure OSD " << osdListString << endl;
-	rm->executeRecovery(deadOsdList);
+	rm->executeRecovery(deadOsdList, dstSpecified, dstSpec);
 }
 
 
 // Just sequentially choose one.
 // Can use different startegy later.
+void RecoveryModule::replaceFailedOsd(struct SegmentLocation& ol,
+		struct SegmentRepairInfo& ret, map<uint32_t, uint32_t>& mapped) {
+
+	lock_guard<mutex> lk(osdStatMapMutex);
+	ret.segmentId = ol.segmentId;
+
+	vector<uint32_t>& ref = ol.osdList;
+	for (int pos = 0; pos < (int)ref.size(); ++pos) {
+		if (_osdStatMap[ref[pos]].osdHealth != ONLINE) {
+			uint32_t deadOsd = ref[pos];
+			// mapped this dead osd with new replacement
+			ref[pos] = mapped[deadOsd];
+			ret.repPos.push_back(pos);
+			ret.repOsd.push_back(mapped[deadOsd]);
+		}
+	}
+
+}
 void RecoveryModule::replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret) {
+	// if not specify the dst, just sequential assign
 	set<uint32_t> used;
 	for (uint32_t osdid : ol.osdList) {
 		if (_osdStatMap[osdid].osdHealth == ONLINE) {
@@ -72,13 +93,25 @@ void RecoveryModule::replaceFailedOsd(struct SegmentLocation& ol, struct Segment
 	}
 }
 
-void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
+void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList, bool
+		dstSpecified, vector<uint32_t> dstSpec) {
+	// this map used if dstSpecified
+	map<uint32_t, uint32_t> mapped;
+	if (dstSpecified) {
+		// one to one map from dead to dst
+		sort(deadOsdList.begin(), deadOsdList.end());
+		sort(dstSpec.begin(), dstSpec.end());
+		for (int i = 0; i < (int)deadOsdList.size(); i++) {
+			mapped[deadOsdList[i]] = dstSpec[i%dstSpec.size()];
+		}
+	}
+
 	debug_yellow("%s\n", "Start Recovery Procedure");
 
 	// Request Recovery to Mds
 	RecoveryTriggerRequestMsg* rtrm = new
 		RecoveryTriggerRequestMsg(_communicator, _communicator->getMdsSockfd(),
-				deadOsdList);
+				deadOsdList, dstSpecified, dstSpec); // add two fields dstSpec
 	rtrm->prepareProtocolMsg();
 	_communicator->addMessage(rtrm, true);
 
@@ -89,24 +122,21 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList) {
 			// Print debug message
 			debug_cyan("Segment Location id = %" PRIu64 " primary = %" PRIu32 "\n", ol.segmentId, 
 					ol.primaryId);
-			/*
-			   printf ("--------Original OSD----------------\n");
-			   for (uint32_t osdid : ol.osdList) printf("%d ", osdid);
-			   printf("\n--------Reverse OSD-------------:\n");
-
-			   for (uint32_t osdid : ol.osdList) printf("%d ", osdid);
-			   printf("\n------------------------------------\n");
-			 */
+			
 			struct SegmentRepairInfo ori;
-			replaceFailedOsd (ol, ori);	
-				ori.out();
+			if (dstSpecified) {
+				replaceFailedOsd (ol, ori, mapped);	
+			} else {
+				replaceFailedOsd (ol, ori);	
+			}
+			ori.out();
 
 			RepairSegmentInfoMsg* roim = new RepairSegmentInfoMsg(_communicator,
 					_communicator->getSockfdFromId(ol.primaryId), ori.segmentId,
 					ori.repPos, ori.repOsd);
 			debug ("sockfd for repair = %" PRIu32 "\n", _communicator->getSockfdFromId(ol.primaryId));
 			roim->prepareProtocolMsg();
-				debug ("%s\n", "add repair segment info msg");
+			debug ("%s\n", "add repair segment info msg");
 			_communicator->addMessage(roim);
 			debug ("%s\n", "added to queue repair segment info msg");
 		}
@@ -139,7 +169,7 @@ void RecoveryModule::failureDetection(uint32_t deadPeriod, uint32_t sleepPeriod)
 			}
 			// If has dead Osd, start recovery
 			if (deadOsdList.size() > 0) {
-				thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList);
+				thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList, false, vector<uint32_t>());
 				recoveryProcedure.detach();
 			}
 		}
@@ -147,7 +177,7 @@ void RecoveryModule::failureDetection(uint32_t deadPeriod, uint32_t sleepPeriod)
 	}
 }
 
-void RecoveryModule::userTriggerDetection() {
+void RecoveryModule::userTriggerDetection(bool dstSpecified) {
 	lock_guard<mutex> lk(triggerRecoveryMutex);
 	vector<uint32_t> deadOsdList;
 	{
@@ -165,7 +195,16 @@ void RecoveryModule::userTriggerDetection() {
 	}
 	// If has dead Osd, start recovery
 	if (deadOsdList.size() > 0) {
-		thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList);
+		vector<uint32_t> dstSpec;
+		if (dstSpecified) {
+			FILE* fp = fopen(RECOVERY_DST, "r");
+			int osdid; 
+			while (fscanf(fp, "%d", &osdid) != EOF) {
+				dstSpec.push_back(osdid);
+			}
+		}
+		thread recoveryProcedure(startRecoveryProcedure, this, deadOsdList,
+				dstSpecified, dstSpec);
 		recoveryProcedure.detach();
 	}
 }

@@ -35,7 +35,9 @@ public:
 	 * @param	mdsSockfd	Socket descriptor
 	 */
 
-	RecoveryTriggerRequestMsg (Communicator* communicator, uint32_t sockfd, const vector<uint32_t> &osdList);
+	RecoveryTriggerRequestMsg (Communicator* communicator, uint32_t sockfd, 
+		const vector<uint32_t> &osdList, bool dstSpecified, const
+		vector<uint32_t> &dstSpecOsdList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -72,6 +74,8 @@ public:
 
 private:
 	vector<uint32_t> _osdList;
+	vector<uint32_t> _dstSpecOsdList;
+	bool _dstSpecified;
 	vector<struct SegmentLocation> _segmentLocations;
 };
 
