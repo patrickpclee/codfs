@@ -10,6 +10,8 @@
 #include "../coding/raid5coding.hh"
 #include "../coding/rscoding.hh"
 #include "../coding/embrcoding.hh"
+#include "../coding/evenoddcoding.hh"
+#include "../coding/rdpcoding.hh"
 #include "../../lib/logger.hh"
 
 using namespace std;
@@ -143,6 +145,24 @@ int main(int argc, char *argv[]) {
 					return 1;
 				}
 			}
+			else if (coding == "evenodd") {
+				codingScheme = EVENODD_CODING;
+				if (vm.count("n")) {
+					codingSetting = EvenOddCoding::generateSetting(n);
+				} else {
+					cout << "Please specify [n]" << endl;
+					return 1;
+				}
+			}
+			else if (coding == "rdp") {
+				codingScheme = RDP_CODING;
+				if (vm.count("n")) {
+					codingSetting = RDPCoding::generateSetting(n);
+				} else {
+					cout << "Please specify [n]" << endl;
+					return 1;
+				}
+			}
 
 		} else { // download
 			if (!vm.count("fid")) {
@@ -167,11 +187,13 @@ int main(int argc, char *argv[]) {
 	ClientCommunicator* communicator = client->getCommunicator();
 
 	// setup log
+	/*
 	FILELog::ReportingLevel() = logDEBUG3;
-	std::string logFileName = "client_" + to_string(client->getClientId())
+	std::string logFileName = "client_" + to_string(clientId)
 			+ ".log";
 	FILE* log_fd = fopen(logFileName.c_str(), "a");
 	Output2FILE::Stream() = log_fd;
+	*/
 
 	// start server
 	communicator->createServerSocket();
@@ -189,7 +211,7 @@ int main(int argc, char *argv[]) {
 	thread sendThread(&Communicator::sendMessage, communicator);
 #endif
 
-	communicator->setId(client->getClientId());
+	communicator->setId(clientId);
 	communicator->setComponentType(CLIENT);
 
 	//communicator->connectAllComponents();
@@ -202,6 +224,10 @@ int main(int argc, char *argv[]) {
 	} else {
 		client->downloadFileRequest(fileId, file);
 	}
+
+	cout << "Now Sleep 5 Seconds then Exit" << endl;
+	sleep(5);
+	exit(0);
 
 	garbageCollectionThread.join();
 	receiveThread.join();
