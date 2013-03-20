@@ -430,6 +430,8 @@ message GetPrimaryListReplyPro{
 
 message RecoveryTriggerRequestPro{
 	repeated fixed32 osdList = 1;
+	repeated fixed32 dstOsdList = 2;
+	optional bool dstspecified = 3;
 }
 
 

@@ -18,11 +18,14 @@ RecoveryTriggerRequestMsg::RecoveryTriggerRequestMsg(Communicator* communicator)
 }
 
 RecoveryTriggerRequestMsg::RecoveryTriggerRequestMsg(Communicator* communicator,
-		uint32_t mdsSockfd, const vector<uint32_t> &osdList) :
+		uint32_t mdsSockfd, const vector<uint32_t> &osdList, bool dstSpecified,
+		const vector<uint32_t> &dstSpec) :
 		Message(communicator) {
 
 	_sockfd = mdsSockfd;
 	_osdList = osdList;
+	_dstSpecified = dstSpecified;
+	_dstSpecOsdList = dstSpec;
 }
 
 void RecoveryTriggerRequestMsg::prepareProtocolMsg() {
@@ -31,6 +34,10 @@ void RecoveryTriggerRequestMsg::prepareProtocolMsg() {
 	ncvfs::RecoveryTriggerRequestPro recoveryTriggerRequestPro;
 	for (uint32_t osd : _osdList) {
 		recoveryTriggerRequestPro.add_osdlist(osd);
+	}
+	recoveryTriggerRequestPro.set_dstspecified(_dstSpecified);
+	for (uint32_t osd : _dstSpecOsdList) {
+		recoveryTriggerRequestPro.add_dstosdlist(osd);
 	}
 
 	if (!recoveryTriggerRequestPro.SerializeToString(&serializedString)) {
@@ -55,13 +62,17 @@ void RecoveryTriggerRequestMsg::parse(char* buf) {
 	for (int i = 0; i < recoveryTriggerRequestPro.osdlist_size(); ++i) {
 			_osdList.push_back(recoveryTriggerRequestPro.osdlist(i));
 	}
+	for (int i = 0; i < recoveryTriggerRequestPro.dstosdlist_size(); ++i) {
+			_dstSpecOsdList.push_back(recoveryTriggerRequestPro.dstosdlist(i));
+	}
+	_dstSpecified = recoveryTriggerRequestPro.dstspecified();
 	return;
 
 }
 
 void RecoveryTriggerRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->recoveryTriggerProcessor (_msgHeader.requestId, _sockfd, _osdList);
+	mds->recoveryTriggerProcessor (_msgHeader.requestId, _sockfd, _osdList, _dstSpecified, _dstSpecOsdList);
 #endif
 }
 

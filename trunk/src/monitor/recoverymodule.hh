@@ -11,21 +11,25 @@
 using namespace std;
 
 class RecoveryModule {
-public:
-	RecoveryModule(map<uint32_t, struct OsdStat>& mapRef, MonitorCommunicator*
-		communicator);
+	public:
+		RecoveryModule(map<uint32_t, struct OsdStat>& mapRef, MonitorCommunicator*
+				communicator);
 
-	void failureDetection(uint32_t deadPeriod, uint32_t sleelPeriod);
+		void failureDetection(uint32_t deadPeriod, uint32_t sleelPeriod);
 
-	void userTriggerDetection();
+		void userTriggerDetection(bool dstSpecified = false);
 
-	void executeRecovery(vector<uint32_t>& deadOsdList);
+		void executeRecovery(vector<uint32_t>& deadOsdList, bool dstSpecified,
+				vector<uint32_t> dstSpec);
 
-	void replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret);
+		void replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret,
+				const vector<uint32_t>& dstSpec, map<uint32_t, uint32_t>& mapped);
 
-private:
-	map<uint32_t, struct OsdStat>& _osdStatMap;
-	MonitorCommunicator* _communicator;
-	mutex triggerRecoveryMutex;
+		void replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret);
+
+	private:
+		map<uint32_t, struct OsdStat>& _osdStatMap;
+		MonitorCommunicator* _communicator;
+		mutex triggerRecoveryMutex;
 };
 #endif
