@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <thread>
+#include <algorithm>
 #include "recoverymodule.hh"
 #include "../protocol/status/recoverytriggerrequest.hh"
 #include "../protocol/status/repairsegmentinfomsg.hh"
@@ -30,34 +31,15 @@ void startRecoveryProcedure(RecoveryModule* rm, vector<uint32_t> deadOsdList,
 // Just sequentially choose one.
 // Can use different startegy later.
 void RecoveryModule::replaceFailedOsd(struct SegmentLocation& ol,
-		struct SegmentRepairInfo& ret, const vector<uint32_t>& dstSpec,
-		map<uint32_t, uint32_t>& mapped) {
+		struct SegmentRepairInfo& ret, map<uint32_t, uint32_t>& mapped) {
 
 	lock_guard<mutex> lk(osdStatMapMutex);
 	ret.segmentId = ol.segmentId;
+
 	vector<uint32_t>& ref = ol.osdList;
 	for (int pos = 0; pos < (int)ref.size(); ++pos) {
 		if (_osdStatMap[ref[pos]].osdHealth != ONLINE) {
 			uint32_t deadOsd = ref[pos];
-			// very ugly style to find mapping between dead one and dst one
-			if (mapped.find(deadOsd) == mapped.end()) {
-				for (uint32_t dstOsd: dstSpec) {
-					bool used = false;
-					for (map<uint32_t,uint32_t>::iterator it = mapped.begin();
-							it != mapped.end(); it++) {
-						if (it->second == dstOsd) {
-							used = true;
-							break;
-						}
-					}
-					if (!used) {
-						// do mapping
-						mapped[deadOsd] = dstOsd;
-						break;
-					}
-				}
-			}
-
 			// mapped this dead osd with new replacement
 			ref[pos] = mapped[deadOsd];
 			ret.repPos.push_back(pos);
@@ -115,6 +97,14 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList, bool
 		dstSpecified, vector<uint32_t> dstSpec) {
 	// this map used if dstSpecified
 	map<uint32_t, uint32_t> mapped;
+	if (dstSpecified) {
+		// one to one map from dead to dst
+		sort(deadOsdList.begin(), deadOsdList.end());
+		sort(dstSpec.begin(), dstSpec.end());
+		for (int i = 0; i < (int)deadOsdList.size(); i++) {
+			mapped[deadOsdList[i]] = dstSpec[i%dstSpec.size()];
+		}
+	}
 
 	debug_yellow("%s\n", "Start Recovery Procedure");
 
@@ -135,7 +125,7 @@ void RecoveryModule::executeRecovery(vector<uint32_t>& deadOsdList, bool
 			
 			struct SegmentRepairInfo ori;
 			if (dstSpecified) {
-				replaceFailedOsd (ol, ori, dstSpec, mapped);	
+				replaceFailedOsd (ol, ori, mapped);	
 			} else {
 				replaceFailedOsd (ol, ori);	
 			}

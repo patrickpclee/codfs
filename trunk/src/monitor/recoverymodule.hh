@@ -23,7 +23,7 @@ class RecoveryModule {
 				vector<uint32_t> dstSpec);
 
 		void replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret,
-				const vector<uint32_t>& dstSpec, map<uint32_t, uint32_t>& mapped);
+				map<uint32_t, uint32_t>& mapped);
 
 		void replaceFailedOsd(struct SegmentLocation& ol, struct SegmentRepairInfo& ret);
 
