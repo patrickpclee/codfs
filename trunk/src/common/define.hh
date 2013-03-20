@@ -66,7 +66,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 //#define MOUNT_OSD
 
 // osd/storagemodule.cc
-#define USE_SEGMENT_CACHE
+//#define USE_SEGMENT_CACHE
 #define HOTNESS_ALG TOP_HOTNESS_ALG
 //#define USE_IO_THREADS
 #define IO_THREADS 2
@@ -90,4 +90,5 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 
 // Trigger Recovery or not
 #define TRIGGER_RECOVERY
+#define RECOVERY_DST "destinations.txt"
 #endif

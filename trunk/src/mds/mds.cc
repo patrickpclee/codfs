@@ -451,11 +451,25 @@ void Mds::secondaryFailureProcessor(uint32_t requestId, uint32_t connectionId,
  * 3. Reply with Segment List, Primary List, and Node List of the Segments
  */
 void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
-		vector<uint32_t> deadOsdList) {
+		vector<uint32_t> deadOsdList, bool dstSpecified, vector<uint32_t>
+		dstOsdList) {
 
 	set <uint64_t> recoverySegments;
 
 	debug_yellow("%s\n", "Recovery Triggered");
+
+	// this map is used iff dstSpecified = true
+	map<uint32_t, uint32_t> mapped;
+
+	if (dstSpecified) {
+		// one to one map from dead to dst
+		sort(deadOsdList.begin(), deadOsdList.end());
+		sort(dstOsdList.begin(), dstOsdList.end());
+		for (int i = 0; i < (int)deadOsdList.size(); i++) {
+			mapped[deadOsdList[i]] = dstOsdList[i%dstOsdList.size()];
+		}
+	}
+
 	vector<struct SegmentLocation> segmentLocationList;
 
 	struct SegmentLocation segmentLocation;
@@ -467,15 +481,23 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 			_metaDataModule->readOsdPrimarySegmentList(osdId);
 
 		for (auto segmentId : primarySegmentList) {
-			// get the node list of an segment and their status
-			vector<uint32_t> nodeList = _metaDataModule->readNodeList(
-					segmentId);
-			vector<bool> nodeStatus = _mdsCommunicator->getOsdStatusRequest(
-					nodeList);
+			if (dstSpecified) {
 
-			// select new primary OSD and write to DB
-			_metaDataModule->selectActingPrimary(segmentId, nodeList,
-					nodeStatus);
+				// pre-assign the newly start osd as primary
+				_metaDataModule->setPrimary(segmentId, mapped[osdId]);
+
+			} else {
+
+				// get the node list of an segment and their status
+				vector<uint32_t> nodeList = _metaDataModule->readNodeList(
+						segmentId);
+				vector<bool> nodeStatus = _mdsCommunicator->getOsdStatusRequest(
+						nodeList);
+
+				// select new primary OSD and write to DB
+				_metaDataModule->selectActingPrimary(segmentId, nodeList,
+						nodeStatus);
+			}
 		}
 	}
 
