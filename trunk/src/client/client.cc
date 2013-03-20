@@ -180,8 +180,10 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s"
 			<< endl;
 
+	/*
 	FILE_LOG(logINFO) << "[UPLOAD]" << formatSize(fileSize) << " transferred in " << duration
 			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s " << "ID = " << fileMetaData._id;
+			*/
 
 	return fileMetaData._id;
 }
@@ -269,9 +271,11 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 			<< " secs, Rate = " << formatSize(fileMetaData._size / duration)
 			<< "/s" << endl;
 
+	/*
 	FILE_LOG(logINFO) << "[DOWNLOAD]" << formatSize(fileMetaData._size) << " transferred in "
 			<< duration << " secs, Rate = "
 			<< formatSize(fileMetaData._size / duration) << "/s" << " Path = " << dstPath;
+			*/
 
 	/*
 	 int rtnval = system("./mid.sh");
