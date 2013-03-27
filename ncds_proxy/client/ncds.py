@@ -19,6 +19,11 @@ def printUsage():
     sys.exit()
 
 def ncdsPut(src, dst):
+
+    if (len(dst) > 70):
+        print "Path cannot be longer than 70 characters"
+        sys.exit()
+
     print "Source Path:", src
     print "Dst Path:", dst
     try:

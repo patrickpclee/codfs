@@ -1,2 +1,13 @@
 Python 2.7.x needed
-Module needed: poster (sudo apt get install python-poster)
+Module needed: poster
+
+To install poster using easy_install or pip:
+
+$ easy_install poster
+[or]
+$ pip install poster
+
+If neither easy_install nor pip is available, you need to install distribute first.
+
+$ curl -O http://python-distribute.org/distribute_setup.py
+$ python distribute_setup.py
