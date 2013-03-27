@@ -2,17 +2,20 @@
 
 import sys
 import urllib, urllib2
+import base64
 from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 
-SERVER_ADDRESS="http://localhost/ncds/server/"
+SERVER_ADDRESS="http://ncdsgw.inc.cuhk.edu.hk/physics/server/"
+USERNAME="ncdsdemo"
+PASSWORD="ncdsdemo"
 
 def printUsage():
     print "Usage:"
-    print "UPLOAD:\t\t./ncds.py put [SRC FILE] [DST PATH]"
-    print "DOWNLOAD:\t./ncds.py get [FILE ID] [DST PATH]"
+    print "UPLOAD:\t\t./ncds.py put [LOCAL PATH] [SERVER PATH]"
+    print "DOWNLOAD:\t./ncds.py get [SERVER PATH] [LOCAL PATH]"
     print "LIST:\t\t./ncds.py list"
-    print "DELETE:\t\t./ncds.py delete [SRC FILE]"
+    print "DELETE:\t\t./ncds.py delete [SERVER PATH]"
     sys.exit()
 
 def ncdsPut(src, dst):
@@ -32,6 +35,12 @@ def ncdsPut(src, dst):
     data, headers = multipart_encode(values)
     request = urllib2.Request(url, data, headers)
     request.unverifiable = True
+
+    # authentication
+    base64string = base64.encodestring('%s:%s' % (USERNAME, PASSWORD))[:-1]
+    authheader =  "Basic %s" % base64string
+    request.add_header("Authorization", authheader)
+
     response = urllib2.urlopen(request)
     the_page = response.read()
 
@@ -45,8 +54,8 @@ def ncdsGetById (fileid, dst):
     print "File ID:", fileid
     print "Dst Path:", dst
 
-    url = SERVER_ADDRESS + 'do_download.php?fileid=' + str(fileid)
-    u = urllib2.urlopen(url)
+    req = getRequestHandle(SERVER_ADDRESS + 'do_download.php?fileid=' + str(fileid))
+    u = urllib2.urlopen(req)
 
     try:
         localFile = open(dst, 'w')
@@ -83,8 +92,8 @@ def getFileIdFromPath(src):
     return fileid
 
 def readFileList():
-    url = SERVER_ADDRESS + 'list.php?python'
-    u = urllib2.urlopen(url)
+    req = getRequestHandle(SERVER_ADDRESS + 'list.php?python')
+    u = urllib2.urlopen(req)
 
     return u.read()
 
@@ -94,10 +103,17 @@ def ncdsList():
 
 def ncdsDelete(src):
     fileid = getFileIdFromPath (src)
-    url = SERVER_ADDRESS + 'do_delete.php?fileid=' + str(fileid)
-    u = urllib2.urlopen(url)
+    req = getRequestHandle(SERVER_ADDRESS + 'do_delete.php?fileid=' + str(fileid))
+    u = urllib2.urlopen(req)
 
     print "\n".join(u.read().split("<br />"))
+
+def getRequestHandle (url):
+    req = urllib2.Request(url)
+    base64string = base64.encodestring('%s:%s' % (USERNAME, PASSWORD))[:-1]
+    authheader =  "Basic %s" % base64string
+    req.add_header("Authorization", authheader)
+    return req
 
 if __name__ == "__main__":
 
