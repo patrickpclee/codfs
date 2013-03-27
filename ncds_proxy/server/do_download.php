@@ -10,7 +10,7 @@ if (empty($_GET['fileid'])){
 $client_no = rand();
 $logfile = uniqid(rand(), true) . '.log';
 $outfile = uniqid(rand(), true) . '.out';
-system ("cd ../bin; ./CLIENT -i $client_no -a download -f $fileid -t $outfile > $logfile 2>&1");
+system ("cd ../bin; ./CLIENT_p -i $client_no -a download -f $fileid -t $outfile > $logfile 2>&1");
 send_file("../bin/$outfile", $fileid);
 unlink("../bin/$outfile");
 unlink("../bin/$logfile");
