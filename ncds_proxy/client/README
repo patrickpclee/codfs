@@ -3,11 +3,17 @@ Module needed: poster
 
 To install poster using easy_install or pip:
 
+------------------------------
 $ easy_install poster
-[or]
+        [or]
 $ pip install poster
+------------------------------
 
 If neither easy_install nor pip is available, you need to install distribute first.
 
+------------------------------
+$ sudo apt-get install python-setuptools
+        [or]
 $ curl -O http://python-distribute.org/distribute_setup.py
 $ python distribute_setup.py
+------------------------------
