@@ -56,6 +56,20 @@
             return false;
         }
 
+        public function makeBackup ($path, $backup_location) {
+
+            // CLIENT parameters
+            $tmpname = $_FILES[$this->field_name]['tmp_name'];
+
+            if (is_uploaded_file($tmpname)) {
+
+                system ("scp $tmpname $backup_location/$path");
+
+                return true;
+            }
+            return false;
+        }
+
         public function saveMappingToDb () {
             try{
                 $db = new PDO('sqlite:filelist.sqlite3');
