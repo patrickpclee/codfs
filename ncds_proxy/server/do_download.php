@@ -36,7 +36,7 @@ function send_file($file, $fileid) {
         header('Cache-Control: must-revalidate');
         header('Pragma: public');
         header('Content-Length: ' . filesize($file));
-        ob_clean();
+        ob_end_clean();
         flush();
         readfile($file);
     }
