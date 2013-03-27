@@ -28,7 +28,7 @@
 
             if (is_uploaded_file($tmpname)) {
 
-                system ("cd ../bin; ./CLIENT -i $client_no -a upload -c $scheme -n $n -k $k -m $m -w $w -t $tmpname > $logfile 2>&1");
+                system ("cd ../bin; ./CLIENT_p -i $client_no -a upload -c $scheme -n $n -k $k -m $m -w $w -t $tmpname > $logfile 2>&1");
 
                 $log_content = file_get_contents("../bin/$logfile", true);
 
