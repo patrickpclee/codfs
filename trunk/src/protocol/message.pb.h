@@ -6062,15 +6062,38 @@ class RecoveryTriggerRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
       mutable_osdlist();
   
+  // repeated fixed32 dstOsdList = 2;
+  inline int dstosdlist_size() const;
+  inline void clear_dstosdlist();
+  static const int kDstOsdListFieldNumber = 2;
+  inline ::google::protobuf::uint32 dstosdlist(int index) const;
+  inline void set_dstosdlist(int index, ::google::protobuf::uint32 value);
+  inline void add_dstosdlist(::google::protobuf::uint32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+      dstosdlist() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+      mutable_dstosdlist();
+  
+  // optional bool dstspecified = 3;
+  inline bool has_dstspecified() const;
+  inline void clear_dstspecified();
+  static const int kDstspecifiedFieldNumber = 3;
+  inline bool dstspecified() const;
+  inline void set_dstspecified(bool value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.RecoveryTriggerRequestPro)
  private:
+  inline void set_has_dstspecified();
+  inline void clear_has_dstspecified();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > osdlist_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > dstosdlist_;
+  bool dstspecified_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -10228,6 +10251,53 @@ RecoveryTriggerRequestPro::osdlist() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
 RecoveryTriggerRequestPro::mutable_osdlist() {
   return &osdlist_;
+}
+
+// repeated fixed32 dstOsdList = 2;
+inline int RecoveryTriggerRequestPro::dstosdlist_size() const {
+  return dstosdlist_.size();
+}
+inline void RecoveryTriggerRequestPro::clear_dstosdlist() {
+  dstosdlist_.Clear();
+}
+inline ::google::protobuf::uint32 RecoveryTriggerRequestPro::dstosdlist(int index) const {
+  return dstosdlist_.Get(index);
+}
+inline void RecoveryTriggerRequestPro::set_dstosdlist(int index, ::google::protobuf::uint32 value) {
+  dstosdlist_.Set(index, value);
+}
+inline void RecoveryTriggerRequestPro::add_dstosdlist(::google::protobuf::uint32 value) {
+  dstosdlist_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >&
+RecoveryTriggerRequestPro::dstosdlist() const {
+  return dstosdlist_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
+RecoveryTriggerRequestPro::mutable_dstosdlist() {
+  return &dstosdlist_;
+}
+
+// optional bool dstspecified = 3;
+inline bool RecoveryTriggerRequestPro::has_dstspecified() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RecoveryTriggerRequestPro::set_has_dstspecified() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RecoveryTriggerRequestPro::clear_has_dstspecified() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RecoveryTriggerRequestPro::clear_dstspecified() {
+  dstspecified_ = false;
+  clear_has_dstspecified();
+}
+inline bool RecoveryTriggerRequestPro::dstspecified() const {
+  return dstspecified_;
+}
+inline void RecoveryTriggerRequestPro::set_dstspecified(bool value) {
+  set_has_dstspecified();
+  dstspecified_ = value;
 }
 
 // -------------------------------------------------------------------
