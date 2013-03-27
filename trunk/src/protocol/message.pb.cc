@@ -1171,8 +1171,10 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrimaryListReplyPro));
   RecoveryTriggerRequestPro_descriptor_ = file->message_type(58);
-  static const int RecoveryTriggerRequestPro_offsets_[1] = {
+  static const int RecoveryTriggerRequestPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecoveryTriggerRequestPro, osdlist_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecoveryTriggerRequestPro, dstosdlist_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecoveryTriggerRequestPro, dstspecified_),
   };
   RecoveryTriggerRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1585,10 +1587,11 @@ void protobuf_AddDesc_message_2eproto() {
     "eplyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n\024RepairSegm"
     "entInfoPro\022\021\n\tsegmentId\030\001 \001(\006\022\024\n\014deadBlo"
     "ckIds\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n\026GetPri"
-    "maryListReplyPro\022\023\n\013primaryList\030\001 \003(\007\",\n"
+    "maryListReplyPro\022\023\n\013primaryList\030\001 \003(\007\"V\n"
     "\031RecoveryTriggerRequestPro\022\017\n\007osdList\030\001 "
-    "\003(\007\"@\n\022GetOsdListReplyPro\022*\n\ronlineOsdLi"
-    "st\030\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 4913);
+    "\003(\007\022\022\n\ndstOsdList\030\002 \003(\007\022\024\n\014dstspecified\030"
+    "\003 \001(\010\"@\n\022GetOsdListReplyPro\022*\n\ronlineOsd"
+    "List\030\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 4955);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -17404,6 +17407,8 @@ void GetPrimaryListReplyPro::Swap(GetPrimaryListReplyPro* other) {
 
 #ifndef _MSC_VER
 const int RecoveryTriggerRequestPro::kOsdListFieldNumber;
+const int RecoveryTriggerRequestPro::kDstOsdListFieldNumber;
+const int RecoveryTriggerRequestPro::kDstspecifiedFieldNumber;
 #endif  // !_MSC_VER
 
 RecoveryTriggerRequestPro::RecoveryTriggerRequestPro()
@@ -17422,6 +17427,7 @@ RecoveryTriggerRequestPro::RecoveryTriggerRequestPro(const RecoveryTriggerReques
 
 void RecoveryTriggerRequestPro::SharedCtor() {
   _cached_size_ = 0;
+  dstspecified_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -17455,7 +17461,11 @@ RecoveryTriggerRequestPro* RecoveryTriggerRequestPro::New() const {
 }
 
 void RecoveryTriggerRequestPro::Clear() {
+  if (_has_bits_[2 / 32] & (0xffu << (2 % 32))) {
+    dstspecified_ = false;
+  }
   osdlist_.Clear();
+  dstosdlist_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -17484,6 +17494,44 @@ bool RecoveryTriggerRequestPro::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(13)) goto parse_osdList;
+        if (input->ExpectTag(21)) goto parse_dstOsdList;
+        break;
+      }
+      
+      // repeated fixed32 dstOsdList = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED32) {
+         parse_dstOsdList:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 1, 21, input, this->mutable_dstosdlist())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_LENGTH_DELIMITED) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED32>(
+                 input, this->mutable_dstosdlist())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(21)) goto parse_dstOsdList;
+        if (input->ExpectTag(24)) goto parse_dstspecified;
+        break;
+      }
+      
+      // optional bool dstspecified = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_dstspecified:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &dstspecified_)));
+          set_has_dstspecified();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -17512,6 +17560,17 @@ void RecoveryTriggerRequestPro::SerializeWithCachedSizes(
       1, this->osdlist(i), output);
   }
   
+  // repeated fixed32 dstOsdList = 2;
+  for (int i = 0; i < this->dstosdlist_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed32(
+      2, this->dstosdlist(i), output);
+  }
+  
+  // optional bool dstspecified = 3;
+  if (has_dstspecified()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->dstspecified(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -17526,6 +17585,17 @@ void RecoveryTriggerRequestPro::SerializeWithCachedSizes(
       WriteFixed32ToArray(1, this->osdlist(i), target);
   }
   
+  // repeated fixed32 dstOsdList = 2;
+  for (int i = 0; i < this->dstosdlist_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteFixed32ToArray(2, this->dstosdlist(i), target);
+  }
+  
+  // optional bool dstspecified = 3;
+  if (has_dstspecified()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->dstspecified(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -17536,11 +17606,25 @@ void RecoveryTriggerRequestPro::SerializeWithCachedSizes(
 int RecoveryTriggerRequestPro::ByteSize() const {
   int total_size = 0;
   
+  if (_has_bits_[2 / 32] & (0xffu << (2 % 32))) {
+    // optional bool dstspecified = 3;
+    if (has_dstspecified()) {
+      total_size += 1 + 1;
+    }
+    
+  }
   // repeated fixed32 osdList = 1;
   {
     int data_size = 0;
     data_size = 4 * this->osdlist_size();
     total_size += 1 * this->osdlist_size() + data_size;
+  }
+  
+  // repeated fixed32 dstOsdList = 2;
+  {
+    int data_size = 0;
+    data_size = 4 * this->dstosdlist_size();
+    total_size += 1 * this->dstosdlist_size() + data_size;
   }
   
   if (!unknown_fields().empty()) {
@@ -17569,6 +17653,12 @@ void RecoveryTriggerRequestPro::MergeFrom(const ::google::protobuf::Message& fro
 void RecoveryTriggerRequestPro::MergeFrom(const RecoveryTriggerRequestPro& from) {
   GOOGLE_CHECK_NE(&from, this);
   osdlist_.MergeFrom(from.osdlist_);
+  dstosdlist_.MergeFrom(from.dstosdlist_);
+  if (from._has_bits_[2 / 32] & (0xffu << (2 % 32))) {
+    if (from.has_dstspecified()) {
+      set_dstspecified(from.dstspecified());
+    }
+  }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
 
@@ -17592,6 +17682,8 @@ bool RecoveryTriggerRequestPro::IsInitialized() const {
 void RecoveryTriggerRequestPro::Swap(RecoveryTriggerRequestPro* other) {
   if (other != this) {
     osdlist_.Swap(&other->osdlist_);
+    dstosdlist_.Swap(&other->dstosdlist_);
+    std::swap(dstspecified_, other->dstspecified_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
