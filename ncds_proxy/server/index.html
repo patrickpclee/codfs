@@ -1,11 +1,130 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-   "http://www.w3.org/TR/html4/strict.dtd">
-<HTML>
-   <HEAD>
-      <TITLE>NCDS File Uploader</TITLE>
-   </HEAD>
-   <BODY>
-       <a href="upload.php">Upload File</a>
-       <a href="list.php">Download File</a>
-   </BODY>
-</HTML>
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title>NCDS Physics</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+/* <![CDATA[ */
+$(document).ready(function(){
+	$("#tabs li").click(function() {
+		//	First remove class "active" from currently active tab
+		$("#tabs li").removeClass('active');
+
+		//	Now add class "active" to the selected/clicked tab
+		$(this).addClass("active");
+
+		//	Hide all tab content
+		$(".tab_content").hide();
+
+		//	Here we get the href value of the selected tab
+		var selected_tab = $(this).find("a").attr("href");
+
+		//	Show the selected tab content
+		$(selected_tab).fadeIn();
+
+		//	At the end, we add return false so that the click on the link is not executed
+		return false;
+	});
+});
+/* ]]> */
+</script>
+<style type="text/css">
+html {
+    min-height: 100%;
+}
+body {
+	font-size: 100%;
+    min-height: 100%;
+}
+p {
+	margin: 0;
+	padding: 0;
+}
+#tabs_wrapper {
+	width: 750px;
+}
+#tabs_container {
+	border-bottom: 1px solid #ccc;
+}
+#tabs {
+	list-style: none;
+	padding: 5px 0 4px 0;
+	margin: 0 0 0 10px;
+	font: 0.75em arial;
+}
+#tabs li {
+	display: inline;
+}
+#tabs li a {
+	border: 1px solid #ccc;
+	padding: 4px 6px;
+	text-decoration: none;
+	background-color: #eeeeee;
+	border-bottom: none;
+	outline: none;
+	border-radius: 5px 5px 0 0;
+	-moz-border-radius: 5px 5px 0 0;
+	-webkit-border-top-left-radius: 5px;
+	-webkit-border-top-right-radius: 5px;
+}
+#tabs li a:hover {
+	background-color: #dddddd;
+	padding: 4px 6px;
+}
+#tabs li.active a {
+	border-bottom: 1px solid #fff;
+	background-color: #fff;
+	padding: 4px 6px 5px 6px;
+	border-bottom: none;
+}
+#tabs li.active a:hover {
+	background-color: #eeeeee;
+	padding: 4px 6px 5px 6px;
+	border-bottom: none;
+}
+
+#tabs li a.icon_accept {
+	background-image: url(accept.png);
+	background-position: 5px;
+	background-repeat: no-repeat;
+	padding-left: 24px;
+}
+#tabs li a.icon_accept:hover {
+	padding-left: 24px;
+}
+
+#tabs_content_container {
+	border: 1px solid #ccc;
+	border-top: none;
+	padding: 10px;
+	width: 800px;
+}
+.tab_content {
+	display: none;
+}
+</style>
+</head>
+<body>
+
+    <h1>NCDS Physics</h1>
+
+<div id="tabs_wrapper">
+	<div id="tabs_container">
+		<ul id="tabs">
+			<li class="active"><a href="#upload">Upload</a></li>
+			<li><a href="#download">Download</a></li>
+		</ul>
+	</div>
+	<div id="tabs_content_container">
+		<div id="upload" class="tab_content" style="display: block;">
+            <iframe src="upload.php" width="750px" height="600px"></iframe>
+		</div>
+		<div id="download" class="tab_content">
+            <iframe src="list.php" width="750px" height="600px"></iframe>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
