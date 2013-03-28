@@ -7,8 +7,8 @@ from poster.encode import multipart_encode
 from poster.streaminghttp import register_openers
 
 SERVER_ADDRESS="http://ncdsgw.inc.cuhk.edu.hk/physics/server/"
-USERNAME="ncdsdemo"
-PASSWORD="ncdsdemo"
+USERNAME="ncdsphysics"
+PASSWORD="ncdsphysics"
 
 def printUsage():
     print "Usage:"

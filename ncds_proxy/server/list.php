@@ -21,7 +21,7 @@ if (isset($_GET['python'])) {
 
     print "Files for download:<br />\n";
 
-    print "<table>\n";
+    print "<table width='100%' border='1'>\n";
     print "<tr>\n";
     print "<td>Path</td>\n";
     print "<td>File ID</td>\n";
