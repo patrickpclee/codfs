@@ -10,19 +10,18 @@
 #include <sys/xattr.h>
 #include <sys/stat.h>
 
+#include <forward_list>		// std::forward_list
+
 #include "client.hh"
 #include "client_communicator.hh"
 
 #include "fuselogger.hh"
 #include "filemetadatacache.hh"
+#include "filedatacache.hh"
 
 #include "../common/metadata.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
-
-#include "../coding/raid1coding.hh"
-#include "../coding/raid5coding.hh"
-#include "../coding/embrcoding.hh"
 
 #include "../config/config.hh"
 
@@ -36,10 +35,21 @@ uint32_t _clientId = 51000;
 ClientCommunicator* _clientCommunicator;
 FuseLogger* _fuseLogger;
 FileMetaDataCache* _fileMetaDataCache;
+FileDataCache* _fileDataCache;
+
+uint32_t _segmentSize = 10 * 1024 * 1024;
+
+std::forward_list<struct SegmentMetaData> _segmentMetaDataList;
+uint32_t _segmentMetaDataAllocateSize = 10;
 
 thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
+
+static void removeNameSpace(const char* path) {
+	unlink(path);
+	return ;
+}
 
 static uint32_t checkNameSpace(const char* path) {
 	string fpath = _fuseFolder + string(path);
@@ -75,15 +85,28 @@ static struct FileMetaData getAndCacheFileMetaData(uint32_t id) {
 	return fileMetaData;
 }
 
+static struct SegmentMetaData allocateSegmentMetaData() {
+
+	if(_segmentMetaDataList.empty()) {
+		vector<struct SegmentMetaData> segmentMetaDataList = _clientCommunicator->getNewSegmentList(_clientId, _segmentMetaDataAllocateSize);
+		_segmentMetaDataList.insert_after(_segmentMetaDataList.before_begin(), segmentMetaDataList.begin(), segmentMetaDataList.end());
+	}
+	struct SegmentMetaData _segmentMetaData = _segmentMetaDataList.front();
+	_segmentMetaDataList.pop_front();
+	return _segmentMetaData;
+}
+
 void startGarbageCollectionThread() {
 	GarbageCollector::getInstance().start();
 }
 
+/*
 static int ncvfs_error(const char *str) {
 	int ret = -errno;
 	printf("    ERROR %s: %s\n", str, strerror(errno));
 	return ret;
 }
+*/
 
 static void* ncvfs_init(struct fuse_conn_info *conn) {
 	_cwd = string(_cwdpath) + "/";
@@ -93,6 +116,8 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
 	_fileMetaDataCache = new FileMetaDataCache();
 	_clientCommunicator = client->getCommunicator();
 	_clientCommunicator->createServerSocket();
+
+	_fileDataCache = new FileDataCache();
 
 	// 1. Garbage Collection Thread
 	garbageCollectionThread = thread(startGarbageCollectionThread);
@@ -113,6 +138,7 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
 	_clientCommunicator->connectToMds();
 	_clientCommunicator->connectToMonitor();
 	_clientCommunicator->getOsdListAndConnect();
+	return NULL;
 }
 
 static int ncvfs_getattr(const char *path, struct stat *stbuf) {
@@ -133,6 +159,7 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 		struct FileMetaData fileMetaData;
 		fileMetaData = getAndCacheFileMetaData(fileId);
 
+		//In Case the Record on MDS is Deleted
 		if(fileMetaData._fileType == NOTFOUND) {
 			return -ENOENT;
 		}
@@ -150,6 +177,23 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 }
 
 static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
+	uint32_t fileId = checkNameSpace(path);
+	if (fileId == 0) {
+		debug("File %s Does Not Exist\n", path);
+		return -ENOENT;
+	} else {
+		struct FileMetaData fileMetaData;
+		fileMetaData = getAndCacheFileMetaData(fileId);
+
+		//In Case the Record on MDS is Deleted
+		if(fileMetaData._fileType == NOTFOUND) {
+			return -ENOENT;
+		}
+
+		fi->fh = fileMetaData._id;
+		debug("Open File %s with ID %" PRIu64 "\n",path,fi->fh);
+	}
+	return 0;
 }
 
 static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *fi) {
@@ -160,8 +204,9 @@ static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *f
 		return ret;
 	}
 
-	uint32_t segmentCount = configLayer->getConfigInt("Fuse>PreallocateSegmentNumber");
-	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, 0, segmentCount);
+	//uint32_t segmentCount = configLayer->getConfigInt("Fuse>PreallocateSegmentNumber");
+	//struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, 0, segmentCount);
+	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, 0, 0);
 	fileMetaData._fileType = NORMAL;
 	_fileMetaDataCache->saveMetaData(fileMetaData);
 	fi->fh = fileMetaData._id;
@@ -173,45 +218,93 @@ static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *f
 }
 
 static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
+	uint32_t fileId = fi->fh;
+	struct FileMetaData fileMetaData = getAndCacheFileMetaData(fileId);
+	uint32_t sizeRead = 0;
+	char* bufptr = buf;
+	if((uint32_t)offset >= fileMetaData._size)
+		return 0;
+	while (sizeRead < size) {
+		// TODO: Check Read Size
+		uint32_t segmentCount = (offset + sizeRead) / _segmentSize;
+		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
+		uint32_t primary = fileMetaData._primaryList[segmentCount];
+		uint32_t segmentOffset = offset + sizeRead - (segmentCount * _segmentSize);
+		uint32_t readSize = min (_segmentSize - segmentOffset, size - sizeRead);
+		uint32_t retstat = _fileDataCache->readDataCache(segmentId, primary, bufptr, readSize, segmentOffset);
+		bufptr += retstat;
+		sizeRead += retstat;
+	}
+	return (int)sizeRead;
 }
 
 static int ncvfs_write(const char *path, const char *buf, size_t size,
 		off_t offset, struct fuse_file_info *fi) {
+	uint32_t fileId = fi->fh;
+	struct FileMetaData fileMetaData = getAndCacheFileMetaData(fileId);
+	uint32_t sizeWritten = 0;
+	const char* bufptr = buf;
+	while (sizeWritten < size) {
+		uint32_t segmentCount = (offset + sizeWritten) / _segmentSize;
+		if(segmentCount >= fileMetaData._segmentList.size()) {
+			struct SegmentMetaData segmentMetaData = allocateSegmentMetaData();
+			fileMetaData._segmentList.push_back(segmentMetaData._id);
+			fileMetaData._primaryList.push_back(segmentMetaData._primary);
+		}
+		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
+		uint32_t primary = fileMetaData._primaryList[segmentCount];
+		uint32_t segmentOffset = offset + sizeWritten - (segmentCount * _segmentSize);
+		uint32_t writeSize = min (_segmentSize - segmentOffset, size - sizeWritten);
+		uint32_t retstat = _fileDataCache->writeDataCache(segmentId, primary, bufptr, writeSize, segmentOffset);
+		bufptr += retstat;
+		sizeWritten += retstat;
+	}
+	if((offset + sizeWritten) > fileMetaData._size)
+		fileMetaData._size = offset + sizeWritten;
+	_fileMetaDataCache->saveMetaData(fileMetaData);
+	return (int)sizeWritten;
 }
 
 static void ncvfs_destroy(void* userdata) {
 }
 
 static int ncvfs_chmod(const char *path, mode_t mode) {
+	return 0;
 }
 
 static int ncvfs_chown(const char *path, uid_t uid, gid_t gid) {
+	return 0;
 }
 
 static int ncvfs_utime(const char *path, struct utimbuf *ubuf) {
 	return 0;
 }
 
-static int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-		off_t offset, struct fuse_file_info *fi) {
-}
-
 static int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
+	return 0;
 }
 
 static int ncvfs_mkdir(const char *path, mode_t mode) {
+	return 0;
 }
 
 static int ncvfs_unlink(const char *path) {
+	removeNameSpace(path);
+	uint32_t fileId = _fileMetaDataCache->path2Id(string(path));
+	_fileMetaDataCache->removeMetaData(fileId);
+	return 0;
 }
 
 static int ncvfs_rmdir(const char *path) {
+	return 0;
 }
 
 static int ncvfs_rename(const char *path, const char *newpath) {
+	return 0;
 }
 
 static int ncvfs_truncate(const char *path, off_t newsize) {
+	return 0;
 }
 
 static int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
@@ -219,12 +312,16 @@ static int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 }
 
 static int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
+	return 0;
 }
 
 static int ncvfs_opendir(const char *path, struct fuse_file_info *fi) {
+	return 0;
 }
 
-static int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset) {
+int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+		off_t offset, struct fuse_file_info *fi) {
+	return 0;
 }
 
 static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
@@ -237,24 +334,37 @@ static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
 	fprintf(fp,"%" PRIu32, fileId);
 	fclose(fp);
 
+	struct FileMetaData fileMetaData = _fileMetaDataCache->getMetaData(fileId);
+	
+	for(uint32_t i = 0; i < fileMetaData._segmentList.size(); ++i) {
+		_fileDataCache->closeDataCache(fileMetaData._segmentList[i]);
+	}
+
+	_clientCommunicator->saveFileSize(_clientId, fileId, fileMetaData._size);
+	_clientCommunicator->saveSegmentList(_clientId, fileId, fileMetaData._segmentList);
 	_fileMetaDataCache->removeMetaData(fileId);
 	return 0;
 }
 
 static int ncvfs_releasedir(const char *path, struct fuse_file_info *fi) {
+	return 0;
 }
 
 static int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
+	return 0;
 }
 
 static int ncvfs_access(const char *path, int mask) {
+	return 0;
 }
 
 static int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
+	return 0;
 }
 
 static int ncvfs_fgetattr(const char *path, struct stat *statbuf,
 		struct fuse_file_info *fi) {
+	return 0;
 }
 
 struct ncvfs_fuse_operations: fuse_operations {

@@ -10,8 +10,8 @@ class FileMetaDataCache {
 		uint32_t path2Id(string path);
 		string id2Path(uint32_t id);
 
-		struct FileMetaData getMetaData(uint32_t id);
-		void saveMetaData(struct FileMetaData fileMetaData);
+		struct FileMetaData& getMetaData(uint32_t id);
+		void saveMetaData(const struct FileMetaData& fileMetaData);
 		void removeMetaData(uint32_t id);
 	private:
 		std::unordered_map<uint32_t, struct FileMetaData> _metaDataCache;
