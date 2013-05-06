@@ -33,7 +33,7 @@
                     $("#uploader").pluploadQueue({
                         // General settings
                         runtimes : 'html5,html4',
-                            url : 'plupload.php',
+                            url : 'do_upload.php',
                             multipart_params: {'path': str}
                     });
 
