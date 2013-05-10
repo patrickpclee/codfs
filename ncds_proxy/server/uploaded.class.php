@@ -42,7 +42,7 @@ class Uploaded {
 
         print "<br />";
 
-        //unlink("../bin/$logfile");
+        unlink("../bin/$logfile");
 
         $this->path = $path;
         $this->fileid = $fileid;
