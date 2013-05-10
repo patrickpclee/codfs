@@ -30,11 +30,12 @@ if (isset($_GET['python'])) {
 
     foreach ($result as $row) {
         $path = str_replace('@', '/', $row['PATH']);
+        $filename = urlencode(basename($path));
         $fileid = $row['FILEID'];
         print "<tr>\n";
         print "<td>".$path."</td>\n";
         print "<td>".$fileid."</td>\n";
-        print "<td><a href='do_download.php?fileid=$fileid'>Download</a></td>\n";
+        print "<td><a href='do_download.php?fileid=$fileid&filename=$filename'>Download</a></td>\n";
         print "<td><a href='do_delete.php?fileid=$fileid'>Delete</a></td>\n";
         print "</tr>\n";
     }

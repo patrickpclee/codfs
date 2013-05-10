@@ -27,10 +27,15 @@ unlink("../bin/$logfile");
 $log->LogInfo("Sent to Client FileID: $fileid");
 
 function send_file($file, $fileid) {
+    if (empty($_GET['filename'])){
+        $filename = $fileid
+    } else{
+        $filename = urldecode($_GET['filename']);
+    }
     if (file_exists($file)) {
         header('Content-Description: File Transfer');
         header('Content-Type: application/octet-stream');
-        header("Content-Disposition: attachment; filename=$fileid");
+        header("Content-Disposition: attachment; filename=$filename");
         header('Content-Transfer-Encoding: binary');
         header('Expires: 0');
         header('Cache-Control: must-revalidate');
