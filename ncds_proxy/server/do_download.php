@@ -28,7 +28,7 @@ $log->LogInfo("Sent to Client FileID: $fileid");
 
 function send_file($file, $fileid) {
     if (empty($_GET['filename'])){
-        $filename = $fileid
+        $filename = $fileid;
     } else{
         $filename = urldecode($_GET['filename']);
     }
