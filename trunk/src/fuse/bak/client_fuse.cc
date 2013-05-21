@@ -203,8 +203,7 @@ void* ncvfs_init(struct fuse_conn_info *conn) {
 static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	debug ("fpath = %s\n", fpath);
 	//printf("%s\n",fpath);
@@ -270,8 +269,7 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 //	struct FileMetaData fileMetaData = getAndCacheFileInfo(path);
 	
 	// Load File ID
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 	FILE* fp = fopen(fpath,"r");
 	int ret = fscanf(fp,"%" PRIu64, &(fi->fh));
 	if (ret < 0) {
@@ -295,8 +293,7 @@ static int ncvfs_create(const char * path, mode_t mode,
 		struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 	
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 	creat(fpath, mode);
 
 	uint32_t segmentCount = configLayer->getConfigInt(
@@ -423,8 +420,7 @@ static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
 	debug("Release %s [%" PRIu32 "]\n", path, (uint32_t)fi->fh);
 
 	// Save File ID
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 	FILE* fp = fopen(fpath,"w");
 	fprintf(fp,"%" PRIu64, fi->fh);
 	fclose(fp);
@@ -454,8 +450,7 @@ int ncvfs_chmod(const char *path, mode_t mode) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = chmod(fpath, mode);
 	if (retstat < 0)
@@ -469,8 +464,7 @@ int ncvfs_chown(const char *path, uid_t uid, gid_t gid) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = chown(fpath, uid, gid);
 	if (retstat < 0)
@@ -484,8 +478,7 @@ int ncvfs_utime(const char *path, struct utimbuf *ubuf) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = utime(fpath, ubuf);
 	if (retstat < 0)
@@ -536,8 +529,7 @@ int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	// On Linux this could just be 'mknod(path, mode, rdev)' but this
 	//  is more portable
@@ -567,8 +559,7 @@ int ncvfs_mkdir(const char *path, mode_t mode) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = mkdir(fpath, mode);
 	if (retstat < 0)
@@ -579,8 +570,7 @@ int ncvfs_mkdir(const char *path, mode_t mode) {
 
 int ncvfs_unlink(const char *path) {
 	debug_cyan("%s\n", "not implemented");
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 	uint64_t fileId = 0;
 	FILE* fp = fopen(fpath,"r");
 	int ret = fscanf(fp,"%" PRIu64, &fileId);
@@ -597,8 +587,7 @@ int ncvfs_rmdir(const char *path) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = rmdir(fpath);
 	if (retstat < 0)
@@ -660,8 +649,7 @@ int ncvfs_truncate(const char *path, off_t newsize) {
 	uint64_t fileId = 0;
 
 	// Load File ID
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 	FILE* fp = fopen(fpath,"r");
 	int ret = fscanf(fp,"%" PRIu64, &fileId);
 	if (ret < 0) {
@@ -692,8 +680,7 @@ int ncvfs_statfs(const char *path, struct statvfs *statv) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	// get stats for underlying filesystem
 	retstat = statvfs(fpath, statv);
@@ -745,8 +732,7 @@ int ncvfs_setxattr(const char *path, const char *name, const char *value,
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = lsetxattr(fpath, name, value, size, flags);
 	if (retstat < 0)
@@ -761,8 +747,7 @@ int ncvfs_getxattr(const char *path, const char *name, char *value,
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = lgetxattr(fpath, name, value, size);
 	if (retstat < 0)
@@ -776,8 +761,7 @@ int ncvfs_listxattr(const char *path, char *list, size_t size) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = llistxattr(fpath, list, size);
 	if (retstat < 0)
@@ -791,8 +775,7 @@ int ncvfs_removexattr(const char *path, const char *name) {
 	//debug_cyan ("%s\n", "not implemented");
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = lremovexattr(fpath, name);
 	if (retstat < 0)
@@ -806,8 +789,7 @@ int ncvfs_opendir(const char *path, struct fuse_file_info *fi) {
 	debug_cyan ("%s\n", "implemented");
 	DIR *dp;
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	dp = opendir(fpath);
 	if (dp == NULL)
@@ -845,8 +827,7 @@ int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
 int ncvfs_access(const char *path, int mask) {
 	debug_cyan ("%s\n", "implemented");
 	int retstat = 0;
-	string fpath_s = _fuseFolder + string(path);
-	const char* fpath = fpath_s.c_str();
+	const char* fpath = (_fuseFolder + string(path)).c_str();
 
 	retstat = access(fpath, mask);
 
