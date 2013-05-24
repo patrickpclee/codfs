@@ -456,7 +456,8 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 
 	set <uint64_t> recoverySegments;
 
-	debug_yellow("%s\n", "Recovery Triggered");
+	debug_yellow("%s\n", "Recovery Triggered ");
+	gettimeofday(&_recoverStartTime, NULL);
 
 	// this map is used iff dstSpecified = true
 	map<uint32_t, uint32_t> mapped;
@@ -521,6 +522,8 @@ void Mds::recoveryTriggerProcessor(uint32_t requestId, uint32_t connectionId,
 		}
 	}
 
+	_numOfSegmentRepairRemaining = segmentLocationList.size();
+
 	_mdsCommunicator->replyRecoveryTrigger(requestId, connectionId,
 			segmentLocationList);
 
@@ -560,6 +563,19 @@ void Mds::repairSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 	}
 
 	_metaDataModule->saveNodeList(segmentId, segmentMetaData._nodeList);
+
+	_numOfSegmentRepairRemaining--;
+	if(_numOfSegmentRepairRemaining == 0) {
+		struct timeval _recoverEndTime;
+		gettimeofday(&_recoverEndTime, NULL);
+		long milliseconds = _recoverEndTime.tv_usec - _recoverStartTime.tv_usec;
+		if (milliseconds < 0) {
+			milliseconds += 1000;
+			_recoverEndTime.tv_sec--;
+		}
+		long seconds = _recoverEndTime.tv_sec - _recoverStartTime.tv_sec;
+		debug("[RECOVER] Recovery Ends. Duration = %ld.%ld seconds\n", seconds, milliseconds);
+	}
 }
 
 MdsCommunicator* Mds::getCommunicator() {
