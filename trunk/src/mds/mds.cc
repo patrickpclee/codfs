@@ -568,7 +568,7 @@ void Mds::repairSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 	if(_numOfSegmentRepairRemaining == 0) {
 		struct timeval _recoverEndTime;
 		gettimeofday(&_recoverEndTime, NULL);
-		long milliseconds = _recoverEndTime.tv_usec - _recoverStartTime.tv_usec;
+		long milliseconds = (_recoverEndTime.tv_usec - _recoverStartTime.tv_usec) / 1000;
 		if (milliseconds < 0) {
 			milliseconds += 1000;
 			_recoverEndTime.tv_sec--;
