@@ -38,8 +38,8 @@ FuseLogger* _fuseLogger;
 
 string _fuseFolder = "./fusedir";
 
-CodingScheme codingScheme = RAID5_CODING;
-string codingSetting = Raid5Coding::generateSetting(4);
+CodingScheme codingScheme = RAID1_CODING;
+string codingSetting = Raid1Coding::generateSetting(1);
 
 uint32_t _clientId = 51000;
 #ifdef FUSE_READ_AHEAD
@@ -297,7 +297,7 @@ static int ncvfs_create(const char * path, mode_t mode,
 	
 	string fpath_s = _fuseFolder + string(path);
 	const char* fpath = fpath_s.c_str();
-	creat(fpath, mode);
+//	creat(fpath, mode);
 
 	uint32_t segmentCount = configLayer->getConfigInt(
 			"Fuse>PreallocateSegmentNumber");
@@ -311,6 +311,9 @@ static int ncvfs_create(const char * path, mode_t mode,
 	_fileDataCache[fileMetaData._id] = new FileDataCache(fileMetaData,
 			segmentSize);
 	fi->fh = fileMetaData._id;
+	FILE* fp = fopen(fpath,"w");
+	fprintf(fp,"%" PRIu64, fi->fh);
+	fclose(fp);
 	return 0;
 }
 
