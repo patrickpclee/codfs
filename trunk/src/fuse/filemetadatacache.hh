@@ -13,6 +13,7 @@ class FileMetaDataCache {
 		struct FileMetaData& getMetaData(uint32_t id);
 		void saveMetaData(const struct FileMetaData& fileMetaData);
 		void removeMetaData(uint32_t id);
+		int renameMetaData(string path, string new_path);
 	private:
 		std::unordered_map<uint32_t, struct FileMetaData> _metaDataCache;
 		std::unordered_map<string, uint32_t> _fileIdCache;

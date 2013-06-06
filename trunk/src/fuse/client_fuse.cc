@@ -64,8 +64,10 @@ static uint32_t checkNameSpace(const char* path) {
 
 	fclose(fp);
 	if (ret < 0) {
-		perror("fscanf()");
-		exit(-1);
+		debug("No File ID for %s", path);
+		return 0;
+		//perror("fscanf()");
+		//exit(-1);
 	}
 	debug("File ID Cached %" PRIu32 "\n", fileId);
 	return fileId;
@@ -101,12 +103,12 @@ void startGarbageCollectionThread() {
 }
 
 /*
-static int ncvfs_error(const char *str) {
-	int ret = -errno;
-	printf("    ERROR %s: %s\n", str, strerror(errno));
-	return ret;
-}
-*/
+   static int ncvfs_error(const char *str) {
+   int ret = -errno;
+   printf("    ERROR %s: %s\n", str, strerror(errno));
+   return ret;
+   }
+ */
 
 static void* ncvfs_init(struct fuse_conn_info *conn) {
 	_cwd = string(_cwdpath) + "/";
@@ -154,7 +156,7 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 	if (fileId == 0) {
 		debug("File %s Does Not Exist\n", path);
 		return -ENOENT;
-	// File ID Cache
+		// File ID Cache
 	} else {
 		struct FileMetaData fileMetaData;
 		fileMetaData = getAndCacheFileMetaData(fileId);
@@ -198,7 +200,7 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 
 static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *fi) {
 	string fpath = _fuseFolder + string(path);
-	int ret = creat(fpath.c_str(), mode);
+	int ret = creat(fpath.c_str(), mode | 0644);
 	if (ret < 0){
 		perror("create()");
 		return ret;
@@ -212,6 +214,10 @@ static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *f
 	fi->fh = fileMetaData._id;
 
 	FILE* fp = fopen(fpath.c_str(),"w");
+	if (fp == NULL) {
+		perror("fopen()");
+		exit(-1);
+	}
 	fprintf(fp,"%" PRIu32, fileMetaData._id);
 	fclose(fp);
 	return 0;
@@ -269,102 +275,175 @@ static void ncvfs_destroy(void* userdata) {
 }
 
 static int ncvfs_chmod(const char *path, mode_t mode) {
-	return 0;
+	string fpath = _fuseFolder + string(path);
+	return ncvfs_chmod(fpath.c_str(),mode);
+	//return 0;
 }
 
 static int ncvfs_chown(const char *path, uid_t uid, gid_t gid) {
-	return 0;
+	string fpath = _fuseFolder + string(path);
+	return chown(fpath.c_str(),uid,gid);
+	//return 0;
 }
 
 static int ncvfs_utime(const char *path, struct utimbuf *ubuf) {
-	return 0;
+	string fpath = _fuseFolder + string(path);
+	return utime(fpath.c_str(), ubuf);
+	//return 0;
 }
 
-static int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
-	return 0;
-}
+/*
+   static int ncvfs_mknod(const char *path, mode_t mode, dev_t dev) {
+   return 0;
+   }
+ */
 
 static int ncvfs_mkdir(const char *path, mode_t mode) {
-	return 0;
+	string fpath = _fuseFolder + string(path);
+	return mkdir(fpath.c_str(), mode);
 }
 
 static int ncvfs_unlink(const char *path) {
 	removeNameSpace(path);
 	uint32_t fileId = _fileMetaDataCache->path2Id(string(path));
-	_fileMetaDataCache->removeMetaData(fileId);
+	if(fileId > 0)
+		_fileMetaDataCache->removeMetaData(fileId);
 	return 0;
 }
 
 static int ncvfs_rmdir(const char *path) {
-	return 0;
+	string fpath = _fuseFolder + string(path);
+	return rmdir(fpath.c_str());
 }
 
 static int ncvfs_rename(const char *path, const char *newpath) {
-	return 0;
+	string fpath = _fuseFolder + string(path);
+	string new_fpath = _fuseFolder + string(newpath);
+
+	/// TODO: Check Return Value
+	_fileMetaDataCache->renameMetaData(fpath, new_fpath);
+
+	return rename(fpath.c_str(), new_fpath.c_str());
 }
 
 static int ncvfs_truncate(const char *path, off_t newsize) {
+	/// TODO: Support truncate to size other than 0
+	if(newsize > 0) {
+		debug_error("%s\n","Only Truncate to 0 is supported");
+		exit(-1);
+	}
+
+	uint32_t fileId = checkNameSpace(path);
+	if (fileId == 0) {
+		debug("File %s Does Not Exist\n", path);
+		return -ENOENT;
+	}
+
+	/// TODO: Exception
+	struct FileMetaData fileMetaData = _fileMetaDataCache->getMetaData(fileId);
+
+	fileMetaData._size = newsize;
+	/// TODO: Discard File Data Cache
+	fileMetaData._segmentList.clear();
+	fileMetaData._primaryList.clear();
+	_fileMetaDataCache->saveMetaData(fileMetaData);
+
+	client->truncateFileRequest(fileId);
 	return 0;
 }
 
 static int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
-	return 0;
-}
+	debug("Flush %s [%" PRIu32 "]\n", path, (uint32_t)fi->fh);
 
-static int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
-	return 0;
-}
-
-static int ncvfs_opendir(const char *path, struct fuse_file_info *fi) {
-	return 0;
-}
-
-int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
-		off_t offset, struct fuse_file_info *fi) {
-	return 0;
-}
-
-static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
-	debug("Release %s [%" PRIu32 "]\n", path, (uint32_t)fi->fh);
-
-	string fpath = _fuseFolder + string(path);
 	uint32_t fileId = (uint32_t)fi->fh;
 
+	/*
+	string fpath = _fuseFolder + string(path);
 	FILE* fp = fopen(fpath.c_str(),"w");
 	fprintf(fp,"%" PRIu32, fileId);
 	fclose(fp);
+	*/
 
 	struct FileMetaData fileMetaData = _fileMetaDataCache->getMetaData(fileId);
-	
+
 	for(uint32_t i = 0; i < fileMetaData._segmentList.size(); ++i) {
 		_fileDataCache->closeDataCache(fileMetaData._segmentList[i]);
 	}
 
 	_clientCommunicator->saveFileSize(_clientId, fileId, fileMetaData._size);
 	_clientCommunicator->saveSegmentList(_clientId, fileId, fileMetaData._segmentList);
+	return 0;
+}
+
+/*
+   static int ncvfs_fsync(const char *path, int datasync, struct fuse_file_info *fi) {
+   return 0;
+   }
+ */
+
+static int ncvfs_opendir(const char *path, struct fuse_file_info *fi) {
+	string fpath = _fuseFolder + string(path);
+	DIR* dp = opendir(fpath.c_str());
+	if(dp == NULL)
+		return -errno;
+	else fi->fh = (intptr_t)dp;
+	return 0;
+}
+
+int ncvfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
+		off_t offset, struct fuse_file_info *fi) {
+
+	DIR* dp;
+	struct dirent *de;
+	dp = (DIR *) (uintptr_t) fi->fh;
+	de = readdir(dp);
+	if (de == 0)
+		return -errno;
+	do {
+		if (filler(buf, de->d_name, NULL, 0) != 0)
+			return -ENOMEM;
+	} while ((de = readdir(dp)) != NULL);
+
+	return 0;
+}
+
+static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
+	debug("Release %s [%" PRIu32 "]\n", path, (uint32_t)fi->fh);
+
+	ncvfs_flush(path,fi);
+
+	/*
+	uint32_t fileId = (uint32_t)fi->fh;
 	_fileMetaDataCache->removeMetaData(fileId);
+	*/
 	return 0;
 }
 
 static int ncvfs_releasedir(const char *path, struct fuse_file_info *fi) {
-	return 0;
+	return closedir((DIR *) (uintptr_t) fi->fh);
 }
 
-static int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
-	return 0;
-}
+/*
+   static int ncvfs_fsyncdir(const char *path, int datasync, struct fuse_file_info *fi) {
+   return 0;
+   }
+ */
 
 static int ncvfs_access(const char *path, int mask) {
-	return 0;
+	string fpath = _fuseFolder + string(path);
+	return access(fpath.c_str(),mask);
 }
 
-static int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
-	return 0;
-}
+/*
+   static int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
+   return 0;
+   }
+ */
 
 static int ncvfs_fgetattr(const char *path, struct stat *statbuf,
 		struct fuse_file_info *fi) {
-	return 0;
+	return ncvfs_getattr(path, statbuf);
+	//	return 0;
 }
 
 struct ncvfs_fuse_operations: fuse_operations {
@@ -377,7 +456,7 @@ struct ncvfs_fuse_operations: fuse_operations {
 //		readlink = ncvfs_readlink; // not required
 		opendir = ncvfs_opendir;
 		readdir = ncvfs_readdir;
-		mknod = ncvfs_mknod; // not required
+//		mknod = ncvfs_mknod; // not required
 		mkdir = ncvfs_mkdir;
 		unlink = ncvfs_unlink;
 		rmdir = ncvfs_rmdir;
@@ -387,7 +466,7 @@ struct ncvfs_fuse_operations: fuse_operations {
 		chmod = ncvfs_chmod;
 		chown = ncvfs_chown; // not required
 		truncate = ncvfs_truncate;
-		ftruncate = ncvfs_ftruncate;
+//		ftruncate = ncvfs_ftruncate; // Would call truncate instead
 		utime = ncvfs_utime; // not required
 		open = ncvfs_open;
 		read = ncvfs_read;
@@ -395,8 +474,8 @@ struct ncvfs_fuse_operations: fuse_operations {
 //		statfs = ncvfs_statfs; // not required
 		release = ncvfs_release;
 		releasedir = ncvfs_releasedir;
-		fsync = ncvfs_fsync; // not strictly required
-		fsyncdir = ncvfs_fsyncdir; // not strictly required
+//		fsync = ncvfs_fsync; // not strictly required
+//		fsyncdir = ncvfs_fsyncdir; // not strictly required
 		flush = ncvfs_flush; // not required
 //		setxattr = ncvfs_setxattr; // not required
 //		getxattr = ncvfs_getxattr; // not required

@@ -25,25 +25,47 @@ FileDataCache::FileDataCache() {
 }
 
 uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary, void* buf, uint32_t size, uint32_t offset) {
-	// Check Write Cache
+	_dataCacheMutex.lock();
 	if(_segmentStatus.count(segmentId) == 1) {
-		if(_segmentStatus[segmentId] == DIRTY) {
+		_dataCacheMutex.unlock();
+		mutex * tempMutex = _segmentLock[segmentId];
+		tempMutex->lock();
+//		if(_segmentStatus[segmentId] == DIRTY) {
 			memcpy(buf, _segmentDataCache[segmentId].buf + offset, size);
+		tempMutex->unlock();
+
 			return size;
-		}
+//		}
 	} else {
 		_segmentStatus[segmentId] = CLEAN;
 		_segmentPrimary[segmentId] = primary;
+		mutex * tempMutex = new mutex();
+		_segmentLock[segmentId] = tempMutex;
+		tempMutex->lock();
+		_dataCacheMutex.unlock();
+
+		uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
+		struct SegmentTransferCache segmentTransferCache = client->getSegment(_clientId, sockfd, segmentId);
+		struct SegmentData segmentCache;
+		segmentCache.buf = segmentTransferCache.buf;
+		segmentCache.info.segmentId = segmentId;
+		segmentCache.info.segmentSize = segmentTransferCache.length;
+		segmentCache.info.segmentPath = "";
+		_segmentDataCache[segmentId] = segmentCache;
+		tempMutex->unlock();
+		memcpy(buf, segmentCache.buf + offset, size);
+		return size;
 	}
 	
 	// Read Cache
-	uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);;
-	struct SegmentTransferCache segmentCache = client->getSegment(_clientId, sockfd, segmentId);
-	memcpy(buf, segmentCache.buf + offset, size);
-	return size;
+	//uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
+	//struct SegmentTransferCache segmentCache = client->getSegment(_clientId, sockfd, segmentId);
+	//memcpy(buf, segmentCache.buf + offset, size);
+	//return size;
 }
 
 uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary, const void* buf, uint32_t size, uint32_t offset) {
+	_dataCacheMutex.lock();
 	// TODO: Check - Forbid Write to Sealed Segment
 	struct SegmentData segmentDataCache;
 	if(_segmentStatus.count(segmentId) == 0) {
@@ -54,6 +76,7 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary, con
 	} else {
 		segmentDataCache = _segmentDataCache[segmentId];
 	}
+	_dataCacheMutex.unlock();
 
 	// TODO: Bound Check
 	memcpy(segmentDataCache.buf + offset, buf, size);
