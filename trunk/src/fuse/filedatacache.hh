@@ -4,6 +4,7 @@
 #define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <unordered_map>
+#include <thread>
 
 #include "../common/enums.hh"
 #include "../common/segmentdata.hh"
@@ -27,5 +28,8 @@ class FileDataCache {
 		uint32_t _segmentSize;
 		string _codingSetting;
 		CodingScheme _codingScheme;
+
+		std::mutex _dataCacheMutex;
+		std::unordered_map<uint64_t, std::mutex*> _segmentLock;
 };
 #endif 
