@@ -28,6 +28,7 @@ public:
 			return;
 		}
 
+		debug("LRU Size %" PRIu32 " / %" PRIu32 "\n",this->_valueMap.size(), this->_size);
 		if (this->_valueMap.size() == this->_size)
 			pop_back();
 
@@ -45,6 +46,7 @@ public:
 		fflush (filePtr);
 		//fsync (fileno (filePtr));
 		fclose(filePtr);
+		debug ("CLOSE2: %s\n", (*it).first.c_str());
 
 		this->_valueMap.erase(it);
 		this->_accessTimeList.pop_front();
