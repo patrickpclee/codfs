@@ -5,6 +5,7 @@
 #include <inttypes.h>
 #include <unordered_map>
 #include <thread>
+#include <list>
 
 #include "../common/enums.hh"
 #include "../common/segmentdata.hh"
@@ -20,6 +21,7 @@ class FileDataCache {
 		void closeDataCache(uint64_t segmentId);
 	private:
 		void writeBack(uint64_t segmentId);
+		void updateLru(uint64_t segmentId);
 
 		std::unordered_map<uint64_t, SegmentStatus> _segmentStatus;
 		std::unordered_map<uint64_t, uint32_t> _segmentPrimary;
@@ -28,8 +30,13 @@ class FileDataCache {
 		uint32_t _segmentSize;
 		string _codingSetting;
 		CodingScheme _codingScheme;
+		uint32_t _lruSizeLimit;
 
 		std::mutex _dataCacheMutex;
 		std::unordered_map<uint64_t, std::mutex*> _segmentLock;
+
+		std::mutex _lruListMutex;
+		std::list<uint64_t> _segmentLruList;
+		std::unordered_map<uint64_t, std::list<uint64_t>::iterator> _segment2LruMap;
 };
 #endif 

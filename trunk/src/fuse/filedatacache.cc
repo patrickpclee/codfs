@@ -22,6 +22,7 @@ FileDataCache::FileDataCache() {
 	_segmentSize = 10 * 1024 * 1024;
 	_codingScheme = RAID0_CODING;
 	_codingSetting = Raid0Coding::generateSetting(1);
+	_lruSizeLimit = 20;
 }
 
 uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary, void* buf, uint32_t size, uint32_t offset) {
@@ -34,7 +35,6 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary, void
 			memcpy(buf, _segmentDataCache[segmentId].buf + offset, size);
 		tempMutex->unlock();
 
-			return size;
 //		}
 	} else {
 		_segmentStatus[segmentId] = CLEAN;
@@ -54,8 +54,11 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary, void
 		_segmentDataCache[segmentId] = segmentCache;
 		tempMutex->unlock();
 		memcpy(buf, segmentCache.buf + offset, size);
-		return size;
 	}
+
+	updateLru(segmentId);
+
+	return size;
 	
 	// Read Cache
 	//uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
@@ -86,6 +89,7 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary, con
 		segmentDataCache.info.segmentSize = offset + size;
 
 	_segmentDataCache[segmentId] = segmentDataCache;
+	updateLru(segmentId);
 	return size;
 }
 
@@ -94,6 +98,15 @@ void FileDataCache::closeDataCache(uint64_t segmentId) {
 		debug("Segment %" PRIu64 " not Cached\n", segmentId);
 		return ;
 	}
+
+	/*
+	_lruListMutex.lock();
+	list<uint64_t>::iterator tempIt;
+	tempIt = _segment2LruMap[segmentId];
+	_segmentLruList.erase(tempIt);
+	_segment2LruMap.erase(segmentId);
+	_lruListMutex.unlock();
+	*/
 	
 	// Read Cache
 	if(_segmentStatus[segmentId] == CLEAN) {
@@ -136,4 +149,27 @@ void FileDataCache::writeBack(uint64_t segmentId) {
 	_clientCommunicator->sendSegment(_clientId, sockfd, segmentDataCache, _codingScheme, _codingSetting, md5ToHex(checksum));
 	MemoryPool::getInstance().poolFree(segmentDataCache.buf);
 	return ;
+}
+
+void FileDataCache::updateLru(uint64_t segmentId) {
+	_lruListMutex.lock();
+	list<uint64_t>::iterator tempIt;
+	if(_segment2LruMap.count(segmentId) == 1){
+		tempIt = _segment2LruMap[segmentId];
+		_segmentLruList.splice(_segmentLruList.end(), _segmentLruList, tempIt);
+	}
+	// Create LRU Record
+	else {
+		if(_segmentLruList.size() >= _lruSizeLimit) {
+			uint64_t segmentToClose = _segmentLruList.front();
+			_segmentLruList.pop_front();
+			_segment2LruMap.erase(segmentToClose);
+			closeDataCache(segmentToClose);
+		}
+		tempIt = _segmentLruList.insert(_segmentLruList.end(), segmentId);
+		_segment2LruMap[segmentId] = tempIt;
+	}
+	_lruListMutex.unlock();
+	return ;
+	
 }
