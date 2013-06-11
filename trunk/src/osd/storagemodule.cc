@@ -708,24 +708,29 @@ FILE* StorageModule::createFile(string filepath) {
 	// open file for read/write
 	// create new if not exist
 	FILE* filePtr;
-	filePtr = fopen(filepath.c_str(), "wb+");
+	try {
+		filePtr = _openedFile->get(filepath);
+	} catch (out_of_range& oor) { // file pointer not found in cache
+		filePtr = fopen(filepath.c_str(), "wb+");
+		debug ("OPEN1: %s\n", filepath.c_str());
 
-	if (filePtr == NULL) {
-		debug("%s\n", "Unable to create file!");
-		return NULL;
+		if (filePtr == NULL) {
+			debug("%s\n", "Unable to create file!");
+			return NULL;
+		}
+
+		// set buffer to zero to avoid memory leak
+		//setvbuf(filePtr, NULL, _IONBF, 0);
+
+		// add file pointer to map
+		_openedFile->insert(filepath, filePtr);
+
+		/*
+		 openedFileMutex.lock();
+		 _openedFile[filepath] = filePtr;
+		 openedFileMutex.unlock();
+		 */
 	}
-
-	// set buffer to zero to avoid memory leak
-	//setvbuf(filePtr, NULL, _IONBF, 0);
-
-	// add file pointer to map
-	_openedFile->insert(filepath, filePtr);
-
-	/*
-	 openedFileMutex.lock();
-	 _openedFile[filepath] = filePtr;
-	 openedFileMutex.unlock();
-	 */
 
 	return filePtr;
 }
@@ -741,6 +746,7 @@ FILE* StorageModule::openFile(string filepath) {
 		filePtr = _openedFile->get(filepath);
 	} catch (out_of_range& oor) { // file pointer not found in cache
 		filePtr = fopen(filepath.c_str(), "rb+");
+		debug ("OPEN2: %s\n", filepath.c_str());
 
 		if (filePtr == NULL) {
 			debug("Unable to open file at %s\n", filepath.c_str());
@@ -763,6 +769,7 @@ void StorageModule::tryCloseFile(string filepath) {
 	try {
 		filePtr = _openedFile->get(filepath);
 		fclose(filePtr);
+		debug ("CLOSE1: %s\n", filepath.c_str());
 		_openedFile->remove(filepath);
 	} catch (out_of_range& oor) { // file pointer not found in cache
 		return;
