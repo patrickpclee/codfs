@@ -438,13 +438,13 @@ static int ncvfs_access(const char *path, int mask) {
    static int ncvfs_ftruncate(const char *path, off_t offset, struct fuse_file_info *fi) {
    return 0;
    }
- */
 
 static int ncvfs_fgetattr(const char *path, struct stat *statbuf,
 		struct fuse_file_info *fi) {
 	return ncvfs_getattr(path, statbuf);
 	//	return 0;
 }
+*/
 
 struct ncvfs_fuse_operations: fuse_operations {
 	ncvfs_fuse_operations() {
