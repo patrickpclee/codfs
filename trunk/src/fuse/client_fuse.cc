@@ -37,6 +37,8 @@ FuseLogger* _fuseLogger;
 FileMetaDataCache* _fileMetaDataCache;
 FileDataCache* _fileDataCache;
 
+mutex _segmentMetaMutex;
+
 uint32_t _segmentSize = 10 * 1024 * 1024;
 
 std::forward_list<struct SegmentMetaData> _segmentMetaDataList;
@@ -45,6 +47,8 @@ uint32_t _segmentMetaDataAllocateSize = 10;
 thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
+
+uint32_t _prefetchCount = 3;
 
 static void removeNameSpace(const char* path) {
 	unlink(path);
@@ -88,13 +92,14 @@ static struct FileMetaData getAndCacheFileMetaData(uint32_t id) {
 }
 
 static struct SegmentMetaData allocateSegmentMetaData() {
-
+	_segmentMetaMutex.lock();
 	if(_segmentMetaDataList.empty()) {
 		vector<struct SegmentMetaData> segmentMetaDataList = _clientCommunicator->getNewSegmentList(_clientId, _segmentMetaDataAllocateSize);
 		_segmentMetaDataList.insert_after(_segmentMetaDataList.before_begin(), segmentMetaDataList.begin(), segmentMetaDataList.end());
 	}
 	struct SegmentMetaData _segmentMetaData = _segmentMetaDataList.front();
 	_segmentMetaDataList.pop_front();
+	_segmentMetaMutex.unlock();
 	return _segmentMetaData;
 }
 
@@ -227,6 +232,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, st
 	uint32_t fileId = fi->fh;
 	struct FileMetaData fileMetaData = getAndCacheFileMetaData(fileId);
 	uint32_t sizeRead = 0;
+	uint32_t lastSegmentCount = 0;
 	char* bufptr = buf;
 	if((uint32_t)offset >= fileMetaData._size)
 		return 0;
@@ -240,6 +246,13 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, st
 		uint32_t retstat = _fileDataCache->readDataCache(segmentId, primary, bufptr, readSize, segmentOffset);
 		bufptr += retstat;
 		sizeRead += retstat;
+		lastSegmentCount = segmentCount;
+	}
+
+	for (uint32_t i = 0; i < _prefetchCount; ++i) {
+		uint32_t segmentCount = lastSegmentCount + i;
+		if(segmentCount < fileMetaData._segmentList.size())
+			_fileDataCache->prefetchSegment(fileMetaData._segmentList[segmentCount], fileMetaData._primaryList[segmentCount]);
 	}
 	return (int)sizeRead;
 }
