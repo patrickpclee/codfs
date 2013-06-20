@@ -123,6 +123,7 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
 	_fileMetaDataCache = new FileMetaDataCache();
 	_clientCommunicator = client->getCommunicator();
 	_clientCommunicator->createServerSocket();
+	_fuseFolder = _cwd + _fuseFolder;
 
 	_fileDataCache = new FileDataCache();
 
