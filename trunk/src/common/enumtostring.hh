@@ -86,13 +86,11 @@ public:
     return "???";
   }
 
-  static const char * toString( SegmentDataStatus en ) {
+  static const char * toString( SegmentStatus en ) {
     switch( en ) {
       case CLEAN: return "CLEAN";
       case DIRTY: return "DIRTY";
       case NEW: return "NEW";
-      case PROCESSING: return "PROCESSING";
-      case UNFETCHED: return "UNFETCHED";
     }
     return "???";
   }

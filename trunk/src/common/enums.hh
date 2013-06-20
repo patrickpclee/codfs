@@ -17,9 +17,7 @@ enum FileType {
 	NOTFOUND = 1, NORMAL = 2, FOLDER = 3
 };
 
-enum SegmentDataStatus {
-	NEW, UNFETCHED, PROCESSING, CLEAN, DIRTY
-};
+enum SegmentStatus {NEW, CLEAN, DIRTY};
 
 enum MsgType {
 	DEFAULT,
