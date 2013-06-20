@@ -1,201 +1,263 @@
 #include "filedatacache.hh"
 
 #include <openssl/md5.h>
-#include "string.h"
 
-#include "../client/client_communicator.hh"
+#include "client.hh"
+#include "client_communicator.hh"
+#include "client_storagemodule.hh"
 
-#include "../common/memorypool.hh"
 #include "../common/debug.hh"
-#include "../common/convertor.hh"
+#include "../common/memorypool.hh"
+#include "../common/convertor.hh"	//md5ToHex()
 
-extern ClientCommunicator* _clientCommunicator;
-extern string codingSetting;
-extern CodingScheme codingScheme;
+#include "../coding/allcoding.hh"
+
+extern Client* client;
 extern uint32_t _clientId;
+extern ClientCommunicator* _clientCommunicator;
+extern ConfigLayer* _configLayer;
 
-#ifdef PARALLEL_TRANSFER
-
-#include "../../lib/threadpool/threadpool.hpp"
-extern boost::threadpool::pool _writetp;
-extern uint32_t _writePoolLimit;
-
-void writeBackThread(FileDataCache* fileDataCache, uint32_t index){
-	fileDataCache->writeBack(index);
-}
-#endif
-
-	FileDataCache::FileDataCache (struct FileMetaData fileMetaData, uint64_t segmentSize)
-: _segmentSize(segmentSize),
-	_metaData(fileMetaData)
-{
-	debug_cyan("File ID %"PRIu32" Segment Size %" PRIu64,fileMetaData._id,segmentSize);
-	for(uint32_t i = 0; i < fileMetaData._segmentList.size(); ++i)
-	{
-		struct SegmentData tempSegmentData;
-		tempSegmentData.info.segmentId = fileMetaData._segmentList[i];
-		//tempSegmentData.buf = MemoryPool::getInstance().poolMalloc(_segmentSize);	
-		tempSegmentData.info.segmentSize = _segmentSize;
-		_segmentDataList.push_back(tempSegmentData);	
-		_segmentStatusList.push_back(NEW);
+FileDataCache::FileDataCache() {
+	// TODO: Read from XML
+	_segmentSize = 10 * 1024 * 1024;
+	_codingScheme = RAID0_CODING;
+	_codingSetting = Raid0Coding::generateSetting(1);
+	_lruSizeLimit = 10;
+	_writeBufferSize = 5;
+	_writeBuffer = new RingBuffer<uint64_t>(_writeBufferSize);
+	_numWriteThread = 5;
+	for(uint32_t i = 0; i < _numWriteThread; ++i) {
+		_writeThreads.push_back(thread(&FileDataCache::doWriteBack, this));
 	}
-	_fileSize = 0;
-	_fileId = fileMetaData._id;
-	_primaryList = fileMetaData._primaryList;
-	//_segmentCount = fileMetaData._segmentList.size();
-	_lastSegmentCount = 0;
-	_lastWriteBackPos = 0;
-	_clean = true;
+	_prefetchBufferSize = 5;
+	_prefetchBuffer = new RingBuffer<std::pair<uint64_t, uint32_t> >(_prefetchBufferSize);
+	_numPrefetchThread = 3;
+	for(uint32_t i = 0; i < _numPrefetchThread; ++i) {
+		_prefetchThreads.push_back(thread(&FileDataCache::doPrefetch, this));
+	}
 }
 
-int64_t FileDataCache::write(const void* buf, uint32_t size, uint64_t offset)
-{
-	_clean = false;
-	uint32_t firstSegmentToWrite = offset / _segmentSize;
-	uint32_t lastSegmentToWrite = (offset + size) / _segmentSize;
-	if(((offset + size) % _segmentSize) == 0)
-		--lastSegmentToWrite;
+uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary, void* buf, uint32_t size, uint32_t offset) {
+	_dataCacheMutex.lock();
+	debug("Read Cache %" PRIu64 " at %" PRIu32 " for %" PRIu32 "\n",segmentId,offset,size);
+	if(_segmentStatus.count(segmentId) == 1) {
+		mutex * tempMutex = _segmentLock[segmentId];
+		tempMutex->lock();
+		_dataCacheMutex.unlock();
+//		if(_segmentStatus[segmentId] == DIRTY) {
+		tempMutex->unlock();
+		memcpy(buf, _segmentDataCache[segmentId].buf + offset, size);
 
-	uint64_t byteWritten = 0;
-	uint64_t bufOffset = 0;
-	uint32_t segmentWriteOffset;
-	uint32_t writeSize;
-	while (lastSegmentToWrite >= _segmentStatusList.size()) {
-		vector<struct SegmentMetaData> segmentMetaDataList = _clientCommunicator->getNewSegmentList(_clientId, _segmentStatusList.size() / 2 + 1);	
-		for(uint32_t i = 0; i < segmentMetaDataList.size(); ++i){
-			struct SegmentData tempSegmentData;
-			tempSegmentData.info.segmentId = segmentMetaDataList[i]._id;
-			tempSegmentData.info.segmentSize = _segmentSize;
-			_primaryList.push_back(segmentMetaDataList[i]._primary);
-			_segmentDataList.push_back(tempSegmentData);
-			_segmentStatusList.push_back(NEW);
-		}
+//		}
+	} else {
+		_segmentStatus[segmentId] = CLEAN;
+		_segmentPrimary[segmentId] = primary;
+		mutex * tempMutex = new mutex();
+		_segmentLock[segmentId] = tempMutex;
+		tempMutex->lock();
+		_dataCacheMutex.unlock();
+
+		uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
+		struct SegmentTransferCache segmentTransferCache = client->getSegment(_clientId, sockfd, segmentId);
+		struct SegmentData segmentCache;
+		segmentCache.buf = segmentTransferCache.buf;
+		segmentCache.info.segmentId = segmentId;
+		segmentCache.info.segmentSize = segmentTransferCache.length;
+		segmentCache.info.segmentPath = "";
+		_segmentDataCache[segmentId] = segmentCache;
+		tempMutex->unlock();
+		memcpy(buf, segmentCache.buf + offset, size);
 	}
 
-	if(firstSegmentToWrite  > _lastWriteBackPos + 1){
-#ifdef PARALLEL_TRANSFER
-		_writetp.wait(_writePoolLimit);
-		_writetp.schedule(boost::bind(&FileDataCache::writeBack,this,_lastWriteBackPos));
-		//_writetp.schedule(boost::bind(writeBackThread,this,_lastWriteBackPos));
-#else
-		writeBack(_lastWriteBackPos);
-#endif
-		++_lastWriteBackPos;
+	updateLru(segmentId);
+
+	return size;
+	
+	// Read Cache
+	//uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
+	//struct SegmentTransferCache segmentCache = client->getSegment(_clientId, sockfd, segmentId);
+	//memcpy(buf, segmentCache.buf + offset, size);
+	//return size;
+}
+
+uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary, const void* buf, uint32_t size, uint32_t offset) {
+	_dataCacheMutex.lock();
+	// TODO: Check - Forbid Write to Sealed Segment
+	struct SegmentData segmentDataCache;
+	if(_segmentStatus.count(segmentId) == 0) {
+		_segmentPrimary[segmentId] = primary;
+		segmentDataCache.info.segmentId = segmentId;
+		segmentDataCache.info.segmentSize = 0;
+		segmentDataCache.buf = (char*)MemoryPool::getInstance().poolMalloc(_segmentSize); 
+	} else {
+		segmentDataCache = _segmentDataCache[segmentId];
 	}
+	_dataCacheMutex.unlock();
 
-	for(uint32_t i = firstSegmentToWrite; i <= lastSegmentToWrite; ++i)
-	{
-		segmentWriteOffset = (offset + byteWritten) - (i * _segmentSize);
-		writeSize = min(min(size - byteWritten, _segmentSize), ((i + 1) * _segmentSize - (offset + byteWritten)));
-		if(_segmentStatusList[i] == NEW){
-			_segmentDataList[i].buf = MemoryPool::getInstance().poolMalloc(_segmentSize);
-			_segmentStatusList[i] = DIRTY;
-		}
-		//char* bufPtr = (char*)_segmentDataList[i].buf + segmentWriteOffset;
-		memcpy((char*)_segmentDataList[i].buf + segmentWriteOffset, (char*)buf + bufOffset, writeSize);
-		bufOffset += writeSize;
-		byteWritten += writeSize;
-	}
-	if(lastSegmentToWrite > _lastSegmentCount)
-		_lastSegmentCount = lastSegmentToWrite;
-	if((offset + size) > _fileSize)
-		_fileSize = offset + size;
+	// TODO: Bound Check
+	memcpy(segmentDataCache.buf + offset, buf, size);
 
-	//TODO: Ask For More Segment ID if exceed Preallocated Number
-	//if(lastSegmentToWrite >= _segmentStatusList.size()){
-	//Ask For New
-	//}
+	_segmentStatus[segmentId] = DIRTY;
+	if(offset + size > segmentDataCache.info.segmentSize)
+		segmentDataCache.info.segmentSize = offset + size;
 
+	_segmentDataCache[segmentId] = segmentDataCache;
+	updateLru(segmentId);
 	return size;
 }
 
-FileDataCache::~FileDataCache ()
-{
-	flush();
-}
-
-void FileDataCache::flush(){
-	if(_clean)
+void FileDataCache::closeDataCache(uint64_t segmentId) {
+	_dataCacheMutex.lock();
+	if(_segmentStatus.count(segmentId) == 0) {
+		_dataCacheMutex.unlock();
+		debug("Segment %" PRIu64 " not Cached\n", segmentId);
 		return ;
-	struct SegmentData segmentData;
-	uint32_t primary;
-	uint32_t osdSockfd;
-	vector<uint64_t> segmentList;
-	_segmentDataList.resize(_lastSegmentCount + 1);
-	for (uint32_t i = 0; i < _lastSegmentCount; ++i)
-	{
-		//if(_segmentStatusList[i] != DIRTY)
-		//	continue;
-
-#ifdef PARALLEL_TRANSFER
-		_writetp.schedule(boost::bind(writeBackThread,this,i));
-#else
-		writeBack(i);
-#endif
-		segmentList.push_back(_segmentDataList[i].info.segmentId);
-		/*
-		   segmentData = _segmentDataList[i];
-		   segmentList.push_back(segmentData.info.segmentId);
-		   primary = _primaryList[i];
-		   osdSockfd = _clientCommunicator->getSockfdFromId(primary);
-
-		   MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
-		   debug_cyan("Send Segment %" PRIu64 " Size %" PRIu64"\n",segmentData.info.segmentId,segmentData.info.segmentSize);
-		   _clientCommunicator->sendSegment(_clientId, osdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum));
-		   MemoryPool::getInstance().poolFree(segmentData.buf);
-		   _segmentStatusList[i] = CLEAN;
-		 */
 	}
-#ifdef PARALLEL_TRANSFER
-	_writetp.wait();
-#endif
-	segmentData = _segmentDataList[_lastSegmentCount];
-	segmentList.push_back(segmentData.info.segmentId);
-	segmentData.info.segmentSize = _fileSize % _segmentSize;
-	debug_cyan("Send Segment 1 %" PRIu64 " Size %" PRIu32" File Size %"PRIu64" Segment Size %"PRIu64"\n",segmentData.info.segmentId,segmentData.info.segmentSize,_fileSize,_segmentSize);
-	if((_fileSize != 0) && (segmentData.info.segmentSize == 0))
-		segmentData.info.segmentSize = _segmentSize;
-	debug_cyan("Send Segment 2 %" PRIu64 " Size %" PRIu32"\n",segmentData.info.segmentId,segmentData.info.segmentSize);
-	primary = _primaryList[_lastSegmentCount];
-	osdSockfd = _clientCommunicator->getSockfdFromId(primary);
 
-	unsigned char checksum[MD5_DIGEST_LENGTH];
-    memset (checksum, 0, MD5_DIGEST_LENGTH);
+	/*
+	_lruListMutex.lock();
+	list<uint64_t>::iterator tempIt;
+	tempIt = _segment2LruMap[segmentId];
+	_segmentLruList.erase(tempIt);
+	_segment2LruMap.erase(segmentId);
+	_lruListMutex.unlock();
+	*/
 
-#ifdef USE_CHECKSUM
-	MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
-#endif
+	debug("Closing Data Cache %" PRIu64 "\n",segmentId);
+	
+	// Read Cache
+	if(_segmentStatus[segmentId] == CLEAN) {
+		mutex * tempMutex = _segmentLock[segmentId];
+		tempMutex->lock();
+		ClientStorageModule* storageModule = client->getStorageModule();
+		storageModule->closeSegment(segmentId);
+		tempMutex->unlock();
+		_segmentStatus.erase(segmentId);
+		_segmentPrimary.erase(segmentId);
+		_segmentLock.erase(segmentId);
+		_segmentDataCache.erase(segmentId);
+		_prefetchBitmap.erase(segmentId);
+		_dataCacheMutex.unlock();
+		return ;
+	}
 
-	debug_cyan("Send Segment 3 %" PRIu64 " Size %" PRIu32"\n",segmentData.info.segmentId,segmentData.info.segmentSize);
-	_clientCommunicator->sendSegment(_clientId, osdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum));
-	MemoryPool::getInstance().poolFree(segmentData.buf);
-	_segmentStatusList[_lastSegmentCount] = CLEAN;
-	_clientCommunicator->saveFileSize(_clientId, _fileId, _fileSize); 
-	_clientCommunicator->saveSegmentList(_clientId, _fileId, segmentList);
-	_clean = true;
+	_segmentStatus.erase(segmentId);
+	_segmentLock.erase(segmentId);
+	_dataCacheMutex.unlock();
+	// Write Cache
+	writeBack(segmentId);
+
+	// TODO: Convert to Read Cache
+	//_segmentStatus[segmentId] = CLEAN;
 }
 
-void FileDataCache::writeBack(uint32_t index) {
-	{
-		lock_guard<mutex> lk(_writeBackMutex);
-		if(_segmentStatusList[index] != DIRTY)
-			return;
-		_segmentStatusList[index] = PROCESSING;
+void FileDataCache::prefetchSegment(uint64_t segmentId, uint32_t primary) {
+	_prefetchBitmapMutex.lock();	
+	if(_prefetchBitmap.count(segmentId) == 0) {
+		_dataCacheMutex.lock();
+		if(_segmentStatus.count(segmentId) == 0) {
+			_prefetchBitmap[segmentId] = true;
+			_prefetchBuffer->push(make_pair(segmentId, primary));
+		}
+		_dataCacheMutex.unlock();
 	}
-	debug_cyan("Write Back Segment at Index %" PRIu32 " [%" PRIu64 "]\n",index,_segmentDataList[index].info.segmentId);
-	struct SegmentData segmentData = _segmentDataList[index];
-	uint32_t primary = _primaryList[index];
-	uint32_t osdSockfd = _clientCommunicator->getSockfdFromId(primary);
+	_prefetchBitmapMutex.unlock();	
+}
+
+void FileDataCache::writeBack(uint64_t segmentId) {
+	_writeBuffer->push(segmentId);
+}
+
+void FileDataCache::doPrefetch() {
+	std::pair<uint64_t, uint32_t> tempPair;
+	while(1) {
+		tempPair = _prefetchBuffer->pop();
+		_dataCacheMutex.lock();
+		uint64_t segmentId = tempPair.first;
+		uint32_t primary = tempPair.second;
+		uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
+		bool fetch = false;
+
+		debug("Prefetch %" PRIu64 "\n",segmentId);
+
+		mutex * tempMutex;
+		if(_segmentStatus.count(segmentId) == 0) {
+			_segmentStatus[segmentId] = CLEAN;
+			_segmentPrimary[segmentId] = primary;
+			tempMutex = new mutex();
+			_segmentLock[segmentId] = tempMutex;
+			fetch = true;
+			debug("Create Cache for %" PRIu64 "\n",segmentId);
+		} else
+			tempMutex = _segmentLock[segmentId];
+
+		tempMutex->lock();
+		_dataCacheMutex.unlock();
+		struct SegmentTransferCache segmentTransferCache = client->getSegment(_clientId, sockfd, segmentId);
+		if(fetch) {
+			struct SegmentData segmentCache;
+			segmentCache.buf = segmentTransferCache.buf;
+			segmentCache.info.segmentId = segmentId;
+			segmentCache.info.segmentSize = segmentTransferCache.length;
+			segmentCache.info.segmentPath = "";
+			_segmentDataCache[segmentId] = segmentCache;
+		}
+		tempMutex->unlock();
+		updateLru(segmentId);
+	
+	}
+}
+
+void FileDataCache::doWriteBack() {
+	while(1) {
+	uint64_t segmentId = _writeBuffer->pop();
+	//SegmentStatus segmentStatus = _segmentStatus[segmentId];
+	uint32_t primary = _segmentPrimary[segmentId];
+	struct SegmentData segmentDataCache = _segmentDataCache[segmentId];
+	_segmentPrimary.erase(segmentId);
+	_segmentDataCache.erase(segmentId);
+
+	// Assume Write Cache are all DIRTY
+	if(segmentDataCache.info.segmentSize == 0){
+		MemoryPool::getInstance().poolFree(segmentDataCache.buf);
+		continue ;
+	}
+	
+	uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
 
 	unsigned char checksum[MD5_DIGEST_LENGTH];
     memset (checksum, 0, MD5_DIGEST_LENGTH);
 
 #ifdef USE_CHECKSUM
-	MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
+	MD5((unsigned char*) segmentDataCache.buf, segmentDataCache.info.segmentSize, checksum);
 #endif
+	
+	debug("Write Back Segment %" PRIu64 " ,Size %" PRIu32 "\n", segmentId, segmentDataCache.info.segmentSize);
+	_clientCommunicator->sendSegment(_clientId, sockfd, segmentDataCache, _codingScheme, _codingSetting, md5ToHex(checksum));
+	MemoryPool::getInstance().poolFree(segmentDataCache.buf);
+	}
+	return ;
+}
 
-	debug_cyan("Send Segment %" PRIu64 " Size %" PRIu32"\n",segmentData.info.segmentId,segmentData.info.segmentSize);
-	_clientCommunicator->sendSegment(_clientId, osdSockfd, segmentData, codingScheme, codingSetting, md5ToHex(checksum));
-	MemoryPool::getInstance().poolFree(segmentData.buf);
-	_segmentStatusList[index] = CLEAN;
+void FileDataCache::updateLru(uint64_t segmentId) {
+	_lruListMutex.lock();
+	list<uint64_t>::iterator tempIt;
+	if(_segment2LruMap.count(segmentId) == 1){
+		tempIt = _segment2LruMap[segmentId];
+		_segmentLruList.splice(_segmentLruList.end(), _segmentLruList, tempIt);
+	}
+	// Create LRU Record
+	else {
+		if(_segmentLruList.size() >= _lruSizeLimit) {
+			uint64_t segmentToClose = _segmentLruList.front();
+			_segmentLruList.pop_front();
+			_segment2LruMap.erase(segmentToClose);
+			closeDataCache(segmentToClose);
+		}
+		tempIt = _segmentLruList.insert(_segmentLruList.end(), segmentId);
+		_segment2LruMap[segmentId] = tempIt;
+	}
+	_lruListMutex.unlock();
+	return ;
+	
 }
