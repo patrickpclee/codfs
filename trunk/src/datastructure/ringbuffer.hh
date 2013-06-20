@@ -11,12 +11,12 @@ template<typename T>
 class RingBuffer {
 	public:
 		RingBuffer (uint64_t size) :
-			_size(size),
+			_size(size + 1),
 			_head(0),
 			_tail(0)
 		{
 			//_buffer = (T*)memalign(getpagesize(), sizeof(T) * size);
-			_buffer = (T*)malloc(sizeof(T) * size);
+			_buffer = (T*)malloc(sizeof(T) * _size);
 		}
 
 		void push(T ele) {
