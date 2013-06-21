@@ -42,13 +42,13 @@ mutex _segmentMetaMutex;
 uint32_t _segmentSize = 10 * 1024 * 1024;
 
 std::forward_list<struct SegmentMetaData> _segmentMetaDataList;
-uint32_t _segmentMetaDataAllocateSize = 10;
+uint32_t _segmentMetaDataAllocateSize = 20;
 
 thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
 
-uint32_t _prefetchCount = 3;
+uint32_t _prefetchCount = 5;
 
 static void removeNameSpace(const char* path) {
 	unlink(path);
@@ -381,7 +381,7 @@ static int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 	struct FileMetaData fileMetaData = _fileMetaDataCache->getMetaData(fileId);
 
 	for(uint32_t i = 0; i < fileMetaData._segmentList.size(); ++i) {
-		_fileDataCache->closeDataCache(fileMetaData._segmentList[i]);
+		_fileDataCache->closeDataCache(fileMetaData._segmentList[i], true);
 	}
 
 	_clientCommunicator->saveFileSize(_clientId, fileId, fileMetaData._size);

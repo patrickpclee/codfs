@@ -91,6 +91,7 @@ public:
       case CLEAN: return "CLEAN";
       case DIRTY: return "DIRTY";
       case NEW: return "NEW";
+      case WRITEBACK: return "WRITEBACK";
     }
     return "???";
   }
