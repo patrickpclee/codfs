@@ -20,11 +20,12 @@ class FileDataCache {
 
 		uint32_t writeDataCache(uint64_t segmentId, uint32_t primary, const void* buf, uint32_t size, uint32_t offset);
 
-		void closeDataCache(uint64_t segmentId);
+		void closeDataCache(uint64_t segmentId, bool sync = false);
 		void prefetchSegment(uint64_t segmentId, uint32_t primary);
 	private:
 		void writeBack(uint64_t segmentId);
-		void doWriteBack();
+		void writeBackThread();
+		void doWriteBack(uint64_t segmentId);
 
 		void doPrefetch();
 		void updateLru(uint64_t segmentId);
