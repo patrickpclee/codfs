@@ -243,7 +243,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, st
 		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
 		uint32_t primary = fileMetaData._primaryList[segmentCount];
 		uint32_t segmentOffset = offset + sizeRead - (segmentCount * _segmentSize);
-		uint32_t readSize = min (_segmentSize - segmentOffset, size - sizeRead);
+		uint32_t readSize = min (_segmentSize - segmentOffset, (uint32_t)size - sizeRead);
 		uint32_t retstat = _fileDataCache->readDataCache(segmentId, primary, bufptr, readSize, segmentOffset);
 		bufptr += retstat;
 		sizeRead += retstat;
@@ -274,7 +274,7 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
 		uint32_t primary = fileMetaData._primaryList[segmentCount];
 		uint32_t segmentOffset = offset + sizeWritten - (segmentCount * _segmentSize);
-		uint32_t writeSize = min (_segmentSize - segmentOffset, size - sizeWritten);
+		uint32_t writeSize = min (_segmentSize - segmentOffset, (uint32_t)size - sizeWritten);
 		uint32_t retstat = _fileDataCache->writeDataCache(segmentId, primary, bufptr, writeSize, segmentOffset);
 		bufptr += retstat;
 		sizeWritten += retstat;
