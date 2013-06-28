@@ -28,7 +28,7 @@ public:
 			return;
 		}
 
-		debug("LRU Size %" PRIu32 " / %" PRIu32 "\n",this->_valueMap.size(), this->_size);
+		debug("LRU Size %zu / %" PRIu32 "\n",this->_valueMap.size(), this->_size);
 		if (this->_valueMap.size() == this->_size)
 			pop_back();
 

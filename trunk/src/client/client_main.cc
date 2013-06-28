@@ -183,7 +183,7 @@ int main(int argc, char *argv[]) {
 	signal(SIGINT, sighandler);
 
 	configLayer = new ConfigLayer("clientconfig.xml");
-	client = new Client(atoi(argv[1]));
+	client = new Client(clientId);
 	ClientCommunicator* communicator = client->getCommunicator();
 
 	// setup log
