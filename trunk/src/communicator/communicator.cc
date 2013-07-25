@@ -995,8 +995,10 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		string codingSetting, string checksum, DataMsgType dataMsgType) {
 
 	const string updateKey = "";	// TODO: auto-increment updateKey
-	//vector<offset_length_t> offsetLength = segmentData.info.offsetLength;
+
+    // pack offsets before send
 	vector<offset_length_t> offsetLength;
+    segmentData.info.packOffsets(offsetLength); // pass by reference
 
 	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
 			segmentData.info.segmentId, sockfd);
