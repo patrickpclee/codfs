@@ -17,12 +17,12 @@ enum FileType {
 	NOTFOUND = 1, NORMAL = 2, FOLDER = 3
 };
 
-enum BlockMsgType {
-	UPLOAD,
-	DOWNLOAD,
-	RECOVERY,
-	UPDATE,
-	PARITY
+enum DataMsgType {
+	UPLOAD = 1,
+	DOWNLOAD = 2,
+	RECOVERY = 3,
+	UPDATE = 4,
+	PARITY = 5
 };
 
 enum SegmentStatus {NEW, CLEAN, DIRTY, WRITEBACK};
