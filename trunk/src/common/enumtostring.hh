@@ -132,6 +132,17 @@ public:
     return "???";
   }
 
+  static const char * toString( BlockMsgType en ) {
+    switch( en ) {
+      case DOWNLOAD: return "DOWNLOAD";
+      case PARITY: return "PARITY";
+      case RECOVERY: return "RECOVERY";
+      case UPDATE: return "UPDATE";
+      case UPLOAD: return "UPLOAD";
+    }
+    return "???";
+  }
+
   static const char * toString( FileType en ) {
     switch( en ) {
       case FOLDER: return "FOLDER";
