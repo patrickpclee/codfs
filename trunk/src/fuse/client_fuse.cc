@@ -55,6 +55,13 @@ static void removeNameSpace(const char* path) {
 	return ;
 }
 
+/**
+ * Get fileId given the filepath
+ * fileId is saved simply as an integer inside the shadow file in _fuseFolder
+ * @param path Filepath
+ * @return fileId
+ */
+
 static uint32_t checkNameSpace(const char* path) {
 	string fpath = _fuseFolder + string(path);
 	FILE* fp = fopen(fpath.c_str(),"r");
@@ -239,17 +246,20 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, st
 		return 0;
 	while (sizeRead < size) {
 		// TODO: Check Read Size
-		uint32_t segmentCount = (offset + sizeRead) / _segmentSize;
+		uint32_t segmentCount = (offset + sizeRead) / _segmentSize;		// position of segment in the file
 		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
 		uint32_t primary = fileMetaData._primaryList[segmentCount];
-		uint32_t segmentOffset = offset + sizeRead - (segmentCount * _segmentSize);
+		uint32_t segmentOffset = offset + sizeRead - (segmentCount * _segmentSize);	// offset within the segment
 		uint32_t readSize = min (_segmentSize - segmentOffset, (uint32_t)size - sizeRead);
+
+		// return immediately if data is cached, otherwise retrieve data from OSDs
 		uint32_t retstat = _fileDataCache->readDataCache(segmentId, primary, bufptr, readSize, segmentOffset);
 		bufptr += retstat;
 		sizeRead += retstat;
 		lastSegmentCount = segmentCount;
 	}
 
+	// prefetch the next _prefetchCount segments
 	for (uint32_t i = 0; i < _prefetchCount; ++i) {
 		uint32_t segmentCount = lastSegmentCount + i;
 		if(segmentCount < fileMetaData._segmentList.size())
