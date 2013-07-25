@@ -157,10 +157,14 @@ public:
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param segmentId Segment ID
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update Key
+	 * @param offsetlength <Offset, Length> of chunks in the segment
 	 */
 
 	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId);
+		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetLength);
 
 	/**
 	 * Action when an segment trunk is received

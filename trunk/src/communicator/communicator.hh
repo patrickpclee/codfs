@@ -268,10 +268,14 @@ protected:
 	 * @param componentId Component ID
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
 	 * @param segmentId Segment ID
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update Key
+	 * @param offsetLength <offset, length> for chunks in segment
 	 */
 
 	void putSegmentEnd(uint32_t componentId, uint32_t dstOsdSockfd,
-			uint64_t segmentId);
+			uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+			vector<offset_length_t> offsetLength);
 
 	/**
 	 * Runs in a separate detached thread
