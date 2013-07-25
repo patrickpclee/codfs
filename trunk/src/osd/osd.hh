@@ -144,21 +144,27 @@ public:
 	 * @param codingScheme Coding Scheme for the segment
 	 * @param setting Coding setting for the segment
 	 * @param checksum Checksum of the segment
+	 * @param dataMsgType Data Message Type
+	 * @param updateKey Key for UPDATE message
 	 */
 
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme, string setting, string checksum);
+			CodingScheme codingScheme, string setting, string checksum, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Action when a put segment end is received
 	 * @param requestId Request ID
 	 * @param sockfd Socket descriptor of message source
 	 * @param segmentId Segment ID
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update Key
+	 * @param offsetlength <Offset, Length> of chunks in the segment
 	 */
 
 	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId);
+		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetLength);
 
 	/**
 	 * Action when an segment trunk is received
@@ -167,12 +173,14 @@ public:
 	 * @param segmentId Segment ID
 	 * @param offset Offset of the trunk in the segment
 	 * @param length Length of trunk
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update Key
 	 * @param buf Pointer to buffer
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
 	uint32_t putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint64_t offset, uint32_t length, char* buf);
+			uint64_t segmentId, uint64_t offset, uint32_t length, DataMsgType dataMsgType, string updateKey, char* buf);
 
 	/**
 	 * Action when a putBlockInitRequest is received

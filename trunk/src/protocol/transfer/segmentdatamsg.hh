@@ -15,8 +15,8 @@ public:
 
 	SegmentDataMsg(Communicator* communicator);
 
-	SegmentDataMsg(Communicator* communicator, uint32_t dstSockfd,
-			uint64_t segmentId, uint64_t offset, uint32_t length);
+	SegmentDataMsg(Communicator* communicator, uint32_t osdSockfd,
+			uint64_t segmentId, uint64_t offset, uint32_t length, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -51,6 +51,8 @@ private:
 	uint64_t _segmentId;
 	uint64_t _offset;
 	uint32_t _length;
+	DataMsgType _dataMsgType;
+	string _updateKey;
 };
 
 #endif
