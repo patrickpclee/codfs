@@ -34,6 +34,7 @@ void protobuf_ShutdownFile_message_2eproto();
 
 class HandshakeRequestPro;
 class HandshakeReplyPro;
+class OffsetLengthPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
 class DeleteFileRequestPro;
@@ -69,7 +70,6 @@ class CacheSegmentReplyPro;
 class ReportDeletedCachePro;
 class PutSegmentInitReplyPro;
 class SegmentTransferEndReplyPro;
-class OffsetLengthPro;
 class PutBlockInitRequestPro;
 class BlockDataPro;
 class BlockTransferEndRequestPro;
@@ -139,6 +139,28 @@ inline bool PutSegmentInitRequestPro_CodingScheme_Parse(
     const ::std::string& name, PutSegmentInitRequestPro_CodingScheme* value) {
   return ::google::protobuf::internal::ParseNamedEnum<PutSegmentInitRequestPro_CodingScheme>(
     PutSegmentInitRequestPro_CodingScheme_descriptor(), name, value);
+}
+enum PutSegmentInitRequestPro_DataMessageType {
+  PutSegmentInitRequestPro_DataMessageType_UPLOAD = 1,
+  PutSegmentInitRequestPro_DataMessageType_DOWNLOAD = 2,
+  PutSegmentInitRequestPro_DataMessageType_RECOVERY = 3,
+  PutSegmentInitRequestPro_DataMessageType_UPDATE = 4,
+  PutSegmentInitRequestPro_DataMessageType_PARITY = 5
+};
+bool PutSegmentInitRequestPro_DataMessageType_IsValid(int value);
+const PutSegmentInitRequestPro_DataMessageType PutSegmentInitRequestPro_DataMessageType_DataMessageType_MIN = PutSegmentInitRequestPro_DataMessageType_UPLOAD;
+const PutSegmentInitRequestPro_DataMessageType PutSegmentInitRequestPro_DataMessageType_DataMessageType_MAX = PutSegmentInitRequestPro_DataMessageType_PARITY;
+const int PutSegmentInitRequestPro_DataMessageType_DataMessageType_ARRAYSIZE = PutSegmentInitRequestPro_DataMessageType_DataMessageType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* PutSegmentInitRequestPro_DataMessageType_descriptor();
+inline const ::std::string& PutSegmentInitRequestPro_DataMessageType_Name(PutSegmentInitRequestPro_DataMessageType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    PutSegmentInitRequestPro_DataMessageType_descriptor(), value);
+}
+inline bool PutSegmentInitRequestPro_DataMessageType_Parse(
+    const ::std::string& name, PutSegmentInitRequestPro_DataMessageType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<PutSegmentInitRequestPro_DataMessageType>(
+    PutSegmentInitRequestPro_DataMessageType_descriptor(), name, value);
 }
 enum DownloadFileReplyPro_FileType {
   DownloadFileReplyPro_FileType_NEWFILE = 1,
@@ -369,6 +391,98 @@ class HandshakeReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static HandshakeReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class OffsetLengthPro : public ::google::protobuf::Message {
+ public:
+  OffsetLengthPro();
+  virtual ~OffsetLengthPro();
+  
+  OffsetLengthPro(const OffsetLengthPro& from);
+  
+  inline OffsetLengthPro& operator=(const OffsetLengthPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const OffsetLengthPro& default_instance();
+  
+  void Swap(OffsetLengthPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  OffsetLengthPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const OffsetLengthPro& from);
+  void MergeFrom(const OffsetLengthPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed32 offset = 1;
+  inline bool has_offset() const;
+  inline void clear_offset();
+  static const int kOffsetFieldNumber = 1;
+  inline ::google::protobuf::uint32 offset() const;
+  inline void set_offset(::google::protobuf::uint32 value);
+  
+  // optional fixed32 length = 2;
+  inline bool has_length() const;
+  inline void clear_length();
+  static const int kLengthFieldNumber = 2;
+  inline ::google::protobuf::uint32 length() const;
+  inline void set_length(::google::protobuf::uint32 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.OffsetLengthPro)
+ private:
+  inline void set_has_offset();
+  inline void clear_has_offset();
+  inline void set_has_length();
+  inline void clear_has_length();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint32 offset_;
+  ::google::protobuf::uint32 length_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static OffsetLengthPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1390,6 +1504,33 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
     return PutSegmentInitRequestPro_CodingScheme_Parse(name, value);
   }
   
+  typedef PutSegmentInitRequestPro_DataMessageType DataMessageType;
+  static const DataMessageType UPLOAD = PutSegmentInitRequestPro_DataMessageType_UPLOAD;
+  static const DataMessageType DOWNLOAD = PutSegmentInitRequestPro_DataMessageType_DOWNLOAD;
+  static const DataMessageType RECOVERY = PutSegmentInitRequestPro_DataMessageType_RECOVERY;
+  static const DataMessageType UPDATE = PutSegmentInitRequestPro_DataMessageType_UPDATE;
+  static const DataMessageType PARITY = PutSegmentInitRequestPro_DataMessageType_PARITY;
+  static inline bool DataMessageType_IsValid(int value) {
+    return PutSegmentInitRequestPro_DataMessageType_IsValid(value);
+  }
+  static const DataMessageType DataMessageType_MIN =
+    PutSegmentInitRequestPro_DataMessageType_DataMessageType_MIN;
+  static const DataMessageType DataMessageType_MAX =
+    PutSegmentInitRequestPro_DataMessageType_DataMessageType_MAX;
+  static const int DataMessageType_ARRAYSIZE =
+    PutSegmentInitRequestPro_DataMessageType_DataMessageType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  DataMessageType_descriptor() {
+    return PutSegmentInitRequestPro_DataMessageType_descriptor();
+  }
+  static inline const ::std::string& DataMessageType_Name(DataMessageType value) {
+    return PutSegmentInitRequestPro_DataMessageType_Name(value);
+  }
+  static inline bool DataMessageType_Parse(const ::std::string& name,
+      DataMessageType* value) {
+    return PutSegmentInitRequestPro_DataMessageType_Parse(name, value);
+  }
+  
   // accessors -------------------------------------------------------
   
   // optional fixed64 segmentId = 1;
@@ -1442,6 +1583,20 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_checksum();
   inline ::std::string* release_checksum();
   
+  // optional .ncvfs.PutSegmentInitRequestPro.DataMessageType messageType = 7;
+  inline bool has_messagetype() const;
+  inline void clear_messagetype();
+  static const int kMessageTypeFieldNumber = 7;
+  inline ::ncvfs::PutSegmentInitRequestPro_DataMessageType messagetype() const;
+  inline void set_messagetype(::ncvfs::PutSegmentInitRequestPro_DataMessageType value);
+  
+  // optional fixed32 updateKey = 8;
+  inline bool has_updatekey() const;
+  inline void clear_updatekey();
+  static const int kUpdateKeyFieldNumber = 8;
+  inline ::google::protobuf::uint32 updatekey() const;
+  inline void set_updatekey(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentInitRequestPro)
  private:
   inline void set_has_segmentid();
@@ -1456,6 +1611,10 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_codingsetting();
   inline void set_has_checksum();
   inline void clear_has_checksum();
+  inline void set_has_messagetype();
+  inline void clear_has_messagetype();
+  inline void set_has_updatekey();
+  inline void clear_has_updatekey();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -1463,11 +1622,13 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 segmentsize_;
   ::google::protobuf::uint32 chunkcount_;
   ::std::string* codingsetting_;
-  ::std::string* checksum_;
   int codingscheme_;
+  int messagetype_;
+  ::std::string* checksum_;
+  ::google::protobuf::uint32 updatekey_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -1553,6 +1714,20 @@ class SegmentDataPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 length() const;
   inline void set_length(::google::protobuf::uint32 value);
   
+  // optional .ncvfs.PutSegmentInitRequestPro.DataMessageType messageType = 4;
+  inline bool has_messagetype() const;
+  inline void clear_messagetype();
+  static const int kMessageTypeFieldNumber = 4;
+  inline ::ncvfs::PutSegmentInitRequestPro_DataMessageType messagetype() const;
+  inline void set_messagetype(::ncvfs::PutSegmentInitRequestPro_DataMessageType value);
+  
+  // optional fixed32 updateKey = 5;
+  inline bool has_updatekey() const;
+  inline void clear_updatekey();
+  static const int kUpdateKeyFieldNumber = 5;
+  inline ::google::protobuf::uint32 updatekey() const;
+  inline void set_updatekey(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.SegmentDataPro)
  private:
   inline void set_has_segmentid();
@@ -1561,15 +1736,21 @@ class SegmentDataPro : public ::google::protobuf::Message {
   inline void clear_has_offset();
   inline void set_has_length();
   inline void clear_has_length();
+  inline void set_has_messagetype();
+  inline void clear_has_messagetype();
+  inline void set_has_updatekey();
+  inline void clear_has_updatekey();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::uint64 offset_;
   ::google::protobuf::uint32 length_;
+  int messagetype_;
+  ::google::protobuf::uint32 updatekey_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -1723,17 +1904,50 @@ class SegmentTransferEndRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint64 value);
   
+  // optional .ncvfs.PutSegmentInitRequestPro.DataMessageType messageType = 4;
+  inline bool has_messagetype() const;
+  inline void clear_messagetype();
+  static const int kMessageTypeFieldNumber = 4;
+  inline ::ncvfs::PutSegmentInitRequestPro_DataMessageType messagetype() const;
+  inline void set_messagetype(::ncvfs::PutSegmentInitRequestPro_DataMessageType value);
+  
+  // optional fixed32 updateKey = 5;
+  inline bool has_updatekey() const;
+  inline void clear_updatekey();
+  static const int kUpdateKeyFieldNumber = 5;
+  inline ::google::protobuf::uint32 updatekey() const;
+  inline void set_updatekey(::google::protobuf::uint32 value);
+  
+  // repeated .ncvfs.OffsetLengthPro offsetLength = 6;
+  inline int offsetlength_size() const;
+  inline void clear_offsetlength();
+  static const int kOffsetLengthFieldNumber = 6;
+  inline const ::ncvfs::OffsetLengthPro& offsetlength(int index) const;
+  inline ::ncvfs::OffsetLengthPro* mutable_offsetlength(int index);
+  inline ::ncvfs::OffsetLengthPro* add_offsetlength();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+      offsetlength() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+      mutable_offsetlength();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.SegmentTransferEndRequestPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
+  inline void set_has_messagetype();
+  inline void clear_has_messagetype();
+  inline void set_has_updatekey();
+  inline void clear_has_updatekey();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
+  int messagetype_;
+  ::google::protobuf::uint32 updatekey_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -3927,98 +4141,6 @@ class SegmentTransferEndReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static SegmentTransferEndReplyPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class OffsetLengthPro : public ::google::protobuf::Message {
- public:
-  OffsetLengthPro();
-  virtual ~OffsetLengthPro();
-  
-  OffsetLengthPro(const OffsetLengthPro& from);
-  
-  inline OffsetLengthPro& operator=(const OffsetLengthPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const OffsetLengthPro& default_instance();
-  
-  void Swap(OffsetLengthPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  OffsetLengthPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const OffsetLengthPro& from);
-  void MergeFrom(const OffsetLengthPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed32 offset = 1;
-  inline bool has_offset() const;
-  inline void clear_offset();
-  static const int kOffsetFieldNumber = 1;
-  inline ::google::protobuf::uint32 offset() const;
-  inline void set_offset(::google::protobuf::uint32 value);
-  
-  // optional fixed32 length = 2;
-  inline bool has_length() const;
-  inline void clear_length();
-  static const int kLengthFieldNumber = 2;
-  inline ::google::protobuf::uint32 length() const;
-  inline void set_length(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.OffsetLengthPro)
- private:
-  inline void set_has_offset();
-  inline void clear_has_offset();
-  inline void set_has_length();
-  inline void clear_has_length();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint32 offset_;
-  ::google::protobuf::uint32 length_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static OffsetLengthPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -6290,6 +6412,54 @@ inline void HandshakeReplyPro::set_componenttype(::ncvfs::HandshakeRequestPro_Co
 
 // -------------------------------------------------------------------
 
+// OffsetLengthPro
+
+// optional fixed32 offset = 1;
+inline bool OffsetLengthPro::has_offset() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void OffsetLengthPro::set_has_offset() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void OffsetLengthPro::clear_has_offset() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void OffsetLengthPro::clear_offset() {
+  offset_ = 0u;
+  clear_has_offset();
+}
+inline ::google::protobuf::uint32 OffsetLengthPro::offset() const {
+  return offset_;
+}
+inline void OffsetLengthPro::set_offset(::google::protobuf::uint32 value) {
+  set_has_offset();
+  offset_ = value;
+}
+
+// optional fixed32 length = 2;
+inline bool OffsetLengthPro::has_length() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void OffsetLengthPro::set_has_length() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void OffsetLengthPro::clear_has_length() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void OffsetLengthPro::clear_length() {
+  length_ = 0u;
+  clear_has_length();
+}
+inline ::google::protobuf::uint32 OffsetLengthPro::length() const {
+  return length_;
+}
+inline void OffsetLengthPro::set_length(::google::protobuf::uint32 value) {
+  set_has_length();
+  length_ = value;
+}
+
+// -------------------------------------------------------------------
+
 // ListDirectoryRequestPro
 
 // optional fixed32 osdId = 1;
@@ -7324,6 +7494,51 @@ inline ::std::string* PutSegmentInitRequestPro::release_checksum() {
   }
 }
 
+// optional .ncvfs.PutSegmentInitRequestPro.DataMessageType messageType = 7;
+inline bool PutSegmentInitRequestPro::has_messagetype() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void PutSegmentInitRequestPro::set_has_messagetype() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void PutSegmentInitRequestPro::clear_has_messagetype() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void PutSegmentInitRequestPro::clear_messagetype() {
+  messagetype_ = 1;
+  clear_has_messagetype();
+}
+inline ::ncvfs::PutSegmentInitRequestPro_DataMessageType PutSegmentInitRequestPro::messagetype() const {
+  return static_cast< ::ncvfs::PutSegmentInitRequestPro_DataMessageType >(messagetype_);
+}
+inline void PutSegmentInitRequestPro::set_messagetype(::ncvfs::PutSegmentInitRequestPro_DataMessageType value) {
+  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_DataMessageType_IsValid(value));
+  set_has_messagetype();
+  messagetype_ = value;
+}
+
+// optional fixed32 updateKey = 8;
+inline bool PutSegmentInitRequestPro::has_updatekey() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void PutSegmentInitRequestPro::set_has_updatekey() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void PutSegmentInitRequestPro::clear_has_updatekey() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void PutSegmentInitRequestPro::clear_updatekey() {
+  updatekey_ = 0u;
+  clear_has_updatekey();
+}
+inline ::google::protobuf::uint32 PutSegmentInitRequestPro::updatekey() const {
+  return updatekey_;
+}
+inline void PutSegmentInitRequestPro::set_updatekey(::google::protobuf::uint32 value) {
+  set_has_updatekey();
+  updatekey_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // SegmentDataPro
@@ -7394,6 +7609,51 @@ inline void SegmentDataPro::set_length(::google::protobuf::uint32 value) {
   length_ = value;
 }
 
+// optional .ncvfs.PutSegmentInitRequestPro.DataMessageType messageType = 4;
+inline bool SegmentDataPro::has_messagetype() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void SegmentDataPro::set_has_messagetype() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void SegmentDataPro::clear_has_messagetype() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void SegmentDataPro::clear_messagetype() {
+  messagetype_ = 1;
+  clear_has_messagetype();
+}
+inline ::ncvfs::PutSegmentInitRequestPro_DataMessageType SegmentDataPro::messagetype() const {
+  return static_cast< ::ncvfs::PutSegmentInitRequestPro_DataMessageType >(messagetype_);
+}
+inline void SegmentDataPro::set_messagetype(::ncvfs::PutSegmentInitRequestPro_DataMessageType value) {
+  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_DataMessageType_IsValid(value));
+  set_has_messagetype();
+  messagetype_ = value;
+}
+
+// optional fixed32 updateKey = 5;
+inline bool SegmentDataPro::has_updatekey() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void SegmentDataPro::set_has_updatekey() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void SegmentDataPro::clear_has_updatekey() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void SegmentDataPro::clear_updatekey() {
+  updatekey_ = 0u;
+  clear_has_updatekey();
+}
+inline ::google::protobuf::uint32 SegmentDataPro::updatekey() const {
+  return updatekey_;
+}
+inline void SegmentDataPro::set_updatekey(::google::protobuf::uint32 value) {
+  set_has_updatekey();
+  updatekey_ = value;
+}
+
 // -------------------------------------------------------------------
 
 // GetSegmentRequestPro
@@ -7444,6 +7704,76 @@ inline ::google::protobuf::uint64 SegmentTransferEndRequestPro::segmentid() cons
 inline void SegmentTransferEndRequestPro::set_segmentid(::google::protobuf::uint64 value) {
   set_has_segmentid();
   segmentid_ = value;
+}
+
+// optional .ncvfs.PutSegmentInitRequestPro.DataMessageType messageType = 4;
+inline bool SegmentTransferEndRequestPro::has_messagetype() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void SegmentTransferEndRequestPro::set_has_messagetype() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void SegmentTransferEndRequestPro::clear_has_messagetype() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void SegmentTransferEndRequestPro::clear_messagetype() {
+  messagetype_ = 1;
+  clear_has_messagetype();
+}
+inline ::ncvfs::PutSegmentInitRequestPro_DataMessageType SegmentTransferEndRequestPro::messagetype() const {
+  return static_cast< ::ncvfs::PutSegmentInitRequestPro_DataMessageType >(messagetype_);
+}
+inline void SegmentTransferEndRequestPro::set_messagetype(::ncvfs::PutSegmentInitRequestPro_DataMessageType value) {
+  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_DataMessageType_IsValid(value));
+  set_has_messagetype();
+  messagetype_ = value;
+}
+
+// optional fixed32 updateKey = 5;
+inline bool SegmentTransferEndRequestPro::has_updatekey() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void SegmentTransferEndRequestPro::set_has_updatekey() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void SegmentTransferEndRequestPro::clear_has_updatekey() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void SegmentTransferEndRequestPro::clear_updatekey() {
+  updatekey_ = 0u;
+  clear_has_updatekey();
+}
+inline ::google::protobuf::uint32 SegmentTransferEndRequestPro::updatekey() const {
+  return updatekey_;
+}
+inline void SegmentTransferEndRequestPro::set_updatekey(::google::protobuf::uint32 value) {
+  set_has_updatekey();
+  updatekey_ = value;
+}
+
+// repeated .ncvfs.OffsetLengthPro offsetLength = 6;
+inline int SegmentTransferEndRequestPro::offsetlength_size() const {
+  return offsetlength_.size();
+}
+inline void SegmentTransferEndRequestPro::clear_offsetlength() {
+  offsetlength_.Clear();
+}
+inline const ::ncvfs::OffsetLengthPro& SegmentTransferEndRequestPro::offsetlength(int index) const {
+  return offsetlength_.Get(index);
+}
+inline ::ncvfs::OffsetLengthPro* SegmentTransferEndRequestPro::mutable_offsetlength(int index) {
+  return offsetlength_.Mutable(index);
+}
+inline ::ncvfs::OffsetLengthPro* SegmentTransferEndRequestPro::add_offsetlength() {
+  return offsetlength_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+SegmentTransferEndRequestPro::offsetlength() const {
+  return offsetlength_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+SegmentTransferEndRequestPro::mutable_offsetlength() {
+  return &offsetlength_;
 }
 
 // -------------------------------------------------------------------
@@ -8952,54 +9282,6 @@ inline void SegmentTransferEndReplyPro::set_segmentid(::google::protobuf::uint64
 
 // -------------------------------------------------------------------
 
-// OffsetLengthPro
-
-// optional fixed32 offset = 1;
-inline bool OffsetLengthPro::has_offset() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void OffsetLengthPro::set_has_offset() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void OffsetLengthPro::clear_has_offset() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void OffsetLengthPro::clear_offset() {
-  offset_ = 0u;
-  clear_has_offset();
-}
-inline ::google::protobuf::uint32 OffsetLengthPro::offset() const {
-  return offset_;
-}
-inline void OffsetLengthPro::set_offset(::google::protobuf::uint32 value) {
-  set_has_offset();
-  offset_ = value;
-}
-
-// optional fixed32 length = 2;
-inline bool OffsetLengthPro::has_length() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void OffsetLengthPro::set_has_length() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void OffsetLengthPro::clear_has_length() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void OffsetLengthPro::clear_length() {
-  length_ = 0u;
-  clear_has_length();
-}
-inline ::google::protobuf::uint32 OffsetLengthPro::length() const {
-  return length_;
-}
-inline void OffsetLengthPro::set_length(::google::protobuf::uint32 value) {
-  set_has_length();
-  length_ = value;
-}
-
-// -------------------------------------------------------------------
-
 // PutBlockInitRequestPro
 
 // optional fixed64 segmentId = 1;
@@ -10345,6 +10627,10 @@ inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::HandshakeRequestPro_Com
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::PutSegmentInitRequestPro_CodingScheme>() {
   return ::ncvfs::PutSegmentInitRequestPro_CodingScheme_descriptor();
+}
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::PutSegmentInitRequestPro_DataMessageType>() {
+  return ::ncvfs::PutSegmentInitRequestPro_DataMessageType_descriptor();
 }
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::DownloadFileReplyPro_FileType>() {

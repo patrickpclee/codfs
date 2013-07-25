@@ -26,7 +26,6 @@
 #include <sys/statvfs.h>
 
 // Global Variables
-extern Osd* osd;
 extern ConfigLayer* configLayer;
 mutex segmentRequestCountMutex;
 mutex recoveryMutex;

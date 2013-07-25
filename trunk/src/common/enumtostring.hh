@@ -132,7 +132,7 @@ public:
     return "???";
   }
 
-  static const char * toString( BlockMsgType en ) {
+  static const char * toString( DataMsgType en ) {
     switch( en ) {
       case DOWNLOAD: return "DOWNLOAD";
       case PARITY: return "PARITY";

@@ -22,6 +22,12 @@ message HandshakeReplyPro {
 }
 
 
+message OffsetLengthPro {
+	optional fixed32 offset = 1;
+	optional fixed32 length = 2;
+}
+
+
 ///////////////// FROM CLIENT /////////////////
 
 //
@@ -106,15 +112,29 @@ message PutSegmentInitRequestPro {
 		DEFAULT_CODING = 15;
 	}
 	
+	enum DataMessageType {
+		UPLOAD = 1;
+		DOWNLOAD = 2;
+		RECOVERY = 3;
+		UPDATE = 4;
+		PARITY = 5;
+	}
+	
 	optional CodingScheme codingScheme = 4;
 	optional string codingSetting = 5;
 	optional string checksum = 6;
+	
+	optional DataMessageType messageType = 7;
+	optional fixed32 updateKey = 8;
 }
 
 message SegmentDataPro {
 	optional fixed64 segmentId = 1;
 	optional fixed64 offset = 2;
 	optional fixed32 length = 3;
+	
+	optional PutSegmentInitRequestPro.DataMessageType messageType = 4;
+	optional fixed32 updateKey = 5;
 }
 
 message GetSegmentRequestPro {
@@ -130,6 +150,10 @@ message GetSegmentRequestPro {
 
 message SegmentTransferEndRequestPro {
 	optional fixed64 segmentId = 1;
+	
+	optional PutSegmentInitRequestPro.DataMessageType messageType = 4;
+	optional fixed32 updateKey = 5;
+	repeated OffsetLengthPro offsetLength = 6;
 }
 
 //
@@ -298,10 +322,6 @@ message SegmentTransferEndReplyPro {
 // OSD -> OSD
 //
 
-message OffsetLengthPro {
-	optional fixed32 offset = 1;
-	optional fixed32 length = 2;
-}
 
 message PutBlockInitRequestPro {
 	optional fixed64 segmentId = 1;
