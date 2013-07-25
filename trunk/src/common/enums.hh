@@ -18,6 +18,7 @@ enum FileType {
 };
 
 enum DataMsgType {
+	DEFAULT_DATA_MSG = 15,
 	UPLOAD = 1,
 	DOWNLOAD = 2,
 	RECOVERY = 3,

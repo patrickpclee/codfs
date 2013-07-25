@@ -112,7 +112,8 @@ message PutSegmentInitRequestPro {
 		DEFAULT_CODING = 15;
 	}
 	
-	enum DataMessageType {
+	enum DataMsgType {
+		DEFAULT_DATA_MSG = 15;
 		UPLOAD = 1;
 		DOWNLOAD = 2;
 		RECOVERY = 3;
@@ -124,8 +125,8 @@ message PutSegmentInitRequestPro {
 	optional string codingSetting = 5;
 	optional string checksum = 6;
 	
-	optional DataMessageType messageType = 7;
-	optional fixed32 updateKey = 8;
+	optional DataMsgType dataMsgType = 7;
+	optional string updateKey = 8;
 }
 
 message SegmentDataPro {
@@ -133,8 +134,8 @@ message SegmentDataPro {
 	optional fixed64 offset = 2;
 	optional fixed32 length = 3;
 	
-	optional PutSegmentInitRequestPro.DataMessageType messageType = 4;
-	optional fixed32 updateKey = 5;
+	optional PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+	optional string updateKey = 5;
 }
 
 message GetSegmentRequestPro {
@@ -151,8 +152,8 @@ message GetSegmentRequestPro {
 message SegmentTransferEndRequestPro {
 	optional fixed64 segmentId = 1;
 	
-	optional PutSegmentInitRequestPro.DataMessageType messageType = 4;
-	optional fixed32 updateKey = 5;
+	optional PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+	optional string updateKey = 5;
 	repeated OffsetLengthPro offsetLength = 6;
 }
 

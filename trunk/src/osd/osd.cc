@@ -195,7 +195,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 					// hack: trigger MDS to update hotness
 					_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId,
-							false);
+					false);
 				}
 
 			} else {
@@ -310,7 +310,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 						debug(
 								"[DOWNLOAD] Start Decoding with %d scheme and settings = %s\n",
-								(int)codingScheme, codingSetting.c_str());
+								(int )codingScheme, codingSetting.c_str());
 						segmentData = _codingModule->decodeBlockToSegment(
 								codingScheme, blockDataList,
 								requiredBlockSymbols, segmentSize,
@@ -323,11 +323,12 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 							uint32_t i = blockSymbols.first;
 							debug(
 									"%" PRIu32 " free block %" PRIu32 " addr = %p\n",
-									i, blockDataList[i].info.blockId, blockDataList[i].buf);
+									i, blockDataList[i].info.blockId,
+									blockDataList[i].buf);
 							MemoryPool::getInstance().poolFree(
 									blockDataList[i].buf);
-							debug("%" PRIu32 " block %" PRIu32 " free-d\n",
-									i, blockDataList[i].info.blockId);
+							debug("%" PRIu32 " block %" PRIu32 " free-d\n", i,
+									blockDataList[i].info.blockId);
 						}
 						_downloadBlockData.erase(segmentId);
 #ifdef TIME_PONT
@@ -474,7 +475,8 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme, string setting, string checksum) {
+		CodingScheme codingScheme, string setting, string checksum,
+		DataMsgType dataMsgType, string updateKey) {
 
 	// reduce memory consumption by limiting the number processing segments
 	while (_pendingSegmentChunk.size() > MAX_NUM_PROCESSING_SEGMENT) {
@@ -543,7 +545,8 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 }
 
 void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId) {
+		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetLength) {
 
 	// TODO: check integrity of segment received
 	while (1) {
@@ -580,7 +583,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_codingSettingMap.erase(segmentId);
 
 			debug("Coding Scheme = %d setting = %s\n",
-					(int) codingSetting.codingScheme, codingSetting.setting.c_str());
+					(int ) codingSetting.codingScheme,
+					codingSetting.setting.c_str());
 
 			vector<struct BlockData> blockDataList =
 					_codingModule->encodeSegmentToBlock(
@@ -603,8 +607,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			for (const auto blockData : blockDataList) {
 
 #ifdef PARALLEL_TRANSFER
-				debug("Thread Pool Status %d/%d/%d\n",
-						(int)_blocktp.active(), (int)_blocktp.pending(), (int)_blocktp.size());
+				debug("Thread Pool Status %d/%d/%d\n", (int )_blocktp.active(),
+						(int )_blocktp.pending(), (int )_blocktp.size());
 				_blocktp.schedule(
 						boost::bind(&Osd::distributeBlock, this, segmentId,
 								blockData, blockLocationList[i], blocktpId));
@@ -723,7 +727,8 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint64_t offset, uint32_t length, char* buf) {
+		uint64_t segmentId, uint64_t offset, uint32_t length,
+		DataMsgType dataMsgType, string updateKey, char* buf) {
 
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeSegmentTransferCache(segmentId, buf,
@@ -828,21 +833,22 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 	debug_yellow(
 			"Repair OSD List repairBlockList size = %zu Osd List size = %zu: %s\n",
-			repairBlockList.size(), repairBlockOsdList.size(), repairBlockOsdListString.c_str());
+			repairBlockList.size(), repairBlockOsdList.size(),
+			repairBlockOsdListString.c_str());
 
 //    lock_guard<mutex> lk(recoveryMutex);
 
 	// get coding information from MDS
 	SegmentTransferOsdInfo segmentInfo =
 			_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, true,
-					true);
+			true);
 
 	const CodingScheme codingScheme = segmentInfo._codingScheme;
 	const string codingSetting = segmentInfo._codingSetting;
 	const uint32_t segmentSize = segmentInfo._size;
 
 	debug_cyan("[RECOVERY] Coding Scheme = %d setting = %s\n",
-			(int) codingScheme, codingSetting.c_str());
+			(int ) codingScheme, codingSetting.c_str());
 
 	// get block status
 	vector<bool> blockStatus = _osdCommunicator->getOsdStatusRequest(
@@ -903,7 +909,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	for (auto repairedBlock : repairedBlocks) {
 		debug(
 				"[RECOVERED_BLOCK] Segment ID = %" PRIu64 " Block ID = %" PRIu32 " codingScheme = %d Length = %" PRIu32 "\n",
-				segmentId, repairedBlock.info.blockId, (int)codingScheme, repairedBlock.info.blockSize);
+				segmentId, repairedBlock.info.blockId, (int )codingScheme,
+				repairedBlock.info.blockSize);
 		BlockLocation blockLocation;
 		blockLocation.blockId = repairedBlock.info.blockId;
 		blockLocation.osdId = repairBlockOsdList[j];

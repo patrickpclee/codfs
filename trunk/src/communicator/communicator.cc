@@ -114,8 +114,8 @@ void Communicator::createServerSocket() {
 
 	_serverPort = _serverSocket.getPort();
 
-	debug("Server Port = %" PRIu16 " sockfd = %" PRIu32 "\n",
-			_serverPort, _serverSocket.getSockfd());
+	debug("Server Port = %" PRIu16 " sockfd = %" PRIu32 "\n", _serverPort,
+			_serverSocket.getSockfd());
 }
 
 /*
@@ -258,10 +258,10 @@ void Communicator::waitForMessage() {
 						if (nbytes == 0) {
 
 							/*
-							// upgrade shared lock to exclusive lock
-							boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
-									lock);
-									*/
+							 // upgrade shared lock to exclusive lock
+							 boost::upgrade_to_unique_lock<boost::shared_mutex> uniqueLock(
+							 lock);
+							 */
 
 							// disconnect and remove from _connectionMap
 							debug("SOCKFD = %" PRIu32 " connection lost\n",
@@ -269,8 +269,10 @@ void Communicator::waitForMessage() {
 
 							// Receive Optimization
 							_sockfdBufMap.erase(p->first);
-							debug("SOCKET %" PRIu32 " deleted from Map\n",p->first);
-							debug("SOCKFD = %" PRIu32 " delete from mutex map\n",
+							debug("SOCKET %" PRIu32 " deleted from Map\n",
+									p->first);
+							debug(
+									"SOCKFD = %" PRIu32 " delete from mutex map\n",
 									p->first);
 
 #ifdef USE_PARSING_THREADS
@@ -279,7 +281,8 @@ void Communicator::waitForMessage() {
 #endif
 
 #ifdef COMPILE_FOR_MONITOR
-							monitor->getStatModule()->removeStatBySockfd(sockfd);
+							monitor->getStatModule()->removeStatBySockfd(
+									sockfd);
 #endif
 							// hack: post-increment adjusts iterator even erase is called
 //							_connectionMap.erase(p++);
@@ -300,8 +303,8 @@ void Communicator::waitForMessage() {
 							if (!_sockfdInQueueMap[sockfd] && byteRead != 0) {
 								debug_cyan("Add Recv to ThreadPool for socket %" PRIu32 " Read Byte %" PRIu32 "\n",sockfd, byteRead);
 								_parsingtp.schedule(
-									boost::bind(&Communicator::parsing, this,
-										sockfd));
+										boost::bind(&Communicator::parsing, this,
+												sockfd));
 								_sockfdInQueueMap[sockfd] = true;
 							}
 							_sockfdMutexMap[sockfd]->unlock();
@@ -330,7 +333,8 @@ void Communicator::parsing(uint32_t sockfd) {
 	lock_guard<mutex> lk(*_sockfdMutexMap[sockfd]);
 #endif
 	struct RecvBuffer* recvBuffer = _sockfdBufMap[sockfd];
-	debug("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n", sockfd, recvBuffer->len);
+	debug("PARSING START FOR SOCKFD %" PRIu32 " BUF LEN = %" PRIu32 "\n",
+			sockfd, recvBuffer->len);
 	uint32_t idx = 0;
 	struct MsgHeader *msgHeader;
 	MsgType msgType;
@@ -342,7 +346,8 @@ void Communicator::parsing(uint32_t sockfd) {
 				+ msgHeader->payloadSize;
 		debug_yellow(
 				"[%s] FOR SOCKET %" PRIu32 " RECV BUF SIZE %" PRIu32 " IDX = %" PRIu32 " TOTAL MSG SIZE %" PRIu32 "\n",
-				EnumToString::toString(msgType), sockfd, recvBuffer->len, idx, totalMsgSize);
+				EnumToString::toString(msgType), sockfd, recvBuffer->len, idx,
+				totalMsgSize);
 		if (idx + totalMsgSize <= recvBuffer->len) {
 			char* buffer = MemoryPool::getInstance().poolMalloc(totalMsgSize);
 			memcpy(buffer, recvBuffer->buf + idx, totalMsgSize);
@@ -351,7 +356,10 @@ void Communicator::parsing(uint32_t sockfd) {
 					boost::bind(&Communicator::dispatch, this, buffer, sockfd,
 							0));
 			debug("Add Thread Pool [%s] Active: %d/Pending: %d/Size: %d\n",
-					EnumToString::toString(msgType), (int)threadPools[msgType].active(), (int)threadPools[msgType].pending(), (int)threadPools[msgType].size());
+					EnumToString::toString(msgType),
+					(int )threadPools[msgType].active(),
+					(int )threadPools[msgType].pending(),
+					(int )threadPools[msgType].size());
 			idx += totalMsgSize;
 		} else {
 			// Not receive complete message, memmove to head
@@ -396,7 +404,8 @@ void Communicator::addMessage(Message* message, bool expectReply,
 			_waitReplyMessageMap.set(requestId, message);
 			debug(
 					"Message (ID: %" PRIu32 " Type = %d FD = %" PRIu32 ") added to waitReplyMessageMap\n",
-					requestId, (int) message->getMsgHeader().protocolMsgType, message->getSockfd());
+					requestId, (int ) message->getMsgHeader().protocolMsgType,
+					message->getSockfd());
 		}
 	}
 
@@ -465,7 +474,8 @@ void Communicator::sendMessage(uint32_t fd) {
 						message->getMsgHeader().requestId);
 				debug(
 						"Deleting Message since sockfd == -1 (Type = %d ID: %" PRIu32 ")\n",
-						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+						(int )message->getMsgHeader().protocolMsgType,
+						message->getMsgHeader().requestId);
 				delete message;
 				continue;
 			}
@@ -478,7 +488,8 @@ void Communicator::sendMessage(uint32_t fd) {
 							sockfd);
 					debug(
 							"Deleting Message since sockfd not found (Type = %d ID: %" PRIu32 ")\n",
-							(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+							(int )message->getMsgHeader().protocolMsgType,
+							message->getMsgHeader().requestId);
 					delete message;
 					continue;
 				}
@@ -497,7 +508,8 @@ void Communicator::sendMessage(uint32_t fd) {
 			// delete message if it is not waiting for reply
 			if (!message->isExpectReply()) {
 				debug("Deleting Message (Type = %d ID: %" PRIu32 ")\n",
-						(int)message->getMsgHeader().protocolMsgType, message->getMsgHeader().requestId);
+						(int )message->getMsgHeader().protocolMsgType,
+						message->getMsgHeader().requestId);
 				delete message;
 			}
 		}
@@ -530,7 +542,8 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
 		_outMessageQueue[conn->getSockfd()] =
 				new struct LowLockQueue<Message *>();
 		_outDataQueue[conn->getSockfd()] = new struct LowLockQueue<Message *>();
-		_outBlockQueue[conn->getSockfd()] = new struct LowLockQueue<Message *>();
+		_outBlockQueue[conn->getSockfd()] =
+				new struct LowLockQueue<Message *>();
 		_dataMutex[conn->getSockfd()] = new mutex();
 		_sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,
 				this, conn->getSockfd());
@@ -639,8 +652,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd,
 	struct MsgHeader msgHeader;
 	memcpy(&msgHeader, buf, sizeof(struct MsgHeader));
 
-	debug("Running dispatch ID = %" PRIu32 " Type = %s\n",
-			msgHeader.requestId, EnumToString::toString(msgHeader.protocolMsgType));
+	debug("Running dispatch ID = %" PRIu32 " Type = %s\n", msgHeader.requestId,
+			EnumToString::toString(msgHeader.protocolMsgType));
 
 	const MsgType msgType = msgHeader.protocolMsgType;
 
@@ -687,9 +700,9 @@ Message* Communicator::popMessage(uint32_t fd) {
 	} else if (_outDataQueue[fd]->try_pop(message) != false) {
 		return message;
 	} else if (_outBlockQueue[fd]->try_pop(message) != false) {
-		return message;	
+		return message;
 	} else
-		return NULL;
+	return NULL;
 #endif
 }
 
@@ -705,7 +718,7 @@ Message* Communicator::popMessage() {
 	} else if (_outBlockQueue.pop(message) != false) {
 		return message;
 	} else
-		return NULL;
+	return NULL;
 #else
 	if (_outMessageQueue->try_pop(message) != false) {
 		return message;
@@ -714,7 +727,7 @@ Message* Communicator::popMessage() {
 	} else if (_outBlockQueue->try_pop(message) != false) {
 		return message;
 	} else
-		return NULL;
+	return NULL;
 #endif
 }
 
@@ -748,8 +761,8 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
 		uint32_t targetComponentId =
 				requestHandshakeMsg->getTargetComponentId();
 #ifdef MOUNT_OSD
-		ComponentType targetComponentType = 
-				requestHandshakeMsg->getTargetComponentType();
+		ComponentType targetComponentType =
+		requestHandshakeMsg->getTargetComponentType();
 		if (targetComponentType == OSD && componentType == OSD) {
 			string cmd_umount = "umount ncds"+to_string(targetComponentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
 			string cmd_mount = "mount ncds"+to_string(targetComponentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
@@ -787,12 +800,12 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
 	_connectionMap[sockfd]->setConnectionType(componentType);
 
 #ifdef MOUNT_OSD
-		if (componentType == OSD && _componentType == OSD) {
-			string cmd_umount = "umount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
-			string cmd_mount = "mount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
-			system(cmd_umount.c_str());
-			system(cmd_mount.c_str());
-		}
+	if (componentType == OSD && _componentType == OSD) {
+		string cmd_umount = "umount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+		string cmd_mount = "mount ncds"+to_string(componentId%10)+":/home/cseadmin/shb118/ncvfs/trunk/osd_block";
+		system(cmd_umount.c_str());
+		system(cmd_mount.c_str());
+	}
 #endif
 
 	// prepare reply message
@@ -863,8 +876,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 
 	for (Component component : componentList) {
 		if (_componentType == CLIENT || _componentId > component.id) {
-			debug("Connecting to %s:%" PRIu16 "\n",
-					component.ip.c_str(), component.port);
+			debug("Connecting to %s:%" PRIu16 "\n", component.ip.c_str(),
+					component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port,
 					component.type);
 
@@ -873,8 +886,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 
 		} else if ((_componentType == MDS || _componentType == OSD)
 				&& component.type == MONITOR) {
-			debug("Connecting to %s:%" PRIu16 "\n",
-					component.ip.c_str(), component.port);
+			debug("Connecting to %s:%" PRIu16 "\n", component.ip.c_str(),
+					component.port);
 			uint32_t sockfd = connectAndAdd(component.ip, component.port,
 					component.type);
 
@@ -882,8 +895,8 @@ void Communicator::connectToComponents(vector<Component> componentList) {
 			requestHandshake(sockfd, _componentId, _componentType);
 
 		} else {
-			debug("Skipping %s:%" PRIu16 "\n",
-					component.ip.c_str(), component.port);
+			debug("Skipping %s:%" PRIu16 "\n", component.ip.c_str(),
+					component.port);
 		}
 	}
 }
@@ -907,7 +920,7 @@ void Communicator::connectToMonitor() {
 		uint32_t sockfd = connectAndAdd(component.ip, component.port,
 				component.type);
 #ifdef USE_PARSING_THREADS
-	_sockfdMutexMap[sockfd] = new std::mutex();
+		_sockfdMutexMap[sockfd] = new std::mutex();
 #endif
 		_sockfdBufMap[sockfd] = new RecvBuffer();
 		debug_cyan(
@@ -924,7 +937,7 @@ void Communicator::connectToMds() {
 		uint32_t sockfd = connectAndAdd(component.ip, component.port,
 				component.type);
 #ifdef USE_PARSING_THREADS
-	_sockfdMutexMap[sockfd] = new std::mutex();
+		_sockfdMutexMap[sockfd] = new std::mutex();
 #endif
 		_sockfdBufMap[sockfd] = new RecvBuffer();
 		debug_cyan(
@@ -979,7 +992,11 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 
 uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		struct SegmentData segmentData, CodingScheme codingScheme,
-		string codingSetting, string checksum) {
+		string codingSetting, string checksum, DataMsgType dataMsgType) {
+
+	const string updateKey = "";	// TODO: auto-increment updateKey
+	//vector<offset_length_t> offsetLength = segmentData.info.offsetLength;
+	vector<offset_length_t> offsetLength;
 
 	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
 			segmentData.info.segmentId, sockfd);
@@ -997,7 +1014,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 #endif
 
 	putSegmentInit(componentId, sockfd, segmentId, totalSize, chunkCount,
-			codingScheme, codingSetting, checksum);
+			codingScheme, codingSetting, checksum, dataMsgType, updateKey);
 	debug("%s\n", "Put Segment Init ACK-ed");
 
 	// Step 2 : Send data chunk by chunk
@@ -1015,7 +1032,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		}
 
 		putSegmentData(componentId, sockfd, segmentId, buf, byteProcessed,
-				byteToSend);
+				byteToSend, dataMsgType, updateKey);
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
 
@@ -1027,7 +1044,8 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	unlockDataQueue(sockfd);
 #endif
 
-	putSegmentEnd(componentId, sockfd, segmentId);
+	putSegmentEnd(componentId, sockfd, segmentId, dataMsgType, updateKey,
+			offsetLength);
 
 	cout << "Put Segment ID = " << segmentId << " Finished" << endl;
 
@@ -1048,16 +1066,17 @@ void Communicator::unlockDataQueue(uint32_t sockfd) {
 // PRIVATE FUNCTIONS
 //
 
-// codingScheme (DEFAULT_CODING) and codingSetting ("") are optional
 void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-		CodingScheme codingScheme, string codingSetting, string checksum) {
+		CodingScheme codingScheme, string codingSetting, string checksum,
+		DataMsgType dataMsgType, string updateKey) {
 
 	// Step 1 of the upload process
 
 	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
 			new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, length,
-					chunkCount, codingScheme, codingSetting, checksum);
+					chunkCount, codingScheme, codingSetting, checksum,
+					dataMsgType, updateKey);
 
 	putSegmentInitRequestMsg->prepareProtocolMsg();
 	addMessage(putSegmentInitRequestMsg, true);
@@ -1073,11 +1092,12 @@ void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 }
 
 void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
-		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length) {
+		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length,
+		DataMsgType dataMsgType, string updateKey) {
 
 	// Step 2 of the upload process
 	SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, dstOsdSockfd,
-			segmentId, offset, length);
+			segmentId, offset, length, dataMsgType, updateKey);
 
 	segmentDataMsg->prepareProtocolMsg();
 	segmentDataMsg->preparePayload(buf + offset, length);
@@ -1086,12 +1106,14 @@ void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
 }
 
 void Communicator::putSegmentEnd(uint32_t componentId, uint32_t dstOsdSockfd,
-		uint64_t segmentId) {
+		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetLength) {
 
 	// Step 3 of the upload process
 
 	SegmentTransferEndRequestMsg* putSegmentEndRequestMsg =
-			new SegmentTransferEndRequestMsg(this, dstOsdSockfd, segmentId);
+			new SegmentTransferEndRequestMsg(this, dstOsdSockfd, segmentId,
+					dataMsgType, updateKey, offsetLength);
 
 	putSegmentEndRequestMsg->prepareProtocolMsg();
 	addMessage(putSegmentEndRequestMsg, true);

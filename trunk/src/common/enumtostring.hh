@@ -115,6 +115,18 @@ public:
     return "???";
   }
 
+  static const char * toString( DataMsgType en ) {
+    switch( en ) {
+      case DEFAULT_DATA_MSG: return "DEFAULT_DATA_MSG";
+      case DOWNLOAD: return "DOWNLOAD";
+      case PARITY: return "PARITY";
+      case RECOVERY: return "RECOVERY";
+      case UPDATE: return "UPDATE";
+      case UPLOAD: return "UPLOAD";
+    }
+    return "???";
+  }
+
   static const char * toString( HotnessAlgorithm en ) {
     switch( en ) {
       case DEFAULT_HOTNESS_ALG: return "DEFAULT_HOTNESS_ALG";
@@ -128,17 +140,6 @@ public:
       case DISKFAILURE: return "DISKFAILURE";
       case SEGMENTLOST: return "SEGMENTLOST";
       case UNREACHABLE: return "UNREACHABLE";
-    }
-    return "???";
-  }
-
-  static const char * toString( DataMsgType en ) {
-    switch( en ) {
-      case DOWNLOAD: return "DOWNLOAD";
-      case PARITY: return "PARITY";
-      case RECOVERY: return "RECOVERY";
-      case UPDATE: return "UPDATE";
-      case UPLOAD: return "UPLOAD";
     }
     return "???";
   }

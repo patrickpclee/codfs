@@ -13,17 +13,23 @@ extern Osd* osd;
 #include "../../client/client.hh"
 extern Client* client;
 #endif
-SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(Communicator* communicator) :
+SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(
+		Communicator* communicator) :
 		Message(communicator) {
 	_threadPoolSize = 4;
 }
 
-SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(Communicator* communicator,
-		uint32_t osdSockfd, uint64_t segmentId) :
+SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(
+		Communicator* communicator, uint32_t osdSockfd, uint64_t segmentId,
+		DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetlength) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
 	_segmentId = segmentId;
+	_dataMsgType = dataMsgType;
+	_offsetlength = offsetlength;
+	_updateKey = updateKey;
 }
 
 void SegmentTransferEndRequestMsg::prepareProtocolMsg() {
@@ -31,6 +37,17 @@ void SegmentTransferEndRequestMsg::prepareProtocolMsg() {
 
 	ncvfs::SegmentTransferEndRequestPro segmentTransferEndRequestPro;
 	segmentTransferEndRequestPro.set_segmentid(_segmentId);
+	segmentTransferEndRequestPro.set_datamsgtype(
+			(ncvfs::PutSegmentInitRequestPro_DataMsgType) _dataMsgType);
+	segmentTransferEndRequestPro.set_updatekey(_updateKey);
+
+	vector<offset_length_t>::iterator it;
+	for (it = _offsetlength.begin(); it < _offsetlength.end(); ++it) {
+		ncvfs::OffsetLengthPro* offsetLengthPro =
+				segmentTransferEndRequestPro.add_offsetlength();
+		offsetLengthPro->set_offset((*it).first);
+		offsetLengthPro->set_length((*it).second);
+	}
 
 	if (!segmentTransferEndRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -38,7 +55,7 @@ void SegmentTransferEndRequestMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType (SEGMENT_TRANSFER_END_REQUEST);
+	setProtocolType(SEGMENT_TRANSFER_END_REQUEST);
 	setProtocolMsg(serializedString);
 
 }
@@ -52,21 +69,35 @@ void SegmentTransferEndRequestMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_segmentId = segmentTransferEndRequestPro.segmentid();
+	_dataMsgType = (DataMsgType) segmentTransferEndRequestPro.datamsgtype();
+	_updateKey = segmentTransferEndRequestPro.updatekey();
+
+	for (int i = 0; i < segmentTransferEndRequestPro.offsetlength_size(); ++i) {
+		offset_length_t tempOffsetLength;
+
+		uint32_t offset = segmentTransferEndRequestPro.offsetlength(i).offset();
+		uint32_t length = segmentTransferEndRequestPro.offsetlength(i).length();
+		tempOffsetLength = make_pair(offset, length);
+
+		_offsetlength.push_back(tempOffsetLength);
+	}
 
 }
 
 void SegmentTransferEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putSegmentEndProcessor (_msgHeader.requestId, _sockfd, _segmentId);
+	osd->putSegmentEndProcessor(_msgHeader.requestId, _sockfd, _segmentId,
+			_dataMsgType, _updateKey, _offsetlength);
 #endif
 
 #ifdef COMPILE_FOR_CLIENT
-	debug ("Start Processor for segment ID = %" PRIu64 "\n", _segmentId);
-	client->putSegmentEndProcessor (_msgHeader.requestId, _sockfd, _segmentId);
-	debug ("End Processor for segment ID = %" PRIu64 "\n", _segmentId);
+	debug("Start Processor for segment ID = %" PRIu64 "\n", _segmentId);
+	client->putSegmentEndProcessor(_msgHeader.requestId, _sockfd, _segmentId);
+	debug("End Processor for segment ID = %" PRIu64 "\n", _segmentId);
 #endif
 }
 
 void SegmentTransferEndRequestMsg::printProtocol() {
-	debug("[SEGMENT_TRANSFER_END_REQUEST] Segment ID = %" PRIu64 "\n", _segmentId);
+	debug("[SEGMENT_TRANSFER_END_REQUEST] Segment ID = %" PRIu64 "\n",
+			_segmentId);
 }
