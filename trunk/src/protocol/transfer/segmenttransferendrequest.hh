@@ -16,7 +16,8 @@ public:
 	SegmentTransferEndRequestMsg(Communicator* communicator);
 
 	SegmentTransferEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t segmentId);
+			uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+			vector<offset_length_t> offsetlength);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -49,6 +50,9 @@ public:
 
 private:
 	uint64_t _segmentId;
+	DataMsgType _dataMsgType;
+	string _updateKey;
+	vector<offset_length_t> _offsetlength;
 };
 
 #endif

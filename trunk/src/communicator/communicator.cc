@@ -994,6 +994,10 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		struct SegmentData segmentData, CodingScheme codingScheme,
 		string codingSetting, string checksum, DataMsgType dataMsgType) {
 
+	const string updateKey = "";	// TODO: auto-increment updateKey
+	//vector<offset_length_t> offsetLength = segmentData.info.offsetLength;
+	vector<offset_length_t> offsetLength;
+
 	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
 			segmentData.info.segmentId, sockfd);
 
@@ -1009,7 +1013,6 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	lockDataQueue(sockfd);
 #endif
 
-	const string updateKey = "";	// TODO: auto-increment updateKey
 	putSegmentInit(componentId, sockfd, segmentId, totalSize, chunkCount,
 			codingScheme, codingSetting, checksum, dataMsgType, updateKey);
 	debug("%s\n", "Put Segment Init ACK-ed");
@@ -1041,7 +1044,8 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	unlockDataQueue(sockfd);
 #endif
 
-	putSegmentEnd(componentId, sockfd, segmentId);
+	putSegmentEnd(componentId, sockfd, segmentId, dataMsgType, updateKey,
+			offsetLength);
 
 	cout << "Put Segment ID = " << segmentId << " Finished" << endl;
 
@@ -1071,7 +1075,8 @@ void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 
 	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
 			new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, length,
-					chunkCount, codingScheme, codingSetting, checksum, dataMsgType, updateKey);
+					chunkCount, codingScheme, codingSetting, checksum,
+					dataMsgType, updateKey);
 
 	putSegmentInitRequestMsg->prepareProtocolMsg();
 	addMessage(putSegmentInitRequestMsg, true);
@@ -1087,7 +1092,8 @@ void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 }
 
 void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
-		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length, DataMsgType dataMsgType, string updateKey) {
+		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length,
+		DataMsgType dataMsgType, string updateKey) {
 
 	// Step 2 of the upload process
 	SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, dstOsdSockfd,
@@ -1100,12 +1106,14 @@ void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
 }
 
 void Communicator::putSegmentEnd(uint32_t componentId, uint32_t dstOsdSockfd,
-		uint64_t segmentId) {
+		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetLength) {
 
 	// Step 3 of the upload process
 
 	SegmentTransferEndRequestMsg* putSegmentEndRequestMsg =
-			new SegmentTransferEndRequestMsg(this, dstOsdSockfd, segmentId);
+			new SegmentTransferEndRequestMsg(this, dstOsdSockfd, segmentId,
+					dataMsgType, updateKey, offsetLength);
 
 	putSegmentEndRequestMsg->prepareProtocolMsg();
 	addMessage(putSegmentEndRequestMsg, true);

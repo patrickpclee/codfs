@@ -545,7 +545,8 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 }
 
 void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId) {
+		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetLength) {
 
 	// TODO: check integrity of segment received
 	while (1) {
