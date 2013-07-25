@@ -35,6 +35,7 @@ void protobuf_ShutdownFile_message_2eproto();
 class HandshakeRequestPro;
 class HandshakeReplyPro;
 class OffsetLengthPro;
+class DataMsgPro;
 class ListDirectoryRequestPro;
 class UploadFileRequestPro;
 class DeleteFileRequestPro;
@@ -114,6 +115,29 @@ inline bool HandshakeRequestPro_ComponentType_Parse(
   return ::google::protobuf::internal::ParseNamedEnum<HandshakeRequestPro_ComponentType>(
     HandshakeRequestPro_ComponentType_descriptor(), name, value);
 }
+enum DataMsgPro_DataMsgType {
+  DataMsgPro_DataMsgType_DEFAULT_DATA_MSG = 15,
+  DataMsgPro_DataMsgType_UPLOAD = 1,
+  DataMsgPro_DataMsgType_DOWNLOAD = 2,
+  DataMsgPro_DataMsgType_RECOVERY = 3,
+  DataMsgPro_DataMsgType_UPDATE = 4,
+  DataMsgPro_DataMsgType_PARITY = 5
+};
+bool DataMsgPro_DataMsgType_IsValid(int value);
+const DataMsgPro_DataMsgType DataMsgPro_DataMsgType_DataMsgType_MIN = DataMsgPro_DataMsgType_UPLOAD;
+const DataMsgPro_DataMsgType DataMsgPro_DataMsgType_DataMsgType_MAX = DataMsgPro_DataMsgType_DEFAULT_DATA_MSG;
+const int DataMsgPro_DataMsgType_DataMsgType_ARRAYSIZE = DataMsgPro_DataMsgType_DataMsgType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* DataMsgPro_DataMsgType_descriptor();
+inline const ::std::string& DataMsgPro_DataMsgType_Name(DataMsgPro_DataMsgType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    DataMsgPro_DataMsgType_descriptor(), value);
+}
+inline bool DataMsgPro_DataMsgType_Parse(
+    const ::std::string& name, DataMsgPro_DataMsgType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<DataMsgPro_DataMsgType>(
+    DataMsgPro_DataMsgType_descriptor(), name, value);
+}
 enum PutSegmentInitRequestPro_CodingScheme {
   PutSegmentInitRequestPro_CodingScheme_RAID0_CODING = 1,
   PutSegmentInitRequestPro_CodingScheme_RAID1_CODING = 2,
@@ -139,29 +163,6 @@ inline bool PutSegmentInitRequestPro_CodingScheme_Parse(
     const ::std::string& name, PutSegmentInitRequestPro_CodingScheme* value) {
   return ::google::protobuf::internal::ParseNamedEnum<PutSegmentInitRequestPro_CodingScheme>(
     PutSegmentInitRequestPro_CodingScheme_descriptor(), name, value);
-}
-enum PutSegmentInitRequestPro_DataMsgType {
-  PutSegmentInitRequestPro_DataMsgType_DEFAULT_DATA_MSG = 15,
-  PutSegmentInitRequestPro_DataMsgType_UPLOAD = 1,
-  PutSegmentInitRequestPro_DataMsgType_DOWNLOAD = 2,
-  PutSegmentInitRequestPro_DataMsgType_RECOVERY = 3,
-  PutSegmentInitRequestPro_DataMsgType_UPDATE = 4,
-  PutSegmentInitRequestPro_DataMsgType_PARITY = 5
-};
-bool PutSegmentInitRequestPro_DataMsgType_IsValid(int value);
-const PutSegmentInitRequestPro_DataMsgType PutSegmentInitRequestPro_DataMsgType_DataMsgType_MIN = PutSegmentInitRequestPro_DataMsgType_UPLOAD;
-const PutSegmentInitRequestPro_DataMsgType PutSegmentInitRequestPro_DataMsgType_DataMsgType_MAX = PutSegmentInitRequestPro_DataMsgType_DEFAULT_DATA_MSG;
-const int PutSegmentInitRequestPro_DataMsgType_DataMsgType_ARRAYSIZE = PutSegmentInitRequestPro_DataMsgType_DataMsgType_MAX + 1;
-
-const ::google::protobuf::EnumDescriptor* PutSegmentInitRequestPro_DataMsgType_descriptor();
-inline const ::std::string& PutSegmentInitRequestPro_DataMsgType_Name(PutSegmentInitRequestPro_DataMsgType value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    PutSegmentInitRequestPro_DataMsgType_descriptor(), value);
-}
-inline bool PutSegmentInitRequestPro_DataMsgType_Parse(
-    const ::std::string& name, PutSegmentInitRequestPro_DataMsgType* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<PutSegmentInitRequestPro_DataMsgType>(
-    PutSegmentInitRequestPro_DataMsgType_descriptor(), name, value);
 }
 enum DownloadFileReplyPro_FileType {
   DownloadFileReplyPro_FileType_NEWFILE = 1,
@@ -484,6 +485,106 @@ class OffsetLengthPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static OffsetLengthPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DataMsgPro : public ::google::protobuf::Message {
+ public:
+  DataMsgPro();
+  virtual ~DataMsgPro();
+  
+  DataMsgPro(const DataMsgPro& from);
+  
+  inline DataMsgPro& operator=(const DataMsgPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DataMsgPro& default_instance();
+  
+  void Swap(DataMsgPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  DataMsgPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DataMsgPro& from);
+  void MergeFrom(const DataMsgPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  typedef DataMsgPro_DataMsgType DataMsgType;
+  static const DataMsgType DEFAULT_DATA_MSG = DataMsgPro_DataMsgType_DEFAULT_DATA_MSG;
+  static const DataMsgType UPLOAD = DataMsgPro_DataMsgType_UPLOAD;
+  static const DataMsgType DOWNLOAD = DataMsgPro_DataMsgType_DOWNLOAD;
+  static const DataMsgType RECOVERY = DataMsgPro_DataMsgType_RECOVERY;
+  static const DataMsgType UPDATE = DataMsgPro_DataMsgType_UPDATE;
+  static const DataMsgType PARITY = DataMsgPro_DataMsgType_PARITY;
+  static inline bool DataMsgType_IsValid(int value) {
+    return DataMsgPro_DataMsgType_IsValid(value);
+  }
+  static const DataMsgType DataMsgType_MIN =
+    DataMsgPro_DataMsgType_DataMsgType_MIN;
+  static const DataMsgType DataMsgType_MAX =
+    DataMsgPro_DataMsgType_DataMsgType_MAX;
+  static const int DataMsgType_ARRAYSIZE =
+    DataMsgPro_DataMsgType_DataMsgType_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  DataMsgType_descriptor() {
+    return DataMsgPro_DataMsgType_descriptor();
+  }
+  static inline const ::std::string& DataMsgType_Name(DataMsgType value) {
+    return DataMsgPro_DataMsgType_Name(value);
+  }
+  static inline bool DataMsgType_Parse(const ::std::string& name,
+      DataMsgType* value) {
+    return DataMsgPro_DataMsgType_Parse(name, value);
+  }
+  
+  // accessors -------------------------------------------------------
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.DataMsgPro)
+ private:
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[1];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static DataMsgPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -1505,34 +1606,6 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
     return PutSegmentInitRequestPro_CodingScheme_Parse(name, value);
   }
   
-  typedef PutSegmentInitRequestPro_DataMsgType DataMsgType;
-  static const DataMsgType DEFAULT_DATA_MSG = PutSegmentInitRequestPro_DataMsgType_DEFAULT_DATA_MSG;
-  static const DataMsgType UPLOAD = PutSegmentInitRequestPro_DataMsgType_UPLOAD;
-  static const DataMsgType DOWNLOAD = PutSegmentInitRequestPro_DataMsgType_DOWNLOAD;
-  static const DataMsgType RECOVERY = PutSegmentInitRequestPro_DataMsgType_RECOVERY;
-  static const DataMsgType UPDATE = PutSegmentInitRequestPro_DataMsgType_UPDATE;
-  static const DataMsgType PARITY = PutSegmentInitRequestPro_DataMsgType_PARITY;
-  static inline bool DataMsgType_IsValid(int value) {
-    return PutSegmentInitRequestPro_DataMsgType_IsValid(value);
-  }
-  static const DataMsgType DataMsgType_MIN =
-    PutSegmentInitRequestPro_DataMsgType_DataMsgType_MIN;
-  static const DataMsgType DataMsgType_MAX =
-    PutSegmentInitRequestPro_DataMsgType_DataMsgType_MAX;
-  static const int DataMsgType_ARRAYSIZE =
-    PutSegmentInitRequestPro_DataMsgType_DataMsgType_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor*
-  DataMsgType_descriptor() {
-    return PutSegmentInitRequestPro_DataMsgType_descriptor();
-  }
-  static inline const ::std::string& DataMsgType_Name(DataMsgType value) {
-    return PutSegmentInitRequestPro_DataMsgType_Name(value);
-  }
-  static inline bool DataMsgType_Parse(const ::std::string& name,
-      DataMsgType* value) {
-    return PutSegmentInitRequestPro_DataMsgType_Parse(name, value);
-  }
-  
   // accessors -------------------------------------------------------
   
   // optional fixed64 segmentId = 1;
@@ -1585,12 +1658,12 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_checksum();
   inline ::std::string* release_checksum();
   
-  // optional .ncvfs.PutSegmentInitRequestPro.DataMsgType dataMsgType = 7;
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 7;
   inline bool has_datamsgtype() const;
   inline void clear_datamsgtype();
   static const int kDataMsgTypeFieldNumber = 7;
-  inline ::ncvfs::PutSegmentInitRequestPro_DataMsgType datamsgtype() const;
-  inline void set_datamsgtype(::ncvfs::PutSegmentInitRequestPro_DataMsgType value);
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
   
   // optional string updateKey = 8;
   inline bool has_updatekey() const;
@@ -1720,12 +1793,12 @@ class SegmentDataPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 length() const;
   inline void set_length(::google::protobuf::uint32 value);
   
-  // optional .ncvfs.PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 4;
   inline bool has_datamsgtype() const;
   inline void clear_datamsgtype();
   static const int kDataMsgTypeFieldNumber = 4;
-  inline ::ncvfs::PutSegmentInitRequestPro_DataMsgType datamsgtype() const;
-  inline void set_datamsgtype(::ncvfs::PutSegmentInitRequestPro_DataMsgType value);
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
   
   // optional string updateKey = 5;
   inline bool has_updatekey() const;
@@ -1914,12 +1987,12 @@ class SegmentTransferEndRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint64 value);
   
-  // optional .ncvfs.PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 4;
   inline bool has_datamsgtype() const;
   inline void clear_datamsgtype();
   static const int kDataMsgTypeFieldNumber = 4;
-  inline ::ncvfs::PutSegmentInitRequestPro_DataMsgType datamsgtype() const;
-  inline void set_datamsgtype(::ncvfs::PutSegmentInitRequestPro_DataMsgType value);
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
   
   // optional string updateKey = 5;
   inline bool has_updatekey() const;
@@ -6474,6 +6547,10 @@ inline void OffsetLengthPro::set_length(::google::protobuf::uint32 value) {
 
 // -------------------------------------------------------------------
 
+// DataMsgPro
+
+// -------------------------------------------------------------------
+
 // ListDirectoryRequestPro
 
 // optional fixed32 osdId = 1;
@@ -7508,7 +7585,7 @@ inline ::std::string* PutSegmentInitRequestPro::release_checksum() {
   }
 }
 
-// optional .ncvfs.PutSegmentInitRequestPro.DataMsgType dataMsgType = 7;
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 7;
 inline bool PutSegmentInitRequestPro::has_datamsgtype() const {
   return (_has_bits_[0] & 0x00000040u) != 0;
 }
@@ -7522,11 +7599,11 @@ inline void PutSegmentInitRequestPro::clear_datamsgtype() {
   datamsgtype_ = 15;
   clear_has_datamsgtype();
 }
-inline ::ncvfs::PutSegmentInitRequestPro_DataMsgType PutSegmentInitRequestPro::datamsgtype() const {
-  return static_cast< ::ncvfs::PutSegmentInitRequestPro_DataMsgType >(datamsgtype_);
+inline ::ncvfs::DataMsgPro_DataMsgType PutSegmentInitRequestPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
 }
-inline void PutSegmentInitRequestPro::set_datamsgtype(::ncvfs::PutSegmentInitRequestPro_DataMsgType value) {
-  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_DataMsgType_IsValid(value));
+inline void PutSegmentInitRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
   set_has_datamsgtype();
   datamsgtype_ = value;
 }
@@ -7659,7 +7736,7 @@ inline void SegmentDataPro::set_length(::google::protobuf::uint32 value) {
   length_ = value;
 }
 
-// optional .ncvfs.PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 4;
 inline bool SegmentDataPro::has_datamsgtype() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
@@ -7673,11 +7750,11 @@ inline void SegmentDataPro::clear_datamsgtype() {
   datamsgtype_ = 15;
   clear_has_datamsgtype();
 }
-inline ::ncvfs::PutSegmentInitRequestPro_DataMsgType SegmentDataPro::datamsgtype() const {
-  return static_cast< ::ncvfs::PutSegmentInitRequestPro_DataMsgType >(datamsgtype_);
+inline ::ncvfs::DataMsgPro_DataMsgType SegmentDataPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
 }
-inline void SegmentDataPro::set_datamsgtype(::ncvfs::PutSegmentInitRequestPro_DataMsgType value) {
-  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_DataMsgType_IsValid(value));
+inline void SegmentDataPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
   set_has_datamsgtype();
   datamsgtype_ = value;
 }
@@ -7792,7 +7869,7 @@ inline void SegmentTransferEndRequestPro::set_segmentid(::google::protobuf::uint
   segmentid_ = value;
 }
 
-// optional .ncvfs.PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 4;
 inline bool SegmentTransferEndRequestPro::has_datamsgtype() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
@@ -7806,11 +7883,11 @@ inline void SegmentTransferEndRequestPro::clear_datamsgtype() {
   datamsgtype_ = 15;
   clear_has_datamsgtype();
 }
-inline ::ncvfs::PutSegmentInitRequestPro_DataMsgType SegmentTransferEndRequestPro::datamsgtype() const {
-  return static_cast< ::ncvfs::PutSegmentInitRequestPro_DataMsgType >(datamsgtype_);
+inline ::ncvfs::DataMsgPro_DataMsgType SegmentTransferEndRequestPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
 }
-inline void SegmentTransferEndRequestPro::set_datamsgtype(::ncvfs::PutSegmentInitRequestPro_DataMsgType value) {
-  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_DataMsgType_IsValid(value));
+inline void SegmentTransferEndRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
   set_has_datamsgtype();
   datamsgtype_ = value;
 }
@@ -10747,12 +10824,12 @@ inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::HandshakeRequestPro_Com
   return ::ncvfs::HandshakeRequestPro_ComponentType_descriptor();
 }
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::PutSegmentInitRequestPro_CodingScheme>() {
-  return ::ncvfs::PutSegmentInitRequestPro_CodingScheme_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::DataMsgPro_DataMsgType>() {
+  return ::ncvfs::DataMsgPro_DataMsgType_descriptor();
 }
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::PutSegmentInitRequestPro_DataMsgType>() {
-  return ::ncvfs::PutSegmentInitRequestPro_DataMsgType_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::PutSegmentInitRequestPro_CodingScheme>() {
+  return ::ncvfs::PutSegmentInitRequestPro_CodingScheme_descriptor();
 }
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::ncvfs::DownloadFileReplyPro_FileType>() {
