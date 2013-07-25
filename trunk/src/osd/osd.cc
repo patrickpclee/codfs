@@ -39,20 +39,6 @@ boost::threadpool::pool _blocktp;
 boost::threadpool::pool _recoverytp;
 #endif
 
-#ifdef TIME_POINT
-#include <chrono>
-typedef chrono::high_resolution_clock Clock;
-typedef chrono::milliseconds milliseconds;
-double lockSegmentCountMutexTime = 0;
-double getSegmentInfoTime = 0;
-double getOSDStatusTime = 0;
-double getBlockTime = 0;
-double decodeSegmentTime = 0;
-double sendSegmentTime = 0;
-double cacheSegmentTime = 0;
-mutex timeMutex;
-#endif
-
 using namespace std;
 
 Osd::Osd(uint32_t selfId) {
@@ -153,16 +139,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				segmentId);
 	}
 
-#ifdef TIME_POINT
-	Clock::time_point t0 = Clock::now();
-	Clock::time_point t1 = Clock::now();
-	Clock::time_point t2 = Clock::now();
-	Clock::time_point t3 = Clock::now();
-	Clock::time_point t4 = Clock::now();
-	Clock::time_point t5 = Clock::now();
-	Clock::time_point t6 = Clock::now();
-	Clock::time_point t7 = Clock::now();
-#endif
 	segmentRequestCountMutex.lock();
 	if (!_segmentRequestCount.count(segmentId)) {
 		_segmentRequestCount.set(segmentId, 1);
@@ -175,9 +151,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	}
 	struct SegmentData& segmentData = _segmentDataMap.get(segmentId);
 	segmentRequestCountMutex.unlock();
-#ifdef TIME_POINT
-	t1 = Clock::now();
-#endif
 
 	{
 		lock_guard<mutex> lk(*(_segmentDownloadMutex.get(segmentId)));
@@ -208,9 +181,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				SegmentTransferOsdInfo segmentInfo =
 						_osdCommunicator->getSegmentInfoRequest(segmentId,
 								_osdId);
-#ifdef TIME_POINT
-				t2 = Clock::now();
-#endif
+
 				const CodingScheme codingScheme = segmentInfo._codingScheme;
 				const string codingSetting = segmentInfo._codingSetting;
 				const uint32_t segmentSize = segmentInfo._size;
@@ -220,9 +191,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 						_osdCommunicator->getOsdStatusRequest(
 								segmentInfo._osdList);
 
-#ifdef TIME_POINT
-				t3 = Clock::now();
-#endif
 				// check which blocks are needed to request
 				uint32_t totalNumOfBlocks = segmentInfo._osdList.size();
 				block_list_t requiredBlockSymbols =
@@ -275,26 +243,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 								segmentId, i);
 
 					} else {
-#ifdef MOUNT_OSD
-						// read block from mounted disk
-						struct BlockData blockData =
-						_storageModule->readRemoteBlock(osdId,
-								segmentId, i, blockSymbols.second);
-
-						// blockDataList reserved space for "all blocks"
-						// only fill in data for "required blocks"
-						blockDataList[i] = blockData;
-
-						_downloadBlockRemaining.decrement(segmentId);
-						debug(
-								"Read from remote block for Segment ID = %" PRIu64 " Block ID = %" PRIu32 "\n",
-								segmentId, i);
-#else
 						// request block from other OSD
 						debug("sending request for block %" PRIu32 "\n", i);
 						_osdCommunicator->getBlockRequest(osdId, segmentId, i,
 								blockSymbols.second);
-#endif
 					}
 				}
 
@@ -302,9 +254,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 				while (1) {
 					if (_downloadBlockRemaining.get(segmentId) == 0) {
-#ifdef TIME_POINT
-						t4 = Clock::now();
-#endif
 
 						// 5. decode blocks
 
@@ -331,9 +280,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 									blockDataList[i].info.blockId);
 						}
 						_downloadBlockData.erase(segmentId);
-#ifdef TIME_PONT
-						t5 = Clock::now();
-#endif
 
 						break;
 					} else {
@@ -360,10 +306,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 				_osdId);
 	}
 
-#ifdef TIME_POINT
-	t6 = Clock::now();
-#endif
-
 	// 6. cache and free
 	segmentRequestCountMutex.lock();
 	bool isLocked = true;
@@ -387,24 +329,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 	if (isLocked) {
 		segmentRequestCountMutex.unlock();
 	}
-
-#ifdef TIME_POINT
-	t7 = Clock::now();
-#endif
-
-#ifdef TIME_POINT
-	timeMutex.lock();
-	lockSegmentCountMutexTime += chrono::duration_cast < milliseconds > (t1 - t0).count();
-	getSegmentInfoTime += chrono::duration_cast < milliseconds > (t2 - t1).count();
-	getOSDStatusTime += chrono::duration_cast < milliseconds > (t3 - t2).count();
-	getBlockTime += chrono::duration_cast < milliseconds > (t4 - t3).count();
-	decodeSegmentTime += chrono::duration_cast < milliseconds > (t5 - t4).count();
-	sendSegmentTime += chrono::duration_cast < milliseconds > (t6 - t5).count();
-	if (!localRetrieve) {
-		cacheSegmentTime += chrono::duration_cast < milliseconds > (t7 - t6).count();
-	}
-	timeMutex.unlock();
-#endif
 
 }
 
@@ -976,10 +900,6 @@ uint32_t Osd::getFreespace() {
 		printf("Failed to stat %s:\n", DISK_PATH);
 		return 0;
 	} else {
-//		printf("Disk %s: \n", DISK_PATH);
-//		printf("\tblock size: %u\n", fiData.f_bsize);
-//		printf("\ttotal no blocks: %i\n", fiData.f_blocks);
-//		printf("\tfree blocks: %i\n", fiData.f_bfree);
 		return ((uint32_t) (fiData.f_bsize * fiData.f_bfree / 1024 / 1024));
 	}
 }
@@ -995,15 +915,3 @@ StorageModule* Osd::getStorageModule() {
 uint32_t Osd::getOsdId() {
 	return _osdId;
 }
-
-/*
- void Osd::setOsdListStatus(vector<bool> &secondaryOsdStatus) {
- for (auto osdStatus : secondaryOsdStatus) {
- osdStatus = true;
- }
-
- // failure simulation
- //secondaryOsdStatus[0] = false;
- //secondaryOsdStatus[1] = false;
- }
- */
