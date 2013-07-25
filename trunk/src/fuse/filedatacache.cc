@@ -97,8 +97,17 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary, con
 	}
 	_dataCacheMutex.unlock();
 
-	// TODO: Bound Check
+	// Bound Check
+    if (offset + size > _segmentSize) {
+        perror ("exceed boundary");
+        return -1;
+    }
+
+    // Copy new update/data into segmentData struct
 	memcpy(segmentDataCache.buf + offset, buf, size);
+
+    // Inline-update: Add offset, length pair
+    segmentDataCache.info.offlenVector.push_back(make_pair(offset, size));
 
 	_segmentStatus[segmentId] = DIRTY;
 	if(offset + size > segmentDataCache.info.segmentSize)
@@ -227,8 +236,9 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 
 	if(_segmentStatus.count(segmentId) == 0) {
 		_dataCacheMutex.unlock();
-		return; ;
+		return;
 	}
+
 	SegmentStatus segmentStatus = _segmentStatus[segmentId];
 	uint32_t primary = _segmentPrimary[segmentId];
 	struct SegmentData segmentDataCache = _segmentDataCache[segmentId];
@@ -244,7 +254,9 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 		_segmentStatus.erase(segmentId);
 		_segmentLock.erase(segmentId);
 		tempMutex->unlock();
-		return ;
+        // Delete the tempMutex before return
+        delete tempMutex;
+		return;
 	}
 
 	uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
@@ -262,6 +274,8 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 	_segmentStatus.erase(segmentId);
 	_segmentLock.erase(segmentId);
 	tempMutex->unlock();
+    // Delete the tempMutex before return
+    delete tempMutex;
 	return ;
 }
 
