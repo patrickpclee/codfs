@@ -38,7 +38,7 @@ void SegmentTransferEndRequestMsg::prepareProtocolMsg() {
 	ncvfs::SegmentTransferEndRequestPro segmentTransferEndRequestPro;
 	segmentTransferEndRequestPro.set_segmentid(_segmentId);
 	segmentTransferEndRequestPro.set_datamsgtype(
-			(ncvfs::PutSegmentInitRequestPro_DataMsgType) _dataMsgType);
+			(ncvfs::DataMsgPro_DataMsgType) _dataMsgType);
 	segmentTransferEndRequestPro.set_updatekey(_updateKey);
 
 	vector<offset_length_t>::iterator it;
