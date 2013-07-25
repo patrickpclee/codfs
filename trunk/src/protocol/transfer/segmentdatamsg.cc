@@ -38,7 +38,7 @@ void SegmentDataMsg::prepareProtocolMsg() {
 	segmentDataPro.set_segmentid(_segmentId);
 	segmentDataPro.set_offset(_offset);
 	segmentDataPro.set_length(_length);
-	segmentDataPro.set_datamsgtype((ncvfs::PutSegmentInitRequestPro_DataMsgType)_dataMsgType);
+	segmentDataPro.set_datamsgtype((ncvfs::DataMsgPro_DataMsgType)_dataMsgType);
 	segmentDataPro.set_updatekey(_updateKey);
 
 	if (!segmentDataPro.SerializeToString(&serializedString)) {

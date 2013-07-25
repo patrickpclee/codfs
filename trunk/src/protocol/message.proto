@@ -28,6 +28,17 @@ message OffsetLengthPro {
 }
 
 
+message DataMsgPro {
+	enum DataMsgType {
+		DEFAULT_DATA_MSG = 15;
+		UPLOAD = 1;
+		DOWNLOAD = 2;
+		RECOVERY = 3;
+		UPDATE = 4;
+		PARITY = 5;
+	}
+}
+
 ///////////////// FROM CLIENT /////////////////
 
 //
@@ -112,20 +123,11 @@ message PutSegmentInitRequestPro {
 		DEFAULT_CODING = 15;
 	}
 	
-	enum DataMsgType {
-		DEFAULT_DATA_MSG = 15;
-		UPLOAD = 1;
-		DOWNLOAD = 2;
-		RECOVERY = 3;
-		UPDATE = 4;
-		PARITY = 5;
-	}
-	
 	optional CodingScheme codingScheme = 4;
 	optional string codingSetting = 5;
 	optional string checksum = 6;
 	
-	optional DataMsgType dataMsgType = 7;
+	optional DataMsgPro.DataMsgType dataMsgType = 7;
 	optional string updateKey = 8;
 }
 
@@ -134,7 +136,7 @@ message SegmentDataPro {
 	optional fixed64 offset = 2;
 	optional fixed32 length = 3;
 	
-	optional PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+	optional DataMsgPro.DataMsgType dataMsgType = 4;
 	optional string updateKey = 5;
 }
 
@@ -152,7 +154,7 @@ message GetSegmentRequestPro {
 message SegmentTransferEndRequestPro {
 	optional fixed64 segmentId = 1;
 	
-	optional PutSegmentInitRequestPro.DataMsgType dataMsgType = 4;
+	optional DataMsgPro.DataMsgType dataMsgType = 4;
 	optional string updateKey = 5;
 	repeated OffsetLengthPro offsetLength = 6;
 }
