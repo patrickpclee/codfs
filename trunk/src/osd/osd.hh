@@ -144,11 +144,13 @@ public:
 	 * @param codingScheme Coding Scheme for the segment
 	 * @param setting Coding setting for the segment
 	 * @param checksum Checksum of the segment
+	 * @param dataMsgType Data Message Type
+	 * @param updateKey Key for UPDATE message
 	 */
 
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme, string setting, string checksum);
+			CodingScheme codingScheme, string setting, string checksum, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Action when a put segment end is received
