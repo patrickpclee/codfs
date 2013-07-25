@@ -91,7 +91,7 @@ void PutSegmentInitRequestMsg::doHandle() {
 
 #ifdef COMPILE_FOR_CLIENT
 	client->putSegmentInitProcessor(_msgHeader.requestId, _sockfd, _segmentId,
-			_segmentSize, _chunkCount, _checksum, _dataMsgType, _updateKey);
+			_segmentSize, _chunkCount, _checksum);
 #endif
 }
 

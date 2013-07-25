@@ -286,7 +286,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-		string checksum, DataMsgType dataMsgType, string updateKey) {
+		string checksum) {
 
 	// initialize chunkCount value
 	_pendingSegmentChunk.set(segmentId, chunkCount);

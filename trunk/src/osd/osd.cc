@@ -726,7 +726,8 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint64_t offset, uint32_t length, char* buf) {
+		uint64_t segmentId, uint64_t offset, uint32_t length,
+		DataMsgType dataMsgType, string updateKey, char* buf) {
 
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeSegmentTransferCache(segmentId, buf,

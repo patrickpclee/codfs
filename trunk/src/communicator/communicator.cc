@@ -1029,7 +1029,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		}
 
 		putSegmentData(componentId, sockfd, segmentId, buf, byteProcessed,
-				byteToSend);
+				byteToSend, dataMsgType, updateKey);
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
 
@@ -1087,11 +1087,11 @@ void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 }
 
 void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
-		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length) {
+		uint64_t segmentId, char* buf, uint64_t offset, uint32_t length, DataMsgType dataMsgType, string updateKey) {
 
 	// Step 2 of the upload process
 	SegmentDataMsg* segmentDataMsg = new SegmentDataMsg(this, dstOsdSockfd,
-			segmentId, offset, length);
+			segmentId, offset, length, dataMsgType, updateKey);
 
 	segmentDataMsg->prepareProtocolMsg();
 	segmentDataMsg->preparePayload(buf + offset, length);
