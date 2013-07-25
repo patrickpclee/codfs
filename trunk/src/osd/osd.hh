@@ -169,12 +169,14 @@ public:
 	 * @param segmentId Segment ID
 	 * @param offset Offset of the trunk in the segment
 	 * @param length Length of trunk
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update Key
 	 * @param buf Pointer to buffer
 	 * @return Length of trunk if success, -1 if failure
 	 */
 
 	uint32_t putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint64_t offset, uint32_t length, char* buf);
+			uint64_t segmentId, uint64_t offset, uint32_t length, DataMsgType dataMsgType, string updateKey, char* buf);
 
 	/**
 	 * Action when a putBlockInitRequest is received

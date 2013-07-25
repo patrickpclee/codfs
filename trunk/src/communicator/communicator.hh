@@ -244,8 +244,8 @@ protected:
 
 	void putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme, string codingSetting,
-			string checksum, DataMsgType dataMsgType, string updateKey);
+			CodingScheme codingScheme, string codingSetting, string checksum,
+			DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Send an segment chunk to OSD (Step 2)
@@ -255,10 +255,13 @@ protected:
 	 * @param buf Buffer containing the segment
 	 * @param offset Offset of the chunk inside the buffer
 	 * @param length Length of the chunk
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update Key
 	 */
 
 	void putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,
-			uint64_t segmentId, char* buf, uint64_t offset, uint32_t length);
+			uint64_t segmentId, char* buf, uint64_t offset, uint32_t length,
+			DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Finalise upload process to OSD (Step 3)
