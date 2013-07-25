@@ -95,10 +95,12 @@ public:
 	 * @param	length		Data Length
 	 * @param 	chunkCount	Number of Chunks
 	 * @param	checksum	CheckSum of the Segment
+	 * @param 	dataMsgType	Data Message Type
+	 * @param	updateKey	Key for UPDATE message
 	 */
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-			string checksum);
+			string checksum, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * @brief	SegmentDataMsg Handler: receive Segment Data

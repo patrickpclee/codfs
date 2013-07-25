@@ -21,8 +21,9 @@ PutSegmentInitRequestMsg::PutSegmentInitRequestMsg(Communicator* communicator) :
 
 PutSegmentInitRequestMsg::PutSegmentInitRequestMsg(Communicator* communicator,
 		uint32_t osdSockfd, uint64_t segmentId, uint32_t segmentSize,
-		uint32_t chunkCount, CodingScheme codingScheme, const string &codingSetting,
-		const string &checksum) :
+		uint32_t chunkCount, CodingScheme codingScheme,
+		const string &codingSetting, const string &checksum,
+		DataMsgType dataMsgType, string updateKey) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -32,7 +33,8 @@ PutSegmentInitRequestMsg::PutSegmentInitRequestMsg(Communicator* communicator,
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
 	_checksum = checksum;
-
+	_dataMsgType = dataMsgType; // DEFAULT: 0
+	_updateKey = updateKey;		// DEFAULT: ""
 }
 
 void PutSegmentInitRequestMsg::prepareProtocolMsg() {
@@ -46,6 +48,9 @@ void PutSegmentInitRequestMsg::prepareProtocolMsg() {
 			(ncvfs::PutSegmentInitRequestPro_CodingScheme) _codingScheme);
 	putSegmentInitRequestPro.set_codingsetting(_codingSetting);
 	putSegmentInitRequestPro.set_checksum(_checksum);
+	putSegmentInitRequestPro.set_datamsgtype(
+			(ncvfs::PutSegmentInitRequestPro_DataMsgType) _dataMsgType);
+	putSegmentInitRequestPro.set_updatekey(_updateKey);
 
 	if (!putSegmentInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -72,23 +77,27 @@ void PutSegmentInitRequestMsg::parse(char* buf) {
 	_codingScheme = (CodingScheme) putSegmentInitRequestPro.codingscheme();
 	_codingSetting = putSegmentInitRequestPro.codingsetting();
 	_checksum = putSegmentInitRequestPro.checksum();
+	_dataMsgType = (DataMsgType) putSegmentInitRequestPro.datamsgtype();
+	_updateKey = putSegmentInitRequestPro.updatekey();
 
 }
 
 void PutSegmentInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putSegmentInitProcessor (_msgHeader.requestId, _sockfd, _segmentId,
-			_segmentSize, _chunkCount, _codingScheme, _codingSetting, _checksum);
+	osd->putSegmentInitProcessor(_msgHeader.requestId, _sockfd, _segmentId,
+			_segmentSize, _chunkCount, _codingScheme, _codingSetting, _checksum,
+			_dataMsgType, _updateKey);
 #endif
 
 #ifdef COMPILE_FOR_CLIENT
-	client->putSegmentInitProcessor (_msgHeader.requestId, _sockfd, _segmentId,
-			_segmentSize, _chunkCount, _checksum);
+	client->putSegmentInitProcessor(_msgHeader.requestId, _sockfd, _segmentId,
+			_segmentSize, _chunkCount, _checksum, _dataMsgType, _updateKey);
 #endif
 }
 
 void PutSegmentInitRequestMsg::printProtocol() {
 	debug(
-			"[PUT_SEGMENT_INIT_REQUEST] Segment ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 " CodingScheme = %" PRIu32 " CodingSetting = %s Checksum = %s\n",
-			_segmentId, _segmentSize, _chunkCount, _codingScheme, _codingSetting.c_str(), _checksum.c_str());
+			"[PUT_SEGMENT_INIT_REQUEST] Segment ID = %" PRIu64 ", Length = %" PRIu64 ", Count = %" PRIu32 " CodingScheme = %" PRIu32 " CodingSetting = %s Checksum = %s DataMsgType = %d\n",
+			_segmentId, _segmentSize, _chunkCount, _codingScheme,
+			_codingSetting.c_str(), _checksum.c_str(), _dataMsgType);
 }
