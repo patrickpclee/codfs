@@ -49,7 +49,7 @@ void PutSegmentInitRequestMsg::prepareProtocolMsg() {
 	putSegmentInitRequestPro.set_codingsetting(_codingSetting);
 	putSegmentInitRequestPro.set_checksum(_checksum);
 	putSegmentInitRequestPro.set_datamsgtype(
-			(ncvfs::PutSegmentInitRequestPro_DataMsgType) _dataMsgType);
+			(ncvfs::DataMsgPro_DataMsgType) _dataMsgType);
 	putSegmentInitRequestPro.set_updatekey(_updateKey);
 
 	if (!putSegmentInitRequestPro.SerializeToString(&serializedString)) {
