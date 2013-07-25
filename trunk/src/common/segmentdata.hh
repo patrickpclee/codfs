@@ -15,8 +15,8 @@ struct SegmentInfo {
 	string segmentPath;
     vector<offset_length_t> offlenVector; 
 
-    void packOffsets() {
-        vector<offset_length_t> packedVector;
+    void packOffsets(vector<offset_length_t>& packedVector) {
+        packedVector.clear();
         sort(offlenVector.begin(), offlenVector.end());
         uint32_t curOffsetStart = offlenVector[0].first;
         uint32_t curOffsetEnd = offlenVector[0].first + offlenVector[0].second;
@@ -32,9 +32,6 @@ struct SegmentInfo {
         }
         // Seal last offset,length
         packedVector.push_back(make_pair(curOffsetStart, curOffsetEnd-curOffsetStart));
-
-        // update the offlenVector by swapping (constant time)
-        offlenVector.swap(packedVector);
     }
 };
 
