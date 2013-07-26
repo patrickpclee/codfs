@@ -190,12 +190,13 @@ uint64_t StorageModule::getFilesize(string filepath) {
 }
 
 void StorageModule::createSegmentTransferCache(uint64_t segmentId,
-		uint32_t length, DataMsgType dataMsgType, string updateKey) {
+		uint32_t segLength, uint32_t bufLength, DataMsgType dataMsgType, string updateKey) {
 
 	// create cache
 	struct SegmentTransferCache segmentTransferCache;
-	segmentTransferCache.length = length;
-	segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(length);
+	segmentTransferCache.bufLength = bufLength;
+	segmentTransferCache.segLength = segLength;
+	segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
 
 	// save cache to map
 	if (dataMsgType == UPLOAD) {
@@ -205,7 +206,7 @@ void StorageModule::createSegmentTransferCache(uint64_t segmentId,
 		}
 		debug(
 				"SegmentTransferCache created ID = %" PRIu64 " Length = %" PRIu32 "\n",
-				segmentId, length);
+				segmentId, bufLength);
 	} else if (dataMsgType == UPDATE) {
 		{
 			lock_guard<mutex> lk(updateCacheMutex);
@@ -213,11 +214,14 @@ void StorageModule::createSegmentTransferCache(uint64_t segmentId,
 		}
 		debug(
 				"SegmentUpdateTransferCache created ID = %" PRIu64 " Length = %" PRIu32 "key = %s\n",
-				segmentId, length, updateKey.c_str());
+				segmentId, bufLength, updateKey.c_str());
 	} else {
 		debug_error("Invalid dataMsgType = %d\n", dataMsgType);
 		exit(-1);
 	}
+	debug(
+			"SegmentTransferCache created ID = %" PRIu64 " segLength = %" PRIu32 " bufLength = %" PRIu32 "\n",
+			segmentId, segLength, bufLength);
 }
 
 void StorageModule::createSegmentDiskCache(uint64_t segmentId,
@@ -898,7 +902,7 @@ void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
 	debug("Before saving segment ID = %" PRIu64 ", cache = %s\n", segmentId,
 			formatSize(_freeSegmentSpace).c_str());
 
-	uint32_t segmentSize = segmentCache.length;
+	uint32_t segmentSize = segmentCache.segLength;
 
 	if (!isEnoughSegmentSpace(segmentSize)) {
 		// clear cache if space is not available
@@ -918,13 +922,14 @@ void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
 	createFile(filepath);
 
 #ifdef USE_SEGMENT_CACHE
+//TODO: segment cache length?
 	uint64_t byteWritten = writeSegmentDiskCache(segmentId, segmentCache.buf, 0,
-			segmentCache.length);
+			segmentCache.segLength);
 #else
-	uint64_t byteWritten = segmentCache.length;
+	uint64_t byteWritten = segmentCache.bufLength;
 #endif
 
-	if (byteWritten != segmentCache.length) {
+	if (byteWritten != segmentCache.bufLength) {
 		perror("Cannot saveSegmentToDisk");
 		exit(-1);
 	}
@@ -936,7 +941,7 @@ void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
 	// save cache to map
 	struct SegmentDiskCache segmentDiskCache;
 	segmentDiskCache.filepath = generateSegmentPath(segmentId, _segmentFolder);
-	segmentDiskCache.length = segmentCache.length;
+	segmentDiskCache.length = segmentCache.bufLength;
 	segmentDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
 
 	_segmentDiskCacheMap.set(segmentId, segmentDiskCache);

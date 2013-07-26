@@ -235,7 +235,8 @@ protected:
 	 * @param componentId My Component ID
 	 * @param dstOsdSockfd Destination OSD Socket Descriptor
 	 * @param segmentId Segment ID
-	 * @param length Size of the segment
+	 * @param segLength Size of the segment
+	 * @param bufLength Size of the buf to be send
 	 * @param chunkCount Number of chunks that will be sent
 	 * @param checksum Checksum of Segment
 	 * @param dataMsgType Data Message Type
@@ -243,8 +244,9 @@ protected:
 	 */
 
 	void putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
-			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme, string codingSetting, string checksum,
+			uint64_t segmentId, uint32_t segLength, uint32_t bufLength, 
+            uint32_t chunkCount, CodingScheme codingScheme, 
+            string codingSetting, string checksum,
 			DataMsgType dataMsgType, string updateKey);
 
 	/**

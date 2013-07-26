@@ -1015,8 +1015,8 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	lockDataQueue(sockfd);
 #endif
 
-	putSegmentInit(componentId, sockfd, segmentId, totalSize, chunkCount,
-			codingScheme, codingSetting, checksum, dataMsgType, updateKey);
+	putSegmentInit(componentId, sockfd, segmentId, segmentData.info.segmentSize, 
+            totalSize, chunkCount, codingScheme, codingSetting, checksum, dataMsgType, updateKey);
 	debug("%s\n", "Put Segment Init ACK-ed");
 
 	// Step 2 : Send data chunk by chunk
@@ -1069,15 +1069,15 @@ void Communicator::unlockDataQueue(uint32_t sockfd) {
 //
 
 void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
-		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
+		uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
 		CodingScheme codingScheme, string codingSetting, string checksum,
 		DataMsgType dataMsgType, string updateKey) {
 
 	// Step 1 of the upload process
 
 	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
-			new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, length,
-					chunkCount, codingScheme, codingSetting, checksum,
+			new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, segLength,
+					bufLength, chunkCount, codingScheme, codingSetting, checksum,
 					dataMsgType, updateKey);
 
 	putSegmentInitRequestMsg->prepareProtocolMsg();

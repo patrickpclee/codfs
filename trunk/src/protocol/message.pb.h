@@ -1676,6 +1676,13 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_updatekey();
   inline ::std::string* release_updatekey();
   
+  // optional fixed32 bufferSize = 9;
+  inline bool has_buffersize() const;
+  inline void clear_buffersize();
+  static const int kBufferSizeFieldNumber = 9;
+  inline ::google::protobuf::uint32 buffersize() const;
+  inline void set_buffersize(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentInitRequestPro)
  private:
   inline void set_has_segmentid();
@@ -1694,6 +1701,8 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_datamsgtype();
   inline void set_has_updatekey();
   inline void clear_has_updatekey();
+  inline void set_has_buffersize();
+  inline void clear_has_buffersize();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -1705,9 +1714,10 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   int datamsgtype_;
   ::std::string* checksum_;
   ::std::string* updatekey_;
+  ::google::protobuf::uint32 buffersize_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(9 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -7719,6 +7729,28 @@ inline ::std::string* PutSegmentInitRequestPro::release_updatekey() {
     updatekey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// optional fixed32 bufferSize = 9;
+inline bool PutSegmentInitRequestPro::has_buffersize() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void PutSegmentInitRequestPro::set_has_buffersize() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void PutSegmentInitRequestPro::clear_has_buffersize() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void PutSegmentInitRequestPro::clear_buffersize() {
+  buffersize_ = 0u;
+  clear_has_buffersize();
+}
+inline ::google::protobuf::uint32 PutSegmentInitRequestPro::buffersize() const {
+  return buffersize_;
+}
+inline void PutSegmentInitRequestPro::set_buffersize(::google::protobuf::uint32 value) {
+  set_has_buffersize();
+  buffersize_ = value;
 }
 
 // -------------------------------------------------------------------
