@@ -15,7 +15,8 @@ public:
 	BlockTransferEndRequestMsg(Communicator* communicator);
 
 	BlockTransferEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t segmentId, uint32_t blockId, bool isRecovery);
+			uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
+			string updateKey, vector<offset_length_t> offsetLength);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -49,7 +50,9 @@ public:
 private:
 	uint64_t _segmentId;
 	uint32_t _blockId;
-	bool _isRecovery;
+	DataMsgType _dataMsgType;
+	string _updateKey;
+	vector<offset_length_t> _offsetLength;
 };
 
 #endif

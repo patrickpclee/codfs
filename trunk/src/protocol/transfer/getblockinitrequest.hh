@@ -13,7 +13,7 @@ public:
 
 	GetBlockInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t segmentId, uint32_t blockId,
-			vector<offset_length_t> symbols, bool isRecovery = false);
+			vector<offset_length_t> symbols, DataMsgType dataMsgType);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -49,17 +49,15 @@ public:
 	 uint32_t getBlockSize();
 	 void setChunkCount(uint32_t chunkCount);
 	 uint32_t getChunkCount();
-	 */
-
 	void setRecoveryBlockData(BlockData blockData);
 	BlockData getRecoveryBlockData();
+	 */
 
 private:
 	uint64_t _segmentId;
 	uint32_t _blockId;
 	vector<offset_length_t> _symbols;
-	bool _isRecovery;
-	BlockData _recoveryBlockData;
+	DataMsgType _dataMsgType;
 };
 
 #endif

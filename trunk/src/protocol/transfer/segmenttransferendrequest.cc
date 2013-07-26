@@ -28,7 +28,7 @@ SegmentTransferEndRequestMsg::SegmentTransferEndRequestMsg(
 	_sockfd = osdSockfd;
 	_segmentId = segmentId;
 	_dataMsgType = dataMsgType;
-	_offsetlength = offsetlength;
+	_offsetLength = offsetlength;
 	_updateKey = updateKey;
 }
 
@@ -42,7 +42,7 @@ void SegmentTransferEndRequestMsg::prepareProtocolMsg() {
 	segmentTransferEndRequestPro.set_updatekey(_updateKey);
 
 	vector<offset_length_t>::iterator it;
-	for (it = _offsetlength.begin(); it < _offsetlength.end(); ++it) {
+	for (it = _offsetLength.begin(); it < _offsetLength.end(); ++it) {
 		ncvfs::OffsetLengthPro* offsetLengthPro =
 				segmentTransferEndRequestPro.add_offsetlength();
 		offsetLengthPro->set_offset((*it).first);
@@ -79,7 +79,7 @@ void SegmentTransferEndRequestMsg::parse(char* buf) {
 		uint32_t length = segmentTransferEndRequestPro.offsetlength(i).length();
 		tempOffsetLength = make_pair(offset, length);
 
-		_offsetlength.push_back(tempOffsetLength);
+		_offsetLength.push_back(tempOffsetLength);
 	}
 
 }
@@ -87,7 +87,7 @@ void SegmentTransferEndRequestMsg::parse(char* buf) {
 void SegmentTransferEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putSegmentEndProcessor(_msgHeader.requestId, _sockfd, _segmentId,
-			_dataMsgType, _updateKey, _offsetlength);
+			_dataMsgType, _updateKey, _offsetLength);
 #endif
 
 #ifdef COMPILE_FOR_CLIENT

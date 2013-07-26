@@ -246,7 +246,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 						// request block from other OSD
 						debug("sending request for block %" PRIu32 "\n", i);
 						_osdCommunicator->getBlockRequest(osdId, segmentId, i,
-								blockSymbols.second);
+								blockSymbols.second, DOWNLOAD);
 					}
 				}
 
@@ -334,10 +334,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols,
-		bool isRecovery) {
+		DataMsgType dataMsgType) {
 	struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
 			symbols);
-	_osdCommunicator->sendBlock(sockfd, blockData, isRecovery);
+	_osdCommunicator->sendBlock(sockfd, blockData, dataMsgType);
 	MemoryPool::getInstance().poolFree(blockData.buf);
 	debug("Block ID = %" PRIu32 " free-d\n", blockId);
 }
@@ -372,7 +372,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 		_isPendingRecovery.set(blockKey, true);
 
 		_osdCommunicator->getBlockRequest(osdId, segmentId, blockId,
-				offsetLength, true);
+				offsetLength, RECOVERY);
 		debug_cyan("[RECOVERY] Requested Symbols for Block %" PRIu32 "\n",
 				blockId);
 
@@ -451,7 +451,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 #else
 		uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
 				blockLocation.osdId);
-		_osdCommunicator->sendBlock(dstSockfd, blockData);
+		_osdCommunicator->sendBlock(dstSockfd, blockData, UPLOAD);
 #endif
 	}
 
@@ -581,15 +581,15 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t blockId, bool isRecovery) {
+		uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
+		string updateKey, vector<offset_length_t> offsetLength) {
 
 	// TODO: check integrity of block received
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
-	bool isDownload = _downloadBlockRemaining.count(segmentId);
 
-	debug("isRecovery = %d\n", isRecovery);
+	debug("dataMsgType = %d\n", dataMsgType);
 
-	if (isRecovery) {
+	if (dataMsgType == RECOVERY) {
 		while (1) {
 			if (_pendingRecoveryBlockChunk.get(blockKey) == 0) {
 				debug(
@@ -608,13 +608,13 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 		while (1) {
 			if (_pendingBlockChunk.get(blockKey) == 0) {
 
-				if (isDownload) {
+				if (dataMsgType == DOWNLOAD) {
 					// for download, do nothing, handled by getSegmentRequestProcessor
 					_downloadBlockRemaining.decrement(segmentId);
 					debug(
 							"[DOWNLOAD] all chunks for block %" PRIu32 "is received\n",
 							blockId);
-				} else {
+				} else if (dataMsgType == UPLOAD) {
 					debug(
 							"[UPLOAD] all chunks for block %" PRIu32 "is received\n",
 							blockId);
@@ -632,6 +632,10 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 					MemoryPool::getInstance().poolFree(blockData.buf);
 					_uploadBlockData.erase(blockDataKey);
+				} else {
+					debug_error("Invalid data message type = %d\n",
+							dataMsgType);
+					exit(-1);
 				}
 
 				// remove from map
@@ -665,16 +669,15 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId, uint32_t length,
-		uint32_t chunkCount, bool isRecovery) {
+		uint32_t chunkCount, DataMsgType dataMsgType, string updateKey) {
 
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
-	bool isDownload = _downloadBlockRemaining.count(segmentId);
 
 	debug(
-			"[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 "isDownload = %d, isRecovery = %d\n",
-			segmentId, blockId, length, chunkCount, isDownload, isRecovery);
+			"[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 " DataMsgType = %d\n",
+			segmentId, blockId, length, chunkCount, dataMsgType);
 
-	if (isRecovery) {
+	if (dataMsgType == RECOVERY) {
 		_pendingRecoveryBlockChunk.set(blockKey, chunkCount);
 		BlockData blockData;
 		blockData.info.segmentId = segmentId;
@@ -682,61 +685,63 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 		blockData.info.blockSize = length;
 		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
 		_recoveryBlockData.set(blockKey, blockData);
-	} else {
-
+	} else if (dataMsgType == DOWNLOAD) {
 		_pendingBlockChunk.set(blockKey, chunkCount);
+		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
 
-		if (isDownload) {
-			struct BlockData& blockData =
-					_downloadBlockData.get(segmentId)[blockId];
-
-			blockData.info.segmentId = segmentId;
-			blockData.info.blockId = blockId;
-			blockData.info.blockSize = length;
-			blockData.buf = MemoryPool::getInstance().poolMalloc(length);
-		} else {
-			BlockData blockData;
-			blockData.info.segmentId = segmentId;
-			blockData.info.blockId = blockId;
-			blockData.info.blockSize = length;
-			blockData.buf = MemoryPool::getInstance().poolMalloc(length);
-			_uploadBlockData.set(blockKey, blockData);
-			debug(
-					"[UPLOAD/RECOVERY] Memory prepared for incoming block %" PRIu64 ".%" PRIu32 "\n",
-					segmentId, blockId);
-			debug("[UPLOAD/RECOVERY] Pending Block Chunk = %" PRIu32 "\n",
-					_pendingBlockChunk.get(blockKey));
-		}
+		blockData.info.segmentId = segmentId;
+		blockData.info.blockId = blockId;
+		blockData.info.blockSize = length;
+		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+	} else if (dataMsgType == UPLOAD) {
+		_pendingBlockChunk.set(blockKey, chunkCount);
+		BlockData blockData;
+		blockData.info.segmentId = segmentId;
+		blockData.info.blockId = blockId;
+		blockData.info.blockSize = length;
+		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+		_uploadBlockData.set(blockKey, blockData);
+		debug(
+				"[UPLOAD/RECOVERY] Memory prepared for incoming block %" PRIu64 ".%" PRIu32 "\n",
+				segmentId, blockId);
+		debug("[UPLOAD/RECOVERY] Pending Block Chunk = %" PRIu32 "\n",
+				_pendingBlockChunk.get(blockKey));
+	} else {
+		debug_error("Invalid data message type = %d\n", dataMsgType);
+		exit(-1);
 	}
 	_osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId, blockId);
 }
 
 uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t blockId, uint32_t offset, uint32_t length,
-		char* buf, bool isRecovery) {
+		char* buf, DataMsgType dataMsgType, string updateKey) {
 
 	const string blockKey = to_string(segmentId) + "." + to_string(blockId);
-	bool isDownload = _downloadBlockRemaining.count(segmentId);
 
-	if (isRecovery) {
+	if (dataMsgType == RECOVERY) {
 		struct BlockData& blockData = _recoveryBlockData.get(blockKey);
 		memcpy(blockData.buf + offset, buf, length);
 		_pendingRecoveryBlockChunk.decrement(blockKey);
 		debug("[Recovery] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
 				offset, length);
 	} else {
-		if (isDownload) {
+		if (dataMsgType == DOWNLOAD) {
+
 			struct BlockData& blockData =
 					_downloadBlockData.get(segmentId)[blockId];
 			memcpy(blockData.buf + offset, buf, length);
 			debug(
 					"[Download] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
 					offset, length);
-		} else {
+		} else if (dataMsgType == UPLOAD) {
 			struct BlockData& blockData = _uploadBlockData.get(blockKey);
 			memcpy(blockData.buf + offset, buf, length);
 			debug("[Upload] block offset = %" PRIu32 ", length = %" PRIu32 "\n",
 					offset, length);
+		} else {
+			debug_error("Invalid data message type = %d\n", dataMsgType);
+			exit(-1);
 		}
 
 		_pendingBlockChunk.decrement(blockKey);
@@ -762,7 +767,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 //    lock_guard<mutex> lk(recoveryMutex);
 
-	// get coding information from MDS
+// get coding information from MDS
 	SegmentTransferOsdInfo segmentInfo =
 			_osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, true,
 			true);
@@ -774,20 +779,20 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 	debug_cyan("[RECOVERY] Coding Scheme = %d setting = %s\n",
 			(int ) codingScheme, codingSetting.c_str());
 
-	// get block status
+// get block status
 	vector<bool> blockStatus = _osdCommunicator->getOsdStatusRequest(
 			segmentInfo._osdList);
 
-	// obtain required blockSymbols for repair
+// obtain required blockSymbols for repair
 	block_list_t blockSymbols = _codingModule->getRepairBlockSymbols(
 			codingScheme, repairBlockList, blockStatus, segmentSize,
 			codingSetting);
 
-	// obtain blocks from other OSD
+// obtain blocks from other OSD
 	vector<BlockData> repairBlockData(
 			_codingModule->getNumberOfBlocks(codingScheme, codingSetting));
 
-	// initialize map for tracking recovery
+// initialize map for tracking recovery
 	uint32_t recoverytpId = ++_recoverytpId; // should not use 0
 	_recoverytpRequestCount.set(recoverytpId, blockSymbols.size());
 	debug("blockSymbols.size = %zu\n", blockSymbols.size());
@@ -810,7 +815,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
 	}
 
-	// block until all recovery blocks retrieved
+// block until all recovery blocks retrieved
 	while (_recoverytpRequestCount.get(recoverytpId) > 0) {
 		usleep(USLEEP_DURATION);
 	}
@@ -820,7 +825,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 			"[RECOVERY] Performing Repair for Segment %" PRIu64 " setting = %s\n",
 			segmentId, codingSetting.c_str());
 
-	// perform repair
+// perform repair
 	vector<BlockData> repairedBlocks = _codingModule->repairBlocks(codingScheme,
 			repairBlockList, repairBlockData, blockSymbols, segmentSize,
 			codingSetting);
@@ -842,14 +847,14 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 		j++;
 	}
 
-	// cleanup
+// cleanup
 	for (auto block : blockSymbols) {
 		uint32_t blockId = block.first;
 		MemoryPool::getInstance().poolFree(repairBlockData[blockId].buf);
 	}
 
-	// TODO: repairBlockOsd fails at this point?
-	// send success message to MDS
+// TODO: repairBlockOsd fails at this point?
+// send success message to MDS
 	_osdCommunicator->repairBlockAck(segmentId, repairBlockList,
 			repairBlockOsdList);
 
@@ -904,11 +909,11 @@ uint32_t Osd::getFreespace() {
 	}
 }
 
-OsdCommunicator* Osd::getCommunicator() {
+OsdCommunicator * Osd::getCommunicator() {
 	return _osdCommunicator;
 }
 
-StorageModule* Osd::getStorageModule() {
+StorageModule * Osd::getStorageModule() {
 	return _storageModule;
 }
 

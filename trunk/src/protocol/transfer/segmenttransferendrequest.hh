@@ -52,7 +52,7 @@ private:
 	uint64_t _segmentId;
 	DataMsgType _dataMsgType;
 	string _updateKey;
-	vector<offset_length_t> _offsetlength;
+	vector<offset_length_t> _offsetLength;
 };
 
 #endif
