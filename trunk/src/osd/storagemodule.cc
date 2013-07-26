@@ -129,7 +129,7 @@ void StorageModule::initializeStorageStatus() {
 		{
 			lock_guard<mutex> lk(diskCacheMutex);
 			_segmentDiskCacheMap.set(segmentId, segmentDiskCache);
-			_segmentCacheQueue.push_back(segmentId);
+			_segmentDiskCacheQueue.push_back(segmentId);
 
 			_freeSegmentSpace -= st.st_size;
 			_currentSegmentUsage += st.st_size;
@@ -251,8 +251,8 @@ bool StorageModule::isSegmentCached(uint64_t segmentId) {
 
 		_segmentDiskCacheMap.get(segmentId).lastAccessedTime = {time(NULL), 0};
 
-		_segmentCacheQueue.remove(segmentId);
-		_segmentCacheQueue.push_back(segmentId);
+		_segmentDiskCacheQueue.remove(segmentId);
+		_segmentDiskCacheQueue.push_back(segmentId);
 
 		return true;
 	}
@@ -807,7 +807,7 @@ int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
 		uint64_t segmentId = 0;
 		struct SegmentDiskCache segmentCache;
 
-		segmentId = _segmentCacheQueue.front();
+		segmentId = _segmentDiskCacheQueue.front();
 		segmentCache = _segmentDiskCacheMap.get(segmentId);
 
 		tryCloseFile(segmentCache.filepath);
@@ -818,7 +818,7 @@ int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
 		_currentSegmentUsage -= segmentCache.length;
 
 		// remove from queue and map
-		_segmentCacheQueue.remove(segmentId);
+		_segmentDiskCacheQueue.remove(segmentId);
 		_segmentDiskCacheMap.erase(segmentId);
 	}
 
@@ -876,7 +876,7 @@ void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
 	segmentDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
 
 	_segmentDiskCacheMap.set(segmentId, segmentDiskCache);
-	_segmentCacheQueue.push_back(segmentId);
+	_segmentDiskCacheQueue.push_back(segmentId);
 
 	debug("After saving segment ID = %" PRIu64 ", cache = %s\n",
 			segmentId, formatSize(_freeSegmentSpace).c_str());
@@ -898,13 +898,13 @@ void StorageModule::clearSegmentDiskCache() {
 
 	lock_guard<mutex> lk(diskCacheMutex);
 
-	for (auto segment : _segmentCacheQueue) {
+	for (auto segment : _segmentDiskCacheQueue) {
 		string filepath = _segmentFolder + to_string(segment);
 		tryCloseFile(filepath);
 		remove(filepath.c_str());
 	}
 
-	_segmentCacheQueue.clear();
+	_segmentDiskCacheQueue.clear();
 	_segmentDiskCacheMap.clear();
 
 	_freeSegmentSpace = _maxSegmentCache;
@@ -912,7 +912,7 @@ void StorageModule::clearSegmentDiskCache() {
 }
 
 list<uint64_t> StorageModule::getSegmentCacheQueue() {
-	return _segmentCacheQueue;
+	return _segmentDiskCacheQueue;
 }
 
 uint32_t StorageModule::getCurrentBlockCapacity() {

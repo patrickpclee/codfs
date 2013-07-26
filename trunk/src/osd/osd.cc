@@ -411,6 +411,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	codingSetting.codingScheme = codingScheme;
 	codingSetting.setting = setting;
 
+
 	// initialize chunkCount value
 	_pendingSegmentChunk.set(segmentId, chunkCount);
 
@@ -506,9 +507,9 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 					segmentId);
 			_codingSettingMap.erase(segmentId);
 
-			debug("Coding Scheme = %d setting = %s\n",
+			debug("Coding Scheme = %d setting = %s length = %" PRIu32 "\n",
 					(int ) codingSetting.codingScheme,
-					codingSetting.setting.c_str());
+					codingSetting.setting.c_str(), segmentCache.length);
 
 			vector<struct BlockData> blockDataList =
 					_codingModule->encodeSegmentToBlock(
@@ -615,14 +616,15 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 							"[DOWNLOAD] all chunks for block %" PRIu32 "is received\n",
 							blockId);
 				} else if (dataMsgType == UPLOAD) {
-					debug(
-							"[UPLOAD] all chunks for block %" PRIu32 "is received\n",
-							blockId);
 					// write block in one go
 					string blockDataKey = to_string(segmentId) + "."
 							+ to_string(blockId);
 					struct BlockData blockData = _uploadBlockData.get(
 							blockDataKey);
+
+					debug(
+							"[UPLOAD] all chunks for block %" PRIu32 "is received blockSize = %" PRIu32 "\n",
+							blockId, blockData.info.blockSize);
 
 					_storageModule->createBlock(segmentId, blockId,
 							blockData.info.blockSize);

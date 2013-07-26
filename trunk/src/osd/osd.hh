@@ -430,6 +430,11 @@ private:
 	ConcurrentMap<uint32_t, uint32_t> _recoverytpRequestCount;
 	atomic<uint32_t> _recoverytpId;
 
+	// update
+	ConcurrentMap<string, BlockData> _updateBlockData;
+	ConcurrentMap<string, uint32_t> _pendingUpdateBlockChunk;
+
+
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingBlockChunk;
 
