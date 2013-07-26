@@ -512,10 +512,9 @@ private:
 
 	// TODO: use more efficient data structure for LRU delete
 	ConcurrentMap<uint64_t, struct SegmentDiskCache> _segmentDiskCacheMap;
-	list<uint64_t> _segmentCacheQueue;
+	list<uint64_t> _segmentDiskCacheQueue;
 
 	FileLruCache<string, FILE*>* _openedFile;
-	//map<string, FILE*> _openedFile;
 	map<uint64_t, struct SegmentTransferCache> _segmentTransferCache;
 	string _segmentFolder;
 	string _blockFolder;
