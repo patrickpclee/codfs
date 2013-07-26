@@ -138,3 +138,8 @@ vector<struct BlockData> Raid0Coding::repairBlocks(
 uint32_t Raid0Coding::getBlockCountFromSetting (string setting) {
 	return getParameters(setting);
 }
+
+uint32_t Raid0Coding::getBlockSize(uint32_t segmentSize, string setting) {
+	uint32_t n = getParameters(setting);
+	return roundTo(segmentSize, n) / n;
+}
