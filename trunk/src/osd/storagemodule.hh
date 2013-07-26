@@ -25,7 +25,8 @@ using namespace std;
  */
 
 struct SegmentTransferCache {
-	uint32_t length;
+    uint32_t segLength;
+	uint32_t bufLength;
 	char* buf;
 };
 
@@ -64,10 +65,11 @@ public:
 	/**
 	 * Creates an SegmentCache for downloading the segment
 	 * @param segmentId Segment ID
-	 * @param length Length of segment
+	 * @param segLength Length of segment
+	 * @param bufLength Length of buffer
 	 */
 
-	void createSegmentTransferCache(uint64_t segmentId, uint32_t length);
+	void createSegmentTransferCache(uint64_t segmentId, uint32_t segLength, uint32_t bufLength);
 
 	/**
 	 * Create and open the file for storing the segment on disk

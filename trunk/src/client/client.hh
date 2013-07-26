@@ -92,13 +92,14 @@ public:
 	 * @param	requestId	Request ID
 	 * @param   sockfd 		Socket file descriptor
 	 * @param	segmentId	Segment ID
-	 * @param	length		Data Length
+	 * @param	segLength	Segment Length
+	 * @param	bufLength	Buffer Length
 	 * @param 	chunkCount	Number of Chunks
 	 * @param	checksum	CheckSum of the Segment
 	 */
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-			string checksum);
+			uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
+            uint32_t chunkCount, string checksum);
 
 	/**
 	 * @brief	SegmentDataMsg Handler: receive Segment Data
