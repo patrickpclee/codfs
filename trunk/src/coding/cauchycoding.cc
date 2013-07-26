@@ -403,6 +403,13 @@ uint32_t CauchyCoding::getBlockCountFromSetting(string setting) {
 	return k + m;
 }
 
+uint32_t CauchyCoding::getBlockSize(uint32_t segmentSize, string setting) {
+	vector<uint32_t> params = getParameters(setting);
+	uint32_t k = params[0];
+	uint32_t w = params[2];
+	return roundTo((roundTo(segmentSize, k*w) / (k*w)), 4) *w;
+}
+
 //
 // PRIVATE FUNCTION
 //
@@ -416,4 +423,5 @@ vector<uint32_t> CauchyCoding::getParameters(string setting) {
 		istringstream(token) >> params[i++];
 	}
 	return params;
+
 }

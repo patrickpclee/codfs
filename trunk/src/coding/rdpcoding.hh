@@ -19,11 +19,9 @@ public:
 			vector<BlockData> &blockData, block_list_t &symbolList,
 			uint32_t segmentSize, string setting);
 
-protected:
-	virtual uint32_t getBlockSize(uint32_t segmentSize, uint32_t k) {
-		return roundTo(segmentSize, k * k) / k;
-	}
+	virtual uint32_t getBlockSize(uint32_t segmentSize, string setting);
 
+protected:
 	virtual uint32_t getSymbolSize(uint32_t blockSize, uint32_t k) {
 		return blockSize / k;
 	}

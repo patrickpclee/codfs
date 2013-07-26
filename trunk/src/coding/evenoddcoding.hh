@@ -26,15 +26,14 @@ public:
 
 	uint32_t getBlockCountFromSetting (string setting);
 
+	virtual uint32_t getBlockSize(uint32_t segmentSize, string setting);
+
 	static string generateSetting(uint32_t n) {
 		return to_string(n);
 	}
 
-protected:
-	virtual uint32_t getBlockSize(uint32_t segmentSize, uint32_t k) {
-		return roundTo(segmentSize, k * (k - 1)) / k;
-	}
 
+protected:
 	virtual uint32_t getSymbolSize(uint32_t blockSize, uint32_t k) {
 		return blockSize / (k - 1);
 	}

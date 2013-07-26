@@ -391,6 +391,12 @@ uint32_t RSCoding::getBlockCountFromSetting(string setting) {
 	return k + m;
 }
 
+uint32_t RSCoding::getBlockSize(uint32_t segmentSize, string setting) {
+	vector<uint32_t> params = getParameters(setting);
+	uint32_t k = params[0];
+	return roundTo((roundTo(segmentSize, k) / k), 4);
+}
+
 //
 // PRIVATE FUNCTION
 //

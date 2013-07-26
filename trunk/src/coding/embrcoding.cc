@@ -379,6 +379,25 @@ uint32_t EMBRCoding::getBlockCountFromSetting (string setting) {
 	return n;
 }
 
+uint32_t EMBRCoding::getBlockSize(uint32_t segmentSize, string setting) {
+	vector<uint32_t> params = getParameters(setting);
+	const uint32_t n = params[0];
+//	const uint32_t k = params[1];
+	const uint32_t w = params[2];
+
+	const uint32_t rs_k = params[3];
+	const uint32_t rs_m = params[4];
+	const uint32_t rs_w = w;
+
+	const uint32_t blockGroupSize = (rs_k + rs_m) * 2 / n;
+
+	string RSSetting = RSCoding::generateSetting(rs_k, rs_m, rs_w);
+
+	uint32_t symbolSize = RSCoding::getBlockSize(segmentSize, RSSetting);
+
+	return symbolSize * blockGroupSize;
+}
+
 //
 // PRIVATE FUNCTION
 //

@@ -26,6 +26,8 @@ public:
 
 	uint32_t getBlockCountFromSetting (string setting);
 
+	uint32_t getBlockSize(uint32_t segmentSize, string setting);
+
 	static string generateSetting(uint32_t k, uint32_t m, uint32_t w) {
 		return to_string(k) + ":" + to_string(m) + ":" + to_string(w);
 	}
