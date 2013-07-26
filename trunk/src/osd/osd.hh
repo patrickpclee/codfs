@@ -100,12 +100,12 @@ public:
 	 * @param segmentId Segment ID
 	 * @param blockId Block ID
 	 * @param symbols List of symbols to retrieve
-	 * @param isRecovery isRecovery
+	 * @param dataMsgType Data Msg Type
 	 */
 
 	void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId,
-			vector<offset_length_t> symbols, bool isRecovery = false);
+			vector<offset_length_t> symbols, DataMsgType dataMsgType);
 
 	/**
 	 * Action when a getRecoveryBlockRequest is received
@@ -150,7 +150,8 @@ public:
 
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
-			CodingScheme codingScheme, string setting, string checksum, DataMsgType dataMsgType, string updateKey);
+			CodingScheme codingScheme, string setting, string checksum,
+			DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Action when a put segment end is received
@@ -163,8 +164,8 @@ public:
 	 */
 
 	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
-		vector<offset_length_t> offsetLength);
+			uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
+			vector<offset_length_t> offsetLength);
 
 	/**
 	 * Action when an segment trunk is received
@@ -180,7 +181,8 @@ public:
 	 */
 
 	uint32_t putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint64_t offset, uint32_t length, DataMsgType dataMsgType, string updateKey, char* buf);
+			uint64_t segmentId, uint64_t offset, uint32_t length,
+			DataMsgType dataMsgType, string updateKey, char* buf);
 
 	/**
 	 * Action when a putBlockInitRequest is received
@@ -195,7 +197,7 @@ public:
 
 	void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t length,
-			uint32_t chunkCount, bool isRecovery = false);
+			uint32_t chunkCount, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Distribute Blocks to OSD
@@ -206,8 +208,7 @@ public:
 	 * @param blocktpId Map key of blocktpRequestCount
 	 */
 	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
-			const struct BlockLocation& blockLocation,
-			uint32_t blocktpId = 0);
+			const struct BlockLocation& blockLocation, uint32_t blocktpId = 0);
 
 	/**
 	 * Action when a block trunk is received
@@ -223,7 +224,8 @@ public:
 
 	uint32_t putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t offset,
-			uint32_t length, char* buf, bool isRecovery = false);
+			uint32_t length, char* buf, DataMsgType dataMsgType,
+			string updateKey);
 
 	/**
 	 * Action when a put block end is received
@@ -234,7 +236,8 @@ public:
 	 */
 
 	void putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t blockId, bool isRecovery = false);
+			uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
+			string updateKey, vector<offset_length_t> offsetLength);
 
 	/**
 	 * Action when a recovery request is received
@@ -411,7 +414,7 @@ private:
 
 	// download
 	ConcurrentMap<uint32_t, uint32_t> _blocktpRequestCount;
-    atomic <uint32_t> _blocktpId;
+	atomic<uint32_t> _blocktpId;
 
 	ConcurrentMap<uint64_t, vector<struct BlockData>> _downloadBlockData;
 	ConcurrentMap<uint64_t, uint32_t> _downloadBlockRemaining;
@@ -425,7 +428,7 @@ private:
 	ConcurrentMap<string, uint32_t> _pendingRecoveryBlockChunk;
 	ConcurrentMap<string, BlockData> _recoveryBlockData;
 	ConcurrentMap<uint32_t, uint32_t> _recoverytpRequestCount;
-    atomic <uint32_t> _recoverytpId;
+	atomic<uint32_t> _recoverytpId;
 
 	// upload / download
 	ConcurrentMap<string, uint32_t> _pendingBlockChunk;

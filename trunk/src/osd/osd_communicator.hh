@@ -108,12 +108,12 @@ public:
 	 * Send a block to another OSD
 	 * @param sockfd Socket Descriptor of the destination
 	 * @param blockData BlockData structure
-	 * @param isRecovery isRecovery
+	 * @param dataMsgType Data Msg Type
 	 * @return 0 if success, -1 if failure
 	 */
 
 	uint32_t sendBlock(uint32_t sockfd, struct BlockData blockData,
-			bool isRecovery = false);
+			DataMsgType dataMsgType, string updateKey = "");
 
 	/**
 	 * Send a request to get a block to other OSD
@@ -121,10 +121,11 @@ public:
 	 * @param segmentId Segment ID
 	 * @param blockId Block ID
 	 * @param symbols List of <offset,length> to obtain for the block
+	 * @param dataMsgType Data Msg Type
 	 */
 
 	void getBlockRequest(uint32_t osdId, uint64_t segmentId, uint32_t blockId,
-			vector<offset_length_t> symbols, bool isRecovery = false);
+			vector<offset_length_t> symbols, DataMsgType dataMsgType);
 
 	/**
 	 * Send a request to get the secondary OSD list of an segment from MDS/Monitor
@@ -208,11 +209,12 @@ private:
 	 * @param blockId Block ID
 	 * @param length Size of the segment
 	 * @param chunkCount Number of chunks that will be sent
-	 * @param isRecovery isRecovery
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update key
 	 */
 
 	void putBlockInit(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
-			uint32_t length, uint32_t chunkCount, bool isRecovery = false);
+			uint32_t length, uint32_t chunkCount, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Send an segment chunk to OSD (Step 2)
@@ -222,23 +224,26 @@ private:
 	 * @param buf Buffer containing the segment
 	 * @param offset Offset of the chunk inside the buffer
 	 * @param length Length of the chunk
-	 * @param isRecovery isRecovery
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update key
 	 */
 
 	void putBlockData(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
 			char* buf, uint64_t offset, uint32_t length,
-			bool isRecovery = false);
+			DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Finalise upload process to OSD (Step 3)
 	 * @param sockfd Destination OSD Socket Descriptor
 	 * @param segmentId Segment ID
 	 * @param blockId Block ID
-	 * @param isRecovery isRecovery
+	 * @param dataMsgType Data Msg Type
+	 * @param updateKey Update key
+	 * @param offsetLength <offset, length> for block updates
 	 */
 
 	void putBlockEnd(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
-			bool isRecovery = false);
+			DataMsgType dataMsgType, string updateKey, vector<offset_length_t> offsetLength);
 
 };
 

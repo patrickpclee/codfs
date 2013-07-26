@@ -20,7 +20,7 @@ BlockDataMsg::BlockDataMsg(Communicator* communicator) :
 
 BlockDataMsg::BlockDataMsg(Communicator* communicator, uint32_t osdSockfd,
 		uint64_t segmentId, uint32_t blockId, uint64_t offset, uint32_t length,
-		bool isRecovery) :
+		DataMsgType dataMsgType, string updateKey) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -28,8 +28,8 @@ BlockDataMsg::BlockDataMsg(Communicator* communicator, uint32_t osdSockfd,
 	_blockId = blockId;
 	_offset = offset;
 	_length = length;
-	_isRecovery = isRecovery;
-
+	_dataMsgType = dataMsgType;
+	_updateKey = updateKey;
 }
 
 void BlockDataMsg::prepareProtocolMsg() {
@@ -40,7 +40,8 @@ void BlockDataMsg::prepareProtocolMsg() {
 	blockDataPro.set_blockid(_blockId);
 	blockDataPro.set_offset(_offset);
 	blockDataPro.set_length(_length);
-	blockDataPro.set_isrecovery(_isRecovery);
+	blockDataPro.set_datamsgtype((ncvfs::DataMsgPro_DataMsgType)_dataMsgType);
+	blockDataPro.set_updatekey(_updateKey);
 
 	if (!blockDataPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -65,18 +66,20 @@ void BlockDataMsg::parse(char* buf) {
 	_blockId = blockDataPro.blockid();
 	_offset = blockDataPro.offset();
 	_length = blockDataPro.length();
-	_isRecovery = blockDataPro.isrecovery();
+	_dataMsgType = (DataMsgType) blockDataPro.datamsgtype();
+	_updateKey = blockDataPro.updatekey();
 
 }
 
 void BlockDataMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->putBlockDataProcessor(_msgHeader.requestId, _sockfd, _segmentId, _blockId, _offset, _length, _payload, _isRecovery);
+	osd->putBlockDataProcessor(_msgHeader.requestId, _sockfd, _segmentId,
+			_blockId, _offset, _length, _payload, _dataMsgType, _updateKey);
 #endif
 }
 
 void BlockDataMsg::printProtocol() {
 	debug(
-			"[BLOCK_DATA] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", offset = %" PRIu64 ", length = %" PRIu32 ", isRecovery = %d\n",
-			_segmentId, _blockId, _offset, _length, _isRecovery);
+			"[BLOCK_DATA] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", offset = %" PRIu64 ", length = %" PRIu32 ", DataMsgType = %d\n",
+			_segmentId, _blockId, _offset, _length, _dataMsgType);
 }

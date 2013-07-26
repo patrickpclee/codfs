@@ -10,6 +10,7 @@ struct BlockInfo {
 	uint64_t segmentId;
 	uint32_t blockId;
 	uint32_t blockSize;
+    vector<offset_length_t> offlenVector;
 };
 
 struct BlockData {

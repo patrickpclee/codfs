@@ -4313,12 +4313,23 @@ class PutBlockInitRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 chunkcount() const;
   inline void set_chunkcount(::google::protobuf::uint32 value);
   
-  // optional bool isRecovery = 5;
-  inline bool has_isrecovery() const;
-  inline void clear_isrecovery();
-  static const int kIsRecoveryFieldNumber = 5;
-  inline bool isrecovery() const;
-  inline void set_isrecovery(bool value);
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 5;
+  inline bool has_datamsgtype() const;
+  inline void clear_datamsgtype();
+  static const int kDataMsgTypeFieldNumber = 5;
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
+  
+  // optional string updateKey = 6;
+  inline bool has_updatekey() const;
+  inline void clear_updatekey();
+  static const int kUpdateKeyFieldNumber = 6;
+  inline const ::std::string& updatekey() const;
+  inline void set_updatekey(const ::std::string& value);
+  inline void set_updatekey(const char* value);
+  inline void set_updatekey(const char* value, size_t size);
+  inline ::std::string* mutable_updatekey();
+  inline ::std::string* release_updatekey();
   
   // @@protoc_insertion_point(class_scope:ncvfs.PutBlockInitRequestPro)
  private:
@@ -4330,8 +4341,10 @@ class PutBlockInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_blocksize();
   inline void set_has_chunkcount();
   inline void clear_has_chunkcount();
-  inline void set_has_isrecovery();
-  inline void clear_has_isrecovery();
+  inline void set_has_datamsgtype();
+  inline void clear_has_datamsgtype();
+  inline void set_has_updatekey();
+  inline void clear_has_updatekey();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -4339,10 +4352,11 @@ class PutBlockInitRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 blockid_;
   ::google::protobuf::uint32 blocksize_;
   ::google::protobuf::uint32 chunkcount_;
-  bool isrecovery_;
+  int datamsgtype_;
+  ::std::string* updatekey_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4435,12 +4449,23 @@ class BlockDataPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 length() const;
   inline void set_length(::google::protobuf::uint32 value);
   
-  // optional bool isRecovery = 5;
-  inline bool has_isrecovery() const;
-  inline void clear_isrecovery();
-  static const int kIsRecoveryFieldNumber = 5;
-  inline bool isrecovery() const;
-  inline void set_isrecovery(bool value);
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 5;
+  inline bool has_datamsgtype() const;
+  inline void clear_datamsgtype();
+  static const int kDataMsgTypeFieldNumber = 5;
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
+  
+  // optional string updateKey = 6;
+  inline bool has_updatekey() const;
+  inline void clear_updatekey();
+  static const int kUpdateKeyFieldNumber = 6;
+  inline const ::std::string& updatekey() const;
+  inline void set_updatekey(const ::std::string& value);
+  inline void set_updatekey(const char* value);
+  inline void set_updatekey(const char* value, size_t size);
+  inline ::std::string* mutable_updatekey();
+  inline ::std::string* release_updatekey();
   
   // @@protoc_insertion_point(class_scope:ncvfs.BlockDataPro)
  private:
@@ -4452,8 +4477,10 @@ class BlockDataPro : public ::google::protobuf::Message {
   inline void clear_has_offset();
   inline void set_has_length();
   inline void clear_has_length();
-  inline void set_has_isrecovery();
-  inline void clear_has_isrecovery();
+  inline void set_has_datamsgtype();
+  inline void clear_has_datamsgtype();
+  inline void set_has_updatekey();
+  inline void clear_has_updatekey();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -4461,10 +4488,11 @@ class BlockDataPro : public ::google::protobuf::Message {
   ::google::protobuf::uint64 offset_;
   ::google::protobuf::uint32 blockid_;
   ::google::protobuf::uint32 length_;
-  bool isrecovery_;
+  ::std::string* updatekey_;
+  int datamsgtype_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4543,12 +4571,35 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 blockid() const;
   inline void set_blockid(::google::protobuf::uint32 value);
   
-  // optional bool isRecovery = 3;
-  inline bool has_isrecovery() const;
-  inline void clear_isrecovery();
-  static const int kIsRecoveryFieldNumber = 3;
-  inline bool isrecovery() const;
-  inline void set_isrecovery(bool value);
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 3;
+  inline bool has_datamsgtype() const;
+  inline void clear_datamsgtype();
+  static const int kDataMsgTypeFieldNumber = 3;
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
+  
+  // optional string updateKey = 4;
+  inline bool has_updatekey() const;
+  inline void clear_updatekey();
+  static const int kUpdateKeyFieldNumber = 4;
+  inline const ::std::string& updatekey() const;
+  inline void set_updatekey(const ::std::string& value);
+  inline void set_updatekey(const char* value);
+  inline void set_updatekey(const char* value, size_t size);
+  inline ::std::string* mutable_updatekey();
+  inline ::std::string* release_updatekey();
+  
+  // repeated .ncvfs.OffsetLengthPro offsetLength = 5;
+  inline int offsetlength_size() const;
+  inline void clear_offsetlength();
+  static const int kOffsetLengthFieldNumber = 5;
+  inline const ::ncvfs::OffsetLengthPro& offsetlength(int index) const;
+  inline ::ncvfs::OffsetLengthPro* mutable_offsetlength(int index);
+  inline ::ncvfs::OffsetLengthPro* add_offsetlength();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+      offsetlength() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+      mutable_offsetlength();
   
   // @@protoc_insertion_point(class_scope:ncvfs.BlockTransferEndRequestPro)
  private:
@@ -4556,17 +4607,21 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   inline void clear_has_segmentid();
   inline void set_has_blockid();
   inline void clear_has_blockid();
-  inline void set_has_isrecovery();
-  inline void clear_has_isrecovery();
+  inline void set_has_datamsgtype();
+  inline void clear_has_datamsgtype();
+  inline void set_has_updatekey();
+  inline void clear_has_updatekey();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::uint32 blockid_;
-  bool isrecovery_;
+  int datamsgtype_;
+  ::std::string* updatekey_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4841,12 +4896,12 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
       mutable_offsetlength();
   
-  // optional bool isRecovery = 4;
-  inline bool has_isrecovery() const;
-  inline void clear_isrecovery();
-  static const int kIsRecoveryFieldNumber = 4;
-  inline bool isrecovery() const;
-  inline void set_isrecovery(bool value);
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 4;
+  inline bool has_datamsgtype() const;
+  inline void clear_datamsgtype();
+  static const int kDataMsgTypeFieldNumber = 4;
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
   
   // @@protoc_insertion_point(class_scope:ncvfs.GetBlockInitRequestPro)
  private:
@@ -4854,15 +4909,15 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_segmentid();
   inline void set_has_blockid();
   inline void clear_has_blockid();
-  inline void set_has_isrecovery();
-  inline void clear_has_isrecovery();
+  inline void set_has_datamsgtype();
+  inline void clear_has_datamsgtype();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
   ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   ::google::protobuf::uint32 blockid_;
-  bool isrecovery_;
+  int datamsgtype_;
   
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
@@ -9571,26 +9626,85 @@ inline void PutBlockInitRequestPro::set_chunkcount(::google::protobuf::uint32 va
   chunkcount_ = value;
 }
 
-// optional bool isRecovery = 5;
-inline bool PutBlockInitRequestPro::has_isrecovery() const {
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 5;
+inline bool PutBlockInitRequestPro::has_datamsgtype() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void PutBlockInitRequestPro::set_has_isrecovery() {
+inline void PutBlockInitRequestPro::set_has_datamsgtype() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void PutBlockInitRequestPro::clear_has_isrecovery() {
+inline void PutBlockInitRequestPro::clear_has_datamsgtype() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void PutBlockInitRequestPro::clear_isrecovery() {
-  isrecovery_ = false;
-  clear_has_isrecovery();
+inline void PutBlockInitRequestPro::clear_datamsgtype() {
+  datamsgtype_ = 15;
+  clear_has_datamsgtype();
 }
-inline bool PutBlockInitRequestPro::isrecovery() const {
-  return isrecovery_;
+inline ::ncvfs::DataMsgPro_DataMsgType PutBlockInitRequestPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
 }
-inline void PutBlockInitRequestPro::set_isrecovery(bool value) {
-  set_has_isrecovery();
-  isrecovery_ = value;
+inline void PutBlockInitRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
+  set_has_datamsgtype();
+  datamsgtype_ = value;
+}
+
+// optional string updateKey = 6;
+inline bool PutBlockInitRequestPro::has_updatekey() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void PutBlockInitRequestPro::set_has_updatekey() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void PutBlockInitRequestPro::clear_has_updatekey() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void PutBlockInitRequestPro::clear_updatekey() {
+  if (updatekey_ != &::google::protobuf::internal::kEmptyString) {
+    updatekey_->clear();
+  }
+  clear_has_updatekey();
+}
+inline const ::std::string& PutBlockInitRequestPro::updatekey() const {
+  return *updatekey_;
+}
+inline void PutBlockInitRequestPro::set_updatekey(const ::std::string& value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void PutBlockInitRequestPro::set_updatekey(const char* value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void PutBlockInitRequestPro::set_updatekey(const char* value, size_t size) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* PutBlockInitRequestPro::mutable_updatekey() {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  return updatekey_;
+}
+inline ::std::string* PutBlockInitRequestPro::release_updatekey() {
+  clear_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = updatekey_;
+    updatekey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------
@@ -9685,26 +9799,85 @@ inline void BlockDataPro::set_length(::google::protobuf::uint32 value) {
   length_ = value;
 }
 
-// optional bool isRecovery = 5;
-inline bool BlockDataPro::has_isrecovery() const {
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 5;
+inline bool BlockDataPro::has_datamsgtype() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void BlockDataPro::set_has_isrecovery() {
+inline void BlockDataPro::set_has_datamsgtype() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void BlockDataPro::clear_has_isrecovery() {
+inline void BlockDataPro::clear_has_datamsgtype() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void BlockDataPro::clear_isrecovery() {
-  isrecovery_ = false;
-  clear_has_isrecovery();
+inline void BlockDataPro::clear_datamsgtype() {
+  datamsgtype_ = 15;
+  clear_has_datamsgtype();
 }
-inline bool BlockDataPro::isrecovery() const {
-  return isrecovery_;
+inline ::ncvfs::DataMsgPro_DataMsgType BlockDataPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
 }
-inline void BlockDataPro::set_isrecovery(bool value) {
-  set_has_isrecovery();
-  isrecovery_ = value;
+inline void BlockDataPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
+  set_has_datamsgtype();
+  datamsgtype_ = value;
+}
+
+// optional string updateKey = 6;
+inline bool BlockDataPro::has_updatekey() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void BlockDataPro::set_has_updatekey() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void BlockDataPro::clear_has_updatekey() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void BlockDataPro::clear_updatekey() {
+  if (updatekey_ != &::google::protobuf::internal::kEmptyString) {
+    updatekey_->clear();
+  }
+  clear_has_updatekey();
+}
+inline const ::std::string& BlockDataPro::updatekey() const {
+  return *updatekey_;
+}
+inline void BlockDataPro::set_updatekey(const ::std::string& value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void BlockDataPro::set_updatekey(const char* value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void BlockDataPro::set_updatekey(const char* value, size_t size) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* BlockDataPro::mutable_updatekey() {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  return updatekey_;
+}
+inline ::std::string* BlockDataPro::release_updatekey() {
+  clear_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = updatekey_;
+    updatekey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------
@@ -9755,26 +9928,110 @@ inline void BlockTransferEndRequestPro::set_blockid(::google::protobuf::uint32 v
   blockid_ = value;
 }
 
-// optional bool isRecovery = 3;
-inline bool BlockTransferEndRequestPro::has_isrecovery() const {
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 3;
+inline bool BlockTransferEndRequestPro::has_datamsgtype() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void BlockTransferEndRequestPro::set_has_isrecovery() {
+inline void BlockTransferEndRequestPro::set_has_datamsgtype() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void BlockTransferEndRequestPro::clear_has_isrecovery() {
+inline void BlockTransferEndRequestPro::clear_has_datamsgtype() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void BlockTransferEndRequestPro::clear_isrecovery() {
-  isrecovery_ = false;
-  clear_has_isrecovery();
+inline void BlockTransferEndRequestPro::clear_datamsgtype() {
+  datamsgtype_ = 15;
+  clear_has_datamsgtype();
 }
-inline bool BlockTransferEndRequestPro::isrecovery() const {
-  return isrecovery_;
+inline ::ncvfs::DataMsgPro_DataMsgType BlockTransferEndRequestPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
 }
-inline void BlockTransferEndRequestPro::set_isrecovery(bool value) {
-  set_has_isrecovery();
-  isrecovery_ = value;
+inline void BlockTransferEndRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
+  set_has_datamsgtype();
+  datamsgtype_ = value;
+}
+
+// optional string updateKey = 4;
+inline bool BlockTransferEndRequestPro::has_updatekey() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void BlockTransferEndRequestPro::set_has_updatekey() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void BlockTransferEndRequestPro::clear_has_updatekey() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void BlockTransferEndRequestPro::clear_updatekey() {
+  if (updatekey_ != &::google::protobuf::internal::kEmptyString) {
+    updatekey_->clear();
+  }
+  clear_has_updatekey();
+}
+inline const ::std::string& BlockTransferEndRequestPro::updatekey() const {
+  return *updatekey_;
+}
+inline void BlockTransferEndRequestPro::set_updatekey(const ::std::string& value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void BlockTransferEndRequestPro::set_updatekey(const char* value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void BlockTransferEndRequestPro::set_updatekey(const char* value, size_t size) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* BlockTransferEndRequestPro::mutable_updatekey() {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  return updatekey_;
+}
+inline ::std::string* BlockTransferEndRequestPro::release_updatekey() {
+  clear_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = updatekey_;
+    updatekey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// repeated .ncvfs.OffsetLengthPro offsetLength = 5;
+inline int BlockTransferEndRequestPro::offsetlength_size() const {
+  return offsetlength_.size();
+}
+inline void BlockTransferEndRequestPro::clear_offsetlength() {
+  offsetlength_.Clear();
+}
+inline const ::ncvfs::OffsetLengthPro& BlockTransferEndRequestPro::offsetlength(int index) const {
+  return offsetlength_.Get(index);
+}
+inline ::ncvfs::OffsetLengthPro* BlockTransferEndRequestPro::mutable_offsetlength(int index) {
+  return offsetlength_.Mutable(index);
+}
+inline ::ncvfs::OffsetLengthPro* BlockTransferEndRequestPro::add_offsetlength() {
+  return offsetlength_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+BlockTransferEndRequestPro::offsetlength() const {
+  return offsetlength_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+BlockTransferEndRequestPro::mutable_offsetlength() {
+  return &offsetlength_;
 }
 
 // -------------------------------------------------------------------
@@ -9946,26 +10203,27 @@ GetBlockInitRequestPro::mutable_offsetlength() {
   return &offsetlength_;
 }
 
-// optional bool isRecovery = 4;
-inline bool GetBlockInitRequestPro::has_isrecovery() const {
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 4;
+inline bool GetBlockInitRequestPro::has_datamsgtype() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void GetBlockInitRequestPro::set_has_isrecovery() {
+inline void GetBlockInitRequestPro::set_has_datamsgtype() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void GetBlockInitRequestPro::clear_has_isrecovery() {
+inline void GetBlockInitRequestPro::clear_has_datamsgtype() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void GetBlockInitRequestPro::clear_isrecovery() {
-  isrecovery_ = false;
-  clear_has_isrecovery();
+inline void GetBlockInitRequestPro::clear_datamsgtype() {
+  datamsgtype_ = 15;
+  clear_has_datamsgtype();
 }
-inline bool GetBlockInitRequestPro::isrecovery() const {
-  return isrecovery_;
+inline ::ncvfs::DataMsgPro_DataMsgType GetBlockInitRequestPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
 }
-inline void GetBlockInitRequestPro::set_isrecovery(bool value) {
-  set_has_isrecovery();
-  isrecovery_ = value;
+inline void GetBlockInitRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
+  set_has_datamsgtype();
+  datamsgtype_ = value;
 }
 
 // -------------------------------------------------------------------

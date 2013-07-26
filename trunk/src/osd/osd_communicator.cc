@@ -130,14 +130,16 @@ uint32_t OsdCommunicator::reportOsdFailure(uint32_t osdId) {
 	return 0;
 }
 
-uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
-		struct BlockData blockData, bool isRecovery) {
+uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
+		DataMsgType dataMsgType, string updateKey) {
 
 	uint64_t segmentId = blockData.info.segmentId;
 	uint32_t blockId = blockData.info.blockId;
 	uint32_t length = blockData.info.blockSize;
 	char* buf = blockData.buf;
 	const uint32_t chunkCount = ((length - 1) / _chunkSize) + 1;
+
+	vector<offset_length_t> offsetLength = blockData.info.offlenVector;
 
 	// step 1: send init message, wait for ack
 
@@ -146,7 +148,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 #endif
 
 	debug("Put Block Init to FD = %" PRIu32 "\n", sockfd);
-	putBlockInit(sockfd, segmentId, blockId, length, chunkCount, isRecovery);
+	putBlockInit(sockfd, segmentId, blockId, length, chunkCount, dataMsgType, updateKey);
 	debug("Put Block Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
 
 	// step 2: send data
@@ -163,8 +165,8 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 			byteToSend = byteRemaining;
 		}
 
-		putBlockData(sockfd, segmentId, blockId, buf, byteProcessed,
-				byteToSend, isRecovery);
+		putBlockData(sockfd, segmentId, blockId, buf, byteProcessed, byteToSend,
+				dataMsgType, updateKey);
 		byteProcessed += byteToSend;
 		byteRemaining -= byteToSend;
 
@@ -176,7 +178,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 	unlockDataQueue(sockfd);
 #endif
 
-	putBlockEnd(sockfd, segmentId, blockId, isRecovery);
+	putBlockEnd(sockfd, segmentId, blockId, dataMsgType, updateKey, offsetLength);
 
 	cout << "Put Block ID = " << segmentId << "." << blockId << " Finished"
 			<< endl;
@@ -185,11 +187,11 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd,
 }
 
 void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
-		uint32_t blockId, vector<offset_length_t> symbols, bool isRecovery) {
+		uint32_t blockId, vector<offset_length_t> symbols, DataMsgType dataMsgType) {
 
 	uint32_t dstSockfd = getSockfdFromId(osdId);
 	GetBlockInitRequestMsg* getBlockInitRequestMsg = new GetBlockInitRequestMsg(
-			this, dstSockfd, segmentId, blockId, symbols, isRecovery);
+			this, dstSockfd, segmentId, blockId, symbols, dataMsgType);
 	getBlockInitRequestMsg->prepareProtocolMsg();
 
 	addMessage(getBlockInitRequestMsg, false);
@@ -211,7 +213,7 @@ vector<struct BlockLocation> OsdCommunicator::getOsdListRequest(
 	if (status == READY) {
 		vector<struct BlockLocation> osdList =
 				getSecondaryListRequestMsg->getSecondaryList();
-        waitAndDelete(getSecondaryListRequestMsg);
+		waitAndDelete(getSecondaryListRequestMsg);
 		return osdList;
 	}
 
@@ -229,7 +231,7 @@ vector<bool> OsdCommunicator::getOsdStatusRequest(vector<uint32_t> osdIdList) {
 
 	if (status == READY) {
 		vector<bool> osdStatusList = getOsdStatusRequestMsg->getOsdStatus();
-        waitAndDelete(getOsdStatusRequestMsg);
+		waitAndDelete(getOsdStatusRequestMsg);
 		return osdStatusList;
 	}
 
@@ -246,12 +248,14 @@ uint32_t OsdCommunicator::sendBlockAck(uint64_t segmentId, uint32_t blockId,
 //
 
 void OsdCommunicator::putBlockInit(uint32_t sockfd, uint64_t segmentId,
-		uint32_t blockId, uint32_t length, uint32_t chunkCount, bool isRecovery) {
+		uint32_t blockId, uint32_t length, uint32_t chunkCount,
+		DataMsgType dataMsgType, string updateKey) {
 
 	// Step 1 of the upload process
 
 	PutBlockInitRequestMsg* putBlockInitRequestMsg = new PutBlockInitRequestMsg(
-			this, sockfd, segmentId, blockId, length, chunkCount, isRecovery);
+			this, sockfd, segmentId, blockId, length, chunkCount, dataMsgType,
+			updateKey);
 
 	putBlockInitRequestMsg->prepareProtocolMsg();
 	addMessage(putBlockInitRequestMsg, true);
@@ -269,11 +273,12 @@ void OsdCommunicator::putBlockInit(uint32_t sockfd, uint64_t segmentId,
 }
 
 void OsdCommunicator::putBlockData(uint32_t sockfd, uint64_t segmentId,
-		uint32_t blockId, char* buf, uint64_t offset, uint32_t length, bool isRecovery) {
+		uint32_t blockId, char* buf, uint64_t offset, uint32_t length,
+		DataMsgType dataMsgType, string updateKey) {
 
 	// Step 2 of the upload process
 	BlockDataMsg* blockDataMsg = new BlockDataMsg(this, sockfd, segmentId,
-			blockId, offset, length, isRecovery);
+			blockId, offset, length, dataMsgType, updateKey);
 
 	blockDataMsg->prepareProtocolMsg();
 	blockDataMsg->preparePayload(buf + offset, length);
@@ -282,12 +287,14 @@ void OsdCommunicator::putBlockData(uint32_t sockfd, uint64_t segmentId,
 }
 
 void OsdCommunicator::putBlockEnd(uint32_t sockfd, uint64_t segmentId,
-		uint32_t blockId, bool isRecovery) {
+		uint32_t blockId, DataMsgType dataMsgType, string updateKey,
+		vector<offset_length_t> offsetLength) {
 
 	// Step 3 of the upload process
 
 	BlockTransferEndRequestMsg* blockTransferEndRequestMsg =
-			new BlockTransferEndRequestMsg(this, sockfd, segmentId, blockId, isRecovery);
+			new BlockTransferEndRequestMsg(this, sockfd, segmentId, blockId,
+					dataMsgType, updateKey, offsetLength);
 
 	blockTransferEndRequestMsg->prepareProtocolMsg();
 	addMessage(blockTransferEndRequestMsg, true);
@@ -338,7 +345,8 @@ struct SegmentTransferOsdInfo OsdCommunicator::getSegmentInfoRequest(
 	uint32_t mdsSockFd = getMdsSockfd();
 
 	GetSegmentInfoRequestMsg* getSegmentInfoRequestMsg =
-			new GetSegmentInfoRequestMsg(this, mdsSockFd, segmentId, osdId, needReply, isRecovery);
+			new GetSegmentInfoRequestMsg(this, mdsSockFd, segmentId, osdId,
+					needReply, isRecovery);
 	getSegmentInfoRequestMsg->prepareProtocolMsg();
 
 	if (needReply) {
@@ -348,7 +356,8 @@ struct SegmentTransferOsdInfo OsdCommunicator::getSegmentInfoRequest(
 		if (status == READY) {
 			segmentInfo._id = segmentId;
 			segmentInfo._size = getSegmentInfoRequestMsg->getSegmentSize();
-			segmentInfo._codingScheme = getSegmentInfoRequestMsg->getCodingScheme();
+			segmentInfo._codingScheme =
+					getSegmentInfoRequestMsg->getCodingScheme();
 			segmentInfo._codingSetting =
 					getSegmentInfoRequestMsg->getCodingSetting();
 			segmentInfo._checksum = getSegmentInfoRequestMsg->getChecksum();

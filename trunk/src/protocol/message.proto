@@ -331,7 +331,8 @@ message PutBlockInitRequestPro {
 	optional fixed32 blockId = 2;
 	optional fixed32 blockSize = 3;
 	optional fixed32 chunkCount = 4;
-	optional bool isRecovery = 5;
+	optional DataMsgPro.DataMsgType dataMsgType = 5;
+	optional string updateKey = 6;
 }
 
 message BlockDataPro {
@@ -339,13 +340,16 @@ message BlockDataPro {
 	optional fixed32 blockId = 2;
 	optional fixed64 offset = 3;
 	optional fixed32 length = 4;
-	optional bool isRecovery = 5;
+	optional DataMsgPro.DataMsgType dataMsgType = 5;
+	optional string updateKey = 6;
 }
 
 message BlockTransferEndRequestPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
-	optional bool isRecovery = 3;
+	optional DataMsgPro.DataMsgType dataMsgType = 3;
+	optional string updateKey = 4;
+	repeated OffsetLengthPro offsetLength = 5;
 }
 
 message PutBlockInitReplyPro {
@@ -362,7 +366,7 @@ message GetBlockInitRequestPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 blockId = 2;
 	repeated OffsetLengthPro offsetLength = 3;
-	optional bool isRecovery = 4;
+	optional DataMsgPro.DataMsgType dataMsgType = 4;
 }
 
 message GetBlockInitReplyPro {
