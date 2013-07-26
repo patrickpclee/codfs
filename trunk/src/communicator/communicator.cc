@@ -997,13 +997,13 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	const string updateKey = "";	// TODO: auto-increment updateKey
 
     // pack offsets before send
-	vector<offset_length_t> offsetLength;
-    segmentData.info.packOffsets(offsetLength); // pass by reference
+    segmentData.packBuf();
+	vector<offset_length_t> offsetLength = segmentData.info.offlenVector;
 
 	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
 			segmentData.info.segmentId, sockfd);
 
-	const uint64_t totalSize = segmentData.info.segmentSize;
+	const uint64_t totalSize = segmentData.totalBufSize;
 	const uint64_t segmentId = segmentData.info.segmentId;
 	char* buf = segmentData.buf;
 
