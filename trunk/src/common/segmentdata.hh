@@ -47,6 +47,10 @@ struct SegmentData {
     uint32_t totalBufSize;
 
     void packBuf() {
+    	if (info.offlenVector.size() == 0) {
+    		totalBufSize = info.segmentSize;
+    		return;
+    	}
         info.packOffsets();
         totalBufSize = 0;
         for (uint32_t i = 0; i < info.offlenVector.size(); i++) {
