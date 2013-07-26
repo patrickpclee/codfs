@@ -402,24 +402,28 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		CodingScheme codingScheme, string setting, string checksum,
 		DataMsgType dataMsgType, string updateKey) {
 
-	// reduce memory consumption by limiting the number processing segments
-	while (_pendingSegmentChunk.size() > MAX_NUM_PROCESSING_SEGMENT) {
-		usleep(USLEEP_DURATION);
-	}
-
 	struct CodingSetting codingSetting;
 	codingSetting.codingScheme = codingScheme;
 	codingSetting.setting = setting;
 
-
-	// initialize chunkCount value
-	_pendingSegmentChunk.set(segmentId, chunkCount);
-
 	// save coding setting
 	_codingSettingMap.set(segmentId, codingSetting);
 
+	if (dataMsgType == UPLOAD) {
+		// reduce memory consumption by limiting the number processing segments
+		while (_pendingSegmentChunk.size() > MAX_NUM_PROCESSING_SEGMENT) {
+			usleep(USLEEP_DURATION);
+		}
+		_pendingSegmentChunk.set(segmentId, chunkCount);
+	} else if (dataMsgType == UPDATE) {
+		_pendingUpdateSegmentChunk.set(updateKey, chunkCount);
+	} else {
+		debug_error ("Invalid dataMsgType = %d\n", dataMsgType);
+		exit (-1);
+	}
+
 	// create segment and cache
-	_storageModule->createSegmentTransferCache(segmentId, length);
+	_storageModule->createSegmentTransferCache(segmentId, length, dataMsgType, updateKey);
 	_osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 
 #ifdef USE_CHECKSUM
@@ -473,13 +477,19 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
 		vector<offset_length_t> offsetLength) {
 
+	if (dataMsgType != UPLOAD && dataMsgType != UPDATE) {
+		debug_error ("Invalid Message Type = %d\n", dataMsgType);
+		exit (-1);
+	}
+
 	// TODO: check integrity of segment received
 	while (1) {
 
-		if (_pendingSegmentChunk.get(segmentId) == 0) {
+		if ((dataMsgType == UPLOAD && _pendingSegmentChunk.get(segmentId) == 0) ||
+				(dataMsgType == UPDATE && _pendingUpdateSegmentChunk.get(updateKey) == 0)) {
 			// if all chunks have arrived
 			struct SegmentTransferCache segmentCache =
-					_storageModule->getSegmentTransferCache(segmentId);
+					_storageModule->getSegmentTransferCache(segmentId, dataMsgType, updateKey);
 
 			unsigned char checksum[MD5_DIGEST_LENGTH];
 			memset(checksum, 0, MD5_DIGEST_LENGTH);
@@ -552,12 +562,16 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			}
 #endif
 			_blocktpRequestCount.erase(requestId);
-			_pendingSegmentChunk.erase(segmentId);
 
-			// Acknowledge MDS for Segment Upload Completed
-			_osdCommunicator->segmentUploadAck(segmentId, segmentCache.length,
-					codingSetting.codingScheme, codingSetting.setting, nodeList,
-					md5ToHex(checksum));
+			if (dataMsgType == UPLOAD) {
+				_pendingSegmentChunk.erase(segmentId);
+				// Acknowledge MDS for Segment Upload Completed
+				_osdCommunicator->segmentUploadAck(segmentId, segmentCache.length,
+						codingSetting.codingScheme, codingSetting.setting, nodeList,
+						md5ToHex(checksum));
+			} else {
+				_pendingUpdateSegmentChunk.erase(updateKey);
+			}
 
 			cout << "Segment " << segmentId << " uploaded" << endl;
 
@@ -570,7 +584,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 #endif
 
 			// close file and free cache
-			_storageModule->closeSegmentTransferCache(segmentId);
+			_storageModule->closeSegmentTransferCache(segmentId, dataMsgType, updateKey);
 
 			break;
 		} else {
@@ -662,9 +676,15 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 	uint32_t byteWritten;
 	byteWritten = _storageModule->writeSegmentTransferCache(segmentId, buf,
-			offset, length);
+			offset, length, dataMsgType, updateKey);
 
-	_pendingSegmentChunk.decrement(segmentId);
+	if (dataMsgType == UPLOAD) {
+		_pendingSegmentChunk.decrement(segmentId);
+	} else if (dataMsgType == UPDATE) {
+		_pendingUpdateSegmentChunk.decrement(updateKey);
+	} else {
+		debug_error ("Invalid dataMsgType = %d\n", dataMsgType);
+	}
 
 	return byteWritten;
 }
