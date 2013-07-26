@@ -28,7 +28,7 @@ RDPCoding::~RDPCoding() {
 vector<BlockData> RDPCoding::encode(SegmentData segmentData, string setting) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = getBlockSize(segmentData.info.segmentSize, k);
+	const uint32_t blockSize = getBlockSize(segmentData.info.segmentSize, setting);
 	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	vector<struct BlockData> blockDataList;
@@ -94,7 +94,7 @@ vector<BlockData> RDPCoding::encode(SegmentData segmentData, string setting) {
 char** RDPCoding::repairDataBlocks(vector<BlockData> &blockDataList, block_list_t &blockList, uint32_t segmentSize, string setting, bool recovery) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	const uint32_t blockSize = getBlockSize(segmentSize, setting);
 	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	uint32_t row_group_erasure[k];
@@ -233,7 +233,7 @@ block_list_t RDPCoding::getRepairBlockSymbols(vector<uint32_t> failedBlocks,
 
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	const uint32_t blockSize = getBlockSize(segmentSize, setting);
 	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 	const uint32_t numOfFailed = (uint32_t)std::count(blockStatus.begin(), blockStatus.end(), false);
 
@@ -356,8 +356,8 @@ vector<BlockData> RDPCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		uint32_t segmentSize, string setting) {
 
 	const uint32_t n = getBlockCountFromSetting(setting);
-	const uint32_t k = n - 2;
-	const uint32_t blockSize = getBlockSize(segmentSize, k);
+	//const uint32_t k = n - 2;
+	const uint32_t blockSize = getBlockSize(segmentSize, setting);
 	//const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	uint32_t segmentId = blockDataList[symbolList[0].first].info.segmentId;
@@ -382,4 +382,9 @@ vector<BlockData> RDPCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 	MemoryPool::getInstance().poolFree((char*)tempBlock);
 	
 	return repairedBlockDataList;
+}
+
+uint32_t RDPCoding::getBlockSize(uint32_t segmentSize, string setting) {
+	uint32_t k = getParameters(setting) - 2;
+	return roundTo(segmentSize, k * k) / k;
 }

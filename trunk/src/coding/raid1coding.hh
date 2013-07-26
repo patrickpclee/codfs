@@ -25,6 +25,8 @@ public:
 
 	uint32_t getBlockCountFromSetting (string setting);
 
+	uint32_t getBlockSize(uint32_t segmentSize, string setting);
+
 	static string generateSetting(int raid1_n) {
 		return to_string(raid1_n);
 	}
