@@ -149,7 +149,8 @@ public:
 	 */
 
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId, uint32_t length, uint32_t chunkCount,
+			uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
+            uint32_t chunkCount,
 			CodingScheme codingScheme, string setting, string checksum,
 			DataMsgType dataMsgType, string updateKey);
 

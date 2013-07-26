@@ -97,11 +97,11 @@ void Client::getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentI
 	segmentCache = getSegment(clientId, dstSockfd, segmentId);
 
 	_storageModule->writeFile(filePtr, dstPath, segmentCache.buf, offset,
-			segmentCache.length);
+			segmentCache.segLength);
 
 	debug(
 			"Write Segment ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu32 " to %s\n",
-			segmentId, offset, segmentCache.length, dstPath.c_str());
+			segmentId, offset, segmentCache.segLength, dstPath.c_str());
 
 	_storageModule->closeSegment(segmentId);
 
@@ -285,7 +285,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 }
 
 void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
+		uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
 		string checksum) {
 
 	// initialize chunkCount value
@@ -294,7 +294,7 @@ void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// create segment and cache
 	if (!_storageModule->locateSegmentCache(segmentId))
-		_storageModule->createSegmentCache(segmentId, length);
+		_storageModule->createSegmentCache(segmentId, segLength, bufLength);
 	_clientCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 
 	// save md5 to map

@@ -62,7 +62,7 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary, void
 		struct SegmentData segmentCache;
 		segmentCache.buf = segmentTransferCache.buf;
 		segmentCache.info.segmentId = segmentId;
-		segmentCache.info.segmentSize = segmentTransferCache.length;
+		segmentCache.info.segmentSize = segmentTransferCache.segLength;
 		segmentCache.info.segmentPath = "";
 		_segmentDataCache[segmentId] = segmentCache;
 		tempMutex->unlock();
@@ -213,7 +213,7 @@ void FileDataCache::doPrefetch() {
 			struct SegmentData segmentCache;
 			segmentCache.buf = segmentTransferCache.buf;
 			segmentCache.info.segmentId = segmentId;
-			segmentCache.info.segmentSize = segmentTransferCache.length;
+			segmentCache.info.segmentSize = segmentTransferCache.segLength;
 			segmentCache.info.segmentPath = "";
 			_segmentDataCache[segmentId] = segmentCache;
 		}

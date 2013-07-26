@@ -17,8 +17,8 @@ public:
 	PutSegmentInitRequestMsg(Communicator* communicator);
 
 	PutSegmentInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t segmentId, uint32_t segmentSize, uint32_t chunkCount,
-			CodingScheme codingScheme, const string &codingSetting,
+			uint64_t segmentId, uint32_t segmentSize, uint32_t bufferSize, 
+            uint32_t chunkCount, CodingScheme codingScheme, const string &codingSetting,
 			const string &checksum, DataMsgType dataMsgType, string updateKey = "");
 
 	/**
@@ -52,7 +52,8 @@ public:
 
 private:
 	uint64_t _segmentId;
-	uint64_t _segmentSize;
+	uint32_t _bufferSize;
+	uint32_t _segmentSize;
 	uint32_t _chunkCount;
 	CodingScheme _codingScheme;
 	string _codingSetting;
