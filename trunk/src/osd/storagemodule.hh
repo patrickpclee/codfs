@@ -12,6 +12,7 @@
 #include "../common/blockdata.hh"
 #include "../common/segmentdata.hh"
 #include "../datastructure/concurrentmap.hh"
+#include "../common/enums.hh"
 #include "filelrucache.hh"
 
 #ifdef USE_IO_THREADS
@@ -67,7 +68,7 @@ public:
 	 * @param length Length of segment
 	 */
 
-	void createSegmentTransferCache(uint64_t segmentId, uint32_t length);
+	void createSegmentTransferCache(uint64_t segmentId, uint32_t length, DataMsgType dataMsgType, string updateKey = "");
 
 	/**
 	 * Create and open the file for storing the segment on disk
@@ -169,7 +170,7 @@ public:
 	 */
 
 	uint32_t writeSegmentTransferCache(uint64_t segmentId, char* buf,
-			uint64_t offsetInSegment, uint32_t length);
+			uint64_t offsetInSegment, uint32_t length, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Write a partial Block ID to the storage
@@ -206,7 +207,7 @@ public:
 	 * @param segmentId Segment ID
 	 */
 
-	void closeSegmentTransferCache(uint64_t segmentId);
+	void closeSegmentTransferCache(uint64_t segmentId, DataMsgType dataMsgType, string updateKey);
 
 	void doFlushFile(string filepath, bool &isFinished);
 	void flushFile(string filepath);
@@ -244,7 +245,7 @@ public:
 	 * @return SegmentTransferCache  Segment Cache
 	 */
 
-	struct SegmentTransferCache getSegmentTransferCache(uint64_t segmentId);
+	struct SegmentTransferCache getSegmentTransferCache(uint64_t segmentId, DataMsgType dataMsgType, string updateKey = "");
 
 	/**
 	 * Set the Capacity of OSD
@@ -515,7 +516,8 @@ private:
 	list<uint64_t> _segmentDiskCacheQueue;
 
 	FileLruCache<string, FILE*>* _openedFile;
-	map<uint64_t, struct SegmentTransferCache> _segmentTransferCache;
+	map<uint64_t, struct SegmentTransferCache> _segmentUploadCache;
+	map<string, struct SegmentTransferCache> _segmentUpdateCache;
 	string _segmentFolder;
 	string _blockFolder;
 	string _remoteBlockFolder;

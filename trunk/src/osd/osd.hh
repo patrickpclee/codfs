@@ -432,6 +432,7 @@ private:
 
 	// update
 	ConcurrentMap<string, BlockData> _updateBlockData;
+	ConcurrentMap<string, uint32_t> _pendingUpdateSegmentChunk;
 	ConcurrentMap<string, uint32_t> _pendingUpdateBlockChunk;
 
 
