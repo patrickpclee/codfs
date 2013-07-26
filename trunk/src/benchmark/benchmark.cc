@@ -72,7 +72,7 @@ void startBenchDownloadThread(uint32_t clientId, uint32_t sockfd,
 		uint64_t segmentId, char* segmentChecksum) {
 	SegmentTransferCache segmentTransferCache = client->getSegment(clientId,
 			sockfd, segmentId);
-	MD5((unsigned char *) segmentTransferCache.buf, segmentTransferCache.length,
+	MD5((unsigned char *) segmentTransferCache.buf, segmentTransferCache.bufLength,
 			(unsigned char *) segmentChecksum);
 	_storageModule->closeSegment(segmentId);
 }

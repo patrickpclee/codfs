@@ -112,7 +112,8 @@ void Osd::cacheSegment(uint64_t segmentId, SegmentData segmentData) {
 	// cache segmentData
 	struct SegmentTransferCache segmentTransferCache;
 	segmentTransferCache.buf = segmentData.buf;
-	segmentTransferCache.length = segmentData.info.segmentSize;
+	segmentTransferCache.segLength = segmentData.info.segmentSize;
+	segmentTransferCache.bufLength = segmentData.totalBufSize;
 
 	if (!_storageModule->isSegmentCached(segmentId)) {
 		_storageModule->putSegmentToDiskCache(segmentId, segmentTransferCache);
@@ -398,7 +399,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId, uint32_t length, uint32_t chunkCount,
+		uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
 		CodingScheme codingScheme, string setting, string checksum,
 		DataMsgType dataMsgType, string updateKey) {
 
@@ -418,7 +419,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	_codingSettingMap.set(segmentId, codingSetting);
 
 	// create segment and cache
-	_storageModule->createSegmentTransferCache(segmentId, length);
+	_storageModule->createSegmentTransferCache(segmentId, segLength, bufLength);
 	_osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 
 #ifdef USE_CHECKSUM
@@ -485,7 +486,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 #ifdef USE_CHECKSUM
 			// compute md5 checksum
-			MD5((unsigned char*) segmentCache.buf, segmentCache.length,
+			MD5((unsigned char*) segmentCache.buf, segmentCache.segLength,
 					checksum);
 			debug_cyan("md5 of segment ID %" PRIu64 " = %s\n",
 					segmentId, md5ToHex(checksum).c_str());
@@ -501,20 +502,26 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			}
 #endif
 
+            // get coding settings
+            
+            struct CodingSetting codingSetting = _codingSettingMap.get(
+    				segmentId);
+    		_codingSettingMap.erase(segmentId);
+   
+   			debug("Coding Scheme = %d setting = %s\n",
+   					(int ) codingSetting.codingScheme,
+   					codingSetting.setting.c_str());
+
 			// perform coding
-			struct CodingSetting codingSetting = _codingSettingMap.get(
-					segmentId);
-			_codingSettingMap.erase(segmentId);
-
-			debug("Coding Scheme = %d setting = %s\n",
-					(int ) codingSetting.codingScheme,
-					codingSetting.setting.c_str());
-
-			vector<struct BlockData> blockDataList =
-					_codingModule->encodeSegmentToBlock(
-							codingSetting.codingScheme, segmentId,
-							segmentCache.buf, segmentCache.length,
-							codingSetting.setting);
+            vector<struct BlockData> blockDataList;
+            if (dataMsgType == UPLOAD) {
+    				blockDataList = _codingModule->encodeSegmentToBlock(
+    							codingSetting.codingScheme, segmentId,
+    							segmentCache.buf, segmentCache.segLength,
+    							codingSetting.setting);
+            } else if (dataMsgType == UPDATE) {
+                //... call codingModule to do update
+            }
 
 			// request secondary OSD list
 			vector<struct BlockLocation> blockLocationList =
@@ -554,7 +561,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 			_pendingSegmentChunk.erase(segmentId);
 
 			// Acknowledge MDS for Segment Upload Completed
-			_osdCommunicator->segmentUploadAck(segmentId, segmentCache.length,
+			_osdCommunicator->segmentUploadAck(segmentId, segmentCache.bufLength,
 					codingSetting.codingScheme, codingSetting.setting, nodeList,
 					md5ToHex(checksum));
 

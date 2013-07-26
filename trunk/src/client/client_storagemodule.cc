@@ -126,12 +126,13 @@ struct SegmentData ClientStorageModule::readSegmentFromFile(string filepath,
 }
 
 void ClientStorageModule::createSegmentCache(uint64_t segmentId,
-		uint32_t length) {
+		uint32_t segLength, uint32_t bufLength) {
 
 	// create cache
 	struct SegmentTransferCache segmentCache;
-	segmentCache.length = length;
-	segmentCache.buf = MemoryPool::getInstance().poolMalloc(length);
+	segmentCache.segLength = segLength;
+	segmentCache.bufLength = bufLength;
+	segmentCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
 
 	// save cache to map
 	{
@@ -139,8 +140,8 @@ void ClientStorageModule::createSegmentCache(uint64_t segmentId,
 		_segmentCache[segmentId] = segmentCache;
 	}
 
-	debug("Segment created ID = %" PRIu64 " Length = %" PRIu32 "\n",
-			segmentId, length);
+	debug("Segment created ID = %" PRIu64 " segLength = %" PRIu32 " bufLength = %" PRIu32 "\n",
+			segmentId, segLength, bufLength);
 }
 
 uint32_t ClientStorageModule::writeSegmentCache(uint64_t segmentId, char* buf,

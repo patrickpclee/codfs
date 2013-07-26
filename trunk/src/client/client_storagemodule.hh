@@ -54,10 +54,10 @@ public:
 	/**
 	 * Create cache of a segment
 	 * @param segmentId 	segment ID
-	 * @param length 	length of the data
+	 * @param segLength 	length of the segment
+	 * @param bufLength 	length of the buffer sent
 	 */
-	void createSegmentCache(uint64_t segmentId, uint32_t length);
-
+    void createSegmentCache(uint64_t segmentId, uint32_t segLength, uint32_t bufLength);
 	/**
 	 * write cache of a segment
 	 * @param segmentId 			segment ID
