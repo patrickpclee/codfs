@@ -437,16 +437,21 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
-        const struct BlockLocation& blockLocation, uint32_t blocktpId) {
+        const struct BlockLocation& blockLocation, enum DataMsgType dataMsgType,
+        uint32_t blocktpId) {
     debug("Distribute Block %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
             segmentId, blockData.info.blockId, blockLocation.osdId);
     // if destination is myself
     if (blockLocation.osdId == _osdId) {
-        _storageModule->createBlock(segmentId, blockData.info.blockId,
-                blockData.info.blockSize);
-        _storageModule->writeBlock(segmentId, blockData.info.blockId,
-                blockData.buf, 0, blockData.info.blockSize);
-        _storageModule->flushBlock(segmentId, blockData.info.blockId);
+        if (dataMsgType == UPLOAD) {
+            _storageModule->createBlock(segmentId, blockData.info.blockId,
+                    blockData.info.blockSize);
+            _storageModule->writeBlock(segmentId, blockData.info.blockId,
+                    blockData.buf, 0, blockData.info.blockSize);
+            _storageModule->flushBlock(segmentId, blockData.info.blockId);
+        } else if (dataMsgType == UPDATE) {
+            // TODO: unpack and save
+        }
     } else {
 #ifdef MOUNT_OSD
         _storageModule->createRemoteBlock(blockLocation.osdId, segmentId,
@@ -459,7 +464,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 #else
         uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
                 blockLocation.osdId);
-        _osdCommunicator->sendBlock(dstSockfd, blockData, UPLOAD);
+        _osdCommunicator->sendBlock(dstSockfd, blockData, dataMsgType);
 #endif
     }
 
@@ -573,9 +578,10 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                         boost::bind(&Osd::distributeBlock, this, segmentId,
                                 blockData,
                                 blockLocationList[blockData.info.blockId],
+                                dataMsgType,
                                 blocktpId));
 #else
-                distributeBlock(segmentId, blockData,blockLocationList[blockData.info.blockId]);
+                distributeBlock(segmentId, blockData,blockLocationList[blockData.info.blockId], dataMsgType);
 #endif
 
                 nodeList.push_back(
@@ -893,7 +899,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
         BlockLocation blockLocation;
         blockLocation.blockId = repairedBlock.info.blockId;
         blockLocation.osdId = repairBlockOsdList[j];
-        distributeBlock(segmentId, repairedBlock, blockLocation); // free-d here
+        distributeBlock(segmentId, repairedBlock, blockLocation, RECOVERY); // free-d here
         j++;
     }
 
