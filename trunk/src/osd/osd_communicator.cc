@@ -135,7 +135,8 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 
 	uint64_t segmentId = blockData.info.segmentId;
 	uint32_t blockId = blockData.info.blockId;
-	uint32_t length = blockData.info.blockSize;
+    // this is buffer length held in the BlockData, not the block size
+	uint32_t length = blockData.totalBufSize; 
 	char* buf = blockData.buf;
 	const uint32_t chunkCount = ((length - 1) / _chunkSize) + 1;
 
