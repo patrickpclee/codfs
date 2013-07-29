@@ -403,6 +403,12 @@ uint32_t CauchyCoding::getBlockCountFromSetting(string setting) {
 	return k + m;
 }
 
+uint32_t CauchyCoding::getParityCountFromSetting(string setting) {
+	vector<uint32_t> params = getParameters(setting);
+	const uint32_t m = params[1];
+	return m;
+}
+
 uint32_t CauchyCoding::getBlockSize(uint32_t segmentSize, string setting) {
 	vector<uint32_t> params = getParameters(setting);
 	uint32_t k = params[0];

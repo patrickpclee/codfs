@@ -300,6 +300,10 @@ uint32_t Raid5Coding::getBlockCountFromSetting (string setting) {
 	return getParameters(setting);
 }
 
+uint32_t Raid5Coding::getParityCountFromSetting (string setting) {
+	return 1;
+}
+
 uint32_t Raid5Coding::getBlockSize(uint32_t segmentSize, string setting) {
 	uint32_t n = getParameters(setting);
 	return roundTo(segmentSize, (n - 1)) / (n - 1);

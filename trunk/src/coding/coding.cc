@@ -41,3 +41,7 @@ void Coding::bitwiseXor(char* result, char* srcA, char* srcB, uint32_t length) {
 		result[j] = srcA[j] ^ srcB[j];
 	}
 }
+
+uint32_t Coding::getParityCountFromSetting(string setting) {
+    return 0;
+}
