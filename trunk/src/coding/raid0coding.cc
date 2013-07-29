@@ -7,8 +7,7 @@
 #include "raid0coding.hh"
 #include "../common/debug.hh"
 #include "../common/blockdata.hh"
-#include "../common/segmentdata.hh"
-#include "../common/memorypool.hh"
+#include "../common/segmentdata.hh" #include "../common/memorypool.hh"
 
 using namespace std;
 
