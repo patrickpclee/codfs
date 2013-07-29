@@ -582,6 +582,11 @@ uint32_t EvenOddCoding::getBlockCountFromSetting(string setting) {
 	return getParameters(setting);
 }
 
+uint32_t EvenOddCoding::getParityCountFromSetting(string setting) {
+    // TODO: is this fixed?
+	return 2;
+}
+
 uint32_t EvenOddCoding::getBlockSize(uint32_t segmentSize, string setting) {
 	uint32_t k = getParameters(setting) - 2;
 	return roundTo(segmentSize, k * (k - 1)) / k;

@@ -26,6 +26,8 @@ public:
 
 	uint32_t getBlockCountFromSetting (string setting);
 
+	uint32_t getParityCountFromSetting (string setting);
+
 	virtual uint32_t getBlockSize(uint32_t segmentSize, string setting);
 
 	static string generateSetting(uint32_t n) {

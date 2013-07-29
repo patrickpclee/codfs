@@ -21,6 +21,8 @@ public:
 
 	virtual uint32_t getBlockSize(uint32_t segmentSize, string setting);
 
+    uint32_t getParityCountFromSetting (string setting);
+
 protected:
 	virtual uint32_t getSymbolSize(uint32_t blockSize, uint32_t k) {
 		return blockSize / k;

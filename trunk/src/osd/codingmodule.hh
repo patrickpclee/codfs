@@ -118,6 +118,37 @@ class CodingModule {
 
         Coding* getCoding(CodingScheme codingScheme);
 
+        /**
+         * Get the Coding block size according to the codingScheme specified
+         * @param codingScheme Type of coding scheme
+         * @param segmentSize Size of the coding segment
+         * @return The Coding segment size
+         */
+        uint32_t getBlockSize(CodingScheme codingScheme, string setting, 
+                uint32_t segmentSize);
+
+        /**
+         * Get the number of parity blocks
+         * @param codingScheme Type of coding scheme
+         * @param segmentSize Size of the coding segment
+         * @return The number of parity blocks
+         */
+        uint32_t getParityNumber(CodingScheme codingScheme, string setting);
+
+        /**
+         * Unpack the segment updates
+         * @param codingScheme Type of coding scheme
+         * @param segmentId Segment ID
+         * @param segmentBuf Packed buffer holding the updates
+         * @param segmentSize Size of the coding segment
+         * @param setting The coding setting
+         * @param offsetLength Vector holding all offsets for updates
+         * @return The Coding segment size
+         */
+        vector<BlockData> unpackUpdates(CodingScheme codingScheme, 
+                uint64_t segmentId, char* segmentBuf, uint32_t segentSize, string setting, 
+                vector<offset_length_t> offsetLengthVector);
+
     private:
         map<CodingScheme, Coding*> _codingWorker;
 };
