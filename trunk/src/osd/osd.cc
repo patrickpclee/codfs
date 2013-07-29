@@ -648,7 +648,10 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
         while (1) {
             if (_pendingUpdateBlockChunk.get(updateKey) == 0) {
                 struct BlockData blockData = _updateBlockData.get(updateKey);
-                // TODO: do something to overwrite the existing file
+                _storageModule->updateBlock(segmentId, blockId, blockData);
+                _storageModule->flushBlock(segmentId, blockId);
+                MemoryPool::getInstance().poolFree(blockData.buf);
+                _updateBlockData.erase(updateKey);
             }
 
             // if all chunks have arrived, send ack
@@ -660,7 +663,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 usleep(USLEEP_DURATION);
             }
         }
-    } else {
+    } else if (dataMsgType == DOWNLOAD || dataMsgType == UPLOAD) {
         while (1) {
             if (_pendingBlockChunk.get(blockKey) == 0) {
                 if (dataMsgType == DOWNLOAD) {
@@ -685,15 +688,9 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
                     MemoryPool::getInstance().poolFree(blockData.buf);
                     _uploadBlockData.erase(blockKey);
-                } else {
-                    debug_error("Invalid data message type = %d\n",
-                            dataMsgType);
-                    exit(-1);
                 }
-
                 // remove from map
                 _pendingBlockChunk.erase(blockKey);
-
             }
             // if all chunks have arrived, send ack
             if (!_pendingBlockChunk.count(blockKey)) {
@@ -704,6 +701,8 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 usleep(USLEEP_DURATION); // sleep 0.01s
             }
         }
+    } else {
+        debug_error("Invalid dataMsgType = %d\n", dataMsgType);
     }
 }
 
