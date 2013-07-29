@@ -88,6 +88,8 @@ public:
 
 	virtual uint32_t getBlockCountFromSetting (string setting) = 0;
 
+	virtual uint32_t getParityCountFromSetting (string setting);
+
 	virtual uint32_t getBlockSize(uint32_t segmentSize, string setting) = 0; 
 
 	/**

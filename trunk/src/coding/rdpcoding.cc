@@ -388,3 +388,8 @@ uint32_t RDPCoding::getBlockSize(uint32_t segmentSize, string setting) {
 	uint32_t k = getParameters(setting) - 2;
 	return roundTo(segmentSize, k * k) / k;
 }
+
+uint32_t RDPCoding::getParityCountFromSetting (string setting) {
+    // TODO: is this fixed?
+    return 2;
+}
