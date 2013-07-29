@@ -209,7 +209,8 @@ public:
 	 * @param blocktpId Map key of blocktpRequestCount
 	 */
 	void distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
-			const struct BlockLocation& blockLocation, uint32_t blocktpId = 0);
+			const struct BlockLocation& blockLocation, DataMsgType dataMsgType, 
+            uint32_t blocktpId = 0);
 
 	/**
 	 * Action when a block trunk is received
