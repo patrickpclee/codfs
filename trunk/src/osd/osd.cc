@@ -450,7 +450,8 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
                     blockData.buf, 0, blockData.info.blockSize);
             _storageModule->flushBlock(segmentId, blockData.info.blockId);
         } else if (dataMsgType == UPDATE) {
-            // TODO: unpack and save
+            _storageModule->updateBlock(segmentId, blockData.info.blockId, blockData);
+            _storageModule->flushBlock(segmentId, blockData.info.blockId);
         }
     } else {
 #ifdef MOUNT_OSD
