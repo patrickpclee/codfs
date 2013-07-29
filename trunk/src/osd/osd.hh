@@ -418,6 +418,7 @@ private:
 	ConcurrentMap<uint32_t, uint32_t> _blocktpRequestCount;
 	atomic<uint32_t> _blocktpId;
 
+
 	ConcurrentMap<uint64_t, vector<struct BlockData>> _downloadBlockData;
 	ConcurrentMap<uint64_t, uint32_t> _downloadBlockRemaining;
 	ConcurrentMap<uint64_t, uint32_t> _segmentRequestCount;
@@ -436,6 +437,7 @@ private:
 	ConcurrentMap<string, BlockData> _updateBlockData;
 	ConcurrentMap<string, uint32_t> _pendingUpdateSegmentChunk;
 	ConcurrentMap<string, uint32_t> _pendingUpdateBlockChunk;
+	atomic<uint32_t> _updateId;
 
 
 	// upload / download
