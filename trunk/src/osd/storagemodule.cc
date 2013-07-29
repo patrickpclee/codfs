@@ -501,6 +501,21 @@ uint32_t StorageModule::writeRemoteBlock(uint32_t osdId, uint64_t segmentId,
 }
 #endif
 
+uint32_t StorageModule::updateBlock (uint64_t segmentId, uint32_t blockId, BlockData blockData) {
+
+	uint32_t byteWritten = 0;
+	uint32_t curOffset= 0;
+
+	string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
+
+	for (offset_length_t offsetLength : blockData.info.offlenVector) {
+	    byteWritten += writeFile(filepath, blockData.buf + curOffset, offsetLength.first, offsetLength.second, false);
+	    curOffset += offsetLength.second;
+	}
+	return byteWritten;
+}
+
+
 void StorageModule::closeSegmentTransferCache(uint64_t segmentId,
 		DataMsgType dataMsgType, string updateKey) {
 
