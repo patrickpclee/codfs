@@ -78,7 +78,7 @@ void Osd::reportRemovedCache() {
         debug("%s\n", "Checking cache...");
 
         list<uint64_t> currentCacheList =
-            _storageModule->getSegmentCacheQueue();
+                _storageModule->getSegmentCacheQueue();
 
         // sort list
         currentCacheList.sort();
@@ -170,7 +170,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                     // hack: trigger MDS to update hotness
                     _osdCommunicator->getSegmentInfoRequest(segmentId, _osdId,
-                            false);
+                    false);
                 }
 
             } else {
@@ -181,8 +181,8 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                 // 1. ask MDS to get segment information
 
                 SegmentTransferOsdInfo segmentInfo =
-                    _osdCommunicator->getSegmentInfoRequest(segmentId,
-                            _osdId);
+                        _osdCommunicator->getSegmentInfoRequest(segmentId,
+                                _osdId);
 
                 const CodingScheme codingScheme = segmentInfo._codingScheme;
                 const string codingSetting = segmentInfo._codingSetting;
@@ -190,14 +190,14 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                 // bool array to store osdStatus
                 vector<bool> blockStatus =
-                    _osdCommunicator->getOsdStatusRequest(
-                            segmentInfo._osdList);
+                        _osdCommunicator->getOsdStatusRequest(
+                                segmentInfo._osdList);
 
                 // check which blocks are needed to request
                 uint32_t totalNumOfBlocks = segmentInfo._osdList.size();
                 block_list_t requiredBlockSymbols =
-                    _codingModule->getRequiredBlockSymbols(codingScheme,
-                            blockStatus, segmentSize, codingSetting);
+                        _codingModule->getRequiredBlockSymbols(codingScheme,
+                                blockStatus, segmentSize, codingSetting);
 
                 // error in finding required Blocks (not enough blocks to rebuild segment)
                 if (requiredBlockSymbols.size() == 0) {
@@ -215,7 +215,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                 _downloadBlockData.set(segmentId,
                         vector<struct BlockData>(totalNumOfBlocks));
                 vector<struct BlockData>& blockDataList =
-                    _downloadBlockData.get(segmentId);
+                        _downloadBlockData.get(segmentId);
 
                 debug("PendingBlockCount = %" PRIu32 "\n", blockCount);
 
@@ -400,9 +400,9 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 }
 
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
-        uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
-        CodingScheme codingScheme, string setting, string checksum,
-        DataMsgType dataMsgType, string updateKey) {
+        uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
+        uint32_t chunkCount, CodingScheme codingScheme, string setting,
+        string checksum, DataMsgType dataMsgType, string updateKey) {
 
     struct CodingSetting codingSetting;
     codingSetting.codingScheme = codingScheme;
@@ -420,12 +420,13 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
     } else if (dataMsgType == UPDATE) {
         _pendingUpdateSegmentChunk.set(updateKey, chunkCount);
     } else {
-        debug_error ("Invalid dataMsgType = %d\n", dataMsgType);
-        exit (-1);
+        debug_error("Invalid dataMsgType = %d\n", dataMsgType);
+        exit(-1);
     }
 
     // create segment and cache
-    _storageModule->createSegmentTransferCache(segmentId, segLength, bufLength, dataMsgType, updateKey);
+    _storageModule->createSegmentTransferCache(segmentId, segLength, bufLength,
+            dataMsgType, updateKey);
     _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 
 #ifdef USE_CHECKSUM
@@ -480,18 +481,20 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
         vector<offset_length_t> offsetLength) {
 
     if (dataMsgType != UPLOAD && dataMsgType != UPDATE) {
-        debug_error ("Invalid Message Type = %d\n", dataMsgType);
-        exit (-1);
+        debug_error("Invalid Message Type = %d\n", dataMsgType);
+        exit(-1);
     }
 
     // TODO: check integrity of segment received
     while (1) {
 
-        if ((dataMsgType == UPLOAD && _pendingSegmentChunk.get(segmentId) == 0) ||
-                (dataMsgType == UPDATE && _pendingUpdateSegmentChunk.get(updateKey) == 0)) {
+        if ((dataMsgType == UPLOAD && _pendingSegmentChunk.get(segmentId) == 0)
+                || (dataMsgType == UPDATE
+                        && _pendingUpdateSegmentChunk.get(updateKey) == 0)) {
             // if all chunks have arrived
             struct SegmentTransferCache segmentCache =
-                _storageModule->getSegmentTransferCache(segmentId, dataMsgType, updateKey);
+                    _storageModule->getSegmentTransferCache(segmentId,
+                            dataMsgType, updateKey);
 
             unsigned char checksum[MD5_DIGEST_LENGTH];
             memset(checksum, 0, MD5_DIGEST_LENGTH);
@@ -526,31 +529,31 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             vector<struct BlockData> blockDataList;
             if (dataMsgType == UPLOAD) {
                 blockDataList = _codingModule->encodeSegmentToBlock(
-                        codingSetting.codingScheme, segmentId,
-                        segmentCache.buf, segmentCache.segLength,
-                        codingSetting.setting);
+                        codingSetting.codingScheme, segmentId, segmentCache.buf,
+                        segmentCache.segLength, codingSetting.setting);
             } else if (dataMsgType == UPDATE) {
                 //... call codingModule to do update
-                blockDataList = _codingModule->unpackUpdates(codingSetting.codingScheme,
-                        segmentId, segmentCache.buf, segmentCache.segLength, 
-                        codingSetting.setting, offsetLength);
+                blockDataList = _codingModule->unpackUpdates(
+                        codingSetting.codingScheme, segmentId, segmentCache.buf,
+                        segmentCache.segLength, codingSetting.setting,
+                        offsetLength);
             }
 
             // request secondary OSD list
             vector<struct BlockLocation> blockLocationList =
-                _osdCommunicator->getOsdListRequest(segmentId, MONITOR,
-                        blockDataList.size(), _osdId,
-                        blockDataList[0].info.blockSize);
-
+                    _osdCommunicator->getOsdListRequest(segmentId, MONITOR,
+                            blockDataList.size(), _osdId,
+                            blockDataList[0].info.blockSize);
 
             // If it is update, append parity node info to secondary OSD
             if (dataMsgType == UPDATE) {
                 uint32_t blockNum = blockLocationList.size();
-                uint32_t parityNum = _codingModule->getParityNumber(codingSetting.codingScheme, 
-                                                                    codingSetting.setting);
+                uint32_t parityNum = _codingModule->getParityNumber(
+                        codingSetting.codingScheme, codingSetting.setting);
                 vector<uint32_t> parityOsdList;
                 for (uint32_t i = 1; i <= parityNum; i++)
-                    parityOsdList.push_back(blockLocationList[blockNum-i].osdId);
+                    parityOsdList.push_back(
+                            blockLocationList[blockNum - i].osdId);
                 for (uint32_t i = 0; i < blockDataList.size(); i++) {
                     blockDataList[i].info.parityVector = parityOsdList;
                 }
@@ -568,12 +571,15 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                         (int )_blocktp.pending(), (int )_blocktp.size());
                 _blocktp.schedule(
                         boost::bind(&Osd::distributeBlock, this, segmentId,
-                            blockData, blockLocationList[blockData.info.blockId], blocktpId));
+                                blockData,
+                                blockLocationList[blockData.info.blockId],
+                                blocktpId));
 #else
                 distributeBlock(segmentId, blockData,blockLocationList[blockData.info.blockId]);
 #endif
 
-                nodeList.push_back(blockLocationList[blockData.info.blockId].osdId);
+                nodeList.push_back(
+                        blockLocationList[blockData.info.blockId].osdId);
 
             }
 #ifdef PARALLEL_TRANSFER
@@ -587,9 +593,9 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             if (dataMsgType == UPLOAD) {
                 _pendingSegmentChunk.erase(segmentId);
                 // Acknowledge MDS for Segment Upload Completed
-                _osdCommunicator->segmentUploadAck(segmentId, segmentCache.bufLength,
-                        codingSetting.codingScheme, codingSetting.setting, nodeList,
-                        md5ToHex(checksum));
+                _osdCommunicator->segmentUploadAck(segmentId,
+                        segmentCache.bufLength, codingSetting.codingScheme,
+                        codingSetting.setting, nodeList, md5ToHex(checksum));
             } else {
                 _pendingUpdateSegmentChunk.erase(updateKey);
             }
@@ -604,7 +610,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             _storageModule->putSegmentToDiskCache(segmentId, segmentCache);
 #endif
 
-            _storageModule->closeSegmentTransferCache(segmentId, dataMsgType, updateKey);
+            _storageModule->closeSegmentTransferCache(segmentId, dataMsgType,
+                    updateKey);
             break;
         } else {
             usleep(USLEEP_DURATION); // sleep 0.01s
@@ -624,47 +631,47 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
     debug("dataMsgType = %d\n", dataMsgType);
 
     if (dataMsgType == RECOVERY) {
-		while (1) {
-			if (_pendingRecoveryBlockChunk.get(blockKey) == 0) {
-				debug(
-						"[RECOVERY] all chunks for block %" PRIu64 ".%" PRIu32 "is received\n",
-						segmentId, blockId);
-				_isPendingRecovery.set(blockKey, false);
-				_osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId,
-						blockId);
-				break;
-			} else {
-				usleep(USLEEP_DURATION); // sleep 0.01s
-			}
-		}
-	} else if (dataMsgType == UPDATE) {
-		while (1) {
-			if (_pendingUpdateBlockChunk.get(updateKey) == 0) {
-				struct BlockData blockData = _updateBlockData.get(updateKey);
-				// TODO: do something to overwrite the existing file
-			}
+        while (1) {
+            if (_pendingRecoveryBlockChunk.get(blockKey) == 0) {
+                debug(
+                        "[RECOVERY] all chunks for block %" PRIu64 ".%" PRIu32 "is received\n",
+                        segmentId, blockId);
+                _isPendingRecovery.set(blockKey, false);
+                _osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId,
+                        blockId);
+                break;
+            } else {
+                usleep(USLEEP_DURATION); // sleep 0.01s
+            }
+        }
+    } else if (dataMsgType == UPDATE) {
+        while (1) {
+            if (_pendingUpdateBlockChunk.get(updateKey) == 0) {
+                struct BlockData blockData = _updateBlockData.get(updateKey);
+                // TODO: do something to overwrite the existing file
+            }
 
-			// if all chunks have arrived, send ack
-			if (!_pendingUpdateBlockChunk.count(updateKey)) {
-				_osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId, blockId);
-				break;
-			} else {
-				usleep(USLEEP_DURATION);
-			}
-		}
-	} else {
-		while (1) {
-			if (_pendingBlockChunk.get(blockKey) == 0) {
-				if (dataMsgType == DOWNLOAD) {
-					// for download, do nothing, handled by getSegmentRequestProcessor
-					_downloadBlockRemaining.decrement(segmentId);
-					debug(
-							"[DOWNLOAD] all chunks for block %" PRIu32 "is received\n",
-							blockId);
-				} else if (dataMsgType == UPLOAD) {
-					// write block in one go
-					struct BlockData blockData = _uploadBlockData.get(
-							blockKey);
+            // if all chunks have arrived, send ack
+            if (!_pendingUpdateBlockChunk.count(updateKey)) {
+                _osdCommunicator->replyPutBlockEnd(requestId, sockfd, segmentId,
+                        blockId);
+                break;
+            } else {
+                usleep(USLEEP_DURATION);
+            }
+        }
+    } else {
+        while (1) {
+            if (_pendingBlockChunk.get(blockKey) == 0) {
+                if (dataMsgType == DOWNLOAD) {
+                    // for download, do nothing, handled by getSegmentRequestProcessor
+                    _downloadBlockRemaining.decrement(segmentId);
+                    debug(
+                            "[DOWNLOAD] all chunks for block %" PRIu32 "is received\n",
+                            blockId);
+                } else if (dataMsgType == UPLOAD) {
+                    // write block in one go
+                    struct BlockData blockData = _uploadBlockData.get(blockKey);
 
                     debug(
                             "[UPLOAD] all chunks for block %" PRIu32 "is received blockSize = %" PRIu32 "\n",
@@ -676,13 +683,13 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                             blockData.buf, 0, blockData.info.blockSize);
                     _storageModule->flushBlock(segmentId, blockId);
 
-					MemoryPool::getInstance().poolFree(blockData.buf);
-					_uploadBlockData.erase(blockKey);
-				} else {
-					debug_error("Invalid data message type = %d\n",
-							dataMsgType);
-					exit(-1);
-				}
+                    MemoryPool::getInstance().poolFree(blockData.buf);
+                    _uploadBlockData.erase(blockKey);
+                } else {
+                    debug_error("Invalid data message type = %d\n",
+                            dataMsgType);
+                    exit(-1);
+                }
 
                 // remove from map
                 _pendingBlockChunk.erase(blockKey);
@@ -708,13 +715,13 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
     byteWritten = _storageModule->writeSegmentTransferCache(segmentId, buf,
             offset, length, dataMsgType, updateKey);
 
-	if (dataMsgType == UPLOAD) {
-		_pendingSegmentChunk.decrement(segmentId);
-	} else if (dataMsgType == UPDATE) {
-		_pendingUpdateSegmentChunk.decrement(updateKey);
-	} else {
-		debug_error("Invalid dataMsgType = %d\n", dataMsgType);
-	}
+    if (dataMsgType == UPLOAD) {
+        _pendingSegmentChunk.decrement(segmentId);
+    } else if (dataMsgType == UPDATE) {
+        _pendingUpdateSegmentChunk.decrement(updateKey);
+    } else {
+        debug_error("Invalid dataMsgType = %d\n", dataMsgType);
+    }
 
     return byteWritten;
 }
@@ -729,34 +736,34 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
             "[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 " DataMsgType = %d\n",
             segmentId, blockId, length, chunkCount, dataMsgType);
 
-	if (dataMsgType == DOWNLOAD) {
-		_pendingBlockChunk.set(blockKey, chunkCount);
-		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
-		blockData.info.segmentId = segmentId;
-		blockData.info.blockId = blockId;
-		blockData.info.blockSize = length;
-		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
-	} else {
-		BlockData blockData;
-		blockData.info.segmentId = segmentId;
-		blockData.info.blockId = blockId;
-		blockData.info.blockSize = length;
-		blockData.buf = MemoryPool::getInstance().poolMalloc(length);
-		if (dataMsgType == RECOVERY) {
-			_pendingRecoveryBlockChunk.set(blockKey, chunkCount);
-			_recoveryBlockData.set(blockKey, blockData);
-		} else if (dataMsgType == UPLOAD) {
-			_pendingBlockChunk.set(blockKey, chunkCount);
-			_uploadBlockData.set(blockKey, blockData);
-		} else if (dataMsgType == UPDATE) {
-			_pendingUpdateBlockChunk.set(updateKey, chunkCount);
-			_updateBlockData.set(updateKey, blockData);
-		} else {
-			debug_error("Invalid data message type = %d\n", dataMsgType);
-			exit(-1);
-		}
-	}
-	_osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId, blockId);
+    if (dataMsgType == DOWNLOAD) {
+        _pendingBlockChunk.set(blockKey, chunkCount);
+        struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
+        blockData.info.segmentId = segmentId;
+        blockData.info.blockId = blockId;
+        blockData.info.blockSize = length;
+        blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+    } else {
+        BlockData blockData;
+        blockData.info.segmentId = segmentId;
+        blockData.info.blockId = blockId;
+        blockData.info.blockSize = length;
+        blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+        if (dataMsgType == RECOVERY) {
+            _pendingRecoveryBlockChunk.set(blockKey, chunkCount);
+            _recoveryBlockData.set(blockKey, blockData);
+        } else if (dataMsgType == UPLOAD) {
+            _pendingBlockChunk.set(blockKey, chunkCount);
+            _uploadBlockData.set(blockKey, blockData);
+        } else if (dataMsgType == UPDATE) {
+            _pendingUpdateBlockChunk.set(updateKey, chunkCount);
+            _updateBlockData.set(updateKey, blockData);
+        } else {
+            debug_error("Invalid data message type = %d\n", dataMsgType);
+            exit(-1);
+        }
+    }
+    _osdCommunicator->replyPutBlockInit(requestId, sockfd, segmentId, blockId);
 }
 
 uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
@@ -765,34 +772,34 @@ uint32_t Osd::putBlockDataProcessor(uint32_t requestId, uint32_t sockfd,
 
     const string blockKey = to_string(segmentId) + "." + to_string(blockId);
 
-	uint32_t chunkLeft = 0;
+    uint32_t chunkLeft = 0;
 
-	if (dataMsgType == RECOVERY) {
-		struct BlockData& blockData = _recoveryBlockData.get(blockKey);
-		memcpy(blockData.buf + offset, buf, length);
-		chunkLeft = _pendingRecoveryBlockChunk.decrement(blockKey);
-	} else if (dataMsgType == DOWNLOAD) {
-		struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
-		memcpy(blockData.buf + offset, buf, length);
-		chunkLeft = _pendingBlockChunk.decrement(blockKey);
-	} else if (dataMsgType == UPLOAD) {
-		struct BlockData& blockData = _uploadBlockData.get(blockKey);
-		memcpy(blockData.buf + offset, buf, length);
-		chunkLeft = _pendingBlockChunk.decrement(blockKey);
-	} else if (dataMsgType == UPDATE) {
-		struct BlockData& blockData = _updateBlockData.get(updateKey);
-		memcpy(blockData.buf + offset, buf, length);
-		chunkLeft = _pendingUpdateBlockChunk.decrement(updateKey);
-	} else {
-		debug_error("Invalid data message type = %d\n", dataMsgType);
-		exit(-1);
-	}
+    if (dataMsgType == RECOVERY) {
+        struct BlockData& blockData = _recoveryBlockData.get(blockKey);
+        memcpy(blockData.buf + offset, buf, length);
+        chunkLeft = _pendingRecoveryBlockChunk.decrement(blockKey);
+    } else if (dataMsgType == DOWNLOAD) {
+        struct BlockData& blockData = _downloadBlockData.get(segmentId)[blockId];
+        memcpy(blockData.buf + offset, buf, length);
+        chunkLeft = _pendingBlockChunk.decrement(blockKey);
+    } else if (dataMsgType == UPLOAD) {
+        struct BlockData& blockData = _uploadBlockData.get(blockKey);
+        memcpy(blockData.buf + offset, buf, length);
+        chunkLeft = _pendingBlockChunk.decrement(blockKey);
+    } else if (dataMsgType == UPDATE) {
+        struct BlockData& blockData = _updateBlockData.get(updateKey);
+        memcpy(blockData.buf + offset, buf, length);
+        chunkLeft = _pendingUpdateBlockChunk.decrement(updateKey);
+    } else {
+        debug_error("Invalid data message type = %d\n", dataMsgType);
+        exit(-1);
+    }
 
-	debug(
-			"[BLOCK_DATA] dataMsgType = %s, segmentId = %" PRIu64 " blockId = %" PRIu32 " chunkLeft = %" PRIu32 "\n",
-			EnumToString::toString(dataMsgType), segmentId, blockId, chunkLeft);
+    debug(
+            "[BLOCK_DATA] dataMsgType = %s, segmentId = %" PRIu64 " blockId = %" PRIu32 " chunkLeft = %" PRIu32 "\n",
+            EnumToString::toString(dataMsgType), segmentId, blockId, chunkLeft);
 
-	return length;
+    return length;
 }
 
 void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
@@ -812,8 +819,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
     // get coding information from MDS
     SegmentTransferOsdInfo segmentInfo =
-        _osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, true,
-                true);
+            _osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, true,
+            true);
 
     const CodingScheme codingScheme = segmentInfo._codingScheme;
     const string codingSetting = segmentInfo._codingSetting;
@@ -853,8 +860,8 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
 
         _recoverytp.schedule(
                 boost::bind(&Osd::retrieveRecoveryBlock, this, recoverytpId,
-                    osdId, segmentId, blockId, offsetLength,
-                    boost::ref(repairBlockData[blockId])));
+                        osdId, segmentId, blockId, offsetLength,
+                        boost::ref(repairBlockData[blockId])));
 
     }
 
