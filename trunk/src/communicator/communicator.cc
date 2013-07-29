@@ -994,7 +994,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		struct SegmentData segmentData, CodingScheme codingScheme,
 		string codingSetting, string checksum, DataMsgType dataMsgType) {
 
-	const string updateKey = "";	// TODO: auto-increment updateKey
+	const string updateKey = to_string(rand());
 
     // pack offsets before send
     segmentData.packBuf();

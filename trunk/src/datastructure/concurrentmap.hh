@@ -54,14 +54,14 @@ public:
 		return value;
 	}
 
-	void increment (K key) {
+	V increment (K key) {
 		std::lock_guard<std::mutex> lk(this->_m);
-		_map[key]++;
+		return ++_map[key];
 	}
 
-	void decrement (K key) {
+	V decrement (K key) {
 		std::lock_guard<std::mutex> lk(this->_m);
-		_map[key]--;
+		return --_map[key];
 	}
 
     size_t size() {
