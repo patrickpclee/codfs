@@ -1003,11 +1003,19 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
 			segmentData.info.segmentId, sockfd);
 
-	const uint64_t totalSize = segmentData.totalBufSize;
+	const uint32_t totalSize = segmentData.totalBufSize;
 	const uint64_t segmentId = segmentData.info.segmentId;
 	char* buf = segmentData.buf;
 
 	const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
+
+	if (dataMsgType == DEFAULT_DATA_MSG &&  totalSize == segmentData.info.segmentSize) {
+	    dataMsgType = UPLOAD;
+	} else {
+	    dataMsgType = UPDATE;
+	}
+
+	debug_cyan("totalSize %" PRIu64 " segmentSize %" PRIu32 "\n", totalSize, segmentData.info.segmentSize);
 
 	// Step 1 : Send Init message (wait for reply)
 

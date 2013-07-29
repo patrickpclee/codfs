@@ -20,8 +20,8 @@ extern ConfigLayer* _configLayer;
 FileDataCache::FileDataCache() {
 	// TODO: Read from XML
 	_segmentSize = 10 * 1024 * 1024;
-	_codingScheme = RAID0_CODING;
-	_codingSetting = Raid0Coding::generateSetting(1);
+	_codingScheme = RAID5_CODING;
+	_codingSetting = Raid5Coding::generateSetting(3);
 	_lruSizeLimit = 10;
 	_writeBufferSize = 1;
 	_writeBuffer = new RingBuffer<uint64_t>(_writeBufferSize);
@@ -87,7 +87,7 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary, con
 	if(_segmentStatus.count(segmentId) == 0) {
 		_segmentPrimary[segmentId] = primary;
 		segmentDataCache.info.segmentId = segmentId;
-		segmentDataCache.info.segmentSize = 0;
+		segmentDataCache.info.segmentSize = _segmentSize;
 		segmentDataCache.buf = (char*)MemoryPool::getInstance().poolMalloc(_segmentSize); 
 		mutex * tempMutex = new mutex();
 		_segmentLock[segmentId] = tempMutex;
@@ -241,7 +241,7 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 
 	SegmentStatus segmentStatus = _segmentStatus[segmentId];
 	uint32_t primary = _segmentPrimary[segmentId];
-	struct SegmentData segmentDataCache = _segmentDataCache[segmentId];
+	struct SegmentData segmentData = _segmentDataCache[segmentId];
 	_segmentPrimary.erase(segmentId);
 	_segmentDataCache.erase(segmentId);
 	_segmentStatus[segmentId] = WRITEBACK;
@@ -249,8 +249,8 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 	tempMutex->lock();
 	_dataCacheMutex.unlock();
 
-	if((segmentDataCache.info.segmentSize == 0) || (segmentStatus != DIRTY)){
-		MemoryPool::getInstance().poolFree(segmentDataCache.buf);
+	if((segmentData.info.segmentSize == 0) || (segmentStatus != DIRTY)){
+		MemoryPool::getInstance().poolFree(segmentData.buf);
 		_segmentStatus.erase(segmentId);
 		_segmentLock.erase(segmentId);
 		tempMutex->unlock();
@@ -265,12 +265,12 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 	memset (checksum, 0, MD5_DIGEST_LENGTH);
 
 #ifdef USE_CHECKSUM
-	MD5((unsigned char*) segmentDataCache.buf, segmentDataCache.info.segmentSize, checksum);
+	MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
 #endif
 
-	debug("Write Back Segment %" PRIu64 " ,Size %" PRIu32 "\n", segmentId, segmentDataCache.info.segmentSize);
-	_clientCommunicator->sendSegment(_clientId, sockfd, segmentDataCache, _codingScheme, _codingSetting, md5ToHex(checksum));
-	MemoryPool::getInstance().poolFree(segmentDataCache.buf);
+	debug("Write Back Segment %" PRIu64 " ,Size %" PRIu32 "\n", segmentId, segmentData.info.segmentSize);
+	_clientCommunicator->sendSegment(_clientId, sockfd, segmentData, _codingScheme, _codingSetting, md5ToHex(checksum));
+	MemoryPool::getInstance().poolFree(segmentData.buf);
 	_segmentStatus.erase(segmentId);
 	_segmentLock.erase(segmentId);
 	tempMutex->unlock();

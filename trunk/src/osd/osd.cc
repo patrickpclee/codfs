@@ -544,6 +544,9 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockDataList = _codingModule->encodeSegmentToBlock(
                         codingSetting.codingScheme, segmentId, segmentCache.buf,
                         segmentCache.segLength, codingSetting.setting);
+                for (BlockData &blockData : blockDataList) {
+                    blockData.totalBufSize = blockData.info.blockSize;
+                }
             } else if (dataMsgType == UPDATE) {
                 //... call codingModule to do update
                 blockDataList = _codingModule->unpackUpdates(
@@ -574,6 +577,14 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 for (uint32_t i = 0; i < blockDataList.size(); i++) {
                     blockDataList[i].info.parityVector = parityOsdList;
                 }
+
+                // copy to blockLocationList
+                for (uint32_t i = 0; i < segmentInfo._osdList.size(); i++) {
+                    BlockLocation blockLocation;
+                    blockLocation.blockId = i;
+                    blockLocation.osdId = segmentInfo._osdList[i];
+                    blockLocationList.push_back(blockLocation);
+                }
             }
 
             vector<uint32_t> nodeList;
@@ -582,6 +593,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             _blocktpRequestCount.set(blocktpId, blockDataList.size());
 
             for (const auto blockData : blockDataList) {
+
+                debug ("blockData blockSize: %" PRIu32 " bufSize %" PRIu32 "\n", blockData.info.blockSize, blockData.totalBufSize);
 
 #ifdef PARALLEL_TRANSFER
                 debug("Thread Pool Status %d/%d/%d\n", (int )_blocktp.active(),
