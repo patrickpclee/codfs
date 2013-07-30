@@ -18,7 +18,6 @@ struct BlockInfo {
 struct BlockData {
 	struct BlockInfo info;
 	char* buf;
-    uint32_t totalBufSize;
 };
 
 #endif

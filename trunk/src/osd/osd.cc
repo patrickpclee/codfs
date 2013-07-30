@@ -544,9 +544,6 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockDataList = _codingModule->encodeSegmentToBlock(
                         codingSetting.codingScheme, segmentId, segmentCache.buf,
                         segmentCache.segLength, codingSetting.setting);
-                for (BlockData &blockData : blockDataList) {
-                    blockData.totalBufSize = blockData.info.blockSize;
-                }
             } else if (dataMsgType == UPDATE) {
                 //... call codingModule to do update
                 blockDataList = _codingModule->unpackUpdates(
@@ -593,8 +590,6 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             _blocktpRequestCount.set(blocktpId, blockDataList.size());
 
             for (const auto blockData : blockDataList) {
-
-                debug ("blockData blockSize: %" PRIu32 " bufSize %" PRIu32 "\n", blockData.info.blockSize, blockData.totalBufSize);
 
 #ifdef PARALLEL_TRANSFER
                 debug("Thread Pool Status %d/%d/%d\n", (int )_blocktp.active(),
@@ -683,6 +678,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 _storageModule->flushBlock(segmentId, blockId);
                 MemoryPool::getInstance().poolFree(blockData.buf);
                 _updateBlockData.erase(updateKey);
+                _pendingUpdateBlockChunk.erase(updateKey);
             }
 
             // if all chunks have arrived, send ack
