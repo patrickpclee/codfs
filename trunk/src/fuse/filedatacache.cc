@@ -270,7 +270,8 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 
 	debug("Write Back Segment %" PRIu64 " ,Size %" PRIu32 "\n", segmentId, segmentData.info.segmentSize);
 	_clientCommunicator->sendSegment(_clientId, sockfd, segmentData, _codingScheme, _codingSetting, md5ToHex(checksum));
-	MemoryPool::getInstance().poolFree(segmentData.buf);
+	//MemoryPool::getInstance().poolFree(segmentData.buf);
+	client->getStorageModule()->closeSegment(segmentId);	// buf is shared, let storage module do the free()
 	_segmentStatus.erase(segmentId);
 	_segmentLock.erase(segmentId);
 	tempMutex->unlock();
