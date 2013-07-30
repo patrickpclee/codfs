@@ -156,10 +156,9 @@ vector<BlockData> CodingModule::unpackUpdates(CodingScheme codingScheme,
             BlockData blkData;
             blkData.info.segmentId = segmentId;
             blkData.info.blockId = i;
-            blkData.info.blockSize = blkSize;
+            blkData.info.blockSize = blkBufSize[i];
             blkData.info.offlenVector.swap(offlenVectors[i]);
 
-            blkData.totalBufSize = blkBufSize[i];
 	        blkData.buf = MemoryPool::getInstance().poolMalloc(blkBufSize[i]);
             memcpy(blkData.buf, segmentBuf + toffset, blkBufSize[i]);
             toffset += blkBufSize[i];
