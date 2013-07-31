@@ -50,6 +50,9 @@ public:
 
 	void printProtocol();
 
+	void setDataMsgType (DataMsgType dataMsgType);
+	DataMsgType getDataMsgType ();
+
 private:
 	uint64_t _segmentId;
 	uint32_t _bufferSize;

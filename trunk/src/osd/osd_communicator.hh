@@ -41,7 +41,7 @@ public:
 	 */
 
 	void replyPutSegmentInit(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId);
+			uint64_t segmentId, DataMsgType dataMsgType);
 
 	/**
 	 * Reply PutBlockInitRequest

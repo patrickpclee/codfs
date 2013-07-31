@@ -104,3 +104,12 @@ void PutSegmentInitRequestMsg::printProtocol() {
 			_segmentId, _segmentSize, _bufferSize,  _chunkCount, _codingScheme,
 			_codingSetting.c_str(), _checksum.c_str(), _dataMsgType);
 }
+
+void PutSegmentInitRequestMsg::setDataMsgType (DataMsgType dataMsgType) {
+    _dataMsgType = dataMsgType;
+}
+
+DataMsgType PutSegmentInitRequestMsg::getDataMsgType () {
+    return _dataMsgType;
+}
+

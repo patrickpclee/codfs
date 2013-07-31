@@ -60,6 +60,16 @@ struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(
 		uint64_t segmentId) {
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONObj result = _segmentMetaDataStorage->readOne(querySegment);
+
+	// check if result is empty
+	if (result.isEmpty()) {
+	    SegmentMetaData segmentMetaData;
+	    segmentMetaData._id = 0;
+	    segmentMetaData._size = 0;
+	    segmentMetaData._codingScheme = DEFAULT_CODING;
+	    return segmentMetaData;
+	}
+
 	struct SegmentMetaData segmentMetaData;
 	segmentMetaData._id = segmentId;
 	BSONForEach(it, result.getObjectField("nodeList")) {

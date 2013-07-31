@@ -196,7 +196,8 @@ void StorageModule::createSegmentTransferCache(uint64_t segmentId,
 	struct SegmentTransferCache segmentTransferCache;
 	segmentTransferCache.bufLength = bufLength;
 	segmentTransferCache.segLength = segLength;
-	segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
+	//segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
+	segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(segLength);
 
 	// save cache to map
 	if (dataMsgType == UPLOAD) {

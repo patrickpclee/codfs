@@ -412,6 +412,18 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
     // save coding setting
     _codingSettingMap.set(segmentId, codingSetting);
 
+    // determine dataMsgType
+    SegmentTransferOsdInfo segmentInfo =
+            _osdCommunicator->getSegmentInfoRequest(segmentId, _osdId);
+
+    debug ("SegmentInfo id = %" PRIu64 " size = %" PRIu32 "\n", segmentInfo._id, segmentInfo._size);
+
+    if (segmentInfo._id == 0 || segmentInfo._size == 0) {
+        dataMsgType = UPLOAD;
+    } else {
+        dataMsgType = UPDATE;
+    }
+
     if (dataMsgType == UPLOAD) {
         // reduce memory consumption by limiting the number processing segments
         while (_pendingSegmentChunk.size() > MAX_NUM_PROCESSING_SEGMENT) {
@@ -428,7 +440,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
     // create segment and cache
     _storageModule->createSegmentTransferCache(segmentId, segLength, bufLength,
             dataMsgType, updateKey);
-    _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
+    _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId, dataMsgType);
 
 #ifdef USE_CHECKSUM
     // save md5 to map
@@ -620,7 +632,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 _pendingSegmentChunk.erase(segmentId);
                 // Acknowledge MDS for Segment Upload Completed
                 _osdCommunicator->segmentUploadAck(segmentId,
-                        segmentCache.bufLength, codingSetting.codingScheme,
+                        segmentCache.segLength, codingSetting.codingScheme,
                         codingSetting.setting, nodeList, md5ToHex(checksum));
             } else {
                 _pendingUpdateSegmentChunk.erase(updateKey);
