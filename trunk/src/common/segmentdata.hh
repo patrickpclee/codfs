@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../common/define.hh"
+#include "../common/enums.hh"
 
 using namespace std;
 
@@ -45,6 +46,7 @@ struct SegmentData {
 	struct SegmentInfo info;
 	char* buf;
     uint32_t totalBufSize;
+    FileType fileType;
 
     void packBuf() {
     	if (info.offlenVector.size() == 0) {

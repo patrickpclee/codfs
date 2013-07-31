@@ -243,7 +243,7 @@ protected:
 	 * @param updateKey Update Key
 	 */
 
-	void putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
+	DataMsgType putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 			uint64_t segmentId, uint32_t segLength, uint32_t bufLength, 
             uint32_t chunkCount, CodingScheme codingScheme, 
             string codingSetting, string checksum,

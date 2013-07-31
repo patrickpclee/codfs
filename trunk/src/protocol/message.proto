@@ -308,6 +308,7 @@ message ReportDeletedCachePro {
 
 message PutSegmentInitReplyPro {
 	optional fixed64 segmentId = 1;
+	optional DataMsgPro.DataMsgType dataMsgType = 2;
 }
 
 // Upload: OSD -> CLIENT

@@ -51,10 +51,10 @@ OsdCommunicator::~OsdCommunicator() {
 }
 
 void OsdCommunicator::replyPutSegmentInit(uint32_t requestId,
-		uint32_t connectionId, uint64_t segmentId) {
+		uint32_t connectionId, uint64_t segmentId, DataMsgType dataMsgType) {
 
 	PutSegmentInitReplyMsg* putSegmentInitReplyMsg = new PutSegmentInitReplyMsg(
-			this, requestId, connectionId, segmentId);
+			this, requestId, connectionId, segmentId, dataMsgType);
 	putSegmentInitReplyMsg->prepareProtocolMsg();
 
 	addMessage(putSegmentInitReplyMsg);

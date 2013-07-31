@@ -147,6 +147,7 @@ public:
   static const char * toString( FileType en ) {
     switch( en ) {
       case FOLDER: return "FOLDER";
+      case NEWFILE: return "NEWFILE";
       case NORMAL: return "NORMAL";
       case NOTFOUND: return "NOTFOUND";
     }

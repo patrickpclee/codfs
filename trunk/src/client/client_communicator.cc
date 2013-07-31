@@ -115,6 +115,7 @@ struct FileMetaData ClientCommunicator::downloadFile(uint32_t clientId,
 		fileMetaData._size = downloadFileRequestMsg->getSize();
 		fileMetaData._segmentList = downloadFileRequestMsg->getSegmentList();
 		fileMetaData._primaryList = downloadFileRequestMsg->getPrimaryList();
+		fileMetaData._fileType = downloadFileRequestMsg->getFileType();
 		waitAndDelete(downloadFileRequestMsg);
 		return fileMetaData;
 	} else {

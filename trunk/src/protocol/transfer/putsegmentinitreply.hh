@@ -16,7 +16,7 @@ public:
 	PutSegmentInitReplyMsg(Communicator* communicator);
 
 	PutSegmentInitReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t osdSockfd,
-			uint64_t segmentId);
+			uint64_t segmentId, DataMsgType dataMsgType = DEFAULT_DATA_MSG);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -49,6 +49,7 @@ public:
 
 private:
 	uint64_t _segmentId;
+	DataMsgType _dataMsgType;
 };
 
 #endif

@@ -20,7 +20,7 @@ class FileDataCache {
 		// Make use of Segment Cache at ClientStorageModule
 		uint32_t readDataCache(uint64_t segmentId, uint32_t primary, void* buf, uint32_t size, uint32_t offset);
 
-		uint32_t writeDataCache(uint64_t segmentId, uint32_t primary, const void* buf, uint32_t size, uint32_t offset);
+		uint32_t writeDataCache(uint64_t segmentId, uint32_t primary, const void* buf, uint32_t size, uint32_t offset, FileType fileType);
 
 		void closeDataCache(uint64_t segmentId, bool sync = false);
 		void prefetchSegment(uint64_t segmentId, uint32_t primary);

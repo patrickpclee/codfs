@@ -1000,8 +1000,8 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
     segmentData.packBuf();
 	vector<offset_length_t> offsetLength = segmentData.info.offlenVector;
 
-	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 "\n",
-			segmentData.info.segmentId, sockfd);
+	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 " dataMsgType = %d fileType = %d\n",
+			segmentData.info.segmentId, sockfd, dataMsgType, segmentData.fileType);
 
 	const uint32_t totalSize = segmentData.totalBufSize;
 	const uint64_t segmentId = segmentData.info.segmentId;
@@ -1009,13 +1009,17 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 
 	const uint32_t chunkCount = ((totalSize - 1) / _chunkSize) + 1;
 
-	if (dataMsgType == DEFAULT_DATA_MSG &&  totalSize == segmentData.info.segmentSize) {
-	    dataMsgType = UPLOAD;
-	} else {
-	    dataMsgType = UPDATE;
+	/*
+	if (dataMsgType == DEFAULT_DATA_MSG) {
+	    if (segmentData.fileType == NEWFILE || segmentData.fileType == NOTFOUND || totalSize == segmentData.info.segmentSize) {
+	        dataMsgType = UPLOAD;
+	    } else {
+	        dataMsgType = UPDATE;
+	    }
 	}
+	*/
 
-	debug_cyan("totalSize %" PRIu64 " segmentSize %" PRIu32 "\n", totalSize, segmentData.info.segmentSize);
+	debug_cyan("totalSize %" PRIu32 " segmentSize %" PRIu32 "\n", totalSize, segmentData.info.segmentSize);
 
 	// Step 1 : Send Init message (wait for reply)
 
@@ -1023,7 +1027,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	lockDataQueue(sockfd);
 #endif
 
-	putSegmentInit(componentId, sockfd, segmentId, segmentData.info.segmentSize, 
+	dataMsgType = putSegmentInit(componentId, sockfd, segmentId, segmentData.info.segmentSize,
             totalSize, chunkCount, codingScheme, codingSetting, checksum, dataMsgType, updateKey);
 	debug("%s\n", "Put Segment Init ACK-ed");
 
@@ -1076,7 +1080,7 @@ void Communicator::unlockDataQueue(uint32_t sockfd) {
 // PRIVATE FUNCTIONS
 //
 
-void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
+DataMsgType Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 		uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
 		CodingScheme codingScheme, string codingSetting, string checksum,
 		DataMsgType dataMsgType, string updateKey) {
@@ -1093,12 +1097,14 @@ void Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 
 	MessageStatus status = putSegmentInitRequestMsg->waitForStatusChange();
 	if (status == READY) {
+	    DataMsgType dataMsgType = putSegmentInitRequestMsg->getDataMsgType();
 		waitAndDelete(putSegmentInitRequestMsg);
-		return;
+		return dataMsgType;
 	} else {
 		debug_error("Put Segment Init Failed %" PRIu64 "\n", segmentId);
 		exit(-1);
 	}
+	return DEFAULT_DATA_MSG;
 }
 
 void Communicator::putSegmentData(uint32_t componentID, uint32_t dstOsdSockfd,

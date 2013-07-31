@@ -14,7 +14,7 @@ enum MessageStatus {
 };
 
 enum FileType {
-	NOTFOUND = 1, NORMAL = 2, FOLDER = 3
+	NOTFOUND = 1, NORMAL = 2, FOLDER = 3, NEWFILE = 4
 };
 
 enum DataMsgType {

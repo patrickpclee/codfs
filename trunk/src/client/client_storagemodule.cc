@@ -132,7 +132,7 @@ void ClientStorageModule::createSegmentCache(uint64_t segmentId,
 	struct SegmentTransferCache segmentCache;
 	segmentCache.segLength = segLength;
 	segmentCache.bufLength = bufLength;
-	segmentCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
+	segmentCache.buf = MemoryPool::getInstance().poolMalloc(segLength);
 
 	// save cache to map
 	{

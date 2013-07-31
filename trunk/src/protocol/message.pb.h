@@ -4138,17 +4138,27 @@ class PutSegmentInitReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint64 value);
   
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 2;
+  inline bool has_datamsgtype() const;
+  inline void clear_datamsgtype();
+  static const int kDataMsgTypeFieldNumber = 2;
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.PutSegmentInitReplyPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
+  inline void set_has_datamsgtype();
+  inline void clear_has_datamsgtype();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
+  int datamsgtype_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -9538,6 +9548,29 @@ inline ::google::protobuf::uint64 PutSegmentInitReplyPro::segmentid() const {
 inline void PutSegmentInitReplyPro::set_segmentid(::google::protobuf::uint64 value) {
   set_has_segmentid();
   segmentid_ = value;
+}
+
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 2;
+inline bool PutSegmentInitReplyPro::has_datamsgtype() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PutSegmentInitReplyPro::set_has_datamsgtype() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PutSegmentInitReplyPro::clear_has_datamsgtype() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PutSegmentInitReplyPro::clear_datamsgtype() {
+  datamsgtype_ = 15;
+  clear_has_datamsgtype();
+}
+inline ::ncvfs::DataMsgPro_DataMsgType PutSegmentInitReplyPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
+}
+inline void PutSegmentInitReplyPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
+  set_has_datamsgtype();
+  datamsgtype_ = value;
 }
 
 // -------------------------------------------------------------------
