@@ -60,7 +60,9 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary, void
 		uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
 		struct SegmentTransferCache segmentTransferCache = client->getSegment(_clientId, sockfd, segmentId);
 		struct SegmentData segmentCache;
-		segmentCache.buf = segmentTransferCache.buf;
+		//segmentCache.buf = segmentTransferCache.buf;
+		segmentCache.buf = (char*)MemoryPool::getInstance().poolMalloc(_segmentSize);
+		memcpy (segmentCache.buf, segmentTransferCache.buf, _segmentSize); // prevent double free in doWriteBack and closeSegment
 		segmentCache.info.segmentId = segmentId;
 		segmentCache.info.segmentSize = segmentTransferCache.segLength;
 		segmentCache.info.segmentPath = "";
@@ -211,7 +213,9 @@ void FileDataCache::doPrefetch() {
 		struct SegmentTransferCache segmentTransferCache = client->getSegment(_clientId, sockfd, segmentId);
 		if(fetch) {
 			struct SegmentData segmentCache;
-			segmentCache.buf = segmentTransferCache.buf;
+			//segmentCache.buf = segmentTransferCache.buf;
+			segmentCache.buf = (char*)MemoryPool::getInstance().poolMalloc(_segmentSize);
+			memcpy (segmentCache.buf, segmentTransferCache.buf, _segmentSize); // prevent double free in doWriteBack and closeSegment
 			segmentCache.info.segmentId = segmentId;
 			segmentCache.info.segmentSize = segmentTransferCache.segLength;
 			segmentCache.info.segmentPath = "";
@@ -270,8 +274,7 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 
 	debug("Write Back Segment %" PRIu64 " ,Size %" PRIu32 "\n", segmentId, segmentData.info.segmentSize);
 	_clientCommunicator->sendSegment(_clientId, sockfd, segmentData, _codingScheme, _codingSetting, md5ToHex(checksum));
-	//MemoryPool::getInstance().poolFree(segmentData.buf);
-	client->getStorageModule()->closeSegment(segmentId);	// buf is shared, let storage module do the free()
+	MemoryPool::getInstance().poolFree(segmentData.buf);
 	_segmentStatus.erase(segmentId);
 	_segmentLock.erase(segmentId);
 	tempMutex->unlock();
