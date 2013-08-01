@@ -211,7 +211,7 @@ public:
 	uint32_t sendSegment(uint32_t componentId, uint32_t sockfd,
 			struct SegmentData segmentData, CodingScheme codingScheme =
 					DEFAULT_CODING, string codingSetting = "", string checksum =
-					"", DataMsgType dataMsgType = DEFAULT_DATA_MSG);
+					"");
 
 	void lockDataQueue(uint32_t sockfd);
 	void unlockDataQueue(uint32_t sockfd);
@@ -239,7 +239,6 @@ protected:
 	 * @param bufLength Size of the buf to be send
 	 * @param chunkCount Number of chunks that will be sent
 	 * @param checksum Checksum of Segment
-	 * @param dataMsgType Data Message Type
 	 * @param updateKey Update Key
 	 */
 
@@ -247,7 +246,7 @@ protected:
 			uint64_t segmentId, uint32_t segLength, uint32_t bufLength, 
             uint32_t chunkCount, CodingScheme codingScheme, 
             string codingSetting, string checksum,
-			DataMsgType dataMsgType, string updateKey);
+			string updateKey);
 
 	/**
 	 * Send an segment chunk to OSD (Step 2)

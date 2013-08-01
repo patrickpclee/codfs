@@ -48,7 +48,7 @@ thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
 
-uint32_t _prefetchCount = 5;
+uint32_t _prefetchCount = 0;
 
 static void removeNameSpace(const char* path) {
 	unlink(path);

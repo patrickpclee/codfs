@@ -992,7 +992,7 @@ uint32_t Communicator::getSockfdFromId(uint32_t componentId) {
 
 uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		struct SegmentData segmentData, CodingScheme codingScheme,
-		string codingSetting, string checksum, DataMsgType dataMsgType) {
+		string codingSetting, string checksum) {
 
 	const string updateKey = to_string(rand());
 
@@ -1000,8 +1000,8 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
     segmentData.packBuf();
 	vector<offset_length_t> offsetLength = segmentData.info.offlenVector;
 
-	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 " dataMsgType = %d fileType = %d\n",
-			segmentData.info.segmentId, sockfd, dataMsgType, segmentData.fileType);
+	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 " fileType = %d\n",
+			segmentData.info.segmentId, sockfd, segmentData.fileType);
 
 	const uint32_t totalSize = segmentData.totalBufSize;
 	const uint64_t segmentId = segmentData.info.segmentId;
@@ -1027,8 +1027,8 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	lockDataQueue(sockfd);
 #endif
 
-	dataMsgType = putSegmentInit(componentId, sockfd, segmentId, segmentData.info.segmentSize,
-            totalSize, chunkCount, codingScheme, codingSetting, checksum, dataMsgType, updateKey);
+    DataMsgType dataMsgType = putSegmentInit(componentId, sockfd, segmentId, segmentData.info.segmentSize,
+            totalSize, chunkCount, codingScheme, codingSetting, checksum, updateKey);
 	debug("%s\n", "Put Segment Init ACK-ed");
 
 	// Step 2 : Send data chunk by chunk
@@ -1083,14 +1083,14 @@ void Communicator::unlockDataQueue(uint32_t sockfd) {
 DataMsgType Communicator::putSegmentInit(uint32_t componentId, uint32_t dstOsdSockfd,
 		uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
 		CodingScheme codingScheme, string codingSetting, string checksum,
-		DataMsgType dataMsgType, string updateKey) {
+		string updateKey) {
 
 	// Step 1 of the upload process
 
 	PutSegmentInitRequestMsg* putSegmentInitRequestMsg =
 			new PutSegmentInitRequestMsg(this, dstOsdSockfd, segmentId, segLength,
 					bufLength, chunkCount, codingScheme, codingSetting, checksum,
-					dataMsgType, updateKey);
+					updateKey);
 
 	putSegmentInitRequestMsg->prepareProtocolMsg();
 	addMessage(putSegmentInitRequestMsg, true);

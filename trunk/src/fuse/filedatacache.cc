@@ -19,8 +19,8 @@ extern ConfigLayer* _configLayer;
 FileDataCache::FileDataCache() {
     // TODO: Read from XML
     _segmentSize = 10 * 1024 * 1024;
-    _codingScheme = RAID5_CODING;
-    _codingSetting = Raid5Coding::generateSetting(3);
+    _codingScheme = RAID0_CODING;
+    _codingSetting = Raid0Coding::generateSetting(2);
     _lruSizeLimit = 10;
     _writeBufferSize = 1;
     _writeBuffer = new RingBuffer<uint64_t>(_writeBufferSize);
@@ -43,6 +43,7 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
     debug("Read Cache %" PRIu64 " at %" PRIu32 " for %" PRIu32 "\n", segmentId,
             offset, size);
     if (_segmentStatus.count(segmentId) == 1) {
+        debug ("Cached %" PRIu64 "\n", segmentId);
         mutex * tempMutex = _segmentLock[segmentId];
         tempMutex->lock();
         _dataCacheMutex.unlock();
@@ -52,6 +53,7 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
 
         //		}
     } else {
+        debug ("Not Cached %" PRIu64 "\n", segmentId);
         _segmentStatus[segmentId] = CLEAN;
         _segmentPrimary[segmentId] = primary;
         mutex * tempMutex = new mutex();
@@ -63,7 +65,6 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
         struct SegmentTransferCache segmentTransferCache = client->getSegment(
                 _clientId, sockfd, segmentId);
         struct SegmentData segmentCache;
-        //segmentCache.buf = segmentTransferCache.buf;
         segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
                 _segmentSize);
         memcpy(segmentCache.buf, segmentTransferCache.buf, _segmentSize); // prevent double free in doWriteBack and closeSegment
@@ -71,6 +72,11 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
         segmentCache.info.segmentSize = segmentTransferCache.segLength;
         segmentCache.info.segmentPath = "";
         _segmentDataCache[segmentId] = segmentCache;
+
+        // ask client to close cache to prevent stale read
+        ClientStorageModule* storageModule = client->getStorageModule();
+        storageModule->closeSegment(segmentId);
+
         tempMutex->unlock();
         memcpy(buf, segmentCache.buf + offset, size);
     }
@@ -222,7 +228,6 @@ void FileDataCache::doPrefetch() {
                 _clientId, sockfd, segmentId);
         if (fetch) {
             struct SegmentData segmentCache;
-            //segmentCache.buf = segmentTransferCache.buf;
             segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
                     _segmentSize);
             memcpy(segmentCache.buf, segmentTransferCache.buf, _segmentSize); // prevent double free in doWriteBack and closeSegment
@@ -269,7 +274,7 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
         _segmentLock.erase(segmentId);
         tempMutex->unlock();
         // Delete the tempMutex before return
-        delete tempMutex;
+        //delete tempMutex;
         return;
     }
 
@@ -291,7 +296,7 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
     _segmentLock.erase(segmentId);
     tempMutex->unlock();
     // Delete the tempMutex before return
-    delete tempMutex;
+    //delete tempMutex;
     return;
 }
 

@@ -144,7 +144,6 @@ public:
 	 * @param codingScheme Coding Scheme for the segment
 	 * @param setting Coding setting for the segment
 	 * @param checksum Checksum of the segment
-	 * @param dataMsgType Data Message Type
 	 * @param updateKey Key for UPDATE message
 	 */
 
@@ -152,7 +151,7 @@ public:
 			uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
             uint32_t chunkCount,
 			CodingScheme codingScheme, string setting, string checksum,
-			DataMsgType dataMsgType, string updateKey);
+			string updateKey);
 
 	/**
 	 * Action when a put segment end is received
