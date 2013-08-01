@@ -403,7 +403,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
         uint32_t chunkCount, CodingScheme codingScheme, string setting,
-        string checksum, DataMsgType dataMsgType, string updateKey) {
+        string checksum, string updateKey) {
 
     struct CodingSetting codingSetting;
     codingSetting.codingScheme = codingScheme;
@@ -418,6 +418,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 
     debug ("SegmentInfo id = %" PRIu64 " size = %" PRIu32 "\n", segmentInfo._id, segmentInfo._size);
 
+    DataMsgType dataMsgType = DEFAULT_DATA_MSG;
     if (segmentInfo._id == 0 || segmentInfo._size == 0) {
         dataMsgType = UPLOAD;
     } else {

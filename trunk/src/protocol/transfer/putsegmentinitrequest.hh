@@ -19,7 +19,7 @@ public:
 	PutSegmentInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t segmentId, uint32_t segmentSize, uint32_t bufferSize, 
             uint32_t chunkCount, CodingScheme codingScheme, const string &codingSetting,
-			const string &checksum, DataMsgType dataMsgType, string updateKey = "");
+			const string &checksum, string updateKey = "");
 
 	/**
 	 * Copy values in private variables to protocol message
