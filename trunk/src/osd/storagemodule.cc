@@ -189,29 +189,29 @@ uint64_t StorageModule::getFilesize(string filepath) {
 
 }
 
-void StorageModule::createSegmentTransferCache(uint64_t segmentId,
+void StorageModule::createSegmentCache(uint64_t segmentId,
 		uint32_t segLength, uint32_t bufLength, DataMsgType dataMsgType, string updateKey) {
 
 	// create cache
-	struct SegmentTransferCache segmentTransferCache;
-	segmentTransferCache.bufLength = bufLength;
-	segmentTransferCache.segLength = segLength;
-	//segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
-	segmentTransferCache.buf = MemoryPool::getInstance().poolMalloc(segLength);
+	struct SegmentData segmentCache;
+	segmentCache.bufLength = bufLength;
+	segmentCache.info.segLength = segLength;
+	//segmentCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
+	segmentCache.buf = MemoryPool::getInstance().poolMalloc(segLength);
 
 	// save cache to map
 	if (dataMsgType == UPLOAD) {
 		{
 			lock_guard<mutex> lk(uploadCacheMutex);
-			_segmentUploadCache[segmentId] = segmentTransferCache;
+			_segmentUploadCache[segmentId] = segmentCache;
 		}
 		debug(
-				"SegmentTransferCache created ID = %" PRIu64 " Length = %" PRIu32 "\n",
+				"SegmentData created ID = %" PRIu64 " Length = %" PRIu32 "\n",
 				segmentId, bufLength);
 	} else if (dataMsgType == UPDATE) {
 		{
 			lock_guard<mutex> lk(updateCacheMutex);
-			_segmentUpdateCache[updateKey] = segmentTransferCache;
+			_segmentUpdateCache[updateKey] = segmentCache;
 		}
 		debug(
 				"SegmentUpdateTransferCache created ID = %" PRIu64 " Length = %" PRIu32 "key = %s\n",
@@ -221,17 +221,8 @@ void StorageModule::createSegmentTransferCache(uint64_t segmentId,
 		exit(-1);
 	}
 	debug(
-			"SegmentTransferCache created ID = %" PRIu64 " segLength = %" PRIu32 " bufLength = %" PRIu32 "\n",
+			"SegmentData created ID = %" PRIu64 " segLength = %" PRIu32 " bufLength = %" PRIu32 "\n",
 			segmentId, segLength, bufLength);
-}
-
-void StorageModule::createSegmentDiskCache(uint64_t segmentId,
-		uint32_t length) {
-	const string filepath = generateSegmentPath(segmentId, _segmentFolder);
-	createFile(filepath);
-
-	// write info
-	// writeSegmentInfo(segmentId, length, filepath);
 }
 
 void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
@@ -292,7 +283,7 @@ struct SegmentData StorageModule::readSegment(uint64_t segmentId,
 	// if length = 0, read whole segment
 	uint32_t byteToRead;
 	if (length == 0) {
-		byteToRead = segmentData.info.segmentSize;
+		byteToRead = segmentData.info.segLength;
 	} else {
 		byteToRead = length;
 	}
@@ -409,7 +400,7 @@ struct BlockData StorageModule::readRemoteBlock(uint32_t osdId,
 }
 #endif
 
-uint32_t StorageModule::writeSegmentTransferCache(uint64_t segmentId, char* buf,
+uint32_t StorageModule::writeSegmentData(uint64_t segmentId, char* buf,
 		uint64_t offsetInSegment, uint32_t length, DataMsgType dataMsgType,
 		string updateKey) {
 
@@ -517,12 +508,12 @@ uint32_t StorageModule::updateBlock (uint64_t segmentId, uint32_t blockId, Block
 }
 
 
-void StorageModule::closeSegmentTransferCache(uint64_t segmentId,
+void StorageModule::closeSegmentData(uint64_t segmentId,
 		DataMsgType dataMsgType, string updateKey) {
 
 	if (dataMsgType == UPLOAD) {
 		// close cache
-		struct SegmentTransferCache segmentCache = getSegmentTransferCache(
+		struct SegmentData segmentCache = getSegmentData(
 				segmentId, dataMsgType);
 		MemoryPool::getInstance().poolFree(segmentCache.buf);
 
@@ -532,7 +523,7 @@ void StorageModule::closeSegmentTransferCache(uint64_t segmentId,
 		}
 	} else if (dataMsgType == UPDATE) {
 		// close cache
-		struct SegmentTransferCache segmentCache = getSegmentTransferCache(
+		struct SegmentData segmentCache = getSegmentData(
 				segmentId, dataMsgType, updateKey);
 		MemoryPool::getInstance().poolFree(segmentCache.buf);
 
@@ -621,7 +612,7 @@ struct SegmentInfo StorageModule::readSegmentInfo(uint64_t segmentId) {
 
 	segmentInfo.segmentId = segmentId;
 	segmentInfo.segmentPath = generateSegmentPath(segmentId, _segmentFolder);
-	segmentInfo.segmentSize = getFilesize(segmentInfo.segmentPath);
+	segmentInfo.segLength = getFilesize(segmentInfo.segmentPath);
 
 	return segmentInfo;
 }
@@ -843,7 +834,7 @@ void StorageModule::tryCloseFile(string filepath) {
 	}
 }
 
-struct SegmentTransferCache StorageModule::getSegmentTransferCache(
+struct SegmentData StorageModule::getSegmentData(
 		uint64_t segmentId, DataMsgType dataMsgType, string updateKey) {
 	if (dataMsgType == UPLOAD) {
 		{
@@ -911,14 +902,14 @@ int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
 }
 
 void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
-		SegmentTransferCache segmentCache) {
+		SegmentData segmentCache) {
 
 	lock_guard<mutex> lk(diskCacheMutex);
 
 	debug("Before saving segment ID = %" PRIu64 ", cache = %s\n", segmentId,
 			formatSize(_freeSegmentSpace).c_str());
 
-	uint32_t segmentSize = segmentCache.segLength;
+	uint32_t segmentSize = segmentCache.info.segLength;
 
 	if (!isEnoughSegmentSpace(segmentSize)) {
 		// clear cache if space is not available

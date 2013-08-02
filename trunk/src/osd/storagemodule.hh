@@ -22,16 +22,6 @@
 using namespace std;
 
 /**
- * For caching an segment in memory during upload/download
- */
-
-struct SegmentTransferCache {
-    uint32_t segLength;
-    uint32_t bufLength;
-    char* buf;
-};
-
-/**
  * For retrieving an segment cache file from the disk
  */
 struct SegmentDiskCache {
@@ -70,16 +60,8 @@ public:
      * @param bufLength Length of buffer
      */
 
-    void createSegmentTransferCache(uint64_t segmentId, uint32_t segLength,
+    void createSegmentCache(uint64_t segmentId, uint32_t segLength,
             uint32_t bufLength, DataMsgType dataMsgType, string updateKey = "");
-
-    /**
-     * Create and open the file for storing the segment on disk
-     * @param segmentId Segment ID
-     * @param length Length of segment
-     */
-
-    void createSegmentDiskCache(uint64_t segmentId, uint32_t length);
 
     /**
      * Create and open the file for storing the block on disk
@@ -172,7 +154,7 @@ public:
      * @return No of bytes written
      */
 
-    uint32_t writeSegmentTransferCache(uint64_t segmentId, char* buf,
+    uint32_t writeSegmentData(uint64_t segmentId, char* buf,
             uint64_t offsetInSegment, uint32_t length, DataMsgType dataMsgType,
             string updateKey);
 
@@ -222,7 +204,7 @@ public:
      * @param segmentId Segment ID
      */
 
-    void closeSegmentTransferCache(uint64_t segmentId, DataMsgType dataMsgType,
+    void closeSegmentData(uint64_t segmentId, DataMsgType dataMsgType,
             string updateKey);
 
     void doFlushFile(string filepath, bool &isFinished);
@@ -258,10 +240,10 @@ public:
      * Get back the SegmentCache from segmentId
      * @param segmentId 				Segment ID
      *
-     * @return SegmentTransferCache  Segment Cache
+     * @return SegmentData  Segment Cache
      */
 
-    struct SegmentTransferCache getSegmentTransferCache(uint64_t segmentId,
+    struct SegmentData getSegmentData(uint64_t segmentId,
             DataMsgType dataMsgType, string updateKey = "");
 
     /**
@@ -345,7 +327,7 @@ public:
      */
 
     void putSegmentToDiskCache(uint64_t segmentId,
-            SegmentTransferCache segmentCache);
+            SegmentData segmentCache);
 
     /**
      * Read segment cache from the disk
@@ -533,8 +515,8 @@ private:
     list<uint64_t> _segmentDiskCacheQueue;
 
     FileLruCache<string, FILE*>* _openedFile;
-    map<uint64_t, struct SegmentTransferCache> _segmentUploadCache;
-    map<string, struct SegmentTransferCache> _segmentUpdateCache;
+    map<uint64_t, struct SegmentData> _segmentUploadCache;
+    map<string, struct SegmentData> _segmentUpdateCache;
     string _segmentFolder;
     string _blockFolder;
     string _remoteBlockFolder;

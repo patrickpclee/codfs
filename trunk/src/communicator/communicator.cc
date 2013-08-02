@@ -1003,7 +1003,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	debug("Send segment ID = %" PRIu64 " to sockfd = %" PRIu32 " fileType = %d\n",
 			segmentData.info.segmentId, sockfd, segmentData.fileType);
 
-	const uint32_t totalSize = segmentData.totalBufSize;
+	const uint32_t totalSize = segmentData.bufLength;
 	const uint64_t segmentId = segmentData.info.segmentId;
 	char* buf = segmentData.buf;
 
@@ -1019,7 +1019,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	}
 	*/
 
-	debug_cyan("totalSize %" PRIu32 " segmentSize %" PRIu32 "\n", totalSize, segmentData.info.segmentSize);
+	debug_cyan("totalSize %" PRIu32 " segmentSize %" PRIu32 "\n", totalSize, segmentData.info.segLength);
 
 	// Step 1 : Send Init message (wait for reply)
 
@@ -1027,7 +1027,7 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 	lockDataQueue(sockfd);
 #endif
 
-    DataMsgType dataMsgType = putSegmentInit(componentId, sockfd, segmentId, segmentData.info.segmentSize,
+    DataMsgType dataMsgType = putSegmentInit(componentId, sockfd, segmentId, segmentData.info.segLength,
             totalSize, chunkCount, codingScheme, codingSetting, checksum, updateKey);
 	debug("%s\n", "Put Segment Init ACK-ed");
 

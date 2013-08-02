@@ -34,7 +34,7 @@ vector<BlockData> CauchyCoding::encode(SegmentData segmentData, string setting) 
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
 	const uint32_t size = roundTo(
-			(roundTo(segmentData.info.segmentSize, k*w) / (k*w)), 4);
+			(roundTo(segmentData.info.segLength, k*w) / (k*w)), 4);
 
 
 	if (k <= 0 || m < 0 || w <= 0 || w > 32
@@ -57,13 +57,13 @@ vector<BlockData> CauchyCoding::encode(SegmentData segmentData, string setting) 
 		blockData.info.blockSize = size*w;
 		blockData.buf = MemoryPool::getInstance().poolMalloc(size*w);
 		char* bufPos = segmentData.buf + i * size*w;
-		if (i * w *size >= segmentData.info.segmentSize) {
+		if (i * w *size >= segmentData.info.segLength) {
 			//Zero Padding
-		} else if ((i + 1) * w * size > segmentData.info.segmentSize) {
+		} else if ((i + 1) * w * size > segmentData.info.segLength) {
 			memcpy(blockData.buf, bufPos,
-					segmentData.info.segmentSize - i * w * size);
-			memset(blockData.buf + segmentData.info.segmentSize - i * w * size, 0,
-					(i + 1) * w * size - segmentData.info.segmentSize);
+					segmentData.info.segLength - i * w * size);
+			memset(blockData.buf + segmentData.info.segLength - i * w * size, 0,
+					(i + 1) * w * size - segmentData.info.segLength);
 		} else
 			memcpy(blockData.buf, bufPos, w * size);
 
@@ -168,7 +168,7 @@ SegmentData CauchyCoding::decode(vector<BlockData> &blockDataList,
 
 	// copy segmentID from first available block
 	segmentData.info.segmentId = blockDataList[blockIdList[0]].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
@@ -329,7 +329,7 @@ vector<BlockData> CauchyCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	// copy segmentID from first available block
 	segmentData.info.segmentId = blockData[blockIdList[0]].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	//segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());

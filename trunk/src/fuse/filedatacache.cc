@@ -4,7 +4,6 @@
 
 #include "client.hh"
 #include "client_communicator.hh"
-#include "client_storagemodule.hh"
 
 #include "../common/debug.hh"
 #include "../common/memorypool.hh"
@@ -35,6 +34,8 @@ FileDataCache::FileDataCache() {
     for (uint32_t i = 0; i < _numPrefetchThread; ++i) {
         _prefetchThreads.push_back(thread(&FileDataCache::doPrefetch, this));
     }
+
+    _storageModule = client->getStorageModule();
 }
 
 uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
@@ -47,11 +48,9 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
         mutex * tempMutex = _segmentLock[segmentId];
         tempMutex->lock();
         _dataCacheMutex.unlock();
-        //		if(_segmentStatus[segmentId] == DIRTY) {
         tempMutex->unlock();
-        memcpy(buf, _segmentDataCache[segmentId].buf + offset, size);
-
-        //		}
+        SegmentData segmentCache = _storageModule->getSegmentCache(segmentId);
+        memcpy(buf, segmentCache.buf + offset, size);
     } else {
         debug ("Not Cached %" PRIu64 "\n", segmentId);
         _segmentStatus[segmentId] = CLEAN;
@@ -62,21 +61,8 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
         _dataCacheMutex.unlock();
 
         uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
-        struct SegmentTransferCache segmentTransferCache = client->getSegment(
+        struct SegmentData segmentCache = client->getSegment(
                 _clientId, sockfd, segmentId);
-        struct SegmentData segmentCache;
-        segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
-                _segmentSize);
-        memcpy(segmentCache.buf, segmentTransferCache.buf, _segmentSize); // prevent double free in doWriteBack and closeSegment
-        segmentCache.info.segmentId = segmentId;
-        segmentCache.info.segmentSize = segmentTransferCache.segLength;
-        segmentCache.info.segmentPath = "";
-        _segmentDataCache[segmentId] = segmentCache;
-
-        // ask client to close cache to prevent stale read
-        ClientStorageModule* storageModule = client->getStorageModule();
-        storageModule->closeSegment(segmentId);
-
         tempMutex->unlock();
         memcpy(buf, segmentCache.buf + offset, size);
     }
@@ -85,33 +71,28 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
 
     return size;
 
-    // Read Cache
-    //uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
-    //struct SegmentTransferCache segmentCache = client->getSegment(_clientId, sockfd, segmentId);
-    //memcpy(buf, segmentCache.buf + offset, size);
-    //return size;
 }
 
 uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary,
         const void* buf, uint32_t size, uint32_t offset, FileType fileType) {
     _dataCacheMutex.lock();
     // TODO: Check - Forbid Write to Sealed Segment
-    struct SegmentData segmentDataCache;
+    struct SegmentData segmentCache;
     if (_segmentStatus.count(segmentId) == 0) {
         _segmentPrimary[segmentId] = primary;
-        segmentDataCache.info.segmentId = segmentId;
-        segmentDataCache.info.segmentSize = _segmentSize;
-        segmentDataCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
+        segmentCache.info.segmentId = segmentId;
+        segmentCache.info.segLength = _segmentSize;
+        segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
                 _segmentSize);
         mutex * tempMutex = new mutex();
         _segmentLock[segmentId] = tempMutex;
         //tempMutex->lock();
     } else {
-        segmentDataCache = _segmentDataCache[segmentId];
+        segmentCache = _storageModule->getSegmentCache(segmentId);
     }
     _dataCacheMutex.unlock();
 
-    segmentDataCache.fileType = fileType;
+    segmentCache.fileType = fileType;
 
     // Bound Check
     if (offset + size > _segmentSize) {
@@ -120,16 +101,16 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary,
     }
 
     // Copy new update/data into segmentData struct
-    memcpy(segmentDataCache.buf + offset, buf, size);
+    memcpy(segmentCache.buf + offset, buf, size);
 
     // Inline-update: Add offset, length pair
-    segmentDataCache.info.offlenVector.push_back(make_pair(offset, size));
+    segmentCache.info.offlenVector.push_back(make_pair(offset, size));
 
     _segmentStatus[segmentId] = DIRTY;
-    if (offset + size > segmentDataCache.info.segmentSize)
-        segmentDataCache.info.segmentSize = offset + size;
+    if (offset + size > segmentCache.info.segLength)
+        segmentCache.info.segLength = offset + size;
 
-    _segmentDataCache[segmentId] = segmentDataCache;
+    _storageModule->setSegmentCache(segmentId, segmentCache);
     updateLru(segmentId);
     return size;
 }
@@ -157,13 +138,11 @@ void FileDataCache::closeDataCache(uint64_t segmentId, bool sync) {
     if (_segmentStatus[segmentId] == CLEAN) {
         mutex * tempMutex = _segmentLock[segmentId];
         tempMutex->lock();
-        ClientStorageModule* storageModule = client->getStorageModule();
-        storageModule->closeSegment(segmentId);
+        _storageModule->closeSegment(segmentId);
         tempMutex->unlock();
         _segmentStatus.erase(segmentId);
         _segmentPrimary.erase(segmentId);
         _segmentLock.erase(segmentId);
-        _segmentDataCache.erase(segmentId);
         _prefetchBitmap.erase(segmentId);
         _dataCacheMutex.unlock();
         return;
@@ -207,7 +186,6 @@ void FileDataCache::doPrefetch() {
         uint64_t segmentId = tempPair.first;
         uint32_t primary = tempPair.second;
         uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
-        bool fetch = false;
 
         debug("Prefetch %" PRIu64 "\n", segmentId);
 
@@ -217,28 +195,16 @@ void FileDataCache::doPrefetch() {
             _segmentPrimary[segmentId] = primary;
             tempMutex = new mutex();
             _segmentLock[segmentId] = tempMutex;
-            fetch = true;
             debug("Create Cache for %" PRIu64 "\n", segmentId);
-        } else
+        } else {
             tempMutex = _segmentLock[segmentId];
+        }
 
         tempMutex->lock();
         _dataCacheMutex.unlock();
-        struct SegmentTransferCache segmentTransferCache = client->getSegment(
-                _clientId, sockfd, segmentId);
-        if (fetch) {
-            struct SegmentData segmentCache;
-            segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
-                    _segmentSize);
-            memcpy(segmentCache.buf, segmentTransferCache.buf, _segmentSize); // prevent double free in doWriteBack and closeSegment
-            segmentCache.info.segmentId = segmentId;
-            segmentCache.info.segmentSize = segmentTransferCache.segLength;
-            segmentCache.info.segmentPath = "";
-            _segmentDataCache[segmentId] = segmentCache;
-        }
+        client->getSegment(_clientId, sockfd, segmentId);
         tempMutex->unlock();
         updateLru(segmentId);
-
     }
 }
 
@@ -260,15 +226,14 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 
     SegmentStatus segmentStatus = _segmentStatus[segmentId];
     uint32_t primary = _segmentPrimary[segmentId];
-    struct SegmentData segmentData = _segmentDataCache[segmentId];
+    struct SegmentData segmentData = _storageModule->getSegmentCache(segmentId);
     _segmentPrimary.erase(segmentId);
-    _segmentDataCache.erase(segmentId);
     _segmentStatus[segmentId] = WRITEBACK;
     mutex * tempMutex = _segmentLock[segmentId];
     tempMutex->lock();
     _dataCacheMutex.unlock();
 
-    if ((segmentData.info.segmentSize == 0) || (segmentStatus != DIRTY)) {
+    if ((segmentData.info.segLength == 0) || (segmentStatus != DIRTY)) {
         MemoryPool::getInstance().poolFree(segmentData.buf);
         _segmentStatus.erase(segmentId);
         _segmentLock.erase(segmentId);
@@ -284,14 +249,14 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
     memset(checksum, 0, MD5_DIGEST_LENGTH);
 
 #ifdef USE_CHECKSUM
-    MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize, checksum);
+    MD5((unsigned char*) segmentData.buf, segmentData.info.segLength, checksum);
 #endif
 
     debug("Write Back Segment %" PRIu64 " ,Size %" PRIu32 "\n", segmentId,
-            segmentData.info.segmentSize);
+            segmentData.info.segLength);
     _clientCommunicator->sendSegment(_clientId, sockfd, segmentData,
             _codingScheme, _codingSetting, md5ToHex(checksum));
-    MemoryPool::getInstance().poolFree(segmentData.buf);
+    _storageModule->closeSegment(segmentId);
     _segmentStatus.erase(segmentId);
     _segmentLock.erase(segmentId);
     tempMutex->unlock();

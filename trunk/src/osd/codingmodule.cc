@@ -46,7 +46,7 @@ vector<struct BlockData> CodingModule::encodeSegmentToBlock(
 	struct SegmentData segmentData;
 	segmentData.buf = buf;
 	segmentData.info.segmentId = segmentId;
-	segmentData.info.segmentSize = length;
+	segmentData.info.segLength = length;
 	return getCoding(codingScheme)->encode(segmentData, setting);
 }
 

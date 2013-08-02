@@ -70,9 +70,9 @@ void startBenchUploadThread(uint32_t clientId, uint32_t sockfd,
 
 void startBenchDownloadThread(uint32_t clientId, uint32_t sockfd,
 		uint64_t segmentId, char* segmentChecksum) {
-	SegmentTransferCache segmentTransferCache = client->getSegment(clientId,
+	SegmentData segmentCache = client->getSegment(clientId,
 			sockfd, segmentId);
-	MD5((unsigned char *) segmentTransferCache.buf, segmentTransferCache.bufLength,
+	MD5((unsigned char *) segmentCache.buf, segmentCache.bufLength,
 			(unsigned char *) segmentChecksum);
 	_storageModule->closeSegment(segmentId);
 }
@@ -363,7 +363,7 @@ void testUpload() {
 		struct SegmentData segmentData;
 		segmentData.buf = databuf + dataBufIdx[i];
 		segmentData.info.segmentId = fileMetaData._segmentList[i];
-		segmentData.info.segmentSize = segmentSize;
+		segmentData.info.segLength = segmentSize;
 		uint32_t primary = fileMetaData._primaryList[i];
 
 		if (OSDLoadCount.count(primary) == 0)

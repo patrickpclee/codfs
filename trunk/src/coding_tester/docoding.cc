@@ -63,7 +63,7 @@ void doEncode(std::string srcSegmentPath) {
 
 	// fill in segment information
 	uint64_t segmentId = (uint64_t) time(NULL); // time is used as segmentID in testing program only
-	segmentData.info.segmentSize = filesize;
+	segmentData.info.segLength = filesize;
 	segmentData.info.segmentId = segmentId;
 	segmentData.info.segmentPath = srcSegmentPath;
 
@@ -84,7 +84,7 @@ void doEncode(std::string srcSegmentPath) {
 
 	// write segment to storage
 	const string segmentPath = segmentFolder + "/" + to_string(segmentId);
-	writeFile(segmentPath, segmentData.buf, segmentData.info.segmentSize);
+	writeFile(segmentPath, segmentData.buf, segmentData.info.segLength);
 
 	// write block to storage
 	cout << endl << "Writing Blocks: " << endl;
@@ -183,7 +183,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 	Clock::time_point tCode = Clock::now();
 
 	// write segment to dstSegmentPath
-	writeFile(dstSegmentPath, segmentData.buf, segmentData.info.segmentSize);
+	writeFile(dstSegmentPath, segmentData.buf, segmentData.info.segLength);
 
 	// free segment
 	MemoryPool::getInstance().poolFree(segmentData.buf);
@@ -203,7 +203,7 @@ void doDecode(uint64_t segmentId, uint64_t segmentSize,
 	printResult(tStart, tRead, tCode, tWrite);
 
 	cout << "Read: " << readSize / 1024 /1024 << "MB" << endl;
-	cout << "Written: " << segmentData.info.segmentSize / 1024 /1024 << "MB" << endl << endl;
+	cout << "Written: " << segmentData.info.segLength / 1024 /1024 << "MB" << endl << endl;
 
 	cout << "Decoded segment written to " << dstSegmentPath << endl;
 

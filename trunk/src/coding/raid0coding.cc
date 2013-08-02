@@ -26,7 +26,7 @@ vector<BlockData> Raid0Coding::encode(SegmentData segmentData, string setting) {
 	const uint32_t raid0_n = getParameters(setting);
 
 	// calculate size of each strip
-	const uint32_t stripSize = Coding::roundTo(segmentData.info.segmentSize,
+	const uint32_t stripSize = Coding::roundTo(segmentData.info.segLength,
 			raid0_n) / raid0_n;
 
 	for (uint32_t i = 0; i < raid0_n; i++) {
@@ -35,10 +35,10 @@ vector<BlockData> Raid0Coding::encode(SegmentData segmentData, string setting) {
 		blockData.info.segmentId = segmentData.info.segmentId;
 		blockData.info.blockId = i;
 
-		if (i * stripSize >= segmentData.info.segmentSize) {
+		if (i * stripSize >= segmentData.info.segLength) {
 			blockData.info.blockSize = 0;
-		} else if ((i + 1) * stripSize > segmentData.info.segmentSize) {
-			blockData.info.blockSize = segmentData.info.segmentSize
+		} else if ((i + 1) * stripSize > segmentData.info.segLength) {
+			blockData.info.blockSize = segmentData.info.segLength
 					- i * stripSize;
 		} else
 			blockData.info.blockSize = stripSize;
@@ -65,7 +65,7 @@ SegmentData Raid0Coding::decode(vector<BlockData> &blockDataList,
 
 	// copy segmentID from first block
 	segmentData.info.segmentId = blockDataList[0].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 

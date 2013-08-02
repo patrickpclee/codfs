@@ -27,13 +27,13 @@ vector<BlockData> Raid1Coding::encode(SegmentData segmentData, string setting) {
 		struct BlockData blockData;
 		blockData.info.segmentId = segmentData.info.segmentId;
 		blockData.info.blockId = i;
-		blockData.info.blockSize = segmentData.info.segmentSize;
+		blockData.info.blockSize = segmentData.info.segLength;
 
 		// an optimization is to point the buf pointer to the same memory,
 		// but it may create confusion when user wants to free the data
 
 		blockData.buf = MemoryPool::getInstance().poolMalloc(
-				segmentData.info.segmentSize);
+				segmentData.info.segLength);
 
 		memcpy(blockData.buf, segmentData.buf, blockData.info.blockSize);
 
@@ -51,11 +51,11 @@ SegmentData Raid1Coding::decode(vector<BlockData> &blockDataList,
 
 	struct SegmentData segmentData;
 	segmentData.info.segmentId = blockDataList[blockId].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(
-			segmentData.info.segmentSize);
+			segmentData.info.segLength);
 	memcpy(segmentData.buf, blockDataList[blockId].buf,
-			segmentData.info.segmentSize);
+			segmentData.info.segLength);
 
 	return segmentData;
 }

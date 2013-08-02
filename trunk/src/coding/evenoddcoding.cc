@@ -28,7 +28,7 @@ EvenOddCoding::~EvenOddCoding() {
 vector<BlockData> EvenOddCoding::encode(SegmentData segmentData, string setting) {
 	const uint32_t n = getBlockCountFromSetting(setting);
 	const uint32_t k = n - 2;
-	const uint32_t blockSize = getBlockSize(segmentData.info.segmentSize, setting);
+	const uint32_t blockSize = getBlockSize(segmentData.info.segLength, setting);
 	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
 	vector<struct BlockData> blockDataList;
@@ -54,13 +54,13 @@ vector<BlockData> EvenOddCoding::encode(SegmentData segmentData, string setting)
 
 		// Copy Data
 		char* bufPos = segmentData.buf + i * blockSize;
-		if (i * blockSize >= segmentData.info.segmentSize) {
+		if (i * blockSize >= segmentData.info.segLength) {
 			//Zero Padding
-		} else if ((i + 1) * blockSize > segmentData.info.segmentSize) {
+		} else if ((i + 1) * blockSize > segmentData.info.segLength) {
 			memcpy(blockData.buf, bufPos,
-					segmentData.info.segmentSize - i * blockSize);
-			memset(blockData.buf + segmentData.info.segmentSize - i * blockSize, 0,
-					(i + 1) * blockSize - segmentData.info.segmentSize);
+					segmentData.info.segLength - i * blockSize);
+			memset(blockData.buf + segmentData.info.segLength - i * blockSize, 0,
+					(i + 1) * blockSize - segmentData.info.segLength);
 		} else
 			memcpy(blockData.buf, bufPos, blockSize);
 
@@ -101,7 +101,7 @@ SegmentData EvenOddCoding::decode(vector<BlockData> &blockDataList,
 	char** tempBlock = this->repairDataBlocks(blockDataList, blockList, segmentSize, setting);
 	SegmentData segmentData;
 	segmentData.info.segmentId = blockDataList[blockList[0].first].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	for(uint32_t i = 0; i < k - 1; ++i)

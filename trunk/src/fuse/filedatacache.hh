@@ -8,6 +8,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <list>
+#include "client_storagemodule.hh"
 
 #include "../common/enums.hh"
 #include "../common/segmentdata.hh"
@@ -34,7 +35,6 @@ class FileDataCache {
 
 		std::unordered_map<uint64_t, SegmentStatus> _segmentStatus;
 		std::unordered_map<uint64_t, uint32_t> _segmentPrimary;
-		std::unordered_map<uint64_t, struct SegmentData> _segmentDataCache;
 
 		uint32_t _segmentSize;
 		string _codingSetting;
@@ -59,5 +59,7 @@ class FileDataCache {
 		std::vector<thread> _prefetchThreads;
 		std::unordered_map<uint64_t, bool> _prefetchBitmap;
 		std::mutex _prefetchBitmapMutex;
+
+		ClientStorageModule* _storageModule;
 };
 #endif 

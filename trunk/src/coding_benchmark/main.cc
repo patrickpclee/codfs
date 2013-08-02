@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 	cout << "///Preparaing Data///" << endl;
 	SegmentData segmentData;
 	segmentData.buf = (char*)calloc(segmentSize,1);
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	segmentData.info.segmentId = 0;
 	segmentData.info.segmentPath = "";
 	int* intptr = (int*) segmentData.buf;

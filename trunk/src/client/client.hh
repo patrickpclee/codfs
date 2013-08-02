@@ -129,7 +129,7 @@ public:
 	 */
 	uint32_t getClientId();
 
-	struct SegmentTransferCache getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentId);
+	struct SegmentData getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentId);
 	void getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentId,
 			uint64_t offset, FILE* filePtr, string dstPath);
 

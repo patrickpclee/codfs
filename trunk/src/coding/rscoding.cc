@@ -33,7 +33,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 	const uint32_t m = params[1];
 	const uint32_t w = params[2];
 	const uint32_t size = roundTo(
-			(roundTo(segmentData.info.segmentSize, k) / k), 4);
+			(roundTo(segmentData.info.segLength, k) / k), 4);
 
 	if (k <= 0 || m < 0 || (w != 8 && w != 16 && w != 32)
 			|| (w <= 16 && k + m > (1 << w))) {
@@ -55,13 +55,13 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 		blockData.buf = MemoryPool::getInstance().poolMalloc(size);
 		char* bufPos = segmentData.buf + i * size;
 		
-		if (i * size >= segmentData.info.segmentSize) {
+		if (i * size >= segmentData.info.segLength) {
 			//Zero Padding
-		} else if ((i + 1) * size > segmentData.info.segmentSize) {
+		} else if ((i + 1) * size > segmentData.info.segLength) {
 			memcpy(blockData.buf, bufPos,
-					segmentData.info.segmentSize - i * size);
-			memset(blockData.buf + segmentData.info.segmentSize - i * size, 0,
-					(i + 1) * size - segmentData.info.segmentSize);
+					segmentData.info.segLength - i * size);
+			memset(blockData.buf + segmentData.info.segLength - i * size, 0,
+					(i + 1) * size - segmentData.info.segLength);
 		} else
 			memcpy(blockData.buf, bufPos, size);
 
@@ -147,7 +147,7 @@ SegmentData RSCoding::decode(vector<BlockData> &blockDataList,
 
 	// copy segmentID from first available block
 	segmentData.info.segmentId = blockDataList[blockIdList[0]].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
@@ -320,7 +320,7 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 
 	// copy segmentID from first available block
 	segmentData.info.segmentId = blockData[blockIdList[0]].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	//segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	set<uint32_t> blockIdListSet(blockIdList.begin(), blockIdList.end());
