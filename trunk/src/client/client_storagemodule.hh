@@ -58,6 +58,7 @@ public:
 	 * @param bufLength 	length of the buffer sent
 	 */
     void createSegmentCache(uint64_t segmentId, uint32_t segLength, uint32_t bufLength);
+
 	/**
 	 * write cache of a segment
 	 * @param segmentId 			segment ID
@@ -87,7 +88,7 @@ public:
 	 *
 	 * @return struct SegmentCache contains the segment info.
 	 */
-	struct SegmentTransferCache getSegmentCache(uint64_t segmentId);
+	struct SegmentData getSegmentCache(uint64_t segmentId);
 
 
 	/**
@@ -114,9 +115,11 @@ public:
 	 */
 	void closeFile (FILE* filePtr);
 
+	void setSegmentCache (uint64_t segmentId, SegmentData segmentCache);
+
 private:
 	uint64_t _segmentSize;
-	map <uint64_t, struct SegmentTransferCache> _segmentCache;
+	map <uint64_t, struct SegmentData> _segmentCache;
 	string _segmentFolder;
 };
 

@@ -35,7 +35,7 @@ vector<BlockData> Raid5Coding::encode(SegmentData segmentData, string setting) {
 	}
 
 	// calculate size of each data stripe
-	const uint32_t stripeSize = Coding::roundTo(segmentData.info.segmentSize,
+	const uint32_t stripeSize = Coding::roundTo(segmentData.info.segLength,
 			numDataBlock) / numDataBlock;
 
 	// prepare parity block
@@ -56,13 +56,13 @@ vector<BlockData> Raid5Coding::encode(SegmentData segmentData, string setting) {
 		// copy data to block
 		blockData.buf = MemoryPool::getInstance().poolMalloc(stripeSize);
 		char* bufPos = segmentData.buf + i * stripeSize;
-		if (i * stripeSize >= segmentData.info.segmentSize) {
+		if (i * stripeSize >= segmentData.info.segLength) {
 			//Zero Padding
-		} else if ((i + 1) * stripeSize > segmentData.info.segmentSize) {
+		} else if ((i + 1) * stripeSize > segmentData.info.segLength) {
 			memcpy(blockData.buf, bufPos,
-					segmentData.info.segmentSize - i * stripeSize);
-			memset(blockData.buf + segmentData.info.segmentSize - i * stripeSize, 0,
-					(i + 1) * stripeSize - segmentData.info.segmentSize);
+					segmentData.info.segLength - i * stripeSize);
+			memset(blockData.buf + segmentData.info.segLength - i * stripeSize, 0,
+					(i + 1) * stripeSize - segmentData.info.segLength);
 		} else
 			memcpy(blockData.buf, bufPos, stripeSize);
 
@@ -105,7 +105,7 @@ SegmentData Raid5Coding::decode(vector<BlockData> &blockDataList,
 	// copy segmentID from first available block
 	segmentData.info.segmentId =
 			blockDataList[symbolList[0].first].info.segmentId;
-	segmentData.info.segmentSize = segmentSize;
+	segmentData.info.segLength = segmentSize;
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
 
 	struct BlockData rebuildBlockData;

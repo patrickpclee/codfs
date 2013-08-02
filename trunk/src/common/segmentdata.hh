@@ -14,7 +14,7 @@ using namespace std;
 
 struct SegmentInfo {
 	uint64_t segmentId;
-	uint32_t segmentSize;
+	uint32_t segLength;
 	string segmentPath;
     vector<offset_length_t> offlenVector; 
 
@@ -45,19 +45,19 @@ struct SegmentInfo {
 struct SegmentData {
 	struct SegmentInfo info;
 	char* buf;
-    uint32_t totalBufSize;
+    uint32_t bufLength;
     FileType fileType;
 
     void packBuf() {
     	if (info.offlenVector.size() == 0) {
-    		totalBufSize = info.segmentSize;
+    		bufLength = info.segLength;
     		return;
     	}
         info.packOffsets();
-        totalBufSize = 0;
+        bufLength = 0;
         for (uint32_t i = 0; i < info.offlenVector.size(); i++) {
-            memmove(buf+totalBufSize, buf+info.offlenVector[i].first, info.offlenVector[i].second);
-            totalBufSize += info.offlenVector[i].second;
+            memmove(buf+bufLength, buf+info.offlenVector[i].first, info.offlenVector[i].second);
+            bufLength += info.offlenVector[i].second;
         }
     };
 };

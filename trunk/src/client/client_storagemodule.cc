@@ -119,18 +119,25 @@ struct SegmentData ClientStorageModule::readSegmentFromFile(string filepath,
 	fclose(file);
 
 	// fill in information about segment
-	segmentData.info.segmentSize = byteToRead;
+	segmentData.info.segLength = byteToRead;
 
 	return segmentData;
 
+}
+
+void ClientStorageModule::setSegmentCache (uint64_t segmentId, SegmentData segmentCache) {
+	{
+		lock_guard<mutex> lk(transferCacheMutex);
+		_segmentCache[segmentId] = segmentCache;
+	}
 }
 
 void ClientStorageModule::createSegmentCache(uint64_t segmentId,
 		uint32_t segLength, uint32_t bufLength) {
 
 	// create cache
-	struct SegmentTransferCache segmentCache;
-	segmentCache.segLength = segLength;
+	struct SegmentData segmentCache;
+	segmentCache.info.segLength = segLength;
 	segmentCache.bufLength = bufLength;
 	segmentCache.buf = MemoryPool::getInstance().poolMalloc(segLength);
 
@@ -167,7 +174,7 @@ bool ClientStorageModule::locateSegmentCache(uint64_t segmentId){
 	return _segmentCache.count(segmentId);
 }
 
-struct SegmentTransferCache ClientStorageModule::getSegmentCache(uint64_t segmentId) {
+struct SegmentData ClientStorageModule::getSegmentCache(uint64_t segmentId) {
 	lock_guard<mutex> lk(transferCacheMutex);
 	if (!_segmentCache.count(segmentId)) {
 		debug("segment cache not found for %" PRIu64 "\n", segmentId);
@@ -183,7 +190,7 @@ void ClientStorageModule::closeSegment(uint64_t segmentId) {
 		debug_yellow("Segment Cache Not Found for %" PRIu64 "\n", segmentId);
 		return;
 	}
-	struct SegmentTransferCache segmentCache = getSegmentCache(segmentId);
+	struct SegmentData segmentCache = getSegmentCache(segmentId);
 	MemoryPool::getInstance().poolFree(segmentCache.buf);
 
 	{

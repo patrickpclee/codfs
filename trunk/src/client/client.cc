@@ -63,9 +63,9 @@ void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t segmentId,
 
 #endif
 
-struct SegmentTransferCache Client::getSegment(uint32_t clientId,
+struct SegmentData Client::getSegment(uint32_t clientId,
 		uint32_t dstSockfd, uint64_t segmentId) {
-	struct SegmentTransferCache segmentCache = { };
+	struct SegmentData segmentCache = { };
 
 	// get segment from cache directly if possible
 	if (_storageModule->locateSegmentCache(segmentId)) {
@@ -92,16 +92,16 @@ struct SegmentTransferCache Client::getSegment(uint32_t clientId,
 void Client::getSegment(uint32_t clientId, uint32_t dstSockfd, uint64_t segmentId,
 		uint64_t offset, FILE* filePtr, string dstPath) {
 
-	struct SegmentTransferCache segmentCache = { };
+	struct SegmentData segmentCache = { };
 
 	segmentCache = getSegment(clientId, dstSockfd, segmentId);
 
 	_storageModule->writeFile(filePtr, dstPath, segmentCache.buf, offset,
-			segmentCache.segLength);
+			segmentCache.info.segLength);
 
 	debug(
 			"Write Segment ID: %" PRIu64 " Offset: %" PRIu64 " Length: %" PRIu32 " to %s\n",
-			segmentId, offset, segmentCache.segLength, dstPath.c_str());
+			segmentId, offset, segmentCache.info.segLength, dstPath.c_str());
 
 	_storageModule->closeSegment(segmentId);
 

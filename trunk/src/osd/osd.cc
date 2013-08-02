@@ -111,14 +111,9 @@ void Osd::reportRemovedCache() {
 }
 
 void Osd::cacheSegment(uint64_t segmentId, SegmentData segmentData) {
-    // cache segmentData
-    struct SegmentTransferCache segmentTransferCache;
-    segmentTransferCache.buf = segmentData.buf;
-    segmentTransferCache.segLength = segmentData.info.segmentSize;
-    segmentTransferCache.bufLength = segmentData.totalBufSize;
 
     if (!_storageModule->isSegmentCached(segmentId)) {
-        _storageModule->putSegmentToDiskCache(segmentId, segmentTransferCache);
+        _storageModule->putSegmentToDiskCache(segmentId, segmentData);
     }
 }
 
@@ -439,7 +434,7 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
     }
 
     // create segment and cache
-    _storageModule->createSegmentTransferCache(segmentId, segLength, bufLength,
+    _storageModule->createSegmentCache(segmentId, segLength, bufLength,
             dataMsgType, updateKey);
     _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId, dataMsgType);
 
@@ -518,8 +513,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 || (dataMsgType == UPDATE
                     && _pendingUpdateSegmentChunk.get(updateKey) == 0)) {
             // if all chunks have arrived
-            struct SegmentTransferCache segmentCache =
-                _storageModule->getSegmentTransferCache(segmentId,
+            struct SegmentData segmentCache =
+                _storageModule->getSegmentData(segmentId,
                         dataMsgType, updateKey);
 
             unsigned char checksum[MD5_DIGEST_LENGTH];
@@ -556,12 +551,12 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             if (dataMsgType == UPLOAD) {
                 blockDataList = _codingModule->encodeSegmentToBlock(
                         codingSetting.codingScheme, segmentId, segmentCache.buf,
-                        segmentCache.segLength, codingSetting.setting);
+                        segmentCache.info.segLength, codingSetting.setting);
             } else if (dataMsgType == UPDATE) {
                 //... call codingModule to do update
                 blockDataList = _codingModule->unpackUpdates(
                         codingSetting.codingScheme, segmentId, segmentCache.buf,
-                        segmentCache.segLength, codingSetting.setting,
+                        segmentCache.info.segLength, codingSetting.setting,
                         offsetLength);
             }
 
@@ -633,7 +628,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 _pendingSegmentChunk.erase(segmentId);
                 // Acknowledge MDS for Segment Upload Completed
                 _osdCommunicator->segmentUploadAck(segmentId,
-                        segmentCache.segLength, codingSetting.codingScheme,
+                        segmentCache.info.segLength, codingSetting.codingScheme,
                         codingSetting.setting, nodeList, md5ToHex(checksum));
             } else {
                 _pendingUpdateSegmentChunk.erase(updateKey);
@@ -649,7 +644,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             _storageModule->putSegmentToDiskCache(segmentId, segmentCache);
 #endif
 
-            _storageModule->closeSegmentTransferCache(segmentId, dataMsgType,
+            _storageModule->closeSegmentData(segmentId, dataMsgType,
                     updateKey);
             break;
         } else {
@@ -751,7 +746,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
         DataMsgType dataMsgType, string updateKey, char* buf) {
 
     uint32_t byteWritten;
-    byteWritten = _storageModule->writeSegmentTransferCache(segmentId, buf,
+    byteWritten = _storageModule->writeSegmentData(segmentId, buf,
             offset, length, dataMsgType, updateKey);
 
     if (dataMsgType == UPLOAD) {
