@@ -194,6 +194,7 @@ void StorageModule::createSegmentCache(uint64_t segmentId,
 
 	// create cache
 	struct SegmentData segmentCache;
+	segmentCache.info.segmentId = segmentId;
 	segmentCache.bufLength = bufLength;
 	segmentCache.info.segLength = segLength;
 	//segmentCache.buf = MemoryPool::getInstance().poolMalloc(bufLength);
