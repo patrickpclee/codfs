@@ -18,8 +18,8 @@ extern ConfigLayer* _configLayer;
 FileDataCache::FileDataCache() {
     // TODO: Read from XML
     _segmentSize = 10 * 1024 * 1024;
-    _codingScheme = RAID0_CODING;
-    _codingSetting = Raid0Coding::generateSetting(2);
+    _codingScheme = RAID5_CODING;
+    _codingSetting = Raid0Coding::generateSetting(3);
     _lruSizeLimit = 10;
     _writeBufferSize = 1;
     _writeBuffer = new RingBuffer<uint64_t>(_writeBufferSize);
@@ -191,7 +191,8 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
     _segmentStatus.erase(segmentId);
 
     if ((segmentData.info.segLength == 0) || (segmentStatus != DIRTY)) {
-        MemoryPool::getInstance().poolFree(segmentData.buf);
+        debug ("Segment ID = %" PRIu64 " SegLength = %" PRIu32 "\n", segmentData.info.segmentId, segmentData.info.segLength);
+        _storageModule->closeSegment(segmentId);
         _segmentStatus.erase(segmentId);
         return;
     }
