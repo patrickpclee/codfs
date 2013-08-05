@@ -35,3 +35,6 @@ log/
 /file1
 /lib
 /o2
+mount.sh
+run_osd.sh
+osdid.txt
