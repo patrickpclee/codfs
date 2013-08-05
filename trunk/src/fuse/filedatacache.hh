@@ -41,10 +41,10 @@ class FileDataCache {
 		CodingScheme _codingScheme;
 		uint32_t _lruSizeLimit;
 
-		std::mutex _dataCacheMutex;
-		std::unordered_map<uint64_t, std::mutex*> _segmentLock;
+//		std::mutex _dataCacheMutex;
+//		std::unordered_map<uint64_t, std::mutex*> _segmentLock;
 
-		std::mutex _lruListMutex;
+//		std::mutex _lruListMutex;
 		std::list<uint64_t> _segmentLruList;
 		std::unordered_map<uint64_t, std::list<uint64_t>::iterator> _segment2LruMap;
 
@@ -58,7 +58,7 @@ class FileDataCache {
 		uint32_t _numPrefetchThread;
 		std::vector<thread> _prefetchThreads;
 		std::unordered_map<uint64_t, bool> _prefetchBitmap;
-		std::mutex _prefetchBitmapMutex;
+//		std::mutex _prefetchBitmapMutex;
 
 		ClientStorageModule* _storageModule;
 };
