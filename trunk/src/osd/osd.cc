@@ -228,6 +228,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                     if (osdId == _osdId) {
                         // read block from disk
+                        debug ("%s\n", "BLK READ FROM DISK");
                         struct BlockData blockData = _storageModule->readBlock(
                                 segmentId, i, blockSymbols.second);
 
@@ -333,6 +334,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols,
         DataMsgType dataMsgType) {
+                        debug ("%s\n", "BLK READ FROM PROCESSOR");
     struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
             symbols);
     _osdCommunicator->sendBlock(sockfd, blockData, dataMsgType);
@@ -354,6 +356,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
     if (osdId == _osdId) {
         // read block from disk
+                        debug ("%s\n", "BLK READ FROM REPAIR");
         repairedBlock = _storageModule->readBlock(segmentId, blockId,
                 offsetLength);
     } else {
@@ -608,10 +611,10 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             for (const auto blockData : blockDataList) {
 
                 // delta update case 1: primary OSD receives the update
-                if (dataMsgType == UPDATE) {
+                if (dataMsgType == UPDATE && blockLocationList[blockData.info.blockId].osdId == _osdId) {
                     // send delta to parity nodes
                     sendDelta(segmentId, blockData.info.blockId, blockData,
-                            offsetLength);
+                            blockData.info.offlenVector);
                 }
 
 #ifdef PARALLEL_TRANSFER
@@ -677,6 +680,7 @@ BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
     }
 
     // read old block
+                        debug ("%s\n", "BLK READ FROM DELTA");
     BlockData delta = _storageModule->readBlock(segmentId, blockId,
             offsetLength);
 

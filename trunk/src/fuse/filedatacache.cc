@@ -19,7 +19,7 @@ FileDataCache::FileDataCache() {
     // TODO: Read from XML
     _segmentSize = 10 * 1024 * 1024;
     _codingScheme = RAID5_CODING;
-    _codingSetting = Raid0Coding::generateSetting(3);
+    _codingSetting = Raid5Coding::generateSetting(3);
     _lruSizeLimit = 10;
     _writeBufferSize = 1;
     _writeBuffer = new RingBuffer<uint64_t>(_writeBufferSize);
