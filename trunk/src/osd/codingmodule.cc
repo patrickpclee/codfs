@@ -140,13 +140,13 @@ vector<BlockData> CodingModule::unpackUpdates(CodingScheme codingScheme,
             uint32_t curSize = blkSize * (headIdx + 1) - curHead;
             // save to tmp
             blkBufSize[headIdx] += curSize;
-            offlenVectors[headIdx].push_back(make_pair(curHead, curSize));
+            offlenVectors[headIdx].push_back(make_pair(curHead-headIdx*blkSize, curSize));
             //update idx
             curHead = blkSize * (headIdx + 1);
             headIdx = curHead / blkSize;
         }
         blkBufSize[tailIdx] += curTail - curHead;
-        offlenVectors[tailIdx].push_back(make_pair(curHead, curTail-curHead));
+        offlenVectors[tailIdx].push_back(make_pair(curHead-headIdx*blkSize, curTail-curHead));
     }
 
     uint32_t toffset = 0;
