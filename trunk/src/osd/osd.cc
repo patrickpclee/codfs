@@ -484,7 +484,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
                 blockLocation.osdId);
         if (dataMsgType == UPDATE || dataMsgType == PARITY) {
             uint32_t updateId = ++_updateId;
-            string updateKey = _osdId + "." + updateId;
+            string updateKey = to_string(_osdId) + "." + to_string(updateId);
             debug ("updateKey = %s\n", updateKey.c_str());
             _osdCommunicator->sendBlock(dstSockfd, blockData, dataMsgType,
                     updateKey);
