@@ -354,6 +354,7 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 	blockData.info.segmentId = segmentId;
 	blockData.info.blockId = blockId;
 	blockData.info.blockSize = combinedLength;
+	blockData.info.offlenVector = symbols;
 	blockData.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
 	char* bufptr = blockData.buf;
 
@@ -501,12 +502,15 @@ uint32_t StorageModule::writeRemoteBlock(uint32_t osdId, uint64_t segmentId,
 
 uint32_t StorageModule::updateBlock (uint64_t segmentId, uint32_t blockId, BlockData blockData) {
 
+    debug ("updateBlock segment %" PRIu64 " %" PRIu32 "\n", segmentId, blockId);
+
 	uint32_t byteWritten = 0;
 	uint32_t curOffset= 0;
 
 	string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
 
 	for (offset_length_t offsetLength : blockData.info.offlenVector) {
+	    debug ("Update block offset %" PRIu32 " length %" PRIu32 "\n", offsetLength.first, offsetLength.second);
 	    byteWritten += writeFile(filepath, blockData.buf + curOffset, offsetLength.first, offsetLength.second, false);
 	    curOffset += offsetLength.second;
 	}

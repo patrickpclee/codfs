@@ -451,7 +451,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
         const struct BlockLocation& blockLocation, enum DataMsgType dataMsgType,
         uint32_t blocktpId) {
     debug("Distribute Block %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
-            segmentId, blockData.info.blockId, blockLocation.osdId);
+            segmentId, blockLocation.blockId, blockLocation.osdId);
     // if destination is myself
     if (blockLocation.osdId == _osdId) {
         if (dataMsgType == UPLOAD) {
@@ -482,6 +482,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
         if (dataMsgType == UPDATE || dataMsgType == PARITY) {
             uint32_t updateId = ++_updateId;
             string updateKey = _osdId + "." + updateId;
+            debug ("updateKey = %s\n", updateKey.c_str());
             _osdCommunicator->sendBlock(dstSockfd, blockData, dataMsgType,
                     updateKey);
         } else {
@@ -580,9 +581,11 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 uint32_t blockNum = segmentInfo._osdList.size();
                 uint32_t parityNum = _codingModule->getParityNumber(
                         codingSetting.codingScheme, codingSetting.setting);
-                vector< pair<uint32_t, uint32_t> > parityOsdListPair;
+                vector<pair<uint32_t, uint32_t> > parityOsdListPair;
                 for (uint32_t i = parityNum; i >= 1; --i) {
-                    parityOsdListPair.push_back(make_pair(segmentInfo._osdList[blockNum - i], blockNum-i));
+                    parityOsdListPair.push_back(
+                            make_pair(segmentInfo._osdList[blockNum - i],
+                                    blockNum - i));
                 }
                 for (uint32_t i = 0; i < blockDataList.size(); i++) {
                     blockDataList[i].info.parityVector = parityOsdListPair;
@@ -607,7 +610,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 // delta update case 1: primary OSD receives the update
                 if (dataMsgType == UPDATE) {
                     // send delta to parity nodes
-                    sendDelta (segmentId, blockData.info.blockId, blockData, offsetLength);
+                    sendDelta(segmentId, blockData.info.blockId, blockData,
+                            offsetLength);
                 }
 
 #ifdef PARALLEL_TRANSFER
@@ -682,23 +686,26 @@ BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
     return delta;
 }
 
-void Osd::sendDelta (uint64_t segmentId, uint32_t blockId,
-        BlockData newBlock, vector<offset_length_t> offsetLength) {
+void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
+        vector<offset_length_t> offsetLength) {
 
     // update delta (should be performed before updating the block in-place
-    BlockData delta = computeDelta(segmentId, blockId, newBlock,
-            offsetLength);
+    BlockData delta = computeDelta(segmentId, blockId, newBlock, offsetLength);
     for (auto& parityPair : newBlock.info.parityVector) {
         BlockLocation blockLocation;
         blockLocation.osdId = parityPair.first;
         blockLocation.blockId = parityPair.second;    // replaced
 
+        delta.info.blockId = parityPair.second;
+
+        debug(
+                "Send delta of segment %" PRIu64 " block %" PRIu32 " to OSD %" PRIu32 "\n",
+                segmentId, blockLocation.blockId, blockLocation.osdId);
+
         uint32_t blocktpId = ++_blocktpId;
         _blocktp.schedule(
-                boost::bind(&Osd::distributeBlock, this, segmentId,
-                        delta,
-                        blockLocation,
-                        PARITY, blocktpId));
+                boost::bind(&Osd::distributeBlock, this, segmentId, delta,
+                        blockLocation, PARITY, blocktpId));
     }
 }
 
@@ -729,12 +736,15 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
         while (1) {
             if (_pendingUpdateBlockChunk.get(updateKey) == 0) {
 
-                debug ("[UPDATE] all chunks for updateKey %s is received\n", updateKey.c_str());
+                debug("[UPDATE] all chunks for updateKey %s is received\n",
+                        updateKey.c_str());
                 struct BlockData blockData = _updateBlockData.get(updateKey);
 
                 // delta update case 2: secondary OSD receives the update
                 // send delta to parity nodes
-                sendDelta (segmentId, blockId, blockData, offsetLength);
+                sendDelta(segmentId, blockId, blockData, offsetLength);
+
+                blockData.info.offlenVector = offsetLength;
 
                 _storageModule->updateBlock(segmentId, blockId, blockData);
                 _storageModule->flushBlock(segmentId, blockId);
@@ -756,8 +766,11 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
     } else if (dataMsgType == PARITY) {
         while (1) {
             if (_pendingUpdateBlockChunk.get(updateKey) == 0) {
-                debug ("[PARITY] all chunks for updateKey %s is received\n", updateKey.c_str());
+                debug("[PARITY] all chunks for updateKey %s is received\n",
+                        updateKey.c_str());
                 struct BlockData blockData = _updateBlockData.get(updateKey);
+
+                blockData.info.offlenVector = offsetLength;
 
                 _storageModule->updateBlock(segmentId, blockId, blockData);
                 _storageModule->flushBlock(segmentId, blockId);
