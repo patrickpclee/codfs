@@ -64,6 +64,7 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 #define MAX_NUM_PROCESSING_SEGMENT 10
 //#define CACHE_AFTER_TRANSFER
 //#define MOUNT_OSD
+#define APPEND_DELTA
 
 // osd/storagemodule.cc
 //#define USE_SEGMENT_CACHE
