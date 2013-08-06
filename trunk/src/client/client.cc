@@ -217,7 +217,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	// 1. Get file infomation from MDS
 	struct FileMetaData fileMetaData = _clientCommunicator->downloadFile(
 			_clientId, fileId);
-	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n",
+	debug("File ID %" PRIu32 ", Size = %" PRIu32 "\n",
 			fileMetaData._id, fileMetaData._size);
 
 	// open file

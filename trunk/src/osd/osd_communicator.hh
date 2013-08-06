@@ -243,7 +243,7 @@ private:
 	 */
 
 	void putBlockEnd(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
-			DataMsgType dataMsgType, string updateKey, vector<offset_length_t> offsetLength);
+			DataMsgType dataMsgType, string updateKey, vector<offset_length_t> offsetLength, vector<BlockLocation> parityList);
 
 };
 

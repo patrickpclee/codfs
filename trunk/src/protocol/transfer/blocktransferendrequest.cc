@@ -18,7 +18,7 @@ BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
 BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
 		Communicator* communicator, uint32_t osdSockfd, uint64_t segmentId,
 		uint32_t blockId, DataMsgType dataMsgType, string updateKey,
-		vector<offset_length_t> offsetLength) :
+		vector<offset_length_t> offsetLength, vector<BlockLocation> parityList) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -27,6 +27,7 @@ BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
 	_dataMsgType = (DataMsgType) dataMsgType;
 	_updateKey = updateKey;
 	_offsetLength = offsetLength;
+	_parityList = parityList;
 }
 
 void BlockTransferEndRequestMsg::prepareProtocolMsg() {
@@ -45,6 +46,14 @@ void BlockTransferEndRequestMsg::prepareProtocolMsg() {
 				blockTransferEndRequestPro.add_offsetlength();
 		offsetLengthPro->set_offset((*it).first);
 		offsetLengthPro->set_length((*it).second);
+	}
+
+    vector<BlockLocation>::iterator it1;
+	for (it1 = _parityList.begin(); it1 < _parityList.end(); ++it1) {
+		ncvfs::BlockLocationPro* blockLocationPro =
+				blockTransferEndRequestPro.add_blocklocation();
+        blockLocationPro->set_osdid((*it1).osdId);
+        blockLocationPro->set_blockid((*it1).blockId);
 	}
 
 	if (!blockTransferEndRequestPro.SerializeToString(&serializedString)) {
@@ -81,12 +90,23 @@ void BlockTransferEndRequestMsg::parse(char* buf) {
 		_offsetLength.push_back(tempOffsetLength);
 	}
 
+	for (int i = 0; i < blockTransferEndRequestPro.blocklocation_size(); ++i) {
+	        struct BlockLocation tempBlockLocation;
+
+	        tempBlockLocation.osdId =
+	                blockTransferEndRequestPro.blocklocation(i).osdid();
+	        tempBlockLocation.blockId =
+	                blockTransferEndRequestPro.blocklocation(i).blockid();
+
+	        _parityList.push_back(tempBlockLocation);
+	    }
+
 }
 
 void BlockTransferEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putBlockEndProcessor(_msgHeader.requestId, _sockfd, _segmentId,
-			_blockId, _dataMsgType, _updateKey, _offsetLength);
+			_blockId, _dataMsgType, _updateKey, _offsetLength, _parityList);
 #endif
 }
 

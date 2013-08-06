@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdint.h>
+#include "../common/blocklocation.hh"
 
 using namespace std;
 
@@ -10,7 +11,7 @@ struct BlockInfo {
 	uint64_t segmentId;
 	uint32_t blockId;
 	uint32_t blockSize;
-    vector< pair<uint32_t, uint32_t> > parityVector; // pair of <osdid, blockid>
+    vector<BlockLocation> parityVector; // pair of <osdid, blockid>
     vector<offset_length_t> offlenVector;
 
 };

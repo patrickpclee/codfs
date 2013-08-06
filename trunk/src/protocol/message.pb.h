@@ -4621,6 +4621,18 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
       mutable_offsetlength();
   
+  // repeated .ncvfs.BlockLocationPro blockLocation = 6;
+  inline int blocklocation_size() const;
+  inline void clear_blocklocation();
+  static const int kBlockLocationFieldNumber = 6;
+  inline const ::ncvfs::BlockLocationPro& blocklocation(int index) const;
+  inline ::ncvfs::BlockLocationPro* mutable_blocklocation(int index);
+  inline ::ncvfs::BlockLocationPro* add_blocklocation();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro >&
+      blocklocation() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro >*
+      mutable_blocklocation();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.BlockTransferEndRequestPro)
  private:
   inline void set_has_segmentid();
@@ -4639,9 +4651,10 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   int datamsgtype_;
   ::std::string* updatekey_;
   ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro > blocklocation_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -10097,6 +10110,31 @@ BlockTransferEndRequestPro::offsetlength() const {
 inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
 BlockTransferEndRequestPro::mutable_offsetlength() {
   return &offsetlength_;
+}
+
+// repeated .ncvfs.BlockLocationPro blockLocation = 6;
+inline int BlockTransferEndRequestPro::blocklocation_size() const {
+  return blocklocation_.size();
+}
+inline void BlockTransferEndRequestPro::clear_blocklocation() {
+  blocklocation_.Clear();
+}
+inline const ::ncvfs::BlockLocationPro& BlockTransferEndRequestPro::blocklocation(int index) const {
+  return blocklocation_.Get(index);
+}
+inline ::ncvfs::BlockLocationPro* BlockTransferEndRequestPro::mutable_blocklocation(int index) {
+  return blocklocation_.Mutable(index);
+}
+inline ::ncvfs::BlockLocationPro* BlockTransferEndRequestPro::add_blocklocation() {
+  return blocklocation_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro >&
+BlockTransferEndRequestPro::blocklocation() const {
+  return blocklocation_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro >*
+BlockTransferEndRequestPro::mutable_blocklocation() {
+  return &blocklocation_;
 }
 
 // -------------------------------------------------------------------
