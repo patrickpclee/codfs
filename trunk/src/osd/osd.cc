@@ -580,12 +580,12 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 uint32_t blockNum = segmentInfo._osdList.size();
                 uint32_t parityNum = _codingModule->getParityNumber(
                         codingSetting.codingScheme, codingSetting.setting);
-                vector<uint32_t> parityOsdList;
+                vector< pair<uint32_t, uint32_t> > parityOsdListPair;
                 for (uint32_t i = parityNum; i >= 1; --i) {
-                    parityOsdList.push_back(segmentInfo._osdList[blockNum - i]);
+                    parityOsdListPair.push_back(make_pair(segmentInfo._osdList[blockNum - i], blockNum-i));
                 }
                 for (uint32_t i = 0; i < blockDataList.size(); i++) {
-                    blockDataList[i].info.parityVector = parityOsdList;
+                    blockDataList[i].info.parityVector = parityOsdListPair;
                 }
 
                 // copy to blockLocationList
@@ -688,10 +688,10 @@ void Osd::sendDelta (uint64_t segmentId, uint32_t blockId,
     // update delta (should be performed before updating the block in-place
     BlockData delta = computeDelta(segmentId, blockId, newBlock,
             offsetLength);
-    for (uint32_t parityId : newBlock.info.parityVector) {
+    for (auto& parityPair : newBlock.info.parityVector) {
         BlockLocation blockLocation;
-        blockLocation.blockId = blockId;    // this is wrong, should be parity block ID
-        blockLocation.osdId = parityId;
+        blockLocation.osdId = parityPair.first;
+        blockLocation.blockId = parityPair.second;    // replaced
 
         uint32_t blocktpId = ++_blocktpId;
         _blocktp.schedule(

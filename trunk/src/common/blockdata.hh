@@ -10,7 +10,7 @@ struct BlockInfo {
 	uint64_t segmentId;
 	uint32_t blockId;
 	uint32_t blockSize;
-    vector<uint32_t> parityVector;
+    vector< pair<uint32_t, uint32_t> > parityVector; // pair of <osdid, blockid>
     vector<offset_length_t> offlenVector;
 
 };
