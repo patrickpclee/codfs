@@ -88,6 +88,14 @@ static struct FileMetaData getAndCacheFileMetaData(uint32_t id) {
 	struct FileMetaData fileMetaData;
 	try {
 		fileMetaData = _fileMetaDataCache->getMetaData(id);
+		for (uint32_t primary : fileMetaData._primaryList) {
+		    // if at least one primary is disconnected, request latest metadata from MDS
+            if (_clientCommunicator->getSockfdFromId(primary) == (uint32_t)-1){
+                fileMetaData = _clientCommunicator->getFileInfo(_clientId, id);
+                _fileMetaDataCache->saveMetaData(fileMetaData);
+                break;
+            }
+		}
 	} catch (const std::out_of_range& oor) {
 		debug("Meta Data of File %" PRIu32 " Not Cached\n",id);
 		fileMetaData = _clientCommunicator->getFileInfo(_clientId, id);
