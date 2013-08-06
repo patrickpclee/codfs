@@ -2,6 +2,7 @@
 #define __BLOCK_TRANSFER_END_REQUEST_HH__
 
 #include "../message.hh"
+#include "../common/blocklocation.hh"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ public:
 
 	BlockTransferEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
-			string updateKey, vector<offset_length_t> offsetLength);
+			string updateKey, vector<offset_length_t> offsetLength, vector<BlockLocation> parityList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -53,6 +54,7 @@ private:
 	DataMsgType _dataMsgType;
 	string _updateKey;
 	vector<offset_length_t> _offsetLength;
+	vector<BlockLocation> _parityList;
 };
 
 #endif

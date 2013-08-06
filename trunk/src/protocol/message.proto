@@ -27,7 +27,6 @@ message OffsetLengthPro {
 	optional fixed32 length = 2;
 }
 
-
 message DataMsgPro {
 	enum DataMsgType {
 		DEFAULT_DATA_MSG = 15;
@@ -353,6 +352,7 @@ message BlockTransferEndRequestPro {
 	optional DataMsgPro.DataMsgType dataMsgType = 3;
 	optional string updateKey = 4;
 	repeated OffsetLengthPro offsetLength = 5;
+	repeated BlockLocationPro blockLocation = 6;
 }
 
 message PutBlockInitReplyPro {

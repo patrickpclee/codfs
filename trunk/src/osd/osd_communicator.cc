@@ -141,6 +141,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 	const uint32_t chunkCount = ((length - 1) / _chunkSize) + 1;
 
 	vector<offset_length_t> offsetLength = blockData.info.offlenVector;
+	vector<BlockLocation> parityList = blockData.info.parityVector;
 
 	// step 1: send init message, wait for ack
 
@@ -179,7 +180,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 	unlockDataQueue(sockfd);
 #endif
 
-	putBlockEnd(sockfd, segmentId, blockId, dataMsgType, updateKey, offsetLength);
+	putBlockEnd(sockfd, segmentId, blockId, dataMsgType, updateKey, offsetLength, parityList);
 
 	cout << "Put Block ID = " << segmentId << "." << blockId << " Finished"
 			<< endl;
@@ -289,13 +290,13 @@ void OsdCommunicator::putBlockData(uint32_t sockfd, uint64_t segmentId,
 
 void OsdCommunicator::putBlockEnd(uint32_t sockfd, uint64_t segmentId,
 		uint32_t blockId, DataMsgType dataMsgType, string updateKey,
-		vector<offset_length_t> offsetLength) {
+		vector<offset_length_t> offsetLength, vector<BlockLocation> parityList) {
 
 	// Step 3 of the upload process
 
 	BlockTransferEndRequestMsg* blockTransferEndRequestMsg =
 			new BlockTransferEndRequestMsg(this, sockfd, segmentId, blockId,
-					dataMsgType, updateKey, offsetLength);
+					dataMsgType, updateKey, offsetLength, parityList);
 
 	blockTransferEndRequestMsg->prepareProtocolMsg();
 	addMessage(blockTransferEndRequestMsg, true);

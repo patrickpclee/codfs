@@ -242,7 +242,7 @@ public:
 
     void putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
             uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
-            string updateKey, vector<offset_length_t> offsetLength);
+            string updateKey, vector<offset_length_t> offsetLength, vector<BlockLocation> parityList);
 
     /**
      * Action when a recovery request is received
