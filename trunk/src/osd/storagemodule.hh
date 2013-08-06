@@ -71,6 +71,7 @@ public:
      */
 
     void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
+    void createDeltaBlock (uint64_t segmentId, uint32_t blockId, uint32_t deltaId, uint32_t length);
 
 #ifdef MOUNT_OSD
     /**
@@ -120,6 +121,7 @@ public:
 
     struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
             vector<offset_length_t> symbols);
+    struct BlockData readDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
 
     /**
      * Read symbols from a remote block
@@ -170,6 +172,8 @@ public:
 
     uint32_t writeBlock(uint64_t segmentId, uint32_t blockId, char* buf,
             uint64_t offsetInBlock, uint32_t length);
+    uint32_t writeDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, char* buf,
+            uint32_t length, vector<offset_length_t> offsetLength);
 
     /**
      * Modify an existing block
@@ -224,6 +228,7 @@ public:
      */
 
     void flushBlock(uint64_t segmentId, uint32_t blockId);
+    void flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
 
 #ifdef MOUNT_OSD
     /**
@@ -463,6 +468,8 @@ private:
      */
 
     string generateBlockPath(uint64_t segmentId, uint32_t blockId,
+            string blockFolder);
+    string generateDeltaBlockPath(uint64_t segmentId, uint32_t blockId, uint32_t deltaId,
             string blockFolder);
 
 #ifdef MOUNT_OSD

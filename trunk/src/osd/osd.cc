@@ -675,10 +675,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
         BlockData newBlock, vector<offset_length_t> offsetLength) {
 
-    uint32_t combinedLength = 0;
-    for (auto offsetLengthPair : offsetLength) {
-        combinedLength += offsetLengthPair.second;
-    }
+    uint32_t combinedLength = getCombinedLength(offsetLength);
 
     // read old block
                         debug ("%s\n", "BLK READ FROM DELTA");
@@ -777,14 +774,20 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockData.info.offlenVector = offsetLength;
                 blockData.info.parityVector = parityList;
 
-                // read old parity and compute XOR
-                BlockData delta = computeDelta(segmentId, blockId, blockData, offsetLength);
+#ifdef APPEND_DELTA
+                uint32_t combinedLength = getCombinedLength(blockData.info.offlenVector);
+                // TODO: append write the parity delta here
 
-                _storageModule->updateBlock(segmentId, blockId, delta);
+#else
+                // read old parity and compute XOR
+                BlockData parityDelta = computeDelta(segmentId, blockId, blockData, offsetLength);
+
+                _storageModule->updateBlock(segmentId, blockId, parityDelta);
                 _storageModule->flushBlock(segmentId, blockId);
 
+                MemoryPool::getInstance().poolFree(parityDelta.buf);
+#endif
                 MemoryPool::getInstance().poolFree(blockData.buf);
-                MemoryPool::getInstance().poolFree(delta.buf);
                 _updateBlockData.erase(updateKey);
                 _pendingUpdateBlockChunk.erase(updateKey);
             }
@@ -1103,4 +1106,12 @@ StorageModule * Osd::getStorageModule() {
 
 uint32_t Osd::getOsdId() {
     return _osdId;
+}
+
+uint32_t Osd::getCombinedLength(vector<offset_length_t> offsetLength) {
+    uint32_t combinedLength = 0;
+    for (auto offsetLengthPair : offsetLength) {
+        combinedLength += offsetLengthPair.second;
+    }
+    return combinedLength;
 }
