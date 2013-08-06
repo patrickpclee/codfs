@@ -293,6 +293,10 @@ struct SegmentData StorageModule::readSegment(uint64_t segmentId,
 	// poolFree in osd_communicator::sendSegment
 	segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
 
+	debug(
+			"READ SEGMENT Segment ID = %" PRIu64 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
+			segmentId, byteToRead, offsetInSegment);
+
 	readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,
 			byteToRead, true);
 
@@ -357,6 +361,7 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 	for (auto offsetLengthPair : symbols) {
 		uint32_t offset = offsetLengthPair.first;
 		uint32_t length = offsetLengthPair.second;
+        debug("READ BLOCK Symbol %s offset = %" PRIu32 " length = %" PRIu32 "\n", blockPath.c_str(), offset, length);
 		readFile(blockPath, bufptr, offset, length, false);
 		bufptr += length;
 	}
