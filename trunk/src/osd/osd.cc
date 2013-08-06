@@ -772,10 +772,14 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
                 blockData.info.offlenVector = offsetLength;
 
-                _storageModule->updateBlock(segmentId, blockId, blockData);
+                // read old parity and compute XOR
+                BlockData delta = computeDelta(segmentId, blockId, blockData, offsetLength);
+
+                _storageModule->updateBlock(segmentId, blockId, delta);
                 _storageModule->flushBlock(segmentId, blockId);
 
                 MemoryPool::getInstance().poolFree(blockData.buf);
+                MemoryPool::getInstance().poolFree(delta.buf);
                 _updateBlockData.erase(updateKey);
                 _pendingUpdateBlockChunk.erase(updateKey);
             }
