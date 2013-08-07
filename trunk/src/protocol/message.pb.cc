@@ -960,11 +960,12 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockTransferEndReplyPro));
   GetBlockInitRequestPro_descriptor_ = file->message_type(44);
-  static const int GetBlockInitRequestPro_offsets_[4] = {
+  static const int GetBlockInitRequestPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitRequestPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitRequestPro, blockid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitRequestPro, offsetlength_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitRequestPro, datamsgtype_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitRequestPro, isparity_),
   };
   GetBlockInitRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1616,38 +1617,38 @@ void protobuf_AddDesc_message_2eproto() {
     "nPro\":\n\024PutBlockInitReplyPro\022\021\n\tsegmentI"
     "d\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\">\n\030BlockTransfe"
     "rEndReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007block"
-    "Id\030\002 \001(\007\"\236\001\n\026GetBlockInitRequestPro\022\021\n\ts"
+    "Id\030\002 \001(\007\"\260\001\n\026GetBlockInitRequestPro\022\021\n\ts"
     "egmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022,\n\014offse"
     "tLength\030\003 \003(\0132\026.ncvfs.OffsetLengthPro\0222\n"
     "\013dataMsgType\030\004 \001(\0162\035.ncvfs.DataMsgPro.Da"
-    "taMsgType\"a\n\024GetBlockInitReplyPro\022\021\n\tseg"
-    "mentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\021\n\tblockSi"
-    "ze\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"g\n\rOsdStart"
-    "upPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001("
-    "\007\022\022\n\nosdLoading\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007"
-    "osdPort\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005osdId"
-    "\030\001 \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005osdId"
-    "\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoadin"
-    "g\030\003 \001(\007\"U\n\032GetSecondaryListRequestPro\022\021\n"
-    "\tnumOfSegs\030\001 \001(\007\022\021\n\tprimaryId\030\002 \001(\007\022\021\n\tb"
-    "lockSize\030\003 \001(\006\"\031\n\027OsdStatUpdateRequestPr"
-    "o\"J\n\030GetSecondaryListReplyPro\022.\n\rseconda"
-    "ryList\030\001 \003(\0132\027.ncvfs.BlockLocationPro\"B\n"
-    "\021NewOsdRegisterPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osd"
-    "Ip\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\"=\n\014OnlineOsdPr"
-    "o\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPo"
-    "rt\030\003 \001(\007\">\n\020OnlineOsdListPro\022*\n\ronlineOs"
-    "dList\030\001 \003(\0132\023.ncvfs.OnlineOsdPro\"(\n\026GetO"
-    "sdStatusRequestPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024Ge"
-    "tOsdStatusReplyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n"
-    "\024RepairSegmentInfoPro\022\021\n\tsegmentId\030\001 \001(\006"
-    "\022\024\n\014deadBlockIds\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003("
-    "\007\"-\n\026GetPrimaryListReplyPro\022\023\n\013primaryLi"
-    "st\030\001 \003(\007\"V\n\031RecoveryTriggerRequestPro\022\017\n"
-    "\007osdList\030\001 \003(\007\022\022\n\ndstOsdList\030\002 \003(\007\022\024\n\014ds"
-    "tspecified\030\003 \001(\010\"@\n\022GetOsdListReplyPro\022*"
-    "\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs.OnlineOsdP"
-    "roB\002H\001", 5686);
+    "taMsgType\022\020\n\010isParity\030\005 \001(\010\"a\n\024GetBlockI"
+    "nitReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockI"
+    "d\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\007\022\022\n\nchunkCount"
+    "\030\004 \001(\007\"g\n\rOsdStartupPro\022\r\n\005osdId\030\001 \001(\007\022\023"
+    "\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\022"
+    "\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007\"\037\n\016OsdSh"
+    "utdownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025OsdStatUpdat"
+    "eReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030"
+    "\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"U\n\032GetSecondar"
+    "yListRequestPro\022\021\n\tnumOfSegs\030\001 \001(\007\022\021\n\tpr"
+    "imaryId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\006\"\031\n\027OsdS"
+    "tatUpdateRequestPro\"J\n\030GetSecondaryListR"
+    "eplyPro\022.\n\rsecondaryList\030\001 \003(\0132\027.ncvfs.B"
+    "lockLocationPro\"B\n\021NewOsdRegisterPro\022\r\n\005"
+    "osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 "
+    "\001(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005os"
+    "dIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020OnlineOsdL"
+    "istPro\022*\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs.On"
+    "lineOsdPro\"(\n\026GetOsdStatusRequestPro\022\016\n\006"
+    "osdIds\030\001 \003(\007\")\n\024GetOsdStatusReplyPro\022\021\n\t"
+    "osdStatus\030\001 \003(\010\"R\n\024RepairSegmentInfoPro\022"
+    "\021\n\tsegmentId\030\001 \001(\006\022\024\n\014deadBlockIds\030\002 \003(\007"
+    "\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n\026GetPrimaryListRep"
+    "lyPro\022\023\n\013primaryList\030\001 \003(\007\"V\n\031RecoveryTr"
+    "iggerRequestPro\022\017\n\007osdList\030\001 \003(\007\022\022\n\ndstO"
+    "sdList\030\002 \003(\007\022\024\n\014dstspecified\030\003 \001(\010\"@\n\022Ge"
+    "tOsdListReplyPro\022*\n\ronlineOsdList\030\001 \003(\0132"
+    "\023.ncvfs.OnlineOsdProB\002H\001", 5704);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -14565,6 +14566,7 @@ const int GetBlockInitRequestPro::kSegmentIdFieldNumber;
 const int GetBlockInitRequestPro::kBlockIdFieldNumber;
 const int GetBlockInitRequestPro::kOffsetLengthFieldNumber;
 const int GetBlockInitRequestPro::kDataMsgTypeFieldNumber;
+const int GetBlockInitRequestPro::kIsParityFieldNumber;
 #endif  // !_MSC_VER
 
 GetBlockInitRequestPro::GetBlockInitRequestPro()
@@ -14586,6 +14588,7 @@ void GetBlockInitRequestPro::SharedCtor() {
   segmentid_ = GOOGLE_ULONGLONG(0);
   blockid_ = 0u;
   datamsgtype_ = 15;
+  isparity_ = false;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -14623,6 +14626,7 @@ void GetBlockInitRequestPro::Clear() {
     segmentid_ = GOOGLE_ULONGLONG(0);
     blockid_ = 0u;
     datamsgtype_ = 15;
+    isparity_ = false;
   }
   offsetlength_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -14698,6 +14702,22 @@ bool GetBlockInitRequestPro::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(40)) goto parse_isParity;
+        break;
+      }
+      
+      // optional bool isParity = 5;
+      case 5: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_isParity:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &isparity_)));
+          set_has_isparity();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -14742,6 +14762,11 @@ void GetBlockInitRequestPro::SerializeWithCachedSizes(
       4, this->datamsgtype(), output);
   }
   
+  // optional bool isParity = 5;
+  if (has_isparity()) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->isparity(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -14773,6 +14798,11 @@ void GetBlockInitRequestPro::SerializeWithCachedSizes(
       4, this->datamsgtype(), target);
   }
   
+  // optional bool isParity = 5;
+  if (has_isparity()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->isparity(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -14798,6 +14828,11 @@ int GetBlockInitRequestPro::ByteSize() const {
     if (has_datamsgtype()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->datamsgtype());
+    }
+    
+    // optional bool isParity = 5;
+    if (has_isparity()) {
+      total_size += 1 + 1;
     }
     
   }
@@ -14845,6 +14880,9 @@ void GetBlockInitRequestPro::MergeFrom(const GetBlockInitRequestPro& from) {
     if (from.has_datamsgtype()) {
       set_datamsgtype(from.datamsgtype());
     }
+    if (from.has_isparity()) {
+      set_isparity(from.isparity());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -14872,6 +14910,7 @@ void GetBlockInitRequestPro::Swap(GetBlockInitRequestPro* other) {
     std::swap(blockid_, other->blockid_);
     offsetlength_.Swap(&other->offsetlength_);
     std::swap(datamsgtype_, other->datamsgtype_);
+    std::swap(isparity_, other->isparity_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

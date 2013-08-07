@@ -4936,6 +4936,13 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
   inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
   
+  // optional bool isParity = 5;
+  inline bool has_isparity() const;
+  inline void clear_isparity();
+  static const int kIsParityFieldNumber = 5;
+  inline bool isparity() const;
+  inline void set_isparity(bool value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.GetBlockInitRequestPro)
  private:
   inline void set_has_segmentid();
@@ -4944,6 +4951,8 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_blockid();
   inline void set_has_datamsgtype();
   inline void clear_has_datamsgtype();
+  inline void set_has_isparity();
+  inline void clear_has_isparity();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -4951,9 +4960,10 @@ class GetBlockInitRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   ::google::protobuf::uint32 blockid_;
   int datamsgtype_;
+  bool isparity_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -10327,6 +10337,28 @@ inline void GetBlockInitRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgT
   GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
   set_has_datamsgtype();
   datamsgtype_ = value;
+}
+
+// optional bool isParity = 5;
+inline bool GetBlockInitRequestPro::has_isparity() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void GetBlockInitRequestPro::set_has_isparity() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void GetBlockInitRequestPro::clear_has_isparity() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void GetBlockInitRequestPro::clear_isparity() {
+  isparity_ = false;
+  clear_has_isparity();
+}
+inline bool GetBlockInitRequestPro::isparity() const {
+  return isparity_;
+}
+inline void GetBlockInitRequestPro::set_isparity(bool value) {
+  set_has_isparity();
+  isparity_ = value;
 }
 
 // -------------------------------------------------------------------

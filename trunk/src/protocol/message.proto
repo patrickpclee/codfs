@@ -370,6 +370,7 @@ message GetBlockInitRequestPro {
 	optional fixed32 blockId = 2;
 	repeated OffsetLengthPro offsetLength = 3;
 	optional DataMsgPro.DataMsgType dataMsgType = 4;
+	optional bool isParity = 5;
 }
 
 message GetBlockInitReplyPro {

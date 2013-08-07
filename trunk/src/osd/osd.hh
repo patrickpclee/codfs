@@ -105,7 +105,7 @@ public:
 
     void getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
             uint64_t segmentId, uint32_t blockId,
-            vector<offset_length_t> symbols, DataMsgType dataMsgType);
+            vector<offset_length_t> symbols, DataMsgType dataMsgType, bool isParity);
 
     /**
      * Action when a getRecoveryBlockRequest is received
@@ -131,7 +131,7 @@ public:
      */
     void retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
             uint64_t segmentId, uint32_t blockId,
-            vector<offset_length_t> &offsetLength, BlockData &repairedBlock);
+            vector<offset_length_t> &offsetLength, BlockData &repairedBlock, bool isParity);
 
     /**
      * Action when a put segment request is received

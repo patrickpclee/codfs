@@ -13,7 +13,7 @@ public:
 
 	GetBlockInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t segmentId, uint32_t blockId,
-			vector<offset_length_t> symbols, DataMsgType dataMsgType);
+			vector<offset_length_t> symbols, DataMsgType dataMsgType, bool isParity);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -58,6 +58,7 @@ private:
 	uint32_t _blockId;
 	vector<offset_length_t> _symbols;
 	DataMsgType _dataMsgType;
+	bool _isParity;
 };
 
 #endif
