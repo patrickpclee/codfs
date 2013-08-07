@@ -125,7 +125,7 @@ public:
 	 */
 
 	void getBlockRequest(uint32_t osdId, uint64_t segmentId, uint32_t blockId,
-			vector<offset_length_t> symbols, DataMsgType dataMsgType);
+			vector<offset_length_t> symbols, DataMsgType dataMsgType, bool isParity);
 
 	/**
 	 * Send a request to get the secondary OSD list of an segment from MDS/Monitor

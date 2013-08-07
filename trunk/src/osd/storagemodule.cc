@@ -432,13 +432,9 @@ struct BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
 
 }
 
-void StorageModule::mergeParity (uint64_t segmentId, uint32_t blockId) {
+BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity) {
 
     uint32_t deltaCount = getDeltaCount(segmentId, blockId);
-    debug ("deltaCount = %" PRIu32 "\n", deltaCount);
-    if (deltaCount == 0) {
-        return;
-    }
 
     // read whole block into memory
     BlockData blockData;
@@ -464,22 +460,45 @@ void StorageModule::mergeParity (uint64_t segmentId, uint32_t blockId) {
             uint32_t offset = offsetLengthPair.first;
             uint32_t length = offsetLengthPair.second;
             debug("Merging off = %" PRIu32 " len = %" PRIu32 "\n", offset, length);
-            Coding::bitwiseXor(blockData.buf + offset, blockData.buf + offset, deltaBufPtr, length);
+            if (isParity) {
+                Coding::bitwiseXor(blockData.buf + offset, blockData.buf + offset, deltaBufPtr, length);
+            } else {
+                memcpy (blockData.buf + offset, deltaBufPtr, length);
+            }
             deltaBufPtr += length;
         }
         MemoryPool::getInstance().poolFree(delta.buf);
-
-        // remove delta from disk
-        tryCloseFile(deltaBlockPath);
-        remove(deltaBlockPath.c_str());
     }
+
+    return blockData;
+}
+
+void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isParity) {
+
+    const string blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
+    uint32_t deltaCount = getDeltaCount(segmentId, blockId);
+    if (deltaCount == 0) {
+        return;
+    }
+
+    BlockData blockData = getMergedBlock(segmentId, blockId, isParity);
 
     // save the whole merged parity into disk
     offset_length_t offsetLength = make_pair (0, blockData.info.blockSize);
     blockData.info.offlenVector.push_back(offsetLength);
     updateBlock(segmentId, blockId, blockData);
     tryCloseFile(blockPath);
+
     MemoryPool::getInstance().poolFree(blockData.buf);
+
+    for (uint32_t i = 0; i < deltaCount; i++) {
+        const string deltaBlockPath = generateDeltaBlockPath(segmentId, blockId, i,
+                _blockFolder);
+
+        // remove delta from disk
+        tryCloseFile(deltaBlockPath);
+        remove(deltaBlockPath.c_str());
+    }
 }
 
 #ifdef MOUNT_OSD

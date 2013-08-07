@@ -226,17 +226,27 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                     uint32_t osdId = segmentInfo._osdList[i];
 
+                    uint32_t parityCount = _codingModule->getParityNumber(codingScheme, codingSetting);
+                    bool isParity = (i >= totalNumOfBlocks - parityCount);
+
                     if (osdId == _osdId) {
+
                         // read block from disk
 
-                        #ifdef APPEND_DELTA
-                        // assume the block is parity, doesn't hurt if it is a data block
-                        // note: if we implement data block append writes, the merging should not be XOR
-                        _storageModule->mergeParity(segmentId, i);
+                        #ifdef APPEND_PARITY
+                            #ifdef COMPACT_PARITY_ON_READ
+                            // assume the block is parity, doesn't hurt if it is a data block
+                            // note: if we implement data block append writes, the merging should not be XOR
+                            _storageModule->mergeBlock(segmentId, i, isParity);
+                            BlockData blockData = _storageModule->readBlock(
+                                    segmentId, i, blockSymbols.second);
+                            #else
+                            BlockData blockData = _storageModule->getMergedBlock(segmentId, i, isParity);
+                            #endif
+                        #else
+                            struct BlockData blockData = _storageModule->readBlock(
+                                    segmentId, i, blockSymbols.second);
                         #endif
-
-                        struct BlockData blockData = _storageModule->readBlock(
-                                segmentId, i, blockSymbols.second);
 
                         // blockDataList reserved space for "all blocks"
                         // only fill in data for "required blocks"
@@ -251,7 +261,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                         // request block from other OSD
                         debug("sending request for block %" PRIu32 "\n", i);
                         _osdCommunicator->getBlockRequest(osdId, segmentId, i,
-                                blockSymbols.second, DOWNLOAD);
+                                blockSymbols.second, DOWNLOAD, isParity);
                     }
                 }
 
@@ -347,16 +357,23 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols,
-        DataMsgType dataMsgType) {
+        DataMsgType dataMsgType, bool isParity) {
 
-#ifdef APPEND_DELTA
-    // assume the block is parity, doesn't hurt if it is a data block
-    // note: if we implement data block append writes, the merging should not be XOR
-    _storageModule->mergeParity(segmentId, blockId);
-#endif
+    #ifdef APPEND_PARITY
+        #ifdef COMPACT_PARITY_ON_READ
+        // assume the block is parity, doesn't hurt if it is a data block
+        // note: if we implement data block append writes, the merging should not be XOR
+        _storageModule->mergeBlock(segmentId, blockId, isParity);
+        BlockData blockData = _storageModule->readBlock(
+                segmentId, blockId, symbols);
+        #else
+        BlockData blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity);
+        #endif
+    #else
+        struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
+                symbols);
+    #endif
 
-    struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
-            symbols);
     _osdCommunicator->sendBlock(sockfd, blockData, dataMsgType);
     MemoryPool::getInstance().poolFree(blockData.buf);
     debug("Block ID = %" PRIu32 " free-d\n", blockId);
@@ -364,7 +381,8 @@ void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
         uint64_t segmentId, uint32_t blockId,
-        vector<offset_length_t> &offsetLength, BlockData &repairedBlock) {
+        vector<offset_length_t> &offsetLength, BlockData &repairedBlock,
+        bool isParity) {
 
     uint64_t recoveryLength = 0;
     for (auto it : offsetLength) {
@@ -393,7 +411,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
         _isPendingRecovery.set(blockKey, true);
 
         _osdCommunicator->getBlockRequest(osdId, segmentId, blockId,
-                offsetLength, RECOVERY);
+                offsetLength, RECOVERY, isParity);
         debug_cyan("[RECOVERY] Requested Symbols for Block %" PRIu32 "\n",
                 blockId);
 
@@ -797,7 +815,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockData.info.offlenVector = offsetLength;
                 blockData.info.parityVector = parityList;
 
-#ifdef APPEND_DELTA
+#ifdef APPEND_PARITY
                 uint32_t deltaId = _storageModule->getDeltaCount(segmentId,
                         blockId);
 
@@ -1017,6 +1035,10 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
         uint32_t blockId = block.first;
         uint32_t osdId = segmentInfo._osdList[blockId];
 
+        uint32_t parityCount = _codingModule->getParityNumber(codingScheme, codingSetting);
+        uint32_t totalNumOfBlocks = _codingModule->getNumberOfBlocks(codingScheme, codingSetting);
+        bool isParity = (blockId >= totalNumOfBlocks - parityCount);
+
         vector<offset_length_t> offsetLength = block.second;
 
         debug_cyan(
@@ -1026,7 +1048,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
         _recoverytp.schedule(
                 boost::bind(&Osd::retrieveRecoveryBlock, this, recoverytpId,
                         osdId, segmentId, blockId, offsetLength,
-                        boost::ref(repairBlockData[blockId])));
+                        boost::ref(repairBlockData[blockId]), isParity));
 
     }
 
