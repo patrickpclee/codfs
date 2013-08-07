@@ -262,6 +262,7 @@ void StorageModule::createRemoteBlock(uint32_t osdId, uint64_t segmentId,
 }
 #endif
 
+// TODO: any race condition in deltaId
 uint32_t StorageModule::getDeltaCount (uint32_t segmentId, uint32_t blockId) {
     uint32_t deltaId = 0;
     while (1) {
