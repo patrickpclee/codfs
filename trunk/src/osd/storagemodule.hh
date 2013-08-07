@@ -123,7 +123,8 @@ public:
     struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
             vector<offset_length_t> symbols);
     struct BlockData readDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
-    void mergeParity (uint64_t segmentId, uint32_t blockId);
+    void mergeBlock (uint64_t segmentId, uint32_t blockId, bool isParity);
+    BlockData getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity);
 
     /**
      * Read symbols from a remote block

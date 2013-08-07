@@ -15,7 +15,7 @@ GetBlockInitRequestMsg::GetBlockInitRequestMsg(Communicator* communicator) :
 
 GetBlockInitRequestMsg::GetBlockInitRequestMsg(Communicator* communicator,
 		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId,
-		vector<offset_length_t> symbols, DataMsgType dataMsgType) :
+		vector<offset_length_t> symbols, DataMsgType dataMsgType, bool isParity) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -23,6 +23,7 @@ GetBlockInitRequestMsg::GetBlockInitRequestMsg(Communicator* communicator,
 	_blockId = blockId;
 	_symbols = symbols;
 	_dataMsgType = dataMsgType;
+	_isParity = isParity;
 
 }
 
@@ -32,6 +33,7 @@ void GetBlockInitRequestMsg::prepareProtocolMsg() {
 	getBlockInitRequestPro.set_segmentid(_segmentId);
 	getBlockInitRequestPro.set_blockid(_blockId);
 	getBlockInitRequestPro.set_datamsgtype((ncvfs::DataMsgPro_DataMsgType)_dataMsgType);
+	getBlockInitRequestPro.set_isparity(_isParity);
 
 	vector<offset_length_t>::iterator it;
 
@@ -64,6 +66,7 @@ void GetBlockInitRequestMsg::parse(char* buf) {
 	_segmentId = getBlockInitRequestPro.segmentid();
 	_blockId = getBlockInitRequestPro.blockid();
 	_dataMsgType = (DataMsgType)getBlockInitRequestPro.datamsgtype();
+	_isParity = getBlockInitRequestPro.isparity();
 
 	for (int i = 0; i < getBlockInitRequestPro.offsetlength_size(); ++i) {
 		offset_length_t tempOffsetLength;
@@ -78,7 +81,7 @@ void GetBlockInitRequestMsg::parse(char* buf) {
 
 void GetBlockInitRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
-	osd->getBlockRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols, _dataMsgType);
+	osd->getBlockRequestProcessor (_msgHeader.requestId, _sockfd, _segmentId, _blockId, _symbols, _dataMsgType, _isParity);
 #endif
 }
 
