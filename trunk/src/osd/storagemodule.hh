@@ -71,7 +71,8 @@ public:
      */
 
     void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
-    void createDeltaBlock (uint64_t segmentId, uint32_t blockId, uint32_t deltaId, uint32_t length);
+    void createDeltaBlock (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
+    uint32_t getDeltaCount (uint32_t segmentId, uint32_t blockId);
 
 #ifdef MOUNT_OSD
     /**
@@ -173,7 +174,7 @@ public:
     uint32_t writeBlock(uint64_t segmentId, uint32_t blockId, char* buf,
             uint64_t offsetInBlock, uint32_t length);
     uint32_t writeDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, char* buf,
-            uint32_t length, vector<offset_length_t> offsetLength);
+            vector<offset_length_t> offsetLength);
 
     /**
      * Modify an existing block
@@ -355,6 +356,8 @@ public:
      */
 
     list<uint64_t> getSegmentCacheQueue();
+
+    static uint32_t getCombinedLength(vector<offset_length_t> offsetLength);
 
 private:
 

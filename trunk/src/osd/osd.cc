@@ -675,7 +675,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
         BlockData newBlock, vector<offset_length_t> offsetLength) {
 
-    uint32_t combinedLength = getCombinedLength(offsetLength);
+    uint32_t combinedLength = StorageModule::getCombinedLength(offsetLength);
 
     // read old block
                         debug ("%s\n", "BLK READ FROM DELTA");
@@ -775,9 +775,12 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockData.info.parityVector = parityList;
 
 #ifdef APPEND_DELTA
-                uint32_t combinedLength = getCombinedLength(blockData.info.offlenVector);
-                // TODO: append write the parity delta here
+                uint32_t deltaId = _storageModule->getDeltaCount(segmentId, blockId);
 
+                // e.g. if there is 3 delta [0 1 2], the deltaId for the new one is 3
+                _storageModule->createDeltaBlock(segmentId, blockId, deltaId);
+                _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, offsetLength);
+                _storageModule->flushDeltaBlock(segmentId, blockId, deltaId);
 #else
                 // read old parity and compute XOR
                 BlockData parityDelta = computeDelta(segmentId, blockId, blockData, offsetLength);
@@ -1106,12 +1109,4 @@ StorageModule * Osd::getStorageModule() {
 
 uint32_t Osd::getOsdId() {
     return _osdId;
-}
-
-uint32_t Osd::getCombinedLength(vector<offset_length_t> offsetLength) {
-    uint32_t combinedLength = 0;
-    for (auto offsetLengthPair : offsetLength) {
-        combinedLength += offsetLengthPair.second;
-    }
-    return combinedLength;
 }

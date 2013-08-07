@@ -237,14 +237,14 @@ void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
 }
 
 void StorageModule::createDeltaBlock(uint64_t segmentId, uint32_t blockId,
-        uint32_t deltaId, uint32_t length) {
+        uint32_t deltaId) {
     const string filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
             _blockFolder);
     createFile(filepath);
 
     debug(
-            "Delta Block created ObjID = %" PRIu64 " BlockID = %" PRIu32 " DeltaID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
-            segmentId, blockId, deltaId, length, filepath.c_str());
+            "Delta Block created ObjID = %" PRIu64 " BlockID = %" PRIu32 " DeltaID = %" PRIu32 " Path = %s\n",
+            segmentId, blockId, deltaId, filepath.c_str());
 }
 
 #ifdef MOUNT_OSD
@@ -260,6 +260,19 @@ void StorageModule::createRemoteBlock(uint32_t osdId, uint64_t segmentId,
             osdId, segmentId, blockId, length, filepath.c_str());
 }
 #endif
+
+uint32_t StorageModule::getDeltaCount (uint32_t segmentId, uint32_t blockId) {
+    uint32_t deltaId = 0;
+    while (1) {
+        const string filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
+                _blockFolder);
+        if ( access( filepath.c_str(), F_OK ) < 0 ) {
+            break;
+        }
+        deltaId++;
+    }
+    return deltaId;
+}
 
 bool StorageModule::isSegmentCached(uint64_t segmentId) {
 
@@ -354,10 +367,7 @@ struct SegmentData StorageModule::readSegment(uint64_t segmentId,
 struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
         vector<offset_length_t> symbols) {
 
-    uint32_t combinedLength = 0;
-    for (auto offsetLengthPair : symbols) {
-        combinedLength += offsetLengthPair.second;
-    }
+    uint32_t combinedLength = getCombinedLength(symbols);
 
     struct BlockData blockData;
     string blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
@@ -393,16 +403,14 @@ struct BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
             _blockFolder);
 
     // parse header
+    uint32_t headerSize = 0;
     uint32_t count = 0;
-    readFile(blockPath, (char*) &count, 0, sizeof(uint32_t), false);
+    headerSize += readFile(blockPath, (char*) &count, 0, sizeof(uint32_t), false);
     vector<offset_length_t> offsetLength(count);
-    readFile(blockPath, (char*) &offsetLength[0], sizeof(uint32_t),
+    headerSize += readFile(blockPath, (char*) &offsetLength[0], sizeof(uint32_t),
             sizeof(offset_length_t) * count, false);
 
-    uint32_t combinedLength = 0;
-    for (auto offsetLengthPair : offsetLength) {
-        combinedLength += offsetLengthPair.second;
-    }
+    uint32_t combinedLength = getCombinedLength(offsetLength);
 
     struct BlockData blockData;
     blockData.info.segmentId = segmentId;
@@ -413,7 +421,7 @@ struct BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
     char* bufptr = blockData.buf;
 
     // read whole delta block into memory
-    readFile(blockPath, bufptr, 0, combinedLength, false);
+    readFile(blockPath, bufptr, headerSize, combinedLength, false);
 
     debug(
             "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " read length = %" PRIu32 "\n",
@@ -427,10 +435,7 @@ struct BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
 struct BlockData StorageModule::readRemoteBlock(uint32_t osdId,
         uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
 
-    uint32_t combinedLength = 0;
-    for (auto offsetLengthPair : symbols) {
-        combinedLength += offsetLengthPair.second;
-    }
+    uint32_t combinedLength = getCombinedLength(symbols);
 
     struct BlockData blockData;
     string blockPath = generateRemoteBlockPath(osdId, segmentId, blockId, _remoteBlockFolder);
@@ -527,8 +532,21 @@ uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
 }
 
 uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
-        uint32_t deltaId, char* buf, uint32_t length,
-        vector<offset_length_t> offsetLength) {
+        uint32_t deltaId, char* buf, vector<offset_length_t> offsetLength) {
+
+    /*
+     *  +-------------------------+
+     *  | PARITY BLOCK | HHAAAABB |
+     *  +-------------------------+
+     *  offsetLength means the original position in the parity block
+     *  e.g., the first offset means the position where AAAA should be
+     *  written during a merge
+     *
+     *  the block size means the actual compressed size of the delta excluding
+     *  the header part
+     *  e.g. the block size here is size of [AAAABB]
+     */
+
 
     uint32_t byteWritten = 0;
 
@@ -545,13 +563,14 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     byteWritten = writeFile(filepath, headerBuf, 0, headerSize, false);
 
     // write delta block
-    byteWritten = writeFile(filepath, buf, byteWritten, length, false);
+    uint32_t combinedLength = getCombinedLength(offsetLength);
+    byteWritten = writeFile(filepath, buf, headerSize, combinedLength, false);
 
     debug(
-            "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
-            segmentId, blockId, byteWritten, 0);
+            "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu32 "\n",
+            segmentId, blockId, deltaId, byteWritten, headerSize);
 
-    updateBlockFreespace(length);
+    updateBlockFreespace(combinedLength);
 
     return byteWritten;
 }
@@ -671,6 +690,12 @@ void StorageModule::flushSegmentDiskCache(uint64_t segmentId) {
 void StorageModule::flushBlock(uint64_t segmentId, uint32_t blockId) {
 
     string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
+    flushFile(filepath);
+}
+
+void StorageModule::flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId) {
+
+    string filepath = generateDeltaBlockPath(segmentId, blockId, deltaId, _blockFolder);
     flushFile(filepath);
 }
 
@@ -1132,3 +1157,12 @@ bool StorageModule::isEnoughBlockSpace(uint32_t size) {
 bool StorageModule::isEnoughSegmentSpace(uint32_t size) {
     return size <= _freeSegmentSpace ? true : false;
 }
+
+uint32_t StorageModule::getCombinedLength(vector<offset_length_t> offsetLength) {
+    uint32_t combinedLength = 0;
+    for (auto offsetLengthPair : offsetLength) {
+        combinedLength += offsetLengthPair.second;
+    }
+    return combinedLength;
+}
+

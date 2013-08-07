@@ -385,8 +385,6 @@ private:
 
     void freeSegment(uint64_t segmentId, SegmentData segmentData);
 
-    uint32_t getCombinedLength(vector<offset_length_t> offsetLength);
-
     /**
      * Stores the list of OSDs that store a certain block
      */
