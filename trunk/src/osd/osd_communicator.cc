@@ -189,11 +189,11 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 }
 
 void OsdCommunicator::getBlockRequest(uint32_t osdId, uint64_t segmentId,
-		uint32_t blockId, vector<offset_length_t> symbols, DataMsgType dataMsgType) {
+		uint32_t blockId, vector<offset_length_t> symbols, DataMsgType dataMsgType, bool isParity) {
 
 	uint32_t dstSockfd = getSockfdFromId(osdId);
 	GetBlockInitRequestMsg* getBlockInitRequestMsg = new GetBlockInitRequestMsg(
-			this, dstSockfd, segmentId, blockId, symbols, dataMsgType);
+			this, dstSockfd, segmentId, blockId, symbols, dataMsgType, isParity);
 	getBlockInitRequestMsg->prepareProtocolMsg();
 
 	addMessage(getBlockInitRequestMsg, false);
