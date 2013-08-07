@@ -172,6 +172,7 @@ uint32_t ClientStorageModule::writeSegmentCache(uint64_t segmentId, char* buf,
 }
 
 bool ClientStorageModule::locateSegmentCache(uint64_t segmentId){
+	lock_guard<mutex> lk(transferCacheMutex);
 	return _segmentCache.count(segmentId);
 }
 

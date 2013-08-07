@@ -38,3 +38,5 @@ log/
 mount.sh
 run_osd.sh
 osdid.txt
+change.cc
+change

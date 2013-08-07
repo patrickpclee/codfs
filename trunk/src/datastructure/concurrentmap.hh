@@ -64,6 +64,16 @@ public:
 		return --_map[key];
 	}
 
+    bool init(K key, V value) {
+        std::lock_guard<std::mutex> lk(this->_m);
+        if (this->_map.count(key) == 0) {
+            this->_map[key] = value;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     size_t size() {
 		std::lock_guard<std::mutex> lk(this->_m);
         return _map.size();

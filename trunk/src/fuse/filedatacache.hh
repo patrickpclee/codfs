@@ -14,6 +14,12 @@
 #include "../common/segmentdata.hh"
 
 #include "../datastructure/ringbuffer.hh"
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+
+typedef boost::shared_mutex RWMutex;
+typedef boost::shared_lock<boost::shared_mutex> readLock;
+typedef boost::unique_lock<boost::shared_mutex> writeLock;
 
 class FileDataCache {
 	public:
@@ -33,16 +39,18 @@ class FileDataCache {
 		void doPrefetch();
 		void updateLru(uint64_t segmentId);
 
+        RWMutex* obtainRWMutex(uint64_t segmentId);
+
 		std::unordered_map<uint64_t, SegmentStatus> _segmentStatus;
-		std::unordered_map<uint64_t, uint32_t> _segmentPrimary;
+		ConcurrentMap<uint64_t, uint32_t> _writeBackSegmentPrimary;
 
 		uint32_t _segmentSize;
 		string _codingSetting;
 		CodingScheme _codingScheme;
 		uint32_t _lruSizeLimit;
 
-//		std::mutex _dataCacheMutex;
-//		std::unordered_map<uint64_t, std::mutex*> _segmentLock;
+        std::unordered_map<uint64_t, boost::shared_mutex*> _segmentRWMutexMap;
+        std::mutex _segmentRWMutexMapMutex;
 
 //		std::mutex _lruListMutex;
 		std::list<uint64_t> _segmentLruList;

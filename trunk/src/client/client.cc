@@ -74,9 +74,10 @@ struct SegmentData Client::getSegment(uint32_t clientId,
 	}
 
 	// unknown number of chunks at this point
-	_pendingSegmentChunk.set(segmentId, -1);
-
-	_clientCommunicator->requestSegment(dstSockfd, segmentId);
+    if (_pendingSegmentChunk.init(segmentId, -1)) {
+        // if it is the first to download, request segment
+	    _clientCommunicator->requestSegment(dstSockfd, segmentId);
+    }
 
 	// wait until the segment is fully downloaded
 	while (_pendingSegmentChunk.count(segmentId)) {
