@@ -228,7 +228,13 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                     if (osdId == _osdId) {
                         // read block from disk
-                        debug ("%s\n", "BLK READ FROM DISK");
+
+                        #ifdef APPEND_DELTA
+                        // assume the block is parity, doesn't hurt if it is a data block
+                        // note: if we implement data block append writes, the merging should not be XOR
+                        _storageModule->mergeParity(segmentId, i);
+                        #endif
+
                         struct BlockData blockData = _storageModule->readBlock(
                                 segmentId, i, blockSymbols.second);
 
@@ -253,6 +259,14 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                 while (1) {
                     if (_downloadBlockRemaining.get(segmentId) == 0) {
+
+                        for (BlockData block : blockDataList) {
+                            unsigned char checksum[MD5_DIGEST_LENGTH];
+                            memset (checksum, 0, MD5_DIGEST_LENGTH);
+                            MD5((unsigned char*) block.buf, block.info.blockSize,
+                                    checksum);
+                            debug ("block ID = %" PRIu32 " checksum = %s\n", block.info.blockId, md5ToHex(checksum).c_str());
+                        }
 
                         // 5. decode blocks
 
@@ -334,7 +348,13 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols,
         DataMsgType dataMsgType) {
-                        debug ("%s\n", "BLK READ FROM PROCESSOR");
+
+#ifdef APPEND_DELTA
+    // assume the block is parity, doesn't hurt if it is a data block
+    // note: if we implement data block append writes, the merging should not be XOR
+    _storageModule->mergeParity(segmentId, blockId);
+#endif
+
     struct BlockData blockData = _storageModule->readBlock(segmentId, blockId,
             symbols);
     _osdCommunicator->sendBlock(sockfd, blockData, dataMsgType);
@@ -356,7 +376,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
     if (osdId == _osdId) {
         // read block from disk
-                        debug ("%s\n", "BLK READ FROM REPAIR");
+        debug("%s\n", "BLK READ FROM REPAIR");
         repairedBlock = _storageModule->readBlock(segmentId, blockId,
                 offsetLength);
     } else {
@@ -485,7 +505,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
         if (dataMsgType == UPDATE || dataMsgType == PARITY) {
             uint32_t updateId = ++_updateId;
             string updateKey = to_string(_osdId) + "." + to_string(updateId);
-            debug ("updateKey = %s\n", updateKey.c_str());
+            debug("updateKey = %s\n", updateKey.c_str());
             _osdCommunicator->sendBlock(dstSockfd, blockData, dataMsgType,
                     updateKey);
         } else {
@@ -587,8 +607,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 vector<BlockLocation> parityOsdListPair;
                 for (uint32_t i = parityNum; i >= 1; --i) {
                     BlockLocation blockLocation;
-                    blockLocation.blockId = blockNum -i;
-                    blockLocation.osdId = segmentInfo._osdList[blockNum -i];
+                    blockLocation.blockId = blockNum - i;
+                    blockLocation.osdId = segmentInfo._osdList[blockNum - i];
                     parityOsdListPair.push_back(blockLocation);
                 }
                 for (uint32_t i = 0; i < blockDataList.size(); i++) {
@@ -612,7 +632,9 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             for (const auto blockData : blockDataList) {
 
                 // delta update case 1: primary OSD receives the update
-                if (dataMsgType == UPDATE && blockLocationList[blockData.info.blockId].osdId == _osdId) {
+                if (dataMsgType == UPDATE
+                        && blockLocationList[blockData.info.blockId].osdId
+                                == _osdId) {
                     // send delta to parity nodes
                     sendDelta(segmentId, blockData.info.blockId, blockData,
                             blockData.info.offlenVector);
@@ -678,7 +700,7 @@ BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
     uint32_t combinedLength = StorageModule::getCombinedLength(offsetLength);
 
     // read old block
-                        debug ("%s\n", "BLK READ FROM DELTA");
+    debug("%s\n", "BLK READ FROM DELTA");
     BlockData delta = _storageModule->readBlock(segmentId, blockId,
             offsetLength);
 
@@ -713,7 +735,8 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
 
 void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
-        string updateKey, vector<offset_length_t> offsetLength, vector<BlockLocation> parityList) {
+        string updateKey, vector<offset_length_t> offsetLength,
+        vector<BlockLocation> parityList) {
 
     // TODO: check integrity of block received
     const string blockKey = to_string(segmentId) + "." + to_string(blockId);
@@ -775,11 +798,13 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockData.info.parityVector = parityList;
 
 #ifdef APPEND_DELTA
-                uint32_t deltaId = _storageModule->getDeltaCount(segmentId, blockId);
+                uint32_t deltaId = _storageModule->getDeltaCount(segmentId,
+                        blockId);
 
                 // e.g. if there is 3 delta [0 1 2], the deltaId for the new one is 3
                 _storageModule->createDeltaBlock(segmentId, blockId, deltaId);
-                _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, offsetLength);
+                _storageModule->writeDeltaBlock(segmentId, blockId, deltaId,
+                        blockData.buf, offsetLength);
                 _storageModule->flushDeltaBlock(segmentId, blockId, deltaId);
 #else
                 // read old parity and compute XOR

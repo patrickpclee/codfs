@@ -18,6 +18,7 @@
 #include "../common/debug.hh"
 #include "../common/define.hh"
 #include "../common/convertor.hh"
+#include "../coding/coding.hh"
 
 // global variable defined in each component
 extern ConfigLayer* configLayer;
@@ -431,6 +432,56 @@ struct BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
 
 }
 
+void StorageModule::mergeParity (uint64_t segmentId, uint32_t blockId) {
+
+    uint32_t deltaCount = getDeltaCount(segmentId, blockId);
+    debug ("deltaCount = %" PRIu32 "\n", deltaCount);
+    if (deltaCount == 0) {
+        return;
+    }
+
+    // read whole block into memory
+    BlockData blockData;
+    blockData.info.segmentId = segmentId;
+    blockData.info.blockId = blockId;
+
+    const string blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
+    const uint32_t filesize = getFilesize(blockPath);
+    const uint32_t byteToRead = filesize;
+
+    blockData.info.blockSize = byteToRead;
+
+    blockData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
+    readFile(blockPath, blockData.buf, 0, byteToRead, false);
+
+    // for each delta block, merge into parity for each <offset, length> using XOR
+    for (uint32_t i = 0; i < deltaCount; i++) {
+        const string deltaBlockPath = generateDeltaBlockPath(segmentId, blockId, i,
+                _blockFolder);
+        BlockData delta = readDeltaBlock(segmentId, blockId, i);
+        char* deltaBufPtr = delta.buf;
+        for (offset_length_t offsetLengthPair : delta.info.offlenVector) {
+            uint32_t offset = offsetLengthPair.first;
+            uint32_t length = offsetLengthPair.second;
+            debug("Merging off = %" PRIu32 " len = %" PRIu32 "\n", offset, length);
+            Coding::bitwiseXor(blockData.buf + offset, blockData.buf + offset, deltaBufPtr, length);
+            deltaBufPtr += length;
+        }
+        MemoryPool::getInstance().poolFree(delta.buf);
+
+        // remove delta from disk
+        tryCloseFile(deltaBlockPath);
+        remove(deltaBlockPath.c_str());
+    }
+
+    // save the whole merged parity into disk
+    offset_length_t offsetLength = make_pair (0, blockData.info.blockSize);
+    blockData.info.offlenVector.push_back(offsetLength);
+    updateBlock(segmentId, blockId, blockData);
+    tryCloseFile(blockPath);
+    MemoryPool::getInstance().poolFree(blockData.buf);
+}
+
 #ifdef MOUNT_OSD
 struct BlockData StorageModule::readRemoteBlock(uint32_t osdId,
         uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols) {
@@ -561,6 +612,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     memcpy(headerBuf + sizeof(uint32_t), &offsetLength[0],
             sizeof(offset_length_t) * count);
     byteWritten = writeFile(filepath, headerBuf, 0, headerSize, false);
+    MemoryPool::getInstance().poolFree(headerBuf);
 
     // write delta block
     uint32_t combinedLength = getCombinedLength(offsetLength);
