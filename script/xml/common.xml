@@ -1,0 +1,48 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+
+	<Coding>
+		<!--<SegmentNumber>1</SegmentNumber>-->
+	</Coding>
+	
+	<Communication>
+
+        <!-- polling interval in terms of us -->
+        <SendPollingInterval>1000</SendPollingInterval>
+        
+        <!-- timeout for select -->
+        <SelectTimeout>
+            <sec>0</sec>
+            <usec>10000</usec>
+        </SelectTimeout>
+	
+		<!-- Chunk Size used in transfer -->
+		<ChunkSize>512K</ChunkSize>
+
+		<!-- No of dispatch thread created for each thread pool -->
+		<NumThreadPerPool>1</NumThreadPerPool>
+	</Communication>
+	
+	<Components>
+	
+		<MDS>
+			<count>1</count>
+			<MDS0>
+				<id>50000</id>
+				<ip>192.168.0.21</ip>
+				<port>50000</port>
+			</MDS0>
+		</MDS>
+		
+		<MONITOR>
+			<count>1</count>
+			<MONITOR0>
+				<id>53000</id>
+				<ip>192.168.0.22</ip>
+				<port>53000</port>
+			</MONITOR0>
+		</MONITOR>
+				
+	</Components>
+	
+</NcvfsConfig>
