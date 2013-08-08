@@ -1,0 +1,7 @@
+ssh node11 'cd /home/ncsgroup/shb118/ncvfs/trunk; make clean; make monitor' > /dev/null; echo '[1] MONITOR Done'
+ssh node12 'cd /home/ncsgroup/shb118/ncvfs/trunk; make clean; make osd' > /dev/null; echo '[2] OSD Done'
+ssh node13 'cd /home/ncsgroup/shb118/ncvfs/trunk; make clean; make benchmark' > /dev/null; echo '[3] BENCHMARK Done'
+ssh node14 'cd /home/ncsgroup/shb118/ncvfs/trunk; make clean; make client' > /dev/null; echo '[4] CLIENT Done'
+ssh node15 'cd /home/ncsgroup/shb118/ncvfs/trunk; make clean; make clientfuse' > /dev/null; echo '[5] FUSE Done'
+ssh node16 'cd /home/ncsgroup/shb118/ncvfs/trunk; make clean; make codingtester' > /dev/null; echo '[6] CODING_TESTER Done'
+ssh node17 'cd /home/ncsgroup/shb118/ncvfs/trunk; make clean; make mds' > /dev/null; echo '[7] MDS Done'

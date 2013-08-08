@@ -521,7 +521,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
                     blockData.info.blockId);
 
 #ifdef APPEND_DATA
-            uint32_t deltaId = _storageModule->getDeltaCount(segmentId, blockData.info.blockId);
+            uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
             _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId);
             _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector);
             _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId);
@@ -535,7 +535,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
                     blockData.info.blockId);
 
 #ifdef APPEND_PARITY
-            uint32_t deltaId = _storageModule->getDeltaCount(segmentId, blockData.info.blockId);
+            uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
             _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId);
             _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector);
             _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId);
@@ -830,7 +830,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 sendDelta(segmentId, blockId, blockData, offsetLength);
 
 #ifdef APPEND_DATA
-                uint32_t deltaId = _storageModule->getDeltaCount(segmentId, blockId);
+                uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockId);
                 _storageModule->createDeltaBlock(segmentId, blockId, deltaId);
                 _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, blockData.info.offlenVector);
                 _storageModule->flushDeltaBlock(segmentId, blockId, deltaId);
@@ -863,7 +863,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockData.info.parityVector = parityList;
 
 #ifdef APPEND_PARITY
-                uint32_t deltaId = _storageModule->getDeltaCount(segmentId,
+                uint32_t deltaId = _storageModule->getNextDeltaId(segmentId,
                         blockId);
 
                 // e.g. if there is 3 delta [0 1 2], the deltaId for the new one is 3
