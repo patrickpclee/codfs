@@ -3,6 +3,8 @@
  */
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
@@ -31,6 +33,7 @@ mutex diskCacheMutex;
 #ifdef USE_IO_THREADS
 using namespace boost::threadpool;
 #endif
+
 
 StorageModule::StorageModule() {
     _openedFile = new FileLruCache<string, FILE*>(MAX_OPEN_FILES);
@@ -174,6 +177,24 @@ void StorageModule::initializeStorageStatus() {
         // save file info
         _freeBlockSpace -= st.st_size;
         _currentBlockUsage += st.st_size;
+
+        // find the blockKey
+        vector<string> tokens;
+        string filename = dent->d_name;
+        boost::split(tokens, filename, boost::is_any_of("."));
+
+        // initialize delta count
+        if (tokens.size() < 2) {
+            debug_error ("Invalid block name: %s\n", dent->d_name);
+            exit (-1);
+        }
+
+        string blockKey = tokens[0] + "." + tokens[1];
+        if (!_deltaCountMap.count(blockKey)) {
+            _deltaCountMap.set(blockKey, 0); // first block is not counted as delta
+        } else {
+            _deltaCountMap.increment(blockKey);
+        }
     }
     closedir(srcdir);
 
@@ -262,18 +283,15 @@ void StorageModule::createRemoteBlock(uint32_t osdId, uint64_t segmentId,
 }
 #endif
 
-// TODO: any race condition in deltaId
 uint32_t StorageModule::getDeltaCount (uint32_t segmentId, uint32_t blockId) {
-    uint32_t deltaId = 0;
-    while (1) {
-        const string filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
-                _blockFolder);
-        if ( access( filepath.c_str(), F_OK ) < 0 ) {
-            break;
-        }
-        deltaId++;
-    }
-    return deltaId;
+    string blockKey = to_string(segmentId) + "." + to_string(blockId);
+    return _deltaCountMap.get(blockKey);
+}
+
+uint32_t StorageModule::getNextDeltaId (uint32_t segmentId, uint32_t blockId) {
+    string blockKey = to_string(segmentId) + "." + to_string(blockId);
+    // next deltaId = next deltaId before increment
+    return _deltaCountMap.increment(blockKey) - 1;
 }
 
 bool StorageModule::isSegmentCached(uint64_t segmentId) {
@@ -499,6 +517,9 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
         // remove delta from disk
         tryCloseFile(deltaBlockPath);
         remove(deltaBlockPath.c_str());
+
+        const string blockKey = to_string(segmentId) + "." + to_string(blockId);
+        _deltaCountMap.decrement(blockKey);
     }
 }
 
