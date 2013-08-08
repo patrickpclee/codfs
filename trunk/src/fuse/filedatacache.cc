@@ -134,6 +134,7 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary,
         segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
                 _segmentSize);
     } else {
+        debug ("segment id %" PRIu64 " getSegmentcache \n", segmentId);
         segmentCache = _storageModule->getSegmentCache(segmentId);
     }
 
@@ -178,10 +179,11 @@ void FileDataCache::closeDataCache(uint64_t segmentId, bool sync) {
         }
 
         // IF the cache has to be write back, i.e. Write Cache
-        if (sync)
+        if (sync) {
             doWriteBack(segmentId);
-        else
+        } else {
             writeBack(segmentId);
+        }
 
         rwmutex->unlock();
     } else {
@@ -236,7 +238,12 @@ void FileDataCache::writeBackThread() {
 
 void FileDataCache::doWriteBack(uint64_t segmentId) {
 
+    if (!_storageModule->locateSegmentCache(segmentId)) {
+        return;
+    }
+
     uint32_t primary = _writeBackSegmentPrimary.get(segmentId);
+    debug ("segment id %" PRIu64 " getSegmentcache \n", segmentId);
     struct SegmentData segmentData = _storageModule->getSegmentCache(segmentId);
     _writeBackSegmentPrimary.erase(segmentId);
 
