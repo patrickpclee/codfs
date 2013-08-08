@@ -10,10 +10,47 @@
     </Storage>
 
 	<Fuse>
-		<TempStorage>/tmp/</TempStorage>
-		<ReadAhead>10</ReadAhead>
-		<PrecacheAhead>10</PrecacheAhead>
-		<WritePoolLimit>20</WritePoolLimit>
-		<ReadCacheLimit>50</ReadCacheLimit>
+        <segmentSize>10M</segmentSize>
+        <writeBufferSize>10</writeBufferSize>
+        <numWriteThread>10</numWriteThread>
+        <codingScheme>2</codingScheme>
+        <!-- 0 -->
+        <RAID0>
+            <N>3</N>
+        </RAID0>
+
+        <!-- 1 -->
+        <RAID1>
+            <N>3</N>
+        </RAID1>
+
+        <!-- 2 -->
+        <RAID5>
+            <N>3</N>
+        </RAID5>
+        
+        <!-- 3 -->
+        <RS>
+            <N>4</N>
+            <K>2</K>
+            <M>8</M>
+        </RS>
+        
+        <!-- 4 -->
+        <EMBR>
+            <N>4</N>
+            <K>2</K>
+            <M>8</M>
+        </EMBR>
+
+        <!-- 5 -->
+        <RDP>
+            <N>6</N>
+        </RDP>
+
+        <!-- 6 -->
+        <EVENODD>
+            <N>7</N>
+        </EVENODD>
 	</Fuse>
 </NcvfsConfig>

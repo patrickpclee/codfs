@@ -31,7 +31,7 @@ string _fuseFolder = "fusedir";
 
 Client* client;
 ConfigLayer* configLayer;
-uint32_t _clientId = 51000;
+uint32_t _clientId;
 ClientCommunicator* _clientCommunicator;
 FuseLogger* _fuseLogger;
 FileMetaDataCache* _fileMetaDataCache;
@@ -521,12 +521,14 @@ struct ncvfs_fuse_operations: fuse_operations {
 
 static struct ncvfs_fuse_operations ncvfs_oper;
 
+
 int main(int argc, char *argv[]) {
+    _clientId = atoi(argv[argc-1]); // last argument is client id
 	_cwdpath = (char*)calloc(sizeof(PATH_MAX) * PATH_MAX,1);
 	if(getcwd(_cwdpath, PATH_MAX) == NULL){
 		perror("getcwd()");
 		exit(-1);
 	}
 	debug("Current Directory = %s\n",_cwdpath);
-	return fuse_main(argc, argv, &ncvfs_oper, _cwdpath);
+	return fuse_main(argc-1, argv, &ncvfs_oper, _cwdpath);
 }

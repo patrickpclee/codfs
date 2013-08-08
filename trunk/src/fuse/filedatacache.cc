@@ -13,20 +13,68 @@
 extern Client* client;
 extern uint32_t _clientId;
 extern ClientCommunicator* _clientCommunicator;
-extern ConfigLayer* _configLayer;
+extern ConfigLayer* configLayer;
 
 FileDataCache::FileDataCache() {
     // TODO: Read from XML
-    _segmentSize = 10 * 1024 * 1024;
-    _codingScheme = RAID5_CODING;
-    _codingSetting = Raid5Coding::generateSetting(3);
+
+    _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
+    int coding = configLayer->getConfigInt("Fuse>codingScheme");
+    int n, k, m;
+    switch (coding) {
+        case 0:
+            n = configLayer->getConfigInt("Fuse>RAID0>N");
+            _codingScheme = RAID0_CODING;
+            _codingSetting = Raid0Coding::generateSetting(n);
+            break;
+        case 1:
+            n = configLayer->getConfigInt("Fuse>RAID1>N");
+            _codingScheme = RAID1_CODING;
+            _codingSetting = Raid1Coding::generateSetting(n);
+            break;
+        case 2:
+            n = configLayer->getConfigInt("Fuse>RAID5>N");
+            _codingScheme = RAID5_CODING;
+            _codingSetting = Raid5Coding::generateSetting(n);
+            break;
+        case 3:
+            n = configLayer->getConfigInt("Fuse>RS>N");
+            k = configLayer->getConfigInt("Fuse>RS>K");
+            m = configLayer->getConfigInt("Fuse>RS>M");
+            _codingScheme = RS_CODING;
+            _codingSetting = RSCoding::generateSetting(n, k, m);
+            break;
+        case 4:
+            n = configLayer->getConfigInt("Fuse>EMBR>N");
+            k = configLayer->getConfigInt("Fuse>EMBR>K");
+            m = configLayer->getConfigInt("Fuse>EMBR>M");
+            _codingScheme = EMBR_CODING;
+            _codingSetting = EMBRCoding::generateSetting(n, k, m);
+            break;
+        case 5:
+            n = configLayer->getConfigInt("Fuse>RDP>N");
+            _codingScheme = RDP_CODING;
+            _codingSetting = RDPCoding::generateSetting(n);
+            break;
+        case 6:
+            n = configLayer->getConfigInt("Fuse>EVENODD>N");
+            _codingScheme = EVENODD_CODING;
+            _codingSetting = EvenOddCoding::generateSetting(n);
+            break;
+        default:
+            debug("Invalid Test = %d\n", coding);
+            break;
+    }
+
     _lruSizeLimit = 10;
-    _writeBufferSize = 1;
+    _writeBufferSize = configLayer->getConfigInt("Fuse>writeBufferSize");
     _writeBuffer = new RingBuffer<uint64_t>(_writeBufferSize);
-    _numWriteThread = 10;
+    _numWriteThread = configLayer->getConfigInt("Fuse>numWriteThread");
     for (uint32_t i = 0; i < _numWriteThread; ++i) {
         _writeThreads.push_back(thread(&FileDataCache::writeBackThread, this));
     }
+
+    // desperated
     _prefetchBufferSize = 10;
     _prefetchBuffer = new RingBuffer<std::pair<uint64_t, uint32_t> >(
             _prefetchBufferSize);

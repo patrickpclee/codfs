@@ -32,10 +32,10 @@ set $alive
 for target
 do
 	targetip=192.168.0.$target
-	echo "rsync -av $ncvfs_home/shb118/ncvfs/trunk -e ssh $targetip:$ncvfs_home/shb118/ncvfs > /dev/null" >> sync_list
+	echo "rsync -av $ncvfs_home/shb118/ncvfs/trunk -e ssh $targetip:$ncvfs_home/shb118/ncvfs > /dev/null" >> sync.job
 done
 
-parallel --jobs 0 < sync_list
-#rm sync_list
+parallel --jobs 0 < sync.job
+rm sync.job
 echo "All nodes code synchronized"
 
