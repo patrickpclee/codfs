@@ -26,7 +26,6 @@ echo "Compile completes"
 parallel --jobs 0 < compile_get.job
 echo "Compile code synchronized"
 
-rm sync_list
 alive=`cat alive_client alive_mds alive_monitor alive_osd | sort | uniq `
 set $alive
 for target
