@@ -114,6 +114,7 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
     struct SegmentData segmentCache = client->getSegment(
             _clientId, sockfd, segmentId);
     memcpy(buf, segmentCache.buf + offset, size);
+    updateLru(segmentId);
     return size;
 }
 
@@ -155,6 +156,7 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary,
 
     _storageModule->setSegmentCache(segmentId, segmentCache);
 
+    updateLru(segmentId);
     return size;
 }
 
@@ -162,22 +164,29 @@ void FileDataCache::closeDataCache(uint64_t segmentId, bool sync) {
 
     // obtain unique lock 
     RWMutex* rwmutex = obtainRWMutex(segmentId);
-    writeLock wtlock(*rwmutex);
+    //debug("TRY LOCK SEGMENT %" PRIu64 "\n", segmentId);
+    if (rwmutex->try_lock()) 
+    {
+        debug("Closing Data Cache %" PRIu64 "\n", segmentId);
 
-    debug("Closing Data Cache %" PRIu64 "\n", segmentId);
+        // If the cache is not modified, just free and return
+        if (_writeBackSegmentPrimary.count(segmentId) == 0) {
+            _storageModule->closeSegment(segmentId);
+            _writeBackSegmentPrimary.erase(segmentId);
+            rwmutex->unlock();
+            return;
+        }
 
-    // If the cache is not modified, just free and return
-    if (_writeBackSegmentPrimary.count(segmentId) == 0) {
-        _storageModule->closeSegment(segmentId);
-        _writeBackSegmentPrimary.erase(segmentId);
-        return;
+        // IF the cache has to be write back, i.e. Write Cache
+        if (sync)
+            doWriteBack(segmentId);
+        else
+            writeBack(segmentId);
+
+        rwmutex->unlock();
+    } else {
+        debug("TRY LOCK SEGMENT %" PRIu64 " FAILED\n", segmentId);
     }
-
-    // IF the cache has to be write back, i.e. Write Cache
-    if (sync)
-        doWriteBack(segmentId);
-    else
-        writeBack(segmentId);
 }
 
 void FileDataCache::prefetchSegment(uint64_t segmentId, uint32_t primary) {
@@ -255,14 +264,16 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 }
 
 void FileDataCache::updateLru(uint64_t segmentId) {
+    lock_guard<std::mutex> lk(_lruMutex);
+
     list<uint64_t>::iterator tempIt;
     if (_segment2LruMap.count(segmentId) == 1) {
         tempIt = _segment2LruMap[segmentId];
         // move tempIt to _segmentLruList.end() 
         _segmentLruList.splice(_segmentLruList.end(), _segmentLruList, tempIt);
     }
-    // Create LRU Record
     else {
+        // Create LRU Record
         if (_segmentLruList.size() >= _lruSizeLimit) {
             uint64_t segmentToClose = _segmentLruList.front();
             _segmentLruList.pop_front();
@@ -273,5 +284,4 @@ void FileDataCache::updateLru(uint64_t segmentId) {
         _segment2LruMap[segmentId] = tempIt;
     }
     return;
-
 }

@@ -52,7 +52,7 @@ class FileDataCache {
         std::unordered_map<uint64_t, boost::shared_mutex*> _segmentRWMutexMap;
         std::mutex _segmentRWMutexMapMutex;
 
-//		std::mutex _lruListMutex;
+		std::mutex _lruMutex;
 		std::list<uint64_t> _segmentLruList;
 		std::unordered_map<uint64_t, std::list<uint64_t>::iterator> _segment2LruMap;
 

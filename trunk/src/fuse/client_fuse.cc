@@ -245,8 +245,10 @@ static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *f
 }
 
 static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
+    debug("%s\n", "haha1");
 	uint32_t fileId = fi->fh;
 	struct FileMetaData fileMetaData = getAndCacheFileMetaData(fileId);
+    debug("%s\n", "haha2");
 	uint32_t sizeRead = 0;
 	uint32_t lastSegmentCount = 0;
 	char* bufptr = buf;
@@ -261,6 +263,7 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, st
 		uint32_t readSize = min (_segmentSize - segmentOffset, (uint32_t)size - sizeRead);
 
 		// return immediately if data is cached, otherwise retrieve data from OSDs
+        debug("%s\n", "haha3");
 		uint32_t retstat = _fileDataCache->readDataCache(segmentId, primary, bufptr, readSize, segmentOffset);
 		bufptr += retstat;
 		sizeRead += retstat;
