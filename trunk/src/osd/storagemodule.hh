@@ -73,6 +73,7 @@ public:
     void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
     void createDeltaBlock (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
     uint32_t getDeltaCount (uint32_t segmentId, uint32_t blockId);
+    uint32_t getNextDeltaId (uint32_t segmentId, uint32_t blockId);
 
 #ifdef MOUNT_OSD
     /**
@@ -538,6 +539,8 @@ private:
     atomic<uint64_t> _freeSegmentSpace;
     atomic<uint32_t> _currentBlockUsage;
     atomic<uint32_t> _currentSegmentUsage;
+
+    ConcurrentMap<string, uint32_t> _deltaCountMap;
 
 #ifdef USE_IO_THREADS
     boost::threadpool::prio_pool _iotp;
