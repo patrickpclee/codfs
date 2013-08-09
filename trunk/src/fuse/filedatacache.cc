@@ -14,11 +14,11 @@ extern Client* client;
 extern uint32_t _clientId;
 extern ClientCommunicator* _clientCommunicator;
 extern ConfigLayer* configLayer;
+extern uint32_t _segmentSize;
 
 FileDataCache::FileDataCache() {
     // TODO: Read from XML
 
-    _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
     int coding = configLayer->getConfigInt("Fuse>codingScheme");
     int n, k, m;
     switch (coding) {
@@ -66,7 +66,7 @@ FileDataCache::FileDataCache() {
             break;
     }
 
-    _lruSizeLimit = 10;
+    _lruSizeLimit = configLayer->getConfigInt("Fuse>lruSize");
     _writeBufferSize = configLayer->getConfigInt("Fuse>writeBufferSize");
     _writeBuffer = new RingBuffer<uint64_t>(_writeBufferSize);
     _numWriteThread = configLayer->getConfigInt("Fuse>numWriteThread");
@@ -74,13 +74,12 @@ FileDataCache::FileDataCache() {
         _writeThreads.push_back(thread(&FileDataCache::writeBackThread, this));
     }
 
-    // desperated
-    _prefetchBufferSize = 10;
+    _prefetchBufferSize = configLayer->getConfigInt("Fuse>prefetchBufferSize");
     _prefetchBuffer = new RingBuffer<std::pair<uint64_t, uint32_t> >(
             _prefetchBufferSize);
-    _numPrefetchThread = 0;
+    _numPrefetchThread = configLayer->getConfigInt("Fuse>numPrefetchThread");
     for (uint32_t i = 0; i < _numPrefetchThread; ++i) {
-        _prefetchThreads.push_back(thread(&FileDataCache::doPrefetch, this));
+        _prefetchThreads.push_back(thread(&FileDataCache::prefetchThread, this));
     }
 
     _storageModule = client->getStorageModule();
@@ -190,11 +189,10 @@ void FileDataCache::closeDataCache(uint64_t segmentId, bool sync) {
 }
 
 void FileDataCache::prefetchSegment(uint64_t segmentId, uint32_t primary) {
+    lock_guard<mutex> lk(_prefetchBitmapMutex);
     if (_prefetchBitmap.count(segmentId) == 0) {
-        if (_segmentStatus.count(segmentId) == 0) {
             _prefetchBitmap[segmentId] = true;
             _prefetchBuffer->push(make_pair(segmentId, primary));
-        }
     }
 }
 
@@ -202,24 +200,21 @@ void FileDataCache::writeBack(uint64_t segmentId) {
     _writeBuffer->push(segmentId);
 }
 
-void FileDataCache::doPrefetch() {
+void FileDataCache::prefetchThread() {
     std::pair<uint64_t, uint32_t> tempPair;
     while (1) {
         tempPair = _prefetchBuffer->pop();
+
         uint64_t segmentId = tempPair.first;
         uint32_t primary = tempPair.second;
-        uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
 
+        RWMutex* rwmutex = obtainRWMutex(segmentId);
+        readLock rdlock(*rwmutex);
         debug("Prefetch %" PRIu64 "\n", segmentId);
 
-        if (_segmentStatus.count(segmentId) == 0) {
-            _segmentStatus[segmentId] = CLEAN;
-            _writeBackSegmentPrimary.set(segmentId, primary);
-            debug("Create Cache for %" PRIu64 "\n", segmentId);
-        }
-
+        uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
         client->getSegment(_clientId, sockfd, segmentId);
-        //updateLru(segmentId);
+        updateLru(segmentId);
     }
 }
 

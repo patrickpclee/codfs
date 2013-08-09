@@ -36,7 +36,7 @@ class FileDataCache {
 		void writeBackThread();
 		void doWriteBack(uint64_t segmentId);
 
-		void doPrefetch();
+		void prefetchThread();
 		void updateLru(uint64_t segmentId);
 
         RWMutex* obtainRWMutex(uint64_t segmentId);
@@ -66,7 +66,7 @@ class FileDataCache {
 		uint32_t _numPrefetchThread;
 		std::vector<thread> _prefetchThreads;
 		std::unordered_map<uint64_t, bool> _prefetchBitmap;
-//		std::mutex _prefetchBitmapMutex;
+		std::mutex _prefetchBitmapMutex;
 
 		ClientStorageModule* _storageModule;
 };

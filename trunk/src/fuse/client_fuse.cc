@@ -21,8 +21,8 @@
 
 #include "../common/metadata.hh"
 #include "../common/garbagecollector.hh"
+#include "../common/convertor.hh"	//md5ToHex()
 #include "../common/debug.hh"
-
 #include "../config/config.hh"
 
 char* _cwdpath;
@@ -39,7 +39,8 @@ FileDataCache* _fileDataCache;
 
 mutex _segmentMetaMutex;
 
-uint32_t _segmentSize = 10 * 1024 * 1024;
+uint32_t _segmentSize;
+uint32_t _prefetchCount;
 
 std::forward_list<struct SegmentMetaData> _segmentMetaDataList;
 uint32_t _segmentMetaDataAllocateSize = 20;
@@ -48,7 +49,6 @@ thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
 
-uint32_t _prefetchCount = 0;
 
 static void removeNameSpace(const char* path) {
 	unlink(path);
@@ -133,6 +133,9 @@ void startGarbageCollectionThread() {
 static void* ncvfs_init(struct fuse_conn_info *conn) {
 	_cwd = string(_cwdpath) + "/";
 	configLayer = new ConfigLayer((_cwd + "common.xml").c_str(),(_cwd + "clientconfig.xml").c_str());
+
+    _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
+    _prefetchCount = configLayer->getConfigInt("Fuse>prefetchCount");
 	client = new Client(_clientId);
 	_fuseLogger = new FuseLogger(_cwd + "fuse.log");	
 	_fileMetaDataCache = new FileMetaDataCache();
