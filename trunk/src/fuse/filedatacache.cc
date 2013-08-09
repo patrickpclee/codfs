@@ -14,11 +14,11 @@ extern Client* client;
 extern uint32_t _clientId;
 extern ClientCommunicator* _clientCommunicator;
 extern ConfigLayer* configLayer;
-extern uint32_t _segmentSize;
 
 FileDataCache::FileDataCache() {
     // TODO: Read from XML
 
+    _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
     int coding = configLayer->getConfigInt("Fuse>codingScheme");
     int n, k, m;
     switch (coding) {

@@ -135,6 +135,7 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
 	configLayer = new ConfigLayer((_cwd + "common.xml").c_str(),(_cwd + "clientconfig.xml").c_str());
 
     _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
+    debug("SEGMENG SIZE = %" PRIu32 "\n", _segmentSize);
     _prefetchCount = configLayer->getConfigInt("Fuse>prefetchCount");
 	client = new Client(_clientId);
 	_fuseLogger = new FuseLogger(_cwd + "fuse.log");	
