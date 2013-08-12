@@ -236,18 +236,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                         BlockData blockData;
 
                         if (isParity) {
-                            #ifdef APPEND_PARITY
-                                #ifdef COMPACT_PARITY_ON_READ
-                                _storageModule->mergeBlock(segmentId, blockId, true);
-                                BlockData blockData = _storageModule->readBlock(
-                                        segmentId, blockId, symbols);
-                                #else
-                                BlockData blockData = _storageModule->getMergedBlock(segmentId, i, true);
-                                #endif
-                            #else
-                                blockData = _storageModule->readBlock(
-                                        segmentId, i, blockSymbols.second);
-                            #endif
+                            BlockData blockData = _storageModule->getMergedBlock(segmentId, i, true);
                         } else {
                             #ifdef APPEND_DATA
                                 blockData = _storageModule->getMergedBlock(segmentId, i, false);
@@ -371,15 +360,7 @@ void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
     BlockData blockData;
 
     if (isParity) {
-        #ifdef APPEND_PARITY
-            #ifdef COMPACT_PARITY_ON_READ
-            _storageModule->mergeBlock(segmentId, blockId, isParity);
-            BlockData blockData = _storageModule->readBlock(
-                    segmentId, blockId, symbols);
-            #else
             BlockData blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity);
-            #endif
-        #endif
     } else {
         #ifdef APPEND_DATA
             blockData = _storageModule->getMergedBlock(segmentId, blockId, false);
@@ -534,15 +515,10 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
             debug("Updating Segment %" PRIu64 " Block %" PRIu32 "\n", segmentId,
                     blockData.info.blockId);
 
-#ifdef APPEND_PARITY
             uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
             _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId);
             _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector);
             _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId);
-#else
-            _storageModule->updateBlock(segmentId, blockData.info.blockId, blockData);
-            _storageModule->flushBlock(segmentId, blockData.info.blockId);
-#endif
 
         }
     } else {
@@ -862,7 +838,6 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockData.info.offlenVector = offsetLength;
                 blockData.info.parityVector = parityList;
 
-#ifdef APPEND_PARITY
                 uint32_t deltaId = _storageModule->getNextDeltaId(segmentId,
                         blockId);
 
@@ -871,15 +846,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 _storageModule->writeDeltaBlock(segmentId, blockId, deltaId,
                         blockData.buf, offsetLength);
                 _storageModule->flushDeltaBlock(segmentId, blockId, deltaId);
-#else
-                // read old parity and compute XOR
-                BlockData parityDelta = computeDelta(segmentId, blockId, blockData, offsetLength);
 
-                _storageModule->updateBlock(segmentId, blockId, parityDelta);
-                _storageModule->flushBlock(segmentId, blockId);
-
-                MemoryPool::getInstance().poolFree(parityDelta.buf);
-#endif
                 MemoryPool::getInstance().poolFree(blockData.buf);
                 _updateBlockData.erase(updateKey);
                 _pendingUpdateBlockChunk.erase(updateKey);
