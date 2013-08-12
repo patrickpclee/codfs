@@ -71,7 +71,7 @@ public:
      */
 
     void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
-    void createDeltaBlock (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
+    void createDeltaBlock (uint64_t segmentId, uint32_t blockId, uint32_t deltaId, bool isParity);
     uint32_t getDeltaCount (uint32_t segmentId, uint32_t blockId);
     uint32_t getNextDeltaId (uint32_t segmentId, uint32_t blockId);
 
@@ -177,7 +177,7 @@ public:
     uint32_t writeBlock(uint64_t segmentId, uint32_t blockId, char* buf,
             uint64_t offsetInBlock, uint32_t length);
     uint32_t writeDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, char* buf,
-            vector<offset_length_t> offsetLength);
+            vector<offset_length_t> offsetLength, bool isParity);
 
     /**
      * Modify an existing block
@@ -232,7 +232,7 @@ public:
      */
 
     void flushBlock(uint64_t segmentId, uint32_t blockId);
-    void flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
+    void flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, bool isParity);
 
 #ifdef MOUNT_OSD
     /**

@@ -259,7 +259,8 @@ void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
 }
 
 void StorageModule::createDeltaBlock(uint64_t segmentId, uint32_t blockId,
-        uint32_t deltaId) {
+        uint32_t deltaId, bool isParity) {
+
     const string filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
             _blockFolder);
     createFile(filepath);
@@ -624,7 +625,7 @@ uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
 }
 
 uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
-        uint32_t deltaId, char* buf, vector<offset_length_t> offsetLength) {
+        uint32_t deltaId, char* buf, vector<offset_length_t> offsetLength, bool isParity) {
 
     /*
      *  +-------------------------+
@@ -786,7 +787,7 @@ void StorageModule::flushBlock(uint64_t segmentId, uint32_t blockId) {
     flushFile(filepath);
 }
 
-void StorageModule::flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId) {
+void StorageModule::flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, bool isParity) {
 
     string filepath = generateDeltaBlockPath(segmentId, blockId, deltaId, _blockFolder);
     flushFile(filepath);

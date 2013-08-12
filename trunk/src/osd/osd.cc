@@ -503,9 +503,9 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 
 #ifdef APPEND_DATA
             uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
-            _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId);
-            _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector);
-            _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId);
+            _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId, false);
+            _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
+            _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId, false);
 #else
             _storageModule->updateBlock(segmentId, blockData.info.blockId, blockData);
             _storageModule->flushBlock(segmentId, blockData.info.blockId);
@@ -516,9 +516,9 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
                     blockData.info.blockId);
 
             uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
-            _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId);
-            _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector);
-            _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId);
+            _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId, true);
+            _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector, true);
+            _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId, true);
 
         }
     } else {
@@ -807,9 +807,9 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 #ifdef APPEND_DATA
                 uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockId);
-                _storageModule->createDeltaBlock(segmentId, blockId, deltaId);
-                _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, blockData.info.offlenVector);
-                _storageModule->flushDeltaBlock(segmentId, blockId, deltaId);
+                _storageModule->createDeltaBlock(segmentId, blockId, deltaId, false);
+                _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
+                _storageModule->flushDeltaBlock(segmentId, blockId, deltaId, false);
 #else
                 _storageModule->updateBlock(segmentId, blockId, blockData);
                 _storageModule->flushBlock(segmentId, blockId);
@@ -841,11 +841,10 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 uint32_t deltaId = _storageModule->getNextDeltaId(segmentId,
                         blockId);
 
-                // e.g. if there is 3 delta [0 1 2], the deltaId for the new one is 3
-                _storageModule->createDeltaBlock(segmentId, blockId, deltaId);
+                _storageModule->createDeltaBlock(segmentId, blockId, deltaId, true);
                 _storageModule->writeDeltaBlock(segmentId, blockId, deltaId,
-                        blockData.buf, offsetLength);
-                _storageModule->flushDeltaBlock(segmentId, blockId, deltaId);
+                        blockData.buf, offsetLength, true);
+                _storageModule->flushDeltaBlock(segmentId, blockId, deltaId, true);
 
                 MemoryPool::getInstance().poolFree(blockData.buf);
                 _updateBlockData.erase(updateKey);
