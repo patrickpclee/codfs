@@ -65,8 +65,8 @@ typedef std::pair<uint32_t, uint32_t> block_symbol_t;
 //#define CACHE_AFTER_TRANSFER
 //#define MOUNT_OSD
 #define APPEND_DATA
-#define APPEND_PARITY
 //#define COMPACT_PARITY_ON_READ
+#define RESERVE_SPACE_SIZE 131072   // 128KB
 
 // osd/storagemodule.cc
 //#define USE_SEGMENT_CACHE
