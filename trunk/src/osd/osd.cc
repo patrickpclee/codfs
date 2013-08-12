@@ -385,7 +385,7 @@ void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
             blockData = _storageModule->getMergedBlock(segmentId, blockId, false);
         #else
             blockData = _storageModule->readBlock(
-                    segmentId, i, blockSymbols.second);
+                    segmentId, blockId, symbols);
         #endif
     }
 
