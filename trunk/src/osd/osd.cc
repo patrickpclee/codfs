@@ -628,42 +628,18 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                         offsetLength);
             }
 
-            // request secondary OSD list
-            const uint32_t parityNum = _codingModule->getParityNumber(
-                    codingSetting.codingScheme, codingSetting.setting);
-
             vector<struct BlockLocation> blockLocationList;
             if (dataMsgType == UPLOAD) {
+                // request new secondary OSD list
                 blockLocationList = _osdCommunicator->getOsdListRequest(
                         segmentId, MONITOR, blockDataList.size(), _osdId,
                         blockDataList[0].info.blockSize);
-                const uint32_t blockNum = blockLocationList.size();
-                vector<BlockLocation> parityOsdListPair;
-                for (uint32_t i = parityNum; i >= 1; --i) {
-                    BlockLocation blockLocation;
-                    blockLocation.blockId = blockNum - i;
-                    blockLocation.osdId = blockLocationList[blockNum - i].osdId;
-                    parityOsdListPair.push_back(blockLocation);
-                }
-                for (uint32_t i = 0; i < blockDataList.size(); i++) {
-                    blockDataList[i].info.parityVector = parityOsdListPair;
-                }
+
             } else if (dataMsgType == UPDATE) {
-                // If it is update, append parity node info to secondary OSD
+                // retrieve old secondary OSD list
                 SegmentTransferOsdInfo segmentInfo =
                         _osdCommunicator->getSegmentInfoRequest(segmentId,
                                 _osdId);
-                const uint32_t blockNum = segmentInfo._osdList.size();
-                vector<BlockLocation> parityOsdListPair;
-                for (uint32_t i = parityNum; i >= 1; --i) {
-                    BlockLocation blockLocation;
-                    blockLocation.blockId = blockNum - i;
-                    blockLocation.osdId = segmentInfo._osdList[blockNum - i];
-                    parityOsdListPair.push_back(blockLocation);
-                }
-                for (uint32_t i = 0; i < blockDataList.size(); i++) {
-                    blockDataList[i].info.parityVector = parityOsdListPair;
-                }
 
                 // copy to blockLocationList
                 for (uint32_t i = 0; i < segmentInfo._osdList.size(); i++) {
@@ -672,6 +648,21 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                     blockLocation.osdId = segmentInfo._osdList[i];
                     blockLocationList.push_back(blockLocation);
                 }
+            }
+
+            // prepare the parity list in blockDataList
+            const uint32_t parityNum = _codingModule->getParityNumber(
+                    codingSetting.codingScheme, codingSetting.setting);
+            const uint32_t blockCount = blockDataList.size();
+            vector<BlockLocation> parityOsdListPair;
+            for (uint32_t i = parityNum; i >= 1; --i) {
+                BlockLocation blockLocation;
+                blockLocation.blockId = blockCount - i;
+                blockLocation.osdId = blockLocationList[blockCount - i].osdId;
+                parityOsdListPair.push_back(blockLocation);
+            }
+            for (uint32_t i = 0; i < blockDataList.size(); i++) {
+                blockDataList[i].info.parityVector = parityOsdListPair;
             }
 
             vector<uint32_t> nodeList;
@@ -898,12 +889,6 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                     std::transform(parityList.begin(), parityList.end(),
                         std::back_inserter(parityBlockId), [](const BlockLocation& b){ return b.blockId; } );
                     const bool isParity = (std::find(parityBlockId.begin(), parityBlockId.end(), blockData.info.blockId) != parityBlockId.end());
-
-                    for (auto blockLocation: parityList) {
-                        cout << "pairtyList: " << blockLocation.blockId << endl;
-                    }
-                    cout << "blockId: " << blockData.info.blockId << endl;
-                    cout << "isParity: " << isParity << endl;
 
                     debug(
                             "[UPLOAD] all chunks for block %" PRIu32 "is received blockSize = %" PRIu32 "\n",
