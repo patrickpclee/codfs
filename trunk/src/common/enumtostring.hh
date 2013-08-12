@@ -115,6 +115,15 @@ public:
     return "???";
   }
 
+  static const char * toString( BlockType en ) {
+    switch( en ) {
+      case DATA_BLOCK: return "DATA_BLOCK";
+      case DEFAULT_BLOCK_TYPE: return "DEFAULT_BLOCK_TYPE";
+      case PARITY_BLOCK: return "PARITY_BLOCK";
+    }
+    return "???";
+  }
+
   static const char * toString( DataMsgType en ) {
     switch( en ) {
       case DEFAULT_DATA_MSG: return "DEFAULT_DATA_MSG";

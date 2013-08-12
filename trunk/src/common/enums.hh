@@ -26,6 +26,12 @@ enum DataMsgType {
 	PARITY = 5
 };
 
+enum BlockType {
+    DEFAULT_BLOCK_TYPE = 15,
+    DATA_BLOCK = 0,     // must be 0 to make it compatible with boolean
+    PARITY_BLOCK = 1
+};
+
 enum SegmentStatus {NEW, CLEAN, DIRTY, WRITEBACK};
 
 enum MsgType {

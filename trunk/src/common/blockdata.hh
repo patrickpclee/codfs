@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdint.h>
+#include "enums.hh"
 #include "../common/blocklocation.hh"
 
 using namespace std;
@@ -13,7 +14,7 @@ struct BlockInfo {
 	uint32_t blockSize;
     vector<BlockLocation> parityVector; // pair of <osdid, blockid>
     vector<offset_length_t> offlenVector;
-
+    BlockType blockType;
 };
 
 struct BlockData {

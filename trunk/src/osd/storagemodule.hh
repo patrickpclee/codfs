@@ -14,6 +14,8 @@
 #include "../datastructure/concurrentmap.hh"
 #include "../common/enums.hh"
 #include "filelrucache.hh"
+#include "reservespaceinfo.hh"
+#include "deltalocation.hh"
 
 #ifdef USE_IO_THREADS
 #include "../../lib/threadpool/threadpool.hpp"
@@ -71,9 +73,12 @@ public:
      */
 
     void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
-    void createDeltaBlock (uint64_t segmentId, uint32_t blockId, uint32_t deltaId, bool isParity);
-    uint32_t getDeltaCount (uint32_t segmentId, uint32_t blockId);
-    uint32_t getNextDeltaId (uint32_t segmentId, uint32_t blockId);
+    void createDeltaBlock(uint64_t segmentId, uint32_t blockId,
+            uint32_t deltaId, bool isParity);
+    void reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
+            uint32_t offset, uint32_t reserveLength);
+    uint32_t getDeltaCount(uint32_t segmentId, uint32_t blockId);
+    uint32_t getNextDeltaId(uint32_t segmentId, uint32_t blockId);
 
 #ifdef MOUNT_OSD
     /**
@@ -541,6 +546,8 @@ private:
     atomic<uint32_t> _currentSegmentUsage;
 
     ConcurrentMap<string, uint32_t> _deltaCountMap;
+    ConcurrentMap<string, vector<DeltaLocation>> _deltaLocationMap;
+    ConcurrentMap<string, ReserveSpaceInfo> _reserveSpaceMap;
 
 #ifdef USE_IO_THREADS
     boost::threadpool::prio_pool _iotp;
