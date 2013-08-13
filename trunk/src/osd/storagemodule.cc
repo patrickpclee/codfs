@@ -276,14 +276,15 @@ void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
     ReserveSpaceInfo reserveSpaceInfo;
     reserveSpaceInfo.currentOffset = offset;
     reserveSpaceInfo.remainingReserveSpace = reserveLength;
+    reserveSpaceInfo.blockSize = offset;
     const string blockKey = to_string(segmentId) + "." + to_string(blockId);
     _reserveSpaceMap.set(blockKey, reserveSpaceInfo);
 }
 
 void StorageModule::createDeltaBlock(uint64_t segmentId, uint32_t blockId,
-        uint32_t deltaId, bool isParity) {
+        uint32_t deltaId, bool useReserve) {
 
-    if (isParity) {
+    if (useReserve) {
         return;
     }
 
@@ -443,21 +444,48 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 
 }
 
-struct BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
+BlockData StorageModule::readDeltaFromReserve(uint64_t segmentId,
+        uint32_t blockId, uint32_t deltaId, DeltaLocation deltaLocation) {
+
+    BlockData blockData = doReadDelta (segmentId, blockId, deltaId, true, deltaLocation.offsetLength.first);
+
+    return blockData;
+
+}
+
+BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
         uint32_t blockId, uint32_t deltaId) {
 
-    string blockPath = generateDeltaBlockPath(segmentId, blockId, deltaId,
-            _blockFolder);
+    BlockData blockData = doReadDelta (segmentId, blockId, deltaId, false, 0);
+
+    return blockData;
+
+}
+
+BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
+        uint32_t deltaId, bool isReserve, uint32_t offset) {
+
+    string blockPath;
+    if (isReserve) {
+        blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
+    } else {
+        blockPath = generateDeltaBlockPath(segmentId, blockId, deltaId,
+                _blockFolder);
+    }
+
+    debug ("Read delta from blockPath = %s\n", blockPath.c_str());
 
     // parse header
     uint32_t headerSize = 0;
     uint32_t count = 0;
-    headerSize += readFile(blockPath, (char*) &count, 0, sizeof(uint32_t), false);
+    headerSize += readFile(blockPath, (char*) &count, offset, sizeof(uint32_t), false);
     vector<offset_length_t> offsetLength(count);
-    headerSize += readFile(blockPath, (char*) &offsetLength[0], sizeof(uint32_t),
+    headerSize += readFile(blockPath, (char*) &offsetLength[0], offset + sizeof(uint32_t),
             sizeof(offset_length_t) * count, false);
 
     uint32_t combinedLength = getCombinedLength(offsetLength);
+
+    debug ("Read delta length = %" PRIu32 " offsetLength size = %zu\n", combinedLength, offsetLength.size());
 
     struct BlockData blockData;
     blockData.info.segmentId = segmentId;
@@ -468,14 +496,9 @@ struct BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
     char* bufptr = blockData.buf;
 
     // read whole delta block into memory
-    readFile(blockPath, bufptr, headerSize, combinedLength, false);
-
-    debug(
-            "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " read length = %" PRIu32 "\n",
-            segmentId, blockId, deltaId, combinedLength);
+    readFile(blockPath, bufptr, offset + headerSize, combinedLength, false);
 
     return blockData;
-
 }
 
 BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity) {
@@ -489,17 +512,36 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
     blockData.info.blockType = (BlockType) isParity;
 
     const string blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
-    const uint32_t filesize = getFilesize(blockPath);
-    const uint32_t byteToRead = filesize;
+    //const uint32_t filesize = getFilesize(blockPath); // includes reserved space if present
 
-    blockData.info.blockSize = byteToRead;
+    const string blockKey = to_string(segmentId) + "." + to_string(blockId);
+    blockData.info.blockSize = _reserveSpaceMap.get(blockKey).blockSize;
+
+
+    debug(
+            "Getting merged block for segment ID %" PRIu64 " block ID %" PRIu32 " isParity = %d blockSize = %" PRIu32 " deltaCount = %" PRIu32 "\n",
+            segmentId, blockId, isParity, blockData.info.blockSize, deltaCount);
+
+    // TODO: read just the block for now, one possible optimization is to read
+    // the block in one go
+    const uint32_t byteToRead = blockData.info.blockSize;
 
     blockData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
     readFile(blockPath, blockData.buf, 0, byteToRead, false);
 
     // for each delta block, merge into parity for each <offset, length> using XOR
     for (uint32_t i = 0; i < deltaCount; i++) {
-        BlockData delta = readDeltaBlock(segmentId, blockId, i);
+
+        // read from reserved space if delta is inside
+        BlockData delta;
+        DeltaLocation deltaLocation = getDeltaLocation(segmentId, blockId, i);
+        if (deltaLocation.isReserveSpace) {
+            debug ("Reading from Reserve Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 "\n", segmentId, blockId, i);
+            delta = readDeltaFromReserve(segmentId, blockId, i, deltaLocation);
+        } else {
+            debug ("Reading from Delta Block Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 "\n", segmentId, blockId, i);
+            delta = readDeltaBlock(segmentId, blockId, i);
+        }
         char* deltaBufPtr = delta.buf;
         for (offset_length_t offsetLengthPair : delta.info.offlenVector) {
             uint32_t offset = offsetLengthPair.first;
@@ -666,36 +708,51 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
      */
 
     const string blockKey = to_string(segmentId) + "." + to_string(blockId);
-    uint32_t currentOffset = 0;
-    string filepath = "";
+    RWMutex* rwmutex = obtainRWMutex(blockKey);
+    writeLock wtlock(*rwmutex);
+
+    const uint32_t combinedLength = getCombinedLength(offsetLength);
+    ReserveSpaceInfo &reserveSpaceInfo = _reserveSpaceMap.get(blockKey);
     debug ("isParity = %d\n", isParity);
 
-    if (isParity) {
-        ReserveSpaceInfo reserveSpaceInfo = _reserveSpaceMap.get(blockKey);
+    // for writing header
+    const uint32_t pairCount = offsetLength.size();
+    const uint32_t headerSize = sizeof(uint32_t) + sizeof(offset_length_t) * pairCount;
+
+    DeltaLocation deltaLocation;
+    deltaLocation.blockId = blockId;
+    deltaLocation.deltaId = deltaId;
+
+    uint32_t currentOffset = 0;
+    string filepath = "";
+    if (isParity && reserveSpaceInfo.remainingReserveSpace > headerSize + combinedLength) {
         currentOffset = reserveSpaceInfo.currentOffset;
         filepath = generateBlockPath(segmentId, blockId,
                     _blockFolder);
+        deltaLocation.offsetLength = make_pair (currentOffset, headerSize + combinedLength);
+        deltaLocation.isReserveSpace = true;
     } else {
+        // not enough reserve space, create new block
+        createDeltaBlock(segmentId, blockId, deltaId, false);
         currentOffset = 0;
         filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
                     _blockFolder);
+        deltaLocation.offsetLength = make_pair (0, headerSize + combinedLength);
+        deltaLocation.isReserveSpace = false;
     }
 
 
     uint32_t byteWritten = 0;
 
     // write header to file
-    uint32_t count = offsetLength.size();
-    uint32_t headerSize = sizeof(uint32_t) + sizeof(offset_length_t) * count;
     char* headerBuf = MemoryPool::getInstance().poolMalloc(headerSize);
-    memcpy(headerBuf, &count, sizeof(uint32_t));
+    memcpy(headerBuf, &pairCount, sizeof(uint32_t));
     memcpy(headerBuf + sizeof(uint32_t), &offsetLength[0],
-            sizeof(offset_length_t) * count);
+            sizeof(offset_length_t) * pairCount);
     byteWritten = writeFile(filepath, headerBuf, currentOffset, headerSize, false);
     MemoryPool::getInstance().poolFree(headerBuf);
 
     // write delta block
-    uint32_t combinedLength = getCombinedLength(offsetLength);
     byteWritten = writeFile(filepath, buf, currentOffset + headerSize, combinedLength, false);
 
     debug(
@@ -706,8 +763,11 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
 
     // TODO: check if locking is needed for the parity block file
     if (isParity) {
-        _reserveSpaceMap.get(blockKey).currentOffset += byteWritten;
+        reserveSpaceInfo.currentOffset += byteWritten;
+        reserveSpaceInfo.remainingReserveSpace -= byteWritten;
     }
+
+    _deltaLocationMap.get(blockKey).push_back(deltaLocation);
 
     return byteWritten;
 }
@@ -1303,3 +1363,35 @@ uint32_t StorageModule::getCombinedLength(vector<offset_length_t> offsetLength) 
     return combinedLength;
 }
 
+
+RWMutex* StorageModule::obtainRWMutex(string blockKey) {
+    // obtain rwmutex for this segment
+    _deltaRWMutexMapMutex.lock();
+    RWMutex* rwmutex;
+    if (_deltaRWMutexMap.count(blockKey) == 0) {
+        rwmutex = new RWMutex();
+        _deltaRWMutexMap[blockKey] = rwmutex;
+    } else {
+        rwmutex = _deltaRWMutexMap[blockKey];
+    }
+    _deltaRWMutexMapMutex.unlock();
+    return rwmutex;
+}
+
+DeltaLocation StorageModule::getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId) {
+    const string blockKey = to_string(segmentId) + "." + to_string(blockId);
+
+    RWMutex* rwmutex = obtainRWMutex(blockKey);
+    readLock rdlock(*rwmutex);
+
+    vector<DeltaLocation> deltaLocationList = _deltaLocationMap.get(blockKey);
+
+    for (DeltaLocation deltaLocation: deltaLocationList) {
+        if (deltaLocation.deltaId == deltaId) {
+            return deltaLocation;
+        }
+    }
+
+    debug_error ("DeltaID %" PRIu32 " not found for %s\n", deltaId, blockKey.c_str());
+    return {};
+}

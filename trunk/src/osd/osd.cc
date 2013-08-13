@@ -222,12 +222,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                 for (auto blockSymbols : requiredBlockSymbols) {
 
-                    uint32_t i = blockSymbols.first;
-
-                    uint32_t osdId = segmentInfo._osdList[i];
-
-                    uint32_t parityCount = _codingModule->getParityNumber(codingScheme, codingSetting);
-                    bool isParity = (i >= totalNumOfBlocks - parityCount);
+                    const uint32_t blockId = blockSymbols.first;
+                    const uint32_t osdId = segmentInfo._osdList[blockId];
+                    const uint32_t parityCount = _codingModule->getParityNumber(codingScheme, codingSetting);
+                    bool isParity = (blockId >= totalNumOfBlocks - parityCount);
 
                     if (osdId == _osdId) {
 
@@ -236,29 +234,29 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                         BlockData blockData;
 
                         if (isParity) {
-                            BlockData blockData = _storageModule->getMergedBlock(segmentId, i, true);
+                            blockData = _storageModule->getMergedBlock(segmentId, blockId, true);
                         } else {
                             #ifdef APPEND_DATA
-                                blockData = _storageModule->getMergedBlock(segmentId, i, false);
+                                blockData = _storageModule->getMergedBlock(segmentId, blockId, false);
                             #else
                                 blockData = _storageModule->readBlock(
-                                        segmentId, i, blockSymbols.second);
+                                        segmentId, blockId, blockSymbols.second);
                             #endif
                         }
 
                         // blockDataList reserved space for "all blocks"
                         // only fill in data for "required blocks"
-                        blockDataList[i] = blockData;
+                        blockDataList[blockId] = blockData;
 
                         _downloadBlockRemaining.decrement(segmentId);
                         debug(
-                                "Read from local block for Segment ID = %" PRIu64 " Block ID = %" PRIu32 "\n",
-                                segmentId, i);
+                                "Read from local block for Segment ID = %" PRIu64 " Block ID = %" PRIu32 " blockData.info.blockID = %" PRIu32 "\n",
+                                segmentId, blockId, blockData.info.blockId);
 
                     } else {
                         // request block from other OSD
-                        debug("sending request for block %" PRIu32 "\n", i);
-                        _osdCommunicator->getBlockRequest(osdId, segmentId, i,
+                        debug("sending request for block %" PRIu32 "\n", blockId);
+                        _osdCommunicator->getBlockRequest(osdId, segmentId, blockId,
                                 blockSymbols.second, DOWNLOAD, isParity);
                     }
                 }
@@ -360,7 +358,7 @@ void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
     BlockData blockData;
 
     if (isParity) {
-            BlockData blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity);
+            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity);
     } else {
         #ifdef APPEND_DATA
             blockData = _storageModule->getMergedBlock(segmentId, blockId, false);
@@ -616,26 +614,23 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
             // perform coding
             vector<struct BlockData> blockDataList;
+            vector<struct BlockLocation> blockLocationList;
+            uint32_t blockCount = 0;
             if (dataMsgType == UPLOAD) {
                 blockDataList = _codingModule->encodeSegmentToBlock(
                         codingSetting.codingScheme, segmentId, segmentCache.buf,
                         segmentCache.info.segLength, codingSetting.setting);
-            } else if (dataMsgType == UPDATE) {
-                //... call codingModule to do update
-                blockDataList = _codingModule->unpackUpdates(
-                        codingSetting.codingScheme, segmentId, segmentCache.buf,
-                        segmentCache.info.segLength, codingSetting.setting,
-                        offsetLength);
-            }
 
-            vector<struct BlockLocation> blockLocationList;
-            if (dataMsgType == UPLOAD) {
                 // request new secondary OSD list
                 blockLocationList = _osdCommunicator->getOsdListRequest(
                         segmentId, MONITOR, blockDataList.size(), _osdId,
                         blockDataList[0].info.blockSize);
-
+                blockCount = blockDataList.size();
             } else if (dataMsgType == UPDATE) {
+                blockDataList = _codingModule->unpackUpdates(
+                        codingSetting.codingScheme, segmentId, segmentCache.buf,
+                        segmentCache.info.segLength, codingSetting.setting,
+                        offsetLength);
                 // retrieve old secondary OSD list
                 SegmentTransferOsdInfo segmentInfo =
                         _osdCommunicator->getSegmentInfoRequest(segmentId,
@@ -648,18 +643,19 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                     blockLocation.osdId = segmentInfo._osdList[i];
                     blockLocationList.push_back(blockLocation);
                 }
+                blockCount = segmentInfo._osdList.size();
             }
 
             // prepare the parity list in blockDataList
             const uint32_t parityNum = _codingModule->getParityNumber(
                     codingSetting.codingScheme, codingSetting.setting);
-            const uint32_t blockCount = blockDataList.size();
             vector<BlockLocation> parityOsdListPair;
             for (uint32_t i = parityNum; i >= 1; --i) {
                 BlockLocation blockLocation;
                 blockLocation.blockId = blockCount - i;
                 blockLocation.osdId = blockLocationList[blockCount - i].osdId;
                 parityOsdListPair.push_back(blockLocation);
+                debug ("parityOsdListPair Block ID = %" PRIu32 " OSDID = %" PRIu32 "\n", blockLocation.blockId, blockLocation.osdId);
             }
             for (uint32_t i = 0; i < blockDataList.size(); i++) {
                 blockDataList[i].info.parityVector = parityOsdListPair;

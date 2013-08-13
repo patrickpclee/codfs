@@ -17,6 +17,17 @@
 #include "reservespaceinfo.hh"
 #include "deltalocation.hh"
 
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+#include <unordered_map>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+
+typedef boost::shared_mutex RWMutex;
+typedef boost::shared_lock<boost::shared_mutex> readLock;
+typedef boost::unique_lock<boost::shared_mutex> writeLock;
+
 #ifdef USE_IO_THREADS
 #include "../../lib/threadpool/threadpool.hpp"
 #endif
@@ -74,7 +85,7 @@ public:
 
     void createBlock(uint64_t segmentId, uint32_t blockId, uint32_t length);
     void createDeltaBlock(uint64_t segmentId, uint32_t blockId,
-            uint32_t deltaId, bool isParity);
+            uint32_t deltaId, bool useReserve);
     void reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
             uint32_t offset, uint32_t reserveLength);
     uint32_t getDeltaCount(uint32_t segmentId, uint32_t blockId);
@@ -131,6 +142,10 @@ public:
     struct BlockData readDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
     void mergeBlock (uint64_t segmentId, uint32_t blockId, bool isParity);
     BlockData getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity);
+    BlockData readDeltaFromReserve(uint64_t segmentId, uint32_t blockId,
+            uint32_t deltaId, DeltaLocation deltaLocation);
+    BlockData doReadDelta(uint64_t segmentId, uint32_t blockId,
+            uint32_t deltaId, bool isReserve, uint32_t offset);
 
     /**
      * Read symbols from a remote block
@@ -528,6 +543,10 @@ private:
      */
     uint64_t getFilesize(string filepath);
 
+    RWMutex* obtainRWMutex(string blockKey);
+
+    DeltaLocation getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
+
     // TODO: use more efficient data structure for LRU delete
     ConcurrentMap<uint64_t, struct SegmentDiskCache> _segmentDiskCacheMap;
     list<uint64_t> _segmentDiskCacheQueue;
@@ -548,6 +567,9 @@ private:
     ConcurrentMap<string, uint32_t> _deltaCountMap;
     ConcurrentMap<string, vector<DeltaLocation>> _deltaLocationMap;
     ConcurrentMap<string, ReserveSpaceInfo> _reserveSpaceMap;
+
+    std::unordered_map<string, boost::shared_mutex*> _deltaRWMutexMap;
+    std::mutex _deltaRWMutexMapMutex;
 
 #ifdef USE_IO_THREADS
     boost::threadpool::prio_pool _iotp;
