@@ -546,6 +546,8 @@ private:
     RWMutex* obtainRWMutex(string blockKey);
 
     DeltaLocation getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
+    string getBlockKey (uint64_t segmentId, uint32_t blockId);
+    string getBlockKey (string segmentId, string blockId);
 
     // TODO: use more efficient data structure for LRU delete
     ConcurrentMap<uint64_t, struct SegmentDiskCache> _segmentDiskCacheMap;

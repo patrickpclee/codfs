@@ -191,7 +191,7 @@ void StorageModule::initializeStorageStatus() {
             exit (-1);
         }
 
-        string blockKey = tokens[0] + "." + tokens[1];
+        const string blockKey = getBlockKey(tokens[0], tokens[1]);
         if (!_deltaCountMap.count(blockKey)) {
             _deltaCountMap.set(blockKey, 0); // first block is not counted as delta
         } else {
@@ -252,16 +252,34 @@ void StorageModule::createSegmentCache(uint64_t segmentId, uint32_t segLength,
 void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
         uint32_t length) {
 
+    const string blockKey = getBlockKey (segmentId, blockId);
+    RWMutex* rwmutex = obtainRWMutex(blockKey);
+    writeLock wtlock(*rwmutex);
+
     const string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
     createFile(filepath);
 
     debug(
             "Block created ObjID = %" PRIu64 " BlockID = %" PRIu32 " Length = %" PRIu32 " Path = %s\n",
             segmentId, blockId, length, filepath.c_str());
+
+    // initialize delta information
+    _deltaCountMap.set (blockKey, 0);
+    _deltaLocationMap.set (blockKey, vector<DeltaLocation>());
+
+    ReserveSpaceInfo reserveSpaceInfo;
+    reserveSpaceInfo.currentOffset = length;
+    reserveSpaceInfo.remainingReserveSpace = 0;
+    reserveSpaceInfo.blockSize = length;
+    _reserveSpaceMap.set (blockKey, reserveSpaceInfo);
 }
 
 void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
         uint32_t offset, uint32_t reserveLength) {
+
+    const string blockKey = getBlockKey (segmentId, blockId);
+    RWMutex* rwmutex = obtainRWMutex(blockKey);
+    writeLock wtlock(*rwmutex);
 
     const string filepath = generateBlockPath(segmentId, blockId, _blockFolder);
     FILE* ptr = openFile(filepath);
@@ -277,7 +295,6 @@ void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
     reserveSpaceInfo.currentOffset = offset;
     reserveSpaceInfo.remainingReserveSpace = reserveLength;
     reserveSpaceInfo.blockSize = offset;
-    const string blockKey = to_string(segmentId) + "." + to_string(blockId);
     _reserveSpaceMap.set(blockKey, reserveSpaceInfo);
 }
 
@@ -312,12 +329,12 @@ void StorageModule::createRemoteBlock(uint32_t osdId, uint64_t segmentId,
 #endif
 
 uint32_t StorageModule::getDeltaCount (uint32_t segmentId, uint32_t blockId) {
-    string blockKey = to_string(segmentId) + "." + to_string(blockId);
+    const string blockKey = getBlockKey (segmentId, blockId);
     return _deltaCountMap.get(blockKey);
 }
 
 uint32_t StorageModule::getNextDeltaId (uint32_t segmentId, uint32_t blockId) {
-    string blockKey = to_string(segmentId) + "." + to_string(blockId);
+    const string blockKey = getBlockKey (segmentId, blockId);
     // next deltaId = next deltaId before increment
     return _deltaCountMap.increment(blockKey) - 1;
 }
@@ -503,6 +520,10 @@ BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
 
 BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity) {
 
+    const string blockKey = getBlockKey (segmentId, blockId);
+    RWMutex* rwmutex = obtainRWMutex(blockKey);
+    readLock rdlock(*rwmutex);
+
     uint32_t deltaCount = getDeltaCount(segmentId, blockId);
 
     // read whole block into memory
@@ -514,7 +535,6 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
     const string blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
     //const uint32_t filesize = getFilesize(blockPath); // includes reserved space if present
 
-    const string blockKey = to_string(segmentId) + "." + to_string(blockId);
     blockData.info.blockSize = _reserveSpaceMap.get(blockKey).blockSize;
 
 
@@ -570,6 +590,10 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
 
     BlockData blockData = getMergedBlock(segmentId, blockId, isParity);
 
+    const string blockKey = getBlockKey (segmentId, blockId);
+    RWMutex* rwmutex = obtainRWMutex(blockKey);
+    writeLock wtlock(*rwmutex);
+
     // save the whole merged parity into disk
     offset_length_t offsetLength = make_pair (0, blockData.info.blockSize);
     blockData.info.offlenVector.push_back(offsetLength);
@@ -585,10 +609,14 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
         // remove delta from disk
         tryCloseFile(deltaBlockPath);
         remove(deltaBlockPath.c_str());
-
-        const string blockKey = to_string(segmentId) + "." + to_string(blockId);
-        _deltaCountMap.decrement(blockKey);
     }
+
+    // remove all delta information
+    _deltaCountMap.set(blockKey, 0);
+    _deltaLocationMap.get(blockKey).clear();
+    ReserveSpaceInfo &reserveSpaceInfo = _reserveSpaceMap.get(blockKey);
+    reserveSpaceInfo.remainingReserveSpace = RESERVE_SPACE_SIZE;
+    reserveSpaceInfo.currentOffset = blockData.info.blockSize;
 }
 
 #ifdef MOUNT_OSD
@@ -707,7 +735,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
      *  e.g. the block size here is size of [AAAABB]
      */
 
-    const string blockKey = to_string(segmentId) + "." + to_string(blockId);
+    const string blockKey = getBlockKey (segmentId, blockId);
     RWMutex* rwmutex = obtainRWMutex(blockKey);
     writeLock wtlock(*rwmutex);
 
@@ -763,8 +791,8 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
 
     // TODO: check if locking is needed for the parity block file
     if (isParity) {
-        reserveSpaceInfo.currentOffset += byteWritten;
-        reserveSpaceInfo.remainingReserveSpace -= byteWritten;
+        reserveSpaceInfo.currentOffset += headerSize + combinedLength;
+        reserveSpaceInfo.remainingReserveSpace -= headerSize + combinedLength;
     }
 
     _deltaLocationMap.get(blockKey).push_back(deltaLocation);
@@ -1394,4 +1422,12 @@ DeltaLocation StorageModule::getDeltaLocation (uint64_t segmentId, uint32_t bloc
 
     debug_error ("DeltaID %" PRIu32 " not found for %s\n", deltaId, blockKey.c_str());
     return {};
+}
+
+string StorageModule::getBlockKey (uint64_t segmentId, uint32_t blockId) {
+    return to_string(segmentId) + "." + to_string(blockId);
+}
+
+string StorageModule::getBlockKey (string segmentId, string blockId) {
+    return segmentId + "." + blockId;
 }
