@@ -40,6 +40,16 @@ struct SegmentInfo {
         // update the offlenVector by swapping (constant time)
         offlenVector.swap(packedVector);
     };
+
+    bool containContent(uint32_t offset, uint32_t length) {
+        packOffsets();
+        for (uint32_t i = 0; i < offlenVector.size(); i++) {
+            if (offset >= offlenVector[i].first && 
+                offset+length <= offlenVector[i].first + offlenVector[i].second) 
+                return true;
+        }
+        return false;
+    };
 };
 
 struct SegmentData {

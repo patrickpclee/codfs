@@ -108,10 +108,25 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
     debug("Read %" PRIu64 " at %" PRIu32 " for %" PRIu32 "\n", segmentId,
             offset, size);
 
+    if (_writeBackSegmentPrimary.count(segmentId) != 0) {
+        rdlock.unlock();
+        debug("Read need flush %" PRIu64 " at %" PRIu32 " for %" PRIu32 "\n", segmentId,
+            offset, size);
+        writeLock wtlock(*rwmutex);
+        if (_writeBackSegmentPrimary.count(segmentId) != 0) {
+            doWriteBack(segmentId);
+        }
+        wtlock.unlock();
+        rdlock.lock();
+        debug("Read flushed %" PRIu64 " at %" PRIu32 " for %" PRIu32 "\n", segmentId,
+            offset, size);
+    }
+
     // no matter whether cached, getSegment check cache first
     uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
     struct SegmentData segmentCache = client->getSegment(
             _clientId, sockfd, segmentId);
+
     memcpy(buf, segmentCache.buf + offset, size);
     updateLru(segmentId);
     return size;
@@ -132,6 +147,7 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary,
         segmentCache.info.segLength = _segmentSize;
         segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
                 _segmentSize);
+        memset(segmentCache.buf, 'A', _segmentSize);
     } else {
         debug ("segment id %" PRIu64 " getSegmentcache \n", segmentId);
         segmentCache = _storageModule->getSegmentCache(segmentId);
