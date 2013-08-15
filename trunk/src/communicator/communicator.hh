@@ -403,5 +403,7 @@ protected:
 	map<uint32_t, struct RecvBuffer *> _sockfdBufMap;
 	map<uint32_t, bool> _sockfdInQueueMap;
 
+	atomic<uint32_t> _updateId;
+
 };
 #endif

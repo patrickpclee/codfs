@@ -3,6 +3,7 @@
 #include <thread>
 #include <iomanip>
 #include <chrono>
+#include <cstring>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <openssl/md5.h>
@@ -67,6 +68,11 @@ struct SegmentData Client::getSegment(uint32_t clientId,
 		uint32_t dstSockfd, uint64_t segmentId) {
 	struct SegmentData segmentCache = { };
 
+	// If currently modifying cache, wait!
+	while (_pendingSegmentChunk.count(segmentId)) {
+		usleep(USLEEP_DURATION);
+	}
+
 	// get segment from cache directly if possible
 	if (_storageModule->locateSegmentCache(segmentId)) {
 		segmentCache = _storageModule->getSegmentCache(segmentId);
@@ -86,7 +92,6 @@ struct SegmentData Client::getSegment(uint32_t clientId,
 
 	// write segment from cache to file
 	segmentCache = _storageModule->getSegmentCache(segmentId);
-
 	return segmentCache;
 }
 
@@ -295,7 +300,10 @@ void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 
 	// create segment and cache
 	if (!_storageModule->locateSegmentCache(segmentId))
+    {
 		_storageModule->createSegmentCache(segmentId, segLength, bufLength);
+        memset(_storageModule->getSegmentCache(segmentId).buf, 'a', segLength);
+    }
 	_clientCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 
 	// save md5 to map

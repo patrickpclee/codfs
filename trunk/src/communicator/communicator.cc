@@ -37,6 +37,16 @@
 extern Monitor* monitor;
 #endif
 
+#ifdef COMPILE_FOR_OSD
+#include "../osd/osd.hh"
+extern Osd* osd;
+#endif
+
+#ifdef COMPILE_FOR_CLIENT
+#include "../client/client.hh"
+extern Client* client;
+#endif
+
 using namespace std;
 
 #ifdef USE_THREAD_POOL
@@ -65,6 +75,7 @@ Communicator::Communicator() {
 
 	// initialize variables
 	_requestId = 0;
+	_updateId = 0;
 	_maxFd = 0;
 	_connectionMap = {};
 
@@ -89,6 +100,7 @@ Communicator::Communicator() {
 			"Communication>SendPollingInterval");
 
 	_parsingtp.size_controller().resize(PARSING_THREADS);
+
 	debug("%s\n", "Communicator constructed");
 
 }
@@ -994,7 +1006,15 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 		struct SegmentData segmentData, CodingScheme codingScheme,
 		string codingSetting, string checksum) {
 
-	const string updateKey = to_string(rand());
+    string updateKey = to_string(rand());
+
+#ifdef COMPILE_FOR_OSD
+	updateKey = to_string (osd->getOsdId()) + "." + to_string(_updateId++);
+#endif
+
+#ifdef COMPILE_FOR_CLIENT
+	updateKey = to_string (client->getClientId()) + "." + to_string(_updateId++);
+#endif
 
     // pack offsets before send
     segmentData.packBuf();

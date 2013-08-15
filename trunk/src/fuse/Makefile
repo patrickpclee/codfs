@@ -14,7 +14,7 @@ CROSS_COMPILE =
 OPTIMIZE := 
 WARNINGS := -Wall 
 DEFS     := -DCOMPILE_FOR_CLIENT
-EXTRA_CFLAGS := -O2 -g -std=c++0x -D_FILE_OFFSET_BITS=64 #`pkg-config --cflags --libs protobuf` -lpthread -lcrypto
+EXTRA_CFLAGS := -O2 -g -std=c++0x -D_FILE_OFFSET_BITS=64 #`pkg-config --cflags --libs protobuf` -lpthread -lcrypto -lboost-system
 
 INC_DIR   =
 SRC_DIR   =	../cache ../common ../communicator ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../client
@@ -103,7 +103,7 @@ $(TARGET): $(all_objs)
 else
 $(TARGET): LD = $(if $(strip $(src-cpp) $(src-cc) $(src-cxx)),$(G++),$(GCC))
 $(TARGET): $(all_objs)
-	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf fuse` -lpthread -lboost_thread -lcrypto
+	$(LD) $(LDFLAGS)  $(all_objs) -o $@ `pkg-config --cflags --libs protobuf fuse` -lpthread -lboost_thread -lboost_system -lcrypto
 endif
 
 .mkdir:

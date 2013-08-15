@@ -13,10 +13,10 @@
         <segmentSize>10M</segmentSize>
         <writeBufferSize>10</writeBufferSize>
         <numWriteThread>10</numWriteThread>
-        <prefetchCount>3</prefetchCount>
+        <prefetchCount>10</prefetchCount>
         <prefetchBufferSize>10</prefetchBufferSize>
         <numPrefetchThread>10</numPrefetchThread>
-        <lruSize>10</lruSize>
+        <lruSize>20</lruSize>
         <codingScheme>2</codingScheme>
         <!-- 0 -->
         <RAID0>

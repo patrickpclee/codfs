@@ -18,8 +18,8 @@
 #include <boost/thread/shared_mutex.hpp>
 
 typedef boost::shared_mutex RWMutex;
-typedef boost::shared_lock<boost::shared_mutex> readLock;
-typedef boost::unique_lock<boost::shared_mutex> writeLock;
+typedef boost::shared_lock<RWMutex> readLock;
+typedef boost::unique_lock<RWMutex> writeLock;
 
 class FileDataCache {
 	public:
