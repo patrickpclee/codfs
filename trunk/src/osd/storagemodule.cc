@@ -790,7 +790,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     updateBlockFreespace(combinedLength);
 
     // TODO: check if locking is needed for the parity block file
-    if (isParity) {
+    if (isParity && deltaLocation.isReserveSpace) {
         reserveSpaceInfo.currentOffset += headerSize + combinedLength;
         reserveSpaceInfo.remainingReserveSpace -= headerSize + combinedLength;
     }
