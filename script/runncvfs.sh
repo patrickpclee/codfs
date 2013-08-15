@@ -44,10 +44,9 @@ for target
 do
 	targetid=$((52000+$target))
 	targetip=192.168.0.$target
-#command="cd ~/shb118/ncvfs/trunk; rm *.log; gdb -ex run --args ./OSD ${targetid} eth0"
+	#command="cd ~/shb118/ncvfs/trunk; rm *.log; gdb -ex run --args ./OSD ${targetid} eth0"
 	command="cd ~/shb118/ncvfs/trunk; rm *.log; ./OSD ${targetid} eth0"
 	screen -dm -t OSD$target -S OSD$target ssh -t -t $targetip $command
-	sleep 1
 done
 echo "Waiting 2 Seconds For OSD Setup"
 sleep 2
