@@ -12,7 +12,7 @@ set $alive
 for target
 do
     targetip=192.168.0.$target
-    command="cd ~/shb118/ncvfs/trunk; dd if=/dev/zero of=/home/ncsgroup/shb118/ncvfs/trunk/mountdir/benchmarkfile${target} bs=1M count=2048"
+    command="cd ~/shb118/ncvfs/trunk; dd if=/dev/zero of=/home/ncsgroup/shb118/ncvfs/trunk/mountdir/benchmarkfile${target} bs=10M count=200"
     screen -dm -t UPLOAD$target -S UPLOAD$target ssh -t -t $targetip $command
 done
 
