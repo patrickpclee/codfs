@@ -180,23 +180,6 @@ void StorageModule::initializeStorageStatus() {
         _freeBlockSpace -= st.st_size;
         _currentBlockUsage += st.st_size;
 
-        // find the blockKey
-        vector<string> tokens;
-        string filename = dent->d_name;
-        boost::split(tokens, filename, boost::is_any_of("."));
-
-        // initialize delta count
-        if (tokens.size() < 2) {
-            debug_error ("Invalid block name: %s\n", dent->d_name);
-            exit (-1);
-        }
-
-        const string blockKey = getBlockKey(tokens[0], tokens[1]);
-        if (!_deltaCountMap.count(blockKey)) {
-            _deltaCountMap.set(blockKey, 0); // first block is not counted as delta
-        } else {
-            _deltaCountMap.increment(blockKey);
-        }
     }
     closedir(srcdir);
 
@@ -492,14 +475,8 @@ BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
 
     debug ("Read delta from blockPath = %s\n", blockPath.c_str());
 
-    // parse header
-    uint32_t headerSize = 0;
-    uint32_t count = 0;
-    headerSize += readFile(blockPath, (char*) &count, offset, sizeof(uint32_t), false);
-    vector<offset_length_t> offsetLength(count);
-    headerSize += readFile(blockPath, (char*) &offsetLength[0], offset + sizeof(uint32_t),
-            sizeof(offset_length_t) * count, false);
-
+    string deltaKey = generateDeltaKey (segmentId, blockId, deltaId);
+    vector<offset_length_t> offsetLength = _deltaOffsetLength.get(deltaKey);
     uint32_t combinedLength = getCombinedLength(offsetLength);
 
     debug ("Read delta length = %" PRIu32 " offsetLength size = %zu\n", combinedLength, offsetLength.size());
@@ -513,7 +490,7 @@ BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
     char* bufptr = blockData.buf;
 
     // read whole delta block into memory
-    readFile(blockPath, bufptr, offset + headerSize, combinedLength, false);
+    readFile(blockPath, bufptr, offset, combinedLength, false);
 
     return blockData;
 }
@@ -743,9 +720,8 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     ReserveSpaceInfo &reserveSpaceInfo = _reserveSpaceMap.get(blockKey);
     debug ("isParity = %d\n", isParity);
 
-    // for writing header
-    const uint32_t pairCount = offsetLength.size();
-    const uint32_t headerSize = sizeof(uint32_t) + sizeof(offset_length_t) * pairCount;
+    string deltaKey = generateDeltaKey (segmentId, blockId, deltaId);
+    _deltaOffsetLength.set(deltaKey, offsetLength);
 
     DeltaLocation deltaLocation;
     deltaLocation.blockId = blockId;
@@ -753,11 +729,11 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
 
     uint32_t currentOffset = 0;
     string filepath = "";
-    if (isParity && reserveSpaceInfo.remainingReserveSpace > headerSize + combinedLength) {
+    if (isParity && reserveSpaceInfo.remainingReserveSpace > combinedLength) {
         currentOffset = reserveSpaceInfo.currentOffset;
         filepath = generateBlockPath(segmentId, blockId,
                     _blockFolder);
-        deltaLocation.offsetLength = make_pair (currentOffset, headerSize + combinedLength);
+        deltaLocation.offsetLength = make_pair (currentOffset, combinedLength);
         deltaLocation.isReserveSpace = true;
     } else {
         // not enough reserve space, create new block
@@ -765,34 +741,26 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
         currentOffset = 0;
         filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
                     _blockFolder);
-        deltaLocation.offsetLength = make_pair (0, headerSize + combinedLength);
+        deltaLocation.offsetLength = make_pair (0, combinedLength);
         deltaLocation.isReserveSpace = false;
     }
 
 
     uint32_t byteWritten = 0;
 
-    // write header to file
-    char* headerBuf = MemoryPool::getInstance().poolMalloc(headerSize);
-    memcpy(headerBuf, &pairCount, sizeof(uint32_t));
-    memcpy(headerBuf + sizeof(uint32_t), &offsetLength[0],
-            sizeof(offset_length_t) * pairCount);
-    byteWritten = writeFile(filepath, headerBuf, currentOffset, headerSize, false);
-    MemoryPool::getInstance().poolFree(headerBuf);
-
     // write delta block
-    byteWritten = writeFile(filepath, buf, currentOffset + headerSize, combinedLength, false);
+    byteWritten = writeFile(filepath, buf, currentOffset, combinedLength, false);
 
     debug(
-            "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu32 "\n",
-            segmentId, blockId, deltaId, byteWritten, headerSize);
+            "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " write %" PRIu32 " bytes\n",
+            segmentId, blockId, deltaId, byteWritten);
 
     updateBlockFreespace(combinedLength);
 
     // TODO: check if locking is needed for the parity block file
     if (isParity && deltaLocation.isReserveSpace) {
-        reserveSpaceInfo.currentOffset += headerSize + combinedLength;
-        reserveSpaceInfo.remainingReserveSpace -= headerSize + combinedLength;
+        reserveSpaceInfo.currentOffset += combinedLength;
+        reserveSpaceInfo.remainingReserveSpace -= combinedLength;
     }
 
     _deltaLocationMap.get(blockKey).push_back(deltaLocation);
@@ -1430,4 +1398,8 @@ string StorageModule::getBlockKey (uint64_t segmentId, uint32_t blockId) {
 
 string StorageModule::getBlockKey (string segmentId, string blockId) {
     return segmentId + "." + blockId;
+}
+
+string StorageModule::generateDeltaKey (uint64_t segmentId, uint32_t blockId, uint32_t deltaId) {
+    return to_string(segmentId) + "." + to_string(blockId) + "." + to_string(deltaId);
 }

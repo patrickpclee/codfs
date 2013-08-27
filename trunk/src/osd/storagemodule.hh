@@ -548,7 +548,8 @@ private:
     DeltaLocation getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
     string getBlockKey (uint64_t segmentId, uint32_t blockId);
     string getBlockKey (string segmentId, string blockId);
-
+    string generateDeltaKey (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
+    
     // TODO: use more efficient data structure for LRU delete
     ConcurrentMap<uint64_t, struct SegmentDiskCache> _segmentDiskCacheMap;
     list<uint64_t> _segmentDiskCacheQueue;
@@ -567,6 +568,7 @@ private:
     atomic<uint32_t> _currentSegmentUsage;
 
     ConcurrentMap<string, uint32_t> _deltaCountMap;
+    ConcurrentMap<string, vector<offset_length_t>> _deltaOffsetLength;
     ConcurrentMap<string, vector<DeltaLocation>> _deltaLocationMap;
     ConcurrentMap<string, ReserveSpaceInfo> _reserveSpaceMap;
 
