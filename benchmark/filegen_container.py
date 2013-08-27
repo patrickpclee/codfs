@@ -62,25 +62,25 @@ if __name__=="__main__":
         segmentList[i] = []       # segment ID -> osdList
         curPermutation = permutations [i % len(permutations)]
         for j in range (numDataBlock + numParityBlock):
-            curOsd = curPermutation[j % len(curPermutation)]
+            idx = curPermutation[j % len(curPermutation)]
+            curOsd = curPermutation[j % len(curPermutation)] + startOsd
 
             #print "Segment", i, "Block", j, ":", curOsd
             segmentList[i].append(curOsd)
 
             # open new container if necessary
-            if blockSize > containerSpace[curOsd]:
-                curContainer[curOsd] += 1
-                containerSpace[curOsd] = containerSize
+            if blockSize > containerSpace[idx]:
+                curContainer[idx] += 1
+                containerSpace[idx] = containerSize
 
             # OSD dd
             with open (str(curOsd) + ".sh", 'a') as f:
-                command = "dd if=/dev/zero of=%s seek=%d bs=%d count=1 &> /dev/null\n" % (blockpath+'c'+str(curContainer[curOsd]), containerSize - containerSpace[curOsd], blockSize)
+                command = "dd if=/dev/zero of=%s seek=%d bs=%d count=1 &> /dev/null\n" % (blockpath+'c'+str(curContainer[idx]), containerSize - containerSpace[idx], blockSize)
                 f.write(command)
 
             # decrease container space
-            containerSpace[curOsd] -= blockSize
+            containerSpace[idx] -= blockSize
 
-    sys.exit()
     ##### INSERT INTO MONGODB #####
 
     # mongodb connection
@@ -129,3 +129,5 @@ if __name__=="__main__":
     os.remove("dd.job")
     for i in range(startOsd, endOsd +1):
         os.remove("%d.sh" % i)
+
+    print "THIS SCRIPT IS  NOT USABLE WITHOUT IN-MEMORY METADATA"

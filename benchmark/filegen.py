@@ -56,7 +56,7 @@ if __name__=="__main__":
         segmentList[i] = []       # segment ID -> osdList
         curPermutation = permutations [i % len(permutations)]
         for j in range (numDataBlock + numParityBlock):
-            curOsd = curPermutation[j % len(curPermutation)]
+            curOsd = curPermutation[j % len(curPermutation)] + startOsd
 
             #print "Segment", i, "Block", j, ":", curOsd
             segmentList[i].append(curOsd)
