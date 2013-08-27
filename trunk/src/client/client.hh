@@ -99,7 +99,7 @@ public:
 	 */
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
-            uint32_t chunkCount, string checksum);
+            uint32_t chunkCount, string checksum, bool isSmallSegment = false);
 
 	/**
 	 * @brief	SegmentDataMsg Handler: receive Segment Data
@@ -120,7 +120,7 @@ public:
 	 * @param	segmentId	Segment ID
 	 */
 	void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-			uint64_t segmentId);
+			uint64_t segmentId, bool isSmallSegment = false);
 
 	/**
 	 * @brief	get the client ID

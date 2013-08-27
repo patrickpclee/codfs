@@ -1,5 +1,5 @@
-#ifndef __PUTSEGMENTINITREQUEST_HH__
-#define __PUTSEGMENTINITREQUEST_HH__
+#ifndef __PUTSMALLSEGMENTREQUEST_HH__
+#define __PUTSMALLSEGMENTREQUEST_HH__
 
 #include "../../common/enums.hh"
 #include "../message.hh"
@@ -11,15 +11,15 @@ using namespace std;
  * Initiate an segment upload
  */
 
-class PutSegmentInitRequestMsg: public Message {
+class PutSmallSegmentRequestMsg: public Message {
 public:
 
-	PutSegmentInitRequestMsg(Communicator* communicator);
+	PutSmallSegmentRequestMsg(Communicator* communicator);
 
-	PutSegmentInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
+	PutSmallSegmentRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t segmentId, uint32_t segmentSize, uint32_t bufferSize, 
-            uint32_t chunkCount, CodingScheme codingScheme, const string &codingSetting,
-			const string &checksum, string updateKey = "");
+            CodingScheme codingScheme, const string &codingSetting,
+			vector<offset_length_t> offsetLength, string updateKey = "");
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -55,14 +55,13 @@ public:
 
 private:
 	uint64_t _segmentId;
-	uint32_t _bufferSize;
 	uint32_t _segmentSize;
-	uint32_t _chunkCount;
 	CodingScheme _codingScheme;
 	string _codingSetting;
 	DataMsgType _dataMsgType;
 	string _updateKey;
-	string _checksum;
+	uint32_t _bufferSize;
+	vector<offset_length_t> _offsetLength;
 };
 
 #endif

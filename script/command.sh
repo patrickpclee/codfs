@@ -22,16 +22,6 @@ do
 	#ssh -t $targetip "echo 'ncsncsncs' | sudo -S killall -9 java"
 	#ssh -t $targetip "ls -l ~/shb118/ncvfs/trunk"
 	#ssh -t $targetip "ps -eo pcpu,pid,user,args | sort -k 1 -r | head -6"
-	ssh -t $targetip "echo 'ncsncsncs' | sudo -S rm -rf ncvfs; mkdir -p /home/ncsgroup/shb118/ncvfs"
-done
-
-alive=`cat alive_osd alive_client | sort | uniq `
-set $alive
-for target
-do
-	targetip=192.168.0.$target
-	#ssh -t $targetip "ls -l ~/shb118/ncvfs/trunk/osd_block"
-	#ssh -t $targetip "mount | grep ramdisk"
-	#ssh -t $targetip "ls /dev/shm/osd_segment | wc -l"
-    #ssh -t $targetip "ps axu | grep ./OSD | grep srv"
+	#ssh -t $targetip "echo 'ncsncsncs' | sudo -S rm -rf ncvfs; mkdir -p /home/ncsgroup/shb118/ncvfs"
+    ssh -t root@$targetip "apt-get install dstat"
 done

@@ -147,10 +147,10 @@ public:
      * @param updateKey Key for UPDATE message
      */
 
-    void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
+    DataMsgType putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
             uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
             uint32_t chunkCount, CodingScheme codingScheme, string setting,
-            string checksum, string updateKey);
+            string checksum, string updateKey, bool isSmallSegment = false);
 
     /**
      * Action when a put segment end is received
@@ -164,7 +164,7 @@ public:
 
     void putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
-            vector<offset_length_t> offsetLength);
+            vector<offset_length_t> offsetLength, bool isSmallSegment = false);
 
     /**
      * Action when an segment trunk is received

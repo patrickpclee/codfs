@@ -29,7 +29,7 @@ struct SegmentTransferOsdInfo {
 struct FileMetaData {
 	string _path;
 	uint32_t _id;
-	uint32_t _size;
+	uint64_t _size;
 	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;
 

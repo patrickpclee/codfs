@@ -16,7 +16,7 @@ public:
 	SegmentTransferEndReplyMsg(Communicator* communicator);
 
 	SegmentTransferEndReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t dstSockfd,
-			uint64_t segmentId);
+			uint64_t segmentId, bool isSmallSegment = false);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -49,6 +49,7 @@ public:
 
 private:
 	uint64_t _segmentId;
+	bool _isSmallSegment;
 };
 
 #endif

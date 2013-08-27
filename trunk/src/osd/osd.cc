@@ -430,10 +430,10 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
     _recoverytpRequestCount.decrement(recoverytpId);
 }
 
-void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
+DataMsgType Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
         uint32_t chunkCount, CodingScheme codingScheme, string setting,
-        string checksum, string updateKey) {
+        string checksum, string updateKey, bool isSmallSegment) {
 
     struct CodingSetting codingSetting;
     codingSetting.codingScheme = codingScheme;
@@ -472,14 +472,17 @@ void Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
     // create segment and cache
     _storageModule->createSegmentCache(segmentId, segLength, bufLength,
             dataMsgType, updateKey);
-    _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId,
-            dataMsgType);
+    if (!isSmallSegment) {
+        _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId,
+                dataMsgType);
+    }
 
 #ifdef USE_CHECKSUM
     // save md5 to map
     _checksumMap.set(segmentId, checksum);
 #endif
 
+	return dataMsgType;
 }
 
 void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
@@ -566,7 +569,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
 
 void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
-        vector<offset_length_t> offsetLength) {
+        vector<offset_length_t> offsetLength, bool isSmallSegment) {
 
     if (dataMsgType != UPLOAD && dataMsgType != UPDATE) {
         debug_error("Invalid Message Type = %d\n", dataMsgType);
@@ -717,7 +720,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             cout << "Segment " << segmentId << " uploaded" << endl;
 
             // if all chunks have arrived, send ack
-            _osdCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId);
+            _osdCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId, isSmallSegment);
 
 #ifdef CACHE_AFTER_TRANSFER
             // after ack, write segment cache to disk (and close file)
@@ -752,6 +755,10 @@ BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
 
 void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
         vector<offset_length_t> offsetLength) {
+        
+    if (newBlock.info.parityVector.empty()) {
+        return;
+    }
 
     // update delta (should be performed before updating the block in-place)
     BlockData delta = computeDelta(segmentId, blockId, newBlock, offsetLength);

@@ -44,6 +44,44 @@ uint32_t Connection::doConnect(string ip, uint16_t port,
 	return _socket.getSockfd();
 }
 
+
+uint32_t Connection::sendMessages(vector<Message*> messages) {
+    int32_t byteSent = 0;
+    uint32_t totalByteSent = 0;
+    int32_t bufLength = 0;
+    char* aggregateBuf = MemoryPool::getInstance().poolMalloc(1<<23);
+	const uint32_t headerLength = sizeof(struct MsgHeader);
+
+    for (Message* msg: messages) {
+	    struct MsgHeader msgHeader = msg->getMsgHeader();
+        int32_t msgLength = headerLength+msg->getProtocolMsg().length()+msgHeader.payloadSize;
+        if (msgLength + bufLength > (1<<23)) {
+            byteSent = _socket.sendn(aggregateBuf, bufLength);
+		    totalByteSent += byteSent;
+            bufLength = 0;
+        }
+        memcpy(aggregateBuf+bufLength, (const char*) &msgHeader, headerLength);
+        bufLength += headerLength;
+        memcpy(aggregateBuf+bufLength, msg->getProtocolMsg().data(), msg->getProtocolMsg().length());
+        bufLength += msg->getProtocolMsg().length();
+        if (msgHeader.payloadSize > 0) {
+            debug("payload size = %" PRIu32 " bufLength = %d\n", msgHeader.payloadSize, bufLength);
+            memcpy(aggregateBuf+bufLength, msg->getPayload(), msgHeader.payloadSize);
+            bufLength += msgHeader.payloadSize;
+        }
+
+        if (!msg->isExpectReply()) {
+            delete msg;
+        }
+    }
+    if (bufLength > 0) {
+        byteSent = _socket.sendn(aggregateBuf, bufLength);
+		totalByteSent += byteSent;
+    }
+    MemoryPool::getInstance().poolFree(aggregateBuf);
+    return totalByteSent;
+}
+
 uint32_t Connection::sendMessage(Message* message) {
 	int32_t byteSent = 0;
 	uint32_t totalByteSent = 0;
@@ -98,6 +136,10 @@ uint32_t Connection::sendMessage(Message* message) {
 
 	debug("ID: %" PRIu32 " Payload sent %" PRIu32 " bytes\n",
 			message->getMsgHeader().requestId, byteSent);
+
+    if (!message->isExpectReply()) {
+        delete message;
+    }
 
 	return totalByteSent;
 }

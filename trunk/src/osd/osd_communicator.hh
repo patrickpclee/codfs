@@ -62,7 +62,7 @@ public:
 	 */
 
 	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId,
-			uint64_t segmentId);
+			uint64_t segmentId, bool isSmallSegment = false);
 
 	/**
 	 * Reply to PutBlockEndRequest / RecoveryBlockData

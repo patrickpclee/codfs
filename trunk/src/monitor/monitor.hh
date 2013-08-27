@@ -9,6 +9,7 @@
 #include "../common/osdstat.hh"
 #include "../cache/cache.hh"
 #include <map>
+#include <mutex>
 
 using namespace std;
 
@@ -177,6 +178,11 @@ private:
 	 * The period sleep time for stat update
 	 */
 	uint32_t _updatePeriod;
+
+    /**
+     * Mutex for OSD start up
+     */
+    mutex _osdStartUpProcessorMutex;
 };
 
 #endif

@@ -10,7 +10,6 @@ rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/
 rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/trunk -e 'ssh -c arcfour' 192.168.0.20:/home/ncsgroup/shb118/ncvfs > /dev/null
 rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/trunk -e 'ssh -c arcfour' 192.168.0.21:/home/ncsgroup/shb118/ncvfs > /dev/null
 rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/trunk -e 'ssh -c arcfour' 192.168.0.22:/home/ncsgroup/shb118/ncvfs > /dev/null
-rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/trunk -e 'ssh -c arcfour' 192.168.0.23:/home/ncsgroup/shb118/ncvfs > /dev/null
 rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/trunk -e 'ssh -c arcfour' 192.168.0.24:/home/ncsgroup/shb118/ncvfs > /dev/null
 rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/trunk -e 'ssh -c arcfour' 192.168.0.25:/home/ncsgroup/shb118/ncvfs > /dev/null
 rsync --exclude-from="exclude.txt" -av --whole-file /home/ncsgroup/shb118/ncvfs/trunk -e 'ssh -c arcfour' 192.168.0.26:/home/ncsgroup/shb118/ncvfs > /dev/null

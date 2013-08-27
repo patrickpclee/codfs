@@ -43,6 +43,7 @@
 #include "transfer/blockdatamsg.hh"
 #include "transfer/getblockinitrequest.hh"
 #include "transfer/getsegmentrequest.hh"
+#include "transfer/putsmallsegmentrequest.hh"
 
 #include "handshake/handshakerequest.hh"
 #include "handshake/handshakereply.hh"
@@ -194,6 +195,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (GET_BLOCK_INIT_REQUEST):
 		return new GetBlockInitRequestMsg(communicator);
 		break;
+	case (PUT_SMALL_SEGMENT_REQUEST):
+	    return new PutSmallSegmentRequestMsg(communicator);
+	    break;
 
 	//STATUS
 	case (OSD_STARTUP):

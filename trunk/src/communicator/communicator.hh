@@ -278,6 +278,11 @@ protected:
 			uint64_t segmentId, DataMsgType dataMsgType, string updateKey,
 			vector<offset_length_t> offsetLength);
 
+	uint32_t putSmallSegment (uint32_t componentId, uint32_t dstOsdSockfd,
+	        uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
+	        CodingScheme codingScheme, string codingSetting,
+	        string updateKey, char* buf, vector<offset_length_t> offsetLength);
+
 	/**
 	 * Runs in a separate detached thread
 	 * Execute message->parse function

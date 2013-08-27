@@ -54,6 +54,7 @@ public:
 	 */
 
 	uint32_t sendMessage (Message *message);
+    uint32_t sendMessages (vector<Message*> messages);
 
 	/**
 	 * Receive a message from the connection

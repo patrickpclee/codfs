@@ -76,6 +76,8 @@ void Monitor::OsdStartupProcessor(uint32_t requestId, uint32_t sockfd,
 		uint32_t osdId, uint32_t capacity, uint32_t loading, uint32_t ip,
 		uint16_t port) {
 
+    lock_guard<mutex> lk(_osdStartUpProcessorMutex);
+
 	debug(
 			"OSD Startup Processor: on id = %" PRIu32 " ip = %" PRIu32 " port = %" PRIu32 "\n",
 			osdId, ip, port);

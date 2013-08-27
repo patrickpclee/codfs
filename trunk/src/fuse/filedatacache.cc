@@ -111,7 +111,7 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
     if (_writeBackSegmentPrimary.count(segmentId) != 0) {
         rdlock.unlock();
         debug("Read need flush %" PRIu64 " at %" PRIu32 " for %" PRIu32 "\n", segmentId,
-            offset, size);
+                offset, size);
         writeLock wtlock(*rwmutex);
         if (_writeBackSegmentPrimary.count(segmentId) != 0) {
             doWriteBack(segmentId);
@@ -119,7 +119,7 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
         wtlock.unlock();
         rdlock.lock();
         debug("Read flushed %" PRIu64 " at %" PRIu32 " for %" PRIu32 "\n", segmentId,
-            offset, size);
+                offset, size);
     }
 
     // no matter whether cached, getSegment check cache first
@@ -143,11 +143,15 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary,
     struct SegmentData segmentCache;
     if (_writeBackSegmentPrimary.count(segmentId) == 0) {
         _writeBackSegmentPrimary.set(segmentId, primary);
-        segmentCache.info.segmentId = segmentId;
-        segmentCache.info.segLength = _segmentSize;
-        segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
+        if (_storageModule->locateSegmentCache(segmentId) == 0) {
+            segmentCache.info.segmentId = segmentId;
+            segmentCache.info.segLength = _segmentSize;
+            segmentCache.buf = (char*) MemoryPool::getInstance().poolMalloc(
                 _segmentSize);
-        memset(segmentCache.buf, 'A', _segmentSize);
+        } else {
+            debug ("segment id %" PRIu64 " getSegmentcache \n", segmentId);
+            segmentCache = _storageModule->getSegmentCache(segmentId);
+        }
     } else {
         debug ("segment id %" PRIu64 " getSegmentcache \n", segmentId);
         segmentCache = _storageModule->getSegmentCache(segmentId);
@@ -183,7 +187,7 @@ void FileDataCache::closeDataCache(uint64_t segmentId, bool sync) {
     //debug("TRY LOCK SEGMENT %" PRIu64 "\n", segmentId);
     if (rwmutex->try_lock()) 
     {
-        debug("Closing Data Cache %" PRIu64 "\n", segmentId);
+        //debug("Closing Data Cache %" PRIu64 "\n", segmentId);
 
         // If the cache is not modified, just free and return
         if (_writeBackSegmentPrimary.count(segmentId) == 0) {
@@ -209,8 +213,8 @@ void FileDataCache::closeDataCache(uint64_t segmentId, bool sync) {
 void FileDataCache::prefetchSegment(uint64_t segmentId, uint32_t primary) {
     lock_guard<mutex> lk(_prefetchBitmapMutex);
     if (_prefetchBitmap.count(segmentId) == 0) {
-            _prefetchBitmap[segmentId] = true;
-            _prefetchBuffer->push(make_pair(segmentId, primary));
+        _prefetchBitmap[segmentId] = true;
+        _prefetchBuffer->push(make_pair(segmentId, primary));
     }
 }
 
@@ -229,6 +233,18 @@ void FileDataCache::prefetchThread() {
         RWMutex* rwmutex = obtainRWMutex(segmentId);
         readLock rdlock(*rwmutex);
         debug("Prefetch %" PRIu64 "\n", segmentId);
+
+        if (_writeBackSegmentPrimary.count(segmentId) != 0) {
+            rdlock.unlock();
+            debug("Prefetch need flush %" PRIu64 "\n", segmentId);
+            writeLock wtlock(*rwmutex);
+            if (_writeBackSegmentPrimary.count(segmentId) != 0) {
+                doWriteBack(segmentId);
+            }
+            wtlock.unlock();
+            rdlock.lock();
+            debug("Prefetch flushed %" PRIu64 "\n", segmentId);
+        }
 
         uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
         client->getSegment(_clientId, sockfd, segmentId);

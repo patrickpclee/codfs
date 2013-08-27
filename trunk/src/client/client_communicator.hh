@@ -162,7 +162,7 @@ public:
 	 * @param connectionId 	connection ID
 	 * @param segmentId 		segment ID
 	 */
-	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId, uint64_t segmentId); //new version
+	void replyPutSegmentEnd(uint32_t requestId, uint32_t connectionId, uint64_t segmentId, bool isSmallSegment); //new version
 
 	/**
 	 * Send a request to monitor to get Osd List and connect 

@@ -71,11 +71,11 @@ void OsdCommunicator::replyPutBlockInit(uint32_t requestId,
 }
 
 void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
-		uint32_t connectionId, uint64_t segmentId) {
+		uint32_t connectionId, uint64_t segmentId, bool isSmallSegment) {
 
 	SegmentTransferEndReplyMsg* putSegmentEndReplyMsg =
 			new SegmentTransferEndReplyMsg(this, requestId, connectionId,
-					segmentId);
+					segmentId, isSmallSegment);
 	putSegmentEndReplyMsg->prepareProtocolMsg();
 
 	addMessage(putSegmentEndReplyMsg);

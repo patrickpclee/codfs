@@ -160,6 +160,17 @@ message SegmentTransferEndRequestPro {
 	repeated OffsetLengthPro offsetLength = 6;
 }
 
+message PutSmallSegmentRequestPro {
+	optional fixed64 segmentId = 1;
+	optional fixed32 segmentSize = 2;
+	optional PutSegmentInitRequestPro.CodingScheme codingScheme = 3;
+	optional string codingSetting = 4;
+	optional DataMsgPro.DataMsgType dataMsgType = 5;
+	optional string updateKey = 6;
+    optional fixed32 bufferSize = 7;
+	repeated OffsetLengthPro offsetLength = 8;
+}
+
 //
 // CLIENT -> MONITOR
 //
@@ -315,6 +326,7 @@ message PutSegmentInitReplyPro {
 
 message SegmentTransferEndReplyPro {
 	optional fixed64 segmentId = 1;
+	optional bool isSmallSegment = 2;
 }
 
 // message GetSegmentReplyPro {

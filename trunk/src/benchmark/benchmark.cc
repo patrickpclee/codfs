@@ -211,7 +211,7 @@ void testDownload() {
 	Clock::time_point t0 = Clock::now();
 	struct FileMetaData fileMetaData = _clientCommunicator->downloadFile(
 			clientId, fileId);
-	debug("File ID %" PRIu32 ", Size = %" PRIu32 "\n",
+	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n",
 			fileMetaData._id, fileMetaData._size);
 
 	// prepare checksum array

@@ -189,7 +189,7 @@ void ClientStorageModule::closeSegment(uint64_t segmentId) {
 
 	// close cache
 	if(_segmentCache.count(segmentId) == 0){
-		debug_yellow("Segment Cache Not Found for %" PRIu64 "\n", segmentId);
+		//debug_yellow("Segment Cache Not Found for %" PRIu64 "\n", segmentId);
 		return;
 	}
 	struct SegmentData segmentCache = getSegmentCache(segmentId);

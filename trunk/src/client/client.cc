@@ -223,7 +223,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	// 1. Get file infomation from MDS
 	struct FileMetaData fileMetaData = _clientCommunicator->downloadFile(
 			_clientId, fileId);
-	debug("File ID %" PRIu32 ", Size = %" PRIu32 "\n",
+	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n",
 			fileMetaData._id, fileMetaData._size);
 
 	// open file
@@ -292,7 +292,7 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 
 void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
-		string checksum) {
+		string checksum, bool isSmallSegment) {
 
 	// initialize chunkCount value
 	_pendingSegmentChunk.set(segmentId, chunkCount);
@@ -304,7 +304,10 @@ void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		_storageModule->createSegmentCache(segmentId, segLength, bufLength);
         memset(_storageModule->getSegmentCache(segmentId).buf, 'a', segLength);
     }
-	_clientCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
+
+	if (!isSmallSegment) {
+	    _clientCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
+	}
 
 	// save md5 to map
 	_checksumMap.set(segmentId, checksum);
@@ -312,7 +315,7 @@ void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 void Client::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
-		uint64_t segmentId) {
+		uint64_t segmentId, bool isSmallSegment) {
 
 	// TODO: check integrity of segment received
 	bool chunkRemaining = false;
@@ -323,7 +326,7 @@ void Client::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 		if (!chunkRemaining) {
 			// if all chunks have arrived, send ack
-			_clientCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId);
+			_clientCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId, isSmallSegment);
 			break;
 		} else {
 			usleep(USLEEP_DURATION); // sleep 0.01s

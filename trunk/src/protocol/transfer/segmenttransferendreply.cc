@@ -1,5 +1,6 @@
 #include "segmenttransferendreply.hh"
 #include "segmenttransferendrequest.hh"
+#include "putsmallsegmentrequest.hh"
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
@@ -11,13 +12,13 @@ SegmentTransferEndReplyMsg::SegmentTransferEndReplyMsg(Communicator* communicato
 }
 
 SegmentTransferEndReplyMsg::SegmentTransferEndReplyMsg(Communicator* communicator,
-		uint32_t requestId, uint32_t dstSockfd, uint64_t segmentId) :
+		uint32_t requestId, uint32_t dstSockfd, uint64_t segmentId, bool isSmallSegment) :
 		Message(communicator) {
 
 	_msgHeader.requestId = requestId;
 	_sockfd = dstSockfd;
 	_segmentId = segmentId;
-	
+	_isSmallSegment = isSmallSegment;
 }
 
 void SegmentTransferEndReplyMsg::prepareProtocolMsg() {
@@ -25,6 +26,7 @@ void SegmentTransferEndReplyMsg::prepareProtocolMsg() {
 
 	ncvfs::SegmentTransferEndReplyPro segmentTransferEndReplyPro;
 	segmentTransferEndReplyPro.set_segmentid(_segmentId);
+	segmentTransferEndReplyPro.set_issmallsegment(_isSmallSegment);
 
 	if (!segmentTransferEndReplyPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -46,14 +48,22 @@ void SegmentTransferEndReplyMsg::parse(char* buf) {
 			_msgHeader.protocolMsgSize);
 
 	_segmentId = segmentTransferEndReplyPro.segmentid();
+	_isSmallSegment = segmentTransferEndReplyPro.issmallsegment();
 
 }
 
 void SegmentTransferEndReplyMsg::doHandle() {
-	SegmentTransferEndRequestMsg* putSegmentEndRequestMsg =
-			(SegmentTransferEndRequestMsg*) _communicator->popWaitReplyMessage(
-					_msgHeader.requestId);
-	putSegmentEndRequestMsg->setStatus(READY);
+    if (_isSmallSegment) {
+        PutSmallSegmentRequestMsg* putSmallSegmentRequestMsg =
+                (PutSmallSegmentRequestMsg*) _communicator->popWaitReplyMessage(
+                        _msgHeader.requestId);
+        putSmallSegmentRequestMsg->setStatus(READY);
+    } else {
+        SegmentTransferEndRequestMsg* putSegmentEndRequestMsg =
+                (SegmentTransferEndRequestMsg*) _communicator->popWaitReplyMessage(
+                        _msgHeader.requestId);
+        putSegmentEndRequestMsg->setStatus(READY);
+    }
 }
 
 void SegmentTransferEndReplyMsg::printProtocol() {

@@ -49,6 +49,7 @@ class PutSegmentInitRequestPro;
 class SegmentDataPro;
 class GetSegmentRequestPro;
 class SegmentTransferEndRequestPro;
+class PutSmallSegmentRequestPro;
 class GetOsdListRequestPro;
 class ListDirectoryReplyPro;
 class FileInfoPro;
@@ -2052,6 +2053,169 @@ class SegmentTransferEndRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static SegmentTransferEndRequestPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class PutSmallSegmentRequestPro : public ::google::protobuf::Message {
+ public:
+  PutSmallSegmentRequestPro();
+  virtual ~PutSmallSegmentRequestPro();
+  
+  PutSmallSegmentRequestPro(const PutSmallSegmentRequestPro& from);
+  
+  inline PutSmallSegmentRequestPro& operator=(const PutSmallSegmentRequestPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const PutSmallSegmentRequestPro& default_instance();
+  
+  void Swap(PutSmallSegmentRequestPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  PutSmallSegmentRequestPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const PutSmallSegmentRequestPro& from);
+  void MergeFrom(const PutSmallSegmentRequestPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 segmentId = 1;
+  inline bool has_segmentid() const;
+  inline void clear_segmentid();
+  static const int kSegmentIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 segmentid() const;
+  inline void set_segmentid(::google::protobuf::uint64 value);
+  
+  // optional fixed32 segmentSize = 2;
+  inline bool has_segmentsize() const;
+  inline void clear_segmentsize();
+  static const int kSegmentSizeFieldNumber = 2;
+  inline ::google::protobuf::uint32 segmentsize() const;
+  inline void set_segmentsize(::google::protobuf::uint32 value);
+  
+  // optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 3;
+  inline bool has_codingscheme() const;
+  inline void clear_codingscheme();
+  static const int kCodingSchemeFieldNumber = 3;
+  inline ::ncvfs::PutSegmentInitRequestPro_CodingScheme codingscheme() const;
+  inline void set_codingscheme(::ncvfs::PutSegmentInitRequestPro_CodingScheme value);
+  
+  // optional string codingSetting = 4;
+  inline bool has_codingsetting() const;
+  inline void clear_codingsetting();
+  static const int kCodingSettingFieldNumber = 4;
+  inline const ::std::string& codingsetting() const;
+  inline void set_codingsetting(const ::std::string& value);
+  inline void set_codingsetting(const char* value);
+  inline void set_codingsetting(const char* value, size_t size);
+  inline ::std::string* mutable_codingsetting();
+  inline ::std::string* release_codingsetting();
+  
+  // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 5;
+  inline bool has_datamsgtype() const;
+  inline void clear_datamsgtype();
+  static const int kDataMsgTypeFieldNumber = 5;
+  inline ::ncvfs::DataMsgPro_DataMsgType datamsgtype() const;
+  inline void set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value);
+  
+  // optional string updateKey = 6;
+  inline bool has_updatekey() const;
+  inline void clear_updatekey();
+  static const int kUpdateKeyFieldNumber = 6;
+  inline const ::std::string& updatekey() const;
+  inline void set_updatekey(const ::std::string& value);
+  inline void set_updatekey(const char* value);
+  inline void set_updatekey(const char* value, size_t size);
+  inline ::std::string* mutable_updatekey();
+  inline ::std::string* release_updatekey();
+  
+  // optional fixed32 bufferSize = 7;
+  inline bool has_buffersize() const;
+  inline void clear_buffersize();
+  static const int kBufferSizeFieldNumber = 7;
+  inline ::google::protobuf::uint32 buffersize() const;
+  inline void set_buffersize(::google::protobuf::uint32 value);
+  
+  // repeated .ncvfs.OffsetLengthPro offsetLength = 8;
+  inline int offsetlength_size() const;
+  inline void clear_offsetlength();
+  static const int kOffsetLengthFieldNumber = 8;
+  inline const ::ncvfs::OffsetLengthPro& offsetlength(int index) const;
+  inline ::ncvfs::OffsetLengthPro* mutable_offsetlength(int index);
+  inline ::ncvfs::OffsetLengthPro* add_offsetlength();
+  inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+      offsetlength() const;
+  inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+      mutable_offsetlength();
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.PutSmallSegmentRequestPro)
+ private:
+  inline void set_has_segmentid();
+  inline void clear_has_segmentid();
+  inline void set_has_segmentsize();
+  inline void clear_has_segmentsize();
+  inline void set_has_codingscheme();
+  inline void clear_has_codingscheme();
+  inline void set_has_codingsetting();
+  inline void clear_has_codingsetting();
+  inline void set_has_datamsgtype();
+  inline void clear_has_datamsgtype();
+  inline void set_has_updatekey();
+  inline void clear_has_updatekey();
+  inline void set_has_buffersize();
+  inline void clear_has_buffersize();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 segmentid_;
+  ::google::protobuf::uint32 segmentsize_;
+  int codingscheme_;
+  ::std::string* codingsetting_;
+  ::std::string* updatekey_;
+  int datamsgtype_;
+  ::google::protobuf::uint32 buffersize_;
+  ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static PutSmallSegmentRequestPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -4230,17 +4394,27 @@ class SegmentTransferEndReplyPro : public ::google::protobuf::Message {
   inline ::google::protobuf::uint64 segmentid() const;
   inline void set_segmentid(::google::protobuf::uint64 value);
   
+  // optional bool isSmallSegment = 2;
+  inline bool has_issmallsegment() const;
+  inline void clear_issmallsegment();
+  static const int kIsSmallSegmentFieldNumber = 2;
+  inline bool issmallsegment() const;
+  inline void set_issmallsegment(bool value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.SegmentTransferEndReplyPro)
  private:
   inline void set_has_segmentid();
   inline void clear_has_segmentid();
+  inline void set_has_issmallsegment();
+  inline void clear_has_issmallsegment();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
   ::google::protobuf::uint64 segmentid_;
+  bool issmallsegment_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -8097,6 +8271,263 @@ SegmentTransferEndRequestPro::mutable_offsetlength() {
 
 // -------------------------------------------------------------------
 
+// PutSmallSegmentRequestPro
+
+// optional fixed64 segmentId = 1;
+inline bool PutSmallSegmentRequestPro::has_segmentid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void PutSmallSegmentRequestPro::set_has_segmentid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void PutSmallSegmentRequestPro::clear_has_segmentid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void PutSmallSegmentRequestPro::clear_segmentid() {
+  segmentid_ = GOOGLE_ULONGLONG(0);
+  clear_has_segmentid();
+}
+inline ::google::protobuf::uint64 PutSmallSegmentRequestPro::segmentid() const {
+  return segmentid_;
+}
+inline void PutSmallSegmentRequestPro::set_segmentid(::google::protobuf::uint64 value) {
+  set_has_segmentid();
+  segmentid_ = value;
+}
+
+// optional fixed32 segmentSize = 2;
+inline bool PutSmallSegmentRequestPro::has_segmentsize() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void PutSmallSegmentRequestPro::set_has_segmentsize() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void PutSmallSegmentRequestPro::clear_has_segmentsize() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void PutSmallSegmentRequestPro::clear_segmentsize() {
+  segmentsize_ = 0u;
+  clear_has_segmentsize();
+}
+inline ::google::protobuf::uint32 PutSmallSegmentRequestPro::segmentsize() const {
+  return segmentsize_;
+}
+inline void PutSmallSegmentRequestPro::set_segmentsize(::google::protobuf::uint32 value) {
+  set_has_segmentsize();
+  segmentsize_ = value;
+}
+
+// optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 3;
+inline bool PutSmallSegmentRequestPro::has_codingscheme() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void PutSmallSegmentRequestPro::set_has_codingscheme() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void PutSmallSegmentRequestPro::clear_has_codingscheme() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void PutSmallSegmentRequestPro::clear_codingscheme() {
+  codingscheme_ = 1;
+  clear_has_codingscheme();
+}
+inline ::ncvfs::PutSegmentInitRequestPro_CodingScheme PutSmallSegmentRequestPro::codingscheme() const {
+  return static_cast< ::ncvfs::PutSegmentInitRequestPro_CodingScheme >(codingscheme_);
+}
+inline void PutSmallSegmentRequestPro::set_codingscheme(::ncvfs::PutSegmentInitRequestPro_CodingScheme value) {
+  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_CodingScheme_IsValid(value));
+  set_has_codingscheme();
+  codingscheme_ = value;
+}
+
+// optional string codingSetting = 4;
+inline bool PutSmallSegmentRequestPro::has_codingsetting() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void PutSmallSegmentRequestPro::set_has_codingsetting() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void PutSmallSegmentRequestPro::clear_has_codingsetting() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void PutSmallSegmentRequestPro::clear_codingsetting() {
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    codingsetting_->clear();
+  }
+  clear_has_codingsetting();
+}
+inline const ::std::string& PutSmallSegmentRequestPro::codingsetting() const {
+  return *codingsetting_;
+}
+inline void PutSmallSegmentRequestPro::set_codingsetting(const ::std::string& value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void PutSmallSegmentRequestPro::set_codingsetting(const char* value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void PutSmallSegmentRequestPro::set_codingsetting(const char* value, size_t size) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* PutSmallSegmentRequestPro::mutable_codingsetting() {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  return codingsetting_;
+}
+inline ::std::string* PutSmallSegmentRequestPro::release_codingsetting() {
+  clear_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = codingsetting_;
+    codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 5;
+inline bool PutSmallSegmentRequestPro::has_datamsgtype() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void PutSmallSegmentRequestPro::set_has_datamsgtype() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void PutSmallSegmentRequestPro::clear_has_datamsgtype() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void PutSmallSegmentRequestPro::clear_datamsgtype() {
+  datamsgtype_ = 15;
+  clear_has_datamsgtype();
+}
+inline ::ncvfs::DataMsgPro_DataMsgType PutSmallSegmentRequestPro::datamsgtype() const {
+  return static_cast< ::ncvfs::DataMsgPro_DataMsgType >(datamsgtype_);
+}
+inline void PutSmallSegmentRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMsgType value) {
+  GOOGLE_DCHECK(::ncvfs::DataMsgPro_DataMsgType_IsValid(value));
+  set_has_datamsgtype();
+  datamsgtype_ = value;
+}
+
+// optional string updateKey = 6;
+inline bool PutSmallSegmentRequestPro::has_updatekey() const {
+  return (_has_bits_[0] & 0x00000020u) != 0;
+}
+inline void PutSmallSegmentRequestPro::set_has_updatekey() {
+  _has_bits_[0] |= 0x00000020u;
+}
+inline void PutSmallSegmentRequestPro::clear_has_updatekey() {
+  _has_bits_[0] &= ~0x00000020u;
+}
+inline void PutSmallSegmentRequestPro::clear_updatekey() {
+  if (updatekey_ != &::google::protobuf::internal::kEmptyString) {
+    updatekey_->clear();
+  }
+  clear_has_updatekey();
+}
+inline const ::std::string& PutSmallSegmentRequestPro::updatekey() const {
+  return *updatekey_;
+}
+inline void PutSmallSegmentRequestPro::set_updatekey(const ::std::string& value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void PutSmallSegmentRequestPro::set_updatekey(const char* value) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(value);
+}
+inline void PutSmallSegmentRequestPro::set_updatekey(const char* value, size_t size) {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  updatekey_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* PutSmallSegmentRequestPro::mutable_updatekey() {
+  set_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    updatekey_ = new ::std::string;
+  }
+  return updatekey_;
+}
+inline ::std::string* PutSmallSegmentRequestPro::release_updatekey() {
+  clear_has_updatekey();
+  if (updatekey_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = updatekey_;
+    updatekey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
+}
+
+// optional fixed32 bufferSize = 7;
+inline bool PutSmallSegmentRequestPro::has_buffersize() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void PutSmallSegmentRequestPro::set_has_buffersize() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void PutSmallSegmentRequestPro::clear_has_buffersize() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void PutSmallSegmentRequestPro::clear_buffersize() {
+  buffersize_ = 0u;
+  clear_has_buffersize();
+}
+inline ::google::protobuf::uint32 PutSmallSegmentRequestPro::buffersize() const {
+  return buffersize_;
+}
+inline void PutSmallSegmentRequestPro::set_buffersize(::google::protobuf::uint32 value) {
+  set_has_buffersize();
+  buffersize_ = value;
+}
+
+// repeated .ncvfs.OffsetLengthPro offsetLength = 8;
+inline int PutSmallSegmentRequestPro::offsetlength_size() const {
+  return offsetlength_.size();
+}
+inline void PutSmallSegmentRequestPro::clear_offsetlength() {
+  offsetlength_.Clear();
+}
+inline const ::ncvfs::OffsetLengthPro& PutSmallSegmentRequestPro::offsetlength(int index) const {
+  return offsetlength_.Get(index);
+}
+inline ::ncvfs::OffsetLengthPro* PutSmallSegmentRequestPro::mutable_offsetlength(int index) {
+  return offsetlength_.Mutable(index);
+}
+inline ::ncvfs::OffsetLengthPro* PutSmallSegmentRequestPro::add_offsetlength() {
+  return offsetlength_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >&
+PutSmallSegmentRequestPro::offsetlength() const {
+  return offsetlength_;
+}
+inline ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro >*
+PutSmallSegmentRequestPro::mutable_offsetlength() {
+  return &offsetlength_;
+}
+
+// -------------------------------------------------------------------
+
 // GetOsdListRequestPro
 
 // -------------------------------------------------------------------
@@ -9620,6 +10051,28 @@ inline ::google::protobuf::uint64 SegmentTransferEndReplyPro::segmentid() const 
 inline void SegmentTransferEndReplyPro::set_segmentid(::google::protobuf::uint64 value) {
   set_has_segmentid();
   segmentid_ = value;
+}
+
+// optional bool isSmallSegment = 2;
+inline bool SegmentTransferEndReplyPro::has_issmallsegment() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void SegmentTransferEndReplyPro::set_has_issmallsegment() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void SegmentTransferEndReplyPro::clear_has_issmallsegment() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void SegmentTransferEndReplyPro::clear_issmallsegment() {
+  issmallsegment_ = false;
+  clear_has_issmallsegment();
+}
+inline bool SegmentTransferEndReplyPro::issmallsegment() const {
+  return issmallsegment_;
+}
+inline void SegmentTransferEndReplyPro::set_issmallsegment(bool value) {
+  set_has_issmallsegment();
+  issmallsegment_ = value;
 }
 
 // -------------------------------------------------------------------
