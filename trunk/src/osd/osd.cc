@@ -705,7 +705,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 usleep(USLEEP_DURATION);
             }
 #endif
-            _blocktpRequestCount.erase(requestId);
+            _blocktpRequestCount.erase(blocktpId);
 
             if (dataMsgType == UPLOAD) {
                 _pendingSegmentChunk.erase(segmentId);
