@@ -158,6 +158,19 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 		return 0;
 	}
 
+	string fpath = _fuseFolder + string(path);
+	int retstat = lstat(fpath.c_str(), stbuf);
+
+	if(retstat < 0) {
+		perror("lstat()");
+		return -ENOENT;
+	}
+
+	if(S_ISDIR(stbuf->st_mode)) {
+		debug("%s is a Directory\n", path);
+		return retstat;
+	}
+
 	uint32_t fileId = checkNameSpace(path);
 	if (fileId == 0) {
 		debug("File %s Does Not Exist\n", path);
@@ -172,12 +185,6 @@ static int ncvfs_getattr(const char *path, struct stat *stbuf) {
 			return -ENOENT;
 		}
 
-		string fpath = _fuseFolder + string(path);
-		int retstat = lstat(fpath.c_str(), stbuf);
-		if(retstat < 0) {
-			perror("lstat()");
-			return -ENOENT;
-		}
 		stbuf->st_size = fileMetaData._size;
 	}
 
@@ -372,11 +379,11 @@ static int ncvfs_flush(const char *path, struct fuse_file_info *fi) {
 	uint32_t fileId = (uint32_t)fi->fh;
 
 	/*
-	string fpath = _fuseFolder + string(path);
-	FILE* fp = fopen(fpath.c_str(),"w");
-	fprintf(fp,"%" PRIu32, fileId);
-	fclose(fp);
-	*/
+	   string fpath = _fuseFolder + string(path);
+	   FILE* fp = fopen(fpath.c_str(),"w");
+	   fprintf(fp,"%" PRIu32, fileId);
+	   fclose(fp);
+	 */
 
 	struct FileMetaData fileMetaData = _fileMetaDataCache->getMetaData(fileId);
 
@@ -427,9 +434,9 @@ static int ncvfs_release(const char* path, struct fuse_file_info *fi) {
 	ncvfs_flush(path,fi);
 
 	/*
-	uint32_t fileId = (uint32_t)fi->fh;
-	_fileMetaDataCache->removeMetaData(fileId);
-	*/
+	   uint32_t fileId = (uint32_t)fi->fh;
+	   _fileMetaDataCache->removeMetaData(fileId);
+	 */
 	return 0;
 }
 
@@ -453,51 +460,51 @@ static int ncvfs_access(const char *path, int mask) {
    return 0;
    }
 
-static int ncvfs_fgetattr(const char *path, struct stat *statbuf,
-		struct fuse_file_info *fi) {
-	return ncvfs_getattr(path, statbuf);
-	//	return 0;
+   static int ncvfs_fgetattr(const char *path, struct stat *statbuf,
+   struct fuse_file_info *fi) {
+   return ncvfs_getattr(path, statbuf);
+//	return 0;
 }
-*/
+ */
 
 struct ncvfs_fuse_operations: fuse_operations {
 	ncvfs_fuse_operations() {
 		init = ncvfs_init;
 		destroy = ncvfs_destroy;
 		getattr = ncvfs_getattr;
-//		fgetattr = ncvfs_fgetattr;
+		//		fgetattr = ncvfs_fgetattr;
 		access = ncvfs_access;
-//		readlink = ncvfs_readlink; // not required
+		//		readlink = ncvfs_readlink; // not required
 		opendir = ncvfs_opendir;
 		readdir = ncvfs_readdir;
-//		mknod = ncvfs_mknod; // not required
+		//		mknod = ncvfs_mknod; // not required
 		mkdir = ncvfs_mkdir;
 		unlink = ncvfs_unlink;
 		rmdir = ncvfs_rmdir;
-//		symlink = ncvfs_symlink; // not required and not implemented
+		//		symlink = ncvfs_symlink; // not required and not implemented
 		rename = ncvfs_rename;
-//		link = ncvfs_link; // not required
+		//		link = ncvfs_link; // not required
 		chmod = ncvfs_chmod;
 		chown = ncvfs_chown; // not required
 		truncate = ncvfs_truncate;
-//		ftruncate = ncvfs_ftruncate; // Would call truncate instead
+		//		ftruncate = ncvfs_ftruncate; // Would call truncate instead
 		utime = ncvfs_utime; // not required
 		open = ncvfs_open;
 		read = ncvfs_read;
 		write = ncvfs_write;
-//		statfs = ncvfs_statfs; // not required
+		//		statfs = ncvfs_statfs; // not required
 		release = ncvfs_release;
 		releasedir = ncvfs_releasedir;
-//		fsync = ncvfs_fsync; // not strictly required
-//		fsyncdir = ncvfs_fsyncdir; // not strictly required
+		//		fsync = ncvfs_fsync; // not strictly required
+		//		fsyncdir = ncvfs_fsyncdir; // not strictly required
 		flush = ncvfs_flush; // not required
-//		setxattr = ncvfs_setxattr; // not required
-//		getxattr = ncvfs_getxattr; // not required
-//		listxattr = ncvfs_listxattr; // not required
-//		removexattr = ncvfs_removexattr; // not required
+		//		setxattr = ncvfs_setxattr; // not required
+		//		getxattr = ncvfs_getxattr; // not required
+		//		listxattr = ncvfs_listxattr; // not required
+		//		removexattr = ncvfs_removexattr; // not required
 		create = ncvfs_create;
 
-//		flag_nullpath_ok = 0;				// accept NULL path and use fi->fh
+		//		flag_nullpath_ok = 0;				// accept NULL path and use fi->fh
 	}
 };
 
