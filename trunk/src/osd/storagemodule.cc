@@ -313,7 +313,8 @@ void StorageModule::createRemoteBlock(uint32_t osdId, uint64_t segmentId,
 
 uint32_t StorageModule::getDeltaCount (uint32_t segmentId, uint32_t blockId) {
     const string blockKey = getBlockKey (segmentId, blockId);
-    return _deltaCountMap.get(blockKey);
+    // cannot use deltaCountMap since it is incremented before block is really written
+    return _deltaLocationMap.get(blockKey).size();
 }
 
 uint32_t StorageModule::getNextDeltaId (uint32_t segmentId, uint32_t blockId) {
@@ -561,11 +562,14 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
 
     const string blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
     uint32_t deltaCount = getDeltaCount(segmentId, blockId);
+    debug ("Merge Block deltaCount = %" PRIu32 "\n", deltaCount);
     if (deltaCount == 0) {
         return;
     }
 
+    debug ("HAHA1 %" PRIu64 "\n", segmentId);
     BlockData blockData = getMergedBlock(segmentId, blockId, isParity);
+    debug ("HAHA2 %" PRIu64 "\n", segmentId);
 
     const string blockKey = getBlockKey (segmentId, blockId);
     RWMutex* rwmutex = obtainRWMutex(blockKey);
@@ -579,6 +583,7 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
 
     MemoryPool::getInstance().poolFree(blockData.buf);
 
+    // doesn't hurt if delta block not exists
     for (uint32_t i = 0; i < deltaCount; i++) {
         const string deltaBlockPath = generateDeltaBlockPath(segmentId, blockId, i,
                 _blockFolder);
@@ -594,6 +599,7 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
     ReserveSpaceInfo &reserveSpaceInfo = _reserveSpaceMap.get(blockKey);
     reserveSpaceInfo.remainingReserveSpace = RESERVE_SPACE_SIZE;
     reserveSpaceInfo.currentOffset = blockData.info.blockSize;
+
 }
 
 #ifdef MOUNT_OSD
@@ -727,22 +733,38 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     deltaLocation.blockId = blockId;
     deltaLocation.deltaId = deltaId;
 
+    for (offset_length_t x : offsetLength) {
+        debug ("XXXXX off = %" PRIu32 " len = %" PRIu32 "\n", x.first, x.second);
+    }
+    debug ("XXXXXX combined len = %" PRIu32 "\n", combinedLength);
+
     uint32_t currentOffset = 0;
     string filepath = "";
-    if (isParity && reserveSpaceInfo.remainingReserveSpace > combinedLength) {
+    if (isParity && combinedLength <= RESERVE_SPACE_SIZE) {
+        if (reserveSpaceInfo.remainingReserveSpace < combinedLength) {
+            // merge existing block and write again
+            debug ("need merge remaining = %" PRIu32 " length = %" PRIu32 " deltaId = %" PRIu32 "\n", reserveSpaceInfo.remainingReserveSpace, combinedLength, deltaId);
+            rwmutex->unlock();
+            mergeBlock(segmentId, blockId, true);
+
+            // reset deltaId after merge
+            deltaLocation.deltaId = 0;
+            deltaId = 0;
+        }
+
         currentOffset = reserveSpaceInfo.currentOffset;
-        filepath = generateBlockPath(segmentId, blockId,
-                    _blockFolder);
-        deltaLocation.offsetLength = make_pair (currentOffset, combinedLength);
+        filepath = generateBlockPath(segmentId, blockId, _blockFolder);
+        deltaLocation.offsetLength = make_pair(currentOffset, combinedLength);
         deltaLocation.isReserveSpace = true;
-    } else {
-        // not enough reserve space, create new block
+        debug ("block %" PRIu32 " written to reserve\n", blockId);
+    } else {    // data block, append
         createDeltaBlock(segmentId, blockId, deltaId, false);
         currentOffset = 0;
         filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
-                    _blockFolder);
-        deltaLocation.offsetLength = make_pair (0, combinedLength);
+                _blockFolder);
+        deltaLocation.offsetLength = make_pair(0, combinedLength);
         deltaLocation.isReserveSpace = false;
+        debug ("block %" PRIu32 " written to delta\n", blockId);
     }
 
 
@@ -1383,13 +1405,14 @@ DeltaLocation StorageModule::getDeltaLocation (uint64_t segmentId, uint32_t bloc
     vector<DeltaLocation> deltaLocationList = _deltaLocationMap.get(blockKey);
 
     for (DeltaLocation deltaLocation: deltaLocationList) {
+        debug ("DeltaLocation deltaId = %" PRIu32 " isReserve = %d\n", deltaLocation.deltaId, deltaLocation.isReserveSpace);
         if (deltaLocation.deltaId == deltaId) {
             return deltaLocation;
         }
     }
 
     debug_error ("DeltaID %" PRIu32 " not found for %s\n", deltaId, blockKey.c_str());
-    return {};
+    exit (-1);
 }
 
 string StorageModule::getBlockKey (uint64_t segmentId, uint32_t blockId) {
