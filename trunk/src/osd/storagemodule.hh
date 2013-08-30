@@ -91,19 +91,6 @@ public:
     uint32_t getDeltaCount(uint32_t segmentId, uint32_t blockId);
     uint32_t getNextDeltaId(uint32_t segmentId, uint32_t blockId);
 
-#ifdef MOUNT_OSD
-    /**
-     * Create and open the file for storing the block on disk
-     * @param osdId OSD ID
-     * @param segmentId Segment ID
-     * @param blockId Block ID
-     * @param length Length of block
-     */
-
-    void createRemoteBlock(uint32_t osdId, uint64_t segmentId, uint32_t blockId,
-            uint32_t length);
-#endif
-
     /**
      * Read a part of an segment from the storage
      * @param segmentId SegmentID
@@ -141,7 +128,7 @@ public:
             vector<offset_length_t> symbols);
     struct BlockData readDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
     void mergeBlock (uint64_t segmentId, uint32_t blockId, bool isParity);
-    BlockData getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity);
+    BlockData getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity, bool needLock);
     BlockData readDeltaFromReserve(uint64_t segmentId, uint32_t blockId,
             uint32_t deltaId, DeltaLocation deltaLocation);
     BlockData doReadDelta(uint64_t segmentId, uint32_t blockId,
@@ -210,23 +197,6 @@ public:
     uint32_t updateBlock(uint64_t segmentId, uint32_t blockId,
             BlockData blockData);
 
-#ifdef MOUNT_OSD
-    /**
-     * Write a partial Block ID to a remote storage
-     * @param osdId Destination OSD ID
-     * @param segmentId Segment ID
-     * @param blockId Block ID
-     * @param buf Pointer to buffer containing data
-     * @param offsetInSegment Offset of the trunk in the block
-     * @param length Number of bytes of the trunk
-     * @return Number of bytes written
-     */
-
-    uint32_t writeRemoteBlock(uint32_t osdId, uint64_t segmentId,
-            uint32_t blockId, char* buf, uint64_t offsetInBlock,
-            uint32_t length);
-#endif
-
     /**
      * Close and remove the segment cache after the transfer is finished
      * @param segmentId Segment ID
@@ -253,17 +223,6 @@ public:
 
     void flushBlock(uint64_t segmentId, uint32_t blockId);
     void flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, bool isParity);
-
-#ifdef MOUNT_OSD
-    /**
-     * Close the block after the transfer is finished
-     * @param osdId OSD ID
-     * @param segmentId Segment ID
-     * @param blockId Block ID
-     */
-
-    void flushRemoteBlock(uint32_t osdId, uint64_t segmentId, uint32_t blockId);
-#endif
 
     /**
      * Get back the SegmentCache from segmentId
@@ -498,20 +457,6 @@ private:
     string generateDeltaBlockPath(uint64_t segmentId, uint32_t blockId, uint32_t deltaId,
             string blockFolder);
 
-#ifdef MOUNT_OSD
-    /**
-     * Return the block path given Segment ID and Block ID
-     * @param osdId Destination OSD ID
-     * @param segmentId Segment ID
-     * @param blockId Block ID
-     * @param blockFolder Location where blocks are stored
-     * @return filepath of the block in the filesystem
-     */
-
-    string generateRemoteBlockPath(uint32_t osdId, uint64_t segmentId,
-            uint32_t blockId, string blockFolder);
-#endif
-
     /**
      * Create a file on disk and open it
      * @param filepath Path of the file on storage
@@ -545,7 +490,7 @@ private:
 
     RWMutex* obtainRWMutex(string blockKey);
 
-    DeltaLocation getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
+//    DeltaLocation getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
     string getBlockKey (uint64_t segmentId, uint32_t blockId);
     string getBlockKey (string segmentId, string blockId);
     string generateDeltaKey (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
@@ -567,13 +512,13 @@ private:
     atomic<uint32_t> _currentBlockUsage;
     atomic<uint32_t> _currentSegmentUsage;
 
-    ConcurrentMap<string, uint32_t> _deltaCountMap;
-    ConcurrentMap<string, vector<offset_length_t>> _deltaOffsetLength;
-    ConcurrentMap<string, vector<DeltaLocation>> _deltaLocationMap;
-    ConcurrentMap<string, ReserveSpaceInfo> _reserveSpaceMap;
+    map<string, uint32_t> _deltaIdMap;
+    map<string, vector<offset_length_t>> _deltaOffsetLength;
+    map<string, vector<DeltaLocation>> _deltaLocationMap;
+    map<string, ReserveSpaceInfo> _reserveSpaceMap;
 
-    std::unordered_map<string, boost::shared_mutex*> _deltaRWMutexMap;
-    std::mutex _deltaRWMutexMapMutex;
+    unordered_map<string, boost::shared_mutex*> _deltaRWMutexMap;
+    mutex _deltaRWMutexMapMutex;
 
 #ifdef USE_IO_THREADS
     boost::threadpool::prio_pool _iotp;

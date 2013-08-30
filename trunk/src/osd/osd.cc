@@ -234,10 +234,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                         BlockData blockData;
 
                         if (isParity) {
-                            blockData = _storageModule->getMergedBlock(segmentId, blockId, true);
+                            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
                         } else {
                             #ifdef APPEND_DATA
-                                blockData = _storageModule->getMergedBlock(segmentId, blockId, false);
+                                blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
                             #else
                                 blockData = _storageModule->readBlock(
                                         segmentId, blockId, blockSymbols.second);
@@ -358,10 +358,10 @@ void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
     BlockData blockData;
 
     if (isParity) {
-            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity);
+            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
     } else {
         #ifdef APPEND_DATA
-            blockData = _storageModule->getMergedBlock(segmentId, blockId, false);
+            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
         #else
             blockData = _storageModule->readBlock(
                     segmentId, blockId, symbols);
