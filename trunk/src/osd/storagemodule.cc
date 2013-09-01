@@ -402,6 +402,7 @@ struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
 
 }
 
+// this function is not thread-safe, make sure the caller has lock
 BlockData StorageModule::readDeltaFromReserve(uint64_t segmentId,
         uint32_t blockId, uint32_t deltaId, DeltaLocation deltaLocation) {
     BlockData blockData = doReadDelta (segmentId, blockId, deltaId, true, deltaLocation.offsetLength.first);
@@ -409,18 +410,18 @@ BlockData StorageModule::readDeltaFromReserve(uint64_t segmentId,
 
 }
 
+// this function is not thread-safe, make sure the caller has lock
 BlockData StorageModule::readDeltaBlock(uint64_t segmentId,
         uint32_t blockId, uint32_t deltaId) {
     BlockData blockData = doReadDelta (segmentId, blockId, deltaId, false, 0);
     return blockData;
 }
 
+// this function is not thread-safe, make sure the caller has lock
 BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
         uint32_t deltaId, bool isReserve, uint32_t offset) {
 
     string blockKey = getBlockKey(segmentId, blockId);
-    RWMutex* rwmutex = obtainRWMutex(blockKey);
-    readLock rdlock(*rwmutex);
 
     string blockPath;
     if (isReserve) {
@@ -451,6 +452,7 @@ BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
     return blockData;
 }
 
+// this function is only thread-safe when needLock == true
 BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity, bool needLock) {
 
     const string blockPath = generateBlockPath(segmentId, blockId, _blockFolder);
@@ -529,6 +531,7 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
     return blockData;
 }
 
+// this function is not thread-safe, make sure the caller has lock
 void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isParity) {
 
     const string blockKey = getBlockKey (segmentId, blockId);
