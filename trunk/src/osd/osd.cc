@@ -763,6 +763,7 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
     // update delta (should be performed before updating the block in-place)
     BlockData delta = computeDelta(segmentId, blockId, newBlock, offsetLength);
     for (auto& parityPair : newBlock.info.parityVector) {
+
         BlockLocation blockLocation;
         blockLocation.osdId = parityPair.osdId;
         blockLocation.blockId = parityPair.blockId;    // replaced
@@ -770,15 +771,21 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
         delta.info.blockId = parityPair.blockId;
         delta.info.blockType = PARITY_BLOCK;
 
+        // make a copy to prevent double free
+        BlockData tempDelta = delta;
+        tempDelta.buf = MemoryPool::getInstance().poolMalloc(delta.info.blockSize);
+        memcpy (tempDelta.buf, delta.buf, delta.info.blockSize);
+
         debug(
                 "Send delta of segment %" PRIu64 " block %" PRIu32 " to OSD %" PRIu32 "\n",
                 segmentId, blockLocation.blockId, blockLocation.osdId);
 
         uint32_t blocktpId = ++_blocktpId;
         _blocktp.schedule(
-                boost::bind(&Osd::distributeBlock, this, segmentId, delta,
+                boost::bind(&Osd::distributeBlock, this, segmentId, tempDelta,
                         blockLocation, PARITY, blocktpId));
     }
+    MemoryPool::getInstance().poolFree(delta.buf);
 }
 
 void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
