@@ -4,11 +4,17 @@
 #include <vector>
 #include <stdint.h>
 
+#include <boost/thread/locks.hpp>
+#include <boost/thread/shared_mutex.hpp>
+
 // coding
 typedef std::pair<uint32_t, uint32_t> offset_length_t;
 typedef std::pair<uint32_t, std::vector<offset_length_t> > symbol_list_t;
 typedef std::vector<symbol_list_t> block_list_t ;
 typedef std::pair<uint32_t, uint32_t> block_symbol_t;
+typedef boost::shared_mutex RWMutex;
+typedef boost::shared_lock<RWMutex> readLock;
+typedef boost::unique_lock<RWMutex> writeLock;
 
 
 #define USLEEP_DURATION 10000

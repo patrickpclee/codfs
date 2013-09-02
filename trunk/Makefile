@@ -1,6 +1,6 @@
-OPTIMIZE := -O0
+OPTIMIZE := -O2
 WARNINGS := -Wall 
-EXTRA_CFLAGS := -g -std=c++0x -DDEBUG=1 -D_FILE_OFFSET_BITS=64
+EXTRA_CFLAGS := -std=c++0x -DDEBUG=0 -D_FILE_OFFSET_BITS=64
 
 ############################################
 
@@ -23,33 +23,33 @@ default:
 	make osd;
 	make monitor;
 	make benchmark;
+	make clientfuse;
 
 all:
 	make mds;
 	make client;
 	make osd;
 	make monitor;
-	make codingtester;
 	make clientfuse;
 	make benchmark;
 
 mds:
-	cd ${MDS_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j4
+	cd ${MDS_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 client:
-	cd ${CLIENT_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j4
+	cd ${CLIENT_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 osd:
-	cd ${OSD_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j4
+	cd ${OSD_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 monitor:
-	cd ${MONITOR_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j4
+	cd ${MONITOR_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 codingtester:
-	cd ${CODING_TESTER_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j4
+	cd ${CODING_TESTER_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 clientfuse:
-	cd ${FUSE_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j4
+	cd ${FUSE_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 enum:
 	cd ${COMMON_DIR}; make
@@ -58,7 +58,7 @@ protocol:
 	cd ${PROTOCOL_DIR}; make
 
 benchmark:
-	cd ${BENCHMARK_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j4
+	cd ${BENCHMARK_DIR}; make OPTIMIZE="$(OPTIMIZE)" WARNINGS="$(WARNINGS)" EXTRA_CFLAGS="$(EXTRA_CFLAGS)" -j3
 
 clean:
 	cd ${OSD_DIR}; make clean

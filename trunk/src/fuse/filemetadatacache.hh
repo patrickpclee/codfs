@@ -3,6 +3,9 @@
 
 #include <unordered_map>
 #include "../common/metadata.hh"
+#include "../common/define.hh"
+
+
 
 class FileMetaDataCache {
 	public:
@@ -15,6 +18,7 @@ class FileMetaDataCache {
 		void removeMetaData(uint32_t id);
 		int renameMetaData(string path, string new_path);
 	private:
+        RWMutex _metaDataCacheMutex;
 		std::unordered_map<uint32_t, struct FileMetaData> _metaDataCache;
 		std::unordered_map<string, uint32_t> _fileIdCache;
 }; 

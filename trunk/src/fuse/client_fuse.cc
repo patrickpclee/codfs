@@ -169,45 +169,45 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
 }
 
 static int ncvfs_getattr(const char *path, struct stat *stbuf) {
-    // Root Directory
-    if (strcmp(path, "/") == 0) {
-        stbuf->st_mode = S_IFDIR | 0755;
-        stbuf->st_uid = getuid();
-        stbuf->st_gid = getgid();
-        return 0;
-    }
+	// Root Directory
+	if (strcmp(path, "/") == 0) {
+		stbuf->st_mode = S_IFDIR | 0755;
+		stbuf->st_uid = getuid();
+		stbuf->st_gid = getgid();
+		return 0;
+	}
 
-    string fpath = _fuseFolder + string(path);
-    int retstat = lstat(fpath.c_str(), stbuf);
+	string fpath = _fuseFolder + string(path);
+	int retstat = lstat(fpath.c_str(), stbuf);
 
-    if(retstat < 0) {
-        perror("lstat()");
-        return -ENOENT;
-    }
+	if(retstat < 0) {
+		perror("lstat()");
+		return -ENOENT;
+	}
 
-    if(S_ISDIR(stbuf->st_mode)) {
-        debug("%s is a Directory\n", path);
-        return retstat;
-    }
+	if(S_ISDIR(stbuf->st_mode)) {
+		debug("%s is a Directory\n", path);
+		return retstat;
+	}
 
-    uint32_t fileId = checkNameSpace(path);
-    if (fileId == 0) {
-        debug("File %s Does Not Exist\n", path);
-        return -ENOENT;
-        // File ID Cache
-    } else {
-        struct FileMetaData fileMetaData;
-        fileMetaData = getAndCacheFileMetaData(fileId);
+	uint32_t fileId = checkNameSpace(path);
+	if (fileId == 0) {
+		debug("File %s Does Not Exist\n", path);
+		return -ENOENT;
+		// File ID Cache
+	} else {
+		struct FileMetaData fileMetaData;
+		fileMetaData = getAndCacheFileMetaData(fileId);
 
-        //In Case the Record on MDS is Deleted
-        if(fileMetaData._fileType == NOTFOUND) {
-            return -ENOENT;
-        }
+		//In Case the Record on MDS is Deleted
+		if(fileMetaData._fileType == NOTFOUND) {
+			return -ENOENT;
+		}
 
-        stbuf->st_size = fileMetaData._size;
-    }
+		stbuf->st_size = fileMetaData._size;
+	}
 
-    return 0;
+	return 0;
 }
 
 static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
@@ -314,7 +314,7 @@ static void ncvfs_destroy(void* userdata) {
 
 static int ncvfs_chmod(const char *path, mode_t mode) {
 	string fpath = _fuseFolder + string(path);
-	return ncvfs_chmod(fpath.c_str(),mode);
+	return chmod(fpath.c_str(),mode);
 	//return 0;
 }
 
@@ -357,9 +357,14 @@ static int ncvfs_rmdir(const char *path) {
 static int ncvfs_rename(const char *path, const char *newpath) {
 	string fpath = _fuseFolder + string(path);
 	string new_fpath = _fuseFolder + string(newpath);
+    string new_path = string(newpath);
 
 	/// TODO: Check Return Value
-	_fileMetaDataCache->renameMetaData(fpath, new_fpath);
+	_fileMetaDataCache->renameMetaData(string(path), new_path);
+
+    uint32_t id = _fileMetaDataCache->path2Id(new_path);
+
+    client->renameFileRequest(id, new_path);
 
 	return rename(fpath.c_str(), new_fpath.c_str());
 }
