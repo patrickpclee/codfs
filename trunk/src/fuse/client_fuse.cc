@@ -357,9 +357,14 @@ static int ncvfs_rmdir(const char *path) {
 static int ncvfs_rename(const char *path, const char *newpath) {
 	string fpath = _fuseFolder + string(path);
 	string new_fpath = _fuseFolder + string(newpath);
+    string new_path = string(newpath);
 
 	/// TODO: Check Return Value
-	_fileMetaDataCache->renameMetaData(fpath, new_fpath);
+	_fileMetaDataCache->renameMetaData(string(path), new_path);
+
+    uint32_t id = _fileMetaDataCache->path2Id(new_path);
+
+    client->renameFileRequest(id, new_path);
 
 	return rename(fpath.c_str(), new_fpath.c_str());
 }

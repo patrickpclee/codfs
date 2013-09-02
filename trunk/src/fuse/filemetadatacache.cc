@@ -47,18 +47,22 @@ void FileMetaDataCache::removeMetaData(uint32_t id) {
 }
 
 int FileMetaDataCache::renameMetaData(string path, string new_path) {
-    writeLock wtlock(_metaDataCacheMutex);
-	uint32_t id = path2Id(path);
-	if (id == 0) {
-		debug_error("Metadata Not Found %s\n",path.c_str());
-		return -1;
-	}
-
+    uint32_t id = 0;
+    {
+        readLock rdlock(_metaDataCacheMutex);
+	    id = path2Id(path);
+        if (id == 0) {
+		    debug_error("Metadata Not Found %s\n",path.c_str());
+		    return -1;
+	    }
+    }
 	struct FileMetaData &fileMetaData = getMetaData(id);
-	fileMetaData._path = new_path;
-	_fileIdCache.erase(path);
-	_fileIdCache[new_path] = id;
-	_metaDataCache[id] = fileMetaData;
-
+    {
+        writeLock wtlock(_metaDataCacheMutex);
+	    fileMetaData._path = new_path;
+	    _fileIdCache.erase(path);
+	    _fileIdCache[new_path] = id;
+	    _metaDataCache[id] = fileMetaData;
+    }
 	return 0;
 }

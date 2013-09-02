@@ -71,6 +71,7 @@ struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 	if (status == READY) {
 		struct FileMetaData fileMetaData { };
 		fileMetaData._id = uploadFileRequestMsg->getFileId();
+        fileMetaData._path = path;
 		fileMetaData._segmentList = uploadFileRequestMsg->getSegmentList();
 		fileMetaData._primaryList = uploadFileRequestMsg->getPrimaryList();
 		waitAndDelete(uploadFileRequestMsg);
