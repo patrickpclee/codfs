@@ -5,6 +5,7 @@
 #include "../common/debug.hh"
 
 uint32_t FileMetaDataCache::path2Id(string path) {
+    readLock rdlock(_metaDataCacheMutex);
 	try {
 		return _fileIdCache.at(path);
 	} catch (const std::out_of_range& oor) {
@@ -12,14 +13,17 @@ uint32_t FileMetaDataCache::path2Id(string path) {
 	}
 }
 string FileMetaDataCache::id2Path(uint32_t id) {
+    readLock rdlock(_metaDataCacheMutex);
 	return _metaDataCache.at(id)._path;
 }
 
 struct FileMetaData& FileMetaDataCache::getMetaData(uint32_t id) {
+    readLock rdlock(_metaDataCacheMutex);
 	return _metaDataCache.at(id);
 }
 
 void FileMetaDataCache::saveMetaData(const struct FileMetaData& fileMetaData) {
+    writeLock wtlock(_metaDataCacheMutex);
 	uint32_t id = fileMetaData._id;
 	string path = fileMetaData._path;
 	_fileIdCache[path] = id;
@@ -28,6 +32,7 @@ void FileMetaDataCache::saveMetaData(const struct FileMetaData& fileMetaData) {
 }
 
 void FileMetaDataCache::removeMetaData(uint32_t id) {
+    writeLock wtlock(_metaDataCacheMutex);
 	string path = id2Path(id);
 	{
 		try{
@@ -42,6 +47,7 @@ void FileMetaDataCache::removeMetaData(uint32_t id) {
 }
 
 int FileMetaDataCache::renameMetaData(string path, string new_path) {
+    writeLock wtlock(_metaDataCacheMutex);
 	uint32_t id = path2Id(path);
 	if (id == 0) {
 		debug_error("Metadata Not Found %s\n",path.c_str());
