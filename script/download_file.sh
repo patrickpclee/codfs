@@ -14,7 +14,7 @@ for target
 do
     targetip=192.168.0.$target
     command="cd ~/shb118/ncvfs/trunk; dd if=/home/ncsgroup/shb118/ncvfs/trunk/mountdir/benchmarkfile${target} of=/dev/null bs=10M count=200"
-    screen -dm -t DOWNLOAD$target_$killNum -S DOWNLOAD$target_killNum ssh -t -t $targetip $command
+    screen -dm -t DOWNLOAD${target}_${killNum} -S DOWNLOAD${target}_${killNum} ssh -t -t $targetip $command
 done
 
 
