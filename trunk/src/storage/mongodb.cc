@@ -119,7 +119,6 @@ vector<BSONObj> MongoDB::read (Query querySegment)
 		tempObj = cursor->next().copy();
 		result.push_back(tempObj);
 	}
-    cout << "HAHA" << _connection->getLastError(true, true, 1) << endl;
 	_conn->done();
 
 	return result;
@@ -133,7 +132,6 @@ BSONObj MongoDB::readOne (Query querySegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	BSONObj result = _connection->findOne(_database + "." + _collection, querySegment);
-    cout << "HAHA" << _connection->getLastError(true, true, 1) << endl;
 	_conn->done();
 
 	return result.copy();
@@ -147,7 +145,6 @@ void MongoDB::insert (BSONObj insertSegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	_connection->insert(_database + "." + _collection, insertSegment);
-    cout << "HAHA" << _connection->getLastError(true, true, 1) << endl;
 	_conn->done();
 
 	pool.flush();
@@ -161,11 +158,7 @@ void MongoDB::update (Query querySegment, BSONObj updateSegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
-    cout << "BSON OBJ TO STR : " << updateSegment.toString() << endl;
-    fflush(stdout);
 	_connection->update(_database + "." + _collection, querySegment, updateSegment, true);
-    cout << "HAHA " << _connection->getLastError(true, true, 1) << endl;
-    fflush(stdout);
 	_conn->done();
 
 	pool.flush();
@@ -180,7 +173,6 @@ void MongoDB::push (Query querySegment, BSONObj pushSegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, pushSegment, true);
-    cout << "HAHA" << _connection->getLastError(true, true, 1) << endl;
 	_conn->done();
 	pool.flush();
 }
@@ -191,7 +183,6 @@ BSONObj MongoDB::findAndModify (BSONObj querySegment, BSONObj updateSegment)
 	DBClientBase* _connection = _conn->get();
 	BSONObj result;
 	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << querySegment << "update" << updateSegment), result);
-    cout << "HAHA" << _connection->getLastError(true, true, 1) << endl;
 	_conn->done();
 
 	pool.flush();
@@ -204,7 +195,6 @@ void MongoDB::removeField (Query querySegment, string field)
 	DBClientBase* _connection = _conn->get();
 	BSONObj unsetSegment = BSON ("$unset" << BSON (field << "1"));
 	_connection->update(_database + "." + _collection, querySegment, unsetSegment, true);
-    cout << "HAHA" << _connection->getLastError(true, true, 1) << endl;
 	_conn->done();
 
 	pool.flush();
@@ -215,7 +205,6 @@ void MongoDB::remove (Query querySegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	_connection->remove(_database + "." + _collection, querySegment);
-    cout << "HAHA" << _connection->getLastError(true, true, 1) << endl;
 	_conn->done();
 
 	pool.flush();
