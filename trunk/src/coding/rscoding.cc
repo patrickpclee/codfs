@@ -403,6 +403,23 @@ uint32_t RSCoding::getBlockSize(uint32_t segmentSize, string setting) {
 	return roundTo((roundTo(segmentSize, k) / k), 4);
 }
 
+/*
+BlockData RSCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
+        vector<offset_length_t> offsetLength) {
+
+    const string codingSetting = newBlock.info.codingSetting;
+    const uint32_t combinedLength = getCombinedLength(offsetLength);
+	const vector<uint32_t> params = getParameters(codingSetting);
+	const uint32_t k = params[0];
+	const uint32_t m = params[1];
+
+	SegmentData oldBlockContainer, newBlockContainer;
+	BlockData oldCodedBlock = encode (oldBlockContainer, codingSetting);
+	BlockData newCodedBlock = encode (newBlockContainer, codingSetting);
+	BlockData delta
+}
+*/
+
 //
 // PRIVATE FUNCTION
 //

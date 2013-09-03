@@ -671,7 +671,11 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             uint32_t blocktpId = ++_blocktpId; // should not use 0
             _blocktpRequestCount.set(blocktpId, blockDataList.size());
 
-            for (const auto blockData : blockDataList) {
+            for (BlockData blockData : blockDataList) {
+
+                // fill in codingScheme and codingSetting
+                blockData.info.codingScheme = codingSetting.codingScheme;
+                blockData.info.codingSetting = codingSetting.setting;
 
                 // delta update case 1: primary OSD receives the update
 
@@ -742,15 +746,16 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
         BlockData newBlock, vector<offset_length_t> offsetLength) {
 
-    uint32_t combinedLength = StorageModule::getCombinedLength(offsetLength);
-
-    // read old block
-    debug("%s\n", "BLK READ FROM DELTA");
-    BlockData delta = _storageModule->readBlock(segmentId, blockId,
+    BlockData oldBlock = _storageModule->readBlock(segmentId, blockId,
             offsetLength);
 
-    // compute delta (borrow bitwiseXor function)
-    Coding::bitwiseXor(delta.buf, delta.buf, newBlock.buf, combinedLength);
+    debug ("Delta codingScheme = %d, codingSetting = %s\n", newBlock.info.codingScheme, newBlock.info.codingSetting.c_str());
+
+    CodingScheme codingScheme = newBlock.info.codingScheme;
+    string codingSetting = newBlock.info.codingSetting;
+    BlockData delta = _codingModule->computeDelta(codingScheme, codingSetting, oldBlock, newBlock, offsetLength);
+
+    MemoryPool::getInstance().poolFree(oldBlock.buf);
 
     return delta;
 }
@@ -793,7 +798,8 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
 void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
         string updateKey, vector<offset_length_t> offsetLength,
-        vector<BlockLocation> parityList) {
+        vector<BlockLocation> parityList, CodingScheme codingScheme,
+        string codingSetting) {
 
     // TODO: check integrity of block received
     const string blockKey = to_string(segmentId) + "." + to_string(blockId);
@@ -823,6 +829,8 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 struct BlockData blockData = _updateBlockData.get(updateKey);
                 blockData.info.offlenVector = offsetLength;
                 blockData.info.parityVector = parityList;
+                blockData.info.codingScheme = codingScheme;
+                blockData.info.codingSetting = codingSetting;
 
                 // delta update case 2: secondary OSD receives the update
                 // send delta to parity nodes

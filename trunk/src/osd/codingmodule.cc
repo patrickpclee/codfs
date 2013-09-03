@@ -114,6 +114,11 @@ uint32_t CodingModule::getBlockSize(CodingScheme codingScheme, string setting,
 	return getCoding(codingScheme)->getBlockSize(segmentSize, setting);
 }
 
+BlockData CodingModule::computeDelta(CodingScheme codingScheme, string setting, BlockData oldBlock, BlockData newBlock,
+        vector<offset_length_t> offsetLength) {
+    return getCoding(codingScheme)->computeDelta(oldBlock, newBlock, offsetLength);
+}
+
 vector<BlockData> CodingModule::unpackUpdates(CodingScheme codingScheme, 
         uint64_t segmentId, char* segmentBuf, uint32_t segmentSize, string setting, 
         vector<offset_length_t> offlenVector) {

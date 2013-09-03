@@ -369,6 +369,8 @@ message BlockTransferEndRequestPro {
 	optional string updateKey = 4;
 	repeated OffsetLengthPro offsetLength = 5;
 	repeated BlockLocationPro blockLocation = 6;
+	optional PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
+	optional string codingSetting = 8;
 }
 
 message PutBlockInitReplyPro {

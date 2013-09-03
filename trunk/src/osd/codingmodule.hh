@@ -149,6 +149,9 @@ class CodingModule {
                 uint64_t segmentId, char* segmentBuf, uint32_t segentSize, string setting, 
                 vector<offset_length_t> offsetLengthVector);
 
+        BlockData computeDelta(CodingScheme codingScheme, string setting, BlockData oldBlock, BlockData newBlock,
+                vector<offset_length_t> offsetLength);
+
     private:
         map<CodingScheme, Coding*> _codingWorker;
 };

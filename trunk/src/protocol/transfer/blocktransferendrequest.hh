@@ -15,9 +15,11 @@ public:
 
 	BlockTransferEndRequestMsg(Communicator* communicator);
 
-	BlockTransferEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
-			uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
-			string updateKey, vector<offset_length_t> offsetLength, vector<BlockLocation> parityList);
+    BlockTransferEndRequestMsg(Communicator* communicator, uint32_t osdSockfd,
+            uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
+            string updateKey, vector<offset_length_t> offsetLength,
+            vector<BlockLocation> parityList, CodingScheme codingScheme,
+            string codingSetting);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -55,6 +57,8 @@ private:
 	string _updateKey;
 	vector<offset_length_t> _offsetLength;
 	vector<BlockLocation> _parityList;
+	CodingScheme _codingScheme;
+	string _codingSetting;
 };
 
 #endif

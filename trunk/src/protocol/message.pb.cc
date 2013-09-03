@@ -952,13 +952,15 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockDataPro));
   BlockTransferEndRequestPro_descriptor_ = file->message_type(43);
-  static const int BlockTransferEndRequestPro_offsets_[6] = {
+  static const int BlockTransferEndRequestPro_offsets_[8] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, blockid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, datamsgtype_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, updatekey_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, offsetlength_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, blocklocation_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, codingscheme_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, codingsetting_),
   };
   BlockTransferEndRequestPro_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -1669,47 +1671,50 @@ void protobuf_AddDesc_message_2eproto() {
     "ro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\016"
     "\n\006offset\030\003 \001(\006\022\016\n\006length\030\004 \001(\007\0222\n\013dataMs"
     "gType\030\005 \001(\0162\035.ncvfs.DataMsgPro.DataMsgTy"
-    "pe\022\021\n\tupdateKey\030\006 \001(\t\"\345\001\n\032BlockTransferE"
+    "pe\022\021\n\tupdateKey\030\006 \001(\t\"\300\002\n\032BlockTransferE"
     "ndRequestPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007block"
     "Id\030\002 \001(\007\0222\n\013dataMsgType\030\003 \001(\0162\035.ncvfs.Da"
     "taMsgPro.DataMsgType\022\021\n\tupdateKey\030\004 \001(\t\022"
     ",\n\014offsetLength\030\005 \003(\0132\026.ncvfs.OffsetLeng"
     "thPro\022.\n\rblockLocation\030\006 \003(\0132\027.ncvfs.Blo"
-    "ckLocationPro\":\n\024PutBlockInitReplyPro\022\021\n"
-    "\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\">\n\030Blo"
-    "ckTransferEndReplyPro\022\021\n\tsegmentId\030\001 \001(\006"
-    "\022\017\n\007blockId\030\002 \001(\007\"\260\001\n\026GetBlockInitReques"
-    "tPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007"
-    "\022,\n\014offsetLength\030\003 \003(\0132\026.ncvfs.OffsetLen"
-    "gthPro\0222\n\013dataMsgType\030\004 \001(\0162\035.ncvfs.Data"
-    "MsgPro.DataMsgType\022\020\n\010isParity\030\005 \001(\010\"a\n\024"
-    "GetBlockInitReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022"
-    "\017\n\007blockId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\007\022\022\n\nc"
-    "hunkCount\030\004 \001(\007\"g\n\rOsdStartupPro\022\r\n\005osdI"
-    "d\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoadi"
-    "ng\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007"
-    "\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025Osd"
-    "StatUpdateReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osd"
-    "Capacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"U\n\032Ge"
-    "tSecondaryListRequestPro\022\021\n\tnumOfSegs\030\001 "
-    "\001(\007\022\021\n\tprimaryId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001("
-    "\006\"\031\n\027OsdStatUpdateRequestPro\"J\n\030GetSecon"
-    "daryListReplyPro\022.\n\rsecondaryList\030\001 \003(\0132"
-    "\027.ncvfs.BlockLocationPro\"B\n\021NewOsdRegist"
-    "erPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007o"
-    "sdPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 "
-    "\001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020O"
-    "nlineOsdListPro\022*\n\ronlineOsdList\030\001 \003(\0132\023"
-    ".ncvfs.OnlineOsdPro\"(\n\026GetOsdStatusReque"
-    "stPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetOsdStatusRep"
-    "lyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n\024RepairSegmen"
-    "tInfoPro\022\021\n\tsegmentId\030\001 \001(\006\022\024\n\014deadBlock"
-    "Ids\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n\026GetPrima"
-    "ryListReplyPro\022\023\n\013primaryList\030\001 \003(\007\"V\n\031R"
-    "ecoveryTriggerRequestPro\022\017\n\007osdList\030\001 \003("
-    "\007\022\022\n\ndstOsdList\030\002 \003(\007\022\024\n\014dstspecified\030\003 "
-    "\001(\010\"@\n\022GetOsdListReplyPro\022*\n\ronlineOsdLi"
-    "st\030\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 6073);
+    "ckLocationPro\022B\n\014codingScheme\030\007 \001(\0162,.nc"
+    "vfs.PutSegmentInitRequestPro.CodingSchem"
+    "e\022\025\n\rcodingSetting\030\010 \001(\t\":\n\024PutBlockInit"
+    "ReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002"
+    " \001(\007\">\n\030BlockTransferEndReplyPro\022\021\n\tsegm"
+    "entId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\"\260\001\n\026GetBloc"
+    "kInitRequestPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007bl"
+    "ockId\030\002 \001(\007\022,\n\014offsetLength\030\003 \003(\0132\026.ncvf"
+    "s.OffsetLengthPro\0222\n\013dataMsgType\030\004 \001(\0162\035"
+    ".ncvfs.DataMsgPro.DataMsgType\022\020\n\010isParit"
+    "y\030\005 \001(\010\"a\n\024GetBlockInitReplyPro\022\021\n\tsegme"
+    "ntId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\021\n\tblockSize"
+    "\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\"g\n\rOsdStartup"
+    "Pro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022"
+    "\022\n\nosdLoading\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007os"
+    "dPort\030\005 \001(\007\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001"
+    " \001(\007\"O\n\025OsdStatUpdateReplyPro\022\r\n\005osdId\030\001"
+    " \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoading\030"
+    "\003 \001(\007\"U\n\032GetSecondaryListRequestPro\022\021\n\tn"
+    "umOfSegs\030\001 \001(\007\022\021\n\tprimaryId\030\002 \001(\007\022\021\n\tblo"
+    "ckSize\030\003 \001(\006\"\031\n\027OsdStatUpdateRequestPro\""
+    "J\n\030GetSecondaryListReplyPro\022.\n\rsecondary"
+    "List\030\001 \003(\0132\027.ncvfs.BlockLocationPro\"B\n\021N"
+    "ewOsdRegisterPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp"
+    "\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022"
+    "\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort"
+    "\030\003 \001(\007\">\n\020OnlineOsdListPro\022*\n\ronlineOsdL"
+    "ist\030\001 \003(\0132\023.ncvfs.OnlineOsdPro\"(\n\026GetOsd"
+    "StatusRequestPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetO"
+    "sdStatusReplyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n\024R"
+    "epairSegmentInfoPro\022\021\n\tsegmentId\030\001 \001(\006\022\024"
+    "\n\014deadBlockIds\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003(\007\""
+    "-\n\026GetPrimaryListReplyPro\022\023\n\013primaryList"
+    "\030\001 \003(\007\"V\n\031RecoveryTriggerRequestPro\022\017\n\007o"
+    "sdList\030\001 \003(\007\022\022\n\ndstOsdList\030\002 \003(\007\022\024\n\014dsts"
+    "pecified\030\003 \001(\010\"@\n\022GetOsdListReplyPro\022*\n\r"
+    "onlineOsdList\030\001 \003(\0132\023.ncvfs.OnlineOsdPro"
+    "B\002H\001", 6164);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -14491,6 +14496,8 @@ const int BlockTransferEndRequestPro::kDataMsgTypeFieldNumber;
 const int BlockTransferEndRequestPro::kUpdateKeyFieldNumber;
 const int BlockTransferEndRequestPro::kOffsetLengthFieldNumber;
 const int BlockTransferEndRequestPro::kBlockLocationFieldNumber;
+const int BlockTransferEndRequestPro::kCodingSchemeFieldNumber;
+const int BlockTransferEndRequestPro::kCodingSettingFieldNumber;
 #endif  // !_MSC_VER
 
 BlockTransferEndRequestPro::BlockTransferEndRequestPro()
@@ -14513,6 +14520,8 @@ void BlockTransferEndRequestPro::SharedCtor() {
   blockid_ = 0u;
   datamsgtype_ = 15;
   updatekey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+  codingscheme_ = 1;
+  codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -14523,6 +14532,9 @@ BlockTransferEndRequestPro::~BlockTransferEndRequestPro() {
 void BlockTransferEndRequestPro::SharedDtor() {
   if (updatekey_ != &::google::protobuf::internal::kEmptyString) {
     delete updatekey_;
+  }
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    delete codingsetting_;
   }
   if (this != default_instance_) {
   }
@@ -14556,6 +14568,12 @@ void BlockTransferEndRequestPro::Clear() {
     if (has_updatekey()) {
       if (updatekey_ != &::google::protobuf::internal::kEmptyString) {
         updatekey_->clear();
+      }
+    }
+    codingscheme_ = 1;
+    if (has_codingsetting()) {
+      if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+        codingsetting_->clear();
       }
     }
   }
@@ -14666,6 +14684,44 @@ bool BlockTransferEndRequestPro::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(50)) goto parse_blockLocation;
+        if (input->ExpectTag(56)) goto parse_codingScheme;
+        break;
+      }
+      
+      // optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
+      case 7: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_codingScheme:
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::ncvfs::PutSegmentInitRequestPro_CodingScheme_IsValid(value)) {
+            set_codingscheme(static_cast< ::ncvfs::PutSegmentInitRequestPro_CodingScheme >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(7, value);
+          }
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(66)) goto parse_codingSetting;
+        break;
+      }
+      
+      // optional string codingSetting = 8;
+      case 8: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED) {
+         parse_codingSetting:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_codingsetting()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+            this->codingsetting().data(), this->codingsetting().length(),
+            ::google::protobuf::internal::WireFormat::PARSE);
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -14725,6 +14781,21 @@ void BlockTransferEndRequestPro::SerializeWithCachedSizes(
       6, this->blocklocation(i), output);
   }
   
+  // optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
+  if (has_codingscheme()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      7, this->codingscheme(), output);
+  }
+  
+  // optional string codingSetting = 8;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      8, this->codingsetting(), output);
+  }
+  
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -14773,6 +14844,22 @@ void BlockTransferEndRequestPro::SerializeWithCachedSizes(
         6, this->blocklocation(i), target);
   }
   
+  // optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
+  if (has_codingscheme()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      7, this->codingscheme(), target);
+  }
+  
+  // optional string codingSetting = 8;
+  if (has_codingsetting()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8String(
+      this->codingsetting().data(), this->codingsetting().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE);
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        8, this->codingsetting(), target);
+  }
+  
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -14805,6 +14892,19 @@ int BlockTransferEndRequestPro::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->updatekey());
+    }
+    
+    // optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
+    if (has_codingscheme()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->codingscheme());
+    }
+    
+    // optional string codingSetting = 8;
+    if (has_codingsetting()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->codingsetting());
     }
     
   }
@@ -14864,6 +14964,12 @@ void BlockTransferEndRequestPro::MergeFrom(const BlockTransferEndRequestPro& fro
     if (from.has_updatekey()) {
       set_updatekey(from.updatekey());
     }
+    if (from.has_codingscheme()) {
+      set_codingscheme(from.codingscheme());
+    }
+    if (from.has_codingsetting()) {
+      set_codingsetting(from.codingsetting());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -14893,6 +14999,8 @@ void BlockTransferEndRequestPro::Swap(BlockTransferEndRequestPro* other) {
     std::swap(updatekey_, other->updatekey_);
     offsetlength_.Swap(&other->offsetlength_);
     blocklocation_.Swap(&other->blocklocation_);
+    std::swap(codingscheme_, other->codingscheme_);
+    std::swap(codingsetting_, other->codingsetting_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

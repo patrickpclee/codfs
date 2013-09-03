@@ -15,6 +15,19 @@ struct BlockInfo {
     vector<BlockLocation> parityVector; // pair of <osdid, blockid>
     vector<offset_length_t> offlenVector;
     BlockType blockType;
+
+    // only for update
+    CodingScheme codingScheme;
+    string codingSetting;
+
+    BlockInfo() {
+        segmentId = 0;
+        blockId = 0;
+        blockSize = 0;
+        blockType = DEFAULT_BLOCK_TYPE;
+        codingScheme = DEFAULT_CODING;
+        codingSetting = "";
+    }
 };
 
 struct BlockData {

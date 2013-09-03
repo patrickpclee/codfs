@@ -16,10 +16,11 @@ BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
 }
 
 BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
-		Communicator* communicator, uint32_t osdSockfd, uint64_t segmentId,
-		uint32_t blockId, DataMsgType dataMsgType, string updateKey,
-		vector<offset_length_t> offsetLength, vector<BlockLocation> parityList) :
-		Message(communicator) {
+        Communicator* communicator, uint32_t osdSockfd, uint64_t segmentId,
+        uint32_t blockId, DataMsgType dataMsgType, string updateKey,
+        vector<offset_length_t> offsetLength, vector<BlockLocation> parityList,
+        CodingScheme codingScheme, string codingSetting) :
+        Message(communicator) {
 
 	_sockfd = osdSockfd;
 	_segmentId = segmentId;
@@ -28,6 +29,8 @@ BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
 	_updateKey = updateKey;
 	_offsetLength = offsetLength;
 	_parityList = parityList;
+	_codingScheme = codingScheme;
+	_codingSetting = codingSetting;
 }
 
 void BlockTransferEndRequestMsg::prepareProtocolMsg() {
@@ -39,6 +42,9 @@ void BlockTransferEndRequestMsg::prepareProtocolMsg() {
 	blockTransferEndRequestPro.set_datamsgtype(
 			(ncvfs::DataMsgPro_DataMsgType) _dataMsgType);
 	blockTransferEndRequestPro.set_updatekey(_updateKey);
+    blockTransferEndRequestPro.set_codingscheme(
+            (ncvfs::PutSegmentInitRequestPro_CodingScheme) _codingScheme);
+    blockTransferEndRequestPro.set_codingsetting(_codingSetting);
 
 	vector<offset_length_t>::iterator it;
 	for (it = _offsetLength.begin(); it < _offsetLength.end(); ++it) {
@@ -79,6 +85,8 @@ void BlockTransferEndRequestMsg::parse(char* buf) {
 	_blockId = blockTransferEndRequestPro.blockid();
 	_dataMsgType = (DataMsgType) blockTransferEndRequestPro.datamsgtype();
 	_updateKey = blockTransferEndRequestPro.updatekey();
+	_codingScheme = (CodingScheme) blockTransferEndRequestPro.codingscheme();
+	_codingSetting = blockTransferEndRequestPro.codingsetting();
 
 	for (int i = 0; i < blockTransferEndRequestPro.offsetlength_size(); ++i) {
 		offset_length_t tempOffsetLength;
@@ -106,12 +114,13 @@ void BlockTransferEndRequestMsg::parse(char* buf) {
 void BlockTransferEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putBlockEndProcessor(_msgHeader.requestId, _sockfd, _segmentId,
-			_blockId, _dataMsgType, _updateKey, _offsetLength, _parityList);
+			_blockId, _dataMsgType, _updateKey, _offsetLength, _parityList, _codingScheme, _codingSetting);
 #endif
 }
 
 void BlockTransferEndRequestMsg::printProtocol() {
 	debug(
-			"[BLOCK_TRANSFER_END_REQUEST] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", dataMsgType = %d\n",
-			_segmentId, _blockId, _dataMsgType);
+            "[BLOCK_TRANSFER_END_REQUEST] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", dataMsgType = %d, codingScheme = %d, codingSetting = %s\n",
+            _segmentId, _blockId, _dataMsgType, _codingScheme,
+            _codingSetting.c_str());
 }

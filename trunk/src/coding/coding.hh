@@ -92,6 +92,9 @@ public:
 
 	virtual uint32_t getBlockSize(uint32_t segmentSize, string setting) = 0; 
 
+	BlockData computeDelta(BlockData oldBlock, BlockData newBlock,
+	        vector<offset_length_t> offsetLength);
+
 	/**
 	 * Round up a number to the nearest multiple
 	 * @param numToRound Number to round
@@ -111,6 +114,8 @@ public:
 
 	static void bitwiseXor(char* result, char* srcA, char* srcB,
 			uint32_t length);
+
+	uint32_t getCombinedLength(vector<offset_length_t> offsetLength);
 
 	// For using Memory Pool in Jerasure implementations
 

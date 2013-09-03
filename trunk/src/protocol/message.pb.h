@@ -4890,6 +4890,24 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro >*
       mutable_blocklocation();
   
+  // optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
+  inline bool has_codingscheme() const;
+  inline void clear_codingscheme();
+  static const int kCodingSchemeFieldNumber = 7;
+  inline ::ncvfs::PutSegmentInitRequestPro_CodingScheme codingscheme() const;
+  inline void set_codingscheme(::ncvfs::PutSegmentInitRequestPro_CodingScheme value);
+  
+  // optional string codingSetting = 8;
+  inline bool has_codingsetting() const;
+  inline void clear_codingsetting();
+  static const int kCodingSettingFieldNumber = 8;
+  inline const ::std::string& codingsetting() const;
+  inline void set_codingsetting(const ::std::string& value);
+  inline void set_codingsetting(const char* value);
+  inline void set_codingsetting(const char* value, size_t size);
+  inline ::std::string* mutable_codingsetting();
+  inline ::std::string* release_codingsetting();
+  
   // @@protoc_insertion_point(class_scope:ncvfs.BlockTransferEndRequestPro)
  private:
   inline void set_has_segmentid();
@@ -4900,6 +4918,10 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   inline void clear_has_datamsgtype();
   inline void set_has_updatekey();
   inline void clear_has_updatekey();
+  inline void set_has_codingscheme();
+  inline void clear_has_codingscheme();
+  inline void set_has_codingsetting();
+  inline void clear_has_codingsetting();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -4909,9 +4931,11 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   ::std::string* updatekey_;
   ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro > blocklocation_;
+  ::std::string* codingsetting_;
+  int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -10707,6 +10731,87 @@ BlockTransferEndRequestPro::blocklocation() const {
 inline ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro >*
 BlockTransferEndRequestPro::mutable_blocklocation() {
   return &blocklocation_;
+}
+
+// optional .ncvfs.PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
+inline bool BlockTransferEndRequestPro::has_codingscheme() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void BlockTransferEndRequestPro::set_has_codingscheme() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void BlockTransferEndRequestPro::clear_has_codingscheme() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void BlockTransferEndRequestPro::clear_codingscheme() {
+  codingscheme_ = 1;
+  clear_has_codingscheme();
+}
+inline ::ncvfs::PutSegmentInitRequestPro_CodingScheme BlockTransferEndRequestPro::codingscheme() const {
+  return static_cast< ::ncvfs::PutSegmentInitRequestPro_CodingScheme >(codingscheme_);
+}
+inline void BlockTransferEndRequestPro::set_codingscheme(::ncvfs::PutSegmentInitRequestPro_CodingScheme value) {
+  GOOGLE_DCHECK(::ncvfs::PutSegmentInitRequestPro_CodingScheme_IsValid(value));
+  set_has_codingscheme();
+  codingscheme_ = value;
+}
+
+// optional string codingSetting = 8;
+inline bool BlockTransferEndRequestPro::has_codingsetting() const {
+  return (_has_bits_[0] & 0x00000080u) != 0;
+}
+inline void BlockTransferEndRequestPro::set_has_codingsetting() {
+  _has_bits_[0] |= 0x00000080u;
+}
+inline void BlockTransferEndRequestPro::clear_has_codingsetting() {
+  _has_bits_[0] &= ~0x00000080u;
+}
+inline void BlockTransferEndRequestPro::clear_codingsetting() {
+  if (codingsetting_ != &::google::protobuf::internal::kEmptyString) {
+    codingsetting_->clear();
+  }
+  clear_has_codingsetting();
+}
+inline const ::std::string& BlockTransferEndRequestPro::codingsetting() const {
+  return *codingsetting_;
+}
+inline void BlockTransferEndRequestPro::set_codingsetting(const ::std::string& value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void BlockTransferEndRequestPro::set_codingsetting(const char* value) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(value);
+}
+inline void BlockTransferEndRequestPro::set_codingsetting(const char* value, size_t size) {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  codingsetting_->assign(reinterpret_cast<const char*>(value), size);
+}
+inline ::std::string* BlockTransferEndRequestPro::mutable_codingsetting() {
+  set_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    codingsetting_ = new ::std::string;
+  }
+  return codingsetting_;
+}
+inline ::std::string* BlockTransferEndRequestPro::release_codingsetting() {
+  clear_has_codingsetting();
+  if (codingsetting_ == &::google::protobuf::internal::kEmptyString) {
+    return NULL;
+  } else {
+    ::std::string* temp = codingsetting_;
+    codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
+    return temp;
+  }
 }
 
 // -------------------------------------------------------------------

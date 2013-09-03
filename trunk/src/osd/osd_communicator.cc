@@ -180,7 +180,9 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 	unlockDataQueue(sockfd);
 #endif
 
-	putBlockEnd(sockfd, segmentId, blockId, dataMsgType, updateKey, offsetLength, parityList);
+    putBlockEnd(sockfd, segmentId, blockId, dataMsgType, updateKey,
+            offsetLength, parityList, blockData.info.codingScheme,
+            blockData.info.codingSetting);
 
 	cout << "Put Block ID = " << segmentId << "." << blockId << " Finished"
 			<< endl;
@@ -290,13 +292,13 @@ void OsdCommunicator::putBlockData(uint32_t sockfd, uint64_t segmentId,
 
 void OsdCommunicator::putBlockEnd(uint32_t sockfd, uint64_t segmentId,
 		uint32_t blockId, DataMsgType dataMsgType, string updateKey,
-		vector<offset_length_t> offsetLength, vector<BlockLocation> parityList) {
+		vector<offset_length_t> offsetLength, vector<BlockLocation> parityList, CodingScheme codingScheme, string codingSetting) {
 
 	// Step 3 of the upload process
 
 	BlockTransferEndRequestMsg* blockTransferEndRequestMsg =
 			new BlockTransferEndRequestMsg(this, sockfd, segmentId, blockId,
-					dataMsgType, updateKey, offsetLength, parityList);
+					dataMsgType, updateKey, offsetLength, parityList, codingScheme, codingSetting);
 
 	blockTransferEndRequestMsg->prepareProtocolMsg();
 	addMessage(blockTransferEndRequestMsg, true);
