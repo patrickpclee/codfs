@@ -26,12 +26,16 @@ def main():
     fileSize = convertHumanReadable(sys.argv[1]) 
     updateSize = convertHumanReadable(sys.argv[2]) 
     numOfWrite = convertHumanReadable(sys.argv[3])
+    segmentSize = convertHumanReadable("10M")
     fileName = sys.argv[4]
 
     random.seed(fileName)
+    initOffset = random.randint(0, segmentSize-updateSize) 
     for i in range(numOfWrite):
-        offset = random.randint(0, fileSize-updateSize)
-        print "%s %d %d" %(fileName, offset, updateSize)
+        print "%s %d %d" %(fileName, initOffset, updateSize)
+        initOffset += segmentSize
+        if (initOffset >= fileSize):
+            initOffset = random.randint(0, segmentSize-updateSize)
 
 if __name__ == '__main__':
     main()
