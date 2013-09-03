@@ -772,7 +772,9 @@ void StorageModule::doFlushFile(string filePath, bool &isFinished) {
     try {
         filePtr = _openedFile->get(filePath);
         fflush(filePtr);
-        //fsync(fileno(filePtr));
+#ifdef USE_FSYNC
+        fsync(fileno(filePtr));
+#endif
     } catch (out_of_range& oor) { // file pointer not found in cache
         return; // file already closed by cache, do nothing
     }
