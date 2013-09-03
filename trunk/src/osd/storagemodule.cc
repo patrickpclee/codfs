@@ -245,13 +245,13 @@ void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
 
         createFile(filepath);
 
-        _deltaIdMap[blockKey] = 0;
-        _deltaLocationMap[blockKey] = vector<DeltaLocation>();
+        _deltaIdMap.set(blockKey, 0);
+        _deltaLocationMap.set(blockKey, vector<DeltaLocation>());
         ReserveSpaceInfo reserveSpaceInfo;
         reserveSpaceInfo.currentOffset = length;
         reserveSpaceInfo.remainingReserveSpace = 0;
         reserveSpaceInfo.blockSize = length;
-        _reserveSpaceMap[blockKey] = reserveSpaceInfo;
+        _reserveSpaceMap.set(blockKey, reserveSpaceInfo);
     }
 }
 
@@ -277,7 +277,7 @@ void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
         reserveSpaceInfo.currentOffset = offset;
         reserveSpaceInfo.remainingReserveSpace = reserveLength;
         reserveSpaceInfo.blockSize = offset;
-        _reserveSpaceMap[blockKey] = reserveSpaceInfo;
+        _reserveSpaceMap.set(blockKey, reserveSpaceInfo);
     }
 }
 
@@ -308,8 +308,8 @@ uint32_t StorageModule::getNextDeltaId (uint32_t segmentId, uint32_t blockId) {
     const string blockKey = getBlockKey (segmentId, blockId);
     RWMutex* rwmutex = obtainRWMutex(blockKey);
     writeLock wtlock(*rwmutex);
-    uint32_t curDeltaId = _deltaIdMap[blockKey];
-    _deltaIdMap[blockKey]++;
+    uint32_t curDeltaId = _deltaIdMap.get(blockKey);
+    _deltaIdMap.increment(blockKey);
     return curDeltaId;
 }
 
@@ -552,7 +552,8 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
     MemoryPool::getInstance().poolFree(blockData.buf);
 
     // remove deltas which are not in reserve
-    for (DeltaLocation deltaLocation : _deltaLocationMap.get(blockKey)) {
+    vector<DeltaLocation> &deltaLocationList = _deltaLocationMap.get(blockKey);
+    for (DeltaLocation deltaLocation : deltaLocationList) {
         if (!deltaLocation.isReserveSpace) {
             const string deltaBlockPath = generateDeltaBlockPath(segmentId, blockId, deltaLocation.deltaId,
                     _blockFolder);
@@ -564,7 +565,7 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
     }
 
     // remove all delta information
-    _deltaLocationMap.get(blockKey).clear();
+    deltaLocationList.clear();
     _reserveSpaceMap.get(blockKey).remainingReserveSpace = RESERVE_SPACE_SIZE;
     _reserveSpaceMap.get(blockKey).currentOffset = blockData.info.blockSize;
 }
@@ -665,7 +666,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     const string deltaKey = generateDeltaKey (segmentId, blockId, deltaId);
     const uint32_t combinedLength = getCombinedLength(offsetLength);
 
-    ReserveSpaceInfo &reserveSpaceInfo = _reserveSpaceMap[blockKey];
+    ReserveSpaceInfo &reserveSpaceInfo = _reserveSpaceMap.get(blockKey);
 
     DeltaLocation deltaLocation;
     deltaLocation.blockId = blockId;
