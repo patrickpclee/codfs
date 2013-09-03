@@ -24,7 +24,7 @@ typedef struct {
 
 // Settings
 
-const int WORKER_NUM = 1;
+const int WORKER_NUM = 10;
 string TARGET_FILE;
 vector <TraceInput> traceInput;
 mutex inputMutex;
@@ -48,6 +48,7 @@ void work() {
     char* buf = NULL;
     LL bufSize = 0;
 
+    FILE* fp = fopen(TARGET_FILE.c_str(), "rb+");
     while (1) {
         inputMutex.lock();
         int idx = inputIndex++;
@@ -58,15 +59,14 @@ void work() {
                 buf = (char*)realloc(buf, input.length);
                 bufSize = input.length;
             }
-            FILE* fp = fopen(TARGET_FILE.c_str(), "rb+");
             memset(buf, rand()%128, input.length);
             pwrite(fileno(fp), buf, input.length, input.offset);
-            fclose(fp);
         } else {
             break;
         }
     }
     free(buf);
+    fclose(fp);
     done++;
 }
 

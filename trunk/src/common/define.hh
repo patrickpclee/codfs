@@ -80,6 +80,7 @@ typedef boost::unique_lock<RWMutex> writeLock;
 //#define USE_IO_THREADS
 #define IO_THREADS 2
 #define IO_POLL_INTERVAL 10000
+#define USE_FSYNC
 
 // protocol/message.hh
 #define USE_MESSAGE_MEMORY_POOL
