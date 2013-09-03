@@ -434,7 +434,7 @@ BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
     debug ("Read delta from blockPath = %s\n", blockPath.c_str());
 
     string deltaKey = generateDeltaKey (segmentId, blockId, deltaId);
-    vector<offset_length_t> offsetLength = _deltaOffsetLength[deltaKey];
+    vector<offset_length_t> offsetLength = _deltaOffsetLength.get(deltaKey);
     uint32_t combinedLength = getCombinedLength(offsetLength);
 
     debug ("Read delta length = %" PRIu32 " offsetLength size = %zu\n", combinedLength, offsetLength.size());
@@ -499,7 +499,7 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
         if (deltaLocation.isReserveSpace) {
             debug ("Reading from Reserve Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 "\n", segmentId, blockId, deltaId);
             string deltaKey = generateDeltaKey (segmentId, blockId, deltaId);
-            vector<offset_length_t> offsetLength = _deltaOffsetLength[deltaKey];
+            vector<offset_length_t> offsetLength = _deltaOffsetLength.get(deltaKey);
             uint32_t combinedLength = getCombinedLength(offsetLength);
             delta.info.segmentId = segmentId;
             delta.info.blockId = blockId;
@@ -713,7 +713,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
         reserveSpaceInfo.remainingReserveSpace -= combinedLength;
     }
 
-    _deltaOffsetLength[deltaKey] = offsetLength;
+    _deltaOffsetLength.set(deltaKey, offsetLength);
     _deltaLocationMap.get(blockKey).push_back(deltaLocation);
 
     return byteWritten;
