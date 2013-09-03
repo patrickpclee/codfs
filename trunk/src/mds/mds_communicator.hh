@@ -164,6 +164,7 @@ public:
 
 	vector<bool> getOsdStatusRequest(vector<uint32_t> osdIdList);
 
+    void replyUploadSegmentAck(uint32_t requestId, uint32_t connectionId, uint64_t segmentId);
 private:
 };
 #endif

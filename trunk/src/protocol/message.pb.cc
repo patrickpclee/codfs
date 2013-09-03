@@ -108,6 +108,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* SwitchPrimaryOsdReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   SwitchPrimaryOsdReplyPro_reflection_ = NULL;
+const ::google::protobuf::Descriptor* UploadSegmentAckReplyPro_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  UploadSegmentAckReplyPro_reflection_ = NULL;
 const ::google::protobuf::Descriptor* GetSegmentInfoReplyPro_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   GetSegmentInfoReplyPro_reflection_ = NULL;
@@ -709,7 +712,22 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SwitchPrimaryOsdReplyPro));
-  GetSegmentInfoReplyPro_descriptor_ = file->message_type(29);
+  UploadSegmentAckReplyPro_descriptor_ = file->message_type(29);
+  static const int UploadSegmentAckReplyPro_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadSegmentAckReplyPro, segmentid_),
+  };
+  UploadSegmentAckReplyPro_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      UploadSegmentAckReplyPro_descriptor_,
+      UploadSegmentAckReplyPro::default_instance_,
+      UploadSegmentAckReplyPro_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadSegmentAckReplyPro, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadSegmentAckReplyPro, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(UploadSegmentAckReplyPro));
+  GetSegmentInfoReplyPro_descriptor_ = file->message_type(30);
   static const int GetSegmentInfoReplyPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSegmentInfoReplyPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSegmentInfoReplyPro, nodelist_),
@@ -728,7 +746,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetSegmentInfoReplyPro));
-  CacheSegmentRequestPro_descriptor_ = file->message_type(30);
+  CacheSegmentRequestPro_descriptor_ = file->message_type(31);
   static const int CacheSegmentRequestPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CacheSegmentRequestPro, segmentid_),
   };
@@ -743,7 +761,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(CacheSegmentRequestPro));
-  GetPrimaryListRequestPro_descriptor_ = file->message_type(31);
+  GetPrimaryListRequestPro_descriptor_ = file->message_type(32);
   static const int GetPrimaryListRequestPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListRequestPro, numofobjs_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListRequestPro, primarylist_),
@@ -759,7 +777,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrimaryListRequestPro));
-  SegmentLocationPro_descriptor_ = file->message_type(32);
+  SegmentLocationPro_descriptor_ = file->message_type(33);
   static const int SegmentLocationPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SegmentLocationPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SegmentLocationPro, primaryid_),
@@ -776,7 +794,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SegmentLocationPro));
-  RecoveryTriggerReplyPro_descriptor_ = file->message_type(33);
+  RecoveryTriggerReplyPro_descriptor_ = file->message_type(34);
   static const int RecoveryTriggerReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecoveryTriggerReplyPro, segmentlocations_),
   };
@@ -791,7 +809,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RecoveryTriggerReplyPro));
-  UploadSegmentAckPro_descriptor_ = file->message_type(34);
+  UploadSegmentAckPro_descriptor_ = file->message_type(35);
   static const int UploadSegmentAckPro_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadSegmentAckPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UploadSegmentAckPro, codingscheme_),
@@ -811,7 +829,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(UploadSegmentAckPro));
-  GetSegmentInfoRequestPro_descriptor_ = file->message_type(35);
+  GetSegmentInfoRequestPro_descriptor_ = file->message_type(36);
   static const int GetSegmentInfoRequestPro_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSegmentInfoRequestPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSegmentInfoRequestPro, osdid_),
@@ -829,7 +847,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetSegmentInfoRequestPro));
-  CacheSegmentReplyPro_descriptor_ = file->message_type(36);
+  CacheSegmentReplyPro_descriptor_ = file->message_type(37);
   static const int CacheSegmentReplyPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CacheSegmentReplyPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(CacheSegmentReplyPro, osdid_),
@@ -845,7 +863,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(CacheSegmentReplyPro));
-  ReportDeletedCachePro_descriptor_ = file->message_type(37);
+  ReportDeletedCachePro_descriptor_ = file->message_type(38);
   static const int ReportDeletedCachePro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReportDeletedCachePro, segmentidlist_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ReportDeletedCachePro, osdid_),
@@ -861,7 +879,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ReportDeletedCachePro));
-  PutSegmentInitReplyPro_descriptor_ = file->message_type(38);
+  PutSegmentInitReplyPro_descriptor_ = file->message_type(39);
   static const int PutSegmentInitReplyPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentInitReplyPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutSegmentInitReplyPro, datamsgtype_),
@@ -877,7 +895,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutSegmentInitReplyPro));
-  SegmentTransferEndReplyPro_descriptor_ = file->message_type(39);
+  SegmentTransferEndReplyPro_descriptor_ = file->message_type(40);
   static const int SegmentTransferEndReplyPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SegmentTransferEndReplyPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(SegmentTransferEndReplyPro, issmallsegment_),
@@ -893,7 +911,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(SegmentTransferEndReplyPro));
-  PutBlockInitRequestPro_descriptor_ = file->message_type(40);
+  PutBlockInitRequestPro_descriptor_ = file->message_type(41);
   static const int PutBlockInitRequestPro_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutBlockInitRequestPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutBlockInitRequestPro, blockid_),
@@ -913,7 +931,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutBlockInitRequestPro));
-  BlockDataPro_descriptor_ = file->message_type(41);
+  BlockDataPro_descriptor_ = file->message_type(42);
   static const int BlockDataPro_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockDataPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockDataPro, blockid_),
@@ -933,7 +951,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockDataPro));
-  BlockTransferEndRequestPro_descriptor_ = file->message_type(42);
+  BlockTransferEndRequestPro_descriptor_ = file->message_type(43);
   static const int BlockTransferEndRequestPro_offsets_[6] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndRequestPro, blockid_),
@@ -953,7 +971,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockTransferEndRequestPro));
-  PutBlockInitReplyPro_descriptor_ = file->message_type(43);
+  PutBlockInitReplyPro_descriptor_ = file->message_type(44);
   static const int PutBlockInitReplyPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutBlockInitReplyPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(PutBlockInitReplyPro, blockid_),
@@ -969,7 +987,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(PutBlockInitReplyPro));
-  BlockTransferEndReplyPro_descriptor_ = file->message_type(44);
+  BlockTransferEndReplyPro_descriptor_ = file->message_type(45);
   static const int BlockTransferEndReplyPro_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndReplyPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(BlockTransferEndReplyPro, blockid_),
@@ -985,7 +1003,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(BlockTransferEndReplyPro));
-  GetBlockInitRequestPro_descriptor_ = file->message_type(45);
+  GetBlockInitRequestPro_descriptor_ = file->message_type(46);
   static const int GetBlockInitRequestPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitRequestPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitRequestPro, blockid_),
@@ -1004,7 +1022,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetBlockInitRequestPro));
-  GetBlockInitReplyPro_descriptor_ = file->message_type(46);
+  GetBlockInitReplyPro_descriptor_ = file->message_type(47);
   static const int GetBlockInitReplyPro_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitReplyPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetBlockInitReplyPro, blockid_),
@@ -1022,7 +1040,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetBlockInitReplyPro));
-  OsdStartupPro_descriptor_ = file->message_type(47);
+  OsdStartupPro_descriptor_ = file->message_type(48);
   static const int OsdStartupPro_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStartupPro, osdcapacity_),
@@ -1041,7 +1059,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OsdStartupPro));
-  OsdShutdownPro_descriptor_ = file->message_type(48);
+  OsdShutdownPro_descriptor_ = file->message_type(49);
   static const int OsdShutdownPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdShutdownPro, osdid_),
   };
@@ -1056,7 +1074,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OsdShutdownPro));
-  OsdStatUpdateReplyPro_descriptor_ = file->message_type(49);
+  OsdStatUpdateReplyPro_descriptor_ = file->message_type(50);
   static const int OsdStatUpdateReplyPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStatUpdateReplyPro, osdid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OsdStatUpdateReplyPro, osdcapacity_),
@@ -1073,7 +1091,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OsdStatUpdateReplyPro));
-  GetSecondaryListRequestPro_descriptor_ = file->message_type(50);
+  GetSecondaryListRequestPro_descriptor_ = file->message_type(51);
   static const int GetSecondaryListRequestPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, numofsegs_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListRequestPro, primaryid_),
@@ -1090,7 +1108,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetSecondaryListRequestPro));
-  OsdStatUpdateRequestPro_descriptor_ = file->message_type(51);
+  OsdStatUpdateRequestPro_descriptor_ = file->message_type(52);
   static const int OsdStatUpdateRequestPro_offsets_[1] = {
   };
   OsdStatUpdateRequestPro_reflection_ =
@@ -1104,7 +1122,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OsdStatUpdateRequestPro));
-  GetSecondaryListReplyPro_descriptor_ = file->message_type(52);
+  GetSecondaryListReplyPro_descriptor_ = file->message_type(53);
   static const int GetSecondaryListReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetSecondaryListReplyPro, secondarylist_),
   };
@@ -1119,7 +1137,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetSecondaryListReplyPro));
-  NewOsdRegisterPro_descriptor_ = file->message_type(53);
+  NewOsdRegisterPro_descriptor_ = file->message_type(54);
   static const int NewOsdRegisterPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NewOsdRegisterPro, osdid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(NewOsdRegisterPro, osdip_),
@@ -1136,7 +1154,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(NewOsdRegisterPro));
-  OnlineOsdPro_descriptor_ = file->message_type(54);
+  OnlineOsdPro_descriptor_ = file->message_type(55);
   static const int OnlineOsdPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdPro, osdid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdPro, osdip_),
@@ -1153,7 +1171,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OnlineOsdPro));
-  OnlineOsdListPro_descriptor_ = file->message_type(55);
+  OnlineOsdListPro_descriptor_ = file->message_type(56);
   static const int OnlineOsdListPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(OnlineOsdListPro, onlineosdlist_),
   };
@@ -1168,7 +1186,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(OnlineOsdListPro));
-  GetOsdStatusRequestPro_descriptor_ = file->message_type(56);
+  GetOsdStatusRequestPro_descriptor_ = file->message_type(57);
   static const int GetOsdStatusRequestPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusRequestPro, osdids_),
   };
@@ -1183,7 +1201,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetOsdStatusRequestPro));
-  GetOsdStatusReplyPro_descriptor_ = file->message_type(57);
+  GetOsdStatusReplyPro_descriptor_ = file->message_type(58);
   static const int GetOsdStatusReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdStatusReplyPro, osdstatus_),
   };
@@ -1198,7 +1216,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetOsdStatusReplyPro));
-  RepairSegmentInfoPro_descriptor_ = file->message_type(58);
+  RepairSegmentInfoPro_descriptor_ = file->message_type(59);
   static const int RepairSegmentInfoPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RepairSegmentInfoPro, segmentid_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RepairSegmentInfoPro, deadblockids_),
@@ -1215,7 +1233,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RepairSegmentInfoPro));
-  GetPrimaryListReplyPro_descriptor_ = file->message_type(59);
+  GetPrimaryListReplyPro_descriptor_ = file->message_type(60);
   static const int GetPrimaryListReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetPrimaryListReplyPro, primarylist_),
   };
@@ -1230,7 +1248,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(GetPrimaryListReplyPro));
-  RecoveryTriggerRequestPro_descriptor_ = file->message_type(60);
+  RecoveryTriggerRequestPro_descriptor_ = file->message_type(61);
   static const int RecoveryTriggerRequestPro_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecoveryTriggerRequestPro, osdlist_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RecoveryTriggerRequestPro, dstosdlist_),
@@ -1247,7 +1265,7 @@ void protobuf_AssignDesc_message_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RecoveryTriggerRequestPro));
-  GetOsdListReplyPro_descriptor_ = file->message_type(61);
+  GetOsdListReplyPro_descriptor_ = file->message_type(62);
   static const int GetOsdListReplyPro_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(GetOsdListReplyPro, onlineosdlist_),
   };
@@ -1332,6 +1350,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
     GetSegmentIdListReplyPro_descriptor_, &GetSegmentIdListReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     SwitchPrimaryOsdReplyPro_descriptor_, &SwitchPrimaryOsdReplyPro::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    UploadSegmentAckReplyPro_descriptor_, &UploadSegmentAckReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     GetSegmentInfoReplyPro_descriptor_, &GetSegmentInfoReplyPro::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
@@ -1461,6 +1481,8 @@ void protobuf_ShutdownFile_message_2eproto() {
   delete GetSegmentIdListReplyPro_reflection_;
   delete SwitchPrimaryOsdReplyPro::default_instance_;
   delete SwitchPrimaryOsdReplyPro_reflection_;
+  delete UploadSegmentAckReplyPro::default_instance_;
+  delete UploadSegmentAckReplyPro_reflection_;
   delete GetSegmentInfoReplyPro::default_instance_;
   delete GetSegmentInfoReplyPro_reflection_;
   delete CacheSegmentRequestPro::default_instance_;
@@ -1612,81 +1634,82 @@ void protobuf_AddDesc_message_2eproto() {
     "\n\n\006FOLDER\020\003\"F\n\030GetSegmentIdListReplyPro\022"
     "\025\n\rsegmentIdList\030\001 \003(\006\022\023\n\013primaryList\030\002 "
     "\003(\007\"3\n\030SwitchPrimaryOsdReplyPro\022\027\n\017newPr"
-    "imaryOsdId\030\001 \001(\007\"\255\001\n\026GetSegmentInfoReply"
-    "Pro\022\021\n\tsegmentId\030\001 \001(\006\022\020\n\010nodeList\030\002 \003(\007"
-    "\022B\n\014codingScheme\030\003 \001(\0162,.ncvfs.PutSegmen"
-    "tInitRequestPro.CodingScheme\022\025\n\rcodingSe"
-    "tting\030\004 \001(\t\022\023\n\013segmentSize\030\005 \001(\007\"+\n\026Cach"
-    "eSegmentRequestPro\022\021\n\tsegmentId\030\001 \001(\006\"B\n"
-    "\030GetPrimaryListRequestPro\022\021\n\tnumOfObjs\030\001"
-    " \001(\007\022\023\n\013primaryList\030\002 \003(\007\"K\n\022SegmentLoca"
-    "tionPro\022\021\n\tsegmentId\030\001 \001(\006\022\021\n\tprimaryId\030"
-    "\002 \001(\007\022\017\n\007osdList\030\003 \003(\007\"N\n\027RecoveryTrigge"
-    "rReplyPro\0223\n\020segmentLocations\030\001 \003(\0132\031.nc"
-    "vfs.SegmentLocationPro\"\274\001\n\023UploadSegment"
-    "AckPro\022\021\n\tsegmentId\030\001 \001(\006\022B\n\014codingSchem"
-    "e\030\002 \001(\0162,.ncvfs.PutSegmentInitRequestPro"
-    ".CodingScheme\022\025\n\rcodingSetting\030\003 \001(\t\022\020\n\010"
-    "nodeList\030\004 \003(\007\022\020\n\010checksum\030\005 \001(\t\022\023\n\013segm"
-    "entSize\030\006 \001(\007\"c\n\030GetSegmentInfoRequestPr"
-    "o\022\021\n\tsegmentId\030\001 \001(\006\022\r\n\005osdId\030\002 \001(\007\022\021\n\tn"
-    "eedReply\030\003 \001(\010\022\022\n\nisRecovery\030\004 \001(\010\"8\n\024Ca"
-    "cheSegmentReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\r\n"
-    "\005osdId\030\002 \001(\007\"=\n\025ReportDeletedCachePro\022\025\n"
-    "\rsegmentIdList\030\001 \003(\006\022\r\n\005osdId\030\002 \001(\007\"_\n\026P"
-    "utSegmentInitReplyPro\022\021\n\tsegmentId\030\001 \001(\006"
-    "\0222\n\013dataMsgType\030\002 \001(\0162\035.ncvfs.DataMsgPro"
-    ".DataMsgType\"G\n\032SegmentTransferEndReplyP"
-    "ro\022\021\n\tsegmentId\030\001 \001(\006\022\026\n\016isSmallSegment\030"
-    "\002 \001(\010\"\252\001\n\026PutBlockInitRequestPro\022\021\n\tsegm"
-    "entId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\021\n\tblockSiz"
-    "e\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\0222\n\013dataMsgTy"
-    "pe\030\005 \001(\0162\035.ncvfs.DataMsgPro.DataMsgType\022"
-    "\021\n\tupdateKey\030\006 \001(\t\"\231\001\n\014BlockDataPro\022\021\n\ts"
-    "egmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\016\n\006offse"
-    "t\030\003 \001(\006\022\016\n\006length\030\004 \001(\007\0222\n\013dataMsgType\030\005"
-    " \001(\0162\035.ncvfs.DataMsgPro.DataMsgType\022\021\n\tu"
-    "pdateKey\030\006 \001(\t\"\345\001\n\032BlockTransferEndReque"
-    "stPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001("
-    "\007\0222\n\013dataMsgType\030\003 \001(\0162\035.ncvfs.DataMsgPr"
-    "o.DataMsgType\022\021\n\tupdateKey\030\004 \001(\t\022,\n\014offs"
-    "etLength\030\005 \003(\0132\026.ncvfs.OffsetLengthPro\022."
-    "\n\rblockLocation\030\006 \003(\0132\027.ncvfs.BlockLocat"
-    "ionPro\":\n\024PutBlockInitReplyPro\022\021\n\tsegmen"
-    "tId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\">\n\030BlockTrans"
-    "ferEndReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blo"
-    "ckId\030\002 \001(\007\"\260\001\n\026GetBlockInitRequestPro\022\021\n"
-    "\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022,\n\014off"
-    "setLength\030\003 \003(\0132\026.ncvfs.OffsetLengthPro\022"
-    "2\n\013dataMsgType\030\004 \001(\0162\035.ncvfs.DataMsgPro."
-    "DataMsgType\022\020\n\010isParity\030\005 \001(\010\"a\n\024GetBloc"
-    "kInitReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007bloc"
-    "kId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\007\022\022\n\nchunkCou"
-    "nt\030\004 \001(\007\"g\n\rOsdStartupPro\022\r\n\005osdId\030\001 \001(\007"
-    "\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001("
-    "\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007\"\037\n\016Osd"
-    "ShutdownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025OsdStatUpd"
-    "ateReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osdCapacit"
-    "y\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"U\n\032GetSecond"
-    "aryListRequestPro\022\021\n\tnumOfSegs\030\001 \001(\007\022\021\n\t"
-    "primaryId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\006\"\031\n\027Os"
-    "dStatUpdateRequestPro\"J\n\030GetSecondaryLis"
-    "tReplyPro\022.\n\rsecondaryList\030\001 \003(\0132\027.ncvfs"
-    ".BlockLocationPro\"B\n\021NewOsdRegisterPro\022\r"
-    "\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030"
-    "\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005"
-    "osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020OnlineOs"
-    "dListPro\022*\n\ronlineOsdList\030\001 \003(\0132\023.ncvfs."
-    "OnlineOsdPro\"(\n\026GetOsdStatusRequestPro\022\016"
-    "\n\006osdIds\030\001 \003(\007\")\n\024GetOsdStatusReplyPro\022\021"
-    "\n\tosdStatus\030\001 \003(\010\"R\n\024RepairSegmentInfoPr"
-    "o\022\021\n\tsegmentId\030\001 \001(\006\022\024\n\014deadBlockIds\030\002 \003"
-    "(\007\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n\026GetPrimaryListR"
-    "eplyPro\022\023\n\013primaryList\030\001 \003(\007\"V\n\031Recovery"
-    "TriggerRequestPro\022\017\n\007osdList\030\001 \003(\007\022\022\n\nds"
-    "tOsdList\030\002 \003(\007\022\024\n\014dstspecified\030\003 \001(\010\"@\n\022"
-    "GetOsdListReplyPro\022*\n\ronlineOsdList\030\001 \003("
-    "\0132\023.ncvfs.OnlineOsdProB\002H\001", 6026);
+    "imaryOsdId\030\001 \001(\007\"-\n\030UploadSegmentAckRepl"
+    "yPro\022\021\n\tsegmentId\030\001 \001(\006\"\255\001\n\026GetSegmentIn"
+    "foReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\020\n\010nodeLis"
+    "t\030\002 \003(\007\022B\n\014codingScheme\030\003 \001(\0162,.ncvfs.Pu"
+    "tSegmentInitRequestPro.CodingScheme\022\025\n\rc"
+    "odingSetting\030\004 \001(\t\022\023\n\013segmentSize\030\005 \001(\007\""
+    "+\n\026CacheSegmentRequestPro\022\021\n\tsegmentId\030\001"
+    " \001(\006\"B\n\030GetPrimaryListRequestPro\022\021\n\tnumO"
+    "fObjs\030\001 \001(\007\022\023\n\013primaryList\030\002 \003(\007\"K\n\022Segm"
+    "entLocationPro\022\021\n\tsegmentId\030\001 \001(\006\022\021\n\tpri"
+    "maryId\030\002 \001(\007\022\017\n\007osdList\030\003 \003(\007\"N\n\027Recover"
+    "yTriggerReplyPro\0223\n\020segmentLocations\030\001 \003"
+    "(\0132\031.ncvfs.SegmentLocationPro\"\274\001\n\023Upload"
+    "SegmentAckPro\022\021\n\tsegmentId\030\001 \001(\006\022B\n\014codi"
+    "ngScheme\030\002 \001(\0162,.ncvfs.PutSegmentInitReq"
+    "uestPro.CodingScheme\022\025\n\rcodingSetting\030\003 "
+    "\001(\t\022\020\n\010nodeList\030\004 \003(\007\022\020\n\010checksum\030\005 \001(\t\022"
+    "\023\n\013segmentSize\030\006 \001(\007\"c\n\030GetSegmentInfoRe"
+    "questPro\022\021\n\tsegmentId\030\001 \001(\006\022\r\n\005osdId\030\002 \001"
+    "(\007\022\021\n\tneedReply\030\003 \001(\010\022\022\n\nisRecovery\030\004 \001("
+    "\010\"8\n\024CacheSegmentReplyPro\022\021\n\tsegmentId\030\001"
+    " \001(\006\022\r\n\005osdId\030\002 \001(\007\"=\n\025ReportDeletedCach"
+    "ePro\022\025\n\rsegmentIdList\030\001 \003(\006\022\r\n\005osdId\030\002 \001"
+    "(\007\"_\n\026PutSegmentInitReplyPro\022\021\n\tsegmentI"
+    "d\030\001 \001(\006\0222\n\013dataMsgType\030\002 \001(\0162\035.ncvfs.Dat"
+    "aMsgPro.DataMsgType\"G\n\032SegmentTransferEn"
+    "dReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022\026\n\016isSmallS"
+    "egment\030\002 \001(\010\"\252\001\n\026PutBlockInitRequestPro\022"
+    "\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\021\n\tb"
+    "lockSize\030\003 \001(\007\022\022\n\nchunkCount\030\004 \001(\007\0222\n\013da"
+    "taMsgType\030\005 \001(\0162\035.ncvfs.DataMsgPro.DataM"
+    "sgType\022\021\n\tupdateKey\030\006 \001(\t\"\231\001\n\014BlockDataP"
+    "ro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\022\016"
+    "\n\006offset\030\003 \001(\006\022\016\n\006length\030\004 \001(\007\0222\n\013dataMs"
+    "gType\030\005 \001(\0162\035.ncvfs.DataMsgPro.DataMsgTy"
+    "pe\022\021\n\tupdateKey\030\006 \001(\t\"\345\001\n\032BlockTransferE"
+    "ndRequestPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007block"
+    "Id\030\002 \001(\007\0222\n\013dataMsgType\030\003 \001(\0162\035.ncvfs.Da"
+    "taMsgPro.DataMsgType\022\021\n\tupdateKey\030\004 \001(\t\022"
+    ",\n\014offsetLength\030\005 \003(\0132\026.ncvfs.OffsetLeng"
+    "thPro\022.\n\rblockLocation\030\006 \003(\0132\027.ncvfs.Blo"
+    "ckLocationPro\":\n\024PutBlockInitReplyPro\022\021\n"
+    "\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007\">\n\030Blo"
+    "ckTransferEndReplyPro\022\021\n\tsegmentId\030\001 \001(\006"
+    "\022\017\n\007blockId\030\002 \001(\007\"\260\001\n\026GetBlockInitReques"
+    "tPro\022\021\n\tsegmentId\030\001 \001(\006\022\017\n\007blockId\030\002 \001(\007"
+    "\022,\n\014offsetLength\030\003 \003(\0132\026.ncvfs.OffsetLen"
+    "gthPro\0222\n\013dataMsgType\030\004 \001(\0162\035.ncvfs.Data"
+    "MsgPro.DataMsgType\022\020\n\010isParity\030\005 \001(\010\"a\n\024"
+    "GetBlockInitReplyPro\022\021\n\tsegmentId\030\001 \001(\006\022"
+    "\017\n\007blockId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001(\007\022\022\n\nc"
+    "hunkCount\030\004 \001(\007\"g\n\rOsdStartupPro\022\r\n\005osdI"
+    "d\030\001 \001(\007\022\023\n\013osdCapacity\030\002 \001(\007\022\022\n\nosdLoadi"
+    "ng\030\003 \001(\007\022\r\n\005osdIp\030\004 \001(\007\022\017\n\007osdPort\030\005 \001(\007"
+    "\"\037\n\016OsdShutdownPro\022\r\n\005osdId\030\001 \001(\007\"O\n\025Osd"
+    "StatUpdateReplyPro\022\r\n\005osdId\030\001 \001(\007\022\023\n\013osd"
+    "Capacity\030\002 \001(\007\022\022\n\nosdLoading\030\003 \001(\007\"U\n\032Ge"
+    "tSecondaryListRequestPro\022\021\n\tnumOfSegs\030\001 "
+    "\001(\007\022\021\n\tprimaryId\030\002 \001(\007\022\021\n\tblockSize\030\003 \001("
+    "\006\"\031\n\027OsdStatUpdateRequestPro\"J\n\030GetSecon"
+    "daryListReplyPro\022.\n\rsecondaryList\030\001 \003(\0132"
+    "\027.ncvfs.BlockLocationPro\"B\n\021NewOsdRegist"
+    "erPro\022\r\n\005osdId\030\001 \001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007o"
+    "sdPort\030\003 \001(\007\"=\n\014OnlineOsdPro\022\r\n\005osdId\030\001 "
+    "\001(\007\022\r\n\005osdIp\030\002 \001(\007\022\017\n\007osdPort\030\003 \001(\007\">\n\020O"
+    "nlineOsdListPro\022*\n\ronlineOsdList\030\001 \003(\0132\023"
+    ".ncvfs.OnlineOsdPro\"(\n\026GetOsdStatusReque"
+    "stPro\022\016\n\006osdIds\030\001 \003(\007\")\n\024GetOsdStatusRep"
+    "lyPro\022\021\n\tosdStatus\030\001 \003(\010\"R\n\024RepairSegmen"
+    "tInfoPro\022\021\n\tsegmentId\030\001 \001(\006\022\024\n\014deadBlock"
+    "Ids\030\002 \003(\007\022\021\n\tnewOsdIds\030\003 \003(\007\"-\n\026GetPrima"
+    "ryListReplyPro\022\023\n\013primaryList\030\001 \003(\007\"V\n\031R"
+    "ecoveryTriggerRequestPro\022\017\n\007osdList\030\001 \003("
+    "\007\022\022\n\ndstOsdList\030\002 \003(\007\022\024\n\014dstspecified\030\003 "
+    "\001(\010\"@\n\022GetOsdListReplyPro\022*\n\ronlineOsdLi"
+    "st\030\001 \003(\0132\023.ncvfs.OnlineOsdProB\002H\001", 6073);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "message.proto", &protobuf_RegisterTypes);
   HandshakeRequestPro::default_instance_ = new HandshakeRequestPro();
@@ -1718,6 +1741,7 @@ void protobuf_AddDesc_message_2eproto() {
   DownloadFileReplyPro::default_instance_ = new DownloadFileReplyPro();
   GetSegmentIdListReplyPro::default_instance_ = new GetSegmentIdListReplyPro();
   SwitchPrimaryOsdReplyPro::default_instance_ = new SwitchPrimaryOsdReplyPro();
+  UploadSegmentAckReplyPro::default_instance_ = new UploadSegmentAckReplyPro();
   GetSegmentInfoReplyPro::default_instance_ = new GetSegmentInfoReplyPro();
   CacheSegmentRequestPro::default_instance_ = new CacheSegmentRequestPro();
   GetPrimaryListRequestPro::default_instance_ = new GetPrimaryListRequestPro();
@@ -1780,6 +1804,7 @@ void protobuf_AddDesc_message_2eproto() {
   DownloadFileReplyPro::default_instance_->InitAsDefaultInstance();
   GetSegmentIdListReplyPro::default_instance_->InitAsDefaultInstance();
   SwitchPrimaryOsdReplyPro::default_instance_->InitAsDefaultInstance();
+  UploadSegmentAckReplyPro::default_instance_->InitAsDefaultInstance();
   GetSegmentInfoReplyPro::default_instance_->InitAsDefaultInstance();
   CacheSegmentRequestPro::default_instance_->InitAsDefaultInstance();
   GetPrimaryListRequestPro::default_instance_->InitAsDefaultInstance();
@@ -10313,6 +10338,211 @@ void SwitchPrimaryOsdReplyPro::Swap(SwitchPrimaryOsdReplyPro* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = SwitchPrimaryOsdReplyPro_descriptor_;
   metadata.reflection = SwitchPrimaryOsdReplyPro_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int UploadSegmentAckReplyPro::kSegmentIdFieldNumber;
+#endif  // !_MSC_VER
+
+UploadSegmentAckReplyPro::UploadSegmentAckReplyPro()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+}
+
+void UploadSegmentAckReplyPro::InitAsDefaultInstance() {
+}
+
+UploadSegmentAckReplyPro::UploadSegmentAckReplyPro(const UploadSegmentAckReplyPro& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+}
+
+void UploadSegmentAckReplyPro::SharedCtor() {
+  _cached_size_ = 0;
+  segmentid_ = GOOGLE_ULONGLONG(0);
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+UploadSegmentAckReplyPro::~UploadSegmentAckReplyPro() {
+  SharedDtor();
+}
+
+void UploadSegmentAckReplyPro::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void UploadSegmentAckReplyPro::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* UploadSegmentAckReplyPro::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return UploadSegmentAckReplyPro_descriptor_;
+}
+
+const UploadSegmentAckReplyPro& UploadSegmentAckReplyPro::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_message_2eproto();  return *default_instance_;
+}
+
+UploadSegmentAckReplyPro* UploadSegmentAckReplyPro::default_instance_ = NULL;
+
+UploadSegmentAckReplyPro* UploadSegmentAckReplyPro::New() const {
+  return new UploadSegmentAckReplyPro;
+}
+
+void UploadSegmentAckReplyPro::Clear() {
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    segmentid_ = GOOGLE_ULONGLONG(0);
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool UploadSegmentAckReplyPro::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) return false
+  ::google::protobuf::uint32 tag;
+  while ((tag = input->ReadTag()) != 0) {
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional fixed64 segmentId = 1;
+      case 1: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_FIXED64) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_FIXED64>(
+                 input, &segmentid_)));
+          set_has_segmentid();
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectAtEnd()) return true;
+        break;
+      }
+      
+      default: {
+      handle_uninterpreted:
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          return true;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+  return true;
+#undef DO_
+}
+
+void UploadSegmentAckReplyPro::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // optional fixed64 segmentId = 1;
+  if (has_segmentid()) {
+    ::google::protobuf::internal::WireFormatLite::WriteFixed64(1, this->segmentid(), output);
+  }
+  
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+}
+
+::google::protobuf::uint8* UploadSegmentAckReplyPro::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // optional fixed64 segmentId = 1;
+  if (has_segmentid()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteFixed64ToArray(1, this->segmentid(), target);
+  }
+  
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  return target;
+}
+
+int UploadSegmentAckReplyPro::ByteSize() const {
+  int total_size = 0;
+  
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional fixed64 segmentId = 1;
+    if (has_segmentid()) {
+      total_size += 1 + 8;
+    }
+    
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void UploadSegmentAckReplyPro::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const UploadSegmentAckReplyPro* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const UploadSegmentAckReplyPro*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void UploadSegmentAckReplyPro::MergeFrom(const UploadSegmentAckReplyPro& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_segmentid()) {
+      set_segmentid(from.segmentid());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void UploadSegmentAckReplyPro::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void UploadSegmentAckReplyPro::CopyFrom(const UploadSegmentAckReplyPro& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool UploadSegmentAckReplyPro::IsInitialized() const {
+  
+  return true;
+}
+
+void UploadSegmentAckReplyPro::Swap(UploadSegmentAckReplyPro* other) {
+  if (other != this) {
+    std::swap(segmentid_, other->segmentid_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata UploadSegmentAckReplyPro::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = UploadSegmentAckReplyPro_descriptor_;
+  metadata.reflection = UploadSegmentAckReplyPro_reflection_;
   return metadata;
 }
 

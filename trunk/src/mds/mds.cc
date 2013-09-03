@@ -172,6 +172,7 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 	//_metaDataModule->saveNodeList(segmentId, segmentNodeList);
 	//_metaDataModule->setPrimary(segmentId, segmentNodeList[0]);
 
+    _mdsCommunicator->replyUploadSegmentAck(requestId, connectionId, segmentId);
 
 #ifdef USE_SEGMENT_CACHE
 

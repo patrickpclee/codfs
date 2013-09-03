@@ -15,6 +15,7 @@
 #include "metadata/deletefilerequest.hh"
 #include "metadata/deletefilereply.hh"
 #include "metadata/uploadsegmentack.hh"
+#include "metadata/uploadsegmentackreply.hh"
 #include "metadata/getsegmentidlistrequest.hh"
 #include "metadata/getsegmentidlistreply.hh"
 #include "metadata/downloadfilerequest.hh"
@@ -111,6 +112,9 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 		break;
 	case (UPLOAD_SEGMENT_ACK):
 		return new UploadSegmentAckMsg(communicator);
+		break;
+	case (UPLOAD_SEGMENT_ACK_REPLY):
+		return new UploadSegmentAckReplyMsg(communicator);
 		break;
 	case (GET_SEGMENT_ID_LIST_REQUEST):
 		return new GetSegmentIdListRequestMsg(communicator);

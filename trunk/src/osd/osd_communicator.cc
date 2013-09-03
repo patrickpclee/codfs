@@ -322,20 +322,18 @@ void OsdCommunicator::segmentUploadAck(uint64_t segmentId, uint32_t segmentSize,
 			nodeList, checksum);
 
 	uploadSegmentAckMsg->prepareProtocolMsg();
-	addMessage(uploadSegmentAckMsg, false);
+    uploadSegmentAckMsg->printProtocol();
+	addMessage(uploadSegmentAckMsg, true);
 
-	/*
-	 addMessage(segmentUploadAckRequestMsg, true);
-
-	 MessageStatus status = segmentUploadAckRequestMsg->waitForStatusChange();
-	 if(status == READY) {
-	 waitAndDelete(segmentUploadAckMsg);
-	 return ;
-	 } else {
-	 debug_error("Segment Upload Ack Failed [%" PRIu64 "]\n", segmentId);
-	 exit(-1);
-	 }
-	 */
+    MessageStatus status = uploadSegmentAckMsg->waitForStatusChange();
+    if(status == READY) {
+        waitAndDelete(uploadSegmentAckMsg);
+        return;
+    }
+    else {
+        debug_error("Segment Upload Ack Failed [%" PRIu64 "]\n", segmentId);
+        exit(-1);
+    }
 }
 
 // DOWNLOAD

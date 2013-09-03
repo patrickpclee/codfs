@@ -86,5 +86,5 @@ void UploadSegmentAckMsg::doHandle() {
 }
 
 void UploadSegmentAckMsg::printProtocol() {
-	debug("[UPLOAD_SEGMENT_ACK] Segment ID = %" PRIu64 "\n", _segmentId);
+	debug("[UPLOAD_SEGMENT_ACK] Segment ID = %" PRIu64 " Coding Scheme = %d Coding Setting = %s\n", _segmentId, _codingScheme, _codingSetting.c_str());
 }

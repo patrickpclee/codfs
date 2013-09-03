@@ -61,6 +61,7 @@ class SaveSegmentListReplyPro;
 class DownloadFileReplyPro;
 class GetSegmentIdListReplyPro;
 class SwitchPrimaryOsdReplyPro;
+class UploadSegmentAckReplyPro;
 class GetSegmentInfoReplyPro;
 class CacheSegmentRequestPro;
 class GetPrimaryListRequestPro;
@@ -3300,6 +3301,88 @@ class SwitchPrimaryOsdReplyPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static SwitchPrimaryOsdReplyPro* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class UploadSegmentAckReplyPro : public ::google::protobuf::Message {
+ public:
+  UploadSegmentAckReplyPro();
+  virtual ~UploadSegmentAckReplyPro();
+  
+  UploadSegmentAckReplyPro(const UploadSegmentAckReplyPro& from);
+  
+  inline UploadSegmentAckReplyPro& operator=(const UploadSegmentAckReplyPro& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+  
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+  
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const UploadSegmentAckReplyPro& default_instance();
+  
+  void Swap(UploadSegmentAckReplyPro* other);
+  
+  // implements Message ----------------------------------------------
+  
+  UploadSegmentAckReplyPro* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const UploadSegmentAckReplyPro& from);
+  void MergeFrom(const UploadSegmentAckReplyPro& from);
+  void Clear();
+  bool IsInitialized() const;
+  
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  
+  ::google::protobuf::Metadata GetMetadata() const;
+  
+  // nested types ----------------------------------------------------
+  
+  // accessors -------------------------------------------------------
+  
+  // optional fixed64 segmentId = 1;
+  inline bool has_segmentid() const;
+  inline void clear_segmentid();
+  static const int kSegmentIdFieldNumber = 1;
+  inline ::google::protobuf::uint64 segmentid() const;
+  inline void set_segmentid(::google::protobuf::uint64 value);
+  
+  // @@protoc_insertion_point(class_scope:ncvfs.UploadSegmentAckReplyPro)
+ private:
+  inline void set_has_segmentid();
+  inline void clear_has_segmentid();
+  
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+  
+  ::google::protobuf::uint64 segmentid_;
+  
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  
+  friend void  protobuf_AddDesc_message_2eproto();
+  friend void protobuf_AssignDesc_message_2eproto();
+  friend void protobuf_ShutdownFile_message_2eproto();
+  
+  void InitAsDefaultInstance();
+  static UploadSegmentAckReplyPro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -9240,6 +9323,32 @@ inline ::google::protobuf::uint32 SwitchPrimaryOsdReplyPro::newprimaryosdid() co
 inline void SwitchPrimaryOsdReplyPro::set_newprimaryosdid(::google::protobuf::uint32 value) {
   set_has_newprimaryosdid();
   newprimaryosdid_ = value;
+}
+
+// -------------------------------------------------------------------
+
+// UploadSegmentAckReplyPro
+
+// optional fixed64 segmentId = 1;
+inline bool UploadSegmentAckReplyPro::has_segmentid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void UploadSegmentAckReplyPro::set_has_segmentid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void UploadSegmentAckReplyPro::clear_has_segmentid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void UploadSegmentAckReplyPro::clear_segmentid() {
+  segmentid_ = GOOGLE_ULONGLONG(0);
+  clear_has_segmentid();
+}
+inline ::google::protobuf::uint64 UploadSegmentAckReplyPro::segmentid() const {
+  return segmentid_;
+}
+inline void UploadSegmentAckReplyPro::set_segmentid(::google::protobuf::uint64 value) {
+  set_has_segmentid();
+  segmentid_ = value;
 }
 
 // -------------------------------------------------------------------

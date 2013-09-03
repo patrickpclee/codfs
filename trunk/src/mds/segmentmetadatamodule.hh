@@ -3,12 +3,14 @@
 
 #include <stdint.h>
 #include <vector>
+#include <unordered_map>
 
 #include "configmetadatamodule.hh"
 
 #include "../storage/mongodb.hh"
 
 #include "../common/metadata.hh"
+#include "../common/define.hh"
 
 class SegmentMetaDataModule {
 public:
@@ -112,6 +114,9 @@ private:
 
 	/// Underlying Meta Data Storage
 	MongoDB* _segmentMetaDataStorage;
+
+    RWMutex _segmentInfoCacheMutex;
+    std::unordered_map <uint64_t, struct SegmentMetaData> _segmentInfoCache;
 
 	//SegmentMetaDataCache *_segmentMetaDataCache;
 };

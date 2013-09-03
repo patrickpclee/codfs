@@ -19,6 +19,8 @@ SegmentMetaDataModule::SegmentMetaDataModule(
 
 	_collection = "SegmentMetaData";
 
+    _segmentInfoCache.clear();
+
 	_segmentMetaDataStorage = new MongoDB();
 	_segmentMetaDataStorage->connect();
 	_segmentMetaDataStorage->setCollection(_collection);
@@ -29,6 +31,11 @@ SegmentMetaDataModule::SegmentMetaDataModule(
  */
 void SegmentMetaDataModule::saveSegmentInfo(uint64_t segmentId,
 		struct SegmentMetaData segmentInfo) {
+    {
+        writeLock wtLock(_segmentInfoCacheMutex);
+        _segmentInfoCache[segmentId] = segmentInfo;
+    }
+
 	vector<uint32_t>::const_iterator it;
 	BSONArrayBuilder arrb;
 	for (it = segmentInfo._nodeList.begin(); it < segmentInfo._nodeList.end();
@@ -58,6 +65,13 @@ void SegmentMetaDataModule::saveSegmentInfo(uint64_t segmentId,
  */
 struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(
 		uint64_t segmentId) {
+    {
+        readLock rdLock(_segmentInfoCacheMutex);
+        if (_segmentInfoCache.count(segmentId) != 0) {
+            return _segmentInfoCache[segmentId];
+        } 
+        debug_red("SHIT SHIT SHIT on segment id = %" PRIu64 "\n", segmentId);
+    }
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONObj result = _segmentMetaDataStorage->readOne(querySegment);
 
@@ -82,6 +96,11 @@ struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(
 	segmentMetaData._codingScheme = (CodingScheme) result.getField(
 			"codingScheme").numberInt();
 	segmentMetaData._codingSetting = result.getField("codingSetting").str();
+
+    {
+        writeLock wtLock(_segmentInfoCacheMutex);
+        _segmentInfoCache[segmentId] = segmentMetaData;
+    }
 
 	return segmentMetaData;
 }

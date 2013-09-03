@@ -15,6 +15,7 @@
 #include "../protocol/metadata/cachesegmentrequest.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/recoverytriggerreply.hh"
+#include "../protocol/metadata/uploadsegmentackreply.hh"
 //#include "../protocol/metadata/heresfilesize.hh"
 
 extern ConfigLayer* configLayer;
@@ -263,3 +264,13 @@ vector<bool> MdsCommunicator::getOsdStatusRequest(vector<uint32_t> osdIdList) {
 	return {};
 }
 
+
+void MdsCommunicator::replyUploadSegmentAck(uint32_t requestId, 
+    uint32_t connectionId, uint64_t segmentId)  {
+
+    UploadSegmentAckReplyMsg* uploadSegmentAckReplyMsg = 
+        new UploadSegmentAckReplyMsg(this, requestId, connectionId, segmentId);
+    uploadSegmentAckReplyMsg->prepareProtocolMsg();
+    uploadSegmentAckReplyMsg->printProtocol();
+    addMessage(uploadSegmentAckReplyMsg, false);
+}

@@ -248,6 +248,10 @@ message SwitchPrimaryOsdReplyPro {
 // MDS -> OSD
 //
 
+message UploadSegmentAckReplyPro {
+	optional fixed64 segmentId = 1;
+}
+
 message GetSegmentInfoReplyPro {
 	optional fixed64 segmentId = 1;
 	repeated fixed32 nodeList = 2;
