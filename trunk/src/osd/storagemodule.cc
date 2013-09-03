@@ -308,8 +308,7 @@ uint32_t StorageModule::getNextDeltaId (uint32_t segmentId, uint32_t blockId) {
     const string blockKey = getBlockKey (segmentId, blockId);
     RWMutex* rwmutex = obtainRWMutex(blockKey);
     writeLock wtlock(*rwmutex);
-    uint32_t curDeltaId = _deltaIdMap.get(blockKey);
-    _deltaIdMap.increment(blockKey);
+    uint32_t curDeltaId = _deltaIdMap.increment(blockKey) - 1;
     return curDeltaId;
 }
 
