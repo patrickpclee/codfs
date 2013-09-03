@@ -68,6 +68,7 @@ public:
       case UPLOAD_FILE_REPLY: return "UPLOAD_FILE_REPLY";
       case UPLOAD_FILE_REQUEST: return "UPLOAD_FILE_REQUEST";
       case UPLOAD_SEGMENT_ACK: return "UPLOAD_SEGMENT_ACK";
+      case UPLOAD_SEGMENT_ACK_REPLY: return "UPLOAD_SEGMENT_ACK_REPLY";
     }
     return "???";
   }
