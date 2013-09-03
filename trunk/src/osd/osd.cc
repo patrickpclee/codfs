@@ -266,6 +266,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                 while (1) {
                     if (_downloadBlockRemaining.get(segmentId) == 0) {
 
+						/*
                         for (BlockData block : blockDataList) {
                             unsigned char checksum[MD5_DIGEST_LENGTH];
                             memset (checksum, 0, MD5_DIGEST_LENGTH);
@@ -273,6 +274,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                                     checksum);
                             debug ("block ID = %" PRIu32 " checksum = %s\n", block.info.blockId, md5ToHex(checksum).c_str());
                         }
+                        */
 
                         // 5. decode blocks
 

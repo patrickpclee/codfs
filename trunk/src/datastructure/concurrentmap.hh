@@ -5,6 +5,7 @@
 #ifndef CONCURRENTMAP_HH_
 #define CONCURRENTMAP_HH_
 
+#include <map>
 #include <thread>
 
 template<class K, class V, class Compare = std::less<K>,

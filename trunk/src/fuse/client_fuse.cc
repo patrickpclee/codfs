@@ -49,9 +49,9 @@ thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
 
-
 static void removeNameSpace(const char* path) {
-	unlink(path);
+	string fpath = _fuseFolder + string(path);
+	unlink(fpath.c_str());
 	return ;
 }
 

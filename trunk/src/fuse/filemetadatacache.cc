@@ -32,9 +32,9 @@ void FileMetaDataCache::saveMetaData(const struct FileMetaData& fileMetaData) {
 }
 
 void FileMetaDataCache::removeMetaData(uint32_t id) {
-    writeLock wtlock(_metaDataCacheMutex);
 	string path = id2Path(id);
 	{
+        writeLock wtlock(_metaDataCacheMutex);
 		try{
 			_fileIdCache.erase(path);
 			_metaDataCache.erase(id);
