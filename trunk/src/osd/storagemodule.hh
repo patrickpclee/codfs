@@ -512,10 +512,10 @@ private:
     atomic<uint32_t> _currentBlockUsage;
     atomic<uint32_t> _currentSegmentUsage;
 
-    map<string, uint32_t> _deltaIdMap;
-    map<string, vector<offset_length_t>> _deltaOffsetLength;
-    map<string, vector<DeltaLocation>> _deltaLocationMap;
-    map<string, ReserveSpaceInfo> _reserveSpaceMap;
+    ConcurrentMap<string, uint32_t> _deltaIdMap;
+    ConcurrentMap<string, vector<offset_length_t>> _deltaOffsetLength;
+    ConcurrentMap<string, vector<DeltaLocation>> _deltaLocationMap;
+    ConcurrentMap<string, ReserveSpaceInfo> _reserveSpaceMap;
 
     unordered_map<string, boost::shared_mutex*> _deltaRWMutexMap;
     mutex _deltaRWMutexMapMutex;

@@ -301,7 +301,7 @@ void StorageModule::createDeltaBlock(uint64_t segmentId, uint32_t blockId,
 uint32_t StorageModule::getDeltaCount (uint32_t segmentId, uint32_t blockId) {
     const string blockKey = getBlockKey (segmentId, blockId);
     // lock by the caller
-    return _deltaLocationMap[blockKey].size(); // this is the real count of written delta
+    return _deltaLocationMap.get(blockKey).size(); // this is the real count of written delta
 }
 
 uint32_t StorageModule::getNextDeltaId (uint32_t segmentId, uint32_t blockId) {
@@ -474,7 +474,7 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
     blockData.info.segmentId = segmentId;
     blockData.info.blockId = blockId;
     blockData.info.blockType = (BlockType) isParity;
-    blockData.info.blockSize = _reserveSpaceMap[blockKey].blockSize;
+    blockData.info.blockSize = _reserveSpaceMap.get(blockKey).blockSize;
     blockData.info.offlenVector.push_back(make_pair (0, blockData.info.blockSize)); // merged
 
     debug(
@@ -482,7 +482,7 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
             segmentId, blockId, isParity, blockData.info.blockSize, deltaCount);
 
     // read block + reserve to wholeBuf
-    const uint32_t byteToRead = _reserveSpaceMap[blockKey].currentOffset;
+    const uint32_t byteToRead = _reserveSpaceMap.get(blockKey).currentOffset;
     char* wholeBuf = MemoryPool::getInstance().poolMalloc(byteToRead);
     readFile(blockPath, wholeBuf, 0, byteToRead, false);
 
@@ -491,7 +491,7 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
     memcpy (blockData.buf, wholeBuf, blockData.info.blockSize);
 
     // for each delta block, merge into parity for each <offset, length> using XOR
-    for (DeltaLocation deltaLocation : _deltaLocationMap[blockKey]) {
+    for (DeltaLocation deltaLocation : _deltaLocationMap.get(blockKey)) {
         const uint32_t deltaId = deltaLocation.deltaId;
 
         // read from reserved space if delta is inside
@@ -552,7 +552,7 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
     MemoryPool::getInstance().poolFree(blockData.buf);
 
     // remove deltas which are not in reserve
-    for (DeltaLocation deltaLocation : _deltaLocationMap[blockKey]) {
+    for (DeltaLocation deltaLocation : _deltaLocationMap.get(blockKey)) {
         if (!deltaLocation.isReserveSpace) {
             const string deltaBlockPath = generateDeltaBlockPath(segmentId, blockId, deltaLocation.deltaId,
                     _blockFolder);
@@ -564,9 +564,9 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
     }
 
     // remove all delta information
-    _deltaLocationMap[blockKey].clear();
-    _reserveSpaceMap[blockKey].remainingReserveSpace = RESERVE_SPACE_SIZE;
-    _reserveSpaceMap[blockKey].currentOffset = blockData.info.blockSize;
+    _deltaLocationMap.get(blockKey).clear();
+    _reserveSpaceMap.get(blockKey).remainingReserveSpace = RESERVE_SPACE_SIZE;
+    _reserveSpaceMap.get(blockKey).currentOffset = blockData.info.blockSize;
 }
 
 uint32_t StorageModule::writeSegmentData(uint64_t segmentId, char* buf,
@@ -713,7 +713,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     }
 
     _deltaOffsetLength[deltaKey] = offsetLength;
-    _deltaLocationMap[blockKey].push_back(deltaLocation);
+    _deltaLocationMap.get(blockKey).push_back(deltaLocation);
 
     return byteWritten;
 }
