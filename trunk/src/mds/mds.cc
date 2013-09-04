@@ -575,7 +575,7 @@ void Mds::repairSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 			_recoverEndTime.tv_sec--;
 		}
 		long seconds = _recoverEndTime.tv_sec - _recoverStartTime.tv_sec;
-		debug("[RECOVER] Recovery Ends. Duration = %ld.%ld seconds\n", seconds, milliseconds);
+		printf("[RECOVER] Recovery Ends. Duration = %ld.%ld seconds\n", seconds, milliseconds);
 	}
 }
 
