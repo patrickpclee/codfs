@@ -92,8 +92,8 @@ public:
 
 	virtual uint32_t getBlockSize(uint32_t segmentSize, string setting) = 0; 
 
-	BlockData computeDelta(BlockData oldBlock, BlockData newBlock,
-	        vector<offset_length_t> offsetLength);
+	virtual BlockData computeDelta(BlockData oldBlock, BlockData newBlock,
+	        vector<offset_length_t> offsetLength, uint32_t parityBlockId);
 
 	/**
 	 * Round up a number to the nearest multiple

@@ -228,7 +228,7 @@ public:
             string updateKey);
 
     BlockData computeDelta(uint64_t segmentId, uint32_t blockId,
-            BlockData newBlockData, vector<offset_length_t> offsetLength);
+            BlockData newBlockData, vector<offset_length_t> offsetLength, uint32_t parityBlockId);
     void sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
             vector<offset_length_t> offsetLength);
 

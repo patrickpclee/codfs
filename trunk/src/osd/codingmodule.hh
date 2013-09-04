@@ -150,7 +150,7 @@ class CodingModule {
                 vector<offset_length_t> offsetLengthVector);
 
         BlockData computeDelta(CodingScheme codingScheme, string setting, BlockData oldBlock, BlockData newBlock,
-                vector<offset_length_t> offsetLength);
+                vector<offset_length_t> offsetLength, uint32_t parityBlockId);
 
     private:
         map<CodingScheme, Coding*> _codingWorker;

@@ -47,7 +47,8 @@ uint32_t Coding::getParityCountFromSetting(string setting) {
 
 // default function, can be overridden
 BlockData Coding::computeDelta(BlockData oldBlock, BlockData newBlock,
-        vector<offset_length_t> offsetLength) {
+        vector<offset_length_t> offsetLength, uint32_t parityBlockId) {
+
     uint32_t combinedLength = getCombinedLength(offsetLength);
     BlockData delta = oldBlock;
     delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);

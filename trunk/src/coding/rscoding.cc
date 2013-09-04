@@ -403,22 +403,49 @@ uint32_t RSCoding::getBlockSize(uint32_t segmentSize, string setting) {
 	return roundTo((roundTo(segmentSize, k) / k), 4);
 }
 
-/*
 BlockData RSCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
-        vector<offset_length_t> offsetLength) {
+        vector<offset_length_t> offsetLength, uint32_t parityBlockId) {
+
 
     const string codingSetting = newBlock.info.codingSetting;
     const uint32_t combinedLength = getCombinedLength(offsetLength);
 	const vector<uint32_t> params = getParameters(codingSetting);
 	const uint32_t k = params[0];
-	const uint32_t m = params[1];
+
+	// create a dummy blank segment with only the changed block data
+	// oldBlockContainer: |0000 0000 AAAA 0000|
+	// newBlockContainer: |0000 0000 BBBB 0000|
 
 	SegmentData oldBlockContainer, newBlockContainer;
-	BlockData oldCodedBlock = encode (oldBlockContainer, codingSetting);
-	BlockData newCodedBlock = encode (newBlockContainer, codingSetting);
-	BlockData delta
+	uint32_t containerSize = combinedLength * k;
+	oldBlockContainer.info.segLength = containerSize;
+	newBlockContainer.info.segLength = containerSize;
+	oldBlockContainer.buf = MemoryPool::getInstance().poolMalloc(containerSize);
+	newBlockContainer.buf = MemoryPool::getInstance().poolMalloc(containerSize);
+
+	memcpy (oldBlockContainer.buf + combinedLength * oldBlock.info.blockId, oldBlock.buf, combinedLength);
+	memcpy (newBlockContainer.buf + combinedLength * newBlock.info.blockId, newBlock.buf, combinedLength);
+
+	vector<BlockData> oldCodedBlocks = encode (oldBlockContainer, codingSetting);
+	vector<BlockData> newCodedBlocks = encode (newBlockContainer, codingSetting);
+
+    BlockData delta;
+    delta.info = oldBlock.info;
+    delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
+    memcpy (delta.buf, oldCodedBlocks[parityBlockId].buf, combinedLength);
+    bitwiseXor(delta.buf, delta.buf, newCodedBlocks[parityBlockId].buf, combinedLength);
+
+    // cleanup
+    for (int i = 0; i < (int)oldCodedBlocks.size(); i++) {
+        debug ("Freeing %d\n", i);
+        MemoryPool::getInstance().poolFree(oldCodedBlocks[i].buf);
+        MemoryPool::getInstance().poolFree(newCodedBlocks[i].buf);
+    }
+    MemoryPool::getInstance().poolFree(oldBlockContainer.buf);
+    MemoryPool::getInstance().poolFree(newBlockContainer.buf);
+
+    return delta;
 }
-*/
 
 //
 // PRIVATE FUNCTION

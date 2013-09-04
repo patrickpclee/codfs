@@ -744,7 +744,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 }
 
 BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
-        BlockData newBlock, vector<offset_length_t> offsetLength) {
+        BlockData newBlock, vector<offset_length_t> offsetLength, uint32_t parityBlockId) {
 
     BlockData oldBlock = _storageModule->readBlock(segmentId, blockId,
             offsetLength);
@@ -753,7 +753,7 @@ BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
 
     CodingScheme codingScheme = newBlock.info.codingScheme;
     string codingSetting = newBlock.info.codingSetting;
-    BlockData delta = _codingModule->computeDelta(codingScheme, codingSetting, oldBlock, newBlock, offsetLength);
+    BlockData delta = _codingModule->computeDelta(codingScheme, codingSetting, oldBlock, newBlock, offsetLength, parityBlockId);
 
     MemoryPool::getInstance().poolFree(oldBlock.buf);
 
@@ -768,8 +768,8 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
     }
 
     // update delta (should be performed before updating the block in-place)
-    BlockData delta = computeDelta(segmentId, blockId, newBlock, offsetLength);
     for (auto& parityPair : newBlock.info.parityVector) {
+        BlockData delta = computeDelta(segmentId, blockId, newBlock, offsetLength, parityPair.blockId);
 
         BlockLocation blockLocation;
         blockLocation.osdId = parityPair.osdId;
@@ -778,21 +778,15 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
         delta.info.blockId = parityPair.blockId;
         delta.info.blockType = PARITY_BLOCK;
 
-        // make a copy to prevent double free
-        BlockData tempDelta = delta;
-        tempDelta.buf = MemoryPool::getInstance().poolMalloc(delta.info.blockSize);
-        memcpy (tempDelta.buf, delta.buf, delta.info.blockSize);
-
         debug(
                 "Send delta of segment %" PRIu64 " block %" PRIu32 " to OSD %" PRIu32 "\n",
                 segmentId, blockLocation.blockId, blockLocation.osdId);
 
         uint32_t blocktpId = ++_blocktpId;
         _blocktp.schedule(
-                boost::bind(&Osd::distributeBlock, this, segmentId, tempDelta,
+                boost::bind(&Osd::distributeBlock, this, segmentId, delta,
                         blockLocation, PARITY, blocktpId));
     }
-    MemoryPool::getInstance().poolFree(delta.buf);
 }
 
 void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
