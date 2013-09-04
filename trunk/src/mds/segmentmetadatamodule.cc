@@ -27,15 +27,19 @@ SegmentMetaDataModule::SegmentMetaDataModule(
 }
 
 /**
+ * @brief	Save Segment Info to Cache
+ */
+void SegmentMetaDataModule::saveSegmentInfoToCache(uint64_t segmentId,
+		struct SegmentMetaData segmentInfo) {
+    writeLock wtLock(_segmentInfoCacheMutex);
+    _segmentInfoCache[segmentId] = segmentInfo;
+}
+
+/**
  * @brief	Save Segment Info
  */
 void SegmentMetaDataModule::saveSegmentInfo(uint64_t segmentId,
 		struct SegmentMetaData segmentInfo) {
-    {
-        writeLock wtLock(_segmentInfoCacheMutex);
-        _segmentInfoCache[segmentId] = segmentInfo;
-    }
-
 	vector<uint32_t>::const_iterator it;
 	BSONArrayBuilder arrb;
 	for (it = segmentInfo._nodeList.begin(); it < segmentInfo._nodeList.end();
@@ -70,7 +74,6 @@ struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(
         if (_segmentInfoCache.count(segmentId) != 0) {
             return _segmentInfoCache[segmentId];
         } 
-        debug_red("SHIT SHIT SHIT on segment id = %" PRIu64 "\n", segmentId);
     }
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONObj result = _segmentMetaDataStorage->readOne(querySegment);
@@ -110,6 +113,12 @@ struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(
  */
 void SegmentMetaDataModule::saveNodeList(uint64_t segmentId,
 		const vector<uint32_t> &segmentNodeList) {
+    {
+        writeLock wtLock(_segmentInfoCacheMutex);
+        auto it = _segmentInfoCache.find(segmentId);
+        if (it != _segmentInfoCache.end())
+            it->second._nodeList = segmentNodeList;
+    }
 	debug("Save Node List For %" PRIu64 "\n", segmentId);
 	vector<uint32_t>::const_iterator it;
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
@@ -133,6 +142,12 @@ void SegmentMetaDataModule::saveNodeList(uint64_t segmentId,
  * @brief	Read Node List of a Segment
  */
 vector<uint32_t> SegmentMetaDataModule::readNodeList(uint64_t segmentId) {
+    {
+        readLock rdLock(_segmentInfoCacheMutex);
+        auto it = _segmentInfoCache.find(segmentId);
+        if (it != _segmentInfoCache.end())
+            return it->second._nodeList;
+    }
 	vector<uint32_t> nodeList;
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONObj result = _segmentMetaDataStorage->readOne(querySegment);
@@ -146,6 +161,12 @@ vector<uint32_t> SegmentMetaDataModule::readNodeList(uint64_t segmentId) {
  * @brief	Set Primary of a Segment
  */
 void SegmentMetaDataModule::setPrimary(uint64_t segmentId, uint32_t primary) {
+    {
+        writeLock wtLock(_segmentInfoCacheMutex);
+        auto it = _segmentInfoCache.find(segmentId);
+        if (it != _segmentInfoCache.end())
+            it->second._primary = primary;
+    }
 	BSONObj querySegment = BSON ("id" << (long long int) segmentId);
 	BSONObj updateSegment = BSON ("$set" << BSON ("primary" << primary));
 	_segmentMetaDataStorage->update(querySegment, updateSegment);
@@ -157,6 +178,12 @@ void SegmentMetaDataModule::setPrimary(uint64_t segmentId, uint32_t primary) {
  * @brief	Get Primary of a Segment
  */
 uint32_t SegmentMetaDataModule::getPrimary(uint64_t segmentId) {
+    {
+        readLock rdLock(_segmentInfoCacheMutex);
+        auto it = _segmentInfoCache.find(segmentId);
+        if (it != _segmentInfoCache.end())
+            return it->second._primary;
+    }
 	BSONObj querySegment = BSON ("id" << (long long int) segmentId);
 	BSONObj temp = _segmentMetaDataStorage->readOne(querySegment);
 	return (uint32_t) temp.getField("primary").Int();

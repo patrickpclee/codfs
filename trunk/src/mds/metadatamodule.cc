@@ -99,10 +99,18 @@ string MetaDataModule::readChecksum(uint32_t fileId) {
 void MetaDataModule::saveSegmentInfo(uint64_t segmentId,
 		struct SegmentMetaData segmentInfo) {
 	_segmentMetaDataModule->saveSegmentInfo(segmentId, segmentInfo);
-
 	return;
 }
 
+/**
+ * @brief	Save Segment Info to Cache
+ */
+void MetaDataModule::saveSegmentInfoToCache(uint64_t segmentId,
+		struct SegmentMetaData segmentInfo) {
+	_segmentMetaDataModule->saveSegmentInfoToCache(segmentId, segmentInfo);
+
+	return;
+}
 /**
  * @brief	Read Segment Info
  *

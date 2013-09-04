@@ -114,9 +114,10 @@ uint32_t CodingModule::getBlockSize(CodingScheme codingScheme, string setting,
 	return getCoding(codingScheme)->getBlockSize(segmentSize, setting);
 }
 
-BlockData CodingModule::computeDelta(CodingScheme codingScheme, string setting, BlockData oldBlock, BlockData newBlock,
-        vector<offset_length_t> offsetLength, uint32_t parityBlockId) {
-    return getCoding(codingScheme)->computeDelta(oldBlock, newBlock, offsetLength, parityBlockId);
+vector<BlockData> CodingModule::computeDelta(CodingScheme codingScheme, string setting, BlockData oldBlock, BlockData newBlock,
+        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
+    return getCoding(codingScheme)->computeDelta(oldBlock, newBlock,
+            offsetLength, parityVector);
 }
 
 vector<BlockData> CodingModule::unpackUpdates(CodingScheme codingScheme, 

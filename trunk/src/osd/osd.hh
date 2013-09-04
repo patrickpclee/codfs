@@ -227,8 +227,8 @@ public:
             uint32_t length, char* buf, DataMsgType dataMsgType,
             string updateKey);
 
-    BlockData computeDelta(uint64_t segmentId, uint32_t blockId,
-            BlockData newBlockData, vector<offset_length_t> offsetLength, uint32_t parityBlockId);
+    vector<BlockData> computeDelta(uint64_t segmentId, uint32_t blockId,
+        BlockData newBlock, vector<offset_length_t> offsetLength, vector<uint32_t> parityVector);
     void sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
             vector<offset_length_t> offsetLength);
 

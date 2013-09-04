@@ -403,9 +403,8 @@ uint32_t RSCoding::getBlockSize(uint32_t segmentSize, string setting) {
 	return roundTo((roundTo(segmentSize, k) / k), 4);
 }
 
-BlockData RSCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
-        vector<offset_length_t> offsetLength, uint32_t parityBlockId) {
-
+vector<BlockData> RSCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
+        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
 
     const string codingSetting = newBlock.info.codingSetting;
     const uint32_t combinedLength = getCombinedLength(offsetLength);
@@ -429,11 +428,16 @@ BlockData RSCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
 	vector<BlockData> oldCodedBlocks = encode (oldBlockContainer, codingSetting);
 	vector<BlockData> newCodedBlocks = encode (newBlockContainer, codingSetting);
 
-    BlockData delta;
-    delta.info = oldBlock.info;
-    delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
-    memcpy (delta.buf, oldCodedBlocks[parityBlockId].buf, combinedLength);
-    bitwiseXor(delta.buf, delta.buf, newCodedBlocks[parityBlockId].buf, combinedLength);
+	vector<BlockData> deltas (parityVector.size());
+
+	for (int i = 0; i < (int) deltas.size(); i++) {
+	    debug ("for i = %d, copying block id %" PRIu32 "\n", i, parityVector[i]);
+	    BlockData &delta = deltas[i];
+	    delta.info = oldBlock.info;
+	    delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
+	    memcpy (delta.buf, oldCodedBlocks[parityVector[i]].buf, combinedLength);
+	    bitwiseXor(delta.buf, delta.buf, newCodedBlocks[parityVector[i]].buf, combinedLength);
+	}
 
     // cleanup
     for (int i = 0; i < (int)oldCodedBlocks.size(); i++) {
@@ -444,7 +448,7 @@ BlockData RSCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
     MemoryPool::getInstance().poolFree(oldBlockContainer.buf);
     MemoryPool::getInstance().poolFree(newBlockContainer.buf);
 
-    return delta;
+    return deltas;
 }
 
 //

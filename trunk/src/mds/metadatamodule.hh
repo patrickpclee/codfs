@@ -129,6 +129,15 @@ public:
 	 */
 	void saveSegmentInfo(uint64_t segmentId,
 			struct SegmentMetaData segmentInfo);
+    /**
+	 * @brief	Save Segment Info to Cache
+	 *
+	 * @param	segmentId	ID of the Segment
+	 * @param	segmentInfo	Info of the Segment
+	 */
+	void saveSegmentInfoToCache(uint64_t segmentId,
+			struct SegmentMetaData segmentInfo);
+
 
 	/**
 	 * @brief	Read Segment Info

@@ -30,8 +30,8 @@ public:
 
 	uint32_t getBlockSize(uint32_t segmentSize, string setting);
 
-	BlockData computeDelta(BlockData oldBlock, BlockData newBlock,
-	        vector<offset_length_t> offsetLength, uint32_t parityBlockId);
+	vector<BlockData> computeDelta(BlockData oldBlock, BlockData newBlock,
+	        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector);
 
 	static string generateSetting(uint32_t k, uint32_t m, uint32_t w) {
 		return to_string(k) + ":" + to_string(m) + ":" + to_string(w);

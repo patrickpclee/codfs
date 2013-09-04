@@ -164,9 +164,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
                     segmentData = _storageModule->getSegmentFromDiskCache(
                             segmentId);
 
+#ifdef USE_SEGMENT_CACHE
                     // hack: trigger MDS to update hotness
-                    _osdCommunicator->getSegmentInfoRequest(segmentId, _osdId,
-                    false);
+                    _osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, false);
+#endif
                 }
 
             } else {
@@ -313,8 +314,10 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
             _isSegmentDownloaded.set(segmentId, true);
         } else {
+#ifdef USE_SEGMENT_CACHE
             // hack: trigger MDS to update hotness
             _osdCommunicator->getSegmentInfoRequest(segmentId, _osdId, false);
+#endif
         }
     }
 
@@ -390,9 +393,17 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
     if (osdId == _osdId) {
         // read block from disk
-        debug("%s\n", "BLK READ FROM REPAIR");
-        repairedBlock = _storageModule->readBlock(segmentId, blockId,
-                offsetLength);
+        BlockData blockData;
+        if (isParity) {
+            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
+        } else {
+            #ifdef APPEND_DATA
+                blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
+            #else
+                blockData = _storageModule->readBlock(
+                        segmentId, blockId, offsetLength);
+            #endif
+        }
     } else {
 
         // create entry first, wait for putBlockInit to set real value
@@ -743,21 +754,27 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 
 }
 
-BlockData Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
-        BlockData newBlock, vector<offset_length_t> offsetLength, uint32_t parityBlockId) {
+vector<BlockData> Osd::computeDelta(uint64_t segmentId, uint32_t blockId,
+        BlockData newBlock, vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
 
     BlockData oldBlock = _storageModule->readBlock(segmentId, blockId,
             offsetLength);
 
-    debug ("Delta codingScheme = %d, codingSetting = %s\n", newBlock.info.codingScheme, newBlock.info.codingSetting.c_str());
+    sort (parityVector.begin(), parityVector.end());
+
+    debug(
+            "Delta codingScheme = %d, codingSetting = %s, parityVectorSize = %zu\n",
+            newBlock.info.codingScheme, newBlock.info.codingSetting.c_str(),
+            parityVector.size());
 
     CodingScheme codingScheme = newBlock.info.codingScheme;
     string codingSetting = newBlock.info.codingSetting;
-    BlockData delta = _codingModule->computeDelta(codingScheme, codingSetting, oldBlock, newBlock, offsetLength, parityBlockId);
+    vector<BlockData> deltas = _codingModule->computeDelta(codingScheme,
+            codingSetting, oldBlock, newBlock, offsetLength, parityVector);
 
     MemoryPool::getInstance().poolFree(oldBlock.buf);
 
-    return delta;
+    return deltas;
 }
 
 void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
@@ -767,16 +784,27 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
         return;
     }
 
+    // transform parityVector pair to simple list of parity block ID
+    vector<uint32_t> parityBlockIdList;
+    std::transform(newBlock.info.parityVector.begin(),
+            newBlock.info.parityVector.end(),
+            std::back_inserter(parityBlockIdList),
+            [](BlockLocation const& x) {return x.blockId;});
+
     // update delta (should be performed before updating the block in-place)
-    for (auto& parityPair : newBlock.info.parityVector) {
-        BlockData delta = computeDelta(segmentId, blockId, newBlock, offsetLength, parityPair.blockId);
+    vector<BlockData> deltas = computeDelta(segmentId, blockId, newBlock,
+            offsetLength, parityBlockIdList);
+    for (int i = 0; i < (int)newBlock.info.parityVector.size(); i++) {
 
         BlockLocation blockLocation;
-        blockLocation.osdId = parityPair.osdId;
-        blockLocation.blockId = parityPair.blockId;    // replaced
+        blockLocation.osdId = newBlock.info.parityVector[i].osdId;
+        blockLocation.blockId = newBlock.info.parityVector[i].blockId;    // replaced
 
-        delta.info.blockId = parityPair.blockId;
-        delta.info.blockType = PARITY_BLOCK;
+        debug ("PARITY ID = %" PRIu32 "\n", blockLocation.blockId);
+
+        BlockData &delta = deltas[i];
+
+        delta.info.blockId = newBlock.info.parityVector[i].blockId;
 
         debug(
                 "Send delta of segment %" PRIu64 " block %" PRIu32 " to OSD %" PRIu32 "\n",
@@ -899,7 +927,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                     struct BlockData blockData = _uploadBlockData.get(blockKey);
 
                     // these few lines just want to check if this block is a parity
-                    std::vector<uint32_t> parityBlockId (parityList.size());
+                    std::vector<uint32_t> parityBlockId;
                     std::transform(parityList.begin(), parityList.end(),
                         std::back_inserter(parityBlockId), [](const BlockLocation& b){ return b.blockId; } );
                     const bool isParity = (std::find(parityBlockId.begin(), parityBlockId.end(), blockData.info.blockId) != parityBlockId.end());

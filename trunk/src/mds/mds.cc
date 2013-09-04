@@ -168,11 +168,12 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 	segmentMetaData._codingSetting = codingSetting;
 	segmentMetaData._checksum = checksum;
 	segmentMetaData._size = segmentSize;
+    _metaDataModule->saveSegmentInfoToCache(segmentId, segmentMetaData);
+    _mdsCommunicator->replyUploadSegmentAck(requestId, connectionId, segmentId);
 	_metaDataModule->saveSegmentInfo(segmentId, segmentMetaData);
 	//_metaDataModule->saveNodeList(segmentId, segmentNodeList);
 	//_metaDataModule->setPrimary(segmentId, segmentNodeList[0]);
 
-    _mdsCommunicator->replyUploadSegmentAck(requestId, connectionId, segmentId);
 
 #ifdef USE_SEGMENT_CACHE
 
@@ -575,7 +576,7 @@ void Mds::repairSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 			_recoverEndTime.tv_sec--;
 		}
 		long seconds = _recoverEndTime.tv_sec - _recoverStartTime.tv_sec;
-		printf("[RECOVER] Recovery Ends. Duration = %ld.%ld seconds\n", seconds, milliseconds);
+		printf ("[RECOVER] Recovery Ends. Duration = %ld.%ld seconds\n", seconds, milliseconds);
 	}
 }
 
