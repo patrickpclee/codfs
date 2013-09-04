@@ -20,7 +20,7 @@ mds_logpath="/home/ncsgroup/shb118/ncvfs_log/ncvfs_MDS.log"
 
 while true
 do
-    count=`grep "Recovery Ends" | wc -l`
+    count=`grep "Recovery Ends" $mds_logpath | wc -l`
     if [ $count = 1 ]; then
         echo "RECOVERY DONE"
         exit
