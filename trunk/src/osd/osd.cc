@@ -393,14 +393,13 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
     if (osdId == _osdId) {
         // read block from disk
-        BlockData blockData;
         if (isParity) {
-            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
+            repairedBlock = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
         } else {
             #ifdef APPEND_DATA
-                blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
+                repairedBlock = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
             #else
-                blockData = _storageModule->readBlock(
+                repairedBlock = _storageModule->readBlock(
                         segmentId, blockId, offsetLength);
             #endif
         }
