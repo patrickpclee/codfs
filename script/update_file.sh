@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]
+if [ $# -ne 4 ]
 then
-    echo '[USAGE] ./update_file [NUM OF FUSE]'
+    echo '[USAGE] ./update_file [NUM OF FUSE] [FILESIZE] [UPDATESIZE] [UPDATECOUNT]'
     exit
 fi
 
