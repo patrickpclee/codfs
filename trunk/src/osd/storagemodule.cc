@@ -268,7 +268,7 @@ void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
         RWMutex* rwmutex = obtainRWMutex(blockKey);
         writeLock wtlock(*rwmutex);
 
-        if (fallocate (fileno (ptr), 0, offset, reserveLength) < 0) {
+        if (posix_fallocate (fileno (ptr), offset, reserveLength) < 0) {
             debug_error ("Failed to reserve space: %s\n", filepath.c_str());
             exit (-1);
         }
