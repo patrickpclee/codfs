@@ -114,10 +114,15 @@ uint32_t CodingModule::getBlockSize(CodingScheme codingScheme, string setting,
 	return getCoding(codingScheme)->getBlockSize(segmentSize, setting);
 }
 
-vector<BlockData> CodingModule::computeDelta(CodingScheme codingScheme, string setting, BlockData oldBlock, BlockData newBlock,
-        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
-    return getCoding(codingScheme)->computeDelta(oldBlock, newBlock,
+vector<BlockData> CodingModule::computeDelta(CodingScheme codingScheme, 
+    string setting, BlockData oldBlock, BlockData newBlock,
+    vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
+
+    vector<BlockData> deltas =  getCoding(codingScheme)->computeDelta(oldBlock, newBlock,
             offsetLength, parityVector);
+    debug_cyan ("codingscheme = %d  second delta segment id = %" PRIu64 " and blockid = %" PRIu32 " length = %" PRIu32 "\n", codingScheme, deltas[1].info.segmentId, deltas[1].info.blockId, deltas[1].info.blockSize);
+    debug_cyan ("codingscheme = %d  second delta segment id = %" PRIu64 " and blockid = %" PRIu32 " length = %" PRIu32 "\n", codingScheme, deltas[0].info.segmentId, deltas[0].info.blockId, deltas[0].info.blockSize);
+    return deltas;
 }
 
 vector<BlockData> CodingModule::unpackUpdates(CodingScheme codingScheme, 

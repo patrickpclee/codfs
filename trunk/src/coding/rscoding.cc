@@ -339,6 +339,8 @@ vector<BlockData> RSCoding::repairBlocks(vector<uint32_t> repairBlockIdList,
 		i < k ? data[i] = talloc<char, uint32_t>(size) : code[i - k] =
 			talloc<char, uint32_t>(size);
 		if (blockIdListSet.count(i) > 0) {
+            debug ("BlockData %d segment id = %" PRIu64 " block id = %" PRIu32 " blkSize = %" PRIu32 "\n",
+                i, blockData[i].info.segmentId, blockData[i].info.blockId, blockData[i].info.blockSize); 
 			i < k ? memcpy(data[i], blockData[i].buf, size) : memcpy(
 					code[i - k], blockData[i].buf, size);
 		} else {

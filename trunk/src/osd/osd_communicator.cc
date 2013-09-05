@@ -149,6 +149,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 	lockDataQueue(sockfd);
 #endif
 
+    debug("XXXXX segmentId = %" PRIu64 " blockid = %" PRIu32 " blocksize = %" PRIu32 "\n", segmentId, blockId, length);
 	debug("Put Block Init to FD = %" PRIu32 "\n", sockfd);
 	putBlockInit(sockfd, segmentId, blockId, length, chunkCount, dataMsgType, updateKey);
 	debug("Put Block Init ACK-ed from FD = %" PRIu32 "\n", sockfd);

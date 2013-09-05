@@ -16,9 +16,54 @@ extern "C" {
 }
 
 using namespace std;
-
+/*
+ * (blockId, symbolIdx) --> parity idx
+ * (0, 0) => 0
+ * (0, 1) => 0, 1
+ * (0, 2) => 1, 2
+ * (0, 3) => 2, 3
+ * (1, 0) => 1
+ * (1, 1) => 0, 2
+ * (1, 2) => 1, 3
+ * (1, 3) => 2
+ * (2, 0) => 2
+ * (2, 1) => 0, 3
+ * (2, 2) => 1
+ * (2, 3) => 0, 2
+ * (3, 0) => 3
+ * (3, 1) => 0
+ * (3, 2) => 0, 1
+ * (3, 3) => 1, 2
+ */
 RDPCoding::RDPCoding() {
+    deltaMap[0][0].push_back(0);
+    deltaMap[0][1].push_back(0);
+    deltaMap[0][1].push_back(1);
+    deltaMap[0][2].push_back(1);
+    deltaMap[0][2].push_back(2);
+    deltaMap[0][3].push_back(2);
+    deltaMap[0][3].push_back(3);
 
+    deltaMap[1][0].push_back(1);
+    deltaMap[1][1].push_back(0);
+    deltaMap[1][1].push_back(2);
+    deltaMap[1][2].push_back(1);
+    deltaMap[1][2].push_back(3);
+    deltaMap[1][3].push_back(2);
+
+    deltaMap[2][0].push_back(2);
+    deltaMap[2][1].push_back(0);
+    deltaMap[2][1].push_back(3);
+    deltaMap[2][2].push_back(1);
+    deltaMap[2][3].push_back(0);
+    deltaMap[2][3].push_back(2);
+
+    deltaMap[3][0].push_back(3);
+    deltaMap[3][1].push_back(0);
+    deltaMap[3][2].push_back(0);
+    deltaMap[3][2].push_back(1);
+    deltaMap[3][3].push_back(1);
+    deltaMap[3][3].push_back(2);
 }
 
 RDPCoding::~RDPCoding() {
@@ -394,57 +439,109 @@ uint32_t RDPCoding::getParityCountFromSetting (string setting) {
     return 2;
 }
 
-
+/* Compute Delta for RDPCoding
+ * First check which blockId it updates
+ * symbolNum * symbolSize = blockSize
+ * Xor the old and new delta first
+ * Repack the offlenVector to align symbolsize, vector<offset_length_t> offlens[symbolNum]
+ * (blockId, symbolIdx) --> parity idx
+ * (0, 0) => 0
+ * (0, 1) => 0, 1
+ * (0, 2) => 1, 2
+ * (0, 3) => 2, 3
+ * (1, 0) => 1
+ * (1, 1) => 0, 2
+ * (1, 2) => 1, 3
+ * (1, 3) => 2
+ * (2, 0) => 2
+ * (2, 1) => 0, 3
+ * (2, 2) => 1
+ * (2, 3) => 0, 2
+ * (3, 0) => 3
+ * (3, 1) => 0
+ * (3, 2) => 0, 1
+ * (3, 3) => 1, 2
+ */ 
 vector<BlockData> RDPCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
-        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
+        vector<offset_length_t> offsetLength, vector<uint32_t> parityBlockIdVector) {
+
+    debug("XXXXX NEW BLOCK SID = %" PRIu64 "\n", newBlock.info.segmentId);
+    debug("XXXXX OLD BLOCK SID = %" PRIu64 "\n", oldBlock.info.segmentId);
 
     const string codingSetting = newBlock.info.codingSetting;
-    const uint32_t combinedLength = getCombinedLength(offsetLength);
+	const uint32_t k = getBlockCountFromSetting(codingSetting) - 2;
     const uint64_t segmentSize = newBlock.info.segmentSize;
 	const uint32_t blockSize = getBlockSize(segmentSize, codingSetting);
+	const uint32_t symbolSize = getSymbolSize(blockSize, k);
 
-    // create a dummy blank segment with only the changed block data
-    // oldBlockContainer: |0000 0000 AAAA 0000|
-    // newBlockContainer: |0000 0000 BBBB 0000|
+    vector<BlockData> deltas (parityBlockIdVector.size());
 
-    SegmentData oldBlockContainer, newBlockContainer;
-    oldBlockContainer.info.segLength = segmentSize;
-    newBlockContainer.info.segLength = segmentSize;
-    oldBlockContainer.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
-    newBlockContainer.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
+    // Compute first parity, just xor
+    uint32_t combinedLength = getCombinedLength(offsetLength);
+    BlockData &delta = deltas[0];
+    delta = oldBlock;
+    delta.info.blockId = parityBlockIdVector[0];
+    delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
+    bitwiseXor(delta.buf, oldBlock.buf, newBlock.buf, combinedLength);
+    
+    // Computer second parity
+    uint32_t blockId = newBlock.info.blockId;
+    char *pbuf = MemoryPool::getInstance().poolMalloc(blockSize);
+    memset(pbuf, 0 , blockSize);
+    vector<offset_length_t> d2offlen;
 
-    uint32_t curOff = 0;
+    uint32_t comboffset = 0;
     for (auto& offlen : offsetLength) {
-        memcpy (oldBlockContainer.buf + blockSize * oldBlock.info.blockId + offlen.first, oldBlock.buf + curOff, offlen.second);
-        memcpy (newBlockContainer.buf + blockSize * newBlock.info.blockId + offlen.first, newBlock.buf + curOff, offlen.second);
-        curOff += offlen.second;
-    }
-
-    vector<BlockData> oldCodedBlocks = encode (oldBlockContainer, codingSetting);
-    vector<BlockData> newCodedBlocks = encode (newBlockContainer, codingSetting);
-
-    vector<BlockData> deltas (parityVector.size());
-
-    for (int i = 0; i < (int) deltas.size(); i++) {
-        debug ("for i = %d, copying block id %" PRIu32 "\n", i, parityVector[i]);
-        BlockData &delta = deltas[i];
-        delta.info = oldBlock.info;
-        delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
-        uint32_t curOff = 0;
-        for (auto& offlen: offsetLength) {
-            bitwiseXor(delta.buf + curOff, oldCodedBlocks[parityVector[i]].buf + offlen.first, newCodedBlocks[parityVector[i]].buf + offlen.first, offlen.second);
-            curOff += offlen.second;
+        uint32_t offset = offlen.first, remain = offlen.second;
+        while (remain) {
+            uint32_t symbolIdx = offset / symbolSize;
+            uint32_t updateLen = min (remain, symbolSize * (symbolIdx + 1) - offset);
+            for (uint32_t paritySymbolIdx : deltaMap[blockId][symbolIdx]) {
+                uint32_t pbufoffset = offset+symbolSize*(paritySymbolIdx-symbolIdx);
+                bitwiseXor(pbuf+pbufoffset, pbuf+pbufoffset, delta.buf+comboffset, updateLen);
+                d2offlen.push_back(make_pair(pbufoffset, updateLen));
+            }
+            comboffset += updateLen;
+            offset += updateLen;
+            remain -= updateLen;
         }
     }
 
-    // cleanup
-    for (int i = 0; i < (int)oldCodedBlocks.size(); i++) {
-        debug ("Freeing %d\n", i);
-        MemoryPool::getInstance().poolFree(oldCodedBlocks[i].buf);
-        MemoryPool::getInstance().poolFree(newCodedBlocks[i].buf);
+    // pack pbuf d2offlen
+    vector<offset_length_t> packedVector;
+    packedVector.clear();
+    sort(d2offlen.begin(), d2offlen.end());
+    uint32_t curOffsetStart = d2offlen[0].first;
+    uint32_t curOffsetEnd = d2offlen[0].first + d2offlen[0].second;
+    for (uint32_t i = 1; i < d2offlen.size(); i++) {
+        if (d2offlen[i].first > curOffsetEnd) {
+            // Seal current offset,length
+            packedVector.push_back(make_pair(curOffsetStart, curOffsetEnd-curOffsetStart));
+            curOffsetStart = d2offlen[i].first;
+            curOffsetEnd = d2offlen[i].first + d2offlen[i].second;
+        } else {
+            curOffsetEnd = max(curOffsetEnd, d2offlen[i].first + d2offlen[i].second);
+        }
     }
-    MemoryPool::getInstance().poolFree(oldBlockContainer.buf);
-    MemoryPool::getInstance().poolFree(newBlockContainer.buf);
+    // Seal last offset,length
+    packedVector.push_back(make_pair(curOffsetStart, curOffsetEnd-curOffsetStart));
 
+    // create second delta
+    BlockData& delta1 = deltas[1];
+    delta1.info = oldBlock.info;
+    delta1.info.blockId = parityBlockIdVector[1];
+    delta1.info.offlenVector = packedVector;
+    delta1.info.blockSize = getCombinedLength(packedVector);
+    delta1.buf = MemoryPool::getInstance().poolMalloc(delta1.info.blockSize);
+    
+
+    comboffset = 0;
+    for (auto& offlen : delta1.info.offlenVector) {
+        debug_cyan ("second delta1 offset = %" PRIu32 " and length = %" PRIu32 "\n", offlen.first, offlen.second);
+        memcpy(delta1.buf + comboffset, pbuf + offlen.first, offlen.second);
+        comboffset += offlen.second;
+    }
+
+    MemoryPool::getInstance().poolFree(pbuf);
     return deltas;
 }
