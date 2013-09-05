@@ -1,6 +1,6 @@
 OPTIMIZE := -O0
 WARNINGS := -Wall 
-EXTRA_CFLAGS := -g -std=c++0x -DDEBUG=1 -D_FILE_OFFSET_BITS=64
+EXTRA_CFLAGS := -g -std=c++0x -DDEBUG=1 -D_FILE_OFFSET_BITS=64 
 
 ############################################
 

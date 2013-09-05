@@ -15,6 +15,7 @@ using namespace std;
 #include "../common/netfunc.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../common/define.hh"
+#include "../../lib/deathhandler/death_handler.h"
 
 #ifdef TIME_POINT
 extern double lockSegmentCountMutexTime;
@@ -66,6 +67,9 @@ int main(int argc, char* argv[]) {
 
 	signal(SIGINT, sighandler);
 	signal(SIGUSR1, sighandler);
+
+	// handle segFault for debug
+	Debug::DeathHandler dh;
 
 	char* interfaceName = NULL;
 	uint32_t selfId = 0;
