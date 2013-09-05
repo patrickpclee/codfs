@@ -371,6 +371,7 @@ message BlockTransferEndRequestPro {
 	repeated BlockLocationPro blockLocation = 6;
 	optional PutSegmentInitRequestPro.CodingScheme codingScheme = 7;
 	optional string codingSetting = 8;
+	optional fixed64 segmentSize = 9;
 }
 
 message PutBlockInitReplyPro {

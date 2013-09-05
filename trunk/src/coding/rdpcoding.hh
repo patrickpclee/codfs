@@ -23,6 +23,9 @@ public:
 
     uint32_t getParityCountFromSetting (string setting);
 
+    vector<BlockData> computeDelta(BlockData oldBlock, BlockData newBlock,
+        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector);
+
 protected:
 	virtual uint32_t getSymbolSize(uint32_t blockSize, uint32_t k) {
 		return blockSize / k;

@@ -19,11 +19,13 @@ struct BlockInfo {
     // only for update
     CodingScheme codingScheme;
     string codingSetting;
+    uint64_t segmentSize;
 
     BlockInfo() {
         segmentId = 0;
         blockId = 0;
         blockSize = 0;
+        segmentSize = 0;
         blockType = DEFAULT_BLOCK_TYPE;
         codingScheme = DEFAULT_CODING;
         codingSetting = "";

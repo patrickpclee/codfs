@@ -686,6 +686,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 // fill in codingScheme and codingSetting
                 blockData.info.codingScheme = codingSetting.codingScheme;
                 blockData.info.codingSetting = codingSetting.setting;
+                blockData.info.segmentSize = segmentCache.info.segLength;
 
                 // delta update case 1: primary OSD receives the update
 
@@ -820,7 +821,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
         string updateKey, vector<offset_length_t> offsetLength,
         vector<BlockLocation> parityList, CodingScheme codingScheme,
-        string codingSetting) {
+        string codingSetting, uint64_t segmentSize) {
 
     // TODO: check integrity of block received
     const string blockKey = to_string(segmentId) + "." + to_string(blockId);
@@ -852,6 +853,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 blockData.info.parityVector = parityList;
                 blockData.info.codingScheme = codingScheme;
                 blockData.info.codingSetting = codingSetting;
+                blockData.info.segmentSize = segmentSize;
 
                 // delta update case 2: secondary OSD receives the update
                 // send delta to parity nodes

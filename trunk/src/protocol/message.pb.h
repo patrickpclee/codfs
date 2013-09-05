@@ -4908,6 +4908,13 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_codingsetting();
   inline ::std::string* release_codingsetting();
   
+  // optional fixed64 segmentSize = 9;
+  inline bool has_segmentsize() const;
+  inline void clear_segmentsize();
+  static const int kSegmentSizeFieldNumber = 9;
+  inline ::google::protobuf::uint64 segmentsize() const;
+  inline void set_segmentsize(::google::protobuf::uint64 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.BlockTransferEndRequestPro)
  private:
   inline void set_has_segmentid();
@@ -4922,6 +4929,8 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   inline void clear_has_codingscheme();
   inline void set_has_codingsetting();
   inline void clear_has_codingsetting();
+  inline void set_has_segmentsize();
+  inline void clear_has_segmentsize();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -4932,10 +4941,11 @@ class BlockTransferEndRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::RepeatedPtrField< ::ncvfs::OffsetLengthPro > offsetlength_;
   ::google::protobuf::RepeatedPtrField< ::ncvfs::BlockLocationPro > blocklocation_;
   ::std::string* codingsetting_;
+  ::google::protobuf::uint64 segmentsize_;
   int codingscheme_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(9 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -10812,6 +10822,28 @@ inline ::std::string* BlockTransferEndRequestPro::release_codingsetting() {
     codingsetting_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// optional fixed64 segmentSize = 9;
+inline bool BlockTransferEndRequestPro::has_segmentsize() const {
+  return (_has_bits_[0] & 0x00000100u) != 0;
+}
+inline void BlockTransferEndRequestPro::set_has_segmentsize() {
+  _has_bits_[0] |= 0x00000100u;
+}
+inline void BlockTransferEndRequestPro::clear_has_segmentsize() {
+  _has_bits_[0] &= ~0x00000100u;
+}
+inline void BlockTransferEndRequestPro::clear_segmentsize() {
+  segmentsize_ = GOOGLE_ULONGLONG(0);
+  clear_has_segmentsize();
+}
+inline ::google::protobuf::uint64 BlockTransferEndRequestPro::segmentsize() const {
+  return segmentsize_;
+}
+inline void BlockTransferEndRequestPro::set_segmentsize(::google::protobuf::uint64 value) {
+  set_has_segmentsize();
+  segmentsize_ = value;
 }
 
 // -------------------------------------------------------------------

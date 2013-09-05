@@ -246,7 +246,7 @@ private:
             DataMsgType dataMsgType, string updateKey,
             vector<offset_length_t> offsetLength,
             vector<BlockLocation> parityList, CodingScheme codingScheme,
-            string codingSetting);
+            string codingSetting, uint64_t segmentSize);
 
 };
 

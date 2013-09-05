@@ -393,3 +393,58 @@ uint32_t RDPCoding::getParityCountFromSetting (string setting) {
     // TODO: is this fixed?
     return 2;
 }
+
+
+vector<BlockData> RDPCoding::computeDelta(BlockData oldBlock, BlockData newBlock,
+        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
+
+    const string codingSetting = newBlock.info.codingSetting;
+    const uint32_t combinedLength = getCombinedLength(offsetLength);
+    const uint64_t segmentSize = newBlock.info.segmentSize;
+	const uint32_t blockSize = getBlockSize(segmentSize, codingSetting);
+
+    // create a dummy blank segment with only the changed block data
+    // oldBlockContainer: |0000 0000 AAAA 0000|
+    // newBlockContainer: |0000 0000 BBBB 0000|
+
+    SegmentData oldBlockContainer, newBlockContainer;
+    oldBlockContainer.info.segLength = segmentSize;
+    newBlockContainer.info.segLength = segmentSize;
+    oldBlockContainer.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
+    newBlockContainer.buf = MemoryPool::getInstance().poolMalloc(segmentSize);
+
+    uint32_t curOff = 0;
+    for (auto& offlen : offsetLength) {
+        memcpy (oldBlockContainer.buf + blockSize * oldBlock.info.blockId + offlen.first, oldBlock.buf + curOff, offlen.second);
+        memcpy (newBlockContainer.buf + blockSize * newBlock.info.blockId + offlen.first, newBlock.buf + curOff, offlen.second);
+        curOff += offlen.second;
+    }
+
+    vector<BlockData> oldCodedBlocks = encode (oldBlockContainer, codingSetting);
+    vector<BlockData> newCodedBlocks = encode (newBlockContainer, codingSetting);
+
+    vector<BlockData> deltas (parityVector.size());
+
+    for (int i = 0; i < (int) deltas.size(); i++) {
+        debug ("for i = %d, copying block id %" PRIu32 "\n", i, parityVector[i]);
+        BlockData &delta = deltas[i];
+        delta.info = oldBlock.info;
+        delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
+        uint32_t curOff = 0;
+        for (auto& offlen: offsetLength) {
+            bitwiseXor(delta.buf + curOff, oldCodedBlocks[parityVector[i]].buf + offlen.first, newCodedBlocks[parityVector[i]].buf + offlen.first, offlen.second);
+            curOff += offlen.second;
+        }
+    }
+
+    // cleanup
+    for (int i = 0; i < (int)oldCodedBlocks.size(); i++) {
+        debug ("Freeing %d\n", i);
+        MemoryPool::getInstance().poolFree(oldCodedBlocks[i].buf);
+        MemoryPool::getInstance().poolFree(newCodedBlocks[i].buf);
+    }
+    MemoryPool::getInstance().poolFree(oldBlockContainer.buf);
+    MemoryPool::getInstance().poolFree(newBlockContainer.buf);
+
+    return deltas;
+}

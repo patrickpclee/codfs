@@ -19,7 +19,7 @@ public:
             uint64_t segmentId, uint32_t blockId, DataMsgType dataMsgType,
             string updateKey, vector<offset_length_t> offsetLength,
             vector<BlockLocation> parityList, CodingScheme codingScheme,
-            string codingSetting);
+            string codingSetting, uint64_t segmentSize);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -59,6 +59,7 @@ private:
 	vector<BlockLocation> _parityList;
 	CodingScheme _codingScheme;
 	string _codingSetting;
+	uint64_t _segmentSize;
 };
 
 #endif

@@ -19,7 +19,7 @@ BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
         Communicator* communicator, uint32_t osdSockfd, uint64_t segmentId,
         uint32_t blockId, DataMsgType dataMsgType, string updateKey,
         vector<offset_length_t> offsetLength, vector<BlockLocation> parityList,
-        CodingScheme codingScheme, string codingSetting) :
+        CodingScheme codingScheme, string codingSetting, uint64_t segmentSize) :
         Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -31,6 +31,7 @@ BlockTransferEndRequestMsg::BlockTransferEndRequestMsg(
 	_parityList = parityList;
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
+	_segmentSize = segmentSize;
 }
 
 void BlockTransferEndRequestMsg::prepareProtocolMsg() {
@@ -45,6 +46,7 @@ void BlockTransferEndRequestMsg::prepareProtocolMsg() {
     blockTransferEndRequestPro.set_codingscheme(
             (ncvfs::PutSegmentInitRequestPro_CodingScheme) _codingScheme);
     blockTransferEndRequestPro.set_codingsetting(_codingSetting);
+    blockTransferEndRequestPro.set_segmentsize(_segmentSize);
 
 	vector<offset_length_t>::iterator it;
 	for (it = _offsetLength.begin(); it < _offsetLength.end(); ++it) {
@@ -87,6 +89,7 @@ void BlockTransferEndRequestMsg::parse(char* buf) {
 	_updateKey = blockTransferEndRequestPro.updatekey();
 	_codingScheme = (CodingScheme) blockTransferEndRequestPro.codingscheme();
 	_codingSetting = blockTransferEndRequestPro.codingsetting();
+	_segmentSize = blockTransferEndRequestPro.segmentsize();
 
 	for (int i = 0; i < blockTransferEndRequestPro.offsetlength_size(); ++i) {
 		offset_length_t tempOffsetLength;
@@ -114,7 +117,7 @@ void BlockTransferEndRequestMsg::parse(char* buf) {
 void BlockTransferEndRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
 	osd->putBlockEndProcessor(_msgHeader.requestId, _sockfd, _segmentId,
-			_blockId, _dataMsgType, _updateKey, _offsetLength, _parityList, _codingScheme, _codingSetting);
+			_blockId, _dataMsgType, _updateKey, _offsetLength, _parityList, _codingScheme, _codingSetting, _segmentSize);
 #endif
 }
 
