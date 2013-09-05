@@ -5,6 +5,7 @@
 #include <thread>
 #include <mutex>	// added for gcc 4.7.1
 #include <unistd.h>	// added for gcc 4.7.1
+#include "../common/convertor.hh"
 #include "../common/debug.hh"
 #include "../common/memorypool.hh"
 #include "client_storagemodule.hh"
@@ -23,7 +24,7 @@ ClientStorageModule::ClientStorageModule() {
 	// read config value
 
 	_segmentCache = {};
-	_segmentSize = configLayer->getConfigLong("Storage>SegmentSize") * 1024;
+    _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
 	debug("Config Segment Size = %" PRIu64 " Bytes\n", _segmentSize);
 }
 

@@ -3,11 +3,6 @@
     <Communication>
 		<NumClientThreads>10</NumClientThreads>
     </Communication>
-    
-    <Storage>
-    	<!-- KB -->
-    	<SegmentSize>10240</SegmentSize>
-    </Storage>
 
 	<Fuse>
         <segmentSize>10M</segmentSize>
