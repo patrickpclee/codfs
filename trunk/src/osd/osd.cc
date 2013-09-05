@@ -937,13 +937,14 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
                     _storageModule->createBlock(segmentId, blockId,
                             blockData.info.blockSize);
-                    _storageModule->writeBlock(segmentId, blockId,
-                            blockData.buf, 0, blockData.info.blockSize);
 
                     if (isParity) {
-                        _storageModule->reserveBlockSpace(segmentId, blockId,
-                                blockData.info.blockSize, RESERVE_SPACE_SIZE);
+                        _storageModule->reserveBlockSpace(segmentId, blockId, 0,
+                                blockData.info.blockSize + RESERVE_SPACE_SIZE);
                     }
+
+                    _storageModule->writeBlock(segmentId, blockId,
+                            blockData.buf, 0, blockData.info.blockSize);
 
                     _storageModule->flushBlock(segmentId, blockId);
 
