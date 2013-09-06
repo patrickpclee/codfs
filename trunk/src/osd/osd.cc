@@ -507,13 +507,14 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
         if (dataMsgType == UPLOAD) {
             _storageModule->createBlock(segmentId, blockData.info.blockId,
                     blockData.info.blockSize);
-            _storageModule->writeBlock(segmentId, blockData.info.blockId,
-                    blockData.buf, 0, blockData.info.blockSize);
 
             if (blockData.info.blockType == PARITY_BLOCK) {
                 _storageModule->reserveBlockSpace(segmentId, blockData.info.blockId,
-                        blockData.info.blockSize, RESERVE_SPACE_SIZE);
+                        0, blockData.info.blockSize, blockData.info.blockSize + RESERVE_SPACE_SIZE);
             }
+
+            _storageModule->writeBlock(segmentId, blockData.info.blockId,
+                    blockData.buf, 0, blockData.info.blockSize);
 
             _storageModule->flushBlock(segmentId, blockData.info.blockId);
 
@@ -942,7 +943,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
 
                     if (isParity) {
                         _storageModule->reserveBlockSpace(segmentId, blockId, 0,
-                                blockData.info.blockSize + RESERVE_SPACE_SIZE);
+                                blockData.info.blockSize, blockData.info.blockSize + RESERVE_SPACE_SIZE);
                     }
 
                     _storageModule->writeBlock(segmentId, blockId,

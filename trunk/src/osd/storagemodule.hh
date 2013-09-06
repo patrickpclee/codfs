@@ -87,7 +87,7 @@ public:
     void createDeltaBlock(uint64_t segmentId, uint32_t blockId,
             uint32_t deltaId, bool useReserve);
     void reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
-            uint32_t offset, uint32_t reserveLength);
+            uint32_t offset, uint32_t blockSize, uint32_t reserveLength);
     uint32_t getDeltaCount(uint32_t segmentId, uint32_t blockId);
     uint32_t getNextDeltaId(uint32_t segmentId, uint32_t blockId);
 

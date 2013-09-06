@@ -256,7 +256,7 @@ void StorageModule::createBlock(uint64_t segmentId, uint32_t blockId,
 }
 
 void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
-        uint32_t offset, uint32_t reserveLength) {
+        uint32_t offset, uint32_t blockSize, uint32_t reserveLength) {
 
     const string blockKey = getBlockKey (segmentId, blockId);
 
@@ -274,9 +274,9 @@ void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
         }
 
         ReserveSpaceInfo reserveSpaceInfo;
-        reserveSpaceInfo.currentOffset = offset;
-        reserveSpaceInfo.remainingReserveSpace = reserveLength;
-        reserveSpaceInfo.blockSize = offset;
+        reserveSpaceInfo.currentOffset = blockSize;
+        reserveSpaceInfo.remainingReserveSpace = RESERVE_SPACE_SIZE;
+        reserveSpaceInfo.blockSize = blockSize;
         _reserveSpaceMap.set(blockKey, reserveSpaceInfo);
     }
 }
