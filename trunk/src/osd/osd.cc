@@ -1164,7 +1164,7 @@ void Osd::repairSegmentInfoProcessor(uint32_t requestId, uint32_t sockfd,
         BlockLocation blockLocation;
         blockLocation.blockId = repairedBlock.info.blockId;
         blockLocation.osdId = repairBlockOsdList[j];
-        distributeBlock(segmentId, repairedBlock, blockLocation, RECOVERY); // free-d here
+        distributeBlock(segmentId, repairedBlock, blockLocation, UPLOAD); // free-d here
         j++;
     }
 
