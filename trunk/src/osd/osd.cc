@@ -497,7 +497,7 @@ DataMsgType Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	return dataMsgType;
 }
 
-void Osd::distributeBlock(uint64_t segmentId, const struct BlockData& blockData,
+void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
         const struct BlockLocation& blockLocation, enum DataMsgType dataMsgType,
         uint32_t blocktpId) {
     debug("Distribute Block %" PRIu64 ".%" PRIu32 " to %" PRIu32 "\n",
@@ -801,9 +801,10 @@ void Osd::sendDelta(uint64_t segmentId, uint32_t blockId, BlockData newBlock,
         blockLocation.osdId = newBlock.info.parityVector[i].osdId;
         blockLocation.blockId = newBlock.info.parityVector[i].blockId;    // replaced
 
-        debug ("PARITY ID = %" PRIu32 "\n", blockLocation.blockId);
+        debug ("PARITY ID = %" PRIu32 " OSD ID = %" PRIu32 "\n", blockLocation.blockId, blockLocation.osdId);
 
         BlockData &delta = deltas[i];
+        debug ("XXXXXX delta segmentid = %" PRIu64 " blockId = %" PRIu32 "\n", delta.info.segmentId, delta.info.blockId); 
 
         delta.info.blockId = newBlock.info.parityVector[i].blockId;
 

@@ -33,6 +33,8 @@ protected:
 
 	virtual char** repairDataBlocks(vector<BlockData> &blockDataList,
 			block_list_t &symbolList, uint32_t segmentSize, string setting, bool recovery = false);
+
+    vector <uint32_t> deltaMap[4][4];
 };
 
 #endif

@@ -47,20 +47,18 @@ uint32_t Coding::getParityCountFromSetting(string setting) {
 
 // default function, can be overridden
 vector<BlockData> Coding::computeDelta(BlockData oldBlock, BlockData newBlock,
-        vector<offset_length_t> offsetLength, vector<uint32_t> parityVector) {
+        vector<offset_length_t> offsetLength, vector<uint32_t> parityBlockIdVector) {
 
     uint32_t combinedLength = getCombinedLength(offsetLength);
-    vector<BlockData> deltas (parityVector.size());
+    vector<BlockData> deltas (parityBlockIdVector.size());
 
-    for (int i = 0; i < (int)parityVector.size(); i++) {
+    for (int i = 0; i < (int)parityBlockIdVector.size(); i++) {
         BlockData &delta = deltas[i];
         delta = oldBlock;
-        delta.info.blockId = parityVector[i];
+        delta.info.blockId = parityBlockIdVector[i];
         delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
-        memcpy (delta.buf, oldBlock.buf, combinedLength);
-        bitwiseXor(delta.buf, delta.buf, newBlock.buf, combinedLength);
+        bitwiseXor(delta.buf, oldBlock.buf, newBlock.buf, combinedLength);
     }
-
     return deltas;
 }
 
