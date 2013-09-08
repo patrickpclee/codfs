@@ -638,7 +638,7 @@ uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
             "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
             segmentId, blockId, byteWritten, offsetInBlock);
 
-    updateBlockFreespace(length);
+    //updateBlockFreespace(length);
 
     return byteWritten;
 }
@@ -704,7 +704,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
             "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " write %" PRIu32 " bytes\n",
             segmentId, blockId, deltaId, byteWritten);
 
-    updateBlockFreespace(combinedLength);
+    //updateBlockFreespace(combinedLength);
 
     // if stored in reserve space
     if (deltaLocation.isReserveSpace) {
@@ -869,7 +869,7 @@ uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
         uint32_t length, bool isCache, bool &isFinished) {
 
 // cache and segment share different mutex
-    lock_guard<mutex> lk(fileMutex[isCache]);
+    //lock_guard<mutex> lk(fileMutex[isCache]);
 
     debug("Read File :%s\n", filepath.c_str());
 
@@ -924,7 +924,7 @@ uint32_t StorageModule::doWriteFile(string filepath, char* buf, uint64_t offset,
         uint32_t length, bool isCache, bool &isFinished) {
 
 // cache and segment share different mutex
-    lock_guard<mutex> lk(fileMutex[isCache]);
+    //lock_guard<mutex> lk(fileMutex[isCache]);
 
     FILE* file = openFile(filepath);
 
