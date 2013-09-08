@@ -13,7 +13,7 @@ class FileMetaDataCache {
 		uint32_t path2Id(string path);
 		string id2Path(uint32_t id);
 
-		struct FileMetaData& getMetaData(uint32_t id);
+		struct FileMetaData getMetaData(uint32_t id);
 		void saveMetaData(const struct FileMetaData& fileMetaData);
 		void removeMetaData(uint32_t id);
 		int renameMetaData(string path, string new_path);

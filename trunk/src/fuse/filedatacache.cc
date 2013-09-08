@@ -258,7 +258,9 @@ void FileDataCache::writeBackThread() {
         // obtain unique lock 
         RWMutex* rwmutex = obtainRWMutex(segmentId);
         writeLock wtlock(*rwmutex);
-        doWriteBack(segmentId);
+        if (_writeBackSegmentPrimary.count(segmentId) != 0) {
+            doWriteBack(segmentId);
+        }
     }
     return;
 }

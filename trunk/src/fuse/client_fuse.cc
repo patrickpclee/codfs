@@ -23,6 +23,7 @@
 #include "../common/garbagecollector.hh"
 #include "../common/convertor.hh"	//md5ToHex()
 #include "../common/debug.hh"
+#include "../common/define.hh"
 #include "../config/config.hh"
 
 char* _cwdpath;
@@ -43,11 +44,31 @@ uint32_t _segmentSize;
 uint32_t _prefetchCount;
 
 std::forward_list<struct SegmentMetaData> _segmentMetaDataList;
-uint32_t _segmentMetaDataAllocateSize = 20;
+uint32_t _segmentMetaDataAllocateSize = 50;
 
 thread garbageCollectionThread;
 thread receiveThread;
 thread sendThread;
+
+
+/*
+ * FileId Mutex for modify file meta data
+ */
+std::mutex _fileRWMutexMapMutex;
+unordered_map <uint32_t, RWMutex*> _fileRWMutexMap;
+static RWMutex* obtainFileRWMutex(uint32_t fileId) {
+    // obtain rwmutex for this segment
+    _fileRWMutexMapMutex.lock();
+    RWMutex* rwmutex;
+    if (_fileRWMutexMap.count(fileId) == 0) {
+        rwmutex = new RWMutex();
+        _fileRWMutexMap[fileId] = rwmutex; 
+    } else {
+        rwmutex = _fileRWMutexMap[fileId];
+    }
+    _fileRWMutexMapMutex.unlock();
+    return rwmutex;
+}
 
 static void removeNameSpace(const char* path) {
 	string fpath = _fuseFolder + string(path);
@@ -85,6 +106,7 @@ static uint32_t checkNameSpace(const char* path) {
 }
 
 static struct FileMetaData getAndCacheFileMetaData(uint32_t id) {
+
 	struct FileMetaData fileMetaData;
 	try {
 		fileMetaData = _fileMetaDataCache->getMetaData(id);
@@ -134,8 +156,8 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
 	_cwd = string(_cwdpath) + "/";
 	configLayer = new ConfigLayer((_cwd + "common.xml").c_str(),(_cwd + "clientconfig.xml").c_str());
 
+    _fileRWMutexMap.clear();
     _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
-    debug("SEGMENG SIZE = %" PRIu32 "\n", _segmentSize);
     _prefetchCount = configLayer->getConfigInt("Fuse>prefetchCount");
 	client = new Client(_clientId);
 	_fuseLogger = new FuseLogger(_cwd + "fuse.log");	
@@ -290,10 +312,16 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 	const char* bufptr = buf;
 	while (sizeWritten < size) {
 		uint32_t segmentCount = (offset + sizeWritten) / _segmentSize;
-		if(segmentCount >= fileMetaData._segmentList.size()) {
-			struct SegmentMetaData segmentMetaData = allocateSegmentMetaData();
-			fileMetaData._segmentList.push_back(segmentMetaData._id);
-			fileMetaData._primaryList.push_back(segmentMetaData._primary);
+		while (segmentCount >= fileMetaData._segmentList.size()) {
+            writeLock wtLock(*obtainFileRWMutex(fileId));
+            fileMetaData = getAndCacheFileMetaData(fileId);
+            if (segmentCount >= fileMetaData._segmentList.size()) {
+                fileMetaData = getAndCacheFileMetaData(fileId);
+			    struct SegmentMetaData segmentMetaData = allocateSegmentMetaData();
+			    fileMetaData._segmentList.push_back(segmentMetaData._id);
+			    fileMetaData._primaryList.push_back(segmentMetaData._primary);
+                _fileMetaDataCache->saveMetaData(fileMetaData);
+            } // else someone else has already allocate for this offset
 		}
 		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
 		uint32_t primary = fileMetaData._primaryList[segmentCount];

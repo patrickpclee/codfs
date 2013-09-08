@@ -17,7 +17,7 @@ string FileMetaDataCache::id2Path(uint32_t id) {
 	return _metaDataCache.at(id)._path;
 }
 
-struct FileMetaData& FileMetaDataCache::getMetaData(uint32_t id) {
+struct FileMetaData FileMetaDataCache::getMetaData(uint32_t id) {
     readLock rdlock(_metaDataCacheMutex);
 	return _metaDataCache.at(id);
 }
@@ -56,7 +56,7 @@ int FileMetaDataCache::renameMetaData(string path, string new_path) {
 		    return -1;
 	    }
     }
-	struct FileMetaData &fileMetaData = getMetaData(id);
+	struct FileMetaData fileMetaData = getMetaData(id);
     {
         writeLock wtlock(_metaDataCacheMutex);
 	    fileMetaData._path = new_path;
