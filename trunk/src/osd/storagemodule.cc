@@ -490,11 +490,12 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
     memcpy (blockData.buf, wholeBuf, blockData.info.blockSize);
 
     // for each delta block, merge into parity for each <offset, length> using XOR
+    BlockData delta;
+    delta.buf = MemoryPool::getInstance().poolMalloc(blockData.info.blockSize);
     for (DeltaLocation deltaLocation : _deltaLocationMap.get(blockKey)) {
         const uint32_t deltaId = deltaLocation.deltaId;
 
         // read from reserved space if delta is inside
-        BlockData delta;
         if (deltaLocation.isReserveSpace) {
             debug ("Reading from Reserve Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 "\n", segmentId, blockId, deltaId);
             string deltaKey = generateDeltaKey (segmentId, blockId, deltaId);
@@ -504,7 +505,6 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
             delta.info.blockId = blockId;
             delta.info.blockSize = combinedLength; // size of delta
             delta.info.offlenVector = offsetLength;
-            delta.buf = MemoryPool::getInstance().poolMalloc(combinedLength);
             memcpy (delta.buf, wholeBuf + deltaLocation.offsetLength.first, combinedLength);
         } else {
             debug ("Reading from Delta Block Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 "\n", segmentId, blockId, deltaId);
@@ -524,8 +524,8 @@ BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, b
             }
             deltaBufPtr += length;
         }
-        MemoryPool::getInstance().poolFree(delta.buf);
     }
+    MemoryPool::getInstance().poolFree(delta.buf);
     MemoryPool::getInstance().poolFree(wholeBuf);
     return blockData;
 }
