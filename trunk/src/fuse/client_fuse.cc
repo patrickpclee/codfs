@@ -255,9 +255,9 @@ static int ncvfs_open(const char *path, struct fuse_file_info *fi) {
 static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *fi) {
 	string fpath = _fuseFolder + string(path);
 
-	//uint32_t segmentCount = configLayer->getConfigInt("Fuse>PreallocateSegmentNumber");
-	//struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, 0, segmentCount);
-	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, 0, 0);
+	uint32_t segmentCount = configLayer->getConfigInt("Fuse>PreallocateSegmentNumber");
+	struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, 0, segmentCount);
+	//struct FileMetaData fileMetaData = _clientCommunicator->uploadFile(_clientId, path, 0, 0);
 	fileMetaData._fileType = NORMAL;
 	_fileMetaDataCache->saveMetaData(fileMetaData);
 	fi->fh = fileMetaData._id;
