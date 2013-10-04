@@ -338,6 +338,13 @@ public:
 
     bool isBlockRequested(uint64_t segmentId, uint32_t blockId);
 
+    // consistency
+    void uniqueLockSegment(uint64_t segmentId);
+    void uniqueUnlockSegment(uint64_t segmentId);
+    void sharedLockSegment(uint64_t segmentId);
+    void sharedUnlockSegment(uint64_t segmentId);
+    RWMutex* obtainRWMutex(uint64_t segmentId);
+
 private:
 
     /**
@@ -449,5 +456,9 @@ private:
     // cache report
     uint32_t _reportCacheInterval;
     list<uint64_t> _previousCacheList;
+
+    // consistency
+    unordered_map<uint64_t, RWMutex*> _segmentRWMutexMap;
+    mutex _segmentRWMutexMapMutex;
 };
 #endif

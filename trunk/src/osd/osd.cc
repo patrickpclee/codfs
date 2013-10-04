@@ -132,6 +132,9 @@ void Osd::freeSegment(uint64_t segmentId, SegmentData segmentData) {
 void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, bool localRetrieve) {
 
+    // for consistency
+    sharedLockSegment(segmentId);
+
     if (localRetrieve) {
         debug_yellow("Local retrieve for segment ID = %" PRIu64 "\n",
                 segmentId);
@@ -354,6 +357,8 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
         segmentRequestCountMutex.unlock();
     }
 
+    // for consistency
+    sharedUnlockSegment(segmentId);
 }
 
 void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
@@ -446,6 +451,9 @@ DataMsgType Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
         uint32_t chunkCount, CodingScheme codingScheme, string setting,
         string checksum, string updateKey, bool isSmallSegment) {
+
+    // for consistency
+    uniqueLockSegment(segmentId);
 
     struct CodingSetting codingSetting;
     codingSetting.codingScheme = codingScheme;
@@ -752,6 +760,9 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
         }
 
     }
+
+    // for consistency
+    uniqueUnlockSegment(segmentId);
 
 }
 
@@ -1241,3 +1252,39 @@ StorageModule * Osd::getStorageModule() {
 uint32_t Osd::getOsdId() {
     return _osdId;
 }
+
+// for consistency
+RWMutex* Osd::obtainRWMutex(uint64_t segmentId) {
+    // obtain rwmutex for this segment
+    _segmentRWMutexMapMutex.lock();
+    RWMutex* rwmutex;
+    if (_segmentRWMutexMap.count(segmentId) == 0) {
+        rwmutex = new RWMutex();
+        _segmentRWMutexMap[segmentId] = rwmutex; 
+    } else {
+        rwmutex = _segmentRWMutexMap[segmentId];
+    }
+    _segmentRWMutexMapMutex.unlock();
+    return rwmutex;
+}
+
+void Osd::uniqueLockSegment(uint64_t segmentId) {
+    RWMutex* rwmutex = obtainRWMutex(segmentId);
+    rwmutex->lock();
+}
+
+void Osd::uniqueUnlockSegment(uint64_t segmentId) {
+    RWMutex* rwmutex = obtainRWMutex(segmentId);
+    rwmutex->unlock();
+}
+
+void Osd::sharedLockSegment(uint64_t segmentId) {
+    RWMutex* rwmutex = obtainRWMutex(segmentId);
+    rwmutex->lock_shared();
+}
+
+void Osd::sharedUnlockSegment(uint64_t segmentId) {
+    RWMutex* rwmutex = obtainRWMutex(segmentId);
+    rwmutex->unlock_shared();
+}
+
