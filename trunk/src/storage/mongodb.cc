@@ -1,3 +1,4 @@
+#include <time.h>
 #include "mongodb.hh"
 
 #include "../common/debug.hh"
@@ -69,6 +70,7 @@ MongoDB::MongoDB ()
 
 	DbAuthHook *dbHook = new DbAuthHook(_database, _user, _password, true);
 	pool.addHook(dbHook);
+	srand(time(NULL));
 }
 
 /**
@@ -144,7 +146,12 @@ void MongoDB::insert (BSONObj insertSegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
+
 	_connection->insert(_database + "." + _collection, insertSegment);
+
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	_connection->update(_database + "." + _collection, insertSegment, versionObj, true);
+
 	_conn->done();
 
 	pool.flush();
@@ -159,6 +166,10 @@ void MongoDB::update (Query querySegment, BSONObj updateSegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, updateSegment, true);
+
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
+
 	_conn->done();
 
 	pool.flush();
@@ -173,6 +184,10 @@ void MongoDB::push (Query querySegment, BSONObj pushSegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, pushSegment, true);
+
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
+
 	_conn->done();
 	pool.flush();
 }
@@ -183,6 +198,10 @@ BSONObj MongoDB::findAndModify (BSONObj querySegment, BSONObj updateSegment)
 	DBClientBase* _connection = _conn->get();
 	BSONObj result;
 	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << querySegment << "update" << updateSegment), result);
+
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
+
 	_conn->done();
 
 	pool.flush();
@@ -195,6 +214,10 @@ void MongoDB::removeField (Query querySegment, string field)
 	DBClientBase* _connection = _conn->get();
 	BSONObj unsetSegment = BSON ("$unset" << BSON (field << "1"));
 	_connection->update(_database + "." + _collection, querySegment, unsetSegment, true);
+
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
+
 	_conn->done();
 
 	pool.flush();
