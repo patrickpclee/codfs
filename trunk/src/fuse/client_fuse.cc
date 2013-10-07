@@ -107,10 +107,6 @@ static uint32_t checkNameSpace(const char* path) {
 
 static struct FileMetaData getAndCacheFileMetaData(uint32_t id) {
 
-#ifdef DISABLE_METADATA_CACHE
-    return _clientCommunicator->getFileInfo(_clientId, id);
-#endif
-
 	struct FileMetaData fileMetaData;
 	try {
 		fileMetaData = _fileMetaDataCache->getMetaData(id);
