@@ -1,6 +1,7 @@
 #ifndef __MONGO_DB_HH__
 #define __MONGO_DB_HH__
 
+#include <atomic>
 #include "../common/define.hh"
 
 //#include "mongo/db/jsobj.h"
@@ -102,7 +103,10 @@ public:
 	 */
 	void remove (mongo::Query querySegment);
 
+	void setMaxVersion();
+
 private:
+
 	/// User
 	string _user;
 
@@ -124,6 +128,8 @@ private:
 	/// Connection to the MongoDB
 	//mongo::DBClientConnection _connection;
 	//mongo::ScopedDbConnection _connection;
+
+    atomic<uint64_t> _version;
 };
 
 #endif

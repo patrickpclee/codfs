@@ -149,7 +149,8 @@ void MongoDB::insert (BSONObj insertSegment)
 
 	_connection->insert(_database + "." + _collection, insertSegment);
 
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	uint64_t version = _version++;
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
 	_connection->update(_database + "." + _collection, insertSegment, versionObj, true);
 
 	_conn->done();
@@ -167,7 +168,8 @@ void MongoDB::update (Query querySegment, BSONObj updateSegment)
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, updateSegment, true);
 
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	uint64_t version = _version++;
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
 	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
 
 	_conn->done();
@@ -185,7 +187,8 @@ void MongoDB::push (Query querySegment, BSONObj pushSegment)
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, pushSegment, true);
 
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	uint64_t version = _version++;
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
 	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
 
 	_conn->done();
@@ -199,7 +202,8 @@ BSONObj MongoDB::findAndModify (BSONObj querySegment, BSONObj updateSegment)
 	BSONObj result;
 	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << querySegment << "update" << updateSegment), result);
 
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	uint64_t version = _version++;
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
 	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
 
 	_conn->done();
@@ -215,7 +219,8 @@ void MongoDB::removeField (Query querySegment, string field)
 	BSONObj unsetSegment = BSON ("$unset" << BSON (field << "1"));
 	_connection->update(_database + "." + _collection, querySegment, unsetSegment, true);
 
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << rand()));
+	uint64_t version = _version++;
+	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
 	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
 
 	_conn->done();
@@ -234,3 +239,17 @@ void MongoDB::remove (Query querySegment)
 	return ;
 }
 
+void MongoDB::setMaxVersion () {
+	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
+	DBClientBase* _connection = _conn->get();
+
+    _connection->ensureIndex(_database + "." + _collection, fromjson("{version:-1}"));
+    BSONObj last_element = _connection->findOne(_database + "." + _collection, Query().sort("version", -1));
+    if (!last_element.isEmpty()) {
+        _version = last_element.getField("version").numberLong();
+        _version++;
+    } else {
+        _version = 0;
+    }
+	_conn->done();
+}
