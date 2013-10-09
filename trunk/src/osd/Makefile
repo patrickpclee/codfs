@@ -18,7 +18,7 @@ EXTRA_CFLAGS := -g -std=c++0x
 LIBS := `pkg-config --cflags --libs protobuf` -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system -lcrypto -ldl
 
 INC_DIR   =
-SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../../lib/jerasure ../../lib/deathhandler ../../lib/sqlite3
+SRC_DIR   =	../cache ../common ../communicator ../coding ../config ../protocol ../protocol/metadata ../protocol/transfer ../protocol/status ../protocol/nodelist ../protocol/handshake ../../lib/tinyxml ../datastructure ../../lib/jerasure ../../lib/deathhandler
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = 

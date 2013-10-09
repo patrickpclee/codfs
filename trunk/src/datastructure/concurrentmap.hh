@@ -11,7 +11,7 @@
 template<class K, class V, class Compare = std::less<K>,
 		class Allocator = std::allocator<std::pair<const K, V> > >
 class ConcurrentMap {
-protected:
+private:
 	std::mutex _m;
 
 public:
