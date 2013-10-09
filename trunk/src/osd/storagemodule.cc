@@ -664,6 +664,26 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
 
     const string deltaKey = generateDeltaKey (segmentId, blockId, deltaId);
     const uint32_t combinedLength = getCombinedLength(offsetLength);
+    const uint32_t additionLength = (8 * offsetLength.size() + 4);
+    const uint32_t totalLength = combinedLength + additionLength + 4;
+
+    if (isParity) {
+        // pack the offlen vector before the buf 
+        uint32_t offset = 0;
+        uint32_t N = offsetLength.size();
+        memcpy(buf, &N, 4); 
+        offset += 4;
+        for (int i = 0; i < N; i++)
+        {
+            memcpy(buf+offset, &(offsetLength[i].first), 4);
+            offset += 4;
+            memcpy(buf+offset, &(offsetLength[i].second), 4);
+            offset += 4;
+        }
+        // clear last 4 bytes in the buf
+        memset(buf+(combinedLength+additionLength), 0, 4);
+    }
+
 
     ReserveSpaceInfo &reserveSpaceInfo = _reserveSpaceMap.get(blockKey);
 
@@ -673,16 +693,16 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
 
     uint32_t currentOffset = 0;
     string filepath = "";
-    if (isParity && combinedLength <= RESERVE_SPACE_SIZE) {
-        if (reserveSpaceInfo.remainingReserveSpace < combinedLength) {
+    if (isParity && totalLength <= RESERVE_SPACE_SIZE) {
+        if (reserveSpaceInfo.remainingReserveSpace < totalLength) {
             // merge existing block and write again
-            debug ("need merge remaining = %" PRIu32 " length = %" PRIu32 " deltaId = %" PRIu32 "\n", reserveSpaceInfo.remainingReserveSpace, combinedLength, deltaId);
+            debug ("need merge remaining = %" PRIu32 " length = %" PRIu32 " deltaId = %" PRIu32 "\n", reserveSpaceInfo.remainingReserveSpace, totalLength, deltaId);
             mergeBlock(segmentId, blockId, true);
         }
 
         currentOffset = reserveSpaceInfo.currentOffset;
         filepath = generateBlockPath(segmentId, blockId, _blockFolder);
-        deltaLocation.offsetLength = make_pair(currentOffset, combinedLength);
+        deltaLocation.offsetLength = make_pair(currentOffset + additionLength, combinedLength);
         deltaLocation.isReserveSpace = true;
         debug ("block %" PRIu32 " written to reserve\n", blockId);
     } else {    // data block or delta too large
@@ -690,7 +710,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
         currentOffset = 0;
         filepath = generateDeltaBlockPath(segmentId, blockId, deltaId,
                 _blockFolder);
-        deltaLocation.offsetLength = make_pair(0, combinedLength);
+        deltaLocation.offsetLength = make_pair(currentOffset + additionLength, combinedLength);
         deltaLocation.isReserveSpace = false;
         debug ("block %" PRIu32 " written to delta\n", blockId);
     }
@@ -698,7 +718,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
     uint32_t byteWritten = 0;
 
     // write delta block
-    byteWritten = writeFile(filepath, buf, currentOffset, combinedLength, false);
+    byteWritten = writeFile(filepath, buf, currentOffset, totalLength, false);
 
     debug(
             "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " write %" PRIu32 " bytes\n",
@@ -708,8 +728,8 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
 
     // if stored in reserve space
     if (deltaLocation.isReserveSpace) {
-        reserveSpaceInfo.currentOffset += combinedLength;
-        reserveSpaceInfo.remainingReserveSpace -= combinedLength;
+        reserveSpaceInfo.currentOffset += combinedLength + additionLength;
+        reserveSpaceInfo.remainingReserveSpace -= combinedLength + additionLength;
     }
 
     _deltaOffsetLength.set(deltaKey, offsetLength);

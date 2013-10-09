@@ -196,7 +196,8 @@ public:
 
     void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
             uint64_t segmentId, uint32_t blockId, uint32_t length,
-            uint32_t chunkCount, DataMsgType dataMsgType, string updateKey);
+            uint32_t chunkCount, DataMsgType dataMsgType, 
+            string updateKey, uint32_t offlenNum);
 
     /**
      * Distribute Blocks to OSD

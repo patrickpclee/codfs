@@ -351,6 +351,7 @@ message PutBlockInitRequestPro {
 	optional fixed32 chunkCount = 4;
 	optional DataMsgPro.DataMsgType dataMsgType = 5;
 	optional string updateKey = 6;
+    optional fixed32 offlenNum = 7;
 }
 
 message BlockDataPro {

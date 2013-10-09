@@ -211,10 +211,12 @@ private:
 	 * @param chunkCount Number of chunks that will be sent
 	 * @param dataMsgType Data Msg Type
 	 * @param updateKey Update key
+	 * @param offlenNum offlenVector.size()
 	 */
 
 	void putBlockInit(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
-			uint32_t length, uint32_t chunkCount, DataMsgType dataMsgType, string updateKey);
+			uint32_t length, uint32_t chunkCount, DataMsgType dataMsgType, string updateKey,
+            uint32_t offlenNum);
 
 	/**
 	 * Send an segment chunk to OSD (Step 2)

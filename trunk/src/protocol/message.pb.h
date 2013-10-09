@@ -4608,6 +4608,13 @@ class PutBlockInitRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_updatekey();
   inline ::std::string* release_updatekey();
   
+  // optional fixed32 offlenNum = 7;
+  inline bool has_offlennum() const;
+  inline void clear_offlennum();
+  static const int kOfflenNumFieldNumber = 7;
+  inline ::google::protobuf::uint32 offlennum() const;
+  inline void set_offlennum(::google::protobuf::uint32 value);
+  
   // @@protoc_insertion_point(class_scope:ncvfs.PutBlockInitRequestPro)
  private:
   inline void set_has_segmentid();
@@ -4622,6 +4629,8 @@ class PutBlockInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_datamsgtype();
   inline void set_has_updatekey();
   inline void clear_has_updatekey();
+  inline void set_has_offlennum();
+  inline void clear_has_offlennum();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -4631,9 +4640,10 @@ class PutBlockInitRequestPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 chunkcount_;
   int datamsgtype_;
   ::std::string* updatekey_;
+  ::google::protobuf::uint32 offlennum_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -10389,6 +10399,28 @@ inline ::std::string* PutBlockInitRequestPro::release_updatekey() {
     updatekey_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
     return temp;
   }
+}
+
+// optional fixed32 offlenNum = 7;
+inline bool PutBlockInitRequestPro::has_offlennum() const {
+  return (_has_bits_[0] & 0x00000040u) != 0;
+}
+inline void PutBlockInitRequestPro::set_has_offlennum() {
+  _has_bits_[0] |= 0x00000040u;
+}
+inline void PutBlockInitRequestPro::clear_has_offlennum() {
+  _has_bits_[0] &= ~0x00000040u;
+}
+inline void PutBlockInitRequestPro::clear_offlennum() {
+  offlennum_ = 0u;
+  clear_has_offlennum();
+}
+inline ::google::protobuf::uint32 PutBlockInitRequestPro::offlennum() const {
+  return offlennum_;
+}
+inline void PutBlockInitRequestPro::set_offlennum(::google::protobuf::uint32 value) {
+  set_has_offlennum();
+  offlennum_ = value;
 }
 
 // -------------------------------------------------------------------

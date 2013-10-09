@@ -18,7 +18,8 @@ public:
 
 	PutBlockInitRequestMsg(Communicator* communicator, uint32_t osdSockfd,
 			uint64_t segmentId, uint32_t blockId, uint32_t blockSize,
-			uint32_t chunkCount, DataMsgType dataMsgType, string updateKey);
+			uint32_t chunkCount, DataMsgType dataMsgType, string updateKey,
+            uint32_t offlenNum);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -54,6 +55,7 @@ private:
 	uint32_t _blockId;
 	uint32_t _blockSize;
 	uint32_t _chunkCount;
+	uint32_t _offlenNum;
 	DataMsgType _dataMsgType;
 	string _updateKey;
 };
