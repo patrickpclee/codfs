@@ -62,6 +62,7 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define FUSE_USE_VERSION 26
 #define FUSE_READ_AHEAD
 #define FUSE_PRECACHE_AHEAD
+#define MULTI_USER_MODE
 
 // osd/osd.cc
 #define INF (1<<29)
@@ -81,6 +82,8 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define IO_THREADS 2
 #define IO_POLL_INTERVAL 10000
 #define USE_FSYNC
+#define PERSISTENT_PLR
+#define OSD_DB "osd.db"
 
 // protocol/message.hh
 #define USE_MESSAGE_MEMORY_POOL
@@ -102,5 +105,4 @@ typedef boost::unique_lock<RWMutex> writeLock;
 //#define TRIGGER_RECOVERY
 #define RECOVERY_DST "destinations.txt"
 
-#define MULTI_USER_MODE
 #endif

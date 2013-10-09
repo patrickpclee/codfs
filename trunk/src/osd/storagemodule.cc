@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <thread>
 #include <mutex>
 #include <unistd.h>
@@ -181,6 +182,19 @@ void StorageModule::initializeStorageStatus() {
     cout << "Block Storage Usage: " << formatSize(_currentBlockUsage) << "/"
             << formatSize(_maxBlockCapacity) << endl;
 
+    // restore storage status
+#ifdef PERSISTENT_PLR
+    int rc;
+    rc = sqlite3_open(OSD_DB, &_db);
+    if (rc) {
+        debug_error("Can't open database: %s\n", sqlite3_errmsg(_db));
+        sqlite3_close(_db);
+        exit(-1);
+    }
+    initializeDb();
+    restoreFromDb();
+    sqlite3_close(_db);
+#endif
 }
 
 uint64_t StorageModule::getFilesize(string filepath) {

@@ -13,6 +13,7 @@
 #include "../common/segmentdata.hh"
 #include "../datastructure/concurrentmap.hh"
 #include "../common/enums.hh"
+#include "../../lib/sqlite3/sqlite3.h"
 #include "filelrucache.hh"
 #include "reservespaceinfo.hh"
 #include "deltalocation.hh"
@@ -523,6 +524,11 @@ private:
 #ifdef USE_IO_THREADS
     boost::threadpool::prio_pool _iotp;
 #endif
+
+    sqlite3 *_db;
+    void initializeDb();
+    void restoreFromDb();
+
 };
 
 #endif
