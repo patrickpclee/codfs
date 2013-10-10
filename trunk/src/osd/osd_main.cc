@@ -124,6 +124,11 @@ int main(int argc, char* argv[]) {
 	communicator->connectToMonitor();
 	communicator->registerToMonitor(selfAddr, selfPort);
 
+
+    // startup merge
+    osd->startupRestore();
+
+
 	garbageCollectionThread.join();
 	receiveThread.join();
 #ifdef USE_MULTIPLE_QUEUE

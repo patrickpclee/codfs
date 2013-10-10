@@ -183,6 +183,119 @@ void StorageModule::initializeStorageStatus() {
 
 }
 
+void StorageModule::getExistingSegmentIds(vector<uint64_t>& segmentIds)
+{
+    struct dirent* dent;
+    DIR* srcdir;
+    segmentIds.clear();
+
+    srcdir = opendir(_blockFolder.c_str());
+    if (srcdir == NULL) {
+        perror("opendir");
+        exit(-1);
+    }
+
+    while ((dent = readdir(srcdir)) != NULL) {
+        struct stat st;
+
+        if (strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
+            continue;
+
+        if (fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0) {
+            perror(dent->d_name);
+            continue;
+        }
+
+        string fh(dent->d_name);
+        segmentIds.push_back(atoll(fh.substr(0,fh.find_first_of('.')).c_str()));
+    }
+    closedir(srcdir);
+}
+
+void StorageModule::startupMerge(unordered_map<uint64_t, SegmentCodingInfo>& segmentInfoMap)
+{
+    struct dirent* dent;
+    DIR* srcdir;
+
+    srcdir = opendir(_blockFolder.c_str());
+    if (srcdir == NULL) {
+        perror("opendir");
+        exit(-1);
+    }
+
+    while ((dent = readdir(srcdir)) != NULL) {
+        struct stat st;
+
+        if (strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
+            continue;
+
+        if (fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0) {
+            perror(dent->d_name);
+            continue;
+        }
+
+        string fh(dent->d_name);
+        uint64_t segmentId = atoll(fh.substr(0,fh.find_first_of('.')).c_str());
+        uint32_t blockId = atoi(fh.substr(fh.find_first_of('.')+1).c_str());
+        uint32_t blockSize;
+
+        if (isParityBlock(segmentId, blockId, blockSize, segmentInfoMap[segmentId])) {
+            doStartupMerge(fh, st.st_size, blockSize);
+        }
+    }
+    closedir(srcdir);
+}
+
+bool StorageModule::isParityBlock(uint64_t segmentId, uint32_t blockId, 
+    uint32_t& blockSize, SegmentCodingInfo& info)
+{
+    return true;
+}
+
+void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockSize)
+{
+    char *buf = MemoryPool::getInstance().poolMalloc(fileSize);
+    FILE* fp = fopen(fh.c_str(), "rb+");
+
+    // first read
+    if (pread(fileno(fp), buf, fileSize, 0) == -1) {
+        perror("pread");
+        exit(-1);
+    }
+
+    int offset = blockSize;
+    while (offset < fileSize)
+    {
+        int n = *((int*)(buf+offset));
+        offset += 4;
+        if (!n) break;
+        char* payload = buf + offset + (n*8);
+        int payoff = 0;
+        while (n--)
+        {
+            int curoff = *((int*)(buf+offset));
+            offset += 4;
+            int curlen = *((int*)(buf+offset));
+            offset += 4;
+            Coding::bitwiseXor(buf+curoff, buf+curoff, payload+payoff, curlen);
+            payoff += curlen;
+        }
+        offset += payoff;
+    }
+
+    // clean the reserved space
+    memset(buf+blockSize, 0, 4);
+
+    if (pwrite(fileno(fp), buf, blockSize+4, 0) == -1) {
+        perror("pwrite");
+        exit(-1);
+    }
+
+    fclose(fp);
+    MemoryPool::getInstance().poolFree(buf);
+}
+
+
 uint64_t StorageModule::getFilesize(string filepath) {
 
     struct stat st;

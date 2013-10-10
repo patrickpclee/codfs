@@ -408,6 +408,7 @@ unordered_map<uint64_t, SegmentCodingInfo> OsdCommunicator::getSegmentCodingInfo
 	GetSegmentCodingInfoRequestMsg* getSegmentCodingInfoRequestMsg =
 			new GetSegmentCodingInfoRequestMsg(this, getMdsSockfd(), segmentIds);
 	getSegmentCodingInfoRequestMsg->prepareProtocolMsg();
+    getSegmentCodingInfoRequestMsg->printProtocol();
 
 	addMessage(getSegmentCodingInfoRequestMsg, true);
 

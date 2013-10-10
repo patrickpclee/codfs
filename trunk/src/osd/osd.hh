@@ -340,6 +340,8 @@ public:
 
     bool isBlockRequested(uint64_t segmentId, uint32_t blockId);
 
+    void startupRestore();
+
 private:
 
     /**

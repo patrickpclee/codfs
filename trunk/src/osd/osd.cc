@@ -72,6 +72,24 @@ Osd::~Osd() {
     delete _osdCommunicator;
 }
 
+void Osd::startupRestore()
+{
+    vector<uint64_t> segmentIds; 
+    _storageModule->getExistingSegmentIds(segmentIds);
+    if (!segmentIds.empty()) {
+        for (uint64_t segmentId: segmentIds) {
+            debug_red("Find segmentId = %" PRIu64 "\n", segmentId);
+        }
+
+        unordered_map<uint64_t, SegmentCodingInfo> infoMap = getSegmentCodingInfo(segmentIds);
+        for (auto& e: infoMap) {
+            cout << e.first << " " << e.second.codingSetting << endl;
+        }
+        //
+        //_storageModule->startupMerge(infoMap);
+    }
+}
+
 unordered_map<uint64_t, SegmentCodingInfo> Osd::getSegmentCodingInfo(
         vector<uint64_t> segmentIds) {
     return _osdCommunicator->getSegmentCodingInfo(segmentIds);
