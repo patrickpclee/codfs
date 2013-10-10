@@ -47,7 +47,7 @@ void GetSegmentCodingInfoReplyMsg::prepareProtocolMsg() {
 	}
 
 	setProtocolSize(serializedString.length());
-	setProtocolType(GET_SEGMENT_INFO_REPLY);
+	setProtocolType(GET_SEGMENT_CODING_INFO_REPLY);
 	setProtocolMsg(serializedString);
 
 }
