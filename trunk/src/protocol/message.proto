@@ -306,6 +306,20 @@ message GetSegmentInfoRequestPro {
 	optional bool isRecovery = 4;
 }
 
+message GetSegmentCodingInfoRequestPro {
+	repeated fixed64 segmentIdList = 1;	
+}
+
+message GetSegmentCodingInfoReplyPro {
+	message SegmentCodingInfoPro {
+		optional fixed64 segmentId = 1;
+		optional fixed32 segmentSize = 2;
+		optional PutSegmentInitRequestPro.CodingScheme codingScheme = 3;
+		optional string codingSetting = 5;
+	}
+	repeated SegmentCodingInfoPro segmentCodingInfo = 1;
+}
+
 message CacheSegmentReplyPro {
 	optional fixed64 segmentId = 1;
 	optional fixed32 osdId = 2;

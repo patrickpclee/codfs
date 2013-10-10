@@ -72,6 +72,11 @@ Osd::~Osd() {
     delete _osdCommunicator;
 }
 
+unordered_map<uint64_t, SegmentCodingInfo> Osd::getSegmentCodingInfo (vector<uint64_t> segmentIds) {
+    unordered_map<uint64_t, SegmentCodingInfo> segmentCodingInfoMap;
+    return segmentCodingInfoMap;
+}
+
 void Osd::reportRemovedCache() {
     debug("%s\n", "Cache report thread started");
 

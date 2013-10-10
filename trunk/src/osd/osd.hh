@@ -10,6 +10,7 @@
 #include "osd_communicator.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
+#include "segmentcodinginfo.hh"
 #include "../common/metadata.hh"
 #include "../common/segmentdata.hh"
 #include "../common/blockdata.hh"
@@ -387,6 +388,8 @@ private:
      */
 
     void freeSegment(uint64_t segmentId, SegmentData segmentData);
+
+    unordered_map<uint64_t, SegmentCodingInfo> getSegmentCodingInfo (vector<uint64_t> segmentIds);
 
     /**
      * Stores the list of OSDs that store a certain block
