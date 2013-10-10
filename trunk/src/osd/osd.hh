@@ -10,7 +10,7 @@
 #include "osd_communicator.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
-#include "segmentcodinginfo.hh"
+#include "../common/segmentcodinginfo.hh"
 #include "../common/metadata.hh"
 #include "../common/segmentdata.hh"
 #include "../common/blockdata.hh"
@@ -339,6 +339,9 @@ public:
      */
 
     bool isBlockRequested(uint64_t segmentId, uint32_t blockId);
+
+    unordered_map<uint64_t, SegmentCodingInfo>getSegmentCodingInfoProcessor(uint32_t requestId, uint32_t sockfd,
+            vector<SegmentCodingInfo> segmentCodingInfo);
 
 private:
 

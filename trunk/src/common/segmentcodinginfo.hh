@@ -4,8 +4,8 @@
 struct SegmentCodingInfo {
     uint64_t segmentId;
     uint32_t segmentSize;
-    CodingScheme _codingScheme;
-    std::string _codingSetting;
+    CodingScheme codingScheme;
+    std::string codingSetting;
 };
 
 #endif
