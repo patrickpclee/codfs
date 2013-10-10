@@ -1,4 +1,5 @@
 #include "getsegmentcodinginforeply.hh"
+#include "getsegmentcodinginforequest.hh"
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
 #include "../../common/enums.hh"
@@ -9,11 +10,17 @@
 extern Osd* osd;
 #endif
 
+GetSegmentCodingInfoReplyMsg::GetSegmentCodingInfoReplyMsg(Communicator* communicator) :
+        Message(communicator) {
+
+}
+
 GetSegmentCodingInfoReplyMsg::GetSegmentCodingInfoReplyMsg(
-        Communicator* communicator, uint32_t osdSockfd,
+        Communicator* communicator, uint32_t requestId, uint32_t osdSockfd,
         vector<SegmentCodingInfo> segmentCodingInfo) :
         Message(communicator) {
 
+    _msgHeader.requestId = requestId;
 	_sockfd = osdSockfd;
 	_segmentCodingInfo = segmentCodingInfo;
 }
@@ -68,9 +75,11 @@ void GetSegmentCodingInfoReplyMsg::parse(char* buf) {
 }
 
 void GetSegmentCodingInfoReplyMsg::doHandle() {
-#ifdef COMPILE_FOR_OSD
-	osd->getSegmentCodingInfoProcessor(_msgHeader.requestId, _sockfd, _segmentCodingInfo);
-#endif
+    GetSegmentCodingInfoRequestMsg* getSegmentCodingInfoRequestMsg =
+            (GetSegmentCodingInfoRequestMsg*) _communicator->popWaitReplyMessage(
+                    _msgHeader.requestId);
+    getSegmentCodingInfoRequestMsg->setSegmentCodingInfoList(_segmentCodingInfo);
+    getSegmentCodingInfoRequestMsg->setStatus(READY);
 }
 
 void GetSegmentCodingInfoReplyMsg::printProtocol() {

@@ -17,7 +17,7 @@ GetSegmentCodingInfoRequestMsg::GetSegmentCodingInfoRequestMsg(Communicator* com
 }
 
 GetSegmentCodingInfoRequestMsg::GetSegmentCodingInfoRequestMsg(Communicator* communicator,
-		uint32_t dstSockfd, list<uint64_t> segmentIdList) :
+		uint32_t dstSockfd, vector<uint64_t> segmentIdList) :
 		Message(communicator) {
 
 	_sockfd = dstSockfd;
@@ -68,4 +68,12 @@ void GetSegmentCodingInfoRequestMsg::printProtocol() {
 	debug(
 			"[GET_SEGMENT_CODING_INFO_REQUEST] Segment ID List Size = %zu\n",
 			_segmentIdList.size());
+}
+
+void GetSegmentCodingInfoRequestMsg::setSegmentCodingInfoList(vector<SegmentCodingInfo> segmentCodingInfoList) {
+    _segmentCodingInfoList = segmentCodingInfoList;
+}
+
+vector<SegmentCodingInfo> GetSegmentCodingInfoRequestMsg::getSegmentCodingInfoList() {
+    return _segmentCodingInfoList;
 }

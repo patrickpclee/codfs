@@ -1,6 +1,7 @@
 #ifndef __GET_SEGMENT_CODING_INFO_REQUEST_HH__
 #define __GET_SEGMENT_CODING_INFO_REQUEST_HH__
 
+#include "../common/segmentcodinginfo.hh"
 #include "../message.hh"
 #include "../../common/enums.hh"
 
@@ -17,7 +18,7 @@ public:
 	GetSegmentCodingInfoRequestMsg(Communicator* communicator);
 
 	GetSegmentCodingInfoRequestMsg(Communicator* communicator, uint32_t dstSockfd,
-			list<uint64_t> segmentId);
+			vector<uint64_t> segmentId);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -48,8 +49,12 @@ public:
 
 	void printProtocol();
 
+	void setSegmentCodingInfoList(vector<SegmentCodingInfo> segmentCodingInfoList);
+	vector<SegmentCodingInfo> getSegmentCodingInfoList();
+
 private:
-	list<uint64_t> _segmentIdList;
+	vector<uint64_t> _segmentIdList;
+	vector<SegmentCodingInfo> _segmentCodingInfoList;
 };
 
 #endif

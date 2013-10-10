@@ -595,9 +595,22 @@ void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId,
 }
 
 void Mds::getSegmentCodingInfoProcessor(uint32_t requestId, uint32_t connectionId,
-			list<uint64_t> segmentIdList) {
-    // TODO
-    return;
+			vector<uint64_t> segmentIdList) {
+
+    vector<SegmentCodingInfo> segmentCodingInfoList;
+    for (uint64_t segmentId: segmentIdList) {
+        SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(
+                segmentId);
+
+        SegmentCodingInfo segmentCodingInfo;
+        segmentCodingInfo.segmentId = segmentId;
+        segmentCodingInfo.segmentSize = segmentMetaData._size;
+        segmentCodingInfo.codingScheme = segmentMetaData._codingScheme;
+        segmentCodingInfo.codingSetting = segmentMetaData._codingSetting;
+        segmentCodingInfoList.push_back(segmentCodingInfo);
+    }
+
+    _mdsCommunicator->replySegmentCodingInfo(requestId, connectionId, segmentCodingInfoList);
 }
 
 int main(void) {

@@ -31,6 +31,8 @@
 #include "metadata/cachesegmentreply.hh"
 #include "metadata/reportdeletedcache.hh"
 #include "metadata/precachesegmentrequest.hh"
+#include "metadata/getsegmentcodinginforequest.hh"
+#include "metadata/getsegmentcodinginforeply.hh"
 
 #include "transfer/putsegmentinitrequest.hh"
 #include "transfer/putsegmentinitreply.hh"
@@ -161,6 +163,12 @@ Message* MessageFactory::createMessage(Communicator* communicator,
 	case (PRECACHE_SEGMENT_REQUEST):
 		return new PrecacheSegmentRequestMsg(communicator);
 		break;
+	case (GET_SEGMENT_CODING_INFO_REPLY):
+	    return new GetSegmentCodingInfoReplyMsg(communicator);
+	    break;
+	case (GET_SEGMENT_CODING_INFO_REQUEST):
+	    return new GetSegmentCodingInfoRequestMsg(communicator);
+	    break;
 
 	//TRANSFER
 	case (PUT_SEGMENT_INIT_REQUEST):

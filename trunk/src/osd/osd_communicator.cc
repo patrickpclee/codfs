@@ -2,6 +2,7 @@
  * osd_communicator.cc
  */
 
+#include <unordered_map>
 #include <iostream>
 #include <cstdio>
 #include "osd.hh"
@@ -29,6 +30,9 @@
 #include "../protocol/status/osdstartupmsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/repairsegmentinfomsg.hh"
+#include "../protocol/metadata/getsegmentcodinginforequest.hh"
+#include "../protocol/metadata/getsegmentcodinginforeply.hh"
+
 
 using namespace std;
 
@@ -395,4 +399,31 @@ void OsdCommunicator::repairBlockAck(uint64_t segmentId,
 			getMdsSockfd(), segmentId, repairBlockList, repairBlockOsdList);
 	repairSegmentInfoMsg->prepareProtocolMsg();
 	addMessage(repairSegmentInfoMsg);
+}
+
+unordered_map<uint64_t, SegmentCodingInfo> OsdCommunicator::getSegmentCodingInfo(vector<uint64_t> segmentIds) {
+
+    unordered_map<uint64_t, SegmentCodingInfo> segmentCodingInfoMap;
+
+	GetSegmentCodingInfoRequestMsg* getSegmentCodingInfoRequestMsg =
+			new GetSegmentCodingInfoRequestMsg(this, getMdsSockfd(), segmentIds);
+	getSegmentCodingInfoRequestMsg->prepareProtocolMsg();
+
+	addMessage(getSegmentCodingInfoRequestMsg, true);
+
+	MessageStatus status = getSegmentCodingInfoRequestMsg->waitForStatusChange();
+	if (status == READY) {
+
+	    vector<SegmentCodingInfo> segmentCodingInfoList = getSegmentCodingInfoRequestMsg->getSegmentCodingInfoList();
+	    for (SegmentCodingInfo info: segmentCodingInfoList) {
+	        segmentCodingInfoMap[info.segmentId] = info;
+	    }
+
+	    waitAndDelete(getSegmentCodingInfoRequestMsg);
+	} else {
+	    debug("%s\n", "Get Segment Info Request Failed");
+	    exit(-1);
+	}
+
+	return segmentCodingInfoMap;
 }

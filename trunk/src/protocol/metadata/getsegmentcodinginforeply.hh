@@ -6,18 +6,13 @@
 
 using namespace std;
 
-/**
- * Extends the Message class
- * Initiate an segment upload
- */
-
 class GetSegmentCodingInfoReplyMsg: public Message {
 public:
 
 	GetSegmentCodingInfoReplyMsg(Communicator* communicator);
 
-	GetSegmentCodingInfoReplyMsg(Communicator* communicator, uint32_t osdSockfd,
-	        vector<SegmentCodingInfo>);
+	GetSegmentCodingInfoReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t osdSockfd,
+	        vector<SegmentCodingInfo> segmentCodingInfoList);
 
 	/**
 	 * Copy values in private variables to protocol message

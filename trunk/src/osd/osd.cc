@@ -74,14 +74,7 @@ Osd::~Osd() {
 
 unordered_map<uint64_t, SegmentCodingInfo> Osd::getSegmentCodingInfo(
         vector<uint64_t> segmentIds) {
-    unordered_map<uint64_t, SegmentCodingInfo> segmentCodingInfoMap;
-    return segmentCodingInfoMap;
-}
-
-unordered_map<uint64_t, SegmentCodingInfo> Osd::getSegmentCodingInfoProcessor(
-        uint32_t requestId, uint32_t sockfd,
-        vector<SegmentCodingInfo> segmentCodingInfo) {
-    return {};
+    return _osdCommunicator->getSegmentCodingInfo(segmentIds);
 }
 
 void Osd::reportRemovedCache() {

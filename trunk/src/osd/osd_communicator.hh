@@ -5,8 +5,10 @@
 #ifndef __OSD_COMMUNICATOR_HH__
 #define __OSD_COMMUNICATOR_HH__
 
+#include <unordered_map>
 #include <iostream>
 #include <stdint.h>
+#include "../common/segmentcodinginfo.hh"
 #include "../common/metadata.hh"
 #include "../common/blocklocation.hh"
 #include "../communicator/communicator.hh"
@@ -200,6 +202,10 @@ public:
 
 	void repairBlockAck(uint64_t segmentId, vector<uint32_t> repairBlockList,
 			vector<uint32_t> repairBlockOsdList);
+
+    unordered_map<uint64_t, SegmentCodingInfo> getSegmentCodingInfo(
+            vector<uint64_t> segmentIds);
+
 private:
 
 	/**
