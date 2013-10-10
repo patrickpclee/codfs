@@ -92,6 +92,9 @@ void Osd::startupRestore()
 
 unordered_map<uint64_t, SegmentCodingInfo> Osd::getSegmentCodingInfo(
         vector<uint64_t> segmentIds) {
+    sort(segmentIds.begin(), segmentIds.end());
+    int n = unique(segmentIds.begin(), segmentIds.end()) - segmentIds.begin();
+    segmentIds.resize(n);
     return _osdCommunicator->getSegmentCodingInfo(segmentIds);
 }
 
