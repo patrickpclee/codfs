@@ -237,10 +237,8 @@ void StorageModule::startupMerge(unordered_map<uint64_t, SegmentCodingInfo>& seg
         string fh(dent->d_name);
         uint64_t segmentId = atoll(fh.substr(0,fh.find_first_of('.')).c_str());
         uint32_t blockId = atoi(fh.substr(fh.find_first_of('.')+1).c_str());
-        uint32_t blockSize;
-
-        if (isParityBlock(segmentId, blockId, blockSize, segmentInfoMap[segmentId])) {
-            doStartupMerge(fh, st.st_size, blockSize);
+        if (st.st_size > segmentInfoMap[segmentId].blockSize) {
+            doStartupMerge(fh, st.st_size, segmentInfoMap[segmentId].blockSize);
         }
     }
     closedir(srcdir);
@@ -254,6 +252,8 @@ bool StorageModule::isParityBlock(uint64_t segmentId, uint32_t blockId,
 
 void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockSize)
 {
+    fh = _blockFolder + fh;
+    debug_red("HEHE %s\n", fh.c_str());
     char *buf = MemoryPool::getInstance().poolMalloc(fileSize);
     FILE* fp = fopen(fh.c_str(), "rb+");
 
@@ -264,6 +264,7 @@ void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockS
     }
 
     int offset = blockSize;
+    debug_red("Merge start %s\n", fh.c_str());
     while (offset < fileSize)
     {
         int n = *((int*)(buf+offset));
@@ -282,6 +283,7 @@ void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockS
         }
         offset += payoff;
     }
+    debug_red("HEHE Merge end %s\n", fh.c_str());
 
     // clean the reserved space
     memset(buf+blockSize, 0, 4);
@@ -293,6 +295,7 @@ void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockS
 
     fclose(fp);
     MemoryPool::getInstance().poolFree(buf);
+
 }
 
 

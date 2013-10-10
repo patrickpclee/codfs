@@ -35,7 +35,7 @@ void GetSegmentCodingInfoReplyMsg::prepareProtocolMsg() {
 		ncvfs::GetSegmentCodingInfoReplyPro_SegmentCodingInfoPro* segmentCodingInfoPro =
 				getSegmentCodingInfoReplyPro.add_segmentcodinginfo();
 		segmentCodingInfoPro->set_segmentid(it->segmentId);
-		segmentCodingInfoPro->set_segmentsize(it->segmentId);
+		segmentCodingInfoPro->set_segmentsize(it->segmentSize);
 		segmentCodingInfoPro->set_codingscheme(
 		        (ncvfs::PutSegmentInitRequestPro_CodingScheme) it->codingScheme);
 		segmentCodingInfoPro->set_codingsetting(it->codingSetting);

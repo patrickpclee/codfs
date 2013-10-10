@@ -78,15 +78,14 @@ void Osd::startupRestore()
     _storageModule->getExistingSegmentIds(segmentIds);
     if (!segmentIds.empty()) {
         for (uint64_t segmentId: segmentIds) {
-            debug_red("Find segmentId = %" PRIu64 "\n", segmentId);
+            debug("Find restore segmentId = %" PRIu64 "\n", segmentId);
         }
 
         unordered_map<uint64_t, SegmentCodingInfo> infoMap = getSegmentCodingInfo(segmentIds);
         for (auto& e: infoMap) {
-            cout << e.first << " " << e.second.codingSetting << endl;
+            e.second.blockSize = _codingModule->getBlockSize(e.second.codingScheme, e.second.codingSetting, e.second.segmentSize);
         }
-        //
-        //_storageModule->startupMerge(infoMap);
+        _storageModule->startupMerge(infoMap);
     }
 }
 

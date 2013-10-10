@@ -6,6 +6,7 @@
 struct SegmentCodingInfo {
     uint64_t segmentId;
     uint32_t segmentSize;
+    uint32_t blockSize;
     CodingScheme codingScheme;
     std::string codingSetting;
 };
