@@ -263,7 +263,6 @@ bool StorageModule::isParityBlock(uint64_t segmentId, uint32_t blockId,
 void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockSize)
 {
     fh = _blockFolder + fh;
-    debug_red("HEHE %s\n", fh.c_str());
     char *buf = MemoryPool::getInstance().poolMalloc(fileSize);
     FILE* fp = fopen(fh.c_str(), "rb+");
 
@@ -273,8 +272,7 @@ void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockS
         exit(-1);
     }
 
-    int offset = blockSize;
-    debug_red("Merge start %s\n", fh.c_str());
+    uint32_t offset = blockSize;
     while (offset < fileSize)
     {
         int n = *((int*)(buf+offset));
@@ -293,7 +291,6 @@ void StorageModule::doStartupMerge(string fh, uint32_t fileSize, uint32_t blockS
         }
         offset += payoff;
     }
-    debug_red("HEHE Merge end %s\n", fh.c_str());
 
     // clean the reserved space
     memset(buf+blockSize, 0, 4);
@@ -799,7 +796,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
         uint32_t N = offsetLength.size();
         memcpy(buf, &N, 4); 
         offset += 4;
-        for (int i = 0; i < N; i++)
+        for (uint32_t i = 0; i < N; i++)
         {
             memcpy(buf+offset, &(offsetLength[i].first), 4);
             offset += 4;
