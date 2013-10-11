@@ -237,8 +237,18 @@ void StorageModule::startupMerge(unordered_map<uint64_t, SegmentCodingInfo>& seg
         string fh(dent->d_name);
         uint64_t segmentId = atoll(fh.substr(0,fh.find_first_of('.')).c_str());
         uint32_t blockId = atoi(fh.substr(fh.find_first_of('.')+1).c_str());
+        const string blockKey = getBlockKey (segmentId, blockId);
         if (st.st_size > segmentInfoMap[segmentId].blockSize) {
             doStartupMerge(fh, st.st_size, segmentInfoMap[segmentId].blockSize);
+
+            // prepare maps
+            _deltaIdMap.set(blockKey, 0);
+            _deltaLocationMap.set(blockKey, vector<DeltaLocation>());
+            ReserveSpaceInfo reserveSpaceInfo;
+            reserveSpaceInfo.currentOffset = segmentInfoMap[segmentId].blockSize;
+            reserveSpaceInfo.remainingReserveSpace = RESERVE_SPACE_SIZE;
+            reserveSpaceInfo.blockSize = segmentInfoMap[segmentId].blockSize;
+            _reserveSpaceMap.set(blockKey, reserveSpaceInfo);
         }
     }
     closedir(srcdir);
