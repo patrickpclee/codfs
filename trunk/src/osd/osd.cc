@@ -72,6 +72,31 @@ Osd::~Osd() {
     delete _osdCommunicator;
 }
 
+void Osd::startupRestore()
+{
+    vector<uint64_t> segmentIds; 
+    _storageModule->getExistingSegmentIds(segmentIds);
+    if (!segmentIds.empty()) {
+        for (uint64_t segmentId: segmentIds) {
+            debug("Find restore segmentId = %" PRIu64 "\n", segmentId);
+        }
+
+        unordered_map<uint64_t, SegmentCodingInfo> infoMap = getSegmentCodingInfo(segmentIds);
+        for (auto& e: infoMap) {
+            e.second.blockSize = _codingModule->getBlockSize(e.second.codingScheme, e.second.codingSetting, e.second.segmentSize);
+        }
+        _storageModule->startupMerge(infoMap);
+    }
+}
+
+unordered_map<uint64_t, SegmentCodingInfo> Osd::getSegmentCodingInfo(
+        vector<uint64_t> segmentIds) {
+    sort(segmentIds.begin(), segmentIds.end());
+    int n = unique(segmentIds.begin(), segmentIds.end()) - segmentIds.begin();
+    segmentIds.resize(n);
+    return _osdCommunicator->getSegmentCodingInfo(segmentIds);
+}
+
 void Osd::reportRemovedCache() {
     debug("%s\n", "Cache report thread started");
 
@@ -904,6 +929,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 struct BlockData blockData = _updateBlockData.get(updateKey);
                 blockData.info.offlenVector = offsetLength;
                 blockData.info.parityVector = parityList;
+                blockData.buf = blockData.buf - (sizeof(uint32_t)*(2*offsetLength.size()+1));
 
                 uint32_t deltaId = _storageModule->getNextDeltaId(segmentId,
                         blockId);
@@ -1004,7 +1030,8 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
 
 void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, uint32_t length,
-        uint32_t chunkCount, DataMsgType dataMsgType, string updateKey) {
+        uint32_t chunkCount, DataMsgType dataMsgType, string updateKey,
+        uint32_t offlenNum) {
 
     const string blockKey = to_string(segmentId) + "." + to_string(blockId);
 
@@ -1024,14 +1051,21 @@ void Osd::putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
         blockData.info.segmentId = segmentId;
         blockData.info.blockId = blockId;
         blockData.info.blockSize = length;
-        blockData.buf = MemoryPool::getInstance().poolMalloc(length);
         if (dataMsgType == RECOVERY) {
+            blockData.buf = MemoryPool::getInstance().poolMalloc(length);
             _pendingRecoveryBlockChunk.set(blockKey, chunkCount);
             _recoveryBlockData.set(blockKey, blockData);
         } else if (dataMsgType == UPLOAD) {
+            blockData.buf = MemoryPool::getInstance().poolMalloc(length);
             _pendingBlockChunk.set(blockKey, chunkCount);
             _uploadBlockData.set(blockKey, blockData);
-        } else if (dataMsgType == UPDATE || dataMsgType == PARITY) {
+        } else if (dataMsgType == UPDATE) {
+            blockData.buf = MemoryPool::getInstance().poolMalloc(length);
+            _pendingUpdateBlockChunk.set(updateKey, chunkCount);
+            _updateBlockData.set(updateKey, blockData);
+        } else if (dataMsgType == PARITY) {
+            blockData.buf = MemoryPool::getInstance().poolMalloc((offlenNum*2+2)*sizeof(uint32_t) + length);
+            blockData.buf = blockData.buf + ((offlenNum*2+1)*sizeof(uint32_t));
             _pendingUpdateBlockChunk.set(updateKey, chunkCount);
             _updateBlockData.set(updateKey, blockData);
         } else {

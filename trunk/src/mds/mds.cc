@@ -594,42 +594,23 @@ void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
-/**
- * @brief	Test Case
- */
-void Mds::test() {
-	/*
-	   uint64_t segmentId = 976172415;
-	   struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(segmentId);
+void Mds::getSegmentCodingInfoProcessor(uint32_t requestId, uint32_t connectionId,
+			vector<uint64_t> segmentIdList) {
 
-	   debug("Segment %" PRIu64 "- Coding %d:%s\n",segmentId, (int)segmentMetaData._codingScheme, segmentMetaData._codingSetting.c_str());
-	   for(const auto node : segmentMetaData._nodeList) {
-	   debug("%" PRIu32 "\n",node);
-	   }
-	 */
-	/*
-	   uint32_t fileId = 216;
-	   vector <uint64_t> segmentList = _metaDataModule->readSegmentList(fileId);
-	   debug("Segment List [%" PRIu32 "]\n",fileId);
-	   for(const auto segment : segmentList){
-	   uint32_t primaryId = _metaDataModule->getPrimary(segment);
-	   printf("%" PRIu64 " [%" PRIu32 "]- ", segment,primaryId);
-	   }
-	   printf("\n");
-	 */
-	/*
-	   debug("%s\n", "Test\n");
-	   for (int i = 0; i < 10; ++i) {
-	   uint32_t temp = _metaDataModule->createFile(1, ".", 1024, RAID1_CODING);
-	   vector<uint64_t> segmentList;
-	   segmentList = _metaDataModule->newSegmentList(10);
-	   _metaDataModule->saveSegmentList(temp, segmentList);
-	   for (int j = 0; j < 10; ++j) {
-	   _metaDataModule->saveNodeList(segmentList[j], { 1 });
-	   _metaDataModule->setPrimary(segmentList[j], 1);
-	   }
-	   }
-	 */
+    vector<SegmentCodingInfo> segmentCodingInfoList;
+    for (uint64_t segmentId: segmentIdList) {
+        SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(
+                segmentId);
+
+        SegmentCodingInfo segmentCodingInfo;
+        segmentCodingInfo.segmentId = segmentId;
+        segmentCodingInfo.segmentSize = segmentMetaData._size;
+        segmentCodingInfo.codingScheme = segmentMetaData._codingScheme;
+        segmentCodingInfo.codingSetting = segmentMetaData._codingSetting;
+        segmentCodingInfoList.push_back(segmentCodingInfo);
+    }
+
+    _mdsCommunicator->replySegmentCodingInfo(requestId, connectionId, segmentCodingInfoList);
 }
 
 int main(void) {

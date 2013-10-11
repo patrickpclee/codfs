@@ -24,6 +24,7 @@ SegmentMetaDataModule::SegmentMetaDataModule(
 	_segmentMetaDataStorage = new MongoDB();
 	_segmentMetaDataStorage->connect();
 	_segmentMetaDataStorage->setCollection(_collection);
+	_segmentMetaDataStorage->setMaxVersion();
 }
 
 /**

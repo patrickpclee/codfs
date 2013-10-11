@@ -277,6 +277,9 @@ public:
 	 */
 	void test();
 
+	void getSegmentCodingInfoProcessor(uint32_t requestId, uint32_t connectionId,
+			vector<uint64_t> segmentIdList);
+
 private:
 
 	/**
