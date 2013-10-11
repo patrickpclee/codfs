@@ -16,6 +16,7 @@
 #include "filelrucache.hh"
 #include "reservespaceinfo.hh"
 #include "deltalocation.hh"
+#include "segmentcodinginfo.hh"
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
@@ -340,6 +341,11 @@ public:
     list<uint64_t> getSegmentCacheQueue();
 
     static uint32_t getCombinedLength(vector<offset_length_t> offsetLength);
+
+    void doStartupMerge(string fh, uint32_t fileSize, uint32_t blockSize);
+    bool isParityBlock(uint64_t segmentId, uint32_t blockId, uint32_t& blockSize, SegmentCodingInfo& info);
+    void startupMerge(unordered_map<uint64_t, SegmentCodingInfo>& segmentInfoMap);
+    void getExistingSegmentIds(vector<uint64_t>& segmentIds);
 
 private:
 

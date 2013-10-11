@@ -2,6 +2,7 @@
  * osd_communicator.cc
  */
 
+#include <unordered_map>
 #include <iostream>
 #include <cstdio>
 #include "osd.hh"
@@ -29,6 +30,9 @@
 #include "../protocol/status/osdstartupmsg.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/repairsegmentinfomsg.hh"
+#include "../protocol/metadata/getsegmentcodinginforequest.hh"
+#include "../protocol/metadata/getsegmentcodinginforeply.hh"
+
 
 using namespace std;
 
@@ -151,7 +155,7 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 
     debug("XXXXX segmentId = %" PRIu64 " blockid = %" PRIu32 " blocksize = %" PRIu32 "\n", segmentId, blockId, length);
 	debug("Put Block Init to FD = %" PRIu32 "\n", sockfd);
-	putBlockInit(sockfd, segmentId, blockId, length, chunkCount, dataMsgType, updateKey);
+	putBlockInit(sockfd, segmentId, blockId, length, chunkCount, dataMsgType, updateKey, offsetLength.size());
 	debug("Put Block Init ACK-ed from FD = %" PRIu32 "\n", sockfd);
 
 	// step 2: send data
@@ -254,13 +258,13 @@ uint32_t OsdCommunicator::sendBlockAck(uint64_t segmentId, uint32_t blockId,
 
 void OsdCommunicator::putBlockInit(uint32_t sockfd, uint64_t segmentId,
 		uint32_t blockId, uint32_t length, uint32_t chunkCount,
-		DataMsgType dataMsgType, string updateKey) {
+		DataMsgType dataMsgType, string updateKey, uint32_t offlenNum) {
 
 	// Step 1 of the upload process
 
 	PutBlockInitRequestMsg* putBlockInitRequestMsg = new PutBlockInitRequestMsg(
 			this, sockfd, segmentId, blockId, length, chunkCount, dataMsgType,
-			updateKey);
+			updateKey, offlenNum);
 
 	putBlockInitRequestMsg->prepareProtocolMsg();
 	addMessage(putBlockInitRequestMsg, true);
@@ -395,4 +399,32 @@ void OsdCommunicator::repairBlockAck(uint64_t segmentId,
 			getMdsSockfd(), segmentId, repairBlockList, repairBlockOsdList);
 	repairSegmentInfoMsg->prepareProtocolMsg();
 	addMessage(repairSegmentInfoMsg);
+}
+
+unordered_map<uint64_t, SegmentCodingInfo> OsdCommunicator::getSegmentCodingInfo(vector<uint64_t> segmentIds) {
+
+    unordered_map<uint64_t, SegmentCodingInfo> segmentCodingInfoMap;
+
+	GetSegmentCodingInfoRequestMsg* getSegmentCodingInfoRequestMsg =
+			new GetSegmentCodingInfoRequestMsg(this, getMdsSockfd(), segmentIds);
+	getSegmentCodingInfoRequestMsg->prepareProtocolMsg();
+    getSegmentCodingInfoRequestMsg->printProtocol();
+
+	addMessage(getSegmentCodingInfoRequestMsg, true);
+
+	MessageStatus status = getSegmentCodingInfoRequestMsg->waitForStatusChange();
+	if (status == READY) {
+
+	    vector<SegmentCodingInfo> segmentCodingInfoList = getSegmentCodingInfoRequestMsg->getSegmentCodingInfoList();
+	    for (SegmentCodingInfo info: segmentCodingInfoList) {
+	        segmentCodingInfoMap[info.segmentId] = info;
+	    }
+
+	    waitAndDelete(getSegmentCodingInfoRequestMsg);
+	} else {
+	    debug("%s\n", "Get Segment Info Request Failed");
+	    exit(-1);
+	}
+
+	return segmentCodingInfoMap;
 }
