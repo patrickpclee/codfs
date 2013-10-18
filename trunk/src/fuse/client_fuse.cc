@@ -408,7 +408,8 @@ static int ncvfs_truncate(const char *path, off_t newsize) {
 	/// TODO: Support truncate to size other than 0
 	if(newsize > 0) {
 		debug_error("%s\n","Only Truncate to 0 is supported");
-		exit(-1);
+//		exit(-1);
+		return 0;
 	}
 
 	uint32_t fileId = checkNameSpace(path);
