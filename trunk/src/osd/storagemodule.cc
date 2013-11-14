@@ -134,8 +134,8 @@ void StorageModule::initializeStorageStatus() {
             _segmentDiskCacheMap.set(segmentId, segmentDiskCache);
             _segmentDiskCacheQueue.push_back(segmentId);
 
-            _freeSegmentSpace -= st.st_size;
-            _currentSegmentUsage += st.st_size;
+            _freeSegmentSpace -= (uint64_t)st.st_size;
+            _currentSegmentUsage += (uint64_t)st.st_size;
         }
 
         cout << "ID: " << segmentId << "\tLength: " << segmentDiskCache.length
@@ -172,8 +172,8 @@ void StorageModule::initializeStorageStatus() {
         }
 
         // save file info
-        _freeBlockSpace -= st.st_size;
-        _currentBlockUsage += st.st_size;
+        _freeBlockSpace -= (uint64_t)st.st_size;
+        _currentBlockUsage += (uint64_t)st.st_size;
 
     }
     closedir(srcdir);
@@ -761,7 +761,7 @@ uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
             "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
             segmentId, blockId, byteWritten, offsetInBlock);
 
-    //updateBlockFreespace(length);
+    updateBlockFreespace(length);
 
     return byteWritten;
 }
@@ -847,7 +847,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
             "Segment ID = %" PRIu64 " Block ID = %" PRIu32 " Delta ID = %" PRIu32 " write %" PRIu32 " bytes\n",
             segmentId, blockId, deltaId, byteWritten);
 
-    //updateBlockFreespace(combinedLength);
+    updateBlockFreespace(combinedLength);
 
     // if stored in reserve space
     if (deltaLocation.isReserveSpace) {
@@ -1231,8 +1231,8 @@ struct SegmentData StorageModule::getSegmentData(uint64_t segmentId,
 
 void StorageModule::updateBlockFreespace(uint32_t size) {
     if (isEnoughBlockSpace(size)) {
-        _currentBlockUsage += size;
-        _freeBlockSpace -= size;
+        _currentBlockUsage += (uint64_t)size;
+        _freeBlockSpace -= (uint64_t)size;
     } else {
         debug_error("Block space not sufficient to save %s\n",
                 formatSize(size).c_str());
@@ -1246,7 +1246,7 @@ int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
         return -1; // error: segment size larger than cache
     }
 
-    while (_freeSegmentSpace < newSegmentSize) {
+    while (_freeSegmentSpace < (uint64_t)newSegmentSize) {
         uint64_t segmentId = 0;
         struct SegmentDiskCache segmentCache;
 
@@ -1310,8 +1310,8 @@ void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
     }
     flushSegmentDiskCache(segmentId);
 
-    _currentSegmentUsage += segmentSize;
-    _freeSegmentSpace -= segmentSize;
+    _currentSegmentUsage += (uint64_t)segmentSize;
+    _freeSegmentSpace -= (uint64_t)segmentSize;
 
 // save cache to map
     struct SegmentDiskCache segmentDiskCache;
@@ -1367,7 +1367,7 @@ uint32_t StorageModule::getCurrentSegmentCache() {
     return _currentSegmentUsage;
 }
 
-uint32_t StorageModule::getFreeBlockSpace() {
+uint64_t StorageModule::getFreeBlockSpace() {
     return _freeBlockSpace;
 }
 
@@ -1383,20 +1383,20 @@ void StorageModule::setMaxSegmentCache(uint32_t max_segment) {
     _maxSegmentCache = max_segment;
 }
 
-uint32_t StorageModule::getMaxBlockCapacity() {
+uint64_t StorageModule::getMaxBlockCapacity() {
     return _maxBlockCapacity;
 }
 
-uint32_t StorageModule::getMaxSegmentCache() {
+uint64_t StorageModule::getMaxSegmentCache() {
     return _maxSegmentCache;
 }
 
 bool StorageModule::isEnoughBlockSpace(uint32_t size) {
-    return size <= _freeBlockSpace ? true : false;
+    return (uint64_t)size <= _freeBlockSpace ? true : false;
 }
 
 bool StorageModule::isEnoughSegmentSpace(uint32_t size) {
-    return size <= _freeSegmentSpace ? true : false;
+    return (uint64_t)size <= _freeSegmentSpace ? true : false;
 }
 
 uint32_t StorageModule::getCombinedLength(vector<offset_length_t> offsetLength) {

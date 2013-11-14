@@ -254,14 +254,14 @@ public:
      * @return uint32_t Max capacity of OSD
      */
 
-    uint32_t getMaxBlockCapacity();
+    uint64_t getMaxBlockCapacity();
 
     /**
      * Get the Space of Segment Cache
      * @return uint32_t Max space of segment cache
      */
 
-    uint32_t getMaxSegmentCache();
+    uint64_t getMaxSegmentCache();
 
     /**
      * Get the current Capacity of OSD
@@ -282,7 +282,7 @@ public:
      * @return uint32_t current free space of OSD
      */
 
-    uint32_t getFreeBlockSpace();
+    uint64_t getFreeBlockSpace();
 
     /**
      * Get the free space of segment cache

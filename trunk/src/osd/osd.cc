@@ -1265,13 +1265,14 @@ uint32_t Osd::getCpuLoadavg(int idx) {
     }
 }
 
-uint32_t Osd::getFreespace() {
+uint64_t Osd::getFreespace() {
     struct statvfs64 fiData;
     if ((statvfs64(DISK_PATH, &fiData)) < 0) {
         printf("Failed to stat %s:\n", DISK_PATH);
         return 0;
     } else {
-        return ((uint32_t) (fiData.f_bsize * fiData.f_bfree / 1024 / 1024));
+		return ((uint64_t) _storageModule->getFreeBlockSpace() / 1024 / 1024);
+        //return ((uint32_t) (fiData.f_bsize * fiData.f_bfree / 1024 / 1024));
     }
 }
 
