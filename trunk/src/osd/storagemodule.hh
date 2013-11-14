@@ -515,8 +515,8 @@ private:
     uint64_t _maxSegmentCache;
     atomic<uint64_t> _freeBlockSpace;
     atomic<uint64_t> _freeSegmentSpace;
-    atomic<uint32_t> _currentBlockUsage;
-    atomic<uint32_t> _currentSegmentUsage;
+    atomic<uint64_t> _currentBlockUsage;
+    atomic<uint64_t> _currentSegmentUsage;
 
     ConcurrentMap<string, uint32_t> _deltaIdMap;
     ConcurrentMap<string, vector<offset_length_t>> _deltaOffsetLength;
