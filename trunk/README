@@ -17,9 +17,7 @@ In Ubuntu, the following changes are needed
 2. Install Prerequsite for MongoDB C++ Driver
 
 > sudo apt-get install build-essential scons libboost-dev libboost-program-options-dev libboost-thread-dev libboost-filesystem-dev
-> cd lib/mongo-cxx-driver-v2.4
-> scons
-> sudo cp libmongoclient.a /usr/local/lib/
+> cd lib/mongo; scons install
 
 -------------------------------
 
