@@ -16,6 +16,7 @@
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/recoverytriggerreply.hh"
 #include "../protocol/metadata/uploadsegmentackreply.hh"
+#include "../protocol/metadata/getsegmentcodinginforeply.hh"
 //#include "../protocol/metadata/heresfilesize.hh"
 
 extern ConfigLayer* configLayer;
@@ -273,4 +274,14 @@ void MdsCommunicator::replyUploadSegmentAck(uint32_t requestId,
     uploadSegmentAckReplyMsg->prepareProtocolMsg();
     uploadSegmentAckReplyMsg->printProtocol();
     addMessage(uploadSegmentAckReplyMsg, false);
+}
+
+void MdsCommunicator::replySegmentCodingInfo(uint32_t requestId,
+        uint32_t connectionId,
+        vector<SegmentCodingInfo> segmentCodingInfoList) {
+
+    GetSegmentCodingInfoReplyMsg*  getSegmentCodingInfoReplyMsg =
+            new GetSegmentCodingInfoReplyMsg(this, requestId, connectionId, segmentCodingInfoList);
+    getSegmentCodingInfoReplyMsg->prepareProtocolMsg();
+    addMessage(getSegmentCodingInfoReplyMsg, false);
 }

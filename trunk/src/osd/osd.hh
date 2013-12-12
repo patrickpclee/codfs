@@ -10,6 +10,7 @@
 #include "osd_communicator.hh"
 #include "storagemodule.hh"
 #include "codingmodule.hh"
+#include "../common/segmentcodinginfo.hh"
 #include "../common/metadata.hh"
 #include "../common/segmentdata.hh"
 #include "../common/blockdata.hh"
@@ -196,7 +197,8 @@ public:
 
     void putBlockInitProcessor(uint32_t requestId, uint32_t sockfd,
             uint64_t segmentId, uint32_t blockId, uint32_t length,
-            uint32_t chunkCount, DataMsgType dataMsgType, string updateKey);
+            uint32_t chunkCount, DataMsgType dataMsgType, 
+            string updateKey, uint32_t offlenNum);
 
     /**
      * Distribute Blocks to OSD
@@ -300,7 +302,7 @@ public:
      * To get the free space of the current disk in MB
      * @return free space in MB, if error, return 0
      */
-    uint32_t getFreespace();
+    uint64_t getFreespace();
 
     /**
      * Get a reference of OSDCommunicator
@@ -337,6 +339,14 @@ public:
      */
 
     bool isBlockRequested(uint64_t segmentId, uint32_t blockId);
+
+    // consistency
+    void uniqueLockSegment(uint64_t segmentId);
+    void uniqueUnlockSegment(uint64_t segmentId);
+    void sharedLockSegment(uint64_t segmentId);
+    void sharedUnlockSegment(uint64_t segmentId);
+    RWMutex* obtainRWMutex(uint64_t segmentId);
+    void startupRestore();
 
 private:
 
@@ -386,6 +396,8 @@ private:
      */
 
     void freeSegment(uint64_t segmentId, SegmentData segmentData);
+
+    unordered_map<uint64_t, SegmentCodingInfo> getSegmentCodingInfo (vector<uint64_t> segmentIds);
 
     /**
      * Stores the list of OSDs that store a certain block
@@ -449,5 +461,9 @@ private:
     // cache report
     uint32_t _reportCacheInterval;
     list<uint64_t> _previousCacheList;
+
+    // consistency
+    unordered_map<uint64_t, RWMutex*> _segmentRWMutexMap;
+    mutex _segmentRWMutexMapMutex;
 };
 #endif

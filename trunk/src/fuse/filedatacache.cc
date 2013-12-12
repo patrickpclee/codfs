@@ -128,7 +128,11 @@ uint32_t FileDataCache::readDataCache(uint64_t segmentId, uint32_t primary,
             _clientId, sockfd, segmentId);
 
     memcpy(buf, segmentCache.buf + offset, size);
+
+#ifndef MULTI_USER_MODE
     updateLru(segmentId);
+#endif
+
     return size;
 }
 
@@ -176,7 +180,12 @@ uint32_t FileDataCache::writeDataCache(uint64_t segmentId, uint32_t primary,
 
     _storageModule->setSegmentCache(segmentId, segmentCache);
 
+#ifdef MULTI_USER_MODE
+    closeDataCache(segmentId);
+#else
     updateLru(segmentId);
+#endif
+
     return size;
 }
 

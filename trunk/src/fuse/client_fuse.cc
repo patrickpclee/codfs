@@ -108,6 +108,12 @@ static uint32_t checkNameSpace(const char* path) {
 static struct FileMetaData getAndCacheFileMetaData(uint32_t id) {
 
 	struct FileMetaData fileMetaData;
+#ifdef MULTI_USER_MODE
+    fileMetaData = _clientCommunicator->getFileInfo(_clientId, id);
+    _fileMetaDataCache->saveMetaData(fileMetaData);
+	return fileMetaData;
+#endif
+
 	try {
 		fileMetaData = _fileMetaDataCache->getMetaData(id);
 		for (uint32_t primary : fileMetaData._primaryList) {
@@ -125,6 +131,7 @@ static struct FileMetaData getAndCacheFileMetaData(uint32_t id) {
 			return fileMetaData;
 		_fileMetaDataCache->saveMetaData(fileMetaData);
 	}
+
 	return fileMetaData;
 }
 
@@ -401,7 +408,8 @@ static int ncvfs_truncate(const char *path, off_t newsize) {
 	/// TODO: Support truncate to size other than 0
 	if(newsize > 0) {
 		debug_error("%s\n","Only Truncate to 0 is supported");
-		exit(-1);
+//		exit(-1);
+		return 0;
 	}
 
 	uint32_t fileId = checkNameSpace(path);

@@ -1,22 +1,18 @@
-#ifndef __OSDSTATUPDATEREPLYMSG_HH__
-#define __OSDSTATUPDATEREPLYMSG_HH__
+#ifndef __GET_SEGMENT_CODING_INFO_REPLY_HH__
+#define __GET_SEGMENT_CODING_INFO_REPLY_HH__
 
 #include "../message.hh"
+#include "../common/segmentcodinginfo.hh"
 
 using namespace std;
 
-/**
- * Extends the Message class
- * Initiate an segment upload
- */
-
-class OsdStatUpdateReplyMsg: public Message {
+class GetSegmentCodingInfoReplyMsg: public Message {
 public:
 
-	OsdStatUpdateReplyMsg(Communicator* communicator);
+	GetSegmentCodingInfoReplyMsg(Communicator* communicator);
 
-	OsdStatUpdateReplyMsg(Communicator* communicator, uint32_t dstSockfd,
-		uint32_t osdId, uint32_t capacity, uint32_t loading);
+	GetSegmentCodingInfoReplyMsg(Communicator* communicator, uint32_t requestId, uint32_t osdSockfd,
+	        vector<SegmentCodingInfo> segmentCodingInfoList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -48,10 +44,7 @@ public:
 	void printProtocol();
 
 private:
-	uint32_t _osdId;
-	uint64_t _capacity;
-	uint32_t _loading;
-
+	vector<SegmentCodingInfo> _segmentCodingInfo;
 };
 
 #endif
