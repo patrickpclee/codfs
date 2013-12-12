@@ -1,0 +1,246 @@
+file /home/jeremy/workspace/ncvfs/trunk/lib/mongo-cxx-driver-v2.4/SConstruct,line 86:
+	Configure(confdir = .sconf_temp)
+scons: Configure: Checking for C++ library boost_thread-mt... 
+scons: Configure: ".sconf_temp/conftest_0.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_0.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_0.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_0.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_0.cpp
+  |
+scons: Configure: Building ".sconf_temp/conftest_0" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_0 -pthread .sconf_temp/conftest_0.o -lboost_thread-mt
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C++ library boost_thread... 
+scons: Configure: ".sconf_temp/conftest_1.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_1.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_1.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_1.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_1.cpp
+  |
+scons: Configure: ".sconf_temp/conftest_1" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_1 -pthread .sconf_temp/conftest_1.o -lboost_thread
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_filesystem-mt... 
+scons: Configure: ".sconf_temp/conftest_2.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_2.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_2.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_2.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_2.cpp
+  |
+scons: Configure: Building ".sconf_temp/conftest_2" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_2 -pthread .sconf_temp/conftest_2.o -lboost_thread -lboost_filesystem-mt
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C++ library boost_filesystem... 
+scons: Configure: ".sconf_temp/conftest_3.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_3.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_3.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_3.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_3.cpp
+  |
+scons: Configure: ".sconf_temp/conftest_3" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_3 -pthread .sconf_temp/conftest_3.o -lboost_thread -lboost_filesystem
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for C++ library boost_system-mt... 
+scons: Configure: ".sconf_temp/conftest_4.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_4.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_4.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_4.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_4.cpp
+  |
+scons: Configure: Building ".sconf_temp/conftest_4" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_4 -pthread .sconf_temp/conftest_4.o -lboost_thread -lboost_filesystem -lboost_system-mt
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C++ library boost_system... 
+scons: Configure: ".sconf_temp/conftest_5.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_5.cpp <-
+  |  |
+  |  |
+  |  |
+  |  |int
+  |  |main() {
+  |  |  
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_5.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_5.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_5.cpp
+  |
+scons: Configure: ".sconf_temp/conftest_5" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_5 -pthread .sconf_temp/conftest_5.o -lboost_thread -lboost_filesystem -lboost_system
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking for sasl_version_info(0, 0, 0, 0, 0, 0) in C library sasl2... 
+scons: Configure: ".sconf_temp/conftest_6.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_6.c <-
+  |  |
+  |  |
+  |  |#include "sasl/sasl.h"
+  |  |
+  |  |int
+  |  |main() {
+  |  |  sasl_version_info(0, 0, 0, 0, 0, 0);
+  |  |return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: Building ".sconf_temp/conftest_6.o" failed in a previous run and all its sources are up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_6.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_6.c
+  |
+scons: Configure: (cached) no
+
+scons: Configure: Checking for C++ header file execinfo.h... 
+scons: Configure: ".sconf_temp/conftest_7.cpp" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_7.cpp <-
+  |  |
+  |  |#include "execinfo.h"
+  |  |
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_7.o" is up to date.
+scons: Configure: The original builder output was:
+  |g++ -o .sconf_temp/conftest_7.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_7.cpp
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking whether backtrace is declared... 
+scons: Configure: ".sconf_temp/conftest_8.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_8.c <-
+  |  |#include <execinfo.h>
+  |  |int main()
+  |  |{
+  |  |#ifndef backtrace
+  |  |    (void) backtrace;
+  |  |#endif
+  |  |    ;
+  |  |    return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_8.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_8.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_8.c
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking whether backtrace_symbols is declared... 
+scons: Configure: ".sconf_temp/conftest_9.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_9.c <-
+  |  |#include <execinfo.h>
+  |  |int main()
+  |  |{
+  |  |#ifndef backtrace_symbols
+  |  |    (void) backtrace_symbols;
+  |  |#endif
+  |  |    ;
+  |  |    return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_9.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_9.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_9.c
+  |
+scons: Configure: (cached) yes
+
+scons: Configure: Checking whether backtrace_symbols_fd is declared... 
+scons: Configure: ".sconf_temp/conftest_10.c" is up to date.
+scons: Configure: The original builder output was:
+  |.sconf_temp/conftest_10.c <-
+  |  |#include <execinfo.h>
+  |  |int main()
+  |  |{
+  |  |#ifndef backtrace_symbols_fd
+  |  |    (void) backtrace_symbols_fd;
+  |  |#endif
+  |  |    ;
+  |  |    return 0;
+  |  |}
+  |  |
+  |
+scons: Configure: ".sconf_temp/conftest_10.o" is up to date.
+scons: Configure: The original builder output was:
+  |gcc -o .sconf_temp/conftest_10.o -c -O3 -pthread -D_SCONS -DMONGO_EXPOSE_MACROS -Ibuild -Ibuild/mongo .sconf_temp/conftest_10.c
+  |
+scons: Configure: (cached) yes
+
+
