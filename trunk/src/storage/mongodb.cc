@@ -1,4 +1,3 @@
-#include <time.h>
 #include "mongodb.hh"
 
 #include "../common/debug.hh"
@@ -70,7 +69,6 @@ MongoDB::MongoDB ()
 
 	DbAuthHook *dbHook = new DbAuthHook(_database, _user, _password, true);
 	pool.addHook(dbHook);
-	srand(time(NULL));
 }
 
 /**
@@ -146,13 +144,7 @@ void MongoDB::insert (BSONObj insertSegment)
 {
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
-
 	_connection->insert(_database + "." + _collection, insertSegment);
-
-	uint64_t version = _version++;
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
-	_connection->update(_database + "." + _collection, insertSegment, versionObj, true);
-
 	_conn->done();
 
 	pool.flush();
@@ -167,11 +159,6 @@ void MongoDB::update (Query querySegment, BSONObj updateSegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, updateSegment, true);
-
-	uint64_t version = _version++;
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
-	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
-
 	_conn->done();
 
 	pool.flush();
@@ -186,11 +173,6 @@ void MongoDB::push (Query querySegment, BSONObj pushSegment)
 	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
 	DBClientBase* _connection = _conn->get();
 	_connection->update(_database + "." + _collection, querySegment, pushSegment, true);
-
-	uint64_t version = _version++;
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
-	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
-
 	_conn->done();
 	pool.flush();
 }
@@ -201,11 +183,6 @@ BSONObj MongoDB::findAndModify (BSONObj querySegment, BSONObj updateSegment)
 	DBClientBase* _connection = _conn->get();
 	BSONObj result;
 	_connection->runCommand(_database, BSON ("findandmodify" << _collection << "query" << querySegment << "update" << updateSegment), result);
-
-	uint64_t version = _version++;
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
-	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
-
 	_conn->done();
 
 	pool.flush();
@@ -218,11 +195,6 @@ void MongoDB::removeField (Query querySegment, string field)
 	DBClientBase* _connection = _conn->get();
 	BSONObj unsetSegment = BSON ("$unset" << BSON (field << "1"));
 	_connection->update(_database + "." + _collection, querySegment, unsetSegment, true);
-
-	uint64_t version = _version++;
-	BSONObj versionObj = BSON ("$set" << BSON ("version" << (long long int)version));
-	_connection->update(_database + "." + _collection, querySegment, versionObj, true);
-
 	_conn->done();
 
 	pool.flush();
@@ -239,17 +211,3 @@ void MongoDB::remove (Query querySegment)
 	return ;
 }
 
-void MongoDB::setMaxVersion () {
-	ScopedDbConnection* _conn = ScopedDbConnection::getScopedDbConnection(_host);
-	DBClientBase* _connection = _conn->get();
-
-    _connection->ensureIndex(_database + "." + _collection, fromjson("{version:-1}"));
-    BSONObj last_element = _connection->findOne(_database + "." + _collection, Query().sort("version", -1));
-    if (!last_element.isEmpty()) {
-        _version = last_element.getField("version").numberLong();
-        _version++;
-    } else {
-        _version = 0;
-    }
-	_conn->done();
-}

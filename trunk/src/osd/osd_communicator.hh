@@ -5,10 +5,8 @@
 #ifndef __OSD_COMMUNICATOR_HH__
 #define __OSD_COMMUNICATOR_HH__
 
-#include <unordered_map>
 #include <iostream>
 #include <stdint.h>
-#include "../common/segmentcodinginfo.hh"
 #include "../common/metadata.hh"
 #include "../common/blocklocation.hh"
 #include "../communicator/communicator.hh"
@@ -202,10 +200,6 @@ public:
 
 	void repairBlockAck(uint64_t segmentId, vector<uint32_t> repairBlockList,
 			vector<uint32_t> repairBlockOsdList);
-
-    unordered_map<uint64_t, SegmentCodingInfo> getSegmentCodingInfo(
-            vector<uint64_t> segmentIds);
-
 private:
 
 	/**
@@ -217,12 +211,10 @@ private:
 	 * @param chunkCount Number of chunks that will be sent
 	 * @param dataMsgType Data Msg Type
 	 * @param updateKey Update key
-	 * @param offlenNum offlenVector.size()
 	 */
 
 	void putBlockInit(uint32_t sockfd, uint64_t segmentId, uint32_t blockId,
-			uint32_t length, uint32_t chunkCount, DataMsgType dataMsgType, string updateKey,
-            uint32_t offlenNum);
+			uint32_t length, uint32_t chunkCount, DataMsgType dataMsgType, string updateKey);
 
 	/**
 	 * Send an segment chunk to OSD (Step 2)

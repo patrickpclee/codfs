@@ -16,7 +16,7 @@ PutBlockInitRequestMsg::PutBlockInitRequestMsg(Communicator* communicator) :
 PutBlockInitRequestMsg::PutBlockInitRequestMsg(Communicator* communicator,
 		uint32_t osdSockfd, uint64_t segmentId, uint32_t blockId,
 		uint32_t blockSize, uint32_t chunkCount, DataMsgType dataMsgType,
-		string updateKey, uint32_t offlenNum) :
+		string updateKey) :
 		Message(communicator) {
 
 	_sockfd = osdSockfd;
@@ -26,7 +26,6 @@ PutBlockInitRequestMsg::PutBlockInitRequestMsg(Communicator* communicator,
 	_chunkCount = chunkCount;
 	_dataMsgType = dataMsgType;
 	_updateKey = updateKey;
-    _offlenNum = offlenNum;
 }
 
 void PutBlockInitRequestMsg::prepareProtocolMsg() {
@@ -38,7 +37,6 @@ void PutBlockInitRequestMsg::prepareProtocolMsg() {
 	putBlockInitRequestPro.set_chunkcount(_chunkCount);
 	putBlockInitRequestPro.set_datamsgtype((ncvfs::DataMsgPro_DataMsgType)_dataMsgType);
 	putBlockInitRequestPro.set_updatekey(_updateKey);
-	putBlockInitRequestPro.set_offlennum(_offlenNum);
 
 	if (!putBlockInitRequestPro.SerializeToString(&serializedString)) {
 		cerr << "Failed to write string." << endl;
@@ -65,7 +63,6 @@ void PutBlockInitRequestMsg::parse(char* buf) {
 	_chunkCount = putBlockInitRequestPro.chunkcount();
 	_dataMsgType = (DataMsgType) putBlockInitRequestPro.datamsgtype();
 	_updateKey = putBlockInitRequestPro.updatekey();
-    _offlenNum = putBlockInitRequestPro.offlennum();
 }
 
 void PutBlockInitRequestMsg::doHandle() {
@@ -74,7 +71,7 @@ void PutBlockInitRequestMsg::doHandle() {
 			"[PUT_BLOCK_INIT] Segment ID = %" PRIu64 ", Block ID = %" PRIu32 ", Length = %" PRIu32 ", Count = %" PRIu32 ", dataMsgType = %d\n",
 			_segmentId, _blockId, _blockSize, _chunkCount, _dataMsgType);
 	osd->putBlockInitProcessor(_msgHeader.requestId, _sockfd, _segmentId,
-			_blockId, _blockSize, _chunkCount, _dataMsgType, _updateKey, _offlenNum);
+			_blockId, _blockSize, _chunkCount, _dataMsgType, _updateKey);
 #endif
 }
 

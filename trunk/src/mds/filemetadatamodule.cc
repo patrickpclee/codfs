@@ -19,7 +19,6 @@ FileMetaDataModule::FileMetaDataModule(ConfigMetaDataModule* configMetaDataModul
 	_fileMetaDataStorage = new MongoDB();
 	_fileMetaDataStorage->connect();
 	_fileMetaDataStorage->setCollection(_collection);
-	_fileMetaDataStorage->setMaxVersion();
 
 	//BSONObj querySegment = BSON ("id" << "config");
 	//BSONObj updateSegment = BSON ("$set" << BSON ("fileId" << 0));

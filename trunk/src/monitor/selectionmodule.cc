@@ -13,8 +13,6 @@ using namespace std;
 extern ConfigLayer* configLayer;
 extern mutex osdLBMapMutex;
 
-const uint32_t MIN_FREE_SPACE = 100; // in MB
-
 
 #ifdef RR_DISTRIBUTE
 mutex RRprimaryMutex;
@@ -128,8 +126,7 @@ vector<uint32_t> SelectionModule::ChoosePrimary(uint32_t numOfSegs) {
 	{
 		lock_guard<mutex> lk(osdStatMapMutex);
 		for(auto& entry: _osdStatMap) {
-			if (entry.second.osdHealth == ONLINE &&
-                entry.second.osdCapacity > MIN_FREE_SPACE) {
+			if (entry.second.osdHealth == ONLINE) {
 				allOnlineList.push_back(entry.first);
 			}
 		}
@@ -162,8 +159,7 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t
     {
         lock_guard<mutex> lk(osdStatMapMutex);
         for(auto& entry: _osdStatMap) {
-            if (entry.second.osdHealth == ONLINE && entry.first != primary
-                && entry.second.osdCapacity > MIN_FREE_SPACE) {
+            if (entry.second.osdHealth == ONLINE && entry.first != primary) {
                 allOnlineList.push_back(entry.first);
             }
         }
@@ -178,16 +174,6 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t
 
     random_shuffle(allOnlineList.begin(), allOnlineList.end());
     allOnlineList.push_back(primary); // ensure primary is at the end
-
-    if (allOnlineList.size() == 0) {
-        debug_error("%s", "ERROR: No harddisk is available!\n");
-        exit(-1);
-    }
-
-    if (allOnlineList.size() < numOfBlks) {
-        debug_error("Warning: number of available osd %" PRIu32 " < number of blocks %" PRIu32 "\n", 
-            allOnlineList.size(), numOfBlks);
-    }
 
     int i = 0;
     while (numOfBlks > 0) {
@@ -209,8 +195,7 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t
 	{
 		lock_guard<mutex> lk(osdStatMapMutex);
 		for(auto& entry: _osdStatMap) {
-			if (entry.second.osdHealth == ONLINE && entry.first != primary
-                && entry.second.osdCapacity > MIN_FREE_SPACE) {
+			if (entry.second.osdHealth == ONLINE && entry.first != primary) {
 				allOnlineList.push_back(entry.first);
 			}
 		}
@@ -225,10 +210,6 @@ vector<struct BlockLocation> SelectionModule::ChooseSecondary(uint32_t
 	secondaryList.push_back(tmp);
 	numOfBlks--;
 
-    if (allOnlineList.size() < numOfBlks) {
-        debug_error("Warning: number of available osd %" PRIu32 " < number of blocks %" PRIu32 "\n", 
-            allOnlineList.size(), numOfBlks);
-    }
 	{
 		lock_guard<mutex> lk(osdLBMapMutex);
 		for (uint32_t i = 0; i < allOnlineList.size(); i++) 

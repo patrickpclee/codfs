@@ -16,7 +16,6 @@
 #include "filelrucache.hh"
 #include "reservespaceinfo.hh"
 #include "deltalocation.hh"
-#include "segmentcodinginfo.hh"
 
 #include <boost/thread/locks.hpp>
 #include <boost/thread/shared_mutex.hpp>
@@ -254,14 +253,14 @@ public:
      * @return uint32_t Max capacity of OSD
      */
 
-    uint64_t getMaxBlockCapacity();
+    uint32_t getMaxBlockCapacity();
 
     /**
      * Get the Space of Segment Cache
      * @return uint32_t Max space of segment cache
      */
 
-    uint64_t getMaxSegmentCache();
+    uint32_t getMaxSegmentCache();
 
     /**
      * Get the current Capacity of OSD
@@ -282,7 +281,7 @@ public:
      * @return uint32_t current free space of OSD
      */
 
-    uint64_t getFreeBlockSpace();
+    uint32_t getFreeBlockSpace();
 
     /**
      * Get the free space of segment cache
@@ -341,11 +340,6 @@ public:
     list<uint64_t> getSegmentCacheQueue();
 
     static uint32_t getCombinedLength(vector<offset_length_t> offsetLength);
-
-    void doStartupMerge(string fh, uint32_t fileSize, uint32_t blockSize);
-    bool isParityBlock(uint64_t segmentId, uint32_t blockId, uint32_t& blockSize, SegmentCodingInfo& info);
-    void startupMerge(unordered_map<uint64_t, SegmentCodingInfo>& segmentInfoMap);
-    void getExistingSegmentIds(vector<uint64_t>& segmentIds);
 
 private:
 
@@ -515,8 +509,8 @@ private:
     uint64_t _maxSegmentCache;
     atomic<uint64_t> _freeBlockSpace;
     atomic<uint64_t> _freeSegmentSpace;
-    atomic<uint64_t> _currentBlockUsage;
-    atomic<uint64_t> _currentSegmentUsage;
+    atomic<uint32_t> _currentBlockUsage;
+    atomic<uint32_t> _currentSegmentUsage;
 
     ConcurrentMap<string, uint32_t> _deltaIdMap;
     ConcurrentMap<string, vector<offset_length_t>> _deltaOffsetLength;

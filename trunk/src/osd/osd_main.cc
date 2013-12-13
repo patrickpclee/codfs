@@ -70,6 +70,7 @@ int main(int argc, char* argv[]) {
 
 	// handle segFault for debug
 	Debug::DeathHandler dh;
+	(void) dh; // avoid warning
 
 	char* interfaceName = NULL;
 	uint32_t selfId = 0;
@@ -122,11 +123,6 @@ int main(int argc, char* argv[]) {
 	communicator->connectToMds();
 	communicator->connectToMonitor();
 	communicator->registerToMonitor(selfAddr, selfPort);
-
-
-    // startup merge
-    osd->startupRestore();
-
 
 	garbageCollectionThread.join();
 	receiveThread.join();
