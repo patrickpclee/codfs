@@ -22,6 +22,10 @@
 #include <boost/function.hpp>
 #include <boost/thread.hpp>
 
+#include <boost/version.hpp>
+#if BOOST_VERSION < 105000
+#define TIME_UTC_ TIME_UTC
+#endif
 
 namespace boost { namespace threadpool
 {
