@@ -14,6 +14,7 @@ using namespace std;
 #include "../coding/embrcoding.hh"
 #include "../coding/evenoddcoding.hh"
 #include "../coding/rdpcoding.hh"
+#include "../coding/cauchycoding.hh"
 #include "../common/debug.hh"
 
 mutex codingMutex;
