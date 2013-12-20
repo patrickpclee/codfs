@@ -65,7 +65,7 @@ FileDataCache::FileDataCache() {
             n = configLayer->getConfigInt("Fuse>CAUCHY>C_N");
             k = configLayer->getConfigInt("Fuse>CAUCHY>C_K");
             m = configLayer->getConfigInt("Fuse>CAUCHY>C_M");
-            _codingScheme = CAUCHY_CODING;
+            _codingScheme = CAUCHY;
             _codingSetting = CauchyCoding::generateSetting(n, k, m);
             break;
         default:
