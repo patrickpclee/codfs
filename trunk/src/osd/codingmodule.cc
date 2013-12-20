@@ -29,6 +29,7 @@ CodingModule::CodingModule() {
 		_codingWorker[EMBR_CODING] = new EMBRCoding();
 		_codingWorker[EVENODD_CODING] = new EvenOddCoding();
 		_codingWorker[RDP_CODING] = new RDPCoding();
+		_codingWorker[CAUCHY] = new CauchyCoding();
 	}
 }
 
