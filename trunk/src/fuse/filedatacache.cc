@@ -61,6 +61,13 @@ FileDataCache::FileDataCache() {
             _codingScheme = EVENODD_CODING;
             _codingSetting = EvenOddCoding::generateSetting(n);
             break;
+        case 7:
+            n = configLayer->getConfigInt("Fuse>CAUCHY>C_N");
+            k = configLayer->getConfigInt("Fuse>CAUCHY>C_K");
+            m = configLayer->getConfigInt("Fuse>CAUCHY>C_M");
+            _codingScheme = CAUCHY_CODING;
+            _codingSetting = CauchyCoding::generateSetting(n, k, m);
+            break;
         default:
             debug("Invalid Test = %d\n", coding);
             break;
