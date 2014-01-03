@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+    <Communication>
+		<NumClientThreads>10</NumClientThreads>
+    </Communication>
+
+	<Fuse>
+        <segmentSize>10M</segmentSize>
+        <writeBufferSize>10</writeBufferSize>
+        <numWriteThread>10</numWriteThread>
+        <PreallocateSegmentNumber>20</PreallocateSegmentNumber>
+        <prefetchCount>10</prefetchCount>
+        <prefetchBufferSize>10</prefetchBufferSize>
+        <numPrefetchThread>10</numPrefetchThread>
+        <lruSize>20</lruSize>
+        <codingScheme>3</codingScheme>
+        <!-- 0 -->
+        <RAID0>
+            <N>3</N>
+        </RAID0>
+
+        <!-- 1 -->
+        <RAID1>
+            <N>1</N>
+        </RAID1>
+
+        <!-- 2 -->
+        <RAID5>
+            <N>3</N>
+        </RAID5>
+        
+        <!-- 3 -->
+        <RS>
+            <N>4</N>
+            <K>2</K>
+            <M>8</M>
+        </RS>
+        
+        <!-- 4 -->
+        <EMBR>
+            <N>4</N>
+            <K>2</K>
+            <M>8</M>
+        </EMBR>
+
+        <!-- 5 -->
+        <RDP>
+            <N>6</N>
+        </RDP>
+
+        <!-- 6 -->
+        <EVENODD>
+            <N>7</N>
+        </EVENODD>
+	</Fuse>
+</NcvfsConfig>

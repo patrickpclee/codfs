@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+    <Communication>
+        <ServerPort>50000</ServerPort>
+    </Communication>
+
+	<MetaData>
+		<BasePath>/tmp/ncvfs</BasePath>
+
+		<MongoDB>
+			<Host>192.168.50.98</Host>
+			<Database>ncvfs</Database>
+
+			<User>ncvfs</User>
+			<!-- Digested Password -->
+			<Password>cf8b7fa0b1bcd277da8217f04f498bd0</Password>
+		</MongoDB>
+	</MetaData>
+
+	<Hotness>
+		<TopK>
+			<THRESHOLD1>10</THRESHOLD1>
+			<THRESHOLD2>20</THRESHOLD2>
+			<HotCount>64</HotCount>
+			<HottestCount>64</HottestCount>
+		</TopK>
+	</Hotness>
+</NcvfsConfig>
