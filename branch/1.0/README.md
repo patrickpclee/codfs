@@ -23,33 +23,68 @@ required libraries.
 The following libraries have to be compiled and installed manually.
 
     Google Protocol Buffers
-    > cd FL/lib/protobuf; ./configure; make; make install
+    > cd FL/lib/protobuf-2.4.1; ./configure; make; sudo make install
     > sudo ln -s /usr/local/lib/libprotobuf.so.7 /usr/lib/libprotobuf.so.7
-    > sudo ln -s /usr/local/lib/libprotobuf.so.7 /usr/lib/libprotobuf.so.7
+    > sudo ln -s /usr/local/lib/libprotoc.so.7 /usr/lib/libprotoc.so.7
 
     MongoDB C++ Driver
-    > cd FL/lib/mongo; scons install
+    > cd FL/lib/mongo; sudo scons install
 
 We provide four implementations for the update schemes: FO, FL, PL and PLR, 
-located in their respective folders.
+located in their respective folders. The above setup procedures only need 
+to be executed once.
 
 How to run 
 =====
 
+We describe how to run CodFS in FL mode. The procedures for running 
+other update schemes are the same.
+
 (I) COMPILE
 
+    > cd FL/; make
 
 (II) IMPORT MONGODB SETTINGS
 
+    1. Set up MongoDB environment
+        a. Create the database parent directory
+            > mkdir /data/db
+        b. Change the MongoDB address "[mongodb_ip]:[mongodb_port]" in "mongo-ncvfs.js" if necessary
+            > db = connect("[mongodb_ip]:[mongodb_port]/ncvfs")
+    2. Change to directory containing MongoDB binary
+        > cd mongo/bin;
+    3. Start MongoDB daemon
+        > sudo ./mongod --fork --dbpath /data/db --logpath /var/log/mongodb.log --logappend
+    4. Import MongoDB Setting
+        > ./mongo ../../mongo-ncvfs.js
 
 (III) SETUP XML CONFIGS
 
+    * MONITOR (monitorconfig.xml)
+        - Time interval for failure and recovery detection
+    * MDS (mdsconfig.xml)
+        - MongoDB configuration
+    * OSD (osdconfig.xml)
+        - Capacity and cache size of Object Storage Servers
+    * CLIENT (clientconfig.xml)
+        - Client-side cache size
+        - Coding scheme settings
+    * Common configuration (common.xml)
+        - Shared MDS and MONITOR configurations
 
 (IV) RUN CODFS SERVERS
 
-
+    * Separate components
+        1. MONITOR
+            > ./MONITOR
+        2. MDS
+            > ./MDS
+        3. OSD
+            > ./OSD [component_id] [network_interface] 
+            
 (V) MOUNT CODFS FUSE CLIENT
-
+    > mkdir fusedir mountdir
+    > ./CLIENT_FUSE -o big_writes,large_read,noatime -f mountdir [client_id]
 
 Contact
 =====
