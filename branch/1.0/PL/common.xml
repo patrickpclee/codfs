@@ -4,6 +4,7 @@
 	<Components>
 	
 		<MDS>
+            <count>1</count>        <!-- do not change -->
 			<MDS0>
                 <id>50000</id>      <!-- unique component ID -->
                 <ip>127.0.0.1</ip>  <!-- MDS IP -->
@@ -12,6 +13,7 @@
 		</MDS>
 		
 		<MONITOR>
+            <count>1</count>        <!-- do not change -->
 			<MONITOR0>
                 <id>53000</id>      <!-- unique component ID -->
                 <ip>127.0.0.1</ip>  <!-- MONITOR IP -->
