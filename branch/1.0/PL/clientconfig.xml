@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+
+	<Fuse>
+        <segmentSize>16M</segmentSize>                                  <!-- segment size -->
+        <codingScheme>5</codingScheme>                                  <!-- specify the coding scheme in use for upload -->
+
+        <!-- 0 -->
+        <RAID0>
+            <N>3</N>
+        </RAID0>
+
+        <!-- 1 -->
+        <RAID1>
+            <N>3</N>
+        </RAID1>
+
+        <!-- 2 -->
+        <RAID5>
+            <N>3</N>
+        </RAID5>
+        
+        <!-- 3 -->
+        <RS>
+            <N>4</N>
+            <K>2</K>
+            <M>8</M>
+        </RS>
+        
+        <!-- 4 -->
+        <EMBR>
+            <N>4</N>
+            <K>2</K>
+            <M>8</M>
+        </EMBR>
+
+        <!-- 5 -->
+        <RDP>
+            <N>6</N>
+        </RDP>
+
+        <!-- 6 -->
+        <EVENODD>
+            <N>7</N>
+        </EVENODD>
+
+        <!-- Changing settings below this line is not recommended -->
+
+        <writeBufferSize>10</writeBufferSize>                           <!-- size of write buffer -->
+        <numWriteThread>10</numWriteThread>                             <!-- no. of write threads -->
+        <PreallocateSegmentNumber>0</PreallocateSegmentNumber>          <!-- preallocate segments during upload -->
+        <prefetchCount>0</prefetchCount>                                <!-- no. of future segments to prefetch -->
+        <prefetchBufferSize>10</prefetchBufferSize>                     <!-- size of ring buffer for storing prefetch segments -->
+        <numPrefetchThread>10</numPrefetchThread>                       <!-- no. of threads use for prefetch segments -->
+        <lruSize>2</lruSize>                                            <!-- size of LRU cache -->
+
+	</Fuse>
+
+    <Communication>
+		<NumClientThreads>10</NumClientThreads>
+    </Communication>
+
+</NcvfsConfig>
