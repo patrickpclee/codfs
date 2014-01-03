@@ -1,9 +1,27 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
 
-	<Coding>
-		<!--<SegmentNumber>1</SegmentNumber>-->
-	</Coding>
+	<Components>
+	
+		<MDS>
+			<MDS0>
+                <id>50000</id>      <!-- unique component ID -->
+                <ip>127.0.0.1</ip>  <!-- MDS IP -->
+                <port>50000</port>  <!-- MDS PORT -->
+			</MDS0>
+		</MDS>
+		
+		<MONITOR>
+			<MONITOR0>
+                <id>53000</id>      <!-- unique component ID -->
+                <ip>127.0.0.1</ip>  <!-- MONITOR IP -->
+                <port>53000</port>  <!-- MONITOR PORT -->
+			</MONITOR0>
+		</MONITOR>
+				
+	</Components>
+
+    <!-- Changing settings below this line is not recommended -->
 	
 	<Communication>
 
@@ -22,27 +40,5 @@
 		<!-- No of dispatch thread created for each thread pool -->
 		<NumThreadPerPool>1</NumThreadPerPool>
 	</Communication>
-	
-	<Components>
-	
-		<MDS>
-			<count>1</count>
-			<MDS0>
-				<id>50000</id>
-				<ip>192.168.0.21</ip>
-				<port>50000</port>
-			</MDS0>
-		</MDS>
-		
-		<MONITOR>
-			<count>1</count>
-			<MONITOR0>
-				<id>53000</id>
-				<ip>192.168.0.22</ip>
-				<port>53000</port>
-			</MONITOR0>
-		</MONITOR>
-				
-	</Components>
 	
 </NcvfsConfig>
