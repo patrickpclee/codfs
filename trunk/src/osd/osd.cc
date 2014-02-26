@@ -1265,7 +1265,7 @@ uint32_t Osd::getOsdId() {
 }
 
 void Osd::dumpLatency() {
-    FILE* f = fopen ("latency.out", "w");
+    FILE* f = fopen ("/tmp/latency.out", "w");
     for (auto latency : _latencyList) {
         fprintf (f, "%d %" PRIu32 "\n", latency.first, latency.second);
     }
