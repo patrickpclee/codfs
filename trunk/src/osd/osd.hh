@@ -338,6 +338,8 @@ public:
 
     bool isBlockRequested(uint64_t segmentId, uint32_t blockId);
 
+    void dumpLatency();
+
 private:
 
     /**
@@ -449,5 +451,8 @@ private:
     // cache report
     uint32_t _reportCacheInterval;
     list<uint64_t> _previousCacheList;
+
+    vector<pair<bool, uint32_t>> _latencyList; // <isUpdate, latency>
+
 };
 #endif

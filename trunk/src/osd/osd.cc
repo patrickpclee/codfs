@@ -2,10 +2,12 @@
  * osd.cc
  */
 
+#include <chrono>
 #include <thread>
 #include <vector>
 #include <openssl/md5.h>
 #include <algorithm>
+#include <atomic>
 #include "osd.hh"
 #include "../common/enumtostring.hh"
 #include "../common/blocklocation.hh"
@@ -26,19 +28,18 @@
 #include <string.h>
 #include <sys/statvfs.h>
 
-// Global Variables
-extern ConfigLayer* configLayer;
-mutex segmentRequestCountMutex;
-mutex recoveryMutex;
-
-#include <atomic>
+mutex latencyMutex;
 
 #ifdef PARALLEL_TRANSFER
-
 #include "../../lib/threadpool/threadpool.hpp"
 boost::threadpool::pool _blocktp;
 boost::threadpool::pool _recoverytp;
 #endif
+
+// Global Variables
+extern ConfigLayer* configLayer;
+mutex segmentRequestCountMutex;
+mutex recoveryMutex;
 
 using namespace std;
 
@@ -64,6 +65,8 @@ Osd::Osd(uint32_t selfId) {
     _blocktpId = 0;
     _updateId = 0;
     _recoverytpId = 0;
+
+    _latencyList.reserve(1000000);
 }
 
 Osd::~Osd() {
@@ -595,6 +598,14 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
         if ((dataMsgType == UPLOAD && _pendingSegmentChunk.get(segmentId) == 0)
                 || (dataMsgType == UPDATE
                         && _pendingUpdateSegmentChunk.get(updateKey) == 0)) {
+
+#ifdef LATENCY_TEST
+            // start timer
+            typedef chrono::high_resolution_clock Clock;
+            typedef chrono::milliseconds milliseconds;
+            Clock::time_point t0 = Clock::now();
+#endif
+
             // if all chunks have arrived
             struct SegmentData segmentCache = _storageModule->getSegmentData(
                     segmentId, dataMsgType, updateKey);
@@ -736,6 +747,17 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             }
 
             cout << "Segment " << segmentId << " uploaded" << endl;
+
+#ifdef LATENCY_TEST
+            // end timer
+            Clock::time_point t1 = Clock::now();
+            milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
+            bool isUpload = (dataMsgType == UPDATE);
+            {
+                lock_guard<mutex> lk(latencyMutex);
+                _latencyList.push_back(make_pair(isUpload, ms.count()));
+            }
+#endif
 
             // if all chunks have arrived, send ack
             _osdCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId, isSmallSegment);
@@ -1240,4 +1262,15 @@ StorageModule * Osd::getStorageModule() {
 
 uint32_t Osd::getOsdId() {
     return _osdId;
+}
+
+void Osd::dumpLatency() {
+    FILE* f = fopen ("latency.out", "w");
+    for (auto latency : _latencyList) {
+        fprintf (f, "%d %" PRIu32 "\n", latency.first, latency.second);
+    }
+    _latencyList.clear();
+    fflush(f);
+    fsync (fileno(f));
+    fclose(f);
 }

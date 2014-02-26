@@ -55,6 +55,11 @@ cout << "Cache Segment: " << cacheSegmentTime / 1000 << endl;
 		fflush (stdout);
 		osd->getStorageModule()->clearSegmentDiskCache();
 		cout << "done" << endl;
+	} else if (signum == SIGUSR2) {
+		cout << "Dumping latency results...";
+		fflush (stdout);
+		osd->dumpLatency();
+		cout << "done" << endl;
 	}
 }
 
@@ -67,6 +72,7 @@ int main(int argc, char* argv[]) {
 
 	signal(SIGINT, sighandler);
 	signal(SIGUSR1, sighandler);
+	signal(SIGUSR2, sighandler);
 
 	// handle segFault for debug
 	Debug::DeathHandler dh;

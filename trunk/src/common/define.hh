@@ -101,4 +101,6 @@ typedef boost::unique_lock<RWMutex> writeLock;
 // Trigger Recovery or not
 //#define TRIGGER_RECOVERY
 #define RECOVERY_DST "destinations.txt"
+
+#define LATENCY_TEST
 #endif
