@@ -678,6 +678,13 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
             // merge existing block and write again
             debug ("need merge remaining = %" PRIu32 " length = %" PRIu32 " deltaId = %" PRIu32 "\n", reserveSpaceInfo.remainingReserveSpace, combinedLength, deltaId);
             mergeBlock(segmentId, blockId, true);
+
+#ifdef LATENCY_TEST
+            typedef chrono::high_resolution_clock Clock;
+            typedef chrono::milliseconds milliseconds;
+            Clock::time_point t0 = Clock::now();
+            cout << "MERGE TIME" << t0.time_since_epoch().count() << endl;
+#endif
         }
 
         currentOffset = reserveSpaceInfo.currentOffset;
