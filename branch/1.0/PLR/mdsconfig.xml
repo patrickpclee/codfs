@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+    <Communication>
+        <ServerPort>50000</ServerPort> <!-- MDS PORT -->
+    </Communication>
+
+	<MetaData>
+
+		<MongoDB>
+            <Host>127.0.0.1</Host> <!-- MongoDB server IP -->
+            <Database>ncvfs</Database> <!-- Database name -->
+
+            <User>ncvfs</User>         <!-- Database user -->
+            <Password>cf8b7fa0b1bcd277da8217f04f498bd0</Password> <!-- Database pw digest -->
+		</MongoDB>
+
+        <!-- Changing settings below this line is not recommended -->
+
+        <BasePath>/tmp/ncvfs</BasePath> <!-- MDS basepath (deprecated) -->
+	</MetaData>
+
+    <!-- parameters of hotness algorithm (deprecated) -->
+	<Hotness>
+		<TopK>
+			<THRESHOLD1>10</THRESHOLD1>
+			<THRESHOLD2>20</THRESHOLD2>
+			<HotCount>64</HotCount>
+			<HottestCount>64</HottestCount>
+		</TopK>
+	</Hotness>
+</NcvfsConfig>

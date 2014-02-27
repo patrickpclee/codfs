@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<NcvfsConfig>
+    <Storage>
+        <SegmentCacheLocation>./osd_segment/</SegmentCacheLocation>         <!-- location for storing cached segments (deprecated) -->
+        <BlockLocation>./osd_block/</BlockLocation>                         <!-- location for storing uploaded chunks -->
+        <RemoteBlockLocation>./remote_osd_block/</RemoteBlockLocation>      <!-- deprecated -->
+    	
+        <BlockCapacity>100G</BlockCapacity>                                 <!-- capacity of chunk storage -->
+        <SegmentCacheCapacity>100M</SegmentCacheCapacity>                   <!-- capacity of segment cache (deprecated) -->
+
+        <!-- Changing settings below this line is not recommended -->
+
+        <ReportCacheInterval>5</ReportCacheInterval>                        <!-- update interval in sec for report cache status (deprecated) --> 
+    </Storage>
+	<ThreadPool>
+        <NumThreads>10</NumThreads>                                         <!-- no. of threads for handling client requests -->
+	</ThreadPool>
+</NcvfsConfig>
