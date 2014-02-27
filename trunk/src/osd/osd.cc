@@ -755,7 +755,8 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             bool isUpload = (dataMsgType == UPDATE);
             {
                 lock_guard<mutex> lk(latencyMutex);
-                _latencyList.push_back(make_pair(isUpload, ms.count()));
+                uint64_t start = t0.time_since_epoch().count();
+                _latencyList.push_back(make_pair(start, ms.count()));
             }
 #endif
 
@@ -1268,7 +1269,7 @@ void Osd::dumpLatency() {
     lock_guard<mutex> lk(latencyMutex);
     FILE* f = fopen ("/tmp/latency.out", "w");
     for (auto latency : _latencyList) {
-        fprintf (f, "%d %" PRIu32 "\n", latency.first, latency.second);
+        fprintf (f, "%" PRIu64 ",%" PRIu32 "\n", latency.first, latency.second);
     }
     _latencyList.clear();
     fflush(f);

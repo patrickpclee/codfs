@@ -452,7 +452,7 @@ private:
     uint32_t _reportCacheInterval;
     list<uint64_t> _previousCacheList;
 
-    vector<pair<bool, uint32_t>> _latencyList; // <isUpdate, latency>
+    vector<pair<uint64_t, uint32_t>> _latencyList; // <isUpdate, latency>
 
 };
 #endif
