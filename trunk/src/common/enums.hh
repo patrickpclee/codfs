@@ -26,6 +26,10 @@ enum DataMsgType {
 	PARITY = 5
 };
 
+enum UpdateScheme {
+	FO, FL, PL, PLR
+}
+
 enum BlockType {
     DEFAULT_BLOCK_TYPE = 15,
     DATA_BLOCK = 0,     // must be 0 to make it compatible with boolean

@@ -155,6 +155,16 @@ public:
     return "???";
   }
 
+  static const char * toString( UpdateScheme en ) {
+    switch( en ) {
+      case FL: return "FL";
+      case FO: return "FO";
+      case PL: return "PL";
+      case PLR: return "PLR";
+    }
+    return "???";
+  }
+
   static const char * toString( FileType en ) {
     switch( en ) {
       case FOLDER: return "FOLDER";

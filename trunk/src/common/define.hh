@@ -70,8 +70,8 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define MAX_NUM_PROCESSING_SEGMENT 10
 //#define CACHE_AFTER_TRANSFER
 //#define MOUNT_OSD
-//#define APPEND_DATA
-//#define COMPACT_PARITY_ON_READ
+
+#define UPDATE_SCHEME 0 // FO,FL,PL,PLR
 #define RESERVE_SPACE_SIZE 5242880
 
 // osd/storagemodule.cc
