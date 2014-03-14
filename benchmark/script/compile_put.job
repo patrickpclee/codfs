@@ -1,0 +1,7 @@
+rsync -av ~/shb118/ncvfs/trunk -e 'ssh -c arcfour' node11:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node11 Complete'
+rsync -av ~/shb118/ncvfs/trunk -e 'ssh -c arcfour' node12:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node12 Complete'
+rsync -av ~/shb118/ncvfs/trunk -e 'ssh -c arcfour' node18:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node18 Complete'
+rsync -av ~/shb118/ncvfs/trunk -e 'ssh -c arcfour' node19:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node19 Complete'
+rsync -av ~/shb118/ncvfs/trunk -e 'ssh -c arcfour' node15:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node15 Complete'
+rsync -av ~/shb118/ncvfs/trunk -e 'ssh -c arcfour' node16:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node16 Complete'
+rsync -av ~/shb118/ncvfs/trunk -e 'ssh -c arcfour' node17:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node17 Complete'
