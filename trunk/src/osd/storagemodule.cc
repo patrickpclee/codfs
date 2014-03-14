@@ -451,6 +451,22 @@ BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
     return blockData;
 }
 
+BlockData StorageModule::getBlock (uint64_t segmentId, uint32_t blockId, bool isParity, vector<offset_length_t> symbols, bool needLock) {
+    if (isParity) {
+        if (UPDATE_SCHEME == FO) {
+            return readBlock(segmentId, blockId, symbols);
+        } else {
+            return getMergedBlock(segmentId, blockId, isParity, true);
+        }
+    } else {
+        if (UPDATE_SCHEME == FL) {
+            return getMergedBlock(segmentId, blockId, isParity, true);
+        } else {
+            return readBlock(segmentId, blockId, symbols);
+        }
+    }
+}
+
 // this function is only thread-safe when needLock == true
 BlockData StorageModule::getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity, bool needLock) {
 

@@ -116,6 +116,8 @@ public:
      uint64_t offsetInBlock = 0, uint32_t length = 0);
      */
 
+    BlockData getBlock (uint64_t segmentId, uint32_t blockId, bool isParity, vector<offset_length_t> symbols, bool needLock);
+
     /**
      * Read symbols from a block
      * @param segmentId Segment ID

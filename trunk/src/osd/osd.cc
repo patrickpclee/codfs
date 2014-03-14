@@ -235,18 +235,7 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
                         // read block from disk
 
-                        BlockData blockData;
-
-                        if (isParity) {
-                            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
-                        } else {
-                            #ifdef APPEND_DATA
-                                blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
-                            #else
-                                blockData = _storageModule->readBlock(
-                                        segmentId, blockId, blockSymbols.second);
-                            #endif
-                        }
+                        BlockData blockData = _storageModule->getBlock (segmentId, blockId, isParity, blockSymbols.second, true);
 
                         // blockDataList reserved space for "all blocks"
                         // only fill in data for "required blocks"
@@ -363,18 +352,7 @@ void Osd::getBlockRequestProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t blockId, vector<offset_length_t> symbols,
         DataMsgType dataMsgType, bool isParity) {
 
-    BlockData blockData;
-
-    if (isParity) {
-            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
-    } else {
-        #ifdef APPEND_DATA
-            blockData = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
-        #else
-            blockData = _storageModule->readBlock(
-                    segmentId, blockId, symbols);
-        #endif
-    }
+    BlockData blockData = _storageModule->getBlock (segmentId, blockId, isParity, symbols, true);
 
     _osdCommunicator->sendBlock(sockfd, blockData, dataMsgType);
     MemoryPool::getInstance().poolFree(blockData.buf);
@@ -396,16 +374,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 
     if (osdId == _osdId) {
         // read block from disk
-        if (isParity) {
-            repairedBlock = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
-        } else {
-            #ifdef APPEND_DATA
-                repairedBlock = _storageModule->getMergedBlock(segmentId, blockId, isParity, true);
-            #else
-                repairedBlock = _storageModule->readBlock(
-                        segmentId, blockId, offsetLength);
-            #endif
-        }
+        repairedBlock = _storageModule->getBlock (segmentId, blockId, isParity, offsetLength, true);
     } else {
 
         // create entry first, wait for putBlockInit to set real value
@@ -511,7 +480,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
             _storageModule->createBlock(segmentId, blockData.info.blockId,
                     blockData.info.blockSize);
 
-            if (blockData.info.blockType == PARITY_BLOCK) {
+            if (UPDATE_SCHEME == PLR && blockData.info.blockType == PARITY_BLOCK) {
                 _storageModule->reserveBlockSpace(segmentId, blockData.info.blockId,
                         0, blockData.info.blockSize, blockData.info.blockSize + RESERVE_SPACE_SIZE);
             }
@@ -526,24 +495,34 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
             debug("Updating Segment %" PRIu64 " Block %" PRIu32 "\n", segmentId,
                     blockData.info.blockId);
 
-#ifdef APPEND_DATA
-            uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
-            _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId, false);
-            _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
-            _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId, false);
-#else
-            _storageModule->updateBlock(segmentId, blockData.info.blockId, blockData);
-            _storageModule->flushBlock(segmentId, blockData.info.blockId);
-#endif
+            if (UPDATE_SCHEME == FL) {
+                uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
+                _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId, false);
+                _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
+                _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId, false);
+            } else {
+                _storageModule->updateBlock(segmentId, blockData.info.blockId, blockData);
+                _storageModule->flushBlock(segmentId, blockData.info.blockId);
+            }
 
         } else if (dataMsgType == PARITY) {
             debug("Updating Segment %" PRIu64 " Block %" PRIu32 "\n", segmentId,
                     blockData.info.blockId);
 
-            uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
-            _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId, true);
-            _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector, true);
-            _storageModule->flushDeltaBlock(segmentId, blockData.info.blockId, deltaId, true);
+            if (UPDATE_SCHEME == FO) {
+                _storageModule->updateBlock(segmentId, blockData.info.blockId, blockData);
+                _storageModule->flushBlock(segmentId, blockData.info.blockId);
+            } else {
+                uint32_t deltaId = _storageModule->getNextDeltaId(segmentId,
+                        blockData.info.blockId);
+                _storageModule->createDeltaBlock(segmentId,
+                        blockData.info.blockId, deltaId, true);
+                _storageModule->writeDeltaBlock(segmentId,
+                        blockData.info.blockId, deltaId, blockData.buf,
+                        blockData.info.offlenVector, true);
+                _storageModule->flushDeltaBlock(segmentId,
+                        blockData.info.blockId, deltaId, true);
+            }
 
         }
     } else {
@@ -884,15 +863,15 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 // send delta to parity nodes
                 sendDelta(segmentId, blockId, blockData, offsetLength);
 
-#ifdef APPEND_DATA
-                uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockId);
-                _storageModule->createDeltaBlock(segmentId, blockId, deltaId, false);
-                _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
-                _storageModule->flushDeltaBlock(segmentId, blockId, deltaId, false);
-#else
-                _storageModule->updateBlock(segmentId, blockId, blockData);
-                _storageModule->flushBlock(segmentId, blockId);
-#endif
+                if (UPDATE_SCHEME == FL) {
+                    uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockId);
+                    _storageModule->createDeltaBlock(segmentId, blockId, deltaId, false);
+                    _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
+                    _storageModule->flushDeltaBlock(segmentId, blockId, deltaId, false);
+                } else {
+                    _storageModule->updateBlock(segmentId, blockId, blockData);
+                    _storageModule->flushBlock(segmentId, blockId);
+                }
 
                 MemoryPool::getInstance().poolFree(blockData.buf);
                 _updateBlockData.erase(updateKey);
@@ -920,10 +899,23 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 uint32_t deltaId = _storageModule->getNextDeltaId(segmentId,
                         blockId);
 
-                _storageModule->createDeltaBlock(segmentId, blockId, deltaId, true);
-                _storageModule->writeDeltaBlock(segmentId, blockId, deltaId,
-                        blockData.buf, offsetLength, true);
-                _storageModule->flushDeltaBlock(segmentId, blockId, deltaId, true);
+                if (UPDATE_SCHEME == FO) {
+                    // read old parity and compute XOR
+                    uint32_t combinedLength = StorageModule::getCombinedLength(offsetLength);
+                    BlockData parityDelta = _storageModule->readBlock(segmentId, blockId,
+                            offsetLength);
+                    Coding::bitwiseXor(parityDelta.buf, parityDelta.buf, blockData.buf, combinedLength);
+
+                    _storageModule->updateBlock(segmentId, blockId, parityDelta);
+                    _storageModule->flushBlock(segmentId, blockId);
+
+                    MemoryPool::getInstance().poolFree(parityDelta.buf);
+                } else  {
+                    _storageModule->createDeltaBlock(segmentId, blockId, deltaId, true);
+                    _storageModule->writeDeltaBlock(segmentId, blockId, deltaId,
+                            blockData.buf, offsetLength, true);
+                    _storageModule->flushDeltaBlock(segmentId, blockId, deltaId, true);
+                }
 
                 MemoryPool::getInstance().poolFree(blockData.buf);
                 _updateBlockData.erase(updateKey);
@@ -965,7 +957,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                     _storageModule->createBlock(segmentId, blockId,
                             blockData.info.blockSize);
 
-                    if (isParity) {
+                    if (isParity && UPDATE_SCHEME == PLR) {
                         _storageModule->reserveBlockSpace(segmentId, blockId, 0,
                                 blockData.info.blockSize, blockData.info.blockSize + RESERVE_SPACE_SIZE);
                     }

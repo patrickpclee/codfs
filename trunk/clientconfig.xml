@@ -13,7 +13,7 @@
         <prefetchBufferSize>10</prefetchBufferSize>
         <numPrefetchThread>10</numPrefetchThread>
         <lruSize>20</lruSize>
-        <codingScheme>3</codingScheme>
+        <codingScheme>1</codingScheme>
         <!-- 0 -->
         <RAID0>
             <N>3</N>
