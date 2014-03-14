@@ -28,7 +28,7 @@ enum DataMsgType {
 
 enum UpdateScheme {
 	FO, FL, PL, PLR
-}
+};
 
 enum BlockType {
     DEFAULT_BLOCK_TYPE = 15,
