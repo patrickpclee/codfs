@@ -5,8 +5,6 @@
 #ifndef __MDS_HH__
 #define __MDS_HH__
 
-#include "../common/hotness.hh"
-#include "hotnessmodule.hh"
 #include "metadatamodule.hh"
 #include "namespacemodule.hh"
 #include "mds_communicator.hh"
@@ -69,17 +67,6 @@ public:
 	void renameFileProcessor(uint32_t requestId, uint32_t connectionId,
 			uint32_t clientId, uint32_t fileId, const string &path,
 			const string &newPath);
-
-	/**
-	 * @brief	Handle Report Delete Cache Message from OSD
-	 * @param requestId 	Request ID
-	 * @param connectionId 	Connection ID
-	 * @param segmentIdList	List of deleted segment ID
-	 * @param osdId OSD ID
-	 */
-
-	void reportDeleteCacheProcessor(uint32_t requestId, uint32_t connectionId,
-			list<uint64_t> segmentIdList, uint32_t osdId);
 
 	/**
 	 * @brief	Handle Upload Segment Acknowledgement from Primary
@@ -153,16 +140,6 @@ public:
 	void getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 			uint64_t segmentId, uint32_t osdId, bool needReply, bool isRecovery = false);
 
-	/**
-	 * @brief	Hendle Precache Segment Request from Client
-	 * 
-	 * @param	requestId	Request ID
-	 * @param	conenctionId	Connection ID
-	 * @param	clientId	ID of the Client
-	 * @param	segmentID	ID of the Segment
-	 */
-	void precacheSegmentProcessor(uint32_t requestId, uint32_t connectionId,
-			uint32_t clientId, uint64_t segmentId);
 	/**
 	 * @brief	Handle List Folder Request from Client
 	 *
@@ -248,13 +225,6 @@ public:
 			vector<uint32_t> repairBlockOsdList);
 
 	/**
-	 * Add OSD to cacheList
-	 * @param segmentId Segment ID
-	 * @param osdId OSD ID
-	 */
-	void cacheSegmentReplyProcessor (uint64_t segmentId, uint32_t osdId);
-
-	/**
 	 * @brief	Get the MDS Communicator
 	 *
 	 * @return	Pointer to the MDS Communicator Module
@@ -262,20 +232,9 @@ public:
 	MdsCommunicator* getCommunicator();
 
 	/**
-	 * Put RAID-1 segments into cache list
-	 */
-
-	void initializeCacheList();
-
-	/**
 	 * @brief	Run the MDS
 	 */
 	void run();
-
-	/**
-	 * @brief	Test Case
-	 */
-	void test();
 
 private:
 
@@ -299,9 +258,6 @@ private:
 
 	/// Handle Namespace Operations
 	NameSpaceModule* _nameSpaceModule;
-
-	/// Handle Hotness Operations
-	HotnessModule* _hotnessModule;
 
 	/// Running Indicator
 	bool running;

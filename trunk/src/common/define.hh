@@ -68,7 +68,6 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define DISK_PATH "/"
 #define RECOVERY_THREADS 10
 #define MAX_NUM_PROCESSING_SEGMENT 10
-//#define CACHE_AFTER_TRANSFER
 //#define MOUNT_OSD
 
 #define UPDATE_SCHEME 0 // FO,FL,PL,PLR
@@ -79,7 +78,6 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #endif
 
 // osd/storagemodule.cc
-//#define USE_SEGMENT_CACHE
 #define HOTNESS_ALG TOP_HOTNESS_ALG
 //#define USE_IO_THREADS
 #define IO_THREADS 2

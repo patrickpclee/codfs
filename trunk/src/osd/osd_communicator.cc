@@ -15,8 +15,6 @@
 #include "../protocol/metadata/uploadsegmentack.hh"
 #include "../protocol/metadata/listdirectoryrequest.hh"
 #include "../protocol/metadata/getsegmentinforequest.hh"
-#include "../protocol/metadata/cachesegmentreply.hh"
-#include "../protocol/metadata/reportdeletedcache.hh"
 #include "../protocol/transfer/putsegmentinitreply.hh"
 #include "../protocol/transfer/getblockinitrequest.hh"
 #include "../protocol/transfer/putblockinitrequest.hh"
@@ -79,31 +77,6 @@ void OsdCommunicator::replyPutSegmentEnd(uint32_t requestId,
 	putSegmentEndReplyMsg->prepareProtocolMsg();
 
 	addMessage(putSegmentEndReplyMsg);
-}
-
-void OsdCommunicator::replyCacheSegment(uint32_t requestId,
-		uint32_t connectionId, uint64_t segmentId, uint32_t osdId) {
-
-	CacheSegmentReplyMsg* cacheSegmentReplyMsg = new CacheSegmentReplyMsg(this,
-			requestId, connectionId, segmentId, osdId);
-	cacheSegmentReplyMsg->prepareProtocolMsg();
-
-	addMessage(cacheSegmentReplyMsg);
-}
-
-void OsdCommunicator::reportDeletedCache(list<uint64_t> segmentIdList,
-		uint32_t osdId) {
-
-	if (segmentIdList.size() == 0) {
-		return;
-	}
-
-	ReportDeletedCacheMsg* reportDeletedCacheMsg = new ReportDeletedCacheMsg(
-			this, getMdsSockfd(), segmentIdList, osdId);
-	reportDeletedCacheMsg->prepareProtocolMsg();
-
-	addMessage(reportDeletedCacheMsg);
-
 }
 
 void OsdCommunicator::replyPutBlockEnd(uint32_t requestId,

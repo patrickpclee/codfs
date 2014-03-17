@@ -15,8 +15,6 @@ public:
       case BLOCK_DATA: return "BLOCK_DATA";
       case BLOCK_TRANSFER_END_REPLY: return "BLOCK_TRANSFER_END_REPLY";
       case BLOCK_TRANSFER_END_REQUEST: return "BLOCK_TRANSFER_END_REQUEST";
-      case CACHE_SEGMENT_REPLY: return "CACHE_SEGMENT_REPLY";
-      case CACHE_SEGMENT_REQUEST: return "CACHE_SEGMENT_REQUEST";
       case DEFAULT: return "DEFAULT";
       case DELETE_FILE_REPLY: return "DELETE_FILE_REPLY";
       case DELETE_FILE_REQUEST: return "DELETE_FILE_REQUEST";
@@ -47,7 +45,6 @@ public:
       case OSDSTAT_UPDATE_REQUEST: return "OSDSTAT_UPDATE_REQUEST";
       case OSD_SHUTDOWN: return "OSD_SHUTDOWN";
       case OSD_STARTUP: return "OSD_STARTUP";
-      case PRECACHE_SEGMENT_REQUEST: return "PRECACHE_SEGMENT_REQUEST";
       case PUT_BLOCK_INIT_REPLY: return "PUT_BLOCK_INIT_REPLY";
       case PUT_BLOCK_INIT_REQUEST: return "PUT_BLOCK_INIT_REQUEST";
       case PUT_SEGMENT_INIT_REPLY: return "PUT_SEGMENT_INIT_REPLY";
@@ -58,7 +55,6 @@ public:
       case RENAME_FILE_REPLY: return "RENAME_FILE_REPLY";
       case RENAME_FILE_REQUEST: return "RENAME_FILE_REQUEST";
       case REPAIR_SEGMENT_INFO: return "REPAIR_SEGMENT_INFO";
-      case REPORT_DELETED_CACHE: return "REPORT_DELETED_CACHE";
       case SAVE_SEGMENT_LIST_REPLY: return "SAVE_SEGMENT_LIST_REPLY";
       case SAVE_SEGMENT_LIST_REQUEST: return "SAVE_SEGMENT_LIST_REQUEST";
       case SEGMENT_DATA: return "SEGMENT_DATA";
@@ -108,15 +104,6 @@ public:
     return "???";
   }
 
-  static const char * toString( HotnessType en ) {
-    switch( en ) {
-      case COLD: return "COLD";
-      case HOT: return "HOT";
-      case HOTTEST: return "HOTTEST";
-    }
-    return "???";
-  }
-
   static const char * toString( BlockType en ) {
     switch( en ) {
       case DATA_BLOCK: return "DATA_BLOCK";
@@ -134,14 +121,6 @@ public:
       case RECOVERY: return "RECOVERY";
       case UPDATE: return "UPDATE";
       case UPLOAD: return "UPLOAD";
-    }
-    return "???";
-  }
-
-  static const char * toString( HotnessAlgorithm en ) {
-    switch( en ) {
-      case DEFAULT_HOTNESS_ALG: return "DEFAULT_HOTNESS_ALG";
-      case TOP_HOTNESS_ALG: return "TOP_HOTNESS_ALG";
     }
     return "???";
   }

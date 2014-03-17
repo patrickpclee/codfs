@@ -63,12 +63,6 @@ public:
     ~Osd();
 
     /**
-     * Report deleted cache to MDS
-     */
-
-    void reportRemovedCache();
-
-    /**
      * Action when an OSD list is received
      * @param requestId Request ID
      * @param sockfd Socket descriptor of message source
@@ -317,11 +311,6 @@ public:
     StorageModule* getStorageModule();
 
     /**
-     * Get a reference of OSD Cache
-     * @return Pointer to OSD block location cache
-     */
-    //BlockLocationCache* getBlockLocationCache();
-    /**
      * Get the ID
      * @return OSD ID
      */
@@ -372,14 +361,6 @@ private:
      */
 
     struct SegmentData degradedRead(uint64_t segmentId);
-
-    /**
-     * Cache segment to disk cache
-     * @param segmentId Segment ID
-     * @param segmentData Segment Data structure
-     */
-
-    void cacheSegment(uint64_t segmentId, SegmentData segmentData);
 
     /**
      * Free segmentData

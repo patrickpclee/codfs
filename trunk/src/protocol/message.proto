@@ -96,11 +96,6 @@ message GetSegmentIdListRequestPro {
 //	optional fixed64 segmentId = 1;
 //}
 
-message PrecacheSegmentRequestPro {
-	optional fixed32 clientId = 1;
-	optional fixed64 segmentId = 2;
-}
-
 //
 // CLIENT -> OSD
 //
@@ -260,10 +255,6 @@ message GetSegmentInfoReplyPro {
 	optional fixed32 segmentSize = 5;
 }
 
-message CacheSegmentRequestPro {
-	optional fixed64 segmentId = 1;
-}
-
 //
 // MDS -> MONITOR
 //
@@ -306,15 +297,6 @@ message GetSegmentInfoRequestPro {
 	optional bool isRecovery = 4;
 }
 
-message CacheSegmentReplyPro {
-	optional fixed64 segmentId = 1;
-	optional fixed32 osdId = 2;
-}
-
-message ReportDeletedCachePro {
-	repeated fixed64 segmentIdList = 1;
-	optional fixed32 osdId = 2;
-}
 
 //
 // OSD -> CLIENT

@@ -7,7 +7,6 @@
 
 #include "mds.hh"
 
-#include "../common/hotness.hh"
 #include "../common/garbagecollector.hh"
 #include "../common/debug.hh"
 #include "../config/config.hh"
@@ -28,35 +27,15 @@ ConfigLayer* configLayer;
  * Initialise MDS Communicator and MetaData Modules
  */
 Mds::Mds() {
-	_hotnessModule = new HotnessModule();
 	_metaDataModule = new MetaDataModule();
 	_nameSpaceModule = new NameSpaceModule();
 	_mdsCommunicator = new MdsCommunicator();
-
-	initializeCacheList();
 }
 
 Mds::~Mds() {
 	delete _mdsCommunicator;
 	delete _metaDataModule;
 	delete _nameSpaceModule;
-	delete _hotnessModule;
-}
-
-void Mds::initializeCacheList() {
-	// SLOW! DISABLE FOR NOW
-
-	/*
-	   vector<pair<uint32_t, uint64_t>> segmentList =
-	   _metaDataModule->getSegmentsFromCoding(RAID1_CODING);
-
-	   for (auto osdSegmentPair : segmentList) {
-	   _hotnessModule->updateSegmentCache(osdSegmentPair.first,
-	   osdSegmentPair.second);
-	   }
-
-	   debug ("Cache list initialized for %zu copies\n", segmentList.size());
-	 */
 }
 
 /**
@@ -94,20 +73,6 @@ uint32_t Mds::uploadFileProcessor(uint32_t requestId, uint32_t connectionId,
 			fileId, segmentList, primaryList);
 
 	return fileId;
-}
-
-void Mds::reportDeleteCacheProcessor(uint32_t requestId, uint32_t connectionId,
-		list<uint64_t> segmentIdList, uint32_t osdId) {
-
-	string deletedCacheString;
-	for (auto segmentId : segmentIdList) {
-		deletedCacheString += to_string(segmentId) + " ";
-	}
-	debug_yellow("Deleted Cache for OSD %" PRIu32 " = %s\n",
-			osdId, deletedCacheString.c_str());
-
-	_hotnessModule->deleteSegmentCache(osdId,
-			vector<uint64_t>(segmentIdList.begin(), segmentIdList.end()));
 }
 
 void Mds::deleteFileProcessor(uint32_t requestId, uint32_t connectionId,
@@ -174,33 +139,6 @@ void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 	//_metaDataModule->saveNodeList(segmentId, segmentNodeList);
 	//_metaDataModule->setPrimary(segmentId, segmentNodeList[0]);
 
-
-#ifdef USE_SEGMENT_CACHE
-
-	// add primary to cache list
-#ifdef CACHE_AFTER_TRANSFER
-	_hotnessModule->updateSegmentCache(segmentId, segmentNodeList[0]);
-#endif
-
-	// Hotness update and see whether new cache should be requested
-	struct HotnessRequest req;
-	req = _hotnessModule->updateSegmentHotness(segmentId, HOTNESS_ALG,
-			0);
-
-	// Check whether new cache should be issued
-	if (req.numOfNewCache > 0) {
-		// Issue the cache request
-		if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache, req.type)) {
-			uint32_t actualReq = _mdsCommunicator->requestCache(segmentId, 
-					req, segmentMetaData._nodeList);
-			cout << "194Actual request " << segmentId << " osd " << actualReq << endl;
-
-		} // else don't send request
-
-	}
-
-#endif
-
 	return;
 }
 
@@ -250,52 +188,28 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		vector<uint64_t>::iterator it;
 		uint32_t primaryId;
 		for (it = segmentList.begin(); it < segmentList.end(); ++it) {
-			// return a random cached copy if available
-			vector<uint32_t> segmentCacheEntry =
-				_hotnessModule->getSegmentCacheEntry(*it);
 
-			// remove OSD entry if disconnected
-			vector<uint32_t>::iterator p = segmentCacheEntry.begin();
-			p = segmentCacheEntry.begin();
-			while (p != segmentCacheEntry.end()) {
-				if (_mdsCommunicator->getSockfdFromId(*p) == (uint32_t)-1){
-					p = segmentCacheEntry.erase(p);
-					continue;
-				}
-				p++;
-			}
+            debug("Read primary list %" PRIu64 "\n", *it);
+            try {
+                primaryId = _metaDataModule->getPrimary(*it);
+                if (_mdsCommunicator->getSockfdFromId(primaryId) == (uint32_t) -1) {
+                    // if currently fail
+                    vector<uint32_t> nodeList = _metaDataModule->readNodeList(*it);
+                    while (true) {
+                        uint32_t idx = rand() % nodeList.size();
+                        if (_mdsCommunicator->getSockfdFromId(nodeList[idx]) != (uint32_t) -1) {
+                            primaryId = nodeList[idx];
+                            break;
+                        }
+                    }
 
-			// remove segmentCacheEntry if no more cache
-			if (segmentCacheEntry.size() == 0) {
-				_hotnessModule->deleteSegmentCache(*it);
-			}
+                }
 
-			if (segmentCacheEntry.size() > 0) {
-				int idx = rand() % segmentCacheEntry.size();
-				primaryList.push_back(segmentCacheEntry[idx]);
-			} else {
-				debug("Read primary list %" PRIu64 "\n", *it);
-				try {
-					primaryId = _metaDataModule->getPrimary(*it);
-					if (_mdsCommunicator->getSockfdFromId(primaryId) == (uint32_t) -1) {
-						// if currently fail
-						vector<uint32_t> nodeList = _metaDataModule->readNodeList(*it);
-						while (true) {
-							uint32_t idx = rand() % nodeList.size();
-							if (_mdsCommunicator->getSockfdFromId(nodeList[idx]) != (uint32_t) -1) {
-								primaryId = nodeList[idx];
-								break;
-							}
-						}
-
-					}
-
-				} catch (...) {
-					debug_yellow("%s\n", "No Primary Found");
-					continue;
-				}
-				primaryList.push_back(primaryId);
-			}
+            } catch (...) {
+                debug_yellow("%s\n", "No Primary Found");
+                continue;
+            }
+            primaryList.push_back(primaryId);
 		}
 		segmentList.resize(primaryList.size());
 
@@ -303,8 +217,9 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		checksum = _metaDataModule->readChecksum(fileId);
 
 		debug("FILESIZE = %" PRIu64 "\n", fileSize);
-	} else
+	} else {
 		fileType = NOTFOUND;
+	}
 
 	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path,
 			fileSize, fileType, checksum, segmentList, primaryList);
@@ -351,71 +266,9 @@ void Mds::getSegmentInfoProcessor(uint32_t requestId, uint32_t connectionId,
 				segmentMetaData._codingScheme, segmentMetaData._codingSetting);
 	}
 
-#ifdef USE_SEGMENT_CACHE
-
-	if (!isRecovery) {
-		// add primary to cache list
-#ifdef CACHE_AFTER_TRANSFER
-		_hotnessModule->updateSegmentCache(segmentId, osdId);
-#endif
-
-		// Hotness update and see whether new cache should be requested
-		struct HotnessRequest req = _hotnessModule->updateSegmentHotness(
-				segmentId, HOTNESS_ALG, 0);
-
-		// Check whether new cache should be issued
-		if (req.numOfNewCache > 0) {
-			// Issue the cache request
-			if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache, req.type)) {
-				uint32_t actualReq = _mdsCommunicator->requestCache(segmentId, req, 
-						segmentMetaData._nodeList);
-				cout << "369Actual request " << segmentId << " osd " << actualReq << endl;
-
-			} // else don't send request
-		}
-	}
-
-#endif
-
 	return;
 }
 
-void Mds::cacheSegmentReplyProcessor (uint64_t segmentId, uint32_t osdId) {
-	// Update the cache list
-	cout << "[CACHE] Cache Completed " << getTime() << "Segment = " << segmentId << " OSD = " << osdId << endl;
-	// first update cache
-	_hotnessModule->updateSegmentCache(segmentId, osdId);
-}
-
-
-/**
- * @brief	Hendle Precache Segment Request from Client
- */
-void Mds::precacheSegmentProcessor(uint32_t requestId, uint32_t connectionId,
-		uint32_t clientId, uint64_t segmentId){
-
-#ifdef USE_SEGMENT_CACHE
-
-	struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(
-			segmentId);
-
-	// Hotness update and see whether new cache should be requested
-	struct HotnessRequest req = _hotnessModule->updateSegmentHotness(segmentId,
-			HOTNESS_ALG, 0);
-
-	// Check whether new cache should be issued
-	if (req.numOfNewCache > 0) {
-		// Issue the cache request
-		if (_hotnessModule->setRequestSent(segmentId, req.numOfNewCache, req.type)) {
-			uint32_t actualReq = _mdsCommunicator->requestCache(segmentId, 
-					req, segmentMetaData._nodeList);
-			cout << "409Actual request " << segmentId << " osd " << actualReq << endl;
-		} // else don't send request
-	}
-
-#endif
-	return;
-}
 
 /**
  * @brief	Handle List Folder Request from Client
@@ -594,43 +447,6 @@ void Mds::setFileSizeProcessor(uint32_t requestId, uint32_t connectionId,
 	return;
 }
 
-/**
- * @brief	Test Case
- */
-void Mds::test() {
-	/*
-	   uint64_t segmentId = 976172415;
-	   struct SegmentMetaData segmentMetaData = _metaDataModule->readSegmentInfo(segmentId);
-
-	   debug("Segment %" PRIu64 "- Coding %d:%s\n",segmentId, (int)segmentMetaData._codingScheme, segmentMetaData._codingSetting.c_str());
-	   for(const auto node : segmentMetaData._nodeList) {
-	   debug("%" PRIu32 "\n",node);
-	   }
-	 */
-	/*
-	   uint32_t fileId = 216;
-	   vector <uint64_t> segmentList = _metaDataModule->readSegmentList(fileId);
-	   debug("Segment List [%" PRIu32 "]\n",fileId);
-	   for(const auto segment : segmentList){
-	   uint32_t primaryId = _metaDataModule->getPrimary(segment);
-	   printf("%" PRIu64 " [%" PRIu32 "]- ", segment,primaryId);
-	   }
-	   printf("\n");
-	 */
-	/*
-	   debug("%s\n", "Test\n");
-	   for (int i = 0; i < 10; ++i) {
-	   uint32_t temp = _metaDataModule->createFile(1, ".", 1024, RAID1_CODING);
-	   vector<uint64_t> segmentList;
-	   segmentList = _metaDataModule->newSegmentList(10);
-	   _metaDataModule->saveSegmentList(temp, segmentList);
-	   for (int j = 0; j < 10; ++j) {
-	   _metaDataModule->saveNodeList(segmentList[j], { 1 });
-	   _metaDataModule->setPrimary(segmentList[j], 1);
-	   }
-	   }
-	 */
-}
 
 int main(void) {
 	configLayer = new ConfigLayer("mdsconfig.xml");

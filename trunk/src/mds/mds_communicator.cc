@@ -12,7 +12,6 @@
 #include "../protocol/metadata/downloadfilereply.hh"
 #include "../protocol/metadata/getsegmentidlistreply.hh"
 #include "../protocol/metadata/renamefilereply.hh"
-#include "../protocol/metadata/cachesegmentrequest.hh"
 #include "../protocol/status/getosdstatusrequestmsg.hh"
 #include "../protocol/status/recoverytriggerreply.hh"
 #include "../protocol/metadata/uploadsegmentackreply.hh"
@@ -22,57 +21,6 @@ extern ConfigLayer* configLayer;
 
 MdsCommunicator::MdsCommunicator() {
 	_serverPort = configLayer->getConfigInt("Communication>ServerPort");
-}
-
-uint32_t MdsCommunicator::requestCache(uint64_t segmentId,
-		HotnessRequest req, vector<uint32_t> osdList) {
-
-	string osdListString;
-	for (auto osdId : osdList) {
-		osdListString += to_string(osdId) + " ";
-	}
-	cout << "[CACHE] Cache Request " << getTime() << "Segment = " << segmentId << " OSD = " << osdListString << endl;
-
-	vector<uint32_t> newCacheOsdList;
-
-	std::sort(osdList.begin(), osdList.end());
-	std::vector<uint32_t>::iterator it;
-	it = std::unique (osdList.begin(), osdList.end());
-
-	uint32_t adjustedNumOfNewCache = (it - osdList.begin()) - req.cachedOsdList.size();
-
-	if (adjustedNumOfNewCache < req.numOfNewCache) {
-		req.numOfNewCache = adjustedNumOfNewCache;
-	}
-
-	// random select a few
-	while ((uint32_t) newCacheOsdList.size() < req.numOfNewCache) {
-		int idx = rand() % osdList.size();
-		if (find(req.cachedOsdList.begin(), req.cachedOsdList.end(),
-				osdList[idx]) == req.cachedOsdList.end() &&
-			find(newCacheOsdList.begin(), newCacheOsdList.end(),
-				osdList[idx]) == newCacheOsdList.end()) {
-			newCacheOsdList.push_back(osdList[idx]);
-		}
-	}
-
-	for (uint32_t i = 0; i < req.numOfNewCache; i++) {
-
-		CacheSegmentRequestMsg* cacheSegmentRequestMsg =
-				new CacheSegmentRequestMsg(this,
-						getSockfdFromId(newCacheOsdList[i]), segmentId);
-		cacheSegmentRequestMsg->prepareProtocolMsg();
-
-		addMessage(cacheSegmentRequestMsg); // discard the reply for now
-
-		debug_yellow(
-				"Request cache for segment %" PRIu64 " at OSD %" PRIu32 "\n",
-				segmentId, newCacheOsdList[i]);
-
-	}
-
-	return newCacheOsdList.size();
-	//return newCacheOsdList; discard return, since now wait for reply
 }
 
 /**
@@ -148,10 +96,6 @@ void MdsCommunicator::replyRenameFile(uint32_t requestId, uint32_t connectionId,
 			requestId, connectionId, fileId);
 	renameFileReplyMsg->prepareProtocolMsg();
 	addMessage(renameFileReplyMsg);
-	return;
-}
-
-void MdsCommunicator::display() {
 	return;
 }
 
