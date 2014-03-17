@@ -442,7 +442,7 @@ void DeathHandler::SignalHandler(int sig,
         int cpi;
         for (cpi = 0; cwd[cpi] == line[cpi]; cpi++) {};
         if (line[cpi - 1] != '/') {
-          for (cpi; line[cpi - 1] != '/'; cpi--) {};
+          for (; line[cpi - 1] != '/'; cpi--) {};
         }
         if (cpi > 1) {
           line = line + cpi;

@@ -331,7 +331,7 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 		bufptr += retstat;
 		sizeWritten += retstat;
 	}
-	if((offset + sizeWritten) > fileMetaData._size)
+	if((offset + sizeWritten) > (uint32_t)fileMetaData._size)
 		fileMetaData._size = offset + sizeWritten;
 	_fileMetaDataCache->saveMetaData(fileMetaData);
 	return (int)sizeWritten;
@@ -401,7 +401,7 @@ static int ncvfs_truncate(const char *path, off_t newsize) {
 	/// TODO: Support truncate to size other than 0
 	if(newsize > 0) {
 		debug_error("%s\n","Only Truncate to 0 is supported");
-		exit(-1);
+		return 0;
 	}
 
 	uint32_t fileId = checkNameSpace(path);

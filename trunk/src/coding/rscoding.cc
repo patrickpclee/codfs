@@ -36,7 +36,7 @@ vector<BlockData> RSCoding::encode(SegmentData segmentData, string setting) {
 			(roundTo(segmentData.info.segLength, k) / k), 4);
 
 	if (k <= 0 || m < 0 || (w != 8 && w != 16 && w != 32)
-			|| (w <= 16 && k + m > (1 << w))) {
+			|| (w <= 16 && k + m > ((uint32_t)1 << w))) {
 		cerr << "Bad Parameters" << endl;
 		exit(-1);
 	}

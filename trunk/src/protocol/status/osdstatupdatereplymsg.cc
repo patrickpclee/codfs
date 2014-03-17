@@ -65,6 +65,6 @@ void OsdStatUpdateReplyMsg::doHandle() {
 }
 
 void OsdStatUpdateReplyMsg::printProtocol() {
-	debug("[OSDSTAT_UPDATE_REPLY] Osd ID = %" PRIu32 ", capacity = %" PRIu32 ", loading = %" PRIu32 "\n",
+	debug("[OSDSTAT_UPDATE_REPLY] Osd ID = %" PRIu32 ", capacity = %" PRIu64 ", loading = %" PRIu32 "\n",
 			_osdId, _capacity, _loading);
 }

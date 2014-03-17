@@ -344,6 +344,7 @@ protected:
 	void requestHandshake(uint32_t sockfd, uint32_t componentId,
 			ComponentType componentType);
 
+
 	/**
 	 * DEBUG: Print the component information saved in the list
 	 * @param componentType Type of component to print (for heading)
@@ -356,6 +357,8 @@ protected:
 	void listThreadPool();
 
 	void parsing(uint32_t sockfd);
+
+	string getIpPortFromSockfd (uint32_t sockfd);
 
 #ifdef USE_MULTIPLE_QUEUE
 	map<uint32_t, thread> _sendThread;

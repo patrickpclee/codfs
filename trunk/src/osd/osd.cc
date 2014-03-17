@@ -731,7 +731,6 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             // end timer
             Clock::time_point t1 = Clock::now();
             milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
-            bool isUpload = (dataMsgType == UPDATE);
             {
                 lock_guard<mutex> lk(latencyMutex);
                 uint64_t start = t0.time_since_epoch().count();
@@ -1235,13 +1234,13 @@ uint32_t Osd::getCpuLoadavg(int idx) {
     }
 }
 
-uint32_t Osd::getFreespace() {
+uint64_t Osd::getFreespace() {
     struct statvfs64 fiData;
     if ((statvfs64(DISK_PATH, &fiData)) < 0) {
         printf("Failed to stat %s:\n", DISK_PATH);
         return 0;
     } else {
-        return ((uint32_t) (fiData.f_bsize * fiData.f_bfree / 1024 / 1024));
+        return ((uint64_t) _storageModule->getFreeBlockSpace() / 1024 / 1024);
     }
 }
 

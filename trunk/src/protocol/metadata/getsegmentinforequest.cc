@@ -1,5 +1,4 @@
 #include <iostream>
-using namespace std;
 #include "getsegmentinforequest.hh"
 #include "../../common/debug.hh"
 #include "../../protocol/message.pb.h"
@@ -10,6 +9,8 @@ using namespace std;
 #include "../../mds/mds.hh"
 extern Mds* mds;
 #endif
+
+using namespace std;
 
 GetSegmentInfoRequestMsg::GetSegmentInfoRequestMsg(Communicator* communicator) :
 		Message(communicator) {

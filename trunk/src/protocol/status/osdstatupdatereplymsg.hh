@@ -49,7 +49,7 @@ public:
 
 private:
 	uint32_t _osdId;
-	uint32_t _capacity;
+	uint64_t _capacity;
 	uint32_t _loading;
 
 };

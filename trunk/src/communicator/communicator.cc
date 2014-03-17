@@ -10,6 +10,7 @@
 #include <sys/select.h>	// required by select()
 #include <sys/ioctl.h>
 #include <boost/thread/thread.hpp>
+#include <arpa/inet.h>
 #include "connection.hh"
 #include "communicator.hh"
 #include "component.hh"
@@ -750,6 +751,18 @@ void Communicator::setComponentType(ComponentType componentType) {
     _componentType = componentType;
 }
 
+string Communicator::getIpPortFromSockfd (uint32_t sockfd) {
+    struct sockaddr_in addr;
+    socklen_t addr_len = sizeof(addr);
+    if (getpeername(sockfd, (struct sockaddr *) &addr, &addr_len) != 0) {
+        perror ("getpeername");
+        debug_error ("Cannot getpeername for socket %d\n", sockfd);
+    }
+    char ipstr[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &addr.sin_addr, ipstr, sizeof(ipstr));
+    return string(ipstr) + ":" + to_string(ntohs(addr.sin_port));
+}
+
 void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
         ComponentType componentType) {
 
@@ -789,6 +802,9 @@ void Communicator::requestHandshake(uint32_t sockfd, uint32_t componentId,
         debug_error("%s\n", "Handshake Request Failed");
         exit(-1);
     }
+
+    string ipport = getIpPortFromSockfd(sockfd);
+    debug_yellow ("Connection requested to %s\n", ipport.c_str());
 }
 
 void Communicator::handshakeRequestProcessor(uint32_t requestId,
@@ -818,6 +834,10 @@ void Communicator::handshakeRequestProcessor(uint32_t requestId,
             requestId, sockfd, _componentId, _componentType);
     handshakeReplyMsg->prepareProtocolMsg();
     addMessage(handshakeReplyMsg, false);
+
+    // print welcome message
+    string ipport = getIpPortFromSockfd(sockfd);
+    debug_yellow ("Connection accepted from %s\n", ipport.c_str());
 }
 
 vector<struct Component> Communicator::parseConfigFile(string componentType) {

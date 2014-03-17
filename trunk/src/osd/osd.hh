@@ -300,7 +300,7 @@ public:
      * To get the free space of the current disk in MB
      * @return free space in MB, if error, return 0
      */
-    uint32_t getFreespace();
+    uint64_t getFreespace();
 
     /**
      * Get a reference of OSDCommunicator

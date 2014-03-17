@@ -38,7 +38,7 @@ vector<BlockData> CauchyCoding::encode(SegmentData segmentData, string setting) 
 
 
 	if (k <= 0 || m < 0 || w <= 0 || w > 32
-			|| (w < 30 && k + m > (1 << w))) {
+			|| (w < 30 && k + m > ((uint32_t) 1 << w))) {
 		cerr << "Bad Parameters" << endl;
 		exit(-1);
 	}

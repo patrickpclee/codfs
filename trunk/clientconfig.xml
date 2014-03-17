@@ -5,15 +5,15 @@
     </Communication>
 
 	<Fuse>
-        <segmentSize>10M</segmentSize>
+        <segmentSize>16M</segmentSize>
         <writeBufferSize>10</writeBufferSize>
         <numWriteThread>10</numWriteThread>
-        <PreallocateSegmentNumber>20</PreallocateSegmentNumber>
-        <prefetchCount>10</prefetchCount>
+        <PreallocateSegmentNumber>0</PreallocateSegmentNumber>
+        <prefetchCount>0</prefetchCount>
         <prefetchBufferSize>10</prefetchBufferSize>
         <numPrefetchThread>10</numPrefetchThread>
-        <lruSize>20</lruSize>
-        <codingScheme>1</codingScheme>
+        <lruSize>2</lruSize>
+        <codingScheme>7</codingScheme>
         <!-- 0 -->
         <RAID0>
             <N>3</N>
@@ -52,5 +52,12 @@
         <EVENODD>
             <N>7</N>
         </EVENODD>
+
+        <!-- 7 -->
+        <CAUCHY>
+            <C_N>4</C_N>
+            <C_K>2</C_K>
+            <C_M>8</C_M>
+        </CAUCHY>
 	</Fuse>
 </NcvfsConfig>

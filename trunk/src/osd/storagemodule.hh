@@ -255,42 +255,42 @@ public:
      * @return uint32_t Max capacity of OSD
      */
 
-    uint32_t getMaxBlockCapacity();
+    uint64_t getMaxBlockCapacity();
 
     /**
      * Get the Space of Segment Cache
      * @return uint32_t Max space of segment cache
      */
 
-    uint32_t getMaxSegmentCache();
+    uint64_t getMaxSegmentCache();
 
     /**
      * Get the current Capacity of OSD
      * @return uint32_t current capacity of OSD
      */
 
-    uint32_t getCurrentBlockCapacity();
+    uint64_t getCurrentBlockCapacity();
 
     /**
      * Get the current usage of segment cache
      * @return uint32_t current usage of segment cache
      */
 
-    uint32_t getCurrentSegmentCache();
+    uint64_t getCurrentSegmentCache();
 
     /**
      * Get the free space of OSD
      * @return uint32_t current free space of OSD
      */
 
-    uint32_t getFreeBlockSpace();
+    uint64_t getFreeBlockSpace();
 
     /**
      * Get the free space of segment cache
      * @return uint32_t current free space of segment cache
      */
 
-    uint32_t getFreeSegmentSpace();
+    uint64_t getFreeSegmentSpace();
 
     /**
      * Verify whether OSD has enough space
@@ -511,8 +511,8 @@ private:
     uint64_t _maxSegmentCache;
     atomic<uint64_t> _freeBlockSpace;
     atomic<uint64_t> _freeSegmentSpace;
-    atomic<uint32_t> _currentBlockUsage;
-    atomic<uint32_t> _currentSegmentUsage;
+    atomic<uint64_t> _currentBlockUsage;
+    atomic<uint64_t> _currentSegmentUsage;
 
     ConcurrentMap<string, uint32_t> _deltaIdMap;
     ConcurrentMap<string, vector<offset_length_t>> _deltaOffsetLength;
