@@ -35,20 +35,12 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define DEBUG 1
 #endif
 
-// common/memorypool.hh
-//#define USE_APR_MEMORY_POOL
-//#define USE_NEDMALLOC
-
 // communicator/communicator.cc
 #define USE_THREAD_POOL
 #define SERIALIZE_DATA_QUEUE
 
 // communicator/message.cc
 #define NUM_THREADS_PER_MSG 10
-
-// communicator/communicator.hh
-#define USE_LOWLOCK_QUEUE
-#define USE_MULTIPLE_QUEUE
 
 // config/config.hh
 #define DEFAULT_CONFIG_PATH	"config.xml"

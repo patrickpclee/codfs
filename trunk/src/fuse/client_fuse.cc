@@ -174,12 +174,6 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
 	// 2. Receive Thread
 	receiveThread = thread(&Communicator::waitForMessage, _clientCommunicator);
 
-	// 3. Send Thread
-#ifdef USE_MULTIPLE_QUEUE
-#else
-	sendThread = thread(&Communicator::sendMessage, _clientCommunicator);
-#endif
-
 	_clientCommunicator->setId(_clientId);
 	_clientCommunicator->setComponentType(CLIENT);
 

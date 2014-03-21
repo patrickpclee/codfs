@@ -217,7 +217,6 @@ void Communicator::waitForMessage() {
                 boost::unique_lock<boost::shared_mutex> lock(
                         connectionMapMutex);
                 _connectionMap[conn->getSockfd()] = conn;
-#ifdef USE_MULTIPLE_QUEUE
                 //thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
                 _outMessageQueue[conn->getSockfd()] = new struct LowLockQueue<
                         Message *>();
@@ -228,7 +227,6 @@ void Communicator::waitForMessage() {
                 _dataMutex[conn->getSockfd()] = new mutex();
                 _sendThread[conn->getSockfd()] = thread(
                         &Communicator::sendMessage, this, conn->getSockfd());
-#endif
             }
 
             // Receive Optimization
@@ -426,25 +424,13 @@ void Communicator::addMessage(Message* message, bool expectReply,
     // add message to outMessageQueue
     switch (message->getMsgHeader().protocolMsgType) {
     case SEGMENT_DATA:
-#ifdef USE_MULTIPLE_QUEUE
         _outDataQueue[message->getSockfd()]->push(message);
-#else
-        _outDataQueue.push(message);
-#endif
         break;
     case BLOCK_DATA:
-#ifdef USE_MULTIPLE_QUEUE
         _outBlockQueue[message->getSockfd()]->push(message);
-#else
-        _outBlockQueue.push(message);
-#endif
         break;
     default:
-#ifdef USE_MULTIPLE_QUEUE
         _outMessageQueue[message->getSockfd()]->push(message);
-#else
-        _outMessageQueue.push(message);
-#endif
     }
 
 }
@@ -463,11 +449,7 @@ Message* Communicator::popWaitReplyMessage(uint32_t requestId) {
     return NULL;
 }
 
-#ifdef USE_MULTIPLE_QUEUE
 void Communicator::sendMessage(uint32_t fd) {
-#else
-    void Communicator::sendMessage() {
-#endif
 
     while (1) {
 
@@ -475,14 +457,10 @@ void Communicator::sendMessage(uint32_t fd) {
         Message* message;
 
         // send all message in the outMessageQueue
-#ifdef USE_MULTIPLE_QUEUE
         while ((message = popMessage(fd)) != NULL) {
             messages.push_back(message);
             if (messages.size() > 10) break;
         }
-#else
-            while ((message = popMessage()) != NULL) {
-#endif
         if (messages.size() > 0) {
             message = messages[0];
             const uint32_t sockfd = message->getSockfd();
@@ -520,10 +498,7 @@ void Communicator::sendMessage(uint32_t fd) {
             }
         }
 
-#ifdef USE_LOWLOCK_QUEUE
-        // polling is not required for concurrent queue since it uses conditional signal
         usleep(_pollingInterval); // in terms of 10^-6 seconds
-#endif
     }
 }
 
@@ -543,7 +518,6 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
     {
         boost::unique_lock<boost::shared_mutex> lock(connectionMapMutex);
         _connectionMap[sockfd] = conn;
-#ifdef USE_MULTIPLE_QUEUE
         //	thread tempSendThread(&Communicator::sendMessage,this,conn->getSockfd());
         _outMessageQueue[conn->getSockfd()] =
                 new struct LowLockQueue<Message *>();
@@ -553,7 +527,6 @@ uint32_t Communicator::connectAndAdd(string ip, uint16_t port,
         _dataMutex[conn->getSockfd()] = new mutex();
         _sendThread[conn->getSockfd()] = thread(&Communicator::sendMessage,
                 this, conn->getSockfd());
-#endif
     }
 
     // adjust _maxFd
@@ -637,10 +610,6 @@ void Communicator::handleThread(Message* message) {
 
 // static function
 void Communicator::sendThread(Communicator* communicator) {
-#ifdef USE_MULTIPLE_QUEUE
-#else
-    communicator->sendMessage();
-#endif
 }
 
 /**
@@ -687,11 +656,8 @@ void Communicator::dispatch(char* buf, uint32_t sockfd,
 
 }
 
-#ifdef USE_MULTIPLE_QUEUE
-
 Message* Communicator::popMessage(uint32_t fd) {
     Message* message = NULL;
-#ifdef USE_LOWLOCK_QUEUE
     if (_outMessageQueue[fd]->pop(message) != false) {
         return message;
     } else if (_outDataQueue[fd]->pop(message) != false) {
@@ -700,44 +666,7 @@ Message* Communicator::popMessage(uint32_t fd) {
         return message;
     } else
         return NULL;
-#else
-    if (_outMessageQueue[fd]->try_pop(message) != false) {
-        return message;
-    } else if (_outDataQueue[fd]->try_pop(message) != false) {
-        return message;
-    } else if (_outBlockQueue[fd]->try_pop(message) != false) {
-        return message;
-    } else
-    return NULL;
-#endif
 }
-
-#else
-Message* Communicator::popMessage() {
-    Message* message = NULL;
-
-#ifdef USE_LOWLOCK_QUEUE
-    if (_outMessageQueue.pop(message) != false) {
-        return message;
-    } else if (_outDataQueue.pop(message) != false) {
-        return message;
-    } else if (_outBlockQueue.pop(message) != false) {
-        return message;
-    } else
-    return NULL;
-#else
-    if (_outMessageQueue->try_pop(message) != false) {
-        return message;
-    } else if (_outDataQueue->try_pop(message) != false) {
-        return message;
-    } else if (_outBlockQueue->try_pop(message) != false) {
-        return message;
-    } else
-    return NULL;
-#endif
-}
-
-#endif
 
 void Communicator::waitAndDelete(Message* message) {
     GarbageCollector::getInstance().addToDeleteList(message);
@@ -1110,7 +1039,6 @@ uint32_t Communicator::sendSegment(uint32_t componentId, uint32_t sockfd,
 
 }
 
-#ifdef USE_MULTIPLE_QUEUE
 void Communicator::lockDataQueue(uint32_t sockfd) {
     _dataMutex[sockfd]->lock();
 }
@@ -1118,7 +1046,6 @@ void Communicator::lockDataQueue(uint32_t sockfd) {
 void Communicator::unlockDataQueue(uint32_t sockfd) {
     _dataMutex[sockfd]->unlock();
 }
-#endif
 //
 // PRIVATE FUNCTIONS
 //

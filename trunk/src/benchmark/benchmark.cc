@@ -456,12 +456,6 @@ int main(int argc, char *argv[]) {
 	// 2. Receive Thread
 	thread receiveThread(&Communicator::waitForMessage, _clientCommunicator);
 
-	// 3. Send Thread
-#ifdef USE_MULTIPLE_QUEUE
-#else
-	thread sendThread(&Communicator::sendMessage, _clientCommunicator);
-#endif
-
 	_clientCommunicator->setId(client->getClientId());
 	_clientCommunicator->setComponentType(CLIENT);
 
@@ -520,10 +514,6 @@ int main(int argc, char *argv[]) {
 
 	garbageCollectionThread.join();
 	receiveThread.join();
-#ifdef USE_MULTIPLE_QUEUE
-#else
-	sendThread.join();
-#endif
 
 	return 0;
 }

@@ -175,11 +175,6 @@ int main(void) {
 	// 2. Receive Thread
 	thread receiveThread(&Communicator::waitForMessage, communicator);
 
-	// 3. Send Thread
-#ifdef USE_MULTIPLE_QUEUE
-#else
-	thread sendThread(&Communicator::sendMessage, communicator);
-#endif
 
 	// 4. Update Thread
 	thread updateThread(&StatModule::updateOsdStatMap, statmodule, communicator,
@@ -194,11 +189,8 @@ int main(void) {
 	// threads join
 	garbageCollectionThread.join();
 	receiveThread.join();
-#ifdef USE_MULTIPLE_QUEUE
-#else
-	sendThread.join();
-#endif
 	updateThread.join();
+
 #ifdef TRIGGER_RECOVERY
 	recoveryThread.join();
 #endif
