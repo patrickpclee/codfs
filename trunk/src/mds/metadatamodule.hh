@@ -113,15 +113,6 @@ public:
 	vector<uint64_t> readOsdPrimarySegmentList(uint32_t osdId);
 
 	/**
-	 * @brief	Read Checksum of a File
-	 *
-	 * @param	fileId	ID fo the file
-	 *
-	 * @return	Checksum
-	 */
-	string readChecksum(uint32_t fileId);
-
-	/**
 	 * @brief	Save Segment Info
 	 *
 	 * @param	segmentId	ID of the Segment

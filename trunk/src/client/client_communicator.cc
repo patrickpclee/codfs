@@ -31,31 +31,6 @@
  */
 extern Client* client;
 
-vector<FileMetaData> ClientCommunicator::listFolderData(uint32_t clientId,
-		string path) {
-	uint32_t mdsSockFd = getMdsSockfd();
-	ListDirectoryRequestMsg* listDirectoryRequestMsg =
-			new ListDirectoryRequestMsg(this, clientId, mdsSockFd, path);
-	listDirectoryRequestMsg->prepareProtocolMsg();
-
-//	future<vector<FileMetaData> > folderData =
-//			listDirectoryRequestMsg->getFolderDataFuture();
-
-	addMessage(listDirectoryRequestMsg, true);
-	MessageStatus status = listDirectoryRequestMsg->waitForStatusChange();
-
-	if (status == READY) {
-		vector<FileMetaData> fileMetaData =
-				listDirectoryRequestMsg->getFolderData();
-		waitAndDelete(listDirectoryRequestMsg);
-		return fileMetaData;
-	} else {
-		debug("%s\n", "List Directory Request Failed");
-		exit(-1);
-	}
-	return {};
-}
-
 struct FileMetaData ClientCommunicator::uploadFile(uint32_t clientId,
 		string path, uint64_t fileSize, uint32_t numOfObjs) {
 
@@ -293,20 +268,3 @@ void ClientCommunicator::getOsdListAndConnect() {
 	}
 	
 }
-
-/*
-uint32_t ClientCommunicator::switchPrimaryRequest(uint32_t clientId, uint64_t segmentId) {
-	uint32_t dstSockfd = -1;
-	while (dstSockfd == (uint32_t) -1) {
-		SwitchPrimaryOsdRequestMsg* msg = new
-		SwitchPrimaryOsdRequestMsg(this, getMdsSockfd(), clientId, segmentId);
-
-		msg->prepareProtocolMsg();
-		addMessage(msg, true);
-		msg->waitForStatusChange();
-
-		dstSockfd = getSockfdFromId(msg->getNewPrimaryOsdId());
-	}
-	return dstSockfd;
-}
-*/

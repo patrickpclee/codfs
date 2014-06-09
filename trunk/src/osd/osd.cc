@@ -5,7 +5,6 @@
 #include <chrono>
 #include <thread>
 #include <vector>
-#include <openssl/md5.h>
 #include <algorithm>
 #include <atomic>
 #include "osd.hh"
@@ -30,11 +29,9 @@
 
 mutex latencyMutex;
 
-#ifdef PARALLEL_TRANSFER
 #include "../../lib/threadpool/threadpool.hpp"
 boost::threadpool::pool _blocktp;
 boost::threadpool::pool _recoverytp;
-#endif
 
 // Global Variables
 extern ConfigLayer* configLayer;
@@ -53,11 +50,9 @@ Osd::Osd(uint32_t selfId) {
 
     srand(time(NULL)); //random test
 
-#ifdef PARALLEL_TRANSFER
     uint32_t _numThreads = configLayer->getConfigInt("ThreadPool>NumThreads");
     _blocktp.size_controller().resize(_numThreads);
     _recoverytp.size_controller().resize(RECOVERY_THREADS);
-#endif
 
     _reportCacheInterval = configLayer->getConfigLong(
             "Storage>ReportCacheInterval");
@@ -195,16 +190,6 @@ void Osd::getSegmentRequestProcessor(uint32_t requestId, uint32_t sockfd,
 
             while (1) {
                 if (_downloadBlockRemaining.get(segmentId) == 0) {
-
-                    /*
-                    for (BlockData block : blockDataList) {
-                        unsigned char checksum[MD5_DIGEST_LENGTH];
-                        memset (checksum, 0, MD5_DIGEST_LENGTH);
-                        MD5((unsigned char*) block.buf, block.info.blockSize,
-                                checksum);
-                        debug ("block ID = %" PRIu32 " checksum = %s\n", block.info.blockId, md5ToHex(checksum).c_str());
-                    }
-                    */
 
                     // 5. decode blocks
 
@@ -344,7 +329,7 @@ void Osd::retrieveRecoveryBlock(uint32_t recoverytpId, uint32_t osdId,
 DataMsgType Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
         uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
         uint32_t chunkCount, CodingScheme codingScheme, string setting,
-        string checksum, string updateKey, bool isSmallSegment) {
+        string updateKey, bool isSmallSegment) {
 
     struct CodingSetting codingSetting;
     codingSetting.codingScheme = codingScheme;
@@ -387,11 +372,6 @@ DataMsgType Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
         _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId,
                 dataMsgType);
     }
-
-#ifdef USE_CHECKSUM
-    // save md5 to map
-    _checksumMap.set(segmentId, checksum);
-#endif
 
 	return dataMsgType;
 }
@@ -516,27 +496,6 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             struct SegmentData segmentCache = _storageModule->getSegmentData(
                     segmentId, dataMsgType, updateKey);
 
-            unsigned char checksum[MD5_DIGEST_LENGTH];
-            memset(checksum, 0, MD5_DIGEST_LENGTH);
-
-#ifdef USE_CHECKSUM
-            // compute md5 checksum
-            MD5((unsigned char*) segmentCache.buf, segmentCache.segLength,
-                    checksum);
-            debug_cyan("md5 of segment ID %" PRIu64 " = %s\n",
-                    segmentId, md5ToHex(checksum).c_str());
-
-            // compare md5 with saved one
-            if (_checksumMap.get(segmentId) != md5ToHex(checksum)) {
-                debug_error("MD5 of Segment ID = %" PRIu64 " mismatch!\n",
-                        segmentId);
-                exit(-1);
-            } else {
-                debug("MD5 of Segment ID = %" PRIu64 " match\n", segmentId);
-                _checksumMap.erase(segmentId);
-            }
-#endif
-
             struct CodingSetting codingSetting = _codingSettingMap.get(
                     segmentId);
             _codingSettingMap.erase(segmentId);
@@ -618,7 +577,6 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                             blockData.info.offlenVector);
                 }
 
-#ifdef PARALLEL_TRANSFER
                 debug("Thread Pool Status %d/%d/%d\n", (int )_blocktp.active(),
                         (int )_blocktp.pending(), (int )_blocktp.size());
                 _blocktp.schedule(
@@ -626,20 +584,15 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                                 blockData,
                                 blockLocationList[blockData.info.blockId],
                                 dataMsgType, blocktpId));
-#else
-                distributeBlock(segmentId, blockData,blockLocationList[blockData.info.blockId], dataMsgType);
-#endif
 
                 nodeList.push_back(
                         blockLocationList[blockData.info.blockId].osdId);
 
             }
-#ifdef PARALLEL_TRANSFER
             // block until all blocks retrieved
             while (_blocktpRequestCount.get(blocktpId) > 0) {
                 usleep(USLEEP_DURATION);
             }
-#endif
             _blocktpRequestCount.erase(blocktpId);
 
             if (dataMsgType == UPLOAD) {
@@ -647,7 +600,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
                 // Acknowledge MDS for Segment Upload Completed
                 _osdCommunicator->segmentUploadAck(segmentId,
                         segmentCache.info.segLength, codingSetting.codingScheme,
-                        codingSetting.setting, nodeList, md5ToHex(checksum));
+                        codingSetting.setting, nodeList);
             } else {
                 _pendingUpdateSegmentChunk.erase(updateKey);
             }

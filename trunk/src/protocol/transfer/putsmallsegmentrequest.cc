@@ -97,7 +97,7 @@ void PutSmallSegmentRequestMsg::doHandle() {
 #ifdef COMPILE_FOR_OSD
     _dataMsgType = osd->putSegmentInitProcessor(_msgHeader.requestId, _sockfd,
             _segmentId, _segmentSize, _bufferSize, 1, _codingScheme,
-            _codingSetting, "", _updateKey, true);
+            _codingSetting, _updateKey, true);
     osd->putSegmentDataProcessor(_msgHeader.requestId, _sockfd, _segmentId, 0,
             _bufferSize, _dataMsgType, _updateKey, _payload);
     osd->putSegmentEndProcessor(_msgHeader.requestId, _sockfd, _segmentId,
@@ -106,7 +106,7 @@ void PutSmallSegmentRequestMsg::doHandle() {
 
 #ifdef COMPILE_FOR_CLIENT
     client->putSegmentInitProcessor(_msgHeader.requestId, _sockfd, _segmentId,
-            _segmentSize, _bufferSize, 1, "", true);
+            _segmentSize, _bufferSize, 1, true);
     client->SegmentDataProcessor(_msgHeader.requestId, _sockfd, _segmentId, 0,
             _bufferSize, _payload);
     client->putSegmentEndProcessor(_msgHeader.requestId, _sockfd, _segmentId,

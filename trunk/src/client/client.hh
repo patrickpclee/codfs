@@ -95,11 +95,10 @@ public:
 	 * @param	segLength	Segment Length
 	 * @param	bufLength	Buffer Length
 	 * @param 	chunkCount	Number of Chunks
-	 * @param	checksum	CheckSum of the Segment
 	 */
 	void putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 			uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
-            uint32_t chunkCount, string checksum, bool isSmallSegment = false);
+            uint32_t chunkCount, bool isSmallSegment = false);
 
 	/**
 	 * @brief	SegmentDataMsg Handler: receive Segment Data
@@ -143,7 +142,6 @@ private:
 	ClientStorageModule* _storageModule;
 
 	ConcurrentMap<uint64_t, int> _pendingSegmentChunk;
-	ConcurrentMap<uint64_t, string> _checksumMap;
 
 	// thread pool for upload
 	uint32_t _numClientThreads;

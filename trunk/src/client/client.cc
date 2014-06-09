@@ -6,7 +6,6 @@
 #include <cstring>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
-#include <openssl/md5.h>
 #include "client.hh"
 #include "client_storagemodule.hh"
 #include "../config/config.hh"
@@ -14,7 +13,6 @@
 #include "../common/segmentdata.hh"
 #include "../common/blockdata.hh"
 #include "../common/convertor.hh"
-#include "../../lib/logger.hh"
 #include "../common/define.hh"
 
 using namespace std;
@@ -46,13 +44,11 @@ ClientStorageModule* Client::getStorageModule() {
 	return _storageModule;
 }
 
-#ifdef PARALLEL_TRANSFER
-
 void startUploadThread(uint32_t clientId, uint32_t sockfd,
 		struct SegmentData segmentData, CodingScheme codingScheme,
-		string codingSetting, string checksum) {
+		string codingSetting) {
 	client->getCommunicator()->sendSegment(clientId, sockfd, segmentData,
-			codingScheme, codingSetting, checksum);
+			codingScheme, codingSetting);
 	MemoryPool::getInstance().poolFree(segmentData.buf);
 }
 
@@ -61,8 +57,6 @@ void startDownloadThread(uint32_t clientId, uint32_t sockfd, uint64_t segmentId,
 	client->getSegment(clientId, sockfd, segmentId, offset, filePtr, dstPath);
 	debug("Segment ID = %" PRIu64 " finished download\n", segmentId);
 }
-
-#endif
 
 struct SegmentData Client::getSegment(uint32_t clientId,
 		uint32_t dstSockfd, uint64_t segmentId) {
@@ -144,31 +138,13 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 		uint32_t dstOsdSockfd = _clientCommunicator->getSockfdFromId(primary);
 		segmentData.info.segmentId = fileMetaData._segmentList[i];
 
-		unsigned char checksum[MD5_DIGEST_LENGTH];
-        memset (checksum, 0, MD5_DIGEST_LENGTH);
-
-#ifdef USE_CHECKSUM
-		// get checksum
-		MD5((unsigned char*) segmentData.buf, segmentData.info.segmentSize,
-				checksum);
-#endif
-
-#ifdef PARALLEL_TRANSFER
 		_tp.schedule(
 				boost::bind(startUploadThread, _clientId, dstOsdSockfd,
-						segmentData, codingScheme, codingSetting,
-						md5ToHex(checksum)));
-#else
-		_clientCommunicator->sendSegment(_clientId, dstOsdSockfd, segmentData,
-				codingScheme, codingSetting, md5ToHex(checksum));
-		MemoryPool::getInstance().poolFree(segmentData.buf);
-#endif
+						segmentData, codingScheme, codingSetting));
 	}
 
-#ifdef PARALLEL_TRANSFER
 	// wait for every thread to finish
 	_tp.wait();
-#endif
 
 	// Time and Rate calculation (in seconds)
 	Clock::time_point t1 = Clock::now();
@@ -185,11 +161,6 @@ uint32_t Client::uploadFileRequest(string path, CodingScheme codingScheme,
 	cout << formatSize(fileSize) << " transferred in " << duration
 			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s"
 			<< endl;
-
-	/*
-	FILE_LOG(logINFO) << "[UPLOAD]" << formatSize(fileSize) << " transferred in " << duration
-			<< " secs, Rate = " << formatSize(fileSize / duration) << "/s " << "ID = " << fileMetaData._id;
-			*/
 
 	return fileMetaData._id;
 }
@@ -239,27 +210,15 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 		uint32_t dstSockfd = _clientCommunicator->getSockfdFromId(
 				dstComponentId);
 
-		/*
-		if (dstSockfd == (uint32_t) -1) 
-			dstSockfd = _clientCommunicator->switchPrimaryRequest(_clientId, segmentId);		
-			*/
-
 		const uint64_t offset = segmentSize * i;
-#ifdef PARALLEL_TRANSFER
 		_tp.schedule(
 				boost::bind(startDownloadThread, _clientId, dstSockfd, segmentId,
 						offset, filePtr, dstPath));
-#else
-		_clientCommunicator->getSegmentAndWriteFile(_clientId, dstSockfd,
-				segmentId, offset, filePtr, dstPath);
-#endif
 
 		i++;
 	}
 
-#ifdef PARALLEL_TRANSFER
 	_tp.wait();
-#endif
 
 	_storageModule->closeFile(filePtr);
 
@@ -276,23 +235,11 @@ void Client::downloadFileRequest(uint32_t fileId, string dstPath) {
 	cout << formatSize(fileMetaData._size) << " transferred in " << duration
 			<< " secs, Rate = " << formatSize(fileMetaData._size / duration)
 			<< "/s" << endl;
-
-	/*
-	FILE_LOG(logINFO) << "[DOWNLOAD]" << formatSize(fileMetaData._size) << " transferred in "
-			<< duration << " secs, Rate = "
-			<< formatSize(fileMetaData._size / duration) << "/s" << " Path = " << dstPath;
-			*/
-
-	/*
-	 int rtnval = system("./mid.sh");
-	 exit(42);
-	 */
-
 }
 
 void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 		uint64_t segmentId, uint32_t segLength, uint32_t bufLength, uint32_t chunkCount,
-		string checksum, bool isSmallSegment) {
+		bool isSmallSegment) {
 
 	// initialize chunkCount value
 	_pendingSegmentChunk.set(segmentId, chunkCount);
@@ -308,9 +255,6 @@ void Client::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
 	if (!isSmallSegment) {
 	    _clientCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId);
 	}
-
-	// save md5 to map
-	_checksumMap.set(segmentId, checksum);
 
 }
 

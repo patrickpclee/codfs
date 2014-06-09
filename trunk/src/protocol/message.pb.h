@@ -44,7 +44,6 @@ class DownloadFileRequestPro;
 class SaveSegmentListRequestPro;
 class SetFileSizeRequestPro;
 class GetSegmentIdListRequestPro;
-class PrecacheSegmentRequestPro;
 class PutSegmentInitRequestPro;
 class SegmentDataPro;
 class GetSegmentRequestPro;
@@ -63,14 +62,11 @@ class GetSegmentIdListReplyPro;
 class SwitchPrimaryOsdReplyPro;
 class UploadSegmentAckReplyPro;
 class GetSegmentInfoReplyPro;
-class CacheSegmentRequestPro;
 class GetPrimaryListRequestPro;
 class SegmentLocationPro;
 class RecoveryTriggerReplyPro;
 class UploadSegmentAckPro;
 class GetSegmentInfoRequestPro;
-class CacheSegmentReplyPro;
-class ReportDeletedCachePro;
 class PutSegmentInitReplyPro;
 class SegmentTransferEndReplyPro;
 class PutBlockInitRequestPro;
@@ -1433,98 +1429,6 @@ class GetSegmentIdListRequestPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class PrecacheSegmentRequestPro : public ::google::protobuf::Message {
- public:
-  PrecacheSegmentRequestPro();
-  virtual ~PrecacheSegmentRequestPro();
-  
-  PrecacheSegmentRequestPro(const PrecacheSegmentRequestPro& from);
-  
-  inline PrecacheSegmentRequestPro& operator=(const PrecacheSegmentRequestPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const PrecacheSegmentRequestPro& default_instance();
-  
-  void Swap(PrecacheSegmentRequestPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  PrecacheSegmentRequestPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const PrecacheSegmentRequestPro& from);
-  void MergeFrom(const PrecacheSegmentRequestPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed32 clientId = 1;
-  inline bool has_clientid() const;
-  inline void clear_clientid();
-  static const int kClientIdFieldNumber = 1;
-  inline ::google::protobuf::uint32 clientid() const;
-  inline void set_clientid(::google::protobuf::uint32 value);
-  
-  // optional fixed64 segmentId = 2;
-  inline bool has_segmentid() const;
-  inline void clear_segmentid();
-  static const int kSegmentIdFieldNumber = 2;
-  inline ::google::protobuf::uint64 segmentid() const;
-  inline void set_segmentid(::google::protobuf::uint64 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.PrecacheSegmentRequestPro)
- private:
-  inline void set_has_clientid();
-  inline void clear_has_clientid();
-  inline void set_has_segmentid();
-  inline void clear_has_segmentid();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint64 segmentid_;
-  ::google::protobuf::uint32 clientid_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static PrecacheSegmentRequestPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
 class PutSegmentInitRequestPro : public ::google::protobuf::Message {
  public:
   PutSegmentInitRequestPro();
@@ -1649,17 +1553,6 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   inline ::std::string* mutable_codingsetting();
   inline ::std::string* release_codingsetting();
   
-  // optional string checksum = 6;
-  inline bool has_checksum() const;
-  inline void clear_checksum();
-  static const int kChecksumFieldNumber = 6;
-  inline const ::std::string& checksum() const;
-  inline void set_checksum(const ::std::string& value);
-  inline void set_checksum(const char* value);
-  inline void set_checksum(const char* value, size_t size);
-  inline ::std::string* mutable_checksum();
-  inline ::std::string* release_checksum();
-  
   // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 7;
   inline bool has_datamsgtype() const;
   inline void clear_datamsgtype();
@@ -1697,8 +1590,6 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   inline void clear_has_codingscheme();
   inline void set_has_codingsetting();
   inline void clear_has_codingsetting();
-  inline void set_has_checksum();
-  inline void clear_has_checksum();
   inline void set_has_datamsgtype();
   inline void clear_has_datamsgtype();
   inline void set_has_updatekey();
@@ -1714,12 +1605,11 @@ class PutSegmentInitRequestPro : public ::google::protobuf::Message {
   ::std::string* codingsetting_;
   int codingscheme_;
   int datamsgtype_;
-  ::std::string* checksum_;
   ::std::string* updatekey_;
   ::google::protobuf::uint32 buffersize_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(9 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(8 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -3054,17 +2944,6 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline ::ncvfs::DownloadFileReplyPro_FileType filetype() const;
   inline void set_filetype(::ncvfs::DownloadFileReplyPro_FileType value);
   
-  // optional string checksum = 6;
-  inline bool has_checksum() const;
-  inline void clear_checksum();
-  static const int kChecksumFieldNumber = 6;
-  inline const ::std::string& checksum() const;
-  inline void set_checksum(const ::std::string& value);
-  inline void set_checksum(const char* value);
-  inline void set_checksum(const char* value, size_t size);
-  inline ::std::string* mutable_checksum();
-  inline ::std::string* release_checksum();
-  
   // repeated fixed64 segmentList = 7;
   inline int segmentlist_size() const;
   inline void clear_segmentlist();
@@ -3099,8 +2978,6 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   inline void clear_has_filesize();
   inline void set_has_filetype();
   inline void clear_has_filetype();
-  inline void set_has_checksum();
-  inline void clear_has_checksum();
   
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
   
@@ -3108,12 +2985,11 @@ class DownloadFileReplyPro : public ::google::protobuf::Message {
   ::google::protobuf::uint32 fileid_;
   int filetype_;
   ::google::protobuf::uint64 filesize_;
-  ::std::string* checksum_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > segmentlist_;
   ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > primarylist_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(7 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -3515,88 +3391,6 @@ class GetSegmentInfoReplyPro : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class CacheSegmentRequestPro : public ::google::protobuf::Message {
- public:
-  CacheSegmentRequestPro();
-  virtual ~CacheSegmentRequestPro();
-  
-  CacheSegmentRequestPro(const CacheSegmentRequestPro& from);
-  
-  inline CacheSegmentRequestPro& operator=(const CacheSegmentRequestPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const CacheSegmentRequestPro& default_instance();
-  
-  void Swap(CacheSegmentRequestPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  CacheSegmentRequestPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const CacheSegmentRequestPro& from);
-  void MergeFrom(const CacheSegmentRequestPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed64 segmentId = 1;
-  inline bool has_segmentid() const;
-  inline void clear_segmentid();
-  static const int kSegmentIdFieldNumber = 1;
-  inline ::google::protobuf::uint64 segmentid() const;
-  inline void set_segmentid(::google::protobuf::uint64 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.CacheSegmentRequestPro)
- private:
-  inline void set_has_segmentid();
-  inline void clear_has_segmentid();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint64 segmentid_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static CacheSegmentRequestPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
 class GetPrimaryListRequestPro : public ::google::protobuf::Message {
  public:
   GetPrimaryListRequestPro();
@@ -3973,17 +3767,6 @@ class UploadSegmentAckPro : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::uint32 >*
       mutable_nodelist();
   
-  // optional string checksum = 5;
-  inline bool has_checksum() const;
-  inline void clear_checksum();
-  static const int kChecksumFieldNumber = 5;
-  inline const ::std::string& checksum() const;
-  inline void set_checksum(const ::std::string& value);
-  inline void set_checksum(const char* value);
-  inline void set_checksum(const char* value, size_t size);
-  inline ::std::string* mutable_checksum();
-  inline ::std::string* release_checksum();
-  
   // optional fixed32 segmentSize = 6;
   inline bool has_segmentsize() const;
   inline void clear_segmentsize();
@@ -3999,8 +3782,6 @@ class UploadSegmentAckPro : public ::google::protobuf::Message {
   inline void clear_has_codingscheme();
   inline void set_has_codingsetting();
   inline void clear_has_codingsetting();
-  inline void set_has_checksum();
-  inline void clear_has_checksum();
   inline void set_has_segmentsize();
   inline void clear_has_segmentsize();
   
@@ -4008,13 +3789,12 @@ class UploadSegmentAckPro : public ::google::protobuf::Message {
   
   ::google::protobuf::uint64 segmentid_;
   ::std::string* codingsetting_;
-  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > nodelist_;
   int codingscheme_;
   ::google::protobuf::uint32 segmentsize_;
-  ::std::string* checksum_;
+  ::google::protobuf::RepeatedField< ::google::protobuf::uint32 > nodelist_;
   
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(6 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(5 + 31) / 32];
   
   friend void  protobuf_AddDesc_message_2eproto();
   friend void protobuf_AssignDesc_message_2eproto();
@@ -4134,193 +3914,6 @@ class GetSegmentInfoRequestPro : public ::google::protobuf::Message {
   
   void InitAsDefaultInstance();
   static GetSegmentInfoRequestPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class CacheSegmentReplyPro : public ::google::protobuf::Message {
- public:
-  CacheSegmentReplyPro();
-  virtual ~CacheSegmentReplyPro();
-  
-  CacheSegmentReplyPro(const CacheSegmentReplyPro& from);
-  
-  inline CacheSegmentReplyPro& operator=(const CacheSegmentReplyPro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const CacheSegmentReplyPro& default_instance();
-  
-  void Swap(CacheSegmentReplyPro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  CacheSegmentReplyPro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const CacheSegmentReplyPro& from);
-  void MergeFrom(const CacheSegmentReplyPro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // optional fixed64 segmentId = 1;
-  inline bool has_segmentid() const;
-  inline void clear_segmentid();
-  static const int kSegmentIdFieldNumber = 1;
-  inline ::google::protobuf::uint64 segmentid() const;
-  inline void set_segmentid(::google::protobuf::uint64 value);
-  
-  // optional fixed32 osdId = 2;
-  inline bool has_osdid() const;
-  inline void clear_osdid();
-  static const int kOsdIdFieldNumber = 2;
-  inline ::google::protobuf::uint32 osdid() const;
-  inline void set_osdid(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.CacheSegmentReplyPro)
- private:
-  inline void set_has_segmentid();
-  inline void clear_has_segmentid();
-  inline void set_has_osdid();
-  inline void clear_has_osdid();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::uint64 segmentid_;
-  ::google::protobuf::uint32 osdid_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static CacheSegmentReplyPro* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class ReportDeletedCachePro : public ::google::protobuf::Message {
- public:
-  ReportDeletedCachePro();
-  virtual ~ReportDeletedCachePro();
-  
-  ReportDeletedCachePro(const ReportDeletedCachePro& from);
-  
-  inline ReportDeletedCachePro& operator=(const ReportDeletedCachePro& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-  
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-  
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const ReportDeletedCachePro& default_instance();
-  
-  void Swap(ReportDeletedCachePro* other);
-  
-  // implements Message ----------------------------------------------
-  
-  ReportDeletedCachePro* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const ReportDeletedCachePro& from);
-  void MergeFrom(const ReportDeletedCachePro& from);
-  void Clear();
-  bool IsInitialized() const;
-  
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-  
-  ::google::protobuf::Metadata GetMetadata() const;
-  
-  // nested types ----------------------------------------------------
-  
-  // accessors -------------------------------------------------------
-  
-  // repeated fixed64 segmentIdList = 1;
-  inline int segmentidlist_size() const;
-  inline void clear_segmentidlist();
-  static const int kSegmentIdListFieldNumber = 1;
-  inline ::google::protobuf::uint64 segmentidlist(int index) const;
-  inline void set_segmentidlist(int index, ::google::protobuf::uint64 value);
-  inline void add_segmentidlist(::google::protobuf::uint64 value);
-  inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
-      segmentidlist() const;
-  inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
-      mutable_segmentidlist();
-  
-  // optional fixed32 osdId = 2;
-  inline bool has_osdid() const;
-  inline void clear_osdid();
-  static const int kOsdIdFieldNumber = 2;
-  inline ::google::protobuf::uint32 osdid() const;
-  inline void set_osdid(::google::protobuf::uint32 value);
-  
-  // @@protoc_insertion_point(class_scope:ncvfs.ReportDeletedCachePro)
- private:
-  inline void set_has_osdid();
-  inline void clear_has_osdid();
-  
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-  
-  ::google::protobuf::RepeatedField< ::google::protobuf::uint64 > segmentidlist_;
-  ::google::protobuf::uint32 osdid_;
-  
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-  
-  friend void  protobuf_AddDesc_message_2eproto();
-  friend void protobuf_AssignDesc_message_2eproto();
-  friend void protobuf_ShutdownFile_message_2eproto();
-  
-  void InitAsDefaultInstance();
-  static ReportDeletedCachePro* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -7719,54 +7312,6 @@ inline void GetSegmentIdListRequestPro::set_numofobjs(::google::protobuf::uint32
 
 // -------------------------------------------------------------------
 
-// PrecacheSegmentRequestPro
-
-// optional fixed32 clientId = 1;
-inline bool PrecacheSegmentRequestPro::has_clientid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void PrecacheSegmentRequestPro::set_has_clientid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void PrecacheSegmentRequestPro::clear_has_clientid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void PrecacheSegmentRequestPro::clear_clientid() {
-  clientid_ = 0u;
-  clear_has_clientid();
-}
-inline ::google::protobuf::uint32 PrecacheSegmentRequestPro::clientid() const {
-  return clientid_;
-}
-inline void PrecacheSegmentRequestPro::set_clientid(::google::protobuf::uint32 value) {
-  set_has_clientid();
-  clientid_ = value;
-}
-
-// optional fixed64 segmentId = 2;
-inline bool PrecacheSegmentRequestPro::has_segmentid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void PrecacheSegmentRequestPro::set_has_segmentid() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void PrecacheSegmentRequestPro::clear_has_segmentid() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void PrecacheSegmentRequestPro::clear_segmentid() {
-  segmentid_ = GOOGLE_ULONGLONG(0);
-  clear_has_segmentid();
-}
-inline ::google::protobuf::uint64 PrecacheSegmentRequestPro::segmentid() const {
-  return segmentid_;
-}
-inline void PrecacheSegmentRequestPro::set_segmentid(::google::protobuf::uint64 value) {
-  set_has_segmentid();
-  segmentid_ = value;
-}
-
-// -------------------------------------------------------------------
-
 // PutSegmentInitRequestPro
 
 // optional fixed64 segmentId = 1;
@@ -7916,73 +7461,15 @@ inline ::std::string* PutSegmentInitRequestPro::release_codingsetting() {
   }
 }
 
-// optional string checksum = 6;
-inline bool PutSegmentInitRequestPro::has_checksum() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
-}
-inline void PutSegmentInitRequestPro::set_has_checksum() {
-  _has_bits_[0] |= 0x00000020u;
-}
-inline void PutSegmentInitRequestPro::clear_has_checksum() {
-  _has_bits_[0] &= ~0x00000020u;
-}
-inline void PutSegmentInitRequestPro::clear_checksum() {
-  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
-    checksum_->clear();
-  }
-  clear_has_checksum();
-}
-inline const ::std::string& PutSegmentInitRequestPro::checksum() const {
-  return *checksum_;
-}
-inline void PutSegmentInitRequestPro::set_checksum(const ::std::string& value) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(value);
-}
-inline void PutSegmentInitRequestPro::set_checksum(const char* value) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(value);
-}
-inline void PutSegmentInitRequestPro::set_checksum(const char* value, size_t size) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* PutSegmentInitRequestPro::mutable_checksum() {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  return checksum_;
-}
-inline ::std::string* PutSegmentInitRequestPro::release_checksum() {
-  clear_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = checksum_;
-    checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-
 // optional .ncvfs.DataMsgPro.DataMsgType dataMsgType = 7;
 inline bool PutSegmentInitRequestPro::has_datamsgtype() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
+  return (_has_bits_[0] & 0x00000020u) != 0;
 }
 inline void PutSegmentInitRequestPro::set_has_datamsgtype() {
-  _has_bits_[0] |= 0x00000040u;
+  _has_bits_[0] |= 0x00000020u;
 }
 inline void PutSegmentInitRequestPro::clear_has_datamsgtype() {
-  _has_bits_[0] &= ~0x00000040u;
+  _has_bits_[0] &= ~0x00000020u;
 }
 inline void PutSegmentInitRequestPro::clear_datamsgtype() {
   datamsgtype_ = 15;
@@ -7999,13 +7486,13 @@ inline void PutSegmentInitRequestPro::set_datamsgtype(::ncvfs::DataMsgPro_DataMs
 
 // optional string updateKey = 8;
 inline bool PutSegmentInitRequestPro::has_updatekey() const {
-  return (_has_bits_[0] & 0x00000080u) != 0;
+  return (_has_bits_[0] & 0x00000040u) != 0;
 }
 inline void PutSegmentInitRequestPro::set_has_updatekey() {
-  _has_bits_[0] |= 0x00000080u;
+  _has_bits_[0] |= 0x00000040u;
 }
 inline void PutSegmentInitRequestPro::clear_has_updatekey() {
-  _has_bits_[0] &= ~0x00000080u;
+  _has_bits_[0] &= ~0x00000040u;
 }
 inline void PutSegmentInitRequestPro::clear_updatekey() {
   if (updatekey_ != &::google::protobuf::internal::kEmptyString) {
@@ -8057,13 +7544,13 @@ inline ::std::string* PutSegmentInitRequestPro::release_updatekey() {
 
 // optional fixed32 bufferSize = 9;
 inline bool PutSegmentInitRequestPro::has_buffersize() const {
-  return (_has_bits_[0] & 0x00000100u) != 0;
+  return (_has_bits_[0] & 0x00000080u) != 0;
 }
 inline void PutSegmentInitRequestPro::set_has_buffersize() {
-  _has_bits_[0] |= 0x00000100u;
+  _has_bits_[0] |= 0x00000080u;
 }
 inline void PutSegmentInitRequestPro::clear_has_buffersize() {
-  _has_bits_[0] &= ~0x00000100u;
+  _has_bits_[0] &= ~0x00000080u;
 }
 inline void PutSegmentInitRequestPro::clear_buffersize() {
   buffersize_ = 0u;
@@ -9171,64 +8658,6 @@ inline void DownloadFileReplyPro::set_filetype(::ncvfs::DownloadFileReplyPro_Fil
   filetype_ = value;
 }
 
-// optional string checksum = 6;
-inline bool DownloadFileReplyPro::has_checksum() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void DownloadFileReplyPro::set_has_checksum() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void DownloadFileReplyPro::clear_has_checksum() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void DownloadFileReplyPro::clear_checksum() {
-  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
-    checksum_->clear();
-  }
-  clear_has_checksum();
-}
-inline const ::std::string& DownloadFileReplyPro::checksum() const {
-  return *checksum_;
-}
-inline void DownloadFileReplyPro::set_checksum(const ::std::string& value) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(value);
-}
-inline void DownloadFileReplyPro::set_checksum(const char* value) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(value);
-}
-inline void DownloadFileReplyPro::set_checksum(const char* value, size_t size) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* DownloadFileReplyPro::mutable_checksum() {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  return checksum_;
-}
-inline ::std::string* DownloadFileReplyPro::release_checksum() {
-  clear_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = checksum_;
-    checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-
 // repeated fixed64 segmentList = 7;
 inline int DownloadFileReplyPro::segmentlist_size() const {
   return segmentlist_.size();
@@ -9541,32 +8970,6 @@ inline void GetSegmentInfoReplyPro::set_segmentsize(::google::protobuf::uint32 v
 
 // -------------------------------------------------------------------
 
-// CacheSegmentRequestPro
-
-// optional fixed64 segmentId = 1;
-inline bool CacheSegmentRequestPro::has_segmentid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void CacheSegmentRequestPro::set_has_segmentid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void CacheSegmentRequestPro::clear_has_segmentid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void CacheSegmentRequestPro::clear_segmentid() {
-  segmentid_ = GOOGLE_ULONGLONG(0);
-  clear_has_segmentid();
-}
-inline ::google::protobuf::uint64 CacheSegmentRequestPro::segmentid() const {
-  return segmentid_;
-}
-inline void CacheSegmentRequestPro::set_segmentid(::google::protobuf::uint64 value) {
-  set_has_segmentid();
-  segmentid_ = value;
-}
-
-// -------------------------------------------------------------------
-
 // GetPrimaryListRequestPro
 
 // optional fixed32 numOfObjs = 1;
@@ -9850,73 +9253,15 @@ UploadSegmentAckPro::mutable_nodelist() {
   return &nodelist_;
 }
 
-// optional string checksum = 5;
-inline bool UploadSegmentAckPro::has_checksum() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void UploadSegmentAckPro::set_has_checksum() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void UploadSegmentAckPro::clear_has_checksum() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void UploadSegmentAckPro::clear_checksum() {
-  if (checksum_ != &::google::protobuf::internal::kEmptyString) {
-    checksum_->clear();
-  }
-  clear_has_checksum();
-}
-inline const ::std::string& UploadSegmentAckPro::checksum() const {
-  return *checksum_;
-}
-inline void UploadSegmentAckPro::set_checksum(const ::std::string& value) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(value);
-}
-inline void UploadSegmentAckPro::set_checksum(const char* value) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(value);
-}
-inline void UploadSegmentAckPro::set_checksum(const char* value, size_t size) {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  checksum_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* UploadSegmentAckPro::mutable_checksum() {
-  set_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    checksum_ = new ::std::string;
-  }
-  return checksum_;
-}
-inline ::std::string* UploadSegmentAckPro::release_checksum() {
-  clear_has_checksum();
-  if (checksum_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = checksum_;
-    checksum_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-
 // optional fixed32 segmentSize = 6;
 inline bool UploadSegmentAckPro::has_segmentsize() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
+  return (_has_bits_[0] & 0x00000010u) != 0;
 }
 inline void UploadSegmentAckPro::set_has_segmentsize() {
-  _has_bits_[0] |= 0x00000020u;
+  _has_bits_[0] |= 0x00000010u;
 }
 inline void UploadSegmentAckPro::clear_has_segmentsize() {
-  _has_bits_[0] &= ~0x00000020u;
+  _has_bits_[0] &= ~0x00000010u;
 }
 inline void UploadSegmentAckPro::clear_segmentsize() {
   segmentsize_ = 0u;
@@ -10020,105 +9365,6 @@ inline bool GetSegmentInfoRequestPro::isrecovery() const {
 inline void GetSegmentInfoRequestPro::set_isrecovery(bool value) {
   set_has_isrecovery();
   isrecovery_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// CacheSegmentReplyPro
-
-// optional fixed64 segmentId = 1;
-inline bool CacheSegmentReplyPro::has_segmentid() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void CacheSegmentReplyPro::set_has_segmentid() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void CacheSegmentReplyPro::clear_has_segmentid() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void CacheSegmentReplyPro::clear_segmentid() {
-  segmentid_ = GOOGLE_ULONGLONG(0);
-  clear_has_segmentid();
-}
-inline ::google::protobuf::uint64 CacheSegmentReplyPro::segmentid() const {
-  return segmentid_;
-}
-inline void CacheSegmentReplyPro::set_segmentid(::google::protobuf::uint64 value) {
-  set_has_segmentid();
-  segmentid_ = value;
-}
-
-// optional fixed32 osdId = 2;
-inline bool CacheSegmentReplyPro::has_osdid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void CacheSegmentReplyPro::set_has_osdid() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void CacheSegmentReplyPro::clear_has_osdid() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void CacheSegmentReplyPro::clear_osdid() {
-  osdid_ = 0u;
-  clear_has_osdid();
-}
-inline ::google::protobuf::uint32 CacheSegmentReplyPro::osdid() const {
-  return osdid_;
-}
-inline void CacheSegmentReplyPro::set_osdid(::google::protobuf::uint32 value) {
-  set_has_osdid();
-  osdid_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// ReportDeletedCachePro
-
-// repeated fixed64 segmentIdList = 1;
-inline int ReportDeletedCachePro::segmentidlist_size() const {
-  return segmentidlist_.size();
-}
-inline void ReportDeletedCachePro::clear_segmentidlist() {
-  segmentidlist_.Clear();
-}
-inline ::google::protobuf::uint64 ReportDeletedCachePro::segmentidlist(int index) const {
-  return segmentidlist_.Get(index);
-}
-inline void ReportDeletedCachePro::set_segmentidlist(int index, ::google::protobuf::uint64 value) {
-  segmentidlist_.Set(index, value);
-}
-inline void ReportDeletedCachePro::add_segmentidlist(::google::protobuf::uint64 value) {
-  segmentidlist_.Add(value);
-}
-inline const ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >&
-ReportDeletedCachePro::segmentidlist() const {
-  return segmentidlist_;
-}
-inline ::google::protobuf::RepeatedField< ::google::protobuf::uint64 >*
-ReportDeletedCachePro::mutable_segmentidlist() {
-  return &segmentidlist_;
-}
-
-// optional fixed32 osdId = 2;
-inline bool ReportDeletedCachePro::has_osdid() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void ReportDeletedCachePro::set_has_osdid() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void ReportDeletedCachePro::clear_has_osdid() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void ReportDeletedCachePro::clear_osdid() {
-  osdid_ = 0u;
-  clear_has_osdid();
-}
-inline ::google::protobuf::uint32 ReportDeletedCachePro::osdid() const {
-  return osdid_;
-}
-inline void ReportDeletedCachePro::set_osdid(::google::protobuf::uint32 value) {
-  set_has_osdid();
-  osdid_ = value;
 }
 
 // -------------------------------------------------------------------

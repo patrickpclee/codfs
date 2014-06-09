@@ -78,12 +78,11 @@ public:
 	 * @param	codingScheme	Coding Scheme
 	 * @param 	codingSetting	Coding Scheme Setting
 	 * @param	segmentNodeList	List of the Osd
-	 * @param	checksum	Checksum
 	 */
 	void uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 			uint64_t segmentId, uint32_t segmentSize, CodingScheme codingScheme,
 			const string &codingSetting,
-			const vector<uint32_t> &segmentNodeList, const string &checksum);
+			const vector<uint32_t> &segmentNodeList);
 
 	/**
 	 * @brief	Handle Download File Request from Client (Request with Path)

@@ -89,10 +89,6 @@ vector<uint64_t> MetaDataModule::readOsdSegmentList(uint32_t osdId) {
 	return _segmentMetaDataModule->findOsdSegments(osdId);
 }
 
-string MetaDataModule::readChecksum(uint32_t fileId) {
-	return ""; // null
-}
-
 /**
  * @brief	Save Segment Info
  */

@@ -23,7 +23,6 @@ struct SegmentTransferOsdInfo {
 	vector <uint32_t> _osdList;
 	CodingScheme _codingScheme;
 	string _codingSetting;
-	string _checksum;
 };
 
 struct FileMetaData {
@@ -33,7 +32,6 @@ struct FileMetaData {
 	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;
 
-	string _checksum;
 	//uint64_t* _segmentList[];
 	FileType _fileType;	
 };
@@ -46,7 +44,6 @@ struct SegmentMetaData {
 	//uint32_t _offsetInFile;
 	vector<uint32_t> _nodeList;
 	uint32_t _primary;
-	string _checksum;
 	CodingScheme _codingScheme;
 	string _codingSetting;
 };
@@ -54,7 +51,6 @@ struct SegmentMetaData {
 struct BlockMetaData {
 	uint32_t _id;
 	uint32_t _offsetInSegment;
-	unsigned char* _checksum;
 };
 
 #endif

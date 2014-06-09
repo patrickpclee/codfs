@@ -105,10 +105,3 @@ void GetSegmentInfoRequestMsg::setSegmentSize(uint32_t segmentSize) {
 	_segmentSize = segmentSize;
 }
 
-string GetSegmentInfoRequestMsg::getChecksum() {
-	return _checksum;
-}
-
-void GetSegmentInfoRequestMsg::setChecksum(string checksum) {
-	_checksum = checksum;
-}

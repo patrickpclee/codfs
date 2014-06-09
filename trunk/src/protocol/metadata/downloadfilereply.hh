@@ -42,14 +42,13 @@ public:
 	 * @param	filePath	File Path
 	 * @param	fileSize	Size of the File
 	 * @param	fileType	File Type
-	 * @param	checksum	Checksum of the File
 	 * @param 	segmentList	List of segments of the file
 	 * @param	primaryList	List of primary for storing the segment
 	 */
 
 	DownloadFileReplyMsg(Communicator* communicator, 
 			uint32_t requestId, uint32_t sockfd, uint32_t fileId, const string &filePath,
-			uint64_t fileSize, const FileType& fileType, const string &checksum, 
+			uint64_t fileSize, const FileType& fileType,
 			const vector<uint64_t> &segmentList, const vector<uint32_t> &primaryList);
 
 
@@ -87,7 +86,6 @@ private:
 	uint32_t _fileId;
 	string _filePath;
 	uint64_t _fileSize;
-	string _checksum;
 	FileType _fileType;
 	vector<uint64_t> _segmentList;
 	vector<uint32_t> _primaryList;

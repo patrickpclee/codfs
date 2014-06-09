@@ -146,15 +146,15 @@ void MdsCommunicator::replySegmentandPrimaryList(uint32_t requestId,
 /**
  * @brief	Reply Download Information to Client
  *
- * File Size, Segment List, Primary List, Checksum
+ * File Size, Segment List, Primary List
  */
 void MdsCommunicator::replyDownloadInfo(uint32_t requestId,
 		uint32_t connectionId, uint32_t fileId, string filePath,
-		uint64_t fileSize, const FileType& fileType, string checksum,
+		uint64_t fileSize, const FileType& fileType,
 		vector<uint64_t> segmentList, vector<uint32_t> primaryList) {
 	DownloadFileReplyMsg* downloadFileReplyMsg = new DownloadFileReplyMsg(this,
 			requestId, connectionId, fileId, filePath, fileSize, fileType,
-			checksum, segmentList, primaryList);
+			segmentList, primaryList);
 
 	debug("FILESIZE = %" PRIu64 "\n", fileSize);
 

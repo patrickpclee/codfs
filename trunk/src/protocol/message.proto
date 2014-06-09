@@ -119,7 +119,6 @@ message PutSegmentInitRequestPro {
 	
 	optional CodingScheme codingScheme = 4;
 	optional string codingSetting = 5;
-	optional string checksum = 6;
 	
 	optional DataMsgPro.DataMsgType dataMsgType = 7;
 	optional string updateKey = 8;
@@ -224,7 +223,6 @@ message DownloadFileReplyPro {
 		FOLDER = 3;
 	}
 	optional FileType fileType = 5;
-	optional string checksum = 6;
 	repeated fixed64 segmentList = 7;
 	repeated fixed32 primaryList = 8;
 }
@@ -286,7 +284,6 @@ message UploadSegmentAckPro {
 	optional PutSegmentInitRequestPro.CodingScheme codingScheme = 2;	
 	optional string codingSetting = 3;
 	repeated fixed32 nodeList = 4;
-	optional string checksum = 5;
 	optional fixed32 segmentSize = 6;
 }
 

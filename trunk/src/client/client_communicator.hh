@@ -13,16 +13,6 @@ public:
 	void segmentMessageHandler();
 
 	/**
-	 * @brief	Send List Folder Request to MDS (Blocking)
-	 *
-	 * @param	clientId	Client ID
-	 * @param	path	Path to the Folder
-	 *
-	 * @return	Folder Data
-	 */
-	vector<FileMetaData> listFolderData(uint32_t clientId, string path);
-
-	/**
 	 * Upload a file to OSD
 	 * @param clientId Client ID
 	 * @param path Destination Path
@@ -127,13 +117,6 @@ public:
 	void requestSegment (uint32_t dstSockfd, uint64_t segmentId);
 
 	/**
-	 * @brief	Send a PreCache Segment Request to MDS
-	 * @param	clientId	Client ID
-	 * @param	segmentId	Segment ID
-	 */
-	void precacheSegment (uint32_t clientId, uint64_t segmentId);
-
-	/**
 	 * 1. Send an init message
 	 * 2. Repeatedly send data chunks to OSD
 	 * 3. Send an end message
@@ -168,8 +151,6 @@ public:
 	 * Send a request to monitor to get Osd List and connect 
 	 */
 	void getOsdListAndConnect();
-
-//	uint32_t switchPrimaryRequest(uint32_t clientId, uint64_t segmentId);
 
 private:
 

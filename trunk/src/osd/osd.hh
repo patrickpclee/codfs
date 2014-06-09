@@ -137,14 +137,13 @@ public:
      * @param chunkCount number of chunks that will be received
      * @param codingScheme Coding Scheme for the segment
      * @param setting Coding setting for the segment
-     * @param checksum Checksum of the segment
      * @param updateKey Key for UPDATE message
      */
 
     DataMsgType putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
             uint64_t segmentId, uint32_t segLength, uint32_t bufLength,
             uint32_t chunkCount, CodingScheme codingScheme, string setting,
-            string checksum, string updateKey, bool isSmallSegment = false);
+            string updateKey, bool isSmallSegment = false);
 
     /**
      * Action when a put segment end is received
@@ -399,7 +398,6 @@ private:
     // upload
     ConcurrentMap<uint64_t, uint32_t> _pendingSegmentChunk;
     ConcurrentMap<uint64_t, struct CodingSetting> _codingSettingMap;
-    ConcurrentMap<uint64_t, string> _checksumMap;
     ConcurrentMap<string, BlockData> _uploadBlockData;
 
     // download

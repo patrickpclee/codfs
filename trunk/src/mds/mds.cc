@@ -123,15 +123,13 @@ void Mds::renameFileProcessor(uint32_t requestId, uint32_t connectionId,
 
 void Mds::uploadSegmentAckProcessor(uint32_t requestId, uint32_t connectionId,
 		uint64_t segmentId, uint32_t segmentSize, CodingScheme codingScheme,
-		const string &codingSetting, const vector<uint32_t> &segmentNodeList,
-		const string &checksum) {
+		const string &codingSetting, const vector<uint32_t> &segmentNodeList) {
 	struct SegmentMetaData segmentMetaData;
 	segmentMetaData._id = segmentId;
 	segmentMetaData._nodeList = segmentNodeList;
 	segmentMetaData._primary = segmentNodeList[0];
 	segmentMetaData._codingScheme = codingScheme;
 	segmentMetaData._codingSetting = codingSetting;
-	segmentMetaData._checksum = checksum;
 	segmentMetaData._size = segmentSize;
     _metaDataModule->saveSegmentInfoToCache(segmentId, segmentMetaData);
     _mdsCommunicator->replyUploadSegmentAck(requestId, connectionId, segmentId);
@@ -176,7 +174,6 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	vector<uint64_t> segmentList;
 	vector<uint32_t> primaryList;
 	uint64_t fileSize = 0;
-	string checksum = "";
 	FileType fileType = NORMAL;
 
 	_nameSpaceModule->openFile(clientId, path);
@@ -214,7 +211,6 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 		segmentList.resize(primaryList.size());
 
 		fileSize = _metaDataModule->readFileSize(fileId);
-		checksum = _metaDataModule->readChecksum(fileId);
 
 		debug("FILESIZE = %" PRIu64 "\n", fileSize);
 	} else {
@@ -222,7 +218,7 @@ void Mds::downloadFileProcess(uint32_t requestId, uint32_t connectionId,
 	}
 
 	_mdsCommunicator->replyDownloadInfo(requestId, connectionId, fileId, path,
-			fileSize, fileType, checksum, segmentList, primaryList);
+			fileSize, fileType, segmentList, primaryList);
 
 	return;
 }

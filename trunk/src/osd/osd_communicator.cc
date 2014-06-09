@@ -292,12 +292,12 @@ void OsdCommunicator::putBlockEnd(uint32_t sockfd, uint64_t segmentId,
 
 void OsdCommunicator::segmentUploadAck(uint64_t segmentId, uint32_t segmentSize,
 		CodingScheme codingScheme, string codingSetting,
-		vector<uint32_t> nodeList, string checksum) {
+		vector<uint32_t> nodeList) {
 	uint32_t mdsSockFd = getMdsSockfd();
 
 	UploadSegmentAckMsg* uploadSegmentAckMsg = new UploadSegmentAckMsg(this,
 			mdsSockFd, segmentId, segmentSize, codingScheme, codingSetting,
-			nodeList, checksum);
+			nodeList);
 
 	uploadSegmentAckMsg->prepareProtocolMsg();
     uploadSegmentAckMsg->printProtocol();
@@ -338,7 +338,6 @@ struct SegmentTransferOsdInfo OsdCommunicator::getSegmentInfoRequest(
 					getSegmentInfoRequestMsg->getCodingScheme();
 			segmentInfo._codingSetting =
 					getSegmentInfoRequestMsg->getCodingSetting();
-			segmentInfo._checksum = getSegmentInfoRequestMsg->getChecksum();
 			segmentInfo._osdList = getSegmentInfoRequestMsg->getNodeList();
 			waitAndDelete(getSegmentInfoRequestMsg);
 		} else {

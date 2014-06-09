@@ -168,12 +168,11 @@ public:
 	 * @param codingScheme Coding Scheme
 	 * @param codingSetting Coding Setting
 	 * @param nodeList List of OSD that saved blocks for the segment
-	 * @param checksum Checksum of the segment
 	 */
 
 	void segmentUploadAck(uint64_t segmentId, uint32_t segmentSize,
 			CodingScheme codingScheme, string codingSetting,
-			vector<uint32_t> nodeList, string checksum);
+			vector<uint32_t> nodeList);
 
 	/**
 	 * Register myself to the MONITOR

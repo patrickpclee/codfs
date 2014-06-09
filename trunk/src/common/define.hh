@@ -19,15 +19,10 @@ typedef boost::unique_lock<RWMutex> writeLock;
 
 #define USLEEP_DURATION 10000
 
-// osd.cc, client.cc, filedatacache.cc, benchmark.cc
-//#define USE_CHECKSUM
-
 // osd/storagemodule.cc
 #define MAX_OPEN_FILES 100
 
 // benchmark/benchmark.cc
-// client/client.cc
-#define PARALLEL_TRANSFER
 #define RANDOM_SHUFFLE_SEGMENT_ORDER
 
 // common/debug.hh
@@ -62,7 +57,7 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define MAX_NUM_PROCESSING_SEGMENT 10
 //#define MOUNT_OSD
 
-#define UPDATE_SCHEME 0 // FO,FL,PL,PLR
+#define UPDATE_SCHEME 3 // FO,FL,PL,PLR
 #if UPDATE_SCHEME == 3
 #define RESERVE_SPACE_SIZE 5242880
 #else

@@ -57,7 +57,6 @@ public:
 	string getCodingSetting();
 	void setCodingSetting(string codingSetting);
 	string getChecksum();
-	void setChecksum(string checksum);
 
 
 private:
@@ -70,7 +69,6 @@ private:
 	vector<uint32_t> _nodeList;
 	CodingScheme _codingScheme;
 	string _codingSetting;
-	string _checksum;
 	bool _isRecovery;
 };
 

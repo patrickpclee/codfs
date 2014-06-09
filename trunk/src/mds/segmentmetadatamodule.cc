@@ -50,7 +50,6 @@ void SegmentMetaDataModule::saveSegmentInfo(uint64_t segmentId,
 	BSONObj querySegment = BSON ("id" << (long long int)segmentId);
 	BSONObj insertSegment = BSON ("id" << (long long int)segmentId
 			<< "primary" << segmentInfo._primary
-			<< "checksum" << segmentInfo._checksum
 			<< "size" << segmentInfo._size
 			<< "codingScheme" << (int)segmentInfo._codingScheme
 			<< "codingSetting" << segmentInfo._codingSetting
@@ -94,7 +93,6 @@ struct SegmentMetaData SegmentMetaDataModule::readSegmentInfo(
 	}
 	segmentMetaData._primary =
 			(uint32_t) result.getField("primary").numberInt();
-	segmentMetaData._checksum = result.getField("checksum").str();
 	segmentMetaData._size = (uint32_t) result.getField("size").numberInt();
 	segmentMetaData._codingScheme = (CodingScheme) result.getField(
 			"codingScheme").numberInt();

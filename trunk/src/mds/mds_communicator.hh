@@ -36,14 +36,13 @@ public:
 	 * @param	filePath	File Path
 	 * @param	fileSize	Size of the File
 	 * @param	fileType	File Type
-	 * @param	checksum	Checksum of the File
 	 * @param	segmentList	Segment List
 	 * @param	primaryList	Primary List
 	 */
 	void replyDownloadInfo(uint32_t requestId, uint32_t connectionId,
 			uint32_t fileId, string filePath, uint64_t fileSize,
-			const FileType& fileType, string checksum,
-			vector<uint64_t> segmentList, vector<uint32_t> primaryList);
+			const FileType& fileType, vector<uint64_t> segmentList,
+			vector<uint32_t> primaryList);
 
 	/**
 	 * @brief	Reply Delete File

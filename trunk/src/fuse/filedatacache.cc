@@ -1,14 +1,10 @@
 #include "filedatacache.hh"
-
-#include <openssl/md5.h>
-
 #include "client.hh"
 #include "client_communicator.hh"
-
 #include "../common/debug.hh"
 #include "../common/memorypool.hh"
-#include "../common/convertor.hh"	//md5ToHex()
 #include "../coding/allcoding.hh"
+#include "../common/convertor.hh"
 
 extern Client* client;
 extern uint32_t _clientId;
@@ -291,17 +287,10 @@ void FileDataCache::doWriteBack(uint64_t segmentId) {
 
     uint32_t sockfd = _clientCommunicator->getSockfdFromId(primary);
 
-    unsigned char checksum[MD5_DIGEST_LENGTH];
-    memset(checksum, 0, MD5_DIGEST_LENGTH);
-
-#ifdef USE_CHECKSUM
-    MD5((unsigned char*) segmentData.buf, segmentData.info.segLength, checksum);
-#endif
-
     debug("Write Back Segment %" PRIu64 " ,Size %" PRIu32 "\n", segmentId,
             segmentData.info.segLength);
     _clientCommunicator->sendSegment(_clientId, sockfd, segmentData,
-            _codingScheme, _codingSetting, md5ToHex(checksum));
+            _codingScheme, _codingSetting);
     _storageModule->closeSegment(segmentId);
     return;
 }

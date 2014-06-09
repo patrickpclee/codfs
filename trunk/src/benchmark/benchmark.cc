@@ -2,7 +2,6 @@
 #include <signal.h>
 #include <chrono>
 #include <ctime>
-#include <openssl/md5.h>
 #include <boost/thread/thread.hpp>
 
 #include "../client/client.hh"
@@ -55,30 +54,25 @@ uint64_t fileSize;
 uint32_t segmentSize;
 uint32_t numberOfSegment;
 char* databuf;
-unsigned char* checksum;
 
 bool download;
 bool hotness = false;
 
-#ifdef PARALLEL_TRANSFER
 void startBenchUploadThread(uint32_t clientId, uint32_t sockfd,
 		struct SegmentData segmentData, CodingScheme codingScheme,
-		string codingSetting, string checksum) {
+		string codingSetting) {
 	_clientCommunicator->sendSegment(clientId, sockfd, segmentData,
-			codingScheme, codingSetting, checksum);
+			codingScheme, codingSetting);
 }
 
 void startBenchDownloadThread(uint32_t clientId, uint32_t sockfd,
-		uint64_t segmentId, char* segmentChecksum) {
+		uint64_t segmentId) {
 	SegmentData segmentCache = client->getSegment(clientId,
 			sockfd, segmentId);
-	MD5((unsigned char *) segmentCache.buf, segmentCache.bufLength,
-			(unsigned char *) segmentChecksum);
 	_storageModule->closeSegment(segmentId);
 }
 
 boost::threadpool::pool _tp;
-#endif
 
 void parseOption(int argc, char* argv[]) {
 
@@ -185,11 +179,9 @@ void parseOption(int argc, char* argv[]) {
 		debug("Coding Setting: %s\n", codingSetting.c_str());
 	}
 
-#ifdef PARALLEL_TRANSFER
 	uint32_t _numClientThreads = configLayer->getConfigInt(
 			"Communication>NumClientThreads");
 	_tp.size_controller().resize(_numClientThreads);
-#endif
 }
 
 void prepareData() {
@@ -198,8 +190,6 @@ void prepareData() {
 	for (uint32_t i = 0; i < DATA_BUF_SIZE / 4; ++i) {
 		intptr[i] = rand();
 	}
-
-	checksum = (unsigned char*) calloc(MD5_DIGEST_LENGTH, 1);
 }
 
 void testDownload() {
@@ -213,12 +203,6 @@ void testDownload() {
 			clientId, fileId);
 	debug("File ID %" PRIu32 ", Size = %" PRIu64 "\n",
 			fileMetaData._id, fileMetaData._size);
-
-	// prepare checksum array
-	vector<char *> segmentChecksumList(fileMetaData._segmentList.size());
-	for (uint32_t i = 0; i < segmentChecksumList.size(); i++) {
-		segmentChecksumList[i] = (char *) calloc(MD5_DIGEST_LENGTH, 1);
-	}
 
 	double startPortion = startPercent / (double) 100;
 	double endPortion = endPercent / (double) 100;
@@ -241,14 +225,9 @@ void testDownload() {
 			debug("segmentId = %" PRIu64 " primary = %" PRIu32 "\n",
 					segmentId, primary);
 
-#ifdef PARALLEL_TRANSFER
 			_tp.schedule(
 					boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd,
-							segmentId, segmentChecksumList[i]));
-#else
-			client->getSegment(clientId, sockfd, segmentId);
-			_storageModule->closeSegment(segmentId);
-#endif
+							segmentId));
 		}
 	} else {
 
@@ -284,36 +263,17 @@ void testDownload() {
 			debug("segmentId = %" PRIu64 " primary = %" PRIu32 "\n",
 					segmentId, primary);
 
-#ifdef PARALLEL_TRANSFER
 			_tp.schedule(
 					boost::bind(startBenchDownloadThread, clientId, dstOsdSockfd,
-							segmentId, segmentChecksumList[i]));
-#else
-			client->getSegment(clientId, sockfd, segmentId);
-			_storageModule->closeSegment(segmentId);
-#endif
+							segmentId));
 		}
 	}
 
-#ifdef PARALLEL_TRANSFER
 	_tp.wait();
-#endif
 
 	Clock::time_point t1 = Clock::now();
 
-	// compute final checksum
-	MD5_CTX context;
-	MD5_Init(&context);
-	unsigned char fileChecksum[MD5_DIGEST_LENGTH];
-	for (char* segmentChecksum : segmentChecksumList) {
-		MD5_Update(&context, segmentChecksum, MD5_DIGEST_LENGTH);
-	}
-	MD5_Final((unsigned char *) fileChecksum, &context);
-
 	cout << "[BENCHMARK END] " << getTime() << endl;
-
-	cout << "Download Done [" << fileMetaData._id << " "
-			<< md5ToHex((unsigned char *) fileChecksum) << "]" << endl;
 
 	milliseconds ms = chrono::duration_cast < milliseconds > (t1 - t0);
 	double duration = ms.count() / 1000.0;
@@ -330,21 +290,10 @@ void testDownload() {
 
 void testUpload() {
 
-	// START BENCHMARK CHECKSUM
-
-	MD5_CTX context;
-	MD5_Init(&context);
-	unsigned char fileChecksum[MD5_DIGEST_LENGTH];
 	int dataBufIdx[numberOfSegment];
 	for (uint32_t i = 0; i < numberOfSegment; ++i) {
 		dataBufIdx[i] = rand() % (DATA_BUF_SIZE - segmentSize);
-		unsigned char checksum[MD5_DIGEST_LENGTH];
-		MD5((unsigned char *) databuf + dataBufIdx[i], segmentSize, checksum);
-		MD5_Update(&context, checksum, MD5_DIGEST_LENGTH);
 	}
-	MD5_Final((unsigned char *) fileChecksum, &context);
-
-	// END BENCHMARK CHECKSUM
 
 	typedef chrono::high_resolution_clock Clock;
 	typedef chrono::milliseconds milliseconds;
@@ -383,18 +332,11 @@ void testUpload() {
 			currentCodingSetting = Raid1Coding::generateSetting(1);
 		}
 
-#ifdef PARALLEL_TRANSFER
 		_tp.schedule(
 				boost::bind(startBenchUploadThread, clientId, dstOsdSockfd,
-						segmentData, currentCodingScheme, currentCodingSetting,
-						md5ToHex(checksum)));
-#else
-		_clientCommunicator->sendSegment(clientId, dstOsdSockfd, segmentData, currentCodingScheme, currentCodingSetting, md5ToHex(checksum));
-#endif
+						segmentData, currentCodingScheme, currentCodingSetting));
 	}
-#ifdef PARALLEL_TRANSFER
 	_tp.wait();
-#endif
 
 	Clock::time_point t1 = Clock::now();
 
@@ -405,9 +347,6 @@ void testUpload() {
 
 	// allow time for messages to go out
 	usleep(USLEEP_DURATION);
-
-	cout << "Upload Done [" << fileMetaData._id << " "
-			<< md5ToHex((unsigned char *) fileChecksum) << "]" << endl;
 
 	cout << fixed;
 	cout << setprecision(2);

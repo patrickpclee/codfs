@@ -18,7 +18,7 @@ UploadSegmentAckMsg::UploadSegmentAckMsg(Communicator* communicator) :
 
 UploadSegmentAckMsg::UploadSegmentAckMsg(Communicator* communicator,
 		uint32_t sockfd, uint64_t segmentId, uint32_t segmentSize, CodingScheme codingScheme,
-		const string &codingSetting, const vector<uint32_t> &nodeList, const string &checksum) :
+		const string &codingSetting, const vector<uint32_t> &nodeList) :
 		Message(communicator) {
 	_sockfd = sockfd;
 	_segmentId = segmentId;
@@ -26,7 +26,6 @@ UploadSegmentAckMsg::UploadSegmentAckMsg(Communicator* communicator,
 	_codingScheme = codingScheme;
 	_codingSetting = codingSetting;
 	_nodeList = nodeList;
-	_checksum = checksum;
 }
 
 void UploadSegmentAckMsg::prepareProtocolMsg() {
@@ -38,7 +37,6 @@ void UploadSegmentAckMsg::prepareProtocolMsg() {
 	uploadSegmentAckPro.set_codingscheme(
 			(ncvfs::PutSegmentInitRequestPro_CodingScheme) _codingScheme);
 	uploadSegmentAckPro.set_codingsetting(_codingSetting);
-	uploadSegmentAckPro.set_checksum(_checksum);
 	uploadSegmentAckPro.set_segmentsize(_segmentSize);
 
 	vector<uint32_t>::iterator it;
@@ -69,7 +67,6 @@ void UploadSegmentAckMsg::parse(char* buf) {
 	_segmentId = uploadSegmentAckPro.segmentid();
 	_codingScheme = (CodingScheme) uploadSegmentAckPro.codingscheme();
 	_codingSetting = uploadSegmentAckPro.codingsetting();
-	_checksum = uploadSegmentAckPro.checksum();
 	_segmentSize = uploadSegmentAckPro.segmentsize();
 
 	for (int i = 0; i < uploadSegmentAckPro.nodelist_size(); ++i) {
@@ -81,7 +78,7 @@ void UploadSegmentAckMsg::parse(char* buf) {
 
 void UploadSegmentAckMsg::doHandle() {
 #ifdef COMPILE_FOR_MDS
-	mds->uploadSegmentAckProcessor(_msgHeader.requestId, _sockfd, _segmentId, _segmentSize, _codingScheme, _codingSetting, _nodeList, _checksum);
+	mds->uploadSegmentAckProcessor(_msgHeader.requestId, _sockfd, _segmentId, _segmentSize, _codingScheme, _codingSetting, _nodeList);
 #endif
 }
 

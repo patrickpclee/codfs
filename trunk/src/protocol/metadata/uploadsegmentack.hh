@@ -34,7 +34,7 @@ public:
 	 */
 	UploadSegmentAckMsg(Communicator* communicator, uint32_t sockfd,
 			uint64_t segmentId, uint32_t segmentSize, CodingScheme codingScheme, const string &codingSetting,
-			const vector<uint32_t> &nodeList, const string &checksum);
+			const vector<uint32_t> &nodeList);
 
 	/**
 	 * Copy values in private variables to protocol message
@@ -70,7 +70,6 @@ private:
 	CodingScheme _codingScheme;
 	string _codingSetting;
 	vector<uint32_t> _nodeList;
-	string _checksum;
 	uint32_t _segmentSize;
 };
 
