@@ -32,11 +32,6 @@ mutex uploadCacheMutex;
 mutex updateCacheMutex;
 mutex diskCacheMutex;
 
-#ifdef USE_IO_THREADS
-using namespace boost::threadpool;
-#endif
-
-
 StorageModule::StorageModule() {
     _openedFile = new FileLruCache<string, FILE*>(MAX_OPEN_FILES);
     _segmentUploadCache = {};
@@ -44,11 +39,6 @@ StorageModule::StorageModule() {
     _segmentFolder = configLayer->getConfigString(
             "Storage>SegmentCacheLocation");
     _blockFolder = configLayer->getConfigString("Storage>BlockLocation");
-
-#ifdef USE_IO_THREADS
-    // create threadpool
-    _iotp.size_controller().resize(IO_THREADS);
-#endif
 
     // create folder if not exist
     struct stat st;
@@ -789,7 +779,7 @@ void StorageModule::closeSegmentData(uint64_t segmentId,
     debug("Segment Cache ID = %" PRIu64 " closed\n", segmentId);
 }
 
-void StorageModule::doFlushFile(string filePath, bool &isFinished) {
+void StorageModule::flushFile(string filePath) {
     FILE* filePtr = NULL;
     try {
         filePtr = _openedFile->get(filePath);
@@ -800,27 +790,7 @@ void StorageModule::doFlushFile(string filePath, bool &isFinished) {
     } catch (out_of_range& oor) { // file pointer not found in cache
         return; // file already closed by cache, do nothing
     }
-    isFinished = true;
     return;
-}
-
-void StorageModule::flushFile(string filePath) {
-    bool isFinished = false;
-
-#ifdef USE_IO_THREADS
-    int priority = 10;
-    schedule(_iotp,
-            prio_task_func(priority,
-                    boost::bind(&StorageModule::doFlushFile, this, filePath, boost::ref(isFinished))));
-
-    while (!isFinished) {
-        usleep(IO_POLL_INTERVAL);
-    }
-
-    return;
-#else
-    return doFlushFile(filePath, isFinished);
-#endif
 }
 
 void StorageModule::flushSegmentDiskCache(uint64_t segmentId) {
@@ -869,27 +839,6 @@ struct SegmentInfo StorageModule::readSegmentInfo(uint64_t segmentId) {
 uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
         uint32_t length, bool isCache, int priority) {
 
-    bool isFinished = false;
-
-#ifdef USE_IO_THREADS
-    schedule(_iotp,
-            prio_task_func(priority,
-                    boost::bind(&StorageModule::doReadFile, this, filepath, buf,
-                            offset, length, isCache, boost::ref(isFinished))));
-
-    while (!isFinished) {
-        usleep(IO_POLL_INTERVAL);
-    }
-
-    return length;
-#else
-    return doReadFile(filepath, buf, offset, length, isCache, isFinished);
-#endif
-}
-
-uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
-        uint32_t length, bool isCache, bool &isFinished) {
-
 // cache and segment share different mutex
     //lock_guard<mutex> lk(fileMutex[isCache]);
 
@@ -914,36 +863,11 @@ uint32_t StorageModule::doReadFile(string filepath, char* buf, uint64_t offset,
         exit(-1);
     }
 
-    isFinished = true;
-
     return byteRead;
 }
 
 uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
         uint32_t length, bool isCache, int priority) {
-
-    bool isFinished = false;
-
-#ifdef USE_IO_THREADS
-    _iotp.schedule(
-            prio_task_func(priority,
-                    boost::bind(&StorageModule::doWriteFile, this, filepath,
-                            buf, offset, length, isCache,
-                            boost::ref(isFinished))));
-
-    while (!isFinished) {
-        usleep(IO_POLL_INTERVAL);
-    }
-
-    debug("Length = %" PRIu32 "\n", length);
-    return length;
-#else
-    return doWriteFile(filepath, buf, offset, length, isCache, isFinished);
-#endif
-}
-
-uint32_t StorageModule::doWriteFile(string filepath, char* buf, uint64_t offset,
-        uint32_t length, bool isCache, bool &isFinished) {
 
 // cache and segment share different mutex
     //lock_guard<mutex> lk(fileMutex[isCache]);
@@ -964,8 +888,6 @@ uint32_t StorageModule::doWriteFile(string filepath, char* buf, uint64_t offset,
                 byteWritten);
         exit(-1);
     }
-
-    isFinished = true;
 
     return byteWritten;
 }

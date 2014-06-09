@@ -433,15 +433,6 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
 
         }
     } else {
-#ifdef MOUNT_OSD
-        _storageModule->createRemoteBlock(blockLocation.osdId, segmentId,
-                blockData.info.blockId, blockData.info.blockSize);
-        _storageModule->writeRemoteBlock(blockLocation.osdId, segmentId,
-                blockData.info.blockId, blockData.buf, 0,
-                blockData.info.blockSize);
-        _storageModule->flushRemoteBlock(blockLocation.osdId, segmentId,
-                blockData.info.blockId);
-#else
         uint32_t dstSockfd = _osdCommunicator->getSockfdFromId(
                 blockLocation.osdId);
         if (dataMsgType == UPDATE || dataMsgType == PARITY) {
@@ -453,7 +444,6 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
         } else {
             _osdCommunicator->sendBlock(dstSockfd, blockData, dataMsgType);
         }
-#endif
     }
 
     // free memory

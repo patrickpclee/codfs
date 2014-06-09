@@ -33,7 +33,6 @@ Message::Message(Communicator* communicator) {
 	_threadPoolSize = NUM_THREADS_PER_MSG; // default thread pool size
 }
 
-#ifdef USE_MESSAGE_MEMORY_POOL
 void* Message::operator new (size_t n) {
 	return MsgMemoryPool::getInstance().poolMalloc(n);
 }
@@ -42,7 +41,6 @@ void* Message::operator new (size_t n) {
 void Message::operator delete (void* p){
 	return MsgMemoryPool::getInstance().poolFree((char*)p);
 }
-#endif
 
 Message::~Message() {
 	//debug ("%s\n", "message destructor");

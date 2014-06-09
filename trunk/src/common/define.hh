@@ -30,10 +30,6 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define DEBUG 1
 #endif
 
-// communicator/communicator.cc
-#define USE_THREAD_POOL
-#define SERIALIZE_DATA_QUEUE
-
 // communicator/message.cc
 #define NUM_THREADS_PER_MSG 10
 
@@ -55,7 +51,6 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define DISK_PATH "/"
 #define RECOVERY_THREADS 10
 #define MAX_NUM_PROCESSING_SEGMENT 10
-//#define MOUNT_OSD
 
 #define UPDATE_SCHEME 3 // FO,FL,PL,PLR
 #if UPDATE_SCHEME == 3
@@ -66,16 +61,9 @@ typedef boost::unique_lock<RWMutex> writeLock;
 
 // osd/storagemodule.cc
 #define HOTNESS_ALG TOP_HOTNESS_ALG
-//#define USE_IO_THREADS
 #define IO_THREADS 2
 #define IO_POLL_INTERVAL 10000
 #define USE_FSYNC
-
-// protocol/message.hh
-#define USE_MESSAGE_MEMORY_POOL
-
-// storage/mongodb.hh
-//#define COLLECTION "ncvfs"
 
 // monitor/selectionmodule.cc
 //#define RR_DISTRIBUTE
@@ -83,9 +71,6 @@ typedef boost::unique_lock<RWMutex> writeLock;
 
 // Receive Optimization
 #define RECV_BUF_PER_SOCKET 10485760
-//#define USE_PARSING_THREADS
-#define PARSING_THREADS 20
-
 
 // Trigger Recovery or not
 //#define TRIGGER_RECOVERY

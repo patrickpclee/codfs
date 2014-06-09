@@ -28,10 +28,6 @@ typedef boost::shared_mutex RWMutex;
 typedef boost::shared_lock<boost::shared_mutex> readLock;
 typedef boost::unique_lock<boost::shared_mutex> writeLock;
 
-#ifdef USE_IO_THREADS
-#include "../../lib/threadpool/threadpool.hpp"
-#endif
-
 using namespace std;
 
 /**
@@ -207,7 +203,6 @@ public:
     void closeSegmentData(uint64_t segmentId, DataMsgType dataMsgType,
             string updateKey);
 
-    void doFlushFile(string filepath, bool &isFinished);
     void flushFile(string filepath);
 
     /**
@@ -419,9 +414,6 @@ private:
     uint32_t readFile(string filepath, char* buf, uint64_t offset,
             uint32_t length, bool isCache, int priority = 10);
 
-    uint32_t doReadFile(string filepath, char* buf, uint64_t offset,
-            uint32_t length, bool isCache, bool &isFinished);
-
     /**
      * Open a file and write data from buffer
      * @param filepath Path of the file in the storage
@@ -433,9 +425,6 @@ private:
 
     uint32_t writeFile(string filepath, char* buf, uint64_t offset,
             uint32_t length, bool isCache, int priority = 10);
-
-    uint32_t doWriteFile(string filepath, char* buf, uint64_t offset,
-            uint32_t length, bool isCache, bool &isFinished);
 
     /**
      * Return the segment path given Segment ID
@@ -521,10 +510,6 @@ private:
 
     unordered_map<string, boost::shared_mutex*> _deltaRWMutexMap;
     mutex _deltaRWMutexMapMutex;
-
-#ifdef USE_IO_THREADS
-    boost::threadpool::prio_pool _iotp;
-#endif
 };
 
 #endif

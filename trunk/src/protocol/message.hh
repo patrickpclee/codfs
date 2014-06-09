@@ -46,11 +46,8 @@ public:
 
 	Message(Communicator* communicator);
 
-	#ifdef USE_MESSAGE_MEMORY_POOL
 	static void* operator new (size_t n);
-
 	static void operator delete (void* p);	
-	#endif
 	/**
 	 * Destructor
 	 */
