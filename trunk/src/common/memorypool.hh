@@ -12,22 +12,6 @@
 
 #include "../common/define.hh"
 
-#ifdef USE_APR_MEMORY_POOL
-#include <thread>
-#include <mutex>
-
-#include <apr-1.0/apr_lib.h>
-#include <apr-1.0/apr_buckets.h>
-#include <apr-1.0/apr_general.h>
-#include <apr-1.0/apr_pools.h>
-
-const apr_size_t POOL_MAX_FREE_SIZE = 20 * 1024 * 1024;
-#endif
-
-#ifdef USE_NEDMALLOC
-#include "../../lib/nedmalloc/nedmalloc.h"
-#endif
-
 /**
  * Provide a memory pool for optimizing frequent malloc / free calls
  * TODO: A dummy memory pool using singleton pattern for now
@@ -86,13 +70,6 @@ private:
 	MemoryPool(MemoryPool const&); // Don't Implement
 	void operator=(MemoryPool const&); // Don't implement
 
-#ifdef USE_APR_MEMORY_POOL
-	apr_pool_t *pool;
-	apr_allocator_t* alloc;
-	apr_bucket_alloc_t* balloc;
-
-	std::mutex memoryPoolMutex;
-#endif
 	uint32_t _maxMsgSize;
 };
 #endif

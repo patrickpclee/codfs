@@ -21,7 +21,6 @@
 #include "../common/debug.hh"
 #include "../common/define.hh"
 #include "../common/convertor.hh"
-#include "../common/deltalocation.hh"
 #include "../coding/coding.hh"
 
 // global variable defined in each component

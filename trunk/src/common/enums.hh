@@ -36,8 +36,6 @@ enum BlockType {
     PARITY_BLOCK = 1
 };
 
-enum SegmentStatus {NEW, CLEAN, DIRTY, WRITEBACK};
-
 enum MsgType {
 	DEFAULT,
 
@@ -110,10 +108,6 @@ enum MsgType {
 
 	// END
 	MSGTYPE_END
-};
-
-enum StorageType {
-	MONGODB, MYSQL
 };
 
 enum CodingScheme {

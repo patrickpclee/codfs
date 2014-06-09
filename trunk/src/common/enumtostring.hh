@@ -84,16 +84,6 @@ public:
     return "???";
   }
 
-  static const char * toString( SegmentStatus en ) {
-    switch( en ) {
-      case CLEAN: return "CLEAN";
-      case DIRTY: return "DIRTY";
-      case NEW: return "NEW";
-      case WRITEBACK: return "WRITEBACK";
-    }
-    return "???";
-  }
-
   static const char * toString( ComponentType en ) {
     switch( en ) {
       case CLIENT: return "CLIENT";
@@ -150,14 +140,6 @@ public:
       case NEWFILE: return "NEWFILE";
       case NORMAL: return "NORMAL";
       case NOTFOUND: return "NOTFOUND";
-    }
-    return "???";
-  }
-
-  static const char * toString( StorageType en ) {
-    switch( en ) {
-      case MONGODB: return "MONGODB";
-      case MYSQL: return "MYSQL";
     }
     return "???";
   }

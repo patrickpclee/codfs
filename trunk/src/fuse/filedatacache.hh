@@ -35,7 +35,6 @@ class FileDataCache {
 
         RWMutex* obtainRWMutex(uint64_t segmentId);
 
-		std::unordered_map<uint64_t, SegmentStatus> _segmentStatus;
 		ConcurrentMap<uint64_t, uint32_t> _writeBackSegmentPrimary;
 
 		uint32_t _segmentSize;
