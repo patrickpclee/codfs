@@ -23,26 +23,11 @@ class SelectionModule {
 
 		/**
 		 * Choose primary osds from the osd status map
-		 * @param numOfObjs Number of OSDs going to be selected
-		 * @return a list of selected osd IDs  
-		 */
-		vector<uint32_t> ChoosePrimaryOld(uint32_t numOfObjs);
-
-		/**
-		 * Choose primary osds from the osd status map
 		 * @param numOfSegs Number of OSDs going to be selected
 		 * @return a list of selected osd IDs  
 		 */
-		vector<uint32_t> ChoosePrimary(uint32_t numOfSegs);
+		vector<uint32_t> choosePrimary(uint32_t numOfSegs);
 
-
-		/**
-		 * Choose secondary osds from the osd status map to store coded blocks
-		 * @param numOfSegs Number of OSDs going to be selected
-		 * @return a list of selected osd IDs  
-		 */
-		vector<struct BlockLocation> ChooseSecondary(uint32_t numOfBlks, uint32_t
-				primary);
 
 		/**
 		 * Choose secondary osds from the osd status map to store coded blocks
@@ -51,7 +36,7 @@ class SelectionModule {
 		 * @param blkSize Each blk size of the encoded segment
 		 * @return a list of selected osd IDs  
 		 */
-		vector<struct BlockLocation> ChooseSecondary(uint32_t numOfBlks, uint32_t
+		vector<struct BlockLocation> chooseSecondary(uint32_t numOfBlks, uint32_t
 				primary, uint64_t blkSize);
 
 		/**

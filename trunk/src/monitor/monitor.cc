@@ -111,7 +111,7 @@ void Monitor::OsdShutdownProcessor(uint32_t requestId, uint32_t sockfd,
 void Monitor::getPrimaryListProcessor(uint32_t requestId, uint32_t sockfd,
 		uint32_t numOfObjs) {
 	vector<uint32_t> primaryList;
-	primaryList = _selectionModule->ChoosePrimary(numOfObjs);
+	primaryList = _selectionModule->choosePrimary(numOfObjs);
 	_monitorCommunicator->replyPrimaryList(requestId, sockfd, primaryList);
 	return;
 }
@@ -120,7 +120,7 @@ void Monitor::getSecondaryListProcessor(uint32_t requestId, uint32_t sockfd,
 		uint32_t numOfBlks, uint32_t primaryId, uint64_t blockSize) {
 
 	vector<struct BlockLocation> secondaryList;
-	secondaryList = _selectionModule->ChooseSecondary(numOfBlks, primaryId, blockSize);
+	secondaryList = _selectionModule->chooseSecondary(numOfBlks, primaryId, blockSize);
 	_monitorCommunicator->replySecondaryList(requestId, sockfd, secondaryList);
 	return;
 }
