@@ -30,15 +30,6 @@ typedef boost::unique_lock<boost::shared_mutex> writeLock;
 
 using namespace std;
 
-/**
- * For retrieving an segment cache file from the disk
- */
-struct SegmentDiskCache {
-    uint32_t length;
-    string filepath;
-    struct timespec lastAccessedTime;
-};
-
 class StorageModule {
 public:
 
@@ -55,21 +46,13 @@ public:
     ~StorageModule();
 
     /**
-     * Check if the segment exists in the storage
-     * @param segmentId Segment ID
-     * @return true if segment exists, false otherwise
-     */
-
-    bool isSegmentCached(uint64_t segmentId);
-
-    /**
      * Creates an SegmentCache for downloading the segment
      * @param segmentId Segment ID
      * @param segLength Length of segment
      * @param bufLength Length of buffer
      */
 
-    void createSegmentCache(uint64_t segmentId, uint32_t segLength,
+    void createSegmentTransferCache(uint64_t segmentId, uint32_t segLength,
             uint32_t bufLength, DataMsgType dataMsgType, string updateKey = "");
 
     /**
@@ -88,17 +71,6 @@ public:
     uint32_t getNextDeltaId(uint32_t segmentId, uint32_t blockId);
 
     /**
-     * Read a part of an segment from the storage
-     * @param segmentId SegmentID
-     * @param offsetInSegment Number of bytes to skip (default 0)
-     * @param length Number of bytes to read (read whole segment if 0)
-     * @return SegmentData structure
-     */
-
-    struct SegmentData readSegment(uint64_t segmentId,
-            uint64_t offsetInSegment = 0, uint32_t length = 0);
-
-    /**
      * Read a part of a block from the storage
      * @param segmentId Segment ID
      * @param blockId Block ID
@@ -112,7 +84,8 @@ public:
      uint64_t offsetInBlock = 0, uint32_t length = 0);
      */
 
-    BlockData getBlock (uint64_t segmentId, uint32_t blockId, bool isParity, vector<offset_length_t> symbols, bool needLock);
+    BlockData getBlock(uint64_t segmentId, uint32_t blockId, bool isParity,
+            vector<offset_length_t> symbols, bool needLock);
 
     /**
      * Read symbols from a block
@@ -124,37 +97,15 @@ public:
 
     struct BlockData readBlock(uint64_t segmentId, uint32_t blockId,
             vector<offset_length_t> symbols);
-    struct BlockData readDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
-    void mergeBlock (uint64_t segmentId, uint32_t blockId, bool isParity);
-    BlockData getMergedBlock (uint64_t segmentId, uint32_t blockId, bool isParity, bool needLock);
+    struct BlockData readDeltaBlock(uint64_t segmentId, uint32_t blockId,
+            uint32_t deltaId);
+    void mergeBlock(uint64_t segmentId, uint32_t blockId, bool isParity);
+    BlockData getMergedBlock(uint64_t segmentId, uint32_t blockId,
+            bool isParity, bool needLock);
     BlockData readDeltaFromReserve(uint64_t segmentId, uint32_t blockId,
             uint32_t deltaId, DeltaLocation deltaLocation);
     BlockData doReadDelta(uint64_t segmentId, uint32_t blockId,
             uint32_t deltaId, bool isReserve, uint32_t offset);
-
-    /**
-     * Read symbols from a remote block
-     * @param osdId OSD ID
-     * @param segmentId Segment ID
-     * @param blockId Block ID
-     * @param symbols A list of <offset, length> tuples
-     * @return BlockData structure
-     */
-
-    struct BlockData readRemoteBlock(uint32_t osdId, uint64_t segmentId,
-            uint32_t blockId, vector<offset_length_t> symbols);
-
-    /**
-     * Write a partial segment to the storage
-     * @param segmentId Segment ID
-     * @param buf Pointer to buffer containing data
-     * @param offsetInSegment Offset of the trunk in the segment
-     * @param length Number of bytes of the trunk
-     * @return Number of bytes written
-     */
-
-    uint32_t writeSegmentDiskCache(uint64_t segmentId, char* buf,
-            uint64_t offsetInSegment, uint32_t length);
 
     /**
      * Write a buffer to the SegmentCache of the segment
@@ -165,7 +116,7 @@ public:
      * @return No of bytes written
      */
 
-    uint32_t writeSegmentData(uint64_t segmentId, char* buf,
+    uint32_t writeSegmentTransferCache(uint64_t segmentId, char* buf,
             uint64_t offsetInSegment, uint32_t length, DataMsgType dataMsgType,
             string updateKey);
 
@@ -181,8 +132,9 @@ public:
 
     uint32_t writeBlock(uint64_t segmentId, uint32_t blockId, char* buf,
             uint64_t offsetInBlock, uint32_t length);
-    uint32_t writeDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, char* buf,
-            vector<offset_length_t> offsetLength, bool isParity);
+    uint32_t writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
+            uint32_t deltaId, char* buf, vector<offset_length_t> offsetLength,
+            bool isParity);
 
     /**
      * Modify an existing block
@@ -200,17 +152,13 @@ public:
      * @param segmentId Segment ID
      */
 
-    void closeSegmentData(uint64_t segmentId, DataMsgType dataMsgType,
+    void closeSegmentTransferCache(uint64_t segmentId, DataMsgType dataMsgType,
             string updateKey);
 
     void flushFile(string filepath);
 
-    /**
-     * Close the segment file
-     * @param segmentId Segment ID
-     */
-
-    void flushSegmentDiskCache(uint64_t segmentId);
+    struct SegmentData getSegmentTransferCache(uint64_t segmentId,
+            DataMsgType dataMsgType, string updateKey = "");
 
     /**
      * Close the block after the transfer is finished
@@ -219,17 +167,8 @@ public:
      */
 
     void flushBlock(uint64_t segmentId, uint32_t blockId);
-    void flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId, bool isParity);
-
-    /**
-     * Get back the SegmentCache from segmentId
-     * @param segmentId 				Segment ID
-     *
-     * @return SegmentData  Segment Cache
-     */
-
-    struct SegmentData getSegmentData(uint64_t segmentId,
-            DataMsgType dataMsgType, string updateKey = "");
+    void flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32_t deltaId,
+            bool isParity);
 
     /**
      * Set the Capacity of OSD
@@ -239,25 +178,11 @@ public:
     void setMaxBlockCapacity(uint32_t max_block);
 
     /**
-     * Set the segment cache space of OSD
-     * @param max_segment capacity of segment cache
-     */
-
-    void setMaxSegmentCache(uint32_t max_segment);
-
-    /**
      * Get the Capacity of OSD
      * @return uint32_t Max capacity of OSD
      */
 
     uint64_t getMaxBlockCapacity();
-
-    /**
-     * Get the Space of Segment Cache
-     * @return uint32_t Max space of segment cache
-     */
-
-    uint64_t getMaxSegmentCache();
 
     /**
      * Get the current Capacity of OSD
@@ -267,25 +192,11 @@ public:
     uint64_t getCurrentBlockCapacity();
 
     /**
-     * Get the current usage of segment cache
-     * @return uint32_t current usage of segment cache
-     */
-
-    uint64_t getCurrentSegmentCache();
-
-    /**
      * Get the free space of OSD
      * @return uint32_t current free space of OSD
      */
 
     uint64_t getFreeBlockSpace();
-
-    /**
-     * Get the free space of segment cache
-     * @return uint32_t current free space of segment cache
-     */
-
-    uint64_t getFreeSegmentSpace();
 
     /**
      * Verify whether OSD has enough space
@@ -295,46 +206,6 @@ public:
      */
 
     bool isEnoughBlockSpace(uint32_t size);
-
-    /**
-     * Verify whether segment cache has enough space
-     * @param size 		the required space size
-     *
-     * @return boolean 	TRUE/FALSE
-     */
-
-    bool isEnoughSegmentSpace(uint32_t size);
-
-    /**
-     * Save segment to segment cache on the disk
-     * @param segmentId 		segment ID
-     * @param segmentCache 	the segment cache to be saved
-     */
-
-    void putSegmentToDiskCache(uint64_t segmentId,
-            SegmentData segmentCache);
-
-    /**
-     * Read segment cache from the disk
-     * @param segmentId 		segment ID
-     *
-     * @return segmentData 	the segment data from the cache
-     */
-
-    struct SegmentData getSegmentFromDiskCache(uint64_t segmentId);
-
-    /**
-     * Clear all segment disk cache
-     */
-
-    void clearSegmentDiskCache();
-
-    /**
-     * Return the list of cached segment ID
-     * @return ID of cached segments
-     */
-
-    list<uint64_t> getSegmentCacheQueue();
 
     static uint32_t getCombinedLength(vector<offset_length_t> offsetLength);
 
@@ -351,57 +222,6 @@ private:
      */
     void updateBlockFreespace(uint32_t size);
 
-    /**
-     * Calculate and update the free space and usage of segment cache
-     * @param new_segment_size	the size of the segment cache to be saved
-     */
-    void updateSegmentFreespace(uint32_t new_segment_size);
-
-    /**
-     * Delete old entry in the segment cache to make room for new one
-     * @param new_segment_size	the size of the segment cache to be saved
-     *
-     * @return int32_t 			the updated size of segment cache after deletion
-     */
-    int32_t spareSegmentSpace(uint32_t new_segment_size);
-
-    /**
-     * Write the information about an segment to the database
-     * @param segmentId Segment ID
-     * @param segmentSize Number of bytes the segment takes
-     * @param filepath Location of the segment in the filesystem
-
-     void writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
-     string filepath);
-     */
-
-    /**
-     * Read the information about an segment from the database
-     * @param segmentId Segment ID
-     * @return SegmentInfo structure
-     */
-
-    struct SegmentInfo readSegmentInfo(uint64_t segmentId);
-
-    /**
-     * Write the information about a block to the database
-     * @param segmentId Segment ID
-     * @param blockId Block ID
-     * @param blockSize Number of bytes the block takes
-     * @param filepath Location of the block in the filesystem
-     */
-
-    void writeBlockInfo(uint64_t segmentId, uint32_t blockId,
-            uint32_t blockSize, string filepath);
-
-    /**
-     * Read the information about a block form the database
-     * @param segmentId Segment ID
-     * @param blockId Block ID
-     * @return BlockInfo structure
-     */
-
-//	struct BlockInfo readBlockInfo(uint64_t segmentId, uint32_t blockId);
     /**
      * Open a file and read data to buffer
      * @param filepath Path of the file in the storage
@@ -427,15 +247,6 @@ private:
             uint32_t length, bool isCache, int priority = 10);
 
     /**
-     * Return the segment path given Segment ID
-     * @param segmentId Segment ID
-     * @param segmentFolder Location where segments are stored
-     * @return filepath of the segment in the filesystem
-     */
-
-    string generateSegmentPath(uint64_t segmentId, string segmentFolder);
-
-    /**
      * Return the block path given Segment ID and Block ID
      * @param segmentId Segment ID
      * @param blockId Block ID
@@ -445,8 +256,8 @@ private:
 
     string generateBlockPath(uint64_t segmentId, uint32_t blockId,
             string blockFolder);
-    string generateDeltaBlockPath(uint64_t segmentId, uint32_t blockId, uint32_t deltaId,
-            string blockFolder);
+    string generateDeltaBlockPath(uint64_t segmentId, uint32_t blockId,
+            uint32_t deltaId, string blockFolder);
 
     /**
      * Create a file on disk and open it
@@ -482,26 +293,19 @@ private:
     RWMutex* obtainRWMutex(string blockKey);
 
 //    DeltaLocation getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
-    string getBlockKey (uint64_t segmentId, uint32_t blockId);
-    string getBlockKey (string segmentId, string blockId);
-    string generateDeltaKey (uint64_t segmentId, uint32_t blockId, uint32_t deltaId);
-    
-    // TODO: use more efficient data structure for LRU delete
-    ConcurrentMap<uint64_t, struct SegmentDiskCache> _segmentDiskCacheMap;
-    list<uint64_t> _segmentDiskCacheQueue;
+    string getBlockKey(uint64_t segmentId, uint32_t blockId);
+    string getBlockKey(string segmentId, string blockId);
+    string generateDeltaKey(uint64_t segmentId, uint32_t blockId,
+            uint32_t deltaId);
 
     FileLruCache<string, FILE*>* _openedFile;
     map<uint64_t, struct SegmentData> _segmentUploadCache;
     map<string, struct SegmentData> _segmentUpdateCache;
-    string _segmentFolder;
     string _blockFolder;
     string _remoteBlockFolder;
     uint64_t _maxBlockCapacity;
-    uint64_t _maxSegmentCache;
     atomic<uint64_t> _freeBlockSpace;
-    atomic<uint64_t> _freeSegmentSpace;
     atomic<uint64_t> _currentBlockUsage;
-    atomic<uint64_t> _currentSegmentUsage;
 
     ConcurrentMap<string, uint32_t> _deltaIdMap;
     ConcurrentMap<string, vector<offset_length_t>> _deltaOffsetLength;

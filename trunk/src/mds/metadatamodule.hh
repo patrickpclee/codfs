@@ -8,7 +8,6 @@ using namespace std;
 #include "configmetadatamodule.hh"
 #include "filemetadatamodule.hh"
 #include "segmentmetadatamodule.hh"
-#include "osdmetadatamodule.hh"
 
 #include "../common/metadata.hh"
 
@@ -217,7 +216,6 @@ private:
 	ConfigMetaDataModule* _configMetaDataStorage;
 	FileMetaDataModule* _fileMetaDataModule;
 	SegmentMetaDataModule* _segmentMetaDataModule;
-	OsdMetaDataModule* _osdMetaDataModule;
 };
 
 #endif

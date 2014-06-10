@@ -35,20 +35,9 @@ StorageModule::StorageModule() {
     _openedFile = new FileLruCache<string, FILE*>(MAX_OPEN_FILES);
     _segmentUploadCache = {};
     _segmentUpdateCache = {};
-    _segmentFolder = configLayer->getConfigString(
-            "Storage>SegmentCacheLocation");
     _blockFolder = configLayer->getConfigString("Storage>BlockLocation");
 
-    // create folder if not exist
     struct stat st;
-    if (stat(_segmentFolder.c_str(), &st) != 0) {
-        debug("%s does not exist, make directory automatically\n",
-                _segmentFolder.c_str());
-        if (mkdir(_segmentFolder.c_str(), S_IRWXU | S_IRGRP | S_IROTH) < 0) {
-            perror("mkdir");
-            exit(-1);
-        }
-    }
     if (stat(_blockFolder.c_str(), &st) != 0) {
         debug("%s does not exist, make directory automatically\n",
                 _blockFolder.c_str());
@@ -59,14 +48,10 @@ StorageModule::StorageModule() {
     }
 
     // Unit in StorageModule: Bytes
-    _maxSegmentCache = stringToByte(
-            configLayer->getConfigString("Storage>SegmentCacheCapacity"));
     _maxBlockCapacity = stringToByte(
             configLayer->getConfigString("Storage>BlockCapacity"));
 
     cout << "=== STORAGE ===" << endl;
-    cout << "Segment Cache Location = " << _segmentFolder << " Size = "
-            << formatSize(_maxSegmentCache) << endl;
     cout << "Block Storage Location = " << _blockFolder << " Size = "
             << formatSize(_maxBlockCapacity) << endl;
     cout << "===============" << endl;
@@ -84,60 +69,11 @@ void StorageModule::initializeStorageStatus() {
     // initialize segments
     //
 
-    _freeSegmentSpace = _maxSegmentCache;
     _freeBlockSpace = _maxBlockCapacity;
-    _currentSegmentUsage = 0;
     _currentBlockUsage = 0;
 
     struct dirent* dent;
     DIR* srcdir;
-
-    srcdir = opendir(_segmentFolder.c_str());
-    if (srcdir == NULL) {
-        perror("opendir");
-        exit(-1);
-    }
-
-    cout << "===== List of Files =====" << endl;
-
-    while ((dent = readdir(srcdir)) != NULL) {
-        struct stat st;
-
-        if (strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
-            continue;
-
-        if (fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0) {
-            perror(dent->d_name);
-            continue;
-        }
-
-        // save file info
-        struct SegmentDiskCache segmentDiskCache;
-        uint64_t segmentId = boost::lexical_cast<uint64_t>(dent->d_name);
-        segmentDiskCache.length = st.st_size;
-        segmentDiskCache.lastAccessedTime = st.st_atim;
-        segmentDiskCache.filepath = _segmentFolder + dent->d_name;
-
-        {
-            lock_guard<mutex> lk(diskCacheMutex);
-            _segmentDiskCacheMap.set(segmentId, segmentDiskCache);
-            _segmentDiskCacheQueue.push_back(segmentId);
-
-            _freeSegmentSpace -= (uint64_t)st.st_size;
-            _currentSegmentUsage += (uint64_t)st.st_size;
-        }
-
-        cout << "ID: " << segmentId << "\tLength: " << segmentDiskCache.length
-                << "\t Modified: " << segmentDiskCache.lastAccessedTime.tv_sec
-                << endl;
-
-    }
-    closedir(srcdir);
-
-    cout << "=======================" << endl;
-
-    cout << "Segment Cache Usage: " << formatSize(_currentSegmentUsage) << "/"
-            << formatSize(_maxSegmentCache) << endl;
 
     //
     // initialize blocks
@@ -180,7 +116,7 @@ uint64_t StorageModule::getFilesize(string filepath) {
 
 }
 
-void StorageModule::createSegmentCache(uint64_t segmentId, uint32_t segLength,
+void StorageModule::createSegmentTransferCache(uint64_t segmentId, uint32_t segLength,
         uint32_t bufLength, DataMsgType dataMsgType, string updateKey) {
 
     // create cache
@@ -299,63 +235,6 @@ uint32_t StorageModule::getNextDeltaId (uint32_t segmentId, uint32_t blockId) {
     writeLock wtlock(*rwmutex);
     uint32_t curDeltaId = _deltaIdMap.increment(blockKey) - 1;
     return curDeltaId;
-}
-
-bool StorageModule::isSegmentCached(uint64_t segmentId) {
-
-#ifndef USE_SEGMENT_CACHE
-    return false;
-#endif
-
-    lock_guard<mutex> lk(diskCacheMutex);
-    if (_segmentDiskCacheMap.count(segmentId)) {
-
-        _segmentDiskCacheMap.get(segmentId).lastAccessedTime = {time(NULL), 0};
-
-        _segmentDiskCacheQueue.remove(segmentId);
-        _segmentDiskCacheQueue.push_back(segmentId);
-
-        return true;
-    }
-    return false;
-}
-
-/**
- * Default length = 0 (read whole segment)
- */
-
-struct SegmentData StorageModule::readSegment(uint64_t segmentId,
-        uint64_t offsetInSegment, uint32_t length) {
-
-    struct SegmentData segmentData;
-    segmentData.info = readSegmentInfo(segmentId);
-
-    // check num of bytes to read
-    // if length = 0, read whole segment
-    uint32_t byteToRead;
-    if (length == 0) {
-        byteToRead = segmentData.info.segLength;
-    } else {
-        byteToRead = length;
-    }
-
-    // TODO: check maximum malloc size
-    // poolFree in osd_communicator::sendSegment
-    segmentData.buf = MemoryPool::getInstance().poolMalloc(byteToRead);
-
-    debug(
-            "READ SEGMENT Segment ID = %" PRIu64 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
-            segmentId, byteToRead, offsetInSegment);
-
-    readFile(segmentData.info.segmentPath, segmentData.buf, offsetInSegment,
-            byteToRead, true);
-
-    debug(
-            "Segment ID = %" PRIu64 " read %" PRIu32 " bytes at offset %" PRIu64 "\n",
-            segmentId, byteToRead, offsetInSegment);
-
-    return segmentData;
-
 }
 
 struct BlockData StorageModule::readBlock(uint64_t segmentId, uint32_t blockId,
@@ -574,7 +453,7 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
     _reserveSpaceMap.get(blockKey).currentOffset = blockData.info.blockSize;
 }
 
-uint32_t StorageModule::writeSegmentData(uint64_t segmentId, char* buf,
+uint32_t StorageModule::writeSegmentTransferCache(uint64_t segmentId, char* buf,
         uint64_t offsetInSegment, uint32_t length, DataMsgType dataMsgType,
         string updateKey) {
 
@@ -608,23 +487,6 @@ uint32_t StorageModule::writeSegmentData(uint64_t segmentId, char* buf,
     memcpy(recvCache + offsetInSegment, buf, length);
 
     return length;
-}
-
-uint32_t StorageModule::writeSegmentDiskCache(uint64_t segmentId, char* buf,
-        uint64_t offsetInSegment, uint32_t length) {
-
-    uint32_t byteWritten;
-
-    string filepath = generateSegmentPath(segmentId, _segmentFolder);
-
-    // lower priority then other read / write
-    byteWritten = writeFile(filepath, buf, offsetInSegment, length, true, 0);
-
-    debug(
-            "Segment ID = %" PRIu64 " write %" PRIu32 " bytes at offset %" PRIu64 "\n",
-            segmentId, byteWritten, offsetInSegment);
-
-    return byteWritten;
 }
 
 uint32_t StorageModule::writeBlock(uint64_t segmentId, uint32_t blockId,
@@ -747,12 +609,12 @@ uint32_t StorageModule::updateBlock(uint64_t segmentId, uint32_t blockId,
     return byteWritten;
 }
 
-void StorageModule::closeSegmentData(uint64_t segmentId,
+void StorageModule::closeSegmentTransferCache(uint64_t segmentId,
         DataMsgType dataMsgType, string updateKey) {
 
     if (dataMsgType == UPLOAD) {
         // close cache
-        struct SegmentData segmentCache = getSegmentData(segmentId,
+        struct SegmentData segmentCache = getSegmentTransferCache(segmentId,
                 dataMsgType);
         MemoryPool::getInstance().poolFree(segmentCache.buf);
 
@@ -762,7 +624,7 @@ void StorageModule::closeSegmentData(uint64_t segmentId,
         }
     } else if (dataMsgType == UPDATE) {
         // close cache
-        struct SegmentData segmentCache = getSegmentData(segmentId, dataMsgType,
+        struct SegmentData segmentCache = getSegmentTransferCache(segmentId, dataMsgType,
                 updateKey);
         MemoryPool::getInstance().poolFree(segmentCache.buf);
 
@@ -792,12 +654,6 @@ void StorageModule::flushFile(string filePath) {
     return;
 }
 
-void StorageModule::flushSegmentDiskCache(uint64_t segmentId) {
-
-    string filepath = generateSegmentPath(segmentId, _segmentFolder);
-    flushFile(filepath);
-
-}
 
 void StorageModule::flushBlock(uint64_t segmentId, uint32_t blockId) {
 
@@ -809,30 +665,6 @@ void StorageModule::flushDeltaBlock(uint64_t segmentId, uint32_t blockId, uint32
 
     string filepath = generateDeltaBlockPath(segmentId, blockId, deltaId, _blockFolder);
     flushFile(filepath);
-}
-
-//
-// PRIVATE METHODS
-//
-
-/*
- void StorageModule::writeSegmentInfo(uint64_t segmentId, uint32_t segmentSize,
- string filepath) {
-
- // TODO: Database to be implemented
-
- }
- */
-
-struct SegmentInfo StorageModule::readSegmentInfo(uint64_t segmentId) {
-// TODO: Database to be implemented
-    struct SegmentInfo segmentInfo;
-
-    segmentInfo.segmentId = segmentId;
-    segmentInfo.segmentPath = generateSegmentPath(segmentId, _segmentFolder);
-    segmentInfo.segLength = getFilesize(segmentInfo.segmentPath);
-
-    return segmentInfo;
 }
 
 uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
@@ -889,17 +721,6 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
     }
 
     return byteWritten;
-}
-
-string StorageModule::generateSegmentPath(uint64_t segmentId,
-        string segmentFolder) {
-
-// append a '/' if not present
-    if (segmentFolder[segmentFolder.length() - 1] != '/') {
-        segmentFolder.append("/");
-    }
-
-    return segmentFolder + to_string(segmentId);
 }
 
 string StorageModule::generateBlockPath(uint64_t segmentId, uint32_t blockId,
@@ -1002,7 +823,7 @@ void StorageModule::tryCloseFile(string filepath) {
     }
 }
 
-struct SegmentData StorageModule::getSegmentData(uint64_t segmentId,
+struct SegmentData StorageModule::getSegmentTransferCache(uint64_t segmentId,
         DataMsgType dataMsgType, string updateKey) {
     if (dataMsgType == UPLOAD) {
         {
@@ -1040,163 +861,24 @@ void StorageModule::updateBlockFreespace(uint32_t size) {
     }
 }
 
-int32_t StorageModule::spareSegmentSpace(uint32_t newSegmentSize) {
-
-    if (_maxSegmentCache < newSegmentSize) {
-        return -1; // error: segment size larger than cache
-    }
-
-    while (_freeSegmentSpace < (uint64_t)newSegmentSize) {
-        uint64_t segmentId = 0;
-        struct SegmentDiskCache segmentCache;
-
-        segmentId = _segmentDiskCacheQueue.front();
-        segmentCache = _segmentDiskCacheMap.get(segmentId);
-
-        tryCloseFile(segmentCache.filepath);
-        remove(segmentCache.filepath.c_str());
-
-        // update size
-        _freeSegmentSpace += segmentCache.length;
-        _currentSegmentUsage -= segmentCache.length;
-
-        // remove from queue and map
-        _segmentDiskCacheQueue.remove(segmentId);
-        _segmentDiskCacheMap.erase(segmentId);
-    }
-
-    return 0;
-
-}
-
-void StorageModule::putSegmentToDiskCache(uint64_t segmentId,
-        SegmentData segmentCache) {
-
-    lock_guard<mutex> lk(diskCacheMutex);
-
-    debug("Before saving segment ID = %" PRIu64 ", cache = %s\n", segmentId,
-            formatSize(_freeSegmentSpace).c_str());
-
-    uint32_t segmentSize = segmentCache.info.segLength;
-
-    if (!isEnoughSegmentSpace(segmentSize)) {
-        // clear cache if space is not available
-        if (spareSegmentSpace(segmentSize) == -1) {
-            debug(
-                    "Not enough space to cache segment! Segment Size = %" PRIu32 "\n",
-                    segmentSize);
-            return;
-        }
-    }
-
-    debug("Spare space for saving segment ID = %" PRIu64 ", cache = %s\n",
-            segmentId, formatSize(_freeSegmentSpace).c_str());
-
-// write cache to disk
-    const string filepath = generateSegmentPath(segmentId, _segmentFolder);
-    createFile(filepath);
-
-#ifdef USE_SEGMENT_CACHE
-//TODO: segment cache length?
-    uint64_t byteWritten = writeSegmentDiskCache(segmentId, segmentCache.buf, 0,
-            segmentCache.segLength);
-#else
-    uint64_t byteWritten = segmentCache.bufLength;
-#endif
-
-    if (byteWritten != segmentCache.bufLength) {
-        perror("Cannot saveSegmentToDisk");
-        exit(-1);
-    }
-    flushSegmentDiskCache(segmentId);
-
-    _currentSegmentUsage += (uint64_t)segmentSize;
-    _freeSegmentSpace -= (uint64_t)segmentSize;
-
-// save cache to map
-    struct SegmentDiskCache segmentDiskCache;
-    segmentDiskCache.filepath = generateSegmentPath(segmentId, _segmentFolder);
-    segmentDiskCache.length = segmentCache.bufLength;
-    segmentDiskCache.lastAccessedTime = {time(NULL), 0}; // set to current time
-
-    _segmentDiskCacheMap.set(segmentId, segmentDiskCache);
-    _segmentDiskCacheQueue.push_back(segmentId);
-
-    debug("After saving segment ID = %" PRIu64 ", cache = %s\n", segmentId,
-            formatSize(_freeSegmentSpace).c_str());
-
-}
-
-struct SegmentData StorageModule::getSegmentFromDiskCache(uint64_t segmentId) {
-    struct SegmentData segmentData;
-    struct SegmentDiskCache segmentDiskCache;
-    {
-        lock_guard<mutex> lk(diskCacheMutex);
-        segmentDiskCache = _segmentDiskCacheMap.get(segmentId);
-    }
-    segmentData = readSegment(segmentId, 0, segmentDiskCache.length);
-    return segmentData;
-}
-
-void StorageModule::clearSegmentDiskCache() {
-
-    lock_guard<mutex> lk(diskCacheMutex);
-
-    for (auto segment : _segmentDiskCacheQueue) {
-        string filepath = _segmentFolder + to_string(segment);
-        tryCloseFile(filepath);
-        remove(filepath.c_str());
-    }
-
-    _segmentDiskCacheQueue.clear();
-    _segmentDiskCacheMap.clear();
-
-    _freeSegmentSpace = _maxSegmentCache;
-    _currentSegmentUsage = 0;
-}
-
-list<uint64_t> StorageModule::getSegmentCacheQueue() {
-    return _segmentDiskCacheQueue;
-}
-
 uint64_t StorageModule::getCurrentBlockCapacity() {
     return _currentBlockUsage;
-}
-
-uint64_t StorageModule::getCurrentSegmentCache() {
-    return _currentSegmentUsage;
 }
 
 uint64_t StorageModule::getFreeBlockSpace() {
     return _freeBlockSpace;
 }
 
-uint64_t StorageModule::getFreeSegmentSpace() {
-    return _freeSegmentSpace;
-}
-
 void StorageModule::setMaxBlockCapacity(uint32_t max_block) {
     _maxBlockCapacity = max_block;
-}
-
-void StorageModule::setMaxSegmentCache(uint32_t max_segment) {
-    _maxSegmentCache = max_segment;
 }
 
 uint64_t StorageModule::getMaxBlockCapacity() {
     return _maxBlockCapacity;
 }
 
-uint64_t StorageModule::getMaxSegmentCache() {
-    return _maxSegmentCache;
-}
-
 bool StorageModule::isEnoughBlockSpace(uint32_t size) {
     return (uint64_t)size <= _freeBlockSpace ? true : false;
-}
-
-bool StorageModule::isEnoughSegmentSpace(uint32_t size) {
-    return (uint64_t)size <= _freeSegmentSpace ? true : false;
 }
 
 uint32_t StorageModule::getCombinedLength(vector<offset_length_t> offsetLength) {
@@ -1221,27 +903,6 @@ RWMutex* StorageModule::obtainRWMutex(string blockKey) {
     _deltaRWMutexMapMutex.unlock();
     return rwmutex;
 }
-
-/*
-DeltaLocation StorageModule::getDeltaLocation (uint64_t segmentId, uint32_t blockId, uint32_t deltaId) {
-    const string blockKey = to_string(segmentId) + "." + to_string(blockId);
-
-    RWMutex* rwmutex = obtainRWMutex(blockKey);
-    readLock rdlock(*rwmutex);
-
-    vector<DeltaLocation> deltaLocationList = _deltaLocationMap[blockKey];
-
-    for (DeltaLocation deltaLocation: deltaLocationList) {
-        debug ("DeltaLocation deltaId = %" PRIu32 " isReserve = %d\n", deltaLocation.deltaId, deltaLocation.isReserveSpace);
-        if (deltaLocation.deltaId == deltaId) {
-            return deltaLocation;
-        }
-    }
-
-    debug_error ("DeltaID %" PRIu32 " not found for %s\n", deltaId, blockKey.c_str());
-    exit (-1);
-}
-*/
 
 string StorageModule::getBlockKey (uint64_t segmentId, uint32_t blockId) {
     return to_string(segmentId) + "." + to_string(blockId);

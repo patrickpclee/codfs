@@ -17,16 +17,6 @@ using namespace std;
 #include "../common/define.hh"
 #include "../../lib/deathhandler/death_handler.h"
 
-#ifdef TIME_POINT
-extern double lockSegmentCountMutexTime;
-extern double getSegmentInfoTime;
-extern double getOSDStatusTime;
-extern double getBlockTime;
-extern double decodeSegmentTime;
-extern double sendSegmentTime;
-extern double cacheSegmentTime;
-#endif
-
 /// Osd Segment
 Osd* osd;
 
@@ -38,24 +28,8 @@ void sighandler(int signum) {
 	cout << "Signal" << signum << "received" << endl;
 	if (signum == SIGINT) {
 		debug_yellow ("%s\n", "SIGINT received\n");
-		cout << fixed;
-		cout << setprecision(2);
-#ifdef TIME_POINT
-cout << "Lock Segment Count Mutex: " << lockSegmentCountMutexTime / 1000 << endl;
-cout << "Get Segment Info: " << getSegmentInfoTime / 1000 << endl;
-cout << "Get OSD Status: " << getOSDStatusTime / 1000 << endl;
-cout << "Get Block: " << getBlockTime / 1000 << endl;
-cout << "Decode Segment: " << decodeSegmentTime / 1000 << endl;
-cout << "Send Segment: " << sendSegmentTime / 1000 << endl;
-cout << "Cache Segment: " << cacheSegmentTime / 1000 << endl;
-#endif
 		exit(42);
 	} else if (signum == SIGUSR1) {
-		cout << "Clearing segment disk cache...";
-		fflush (stdout);
-		osd->getStorageModule()->clearSegmentDiskCache();
-		cout << "done" << endl;
-	} else if (signum == SIGUSR2) {
 		cout << "Dumping latency results...";
 		fflush (stdout);
 		osd->dumpLatency();
@@ -72,7 +46,6 @@ int main(int argc, char* argv[]) {
 
 	signal(SIGINT, sighandler);
 	signal(SIGUSR1, sighandler);
-	signal(SIGUSR2, sighandler);
 
 	// handle segFault for debug
 	Debug::DeathHandler dh;

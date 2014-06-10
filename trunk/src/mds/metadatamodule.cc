@@ -6,7 +6,6 @@ MetaDataModule::MetaDataModule() {
 	_configMetaDataStorage = new ConfigMetaDataModule();
 	_fileMetaDataModule = new FileMetaDataModule(_configMetaDataStorage);
 	_segmentMetaDataModule = new SegmentMetaDataModule(_configMetaDataStorage);
-	_osdMetaDataModule = new OsdMetaDataModule();
 
 	srand(time(NULL));
 }

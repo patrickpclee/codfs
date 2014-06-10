@@ -118,10 +118,6 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 
 	// step 1: send init message, wait for ack
 
-#ifdef SERIALIZE_DATA_QUEUE
-	lockDataQueue(sockfd);
-#endif
-
     debug("XXXXX segmentId = %" PRIu64 " blockid = %" PRIu32 " blocksize = %" PRIu32 "\n", segmentId, blockId, length);
 	debug("Put Block Init to FD = %" PRIu32 "\n", sockfd);
 	putBlockInit(sockfd, segmentId, blockId, length, chunkCount, dataMsgType, updateKey);
@@ -149,10 +145,6 @@ uint32_t OsdCommunicator::sendBlock(uint32_t sockfd, struct BlockData blockData,
 	}
 
 	// Step 3: Send End message
-
-#ifdef SERIALIZE_DATA_QUEUE
-	unlockDataQueue(sockfd);
-#endif
 
     putBlockEnd(sockfd, segmentId, blockId, dataMsgType, updateKey,
             offsetLength, parityList, blockData.info.codingScheme,

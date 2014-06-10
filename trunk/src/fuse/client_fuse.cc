@@ -15,7 +15,6 @@
 #include "client.hh"
 #include "client_communicator.hh"
 
-#include "fuselogger.hh"
 #include "filemetadatacache.hh"
 #include "filedatacache.hh"
 
@@ -34,7 +33,6 @@ Client* client;
 ConfigLayer* configLayer;
 uint32_t _clientId;
 ClientCommunicator* _clientCommunicator;
-FuseLogger* _fuseLogger;
 FileMetaDataCache* _fileMetaDataCache;
 FileDataCache* _fileDataCache;
 
@@ -160,7 +158,6 @@ static void* ncvfs_init(struct fuse_conn_info *conn) {
     _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
     _prefetchCount = configLayer->getConfigInt("Fuse>prefetchCount");
 	client = new Client(_clientId);
-	_fuseLogger = new FuseLogger(_cwd + "fuse.log");	
 	_fileMetaDataCache = new FileMetaDataCache();
 	_clientCommunicator = client->getCommunicator();
 	_clientCommunicator->createServerSocket();

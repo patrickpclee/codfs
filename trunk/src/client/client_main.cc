@@ -12,7 +12,6 @@
 #include "../coding/embrcoding.hh"
 #include "../coding/evenoddcoding.hh"
 #include "../coding/rdpcoding.hh"
-#include "../../lib/logger.hh"
 
 using namespace std;
 

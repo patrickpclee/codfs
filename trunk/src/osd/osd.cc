@@ -366,7 +366,7 @@ DataMsgType Osd::putSegmentInitProcessor(uint32_t requestId, uint32_t sockfd,
     }
 
     // create segment and cache
-    _storageModule->createSegmentCache(segmentId, segLength, bufLength,
+    _storageModule->createSegmentTransferCache(segmentId, segLength, bufLength,
             dataMsgType, updateKey);
     if (!isSmallSegment) {
         _osdCommunicator->replyPutSegmentInit(requestId, sockfd, segmentId,
@@ -483,7 +483,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
 #endif
 
             // if all chunks have arrived
-            struct SegmentData segmentCache = _storageModule->getSegmentData(
+            struct SegmentData segmentCache = _storageModule->getSegmentTransferCache(
                     segmentId, dataMsgType, updateKey);
 
             struct CodingSetting codingSetting = _codingSettingMap.get(
@@ -611,7 +611,7 @@ void Osd::putSegmentEndProcessor(uint32_t requestId, uint32_t sockfd,
             // if all chunks have arrived, send ack
             _osdCommunicator->replyPutSegmentEnd(requestId, sockfd, segmentId, isSmallSegment);
 
-            _storageModule->closeSegmentData(segmentId, dataMsgType, updateKey);
+            _storageModule->closeSegmentTransferCache(segmentId, dataMsgType, updateKey);
             break;
         } else {
             usleep(USLEEP_DURATION); // sleep 0.01s
@@ -856,7 +856,7 @@ uint32_t Osd::putSegmentDataProcessor(uint32_t requestId, uint32_t sockfd,
         DataMsgType dataMsgType, string updateKey, char* buf) {
 
     uint32_t byteWritten;
-    byteWritten = _storageModule->writeSegmentData(segmentId, buf, offset,
+    byteWritten = _storageModule->writeSegmentTransferCache(segmentId, buf, offset,
             length, dataMsgType, updateKey);
 
     if (dataMsgType == UPLOAD) {
