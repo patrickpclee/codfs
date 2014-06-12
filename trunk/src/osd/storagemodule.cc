@@ -37,6 +37,13 @@ StorageModule::StorageModule() {
     _segmentUpdateCache = {};
     _blockFolder = configLayer->getConfigString("Storage>BlockLocation");
 
+    _updateScheme = configLayer->getConfigInt("Storage>UpdateScheme");
+    if (_updateScheme == PLR) {
+        _reservedSpaceSize = configLayer->getConfigLong("Storage>ReservedSpaceSize");
+    } else {
+        _reservedSpaceSize = 0; // important
+    }
+
     struct stat st;
     if (stat(_blockFolder.c_str(), &st) != 0) {
         debug("%s does not exist, make directory automatically\n",
@@ -200,7 +207,7 @@ void StorageModule::reserveBlockSpace(uint64_t segmentId, uint32_t blockId,
 
         ReserveSpaceInfo reserveSpaceInfo;
         reserveSpaceInfo.currentOffset = blockSize;
-        reserveSpaceInfo.remainingReserveSpace = RESERVE_SPACE_SIZE;
+        reserveSpaceInfo.remainingReserveSpace = _reservedSpaceSize;
         reserveSpaceInfo.blockSize = blockSize;
         _reserveSpaceMap.set(blockKey, reserveSpaceInfo);
     }
@@ -321,13 +328,13 @@ BlockData StorageModule::doReadDelta(uint64_t segmentId, uint32_t blockId,
 
 BlockData StorageModule::getBlock (uint64_t segmentId, uint32_t blockId, bool isParity, vector<offset_length_t> symbols, bool needLock) {
     if (isParity) {
-        if (UPDATE_SCHEME == FO) {
+        if (_updateScheme == FO) {
             return readBlock(segmentId, blockId, symbols);
         } else {
             return getMergedBlock(segmentId, blockId, isParity, true);
         }
     } else {
-        if (UPDATE_SCHEME == FL) {
+        if (_updateScheme == FL) {
             return getMergedBlock(segmentId, blockId, isParity, true);
         } else {
             return readBlock(segmentId, blockId, symbols);
@@ -449,7 +456,7 @@ void StorageModule::mergeBlock (uint64_t segmentId, uint32_t blockId, bool isPar
 
     // remove all delta information
     deltaLocationList.clear();
-    _reserveSpaceMap.get(blockKey).remainingReserveSpace = RESERVE_SPACE_SIZE;
+    _reserveSpaceMap.get(blockKey).remainingReserveSpace = _reservedSpaceSize;
     _reserveSpaceMap.get(blockKey).currentOffset = blockData.info.blockSize;
 }
 
@@ -540,7 +547,7 @@ uint32_t StorageModule::writeDeltaBlock(uint64_t segmentId, uint32_t blockId,
 
     uint32_t currentOffset = 0;
     string filepath = "";
-    if (isParity && combinedLength <= RESERVE_SPACE_SIZE) {
+    if (isParity && combinedLength <= _reservedSpaceSize) {
         if (reserveSpaceInfo.remainingReserveSpace < combinedLength) {
             // merge existing block and write again
             debug ("need merge remaining = %" PRIu32 " length = %" PRIu32 " deltaId = %" PRIu32 "\n", reserveSpaceInfo.remainingReserveSpace, combinedLength, deltaId);

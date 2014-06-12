@@ -1,16 +1,23 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
     <Storage>
-        <BlockLocation>./osd_block/</BlockLocation>                         <!-- location for storing uploaded chunks -->
+        <!-- location for storing uploaded chunks -->
+        <BlockLocation>./osd_block/</BlockLocation>                         
     	
-        <BlockCapacity>100G</BlockCapacity>                                 <!-- capacity of chunk storage -->
-        <SegmentCacheCapacity>100M</SegmentCacheCapacity>                   <!-- capacity of segment cache (deprecated) -->
+        <!-- capacity of chunk storage -->
+        <BlockCapacity>100G</BlockCapacity>                                 
 
-        <!-- Changing settings below this line is not recommended -->
+        <!-- FO=0, FL=1, PL=2, PLR=3 -->
+        <UpdateScheme>3</UpdateScheme>                                      
 
-        <ReportCacheInterval>5</ReportCacheInterval>                        <!-- update interval in sec for report cache status (deprecated) --> 
+        <!-- reserved space size (used by PLR only, multiples of chunk size) -->
+        <ReservedSpaceSize>4M</ReservedSpaceSize>                                   
+
+        <!-- CHANGING SETTINGS BELOW THIS LINE IS NOT RECOMMENDED -->
+
     </Storage>
 	<ThreadPool>
-        <NumThreads>10</NumThreads>                                         <!-- no. of threads for handling client requests -->
+        <!-- no. of threads for handling client requests -->
+        <NumThreads>10</NumThreads>                                         
 	</ThreadPool>
 </NcvfsConfig>

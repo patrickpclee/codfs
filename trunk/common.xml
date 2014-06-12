@@ -4,26 +4,40 @@
 	<Components>
 	
 		<MDS>
-            <count>1</count>        <!-- do not change -->
+            <!-- do not change -->
+            <count>1</count>        
+
 			<MDS0>
-                <id>50000</id>      <!-- unique component ID -->
-                <ip>127.0.0.1</ip>  <!-- MDS IP -->
-                <port>50000</port>  <!-- MDS PORT -->
+                <!-- unique component ID -->
+                <id>50000</id>      
+
+                <!-- MDS IP -->
+                <ip>127.0.0.1</ip>  
+                
+                <!-- MDS PORT -->
+                <port>50000</port>  
 			</MDS0>
 		</MDS>
 		
 		<MONITOR>
-            <count>1</count>        <!-- do not change -->
-			<MONITOR0>
-                <id>53000</id>      <!-- unique component ID -->
-                <ip>127.0.0.1</ip>  <!-- MONITOR IP -->
-                <port>53000</port>  <!-- MONITOR PORT -->
+            <!-- do not change -->
+            <count>1</count>        
+            
+            <MONITOR0>
+                <!-- unique component ID -->
+                <id>53000</id>      
+
+                <!-- MONITOR IP -->
+                <ip>127.0.0.1</ip>  
+
+                <!-- MONITOR PORT -->
+                <port>53000</port>  
 			</MONITOR0>
 		</MONITOR>
 				
 	</Components>
 
-    <!-- Changing settings below this line is not recommended -->
+    <!-- CHANGING SETTINGS BELOW THIS LINE IS NOT RECOMMENDED -->
 	
 	<Communication>
 

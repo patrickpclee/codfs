@@ -52,13 +52,6 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define RECOVERY_THREADS 10
 #define MAX_NUM_PROCESSING_SEGMENT 10
 
-#define UPDATE_SCHEME 2 // FO,FL,PL,PLR
-#if UPDATE_SCHEME == 3
-#define RESERVE_SPACE_SIZE 5242880
-#else
-#define RESERVE_SPACE_SIZE 0
-#endif
-
 // osd/storagemodule.cc
 #define HOTNESS_ALG TOP_HOTNESS_ALG
 #define IO_THREADS 2

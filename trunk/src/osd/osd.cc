@@ -57,6 +57,13 @@ Osd::Osd(uint32_t selfId) {
     _reportCacheInterval = configLayer->getConfigLong(
             "Storage>ReportCacheInterval");
 
+    _updateScheme = configLayer->getConfigInt("Storage>UpdateScheme");
+    if (_updateScheme == PLR) {
+        _reservedSpaceSize = configLayer->getConfigLong("Storage>ReservedSpaceSize");
+    } else {
+        _reservedSpaceSize = 0; // important
+    }
+
     _blocktpId = 0;
     _updateId = 0;
     _recoverytpId = 0;
@@ -75,7 +82,6 @@ void Osd::freeSegment(uint64_t segmentId, SegmentData segmentData) {
     debug("free segment %" PRIu64 "\n", segmentId);
     MemoryPool::getInstance().poolFree(segmentData.buf);
     debug("segment %" PRIu64 "free-d\n", segmentId);
-
 }
 
 /**
@@ -387,9 +393,9 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
             _storageModule->createBlock(segmentId, blockData.info.blockId,
                     blockData.info.blockSize);
 
-            if (UPDATE_SCHEME == PLR && blockData.info.blockType == PARITY_BLOCK) {
+            if (_updateScheme == PLR && blockData.info.blockType == PARITY_BLOCK) {
                 _storageModule->reserveBlockSpace(segmentId, blockData.info.blockId,
-                        0, blockData.info.blockSize, blockData.info.blockSize + RESERVE_SPACE_SIZE);
+                        0, blockData.info.blockSize, blockData.info.blockSize + _reservedSpaceSize);
             }
 
             _storageModule->writeBlock(segmentId, blockData.info.blockId,
@@ -402,7 +408,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
             debug("Updating Segment %" PRIu64 " Block %" PRIu32 "\n", segmentId,
                     blockData.info.blockId);
 
-            if (UPDATE_SCHEME == FL) {
+            if (_updateScheme == FL) {
                 uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockData.info.blockId);
                 _storageModule->createDeltaBlock(segmentId, blockData.info.blockId, deltaId, false);
                 _storageModule->writeDeltaBlock(segmentId, blockData.info.blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
@@ -416,7 +422,7 @@ void Osd::distributeBlock(uint64_t segmentId, const struct BlockData blockData,
             debug("Updating Segment %" PRIu64 " Block %" PRIu32 "\n", segmentId,
                     blockData.info.blockId);
 
-            if (UPDATE_SCHEME == FO) {
+            if (_updateScheme == FO) {
                 _storageModule->updateBlock(segmentId, blockData.info.blockId, blockData);
                 _storageModule->flushBlock(segmentId, blockData.info.blockId);
             } else {
@@ -727,7 +733,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 // send delta to parity nodes
                 sendDelta(segmentId, blockId, blockData, offsetLength);
 
-                if (UPDATE_SCHEME == FL) {
+                if (_updateScheme == FL) {
                     uint32_t deltaId = _storageModule->getNextDeltaId(segmentId, blockId);
                     _storageModule->createDeltaBlock(segmentId, blockId, deltaId, false);
                     _storageModule->writeDeltaBlock(segmentId, blockId, deltaId, blockData.buf, blockData.info.offlenVector, false);
@@ -763,7 +769,7 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                 uint32_t deltaId = _storageModule->getNextDeltaId(segmentId,
                         blockId);
 
-                if (UPDATE_SCHEME == FO) {
+                if (_updateScheme == FO) {
                     // read old parity and compute XOR
                     uint32_t combinedLength = StorageModule::getCombinedLength(offsetLength);
                     BlockData parityDelta = _storageModule->readBlock(segmentId, blockId,
@@ -821,9 +827,9 @@ void Osd::putBlockEndProcessor(uint32_t requestId, uint32_t sockfd,
                     _storageModule->createBlock(segmentId, blockId,
                             blockData.info.blockSize);
 
-                    if (isParity && UPDATE_SCHEME == PLR) {
+                    if (isParity && _updateScheme == PLR) {
                         _storageModule->reserveBlockSpace(segmentId, blockId, 0,
-                                blockData.info.blockSize, blockData.info.blockSize + RESERVE_SPACE_SIZE);
+                                blockData.info.blockSize, blockData.info.blockSize + _reservedSpaceSize);
                     }
 
                     _storageModule->writeBlock(segmentId, blockId,

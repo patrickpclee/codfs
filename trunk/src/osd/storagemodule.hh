@@ -314,6 +314,9 @@ private:
 
     unordered_map<string, boost::shared_mutex*> _deltaRWMutexMap;
     mutex _deltaRWMutexMapMutex;
+
+    uint32_t _updateScheme;
+    uint64_t _reservedSpaceSize;
 };
 
 #endif

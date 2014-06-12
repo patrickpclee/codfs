@@ -433,5 +433,8 @@ private:
 
     vector<pair<uint64_t, uint32_t>> _latencyList; // <isUpdate, latency>
 
+    uint32_t _updateScheme;
+    uint64_t _reservedSpaceSize;
+
 };
 #endif

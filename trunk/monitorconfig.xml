@@ -1,10 +1,21 @@
 <?xml version="1.0" ?>
 <NcvfsConfig>
     <Communication>
-        <ServerPort>53000</ServerPort>  <!-- MONITOR PORT -->
+
+        <!-- MONITOR PORT -->
+        <ServerPort>53000</ServerPort>  
+
     </Communication>
-    <MonitorId>53000</MonitorId>        <!-- unique component ID -->
-    <SleepPeriod>15</SleepPeriod>       <!-- no. of sec before declaring failure  -->
-    <DeadPeriod>600</DeadPeriod>        <!-- no. of sec before triggering recovery -->
-    <UpdatePeriod>15</UpdatePeriod>     <!-- OSD status update interval in sec -->
+
+    <!-- unique component ID -->
+    <MonitorId>53000</MonitorId>        
+
+    <!-- no. of sec before declaring failure  -->
+    <SleepPeriod>15</SleepPeriod>       
+
+    <!-- no. of sec before triggering recovery -->
+    <DeadPeriod>600</DeadPeriod>        
+
+    <!-- OSD status update interval in sec -->
+    <UpdatePeriod>15</UpdatePeriod>     
 </NcvfsConfig>
