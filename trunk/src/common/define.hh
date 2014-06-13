@@ -56,7 +56,7 @@ typedef boost::unique_lock<RWMutex> writeLock;
 #define HOTNESS_ALG TOP_HOTNESS_ALG
 #define IO_THREADS 2
 #define IO_POLL_INTERVAL 10000
-#define USE_FSYNC
+//#define USE_FSYNC
 
 // monitor/selectionmodule.cc
 //#define RR_DISTRIBUTE
