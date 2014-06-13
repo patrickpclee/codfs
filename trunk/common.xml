@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<NcvfsConfig>
+<CodfsConfig>
 
 	<Components>
 	
@@ -57,4 +57,4 @@
 		<NumThreadPerPool>1</NumThreadPerPool>
 	</Communication>
 	
-</NcvfsConfig>
+</CodfsConfig>

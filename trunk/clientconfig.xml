@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<NcvfsConfig>
+<CodfsConfig>
 
 	<Fuse>
         <!-- segment size -->
@@ -83,4 +83,4 @@
 		<NumClientThreads>10</NumClientThreads>
     </Communication>
 
-</NcvfsConfig>
+</CodfsConfig>

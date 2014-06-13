@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+<CodfsConfig>
+
+	<Components>
+	
+		<MDS>
+            <!-- do not change -->
+            <count>1</count>        
+
+			<MDS0>
+                <!-- unique component ID -->
+                <id>50000</id>      
+
+                <!-- MDS IP -->
+                <ip>127.0.0.1</ip>  
+                
+                <!-- MDS PORT -->
+                <port>50000</port>  
+			</MDS0>
+		</MDS>
+		
+		<MONITOR>
+            <!-- do not change -->
+            <count>1</count>        
+            
+            <MONITOR0>
+                <!-- unique component ID -->
+                <id>53000</id>      
+
+                <!-- MONITOR IP -->
+                <ip>127.0.0.1</ip>  
+
+                <!-- MONITOR PORT -->
+                <port>53000</port>  
+			</MONITOR0>
+		</MONITOR>
+				
+	</Components>
+
+    <!-- CHANGING SETTINGS BELOW THIS LINE IS NOT RECOMMENDED -->
+	
+	<Communication>
+
+        <!-- polling interval in terms of us -->
+        <SendPollingInterval>1000</SendPollingInterval>
+        
+        <!-- timeout for select -->
+        <SelectTimeout>
+            <sec>0</sec>
+            <usec>10000</usec>
+        </SelectTimeout>
+	
+		<!-- Chunk Size used in transfer -->
+		<ChunkSize>512K</ChunkSize>
+
+		<!-- No of dispatch thread created for each thread pool -->
+		<NumThreadPerPool>1</NumThreadPerPool>
+	</Communication>
+	
+</CodfsConfig>

@@ -36,7 +36,7 @@ typedef boost::unique_lock<RWMutex> writeLock;
 // config/config.hh
 #define DEFAULT_CONFIG_PATH	"config.xml"
 #define DEFAUTT_COMMON_CONFIG "common.xml"
-#define XML_ROOT_NODE "NcvfsConfig"
+#define XML_ROOT_NODE "CodfsConfig"
 
 // datastructure/lowlockqueue.hh
 #define CACHE_LINE_SIZE 64

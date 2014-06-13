@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<CodfsConfig>
+    <Communication>
+
+        <!-- MONITOR PORT -->
+        <ServerPort>53000</ServerPort>  
+
+    </Communication>
+
+    <!-- unique component ID -->
+    <MonitorId>53000</MonitorId>        
+
+    <!-- no. of sec before declaring failure  -->
+    <SleepPeriod>15</SleepPeriod>       
+
+    <!-- no. of sec before triggering recovery -->
+    <DeadPeriod>600</DeadPeriod>        
+
+    <!-- OSD status update interval in sec -->
+    <UpdatePeriod>15</UpdatePeriod>     
+</CodfsConfig>

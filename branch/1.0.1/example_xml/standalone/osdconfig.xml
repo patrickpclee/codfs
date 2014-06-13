@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<CodfsConfig>
+    <Storage>
+        <!-- location for storing uploaded chunks -->
+        <BlockLocation>./osd_block/</BlockLocation>                         
+    	
+        <!-- capacity of chunk storage -->
+        <BlockCapacity>100G</BlockCapacity>                                 
+
+        <!-- FO=0, FL=1, PL=2, PLR=3 -->
+        <UpdateScheme>3</UpdateScheme>                                      
+
+        <!-- reserved space size (used by PLR only, multiples of chunk size) -->
+        <ReservedSpaceSize>4M</ReservedSpaceSize>                                   
+
+        <!-- CHANGING SETTINGS BELOW THIS LINE IS NOT RECOMMENDED -->
+
+    </Storage>
+	<ThreadPool>
+        <!-- no. of threads for handling client requests -->
+        <NumThreads>10</NumThreads>                                         
+	</ThreadPool>
+</CodfsConfig>

@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<NcvfsConfig>
+<CodfsConfig>
     <Communication>
 
         <!-- MONITOR PORT -->
@@ -18,4 +18,4 @@
 
     <!-- OSD status update interval in sec -->
     <UpdatePeriod>15</UpdatePeriod>     
-</NcvfsConfig>
+</CodfsConfig>

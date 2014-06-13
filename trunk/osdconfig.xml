@@ -1,5 +1,5 @@
 <?xml version="1.0" ?>
-<NcvfsConfig>
+<CodfsConfig>
     <Storage>
         <!-- location for storing uploaded chunks -->
         <BlockLocation>./osd_block/</BlockLocation>                         
@@ -20,4 +20,4 @@
         <!-- no. of threads for handling client requests -->
         <NumThreads>10</NumThreads>                                         
 	</ThreadPool>
-</NcvfsConfig>
+</CodfsConfig>
