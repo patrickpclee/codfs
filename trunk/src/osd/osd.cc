@@ -59,7 +59,7 @@ Osd::Osd(uint32_t selfId) {
 
     _updateScheme = configLayer->getConfigInt("Storage>UpdateScheme");
     if (_updateScheme == PLR) {
-        _reservedSpaceSize = configLayer->getConfigLong("Storage>ReservedSpaceSize");
+        _reservedSpaceSize = stringToByte(configLayer->getConfigString("Storage>ReservedSpaceSize"));
     } else {
         _reservedSpaceSize = 0; // important
     }
