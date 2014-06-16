@@ -14,9 +14,10 @@ CROSS_COMPILE =
 OPTIMIZE := -O2
 WARNINGS := -Wall 
 EXTRA_CFLAGS := -g -std=c++0x
+LIBS := -lpthread  -lmongoclient -lboost_thread -lboost_filesystem -lboost_system 
 
 INC_DIR   =
-SRC_DIR   =	../coding ../common ./config ../../lib/tinyxml ../../lib/jerasure
+SRC_DIR   =	../coding ../common ../config ../../lib/tinyxml ../../lib/jerasure
 OBJ_DIR   = ./obj
 EXTRA_SRC = 
 EXCLUDE_FILES = ../common/garbagecollector.cc ../common/msgmemorypool.cc ../common/netfunc.cc
@@ -107,7 +108,7 @@ $(TARGET): $(all_objs)
 else
 $(TARGET): LD = $(if $(strip $(src-cpp) $(src-cc) $(src-cxx)),$(G++),$(GCC))
 $(TARGET): $(all_objs)
-	$(LD) $(LDFLAGS)  $(all_objs) -o $@
+	$(LD) $(LDFLAGS)  $(all_objs) -o $@ $(LIBS)
 endif
 
 .mkdir:

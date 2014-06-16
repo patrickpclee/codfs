@@ -55,12 +55,5 @@ public:
 	 */
 	vector<FileMetaData> listFolder (uint32_t clientId, const string &inpath);
 
-private:
-	/**
-	 * @brief	Covert Path to Real One
-	 *
-	 * @param	path	Path
-	 */
-	string convertPath (const string &path);
 };
 #endif

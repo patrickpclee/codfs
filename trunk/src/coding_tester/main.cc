@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <dirent.h>
+#include <boost/lexical_cast.hpp>
 #include "../config/config.hh"
 #include "../coding/coding.hh"
 #include "../coding/raid0coding.hh"
