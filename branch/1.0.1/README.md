@@ -276,8 +276,10 @@ $ make linux-AMD64
 Copy IOZone executable to CodFS root, and execute the following:
 
 ```
-$ ./iozone -Ra -+n -i0 -i2 -s 4g -r 16m -e -c -w -f mountdir/iozonetest
+$ ./iozone -Ra -+n -i0 -i2 -s 4g -r 128k -e -c -w -f mountdir/iozonetest
 ```
+
+This will create a 4GB file and perform random read/write with 128KB record size.
 
 Contact
 =================
