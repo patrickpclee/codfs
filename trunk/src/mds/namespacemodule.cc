@@ -15,12 +15,6 @@ extern ConfigLayer* configLayer;
  * @brief	Default Constructor, Read Setting From Config
  */
 NameSpaceModule::NameSpaceModule () {
-	_basePath = configLayer->getConfigString("MetaData>BasePath");
-
-	if (*(--_basePath.end()) != '/')
-		_basePath = _basePath + "/";
-
-	debug("Base Path at %s\n", _basePath.c_str());
 }
 
 /**
@@ -99,10 +93,3 @@ void NameSpaceModule::renameFile (uint32_t clientId, const string &path, const s
 	return ;
 }
 
-/**
- * @brief	Covert Path to Real One
- */
-string NameSpaceModule::convertPath (const string &path)
-{
-	return _basePath + path;
-}

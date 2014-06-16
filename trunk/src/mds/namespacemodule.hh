@@ -62,8 +62,5 @@ private:
 	 * @param	path	Path
 	 */
 	string convertPath (const string &path);
-
-	/// Base Path of the Namespace Tree
-	string _basePath;
 };
 #endif
