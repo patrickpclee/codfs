@@ -16,7 +16,7 @@ Users can use apt-get to install the required libraries.
 
  - build-essential (build-essential)
  - scons (scons)
- - boost libraries (libboost-dev, libboost-program-options-dev, libboost-thread-dev, libboost-filesystem-dev)
+ - boost libraries version 1.5x (libboost-dev, libboost-program-options-dev, libboost-thread-dev, libboost-filesystem-dev)
  - FUSE (libfuse-dev)
  - openssl (libssl-dev)
  - pkg-config (pkg-config)
@@ -177,7 +177,8 @@ Start the components in the following order
  
 
  - Assign a `component_id` that is unique from MDS, MONITOR, other OSDs and clients
- - Use "ifconfig" to check the name of the network interface (e.g., eth0)
+ - Use "ifconfig" to check the name of the network interface (e.g., eth0). If multiple interfaces exist, select the one 
+ that can be reached by other components 
 
             
 
