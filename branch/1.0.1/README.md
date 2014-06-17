@@ -33,7 +33,7 @@ The following libraries have to be compiled and installed manually:
 
 ```
 $ cd lib/protobuf-2.4.1
-$ ./configure; make
+$ ./configure; make clean; make
 $ sudo make install
 $ sudo ln -s /usr/local/lib/libprotobuf.so.7 /usr/lib/libprotobuf.so.7
 $ sudo ln -s /usr/local/lib/libprotoc.so.7 /usr/lib/libprotoc.so.7
@@ -212,7 +212,7 @@ Recovery
 Automatic Recovery
 -------------------------------------
 
-CodFS does not detect and recover automatically. 
+CodFS does not automatically recover by default.
 To enable this features, uncomment the line `#define TRIGGER_RECOVERY` in `src/common/define.hh`
 
 **Note**
@@ -230,7 +230,7 @@ To simulate failure, kill the OSD process on one of the OSD hosts
 $ pkill -9 OSD
 ```
 
-To force CodFS to detect and recovery from failures, send a signal to the MONITOR process on the MONITOR host
+To force failure detection and recovery, send a signal to the MONITOR process on the MONITOR host
 
 ```
 $ pkill -USR1 MONITOR
@@ -263,9 +263,9 @@ $ dd if=mountdir/ddtest of=/dev/null count=256 bs=16M
 Test random write throughput using IOzone
 ---------------------------------------------
 
-Download latest IOZone tarball from http://www.iozone.org/.
+Download latest IOzone tarball from http://www.iozone.org/.
 
-Compiling iozone from source
+Compile IOzone from source
 
 ```
 $ tar xf iozone3_424.tar
@@ -273,7 +273,7 @@ $ cd iozone3_424/src/current
 $ make linux-AMD64
 ```
 
-Copy IOZone executable to CodFS root, and execute the following:
+Copy the IOzone executable to CodFS root, and execute the following:
 
 ```
 $ ./iozone -Ra -+n -i0 -i2 -s 4g -r 128k -e -c -w -f mountdir/iozonetest
