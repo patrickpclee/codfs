@@ -1,7 +1,0 @@
-rsync -av ~/shb118/ncvfs/trunk -e ssh node11:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node11 Complete'
-rsync -av ~/shb118/ncvfs/trunk -e ssh node12:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node12 Complete'
-rsync -av ~/shb118/ncvfs/trunk -e ssh node13:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node13 Complete'
-rsync -av ~/shb118/ncvfs/trunk -e ssh node14:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node14 Complete'
-rsync -av ~/shb118/ncvfs/trunk -e ssh node15:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node15 Complete'
-rsync -av ~/shb118/ncvfs/trunk -e ssh node16:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node16 Complete'
-rsync -av ~/shb118/ncvfs/trunk -e ssh node17:~/shb118/ncvfs > /dev/null ; echo 'Rsync to node17 Complete'

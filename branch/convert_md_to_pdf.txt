@@ -1,0 +1,6 @@
+README.md is formatted using Github Flavoured Markdown.
+
+To convert to pdf:
+> sudo apt-get install rubygems wkhtmltopdf
+> sudo gem install gimli
+> gimli -f ./README.md

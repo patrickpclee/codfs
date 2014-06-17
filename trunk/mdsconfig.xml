@@ -1,22 +1,35 @@
 <?xml version="1.0" ?>
-<NcvfsConfig>
+<CodfsConfig>
     <Communication>
-        <ServerPort>50000</ServerPort>
+        <!-- MDS PORT -->
+        <ServerPort>50000</ServerPort> 
     </Communication>
 
 	<MetaData>
-		<BasePath>/tmp/ncvfs</BasePath>
 
 		<MongoDB>
-			<Host>192.168.50.98</Host>
-			<Database>ncvfs</Database>
+            <!-- MongoDB server IP -->
+            <Host>192.168.50.98</Host> 
 
-			<User>ncvfs</User>
-			<!-- Digested Password -->
-			<Password>cf8b7fa0b1bcd277da8217f04f498bd0</Password>
+            <!-- MongoDB port -->
+            <Port>27017</Port> 
+
+            <!-- Database name -->
+            <Database>codfs</Database> 
+
+            <!-- Database user -->
+            <User>codfs</User>         
+
+            <!-- Database PW MD5 digest -->
+            <Password>cf8b7fa0b1bcd277da8217f04f498bd0</Password> 
 		</MongoDB>
-	</MetaData>
 
+
+	</MetaData>
+    
+    <!-- CHANGING SETTINGS BELOW THIS LINE IS NOT RECOMMENDED -->
+
+    <!-- parameters of hotness algorithm (deprecated) -->
 	<Hotness>
 		<TopK>
 			<THRESHOLD1>10</THRESHOLD1>
@@ -25,4 +38,4 @@
 			<HottestCount>64</HottestCount>
 		</TopK>
 	</Hotness>
-</NcvfsConfig>
+</CodfsConfig>
