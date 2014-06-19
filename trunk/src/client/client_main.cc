@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
 				if (vm.count("k") && vm.count("m") && vm.count("w")) {
 					codingSetting = RSCoding::generateSetting(k,m,w);
 				} else {
-					cout << "Please specify [n,k,m,w]" << endl;
+					cout << "Please specify [k,m,w]" << endl;
 					return 1;
 				}
 			}

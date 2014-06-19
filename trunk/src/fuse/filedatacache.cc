@@ -16,7 +16,7 @@ FileDataCache::FileDataCache() {
 
     _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
     int coding = configLayer->getConfigInt("Fuse>codingScheme");
-    int n, k, m;
+    int n, k, m, w;
     switch (coding) {
         case 0:
             n = configLayer->getConfigInt("Fuse>RAID0>N");
@@ -34,18 +34,18 @@ FileDataCache::FileDataCache() {
             _codingSetting = Raid5Coding::generateSetting(n);
             break;
         case 3:
-            n = configLayer->getConfigInt("Fuse>RS>N");
             k = configLayer->getConfigInt("Fuse>RS>K");
             m = configLayer->getConfigInt("Fuse>RS>M");
+            w = configLayer->getConfigInt("Fuse>RS>W");
             _codingScheme = RS_CODING;
-            _codingSetting = RSCoding::generateSetting(n, k, m);
+            _codingSetting = RSCoding::generateSetting(k, m, w);
             break;
         case 4:
             n = configLayer->getConfigInt("Fuse>EMBR>N");
             k = configLayer->getConfigInt("Fuse>EMBR>K");
-            m = configLayer->getConfigInt("Fuse>EMBR>M");
+            w = configLayer->getConfigInt("Fuse>EMBR>W");
             _codingScheme = EMBR_CODING;
-            _codingSetting = EMBRCoding::generateSetting(n, k, m);
+            _codingSetting = EMBRCoding::generateSetting(n, k, w);
             break;
         case 5:
             n = configLayer->getConfigInt("Fuse>RDP>N");
@@ -58,11 +58,11 @@ FileDataCache::FileDataCache() {
             _codingSetting = EvenOddCoding::generateSetting(n);
             break;
         case 7:
-            n = configLayer->getConfigInt("Fuse>CAUCHY>C_N");
             k = configLayer->getConfigInt("Fuse>CAUCHY>C_K");
             m = configLayer->getConfigInt("Fuse>CAUCHY>C_M");
+            w = configLayer->getConfigInt("Fuse>CAUCHY>C_W");
             _codingScheme = CAUCHY;
-            _codingSetting = CauchyCoding::generateSetting(n, k, m);
+            _codingSetting = CauchyCoding::generateSetting(k, m, w);
             break;
         default:
             debug("Invalid Test = %d\n", coding);
