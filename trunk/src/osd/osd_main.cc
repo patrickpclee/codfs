@@ -52,14 +52,26 @@ int main(int argc, char* argv[]) {
 	(void) dh; // avoid warning
 
 	char* interfaceName = NULL;
+	char* gwIP = NULL;
+	bool forward = false;
 	uint32_t selfId = 0;
 
 	if (argc < 3) {
 		cout << "Usage: ./OSD [ID] [NETWORK INTERFACE]" << endl;
+		cout << "Usage: ./OSD [ID] FORWARD [GATEWAY IP]" << endl;
 		exit(0);
 	} else {
 		selfId = atoi(argv[1]);
 		interfaceName = argv[2];
+		if (strcmp(interfaceName, "FORWARD") == 0) {
+			forward = true;
+			if (argc < 4) {
+				cout << "Usage: ./OSD [ID] [NETWORK INTERFACE]" << endl;
+				cout << "Usage: ./OSD [ID] FORWARD [GATEWAY IP]" << endl;
+				exit(0);
+			} else
+				gwIP = argv[3];
+		}
 	}
 
 	// create new OSD segment and communicator
@@ -67,6 +79,9 @@ int main(int argc, char* argv[]) {
 
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
+
+	if (forward)
+		communicator->setServerPort((uint16_t)selfId);
 
 	// set identity
 	communicator->setId(osd->getOsdId());
@@ -81,13 +96,22 @@ int main(int argc, char* argv[]) {
 	// 2. Receive Thread
 	thread receiveThread(&Communicator::waitForMessage, communicator);
 
-	uint32_t selfAddr = getInterfaceAddressV4(interfaceName);
-	uint16_t selfPort = communicator->getServerPort();
+	uint32_t selfAddr;
+	uint16_t selfPort;
+	if (forward) {
+		struct sockaddr_in addr;
+		inet_pton(AF_INET, gwIP, &(addr.sin_addr));
+		selfAddr = addr.sin_addr.s_addr;
+	} else
+		selfAddr = getInterfaceAddressV4(interfaceName);
+	selfPort = communicator->getServerPort();
+
 	printIp(selfAddr);
 	printf("Port = %hu\n",selfPort);
 
 	//communicator->connectAllComponents();
-	communicator->connectToMyself(Ipv4Int2Str(selfAddr), selfPort, OSD);
+	communicator->connectToMyself("127.0.0.1", selfPort, OSD);
+	//communicator->connectToMyself(Ipv4Int2Str(selfAddr), selfPort, OSD);
 	communicator->connectToMds();
 	communicator->connectToMonitor();
 	communicator->registerToMonitor(selfAddr, selfPort);
