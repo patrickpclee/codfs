@@ -214,6 +214,12 @@ public:
 	void connectToOsd(uint32_t ip, uint32_t port);
 
 	uint16_t getServerPort();
+
+	/**
+	 * Set the Server Port of the Communicator
+	 * @param port Server Port
+	 */
+	void setServerPort(uint16_t port);
 protected:
 
 	/**

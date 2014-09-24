@@ -1054,3 +1054,7 @@ uint32_t Communicator::putSmallSegment(uint32_t componentId,
 uint16_t Communicator::getServerPort() {
     return _serverPort;
 }
+
+void Communicator::setServerPort(uint16_t port) {
+	_serverPort = port;
+}
