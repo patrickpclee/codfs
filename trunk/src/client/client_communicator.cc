@@ -264,7 +264,13 @@ void ClientCommunicator::getOsdListAndConnect() {
 		vector<struct OnlineOsd>& onlineList =
 				getOsdListRequestMsg->getOsdList();
 		for (uint32_t i = 0; i < onlineList.size(); i++)
-			connectToOsd(onlineList[i].osdIp, onlineList[i].osdPort);
+			if (_forwardMode) {
+				sockaddr_in m_addr;
+				inet_pton(AF_INET, _forwardIp.c_str(), &m_addr.sin_addr);
+				uint32_t ip = m_addr.sin_addr.s_addr;
+				connectToOsd(ip, onlineList[i].osdPort);
+			} else
+				connectToOsd(onlineList[i].osdIp, onlineList[i].osdPort);
 	}
 	
 }

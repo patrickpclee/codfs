@@ -376,5 +376,7 @@ protected:
 
 	atomic<uint32_t> _updateId;
 
+	bool _forwardMode;
+	string _forwardIp;
 };
 #endif

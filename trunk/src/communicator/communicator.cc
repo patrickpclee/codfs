@@ -95,6 +95,15 @@ Communicator::Communicator() {
     _pollingInterval = configLayer->getConfigInt(
             "Communication>SendPollingInterval");
 
+	int forwardMode = configLayer->getConfigInt("Communication>ForwardMode");
+	if (forwardMode == 1) {
+		_forwardMode = true;
+		_forwardIp = configLayer->getConfigString("Communication>ForwardServer");
+	} else {
+		_forwardMode = false;
+		_forwardIp = "";
+	}
+
     debug("%s\n", "Communicator constructed");
 
 }
@@ -729,8 +738,12 @@ vector<struct Component> Communicator::parseConfigFile(string componentType) {
         else if (componentType == "CLIENT")
             component.type = CLIENT;
 
+		if (_forwardMode) {
+        	component.ip = _forwardIp;
+		} else 
+        	component.ip = ip;
+
         component.id = id;
-        component.ip = ip;
         component.port = (uint16_t) port;
 
         componentList.push_back(component);

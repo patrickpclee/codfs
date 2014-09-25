@@ -80,6 +80,8 @@
 	</Fuse>
 
     <Communication>
+		<ForwardMode>0</ForwardMode>
+		<ForwardServer></ForwardServer>
 		<NumClientThreads>10</NumClientThreads>
     </Communication>
 
