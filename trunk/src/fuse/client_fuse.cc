@@ -278,12 +278,15 @@ static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, st
 		uint32_t primary = fileMetaData._primaryList[segmentCount];
 		uint32_t segmentOffset = offset + sizeRead - (segmentCount * _segmentSize);	// offset within the segment
 		uint32_t readSize = min (_segmentSize - segmentOffset, (uint32_t)size - sizeRead);
+		readSize = min((uint32_t)(fileMetaData._size - offset - sizeRead), readSize);
 
 		// return immediately if data is cached, otherwise retrieve data from OSDs
 		uint32_t retstat = _fileDataCache->readDataCache(segmentId, primary, bufptr, readSize, segmentOffset);
 		bufptr += retstat;
 		sizeRead += retstat;
 		lastSegmentCount = segmentCount;
+		if (fileMetaData._size <= offset + sizeRead)
+			break;
 	}
 
 	// prefetch the next _prefetchCount segments
