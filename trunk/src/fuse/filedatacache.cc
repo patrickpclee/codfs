@@ -11,11 +11,7 @@ extern uint32_t _clientId;
 extern ClientCommunicator* _clientCommunicator;
 extern ConfigLayer* configLayer;
 
-FileDataCache::FileDataCache() {
-    // TODO: Read from XML
-
-    _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
-    int coding = configLayer->getConfigInt("Fuse>codingScheme");
+void FileDataCache::changeCoding(int coding) {
     int n, k, m, w;
     switch (coding) {
         case 0:
@@ -56,6 +52,7 @@ FileDataCache::FileDataCache() {
             n = configLayer->getConfigInt("Fuse>EVENODD>N");
             _codingScheme = EVENODD_CODING;
             _codingSetting = EvenOddCoding::generateSetting(n);
+
             break;
         case 7:
             k = configLayer->getConfigInt("Fuse>CAUCHY>C_K");
@@ -68,6 +65,14 @@ FileDataCache::FileDataCache() {
             debug("Invalid Test = %d\n", coding);
             break;
     }
+}
+
+FileDataCache::FileDataCache() {
+    // TODO: Read from XML
+
+    _segmentSize = stringToByte(configLayer->getConfigString("Fuse>segmentSize"));
+    int coding = configLayer->getConfigInt("Fuse>codingScheme");
+	changeCoding(coding);
 
     _lruSizeLimit = configLayer->getConfigInt("Fuse>lruSize");
     _writeBufferSize = configLayer->getConfigInt("Fuse>writeBufferSize");

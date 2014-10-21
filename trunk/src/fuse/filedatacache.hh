@@ -25,6 +25,7 @@ class FileDataCache {
 
 		void closeDataCache(uint64_t segmentId, bool sync = false);
 		void prefetchSegment(uint64_t segmentId, uint32_t primary);
+		void changeCoding(int coding);
 	private:
 		void writeBack(uint64_t segmentId);
 		void writeBackThread();
