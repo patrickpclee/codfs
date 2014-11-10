@@ -21,6 +21,7 @@ typedef boost::unique_lock<RWMutex> writeLock;
 
 // osd/storagemodule.cc
 #define MAX_OPEN_FILES 100
+// #define NO_WRITE
 
 // benchmark/benchmark.cc
 #define RANDOM_SHUFFLE_SEGMENT_ORDER

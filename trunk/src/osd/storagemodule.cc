@@ -690,8 +690,12 @@ uint32_t StorageModule::readFile(string filepath, char* buf, uint64_t offset,
         exit(-1);
     }
 
+#ifndef NO_WRITE
 // Read file contents into buffer
     uint32_t byteRead = pread(fileno(file), buf, length, offset);
+#else
+	uint32_t byteRead = length;
+#endif
 
     if (byteRead != length) {
         debug_error(
@@ -718,8 +722,12 @@ uint32_t StorageModule::writeFile(string filepath, char* buf, uint64_t offset,
         exit(-1);
     }
 
+#ifndef NO_WRITE
 // Write file contents from buffer
     uint32_t byteWritten = pwrite(fileno(file), buf, length, offset);
+#else
+	uint32_t byteWritten = length;
+#endif
 
     if (byteWritten != length) {
         debug_error("ERROR: Length = %d, byteWritten = %d\n", length,
