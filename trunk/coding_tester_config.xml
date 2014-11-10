@@ -1,4 +1,5 @@
-<CodingTesterConfig>
+<?xml version="1.0" ?>
+<CodfsConfig>
 
 	<SegmentFolder>./coding_tester_segment</SegmentFolder>
 	<BlockFolder>./coding_tester_block</BlockFolder>
@@ -41,4 +42,4 @@
 
 	<NumFailedOsd>2</NumFailedOsd>
     
-</CodingTesterConfig>
+</CodfsConfig>
