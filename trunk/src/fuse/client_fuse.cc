@@ -266,19 +266,22 @@ static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *f
 static int ncvfs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi) {
 	uint32_t fileId = fi->fh;
 	struct FileMetaData fileMetaData = getAndCacheFileMetaData(fileId);
-	uint32_t sizeRead = 0;
+	uint64_t sizeRead = 0;
 	uint32_t lastSegmentCount = 0;
 	char* bufptr = buf;
-	if((uint32_t)offset >= fileMetaData._size)
+	if(offset >= fileMetaData._size)
 		return 0;
 	while (sizeRead < size) {
 		// TODO: Check Read Size
 		uint32_t segmentCount = (offset + sizeRead) / _segmentSize;		// position of segment in the file
 		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
 		uint32_t primary = fileMetaData._primaryList[segmentCount];
-		uint32_t segmentOffset = offset + sizeRead - (segmentCount * _segmentSize);	// offset within the segment
-		uint32_t readSize = min (_segmentSize - segmentOffset, (uint32_t)size - sizeRead);
-		readSize = min((uint32_t)(fileMetaData._size - offset - sizeRead), readSize);
+		uint32_t segmentOffset = offset + sizeRead - ((uint64_t)segmentCount * _segmentSize);	// offset within the segment
+		debug("Read at %" PRIu64 " for %" PRIu64 ", Seg Cnt %" PRIu32 " off %" PRIu32 "\n", offset, size, segmentCount, segmentOffset);
+		uint32_t readSize = min (_segmentSize - segmentOffset, (uint32_t)(size - sizeRead));
+		if (fileMetaData._size - offset - sizeRead < readSize)
+			readSize = fileMetaData._size - offset - sizeRead;
+		debug("Seg Size %" PRIu32 ", Seg Off %" PRIu32 ", Size %" PRIu64 ", Size Read %" PRIu64 ", File Size %" PRIu64 ", Offset %" PRIu64 "\n", _segmentSize, segmentOffset, size, sizeRead, fileMetaData._size, offset);
 
 		// return immediately if data is cached, otherwise retrieve data from OSDs
 		uint32_t retstat = _fileDataCache->readDataCache(segmentId, primary, bufptr, readSize, segmentOffset);
@@ -302,7 +305,7 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 		off_t offset, struct fuse_file_info *fi) {
 	uint32_t fileId = fi->fh;
 	struct FileMetaData fileMetaData = getAndCacheFileMetaData(fileId);
-	uint32_t sizeWritten = 0;
+	uint64_t sizeWritten = 0;
 	const char* bufptr = buf;
 	while (sizeWritten < size) {
 		uint32_t segmentCount = (offset + sizeWritten) / _segmentSize;
@@ -320,12 +323,12 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 		uint64_t segmentId = fileMetaData._segmentList[segmentCount];
 		uint32_t primary = fileMetaData._primaryList[segmentCount];
 		uint32_t segmentOffset = offset + sizeWritten - (segmentCount * _segmentSize);
-		uint32_t writeSize = min (_segmentSize - segmentOffset, (uint32_t)size - sizeWritten);
+		uint32_t writeSize = min (_segmentSize - segmentOffset, (uint32_t)(size - sizeWritten));
 		uint32_t retstat = _fileDataCache->writeDataCache(segmentId, primary, bufptr, writeSize, segmentOffset, fileMetaData._fileType);
 		bufptr += retstat;
 		sizeWritten += retstat;
 	}
-	if((offset + sizeWritten) > (uint32_t)fileMetaData._size)
+	if((offset + sizeWritten) > fileMetaData._size)
 		fileMetaData._size = offset + sizeWritten;
 	_fileMetaDataCache->saveMetaData(fileMetaData);
 	return (int)sizeWritten;
