@@ -1,0 +1,86 @@
+<?xml version="1.0" ?>
+<CodfsConfig>
+
+	<Fuse>
+        <!-- segment size -->
+        <segmentSize>16M</segmentSize>                                  
+
+        <!-- specify the coding scheme used for upload (refer below) -->
+        <codingScheme>5</codingScheme>                                  
+
+        <!-- 0 -->
+        <RAID0>
+            <N>3</N>
+        </RAID0>
+
+        <!-- 1 -->
+        <RAID1>
+            <N>3</N>
+        </RAID1>
+
+        <!-- 2 -->
+        <RAID5>
+            <N>3</N>
+        </RAID5>
+        
+        <!-- 3 -->
+        <RS>
+            <K>4</K>
+            <M>2</M>
+            <W>8</W>
+        </RS>
+        
+        <!-- 4 -->
+        <EMBR>
+            <N>4</N>
+            <K>2</K>
+            <W>8</W>
+        </EMBR>
+
+        <!-- 5 -->
+        <RDP>
+            <N>6</N>
+        </RDP>
+
+        <!-- 6 -->
+        <EVENODD>
+            <N>7</N>
+        </EVENODD>
+
+        <!-- 6 -->
+        <CAUCHY>
+            <C_K>4</C_K>
+            <C_M>2</C_M>
+            <C_W>8</C_W>
+        </CAUCHY>
+
+        <!-- CHANGING SETTINGS BELOW THIS LINE IS NOT RECOMMENDED -->
+
+        <!-- size of write buffer -->
+        <writeBufferSize>10</writeBufferSize>                           
+
+        <!-- no. of write threads -->
+        <numWriteThread>10</numWriteThread>                             
+
+        <!-- preallocate segments during upload -->
+        <PreallocateSegmentNumber>0</PreallocateSegmentNumber>          
+
+        <!-- no. of future segments to prefetch -->
+        <prefetchCount>0</prefetchCount>                                
+
+        <!-- size of ring buffer for storing prefetch segments -->
+        <prefetchBufferSize>10</prefetchBufferSize>                     
+
+        <!-- no. of threads use for prefetch segments -->
+        <numPrefetchThread>10</numPrefetchThread>                       
+
+        <!-- size of LRU cache -->
+        <lruSize>2</lruSize>                                            
+
+	</Fuse>
+
+    <Communication>
+		<NumClientThreads>10</NumClientThreads>
+    </Communication>
+
+</CodfsConfig>

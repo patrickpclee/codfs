@@ -1,0 +1,41 @@
+<?xml version="1.0" ?>
+<CodfsConfig>
+    <Communication>
+        <!-- MDS PORT -->
+        <ServerPort>50000</ServerPort> 
+    </Communication>
+
+	<MetaData>
+
+		<MongoDB>
+            <!-- MongoDB server IP -->
+            <Host>127.0.0.1</Host> 
+
+            <!-- MongoDB port -->
+            <Port>27017</Port> 
+
+            <!-- Database name -->
+            <Database>codfs</Database> 
+
+            <!-- Database user -->
+            <User>codfs</User>         
+
+            <!-- Database PW MD5 digest -->
+            <Password>cf8b7fa0b1bcd277da8217f04f498bd0</Password> 
+		</MongoDB>
+
+
+	</MetaData>
+    
+    <!-- CHANGING SETTINGS BELOW THIS LINE IS NOT RECOMMENDED -->
+
+    <!-- parameters of hotness algorithm (deprecated) -->
+	<Hotness>
+		<TopK>
+			<THRESHOLD1>10</THRESHOLD1>
+			<THRESHOLD2>20</THRESHOLD2>
+			<HotCount>64</HotCount>
+			<HottestCount>64</HottestCount>
+		</TopK>
+	</Hotness>
+</CodfsConfig>

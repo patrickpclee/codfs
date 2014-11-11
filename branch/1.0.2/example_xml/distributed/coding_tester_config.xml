@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<CodfsConfig>
+
+	<SegmentFolder>./coding_tester_segment</SegmentFolder>
+	<BlockFolder>./coding_tester_block</BlockFolder>
+    <RepairFolder>./coding_tester_repair</RepairFolder>
+
+	<SelectedCodingScheme>RDP</SelectedCodingScheme>
+
+	<CodingSetting>
+		<RAID0>
+			<n>3</n>
+		</RAID0>
+		<RAID1>
+			<n>3</n>
+		</RAID1>
+		<RAID5>
+			<n>7</n>
+		</RAID5>
+		<EVENODD>
+			<n>7</n>
+		</EVENODD>
+		<RDP>
+			<n>6</n>
+		</RDP>
+		<RS>
+			<k>6</k>
+			<m>2</m>
+			<w>8</w>
+		</RS>
+		<CAUCHY>
+			<k>3</k>
+			<m>3</m>
+			<w>3</w>
+		</CAUCHY>
+		<EMBR>
+			<n>4</n>
+			<k>2</k>
+			<w>8</w>
+		</EMBR>
+	</CodingSetting>
+
+	<NumFailedOsd>2</NumFailedOsd>
+    
+</CodfsConfig>
