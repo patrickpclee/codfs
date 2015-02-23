@@ -53,25 +53,18 @@ int main(int argc, char* argv[]) {
 
 	char* interfaceName = NULL;
 	char* gwIP = NULL;
-	bool forward = false;
+//	bool forward = false;
 	uint32_t selfId = 0;
+	uint16_t selfPort = 0;
 
 	if (argc < 3) {
-		cout << "Usage: ./OSD [ID] [NETWORK INTERFACE]" << endl;
-		cout << "Usage: ./OSD [ID] FORWARD [GATEWAY IP]" << endl;
+		cout << "Usage: ./OSD [ID] [NETWORK INTERFACE] (Port)" << endl;
 		exit(0);
 	} else {
 		selfId = atoi(argv[1]);
 		interfaceName = argv[2];
-		if (strcmp(interfaceName, "FORWARD") == 0) {
-			forward = true;
-			if (argc < 4) {
-				cout << "Usage: ./OSD [ID] [NETWORK INTERFACE]" << endl;
-				cout << "Usage: ./OSD [ID] FORWARD [GATEWAY IP]" << endl;
-				exit(0);
-			} else
-				gwIP = argv[3];
-		}
+		if (argc >= 4)
+			selfPort = atoi(argv[3]);
 	}
 
 	// create new OSD segment and communicator
@@ -80,7 +73,7 @@ int main(int argc, char* argv[]) {
 	// create new communicator
 	OsdCommunicator* communicator = osd->getCommunicator();
 
-	if (forward)
+	if (selfPort > 0)
 		communicator->setServerPort((uint16_t)selfId);
 
 	// set identity
@@ -97,13 +90,7 @@ int main(int argc, char* argv[]) {
 	thread receiveThread(&Communicator::waitForMessage, communicator);
 
 	uint32_t selfAddr;
-	uint16_t selfPort;
-	if (forward) {
-		struct sockaddr_in addr;
-		inet_pton(AF_INET, gwIP, &(addr.sin_addr));
-		selfAddr = addr.sin_addr.s_addr;
-	} else
-		selfAddr = getInterfaceAddressV4(interfaceName);
+	selfAddr = getInterfaceAddressV4(interfaceName);
 	selfPort = communicator->getServerPort();
 
 	printIp(selfAddr);
