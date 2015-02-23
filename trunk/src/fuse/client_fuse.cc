@@ -253,6 +253,12 @@ static int ncvfs_create(const char * path, mode_t mode, struct fuse_file_info *f
 	_fileMetaDataCache->saveMetaData(fileMetaData);
 	fi->fh = fileMetaData._id;
 
+	if (strncmp("/changecode",path,11) == 0) {
+		int coding = path[11] - '0';
+		fprintf(stderr, "Change Coding to %d\n", coding);
+		_fileDataCache->changeCoding(coding);
+	}
+
 	FILE* fp = fopen(fpath.c_str(),"w");
 	if (fp == NULL) {
 		perror("fopen()");
