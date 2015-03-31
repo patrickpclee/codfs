@@ -333,7 +333,7 @@ static int ncvfs_write(const char *path, const char *buf, size_t size,
 		uint32_t segmentOffset = offset + sizeWritten - (segmentCount * _segmentSize);
 		uint32_t writeSize = _segmentSize - segmentOffset;
 		if (size - sizeWritten < writeSize)
-			writeSize = _segmentSize - segmentOffset;
+			writeSize = size - sizeWritten;
 		uint32_t retstat = _fileDataCache->writeDataCache(segmentId, primary, bufptr, writeSize, segmentOffset, fileMetaData._fileType);
 		bufptr += retstat;
 		sizeWritten += retstat;
